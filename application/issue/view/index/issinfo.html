@@ -1,0 +1,210 @@
+{include file="../application/common/headeruser.html" title="事务信息" }
+
+<!-- pagewrap  -->
+<div class="container-fluid">
+	<h4>
+		{$username}&nbsp;【{$rolename}】查看
+		
+	</h4>
+	<h3>
+		<!-- <span class="bg-info">{$typename}事务信息</span>  -->
+		<span class="label label-info glyphicon glyphicon-pushpin">&nbsp;事务信息</span>&nbsp;<button type="button" class="btn btn-sm btn-primary btnClose">关闭本页</button>	
+		<!-- <button type="submit" class="btn btn-primary btn-sm btnReturn" >返回</button> -->
+		<!-- <a class="btn btn-primary btn-xs" role="button" href="{$home}/issue/index/index/role/{$role}/type/{$type}">返回</a> -->
+	</h3>
+
+	<div class="tab-content">
+		
+		<!-- 事务基本信息表单 -->
+		<table class="table table-bordered table-striped table-responsive table-condensed">
+			<tbody>
+				<tr>
+					<td>
+						<div class="col-sm-4" ><p><strong>名称：</strong><span class="label label-info" style="font-size:14px;">{$topic}</span></p></div>
+						<div class="col-sm-2" ><p><strong>事务类型：</strong>{$typesubname}</p></div>
+						<div class="col-sm-2" ><p><strong>撰写人：</strong>{$writer}</p></div>
+						<div class="col-sm-3" ><p><strong>所属部门：</strong>{$dept}</p></div>
+					</td>	
+				</tr>
+				
+				<tr>
+					<td>
+						<div class="col-sm-6"><p><strong>事务简介：</strong>{$abstract}</p></div>
+						<div class="col-sm-2"><p><strong>事务编号：</strong>{$issnum}</p></div>
+						<div id="divRel" class="col-sm-4">
+							<p><strong>关联{$typename}：</strong>
+								{if $reltopic!='null'}
+									<a href="{$home}/patent/index/patinfo/id/{$pat_id}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="专利信息">{$reltopic}</a>	
+								{else/}
+									无
+								{/if}
+							</p>
+						</div>
+					</td>					
+				</tr>
+				
+				<tr>
+					<td>
+						<div class="col-sm-2">
+							<a href="{$home}/issue/index/issrecords/id/{$id}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="事务过程">
+								<p><strong>事务状态：</strong>{$status}</p>
+							</a>
+						
+						</div>
+						
+						<div id="divExecuter" class="col-sm-2"><p><strong>执行人：</strong>{$executer} </p></div>
+						<div id="divActdetail" class="col-sm-6"><p><strong>审批意见：</strong>{$actdetail}</p></div>
+						
+					</td>				
+				</tr>
+				
+				<tr>
+					<td>
+						<div class="col-sm-2"><p><strong>填报/修改日期：</strong>{$addnewdate}</p></div>
+						<div class="col-sm-2"><p><strong>提交日期：</strong>{$submitdate}</p></div>
+						<div class="col-sm-2"><p><strong>审核日期：</strong>{$auditrejectdate}</p></div>
+						<div class="col-sm-2"><p><strong>审批日期：</strong>{$resultdate}</p></div>
+						<div class="col-sm-2"><p><strong>执行开始日期：</strong>{$operatestartdate}</p></div>
+						<div class="col-sm-2"><p><strong>关闭日期：</strong>{$finishdate}</p></div>
+						
+					</td>				
+				</tr>
+				
+				<tr>
+					<td>
+						<div id="divReport" class="col-sm-6"><p><strong>最近执行情况简报：</strong>{$report}</p></div>
+						<div id="divReportdate" class="col-sm-4"><p><strong>简报日期：</strong>{$reportdate}</p></div>
+					</td>					
+				</tr>
+			</tbody>
+		</table>
+		
+		
+		
+		
+		<!-- 附件表单 -->
+		<h3><span class="label label-info glyphicon glyphicon-pushpin">&nbsp;事务附件</span></h3>
+		<div id="divAtt" class="table-responsive">
+			<table id="tblAtt" class="table table-bordered table-hover table-condensed">
+				<thead>
+					<tr>
+						<!-- <th>选择</th> -->
+						<th>序号</th>
+						<th>附件类型</th>
+						<th>附件名称</th>
+						<th>上传日期</th>
+						<th>上传人</th>
+						<th>系统角色</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="atts" id="vo" empty="暂无附件"}
+					<tr>
+						<!-- <td><input type="checkbox" check=""></td> -->
+						<td>{$i}</td>
+						<td>{$vo.atttype}</a></td>
+						<td>{$vo.name}</a></td>
+						<td>{$vo.uploaddate}</td>
+						<td>{$vo.uploader}</td>
+						<td>{$vo.rolename}</td>
+						<td>
+							<!-- {eq name="vo.rolename" value="$rolename"} -->
+								<!-- <a href="{$home}/attachment/index/download/id/{$vo.id}">下载</a>&nbsp; -->
+							<!-- {else/} -->
+								
+							<!-- {/eq} -->
+							{in name="$rolename" value="撰写人,审核人,批准人,执行人"}
+									<a href="{$home}/attachment/index/download/id/{$vo.id}">下载</a>&nbsp;
+							{/in}
+						</td>
+					</tr>
+					{/volist}
+				
+				</tbody>
+				
+			</table>
+			
+		
+		</div>
+		
+		<hr>
+		
+		<button type="button" class="btn btn-sm btn-primary  btnClose">关闭本页</button>	
+		
+		<!-- <div class="btn-group-sm"> -->
+			<!-- <button type="submit" class="btn btn-primary btnReturn" >返回</button> -->
+			<!-- <a class="btn btn-primary" role="button" href="{$home}/issue/index/index/role/{$role}/type/{$type}">返回</a>				 -->
+		<!-- </div> -->
+	
+	</div>
+</div>
+
+</br>
+
+
+
+<!-- /pagewrap  -->
+
+<script>
+$(document).ready(function(){
+
+	$("#divSel").hide();
+	$("#divActdetail").hide();
+	$("#divExecuter").hide();
+	$("#divReport").parent().hide();
+	$("#divReportdate").hide();
+	
+	<!-- $(".btnReturn").click(function(){ -->
+		<!-- window.location.href="{$home}/issue/index/index/role/{$role}/type/{$type}"; -->
+	<!-- }); -->
+	
+	<!-- 根据{$status}的值，控制$("#divActdetail")和$("#divExecuter")是否显示 -->
+	
+	<!-- 根据{$role}的值，显示不同的div -->
+	switch("{$status}"){
+		case '审核通过':
+			$("#divActdetail").show();
+		break;
+		
+		case '退回修改':
+			$("#divActdetail").show();
+		break;
+		
+		case '批准':
+			$("#divActdetail").show();
+			$("#divExecuter").show();
+		break;
+		
+		case '否决':
+			$("#divActdetail").show();
+		break;
+		
+		case '执行中':
+			$("#divActdetail").show();
+			$("#divExecuter").show();
+			$("#divReport").parent().show();
+			$("#divReportdate").show();
+		break;
+		
+		case '完成':
+			$("#divActdetail").show();
+			$("#divExecuter").show();
+			$("#divReport").parent().show();
+			$("#divReportdate").show();
+		break;
+		
+		default:
+			
+		break;
+	}
+	
+	$(".btnClose").click(function(){
+		window.close();
+	});
+	
+});
+</script>
+
+	
+{include file="../application/common/footer.html"}

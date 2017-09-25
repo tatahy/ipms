@@ -1,0 +1,377 @@
+{include file="../application/common/header.html" title="ipmsv3" }
+
+<!-- pagewrap  -->
+
+<div class="container-fluid">
+	<h4>搜索——精细查找&nbsp;<button type="submit" class="btn btn-primary btn-sm btnClose" >关闭本页</button></h4>
+	<!-- <div class="row" > -->
+		<form class="form col-sm-offset-0" role="form" method="post" action="{$home}/search/index/searchresult">
+			<table class="table table-bordered table-striped table-responsive table-condensed">
+				<tbody>
+					<tr>
+						<td>
+							<div class="form-group col-sm-2">
+								<label class="control-label" for="selType">分类</label>
+								<select class="form-control" id="selType" name="type" >
+									<option value="all">…不限…</option>
+									<option value="project">项目</option>
+									<option value="patent">专利</option>
+									<option value="thesis">论文</option>
+									<option value="issue">事务</option>
+								</select>
+							</div>
+							
+							<!-- <div class="form-group col-sm-4"> -->
+								<!-- <label class="" for="topic">关键词（题目/作者/部门/简介…)</label> -->
+								<!-- <input class="form-control" id="topic" name="topic" type="text" placeholder="关键词（题目/作者/部门/简介…)"> -->
+							<!-- </div> -->
+							
+							<div class="form-group col-sm-4">
+								<label class="" for="topic">题目</label>
+								<input class="form-control" id="topic" name="topic" type="text" placeholder="题目（关键词）">
+							</div>
+							
+							<div class="form-group col-sm-2">
+								<label class="" for="writer">作者</label>
+								<input class="form-control" id="writer" name="writer" type="text" placeholder="姓名（撰写人）">
+							</div>
+							
+							<div class="form-group col-sm-3">
+								<label class="" for="dept">部门</label>
+								<input class="form-control" id="dept" name="dept" type="text" placeholder="部门（关键词）">
+							</div>
+							
+							<!-- <div class="date form-group col-sm-2"> -->
+								<!-- <label class="" for="date">查询日期的类型</label> -->
+								<!-- <select class="form-control" id="selDate" name="date" > -->
+									<!-- <option value="submitdate">提交日期</option> -->
+									<!-- <option value="auditdate">审查日期</option> -->
+									<!-- <option value="aprovedate">批准日期</option> -->
+									<!-- <option value="resultdate">完成日期</option> -->
+									
+								<!-- </select> -->
+							<!-- </div> -->
+							
+							<!-- class="date" -->
+							<div id="divDate" class="date form-group col-sm-2">
+								<label class="" for="date">查询日期</label>
+								<select class="form-control" id="date" name="date" readonly>
+									<option value="submitdate" checked>提交日期</option>
+								</select>
+							</div>
+							
+							<div id="divDateRange"class="date form-group col-sm-1">
+								<input type="radio" name="daterange" value="leq"><span><strong>&nbsp;&le;</strong></span><br>
+								<input type="radio" name="daterange" value="geq"><span><strong>&nbsp;&ge;</strong></span><br>
+								<input type="radio" name="daterange" value="btw"><span><strong>&nbsp;介于</strong></span>	
+							</div>
+							
+							<div id="divStartDate" class="date form-group col-sm-2">
+								<label class="" for="startdate">查询日期（起始）</label>
+								<input class="form-control" id="startdate" name="startdate" type="text" value="{$lastday}" placeholder="yyyy-mm-dd">
+							</div>
+							
+							<div id="divEndDate" class="date form-group col-sm-2">
+								<label class="" for="enddate">查询日期（截止）</label>
+								<input class="form-control" id="enddate" name="enddate" type="text" value="{$today}" placeholder="yyyy-mm-dd">
+							</div>	
+							<!-- /class="date" -->
+							
+						</td>	
+					</tr>
+					
+					<tr class="project">
+						<td>
+							<div class="form-group col-sm-2">
+								<label class="bg-default" for="selProType">&nbsp;<span class="glyphicon glyphicon-inbox">&nbsp;<strong>项目类型</strong>&nbsp;</span></label>
+								<select class="form-control" id="selProType" name="protype" >
+									<option value="不限">…不限…</option>
+									<option value="发明专利">发明专利</option>
+									
+								</select>
+							</div>
+							
+							<div class="form-group col-sm-4">
+								<label class="" for="num">编号</label>
+								<input class="form-control" id="num" type="text" placeholder="">
+							</div>
+						</td>	
+					</tr>
+					
+					<tr class="patent">
+						<td>
+							<!-- <h4><span class="glyphicon glyphicon-wrench">&nbsp;专利</span></h4> -->
+							<div class="form-group col-sm-2">
+								<label class="bg-warning" for="selPatType">&nbsp;<span class="glyphicon glyphicon-wrench">&nbsp;<strong>专利类型</strong>&nbsp;</span></label>
+								<select class="form-control" id="selPatType" name="pattype" >
+									<option value="不限">…不限…</option>
+									<option value="发明专利">发明专利</option>
+									<option value="实用新型专利">实用新型专利</option>
+									<option value="外观设计专利">外观设计专利</option>
+									<option value="软件版权">软件版权</option>
+									<option value="著作权">著作权</option>
+									<option value="集成电路图">集成电路图</option>
+								</select>
+							</div>
+							
+							<div id="divPatStatus" class="form-group col-sm-2">
+								<label class="" for="selPatStatus">状态</span></label>
+								<select class="form-control" id="selPatStatus" name="patstatus">
+									<option value="不限">…不限…</option>
+									<option value="新增">新增</option>
+									<option value="申报">申报</option>
+									<option value="返回修改">返回修改</option>
+									<option value="授权">授权</option>
+									<option value="续费中">续费中</option>
+									<option value="续费授权">续费授权</option>
+									<option value="驳回">驳回</option>
+									<option value="放弃">放弃</option>
+								</select>
+							</div>
+							
+							<div id="divPatDate" class="form-group col-sm-2">
+								<label class="" for="selPatDate">查询日期</label>
+								<select class="form-control" id="selPatDate" name="patdate">
+									<option value="submitdate">提交日期</option>
+									<option value="applydate">申报日期</option>
+									<option value="modifydate">修改日期</option>
+									<option value="authrejectdate">授权/驳回日期</option>
+									<option value="renewdeadlinedate">续费截止日期</option>
+									<option value="nextrenewdate">下一次续费日期</option>
+									<option value="renewabandondate">续费/放弃</option>
+									
+								</select>
+							</div>
+							
+							<div id="divPatDateRange"class="form-group col-sm-1">
+								<input type="radio" name="patdaterange" value="leq"><span><strong>&nbsp;&le;</strong></span><br>
+								<input type="radio" name="patdaterange" value="geq"><span><strong>&nbsp;&ge;</strong></span><br>
+								<input type="radio" name="patdaterange" value="between"><span><strong>&nbsp;介于</strong></span>
+							</div>
+							
+							<div id="divPatStartDate" class="form-group col-sm-2">
+								<label class="" for="startdate">查询日期（起始）</label>
+								<input class="form-control" id="patstartdate" name="patstartdate" type="text" value="{$lastday}" placeholder="yyyy-mm-dd">
+							</div>
+							
+							<div id="divPatEndDate" class="form-group col-sm-2">
+								<label class="" for="enddate">查询日期（截止）</label>
+								<input class="form-control" id="patenddate" name="patenddate" type="text" value="{$today}" placeholder="yyyy-mm-dd">
+							</div>	
+							
+						</td>	
+					</tr>
+					
+					<tr class="thesis">
+						<td>
+							<div class="form-group col-sm-2">
+								<label class="bg-info" for="selTheType">&nbsp;<span class="glyphicon glyphicon-list">&nbsp;<strong>论文类型</strong>&nbsp;</span></label>
+								<select class="form-control" id="selTheType" name="thetype" >
+									<option value="不限">…不限…</option>
+									<option value="发明专利">发明专利</option>
+									
+								</select>
+							</div>
+						</td>	
+					</tr>
+					
+					<tr class="issue">
+						<td>
+							<div class="form-group col-sm-2">
+								<label class="bg-primary" for="selIssType">&nbsp;<span class="glyphicon glyphicon-pushpin">&nbsp;<strong>事务类型</strong>&nbsp;</span></label>
+								<select class="form-control" id="selIssType" name="isstype" >
+									<option value="不限">…不限…</option>
+									<option value="发明专利">发明专利</option>
+									
+								</select>
+							</div>
+						</td>	
+					</tr>
+					
+					<tr>
+						<td>
+							<button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span>&nbsp;搜索</button>
+							<button type="reset" class="btn btn-primary">重置</button>
+						</td>	
+					</tr>
+					
+				</tbody>
+			</table>
+		</form>
+	
+	<div id="result">	
+		<h4>搜索结果 <span class="badge">{$patsnum+$prosnum+$thesnum+$issesnum}</h4>
+		<div class="project panel-group">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" href="#collapse1"><span class="glyphicon glyphicon-inbox">&nbsp;项目&nbsp;{$prosnum}</span></a>
+					</h4>
+				
+				</div>
+				<div id="collapse1" class="panel-collapse collapse">
+					<div class="panel-body">Panel Body
+						<div class="bs-callout bs-callout-primary" id="">
+							<h4>项目《xxxx》</h4>
+							<p>在 HTML5 中可以放心使用 <code>&lt;b&gt;</code> 和 <code>&lt;i&gt;</code> 标签。<code>&lt;b&gt;</code> 用于高亮单词或短语，不带有任何着重的意味；而 <code>&lt;i&gt;</code> 标签主要用于发言、技术词汇等。
+							</p>
+							<footer>项目《xxxx》，编号：prj2017001，部门：yy；申报时间：2015-1-2；现在状态：验收</footer>
+							
+						</div>
+					
+						<div class="bs-callout bs-callout-primary" id="callout-type-b-i-elems">
+							<h4>项目《xxxx》</h4>
+							<p>在 HTML5 中可以放心使用 <code>&lt;b&gt;</code> 和 <code>&lt;i&gt;</code> 标签。<code>&lt;b&gt;</code> 用于高亮单词或短语，不带有任何着重的意味；而 <code>&lt;i&gt;</code> 标签主要用于发言、技术词汇等。
+							</p>
+							<footer>项目《xxxx》，编号：prj2017001，部门：yy；申报时间：2015-1-2；现在状态：验收</footer>
+							
+						</div>
+				
+					</div>
+					<div class="panel-footer">Panel Footer</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="patent panel-group">
+			<div class="panel panel-warning">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+					  <a data-toggle="collapse" href="#collapse2"><span class="glyphicon glyphicon-wrench">&nbsp;专利&nbsp;{$patsnum}</span></a>
+					</h4>
+				</div>
+				
+				<div id="collapse2" class="panel-collapse collapse">
+					<div class="panel-body">
+						{volist name="pats" id="vo" empty="暂无专利"}
+						<div class="bs-callout bs-callout-warning">
+							<h4>{$i}&nbsp;{$vo.topic}</h4>
+							<p>{$vo.summary}</p>
+							<footer>
+								<a href="{$home}/patent/index/patinfo/id/{$vo.id}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="专利信息">{$vo.topic}</a>； 
+								状态：<a href="{$home}/patent/index/patrecords/id/{$vo.id}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="专利过程">{$vo.status}</a>；  
+								撰写人：{$vo.author}；编号：{$vo.patnum}；部门：{$vo.dept}；提交时间：{$vo.submitdate}；
+							</footer>
+						
+						</div>
+						{/volist}		
+						
+						<div id="patpagetotal" class="patpage col-sm-10 text-right">
+							<ul class="pagination pagination-sm">
+								<li><a href="#">1</a></li>
+								<li class="active"><a href="#">2</a></li>
+								<li><a href="#">3</a></li>
+								<li><a href="#">4</a></li>
+								<li><a href="#">5</a></li>
+							</ul>
+						</div>
+					
+					</div>
+					
+					<div class="panel-footer">footer
+						
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		
+		<div class="thesis panel-group">
+			<div class="panel panel-info">
+			  <div class="panel-heading">
+				<h4 class="panel-title">
+				   <a data-toggle="collapse" href="#collapse3"><span class="glyphicon glyphicon-list">&nbsp;论文&nbsp;{$thesnum}</span></a>
+				</h4>
+			  </div>
+			  <div id="collapse3" class="panel-collapse collapse">
+				<div class="panel-body">Panel Body
+					<div class="bs-callout bs-callout-info" id="">
+						<h4>项目《xxxx》</h4>
+						<p>在 HTML5 中可以放心使用 <code>&lt;b&gt;</code> 和 <code>&lt;i&gt;</code> 标签。<code>&lt;b&gt;</code> 用于高亮单词或短语，不带有任何着重的意味；而 <code>&lt;i&gt;</code> 标签主要用于发言、技术词汇等。
+						</p>
+						<footer>项目《xxxx》，编号：prj2017001，部门：yy；申报时间：2015-1-2；现在状态：验收</footer>
+						
+					</div>
+					
+					<div class="bs-callout bs-callout-info" id="callout-type-b-i-elems">
+						<h4>项目《xxxx》</h4>
+						<p>在 HTML5 中可以放心使用 <code>&lt;b&gt;</code> 和 <code>&lt;i&gt;</code> 标签。<code>&lt;b&gt;</code> 用于高亮单词或短语，不带有任何着重的意味；而 <code>&lt;i&gt;</code> 标签主要用于发言、技术词汇等。
+						</p>
+						<footer>项目《xxxx》，编号：prj2017001，部门：yy；申报时间：2015-1-2；现在状态：验收</footer>
+						
+					</div>
+				</div>
+				<div class="panel-footer">Panel Footer</div>
+			  </div>
+			</div>
+		</div>
+		
+		<div class="issue panel-group">
+			<div class="panel panel-primary">
+			  <div class="panel-heading">
+				<h4 class="panel-title">
+				   <a data-toggle="collapse" href="#collapse4"><span class="glyphicon glyphicon-pushpin">&nbsp;事务&nbsp;{$issesnum}</span></a>
+				</h4>
+			  </div>
+			  <div id="collapse4" class="panel-collapse collapse">
+				<div class="panel-body">Panel Body
+					<div class="bs-callout bs-callout-info" id="">
+						<h4>项目《xxxx》</h4>
+						<p>在 HTML5 中可以放心使用 <code>&lt;b&gt;</code> 和 <code>&lt;i&gt;</code> 标签。<code>&lt;b&gt;</code> 用于高亮单词或短语，不带有任何着重的意味；而 <code>&lt;i&gt;</code> 标签主要用于发言、技术词汇等。
+						</p>
+						<footer>项目《xxxx》，编号：prj2017001，部门：yy；申报时间：2015-1-2；现在状态：验收</footer>
+						
+					</div>
+					
+					<div class="bs-callout bs-callout-info" id="callout-type-b-i-elems">
+						<h4>项目《xxxx》</h4>
+						<p>在 HTML5 中可以放心使用 <code>&lt;b&gt;</code> 和 <code>&lt;i&gt;</code> 标签。<code>&lt;b&gt;</code> 用于高亮单词或短语，不带有任何着重的意味；而 <code>&lt;i&gt;</code> 标签主要用于发言、技术词汇等。
+						</p>
+						<footer>项目《xxxx》，编号：prj2017001，部门：yy；申报时间：2015-1-2；现在状态：验收</footer>
+						
+					</div>
+				</div>
+				<div class="panel-footer">Panel Footer</div>
+			  </div>
+			</div>
+		</div>
+		
+</div>
+		
+<!-- <div class="btn-group"> -->
+			<button type="submit" class="btn btn-primary btn-sm btnClose" >关闭本页</button>
+<!-- </div> -->
+	
+<!-- /pagewrap -->
+
+<script>
+$(document).ready(function(){
+
+	$(".btnClose").click(function(){
+		window.close();
+	});
+	
+	<!--去除 "../application/common/header.html"中的#liSearch、#liQuit-->
+	$("#liSearch").remove();
+	$("#liQuit").remove();
+	
+	if({$patsnum+$prosnum+$thesnum+$issesnum}!=0){
+		$("#result" ).show();
+	}
+	else{
+		$("#result").hide();
+	}
+	
+	if({$patsnum}){
+		$(".patent" ).show();
+		$("#trPatent").hide();
+	}
+	else{
+		$(".patent").hide();
+	}
+	
+	
+
+</script>
+	
+{include file="../application/common/footer.html"}

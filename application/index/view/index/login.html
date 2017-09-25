@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>IPMS</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {/* TP5中的模板注释格式，多行。内容不会出现在发送给浏览器的HTML文件中
+  <!-- 使用cdn提高解析速度 -->
+  <!-- <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.bootcss.com/bootstrap/3.3.6/css/bootstrap3.3.7.min.css">
+  <script src="https://ajax.googleapis.bootcss.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.min.js"></script> -->
+   */}
+  
+ {// TP5中的模板注释格式，单行。<!-- TP5的资源文件加载写法 -->内容不会出现在发送给浏览器的HTML文件中 }  
+  {js href="/home/res/js/jquery1.12.4.min.js" }
+  {js href="/home/res/js/bootstrap3.3.7.min.js" }
+  {css href="/home/res/css/bootstrap3.3.7.min.css" }
+  {css href="/home/res/css/bs-callout.css" }
+
+{/*<!-- 实现nav固定在页面顶端效果的补充代码块,
+同时还需设置nav的data-offset-top="-3"防止鼠标单击页面时出现跳动-->
+*/}
+  <style>
+  .affix {
+      top: 0;
+      width: 100%;
+  }
+
+  .affix + .container-fluid {
+      padding-top: 70px;
+  }
+  </style>
+  
+{/*
+<!-- Tooltips must be initialized with jQuery: select the specified element and call the tooltip() method.
+The following code will enable all tooltips in the document:-->
+*/}
+<script>
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();   
+});
+</script>
+
+</head>
+<body>
+
+<!-- pageheader  -->
+<nav class="navbar navbar-default navbar-fixed-top" data-spy="affix" data-offset-top="-3">
+  <div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>                        
+			</button>
+			<a class="navbar-brand" href="http://www.gzgjd.com" data-toggle="tooltip"  data-placement="bottom" title="GZOME主页" target="_blank"><strong>IPMS
+			<img src="/home/res/images/logo.png" class="img-responsive img-circle margin" style="display:inline" width="45" height="40">
+			</strong></a>
+		</div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav navbar-right">
+		<li class="">
+				<form class="navbar-form" role="form" action="{$home}/index/index/index" method="post">
+					<div class="form-group">
+						<label class="sr-only" for="username">用户名</label>
+						<input class="form-control" id="username" name= "username" type="text" placeholder="用户名" >
+					</div>	
+					<div class="form-group">
+						<label class="sr-only" for="pwd">密码</label>
+						<input class="form-control" id="pwd" name="pwd" type="password" placeholder="密码" >
+					</div>
+						<button type="submit" class="btn btn-default form-control"><span class="glyphicon glyphicon-log-in"></span>&nbsp;登录</button>
+				</form>
+		</li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<!-- /pageheader  -->
+
+<!-- pagewrap  -->
+<div class="container-fluid" style="height:500px;">	
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="panel-group">
+				<div class="panel panel-default">
+					<div class="panel-heading"><strong>项目概况</strong></div>
+						<div class="panel-body">
+							<a href="#"><span class="label label-default">新增项目</span></a>
+							<a href="#"><span class="label label-info">申报项目</span></a>
+							<a href="#"><span class="label label-warning">立项项目</span></a>
+							<a href="#"><span class="label label-primary">在研项目</span></a>
+						</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col-sm-6">
+			<div class="panel-group">
+				<div class="panel panel-default">
+					<div class="panel-heading"><strong>专利概况</strong></div>
+						<div class="panel-body">
+							<a href="#"><span class="label label-default">新增专利</span></a>
+							<a href="#"><span class="label label-info">申报专利</span></a>
+							<a href="#"><span class="label label-success">有效专利</span></a>
+						</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="col-sm-6">
+			<div class="panel-group">
+				<div class="panel panel-default">
+					<div class="panel-heading"><strong>论文概况</strong></div>
+						<div class="panel-body">
+							<a href="#"><span class="label label-default">新增论文</span></a>
+							<a href="#"><span class="label label-info">投稿论文</span></a>
+							<a href="#"><span class="label label-success">发表论文</span></a>
+						</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- <div class="row">
+		<div class="col-sm-6">
+			<div class="panel-group">
+				<div class="panel panel-default">
+					<div class="panel-heading"><strong>获奖概况</strong></div>
+						<div class="panel-body">
+							<a href="#"><span class="label label-default">新增获奖</span></a>
+							<a href="#"><span class="label label-info">申报奖励</span></a>
+							<a href="#"><span class="label label-success">获得奖励</span></a>
+						</div>
+				</div>
+			</div>
+		</div> -->
+		
+		<!-- <div class="col-sm-6">
+			<div class="panel-group">
+				<div class="panel panel-default">
+					<div class="panel-heading"><strong>成果转化概况</strong></div>
+						<div class="panel-body">
+							<a href="#"><span class="label label-default">成果转化</span></a>
+							<a href="#"><span class="label label-info">转化中成果</span></a>
+							<a href="#"><span class="label label-success">已转化成果</span></a>
+						</div>
+				</div>
+			</div>
+		</div> -->
+	</div>
+</div>
+<!-- /pagewrap -->
+	
+{include file="../application/common/footer.html"}

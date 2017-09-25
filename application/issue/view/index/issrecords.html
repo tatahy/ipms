@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>事务过程记录</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {/* TP5中的模板注释格式，多行。内容不会出现在发送给浏览器的HTML文件中
+  <!-- 使用cdn提高解析速度 -->
+  <!-- <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.bootcss.com/bootstrap/3.3.6/css/bootstrap3.3.7.min.css">
+  <script src="https://ajax.googleapis.bootcss.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.min.js"></script> -->
+   */}
+  
+ {// TP5中的模板注释格式，单行。<!-- TP5的资源文件加载写法 -->内容不会出现在发送给浏览器的HTML文件中 }  
+  {css href="/home/res/css/bootstrap3.3.7.min.css" }
+  {css href="/home/res/css/bs-callout.css" }
+  {js href="/home/res/js/jquery1.12.4.min.js" }
+  {js href="/home/res/js/bootstrap3.3.7.min.js" }
+
+
+  <!-- 实现nav固定在页面顶端效果的补充代码块，同时还需设置nav的data-offset-top="-3"防止鼠标单击页面时出现跳动-->
+  <style>
+  .affix {
+      top: 0;
+      width: 100%;
+  }
+
+  .affix + .container-fluid {
+      padding-top: 70px;
+  }
+  </style>
+  
+  <!-- Tooltips must be initialized with jQuery: select the specified element and call the tooltip() method.
+The following code will enable all tooltips in the document:-->
+<script>
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();   
+});
+</script>
+  
+</head>
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top" data-spy="affix" data-offset-top="-3">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>                        
+			</button>
+			<!-- <a class="navbar-brand" href="#">撰写人：username&nbsp;<span class="glyphicon glyphicon-user"></span>&nbsp;个人中心</a> -->
+			<span class="navbar-brand">
+				<a href="#" data-toggle="tooltip" data-placement="bottom" title="IPMS个人中心">
+					<strong>{$username}</strong>&nbsp;
+					<span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;IPMS个人中心
+					
+				</a>
+			</span>
+		</div>
+		
+	</div>
+</nav>
+
+<!-- pagewrap  -->
+<div class="container-fluid">
+	<h4>
+		<span class="label label-info glyphicon glyphicon-pushpin" style="font-size:16px;">&nbsp;事务过程</span>&nbsp;"{$topic}"&nbsp;
+		<button type="submit" class="btn btn-primary btn-sm btnClose" >关闭本页</button>
+	</h4>
+	<div class="table-responsive">	
+			<table id="" class="table table-bordered table-striped table-condensed">
+				<thead>
+					<tr>
+						<!-- <th>选择</th> -->
+						<th>序号</th>
+						<th>用户</th>
+						<th>系统角色</th>
+						<th>操作</th>
+						<th>操作说明</th>
+						<th>操作时间</th>
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="issrecords" id="vo" empty="暂无信息"}
+					<tr>
+						<!-- <td><input type="checkbox" check=""></td> -->
+						<td>{$i}</td>
+						<td>{$vo.username}</a></td>
+						<td>{$vo.rolename}</a></td>
+						<td>{$vo.act}</td>
+						<td>{$vo.actdetail}</td>
+						<td>{$vo.acttime}</td>
+						
+					</tr>
+					{/volist}
+				
+				</tbody>
+				
+			</table>
+		
+		
+	</div>
+	
+	<div class="btn-group-sm">
+		<button type="submit" class="btn btn-primary btnClose" >关闭本页</button>
+	</div>
+	
+</div>
+		
+
+<!-- /pagewrap  -->
+<script>
+$(document).ready(function(){
+
+	$(".btnClose").click(function(){
+		window.close();
+	});
+	
+	
+	
+});
+</script>
+
+<!-- pagefooter	 -->
+<div class="row">
+	<div class="panel panel-default text-center">
+		<div class="panel-heading">
+			<span class=""><a href="#">联系我们</a>&nbsp;┆&nbsp;<a href="#">管理登录</a></span></br>
+			<span class="">Powered by P_S & HY    Copyright © 2015-2016 广州市光机电技术研究院（GZOME）. All rights reserved</span></br>
+			<span class="">为获得最佳的浏览效果，推荐使用<a href="#">Chrome</a>、 <a href="#">Firefox</a>浏览器</span></br>	
+		</div>
+	</div>
+</div>
+<!-- /pagefooter -->	
+
+
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!-- <div class="hy-box"> -->
+	<!-- <p><strong>选择用户类型</strong></p> -->
+	
+	<!-- <p><strong>用户列表</strong></p> -->
+	
+	<!-- <p><strong>用户列表分页</strong></p>	 -->
+				
+				
+<!-- </div> -->
+
+<div class="panel panel-default ">
+		<div class="panel-heading"><strong>用户列表</strong></div>
+		<div class="panel-body " >	
+					
+			<table class="table table-striped ">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>用户名</th>
+						<th>所属部门</th>
+						<th>用户组</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="users" id="vo" empty="暂时没有数据"}
+					<tr>
+						<td>{$i}</td>
+						<td>{$vo.username}</td>
+						<td>{$vo.dept}</td>
+						<td>{$vo.roleid}</td>
+						<td>
+							<!-- <a href="#" class="btn btn-primary btn-xs" role="button"><span class="glyphicon glyphicon-edit"></span> 编辑</a> -->
+							<!-- <a href="#" class="btn btn-danger btn-xs" role="button"><span class="glyphicon glyphicon-remove"></span> 删除</a> -->
+							<!-- <a href="#" class="btn btn-warning btn-xs" role="button"><span class="glyphicon glyphicon-ban-circle"></span> 禁用</a> -->
+							
+							<a href="#"><span class="glyphicon glyphicon-edit"></span>编辑</a>&nbsp;
+							<a href="#" ><span class="text-danger glyphicon glyphicon-remove"></span>删除</a>&nbsp;
+							<a href="#" ><span class="text-warning glyphicon glyphicon-ban-circle"></span>禁用</a>
+						
+						</td>
+					</tr>
+					{/volist}
+				</tbody>
+			</table>
+				
+					
+		</div>
+</div>
+
+<div class="panel panel-default ">
+		<div class="panel-heading"><strong>用户组列表</strong></div>
+		<div class="panel-body " >	
+					
+			<table class="table table-striped ">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>用户名</th>
+						<th>所属部门</th>
+						<th>用户组</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="users" id="vo" empty="暂时没有数据"}
+					<tr>
+						<td>{$i}</td>
+						<td>{$vo.username}</td>
+						<td>{$vo.dept}</td>
+						<td>{$vo.roleid}</td>
+						<td>
+							<!-- <a href="#" class="btn btn-primary btn-xs" role="button"><span class="glyphicon glyphicon-edit"></span> 编辑</a> -->
+							<!-- <a href="#" class="btn btn-danger btn-xs" role="button"><span class="glyphicon glyphicon-remove"></span> 删除</a> -->
+							<!-- <a href="#" class="btn btn-warning btn-xs" role="button"><span class="glyphicon glyphicon-ban-circle"></span> 禁用</a> -->
+							
+							<a href="#"><span class="glyphicon glyphicon-edit"></span>编辑</a>&nbsp;
+							<a href="#" ><span class="text-danger glyphicon glyphicon-remove"></span>删除</a>&nbsp;
+							<a href="#" ><span class="text-warning glyphicon glyphicon-ban-circle"></span>禁用</a>
+						
+						</td>
+					</tr>
+					{/volist}
+				</tbody>
+			</table>
+				
+					
+		</div>
+</div>
+	
+	
+		
+		
+
+		

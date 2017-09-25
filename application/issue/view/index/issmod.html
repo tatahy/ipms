@@ -1,0 +1,177 @@
+{include file="../application/common/headeruser.html" title="修改专利" }
+
+<!-- pagewrap  -->
+<div class="container-fluid">
+	<h4><span class="glyphicon glyphicon-folder-open"></span>&nbsp;【{$rolename}】修改专利 </h4>
+	<div class="tab-content">
+    <div id="menu0" class="tab-pane fade in active">
+		
+		<form class="" role="form" method="post" action="{$home}/patent/index/patupdate">
+		</br>
+		
+		
+		<!-- 专利基本信息表单 -->
+		<table class="table table-bordered table-striped table-responsive table-condensed">
+			<tbody>
+			{foreach name="listpat" item="vo"}
+				<tr>
+					<td>
+						<div class="form-group col-sm-4">
+							<label class="control-label" for="topic">名称</label>
+							<input class="form-control" name="topic" id="topic" type="text" value="{$vo.topic}">
+						</div>
+						
+						<div class="form-group col-sm-2">
+							<label for="pattype">类型</label>
+							<input class="form-control" name="pattype" id="pattype" type="text" value="{$vo.pattype}">
+						</div>
+						
+						<div class="form-group col-sm-3">
+							<label class="control-label" for="patowner">所有人</label>
+							<input class="form-control" name="patowner" id="patowner" type="text" value="{$vo.patowner}" readonly>
+						</div>
+						
+						<div class="form-group col-sm-3">
+							<label for="dept">所属部门</label>
+							<input class="form-control" name="dept" id="dept" type="text" value="{$vo.dept}">
+							
+						</div>
+						
+					</td>		
+				</tr>
+
+				<tr>
+					<td>
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="author">撰写人</label>
+							<input class="form-control" name="author" id="author" type="text" value="{$vo.author}" readonly>
+						</div>
+						
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="inventor">发明人</label>
+							<input class="form-control" name="inventor" id="inventor" type="text" value="{$vo.inventor}">
+						</div>
+						
+						<div class="form-group col-sm-4">
+							<label class="control-label" for="otherinventor">其他发明人</label>
+							<input class="form-control" name="otherinventor" id="otherinventor" type="text" value="{$vo.otherinventor}">
+						</div>
+						
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="status">状态</label>
+							<input class="form-control" name="status" id="status" type="text" value="{$vo.status}" readonly>
+						</div>
+						
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="addnewdate">填报日期</label>
+							<input class="form-control" name="addnewdate" id="addnewdate" type="text" value="{$vo.addnewdate}" readonly>
+						</div>
+						
+					</td>		
+				</tr>
+				
+				<tr>
+					<td>
+						<div class="form-group col-sm-3">
+							<label for="keyword">关键词</label>
+							<textarea class="form-control" rows="2" name="keyword" id="keyword">{$vo.keyword}</textarea>
+						</div>
+						
+						<div class="form-group col-sm-5">
+							<label for="abstract">专利简介</label>
+							<textarea class="form-control" rows="5" name="summary" id="summary" placeholder="填写专利的简要描述，字数不超过100字。">{$vo.summary}</textarea>
+						</div>
+						
+						<div class="form-group col-sm-4">
+							<label for="pronum">关联项目（在研）</label>
+							<input class="form-control" name="pronum" id="pronum" type="text" value="{$vo.pronum}">
+							
+						</div>
+						
+					</td>		
+				</tr>
+				
+				<!-- <tr>
+					<td>
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="focusedInput">填报日期</label>
+							<input class="form-control  " id="focusedInput" type="text" placeholder="">
+						</div>
+						
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="focusedInput">申报日期</label>
+							<input class="form-control  " id="focusedInput" type="text" placeholder="">
+						</div>
+						
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="focusedInput">授权/放弃日期</label>
+							<input class="form-control  " id="focusedInput" type="text" placeholder="">
+						</div>
+					</td>		
+				</tr> -->
+			{/foreach}
+			</tbody>
+		</table>
+				
+		<!-- 附件表单 -->
+		<table class="table table-bordered table-striped table-responsive table-condensed">
+			<thead>
+				<h4>专利附件材料</h4>
+				<tr>
+					<th>选择</th>
+					<th>序号</th>
+					<th>附件类型</th>
+					<th>附件名称</th>
+					<th>上传日期</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><input type="checkbox" value=""></td>
+					<td>1</td>
+					<td>新增专利申请材料</td>
+					<td>专利申请表.doc</td>
+					<td>2017-01-02 11:30:21</td>
+					<td><a href="#">下载(专利申请表.doc)</a></td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<div class="btn-group-xs">
+			<button type="button" class="btn btn-primary" formaction="">增加附件</button>
+			<button type="button" class="btn btn-primary" formaction="">上移</button>
+			<button type="button" class="btn btn-primary" formaction="">下移</button>
+			<button type="button" class="btn btn-primary" formaction="">删除</button>				
+		</div>
+		<hr>
+
+		<div class="btn-group-sm">
+			<button id="save" type="submit" class="btn btn-primary" formaction="">保存专利信息及附件</button>
+			<button type="button" class="btn btn-primary" formaction="">提交申报专利申请</button>
+			<button type="button" class="btn btn-primary" formaction="">浏览</button>	
+			<button type="submit" class="btn btn-primary" formaction="{$home}/patent/index/index/role/{$role}">返回</button>				
+		</div>
+		</form>
+		
+    </div>
+	
+</div>
+</div>
+
+</br>
+
+<!-- /pagewrap  -->
+
+<script>
+$(document).ready(function(){
+  $("#save").click(function() {
+        var sel = $("#pronum").val();
+		<!-- $("#pronum").val(sel); -->
+       <!--  alert(被选中的是:"+sel+"。") -->;
+    });
+});
+</script>
+
+	
+{include file="../application/common/footer.html"}

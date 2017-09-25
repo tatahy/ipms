@@ -1,0 +1,67 @@
+{include file="../application/common/bg_header.html" title="系统管理" }
+
+<!-- pagewrap  -->
+
+<div class="container-fluid" >
+	<div class="row content" >
+		<div class="col-sm-2">
+			<ul class="nav nav-pills nav-stacked hy-box" >
+				<li id="li0" class="active"><a href="#div0"><span class="glyphicon glyphicon-inbox"></span>&nbsp;系统概况</a></li>
+				<li id="li1"><a href="#div1"><span class="glyphicon glyphicon-user"></span>&nbsp;系统用户管理</a></li>
+				<li id="li2"><a href="#div2"><span class="glyphicon glyphicon-wrench"></span>&nbsp;系统设置</a></li>
+			</ul>
+			
+		</div>
+		
+		<div class="col-sm-10 tab-content" >
+			
+			<div id="div0" class="tab-pane fade in active">
+				<h4><strong>"系统概况"</strong></h4>
+				{include file="../application/admin/view/index/sys_sumary.html"}
+				
+			</div>
+	
+			<div id="div1" class="tab-pane fade">
+				<h4><strong>"系统用户管理"</strong></h4>
+				{include file="../application/admin/view/index/sys_user.html"}
+							
+							
+			</div>
+					
+			<div id="div2" class="tab-pane fade">
+				<h4><strong>"系统设置"</strong>开发中</h4>
+				{include file="../application/admin/view/index/sys_param.html"}			
+							
+			</div>
+		
+		</div>
+		
+		
+		
+	</div>
+	
+
+</div>
+
+<!-- /pagewrap  -->
+
+
+<script>
+$(document).ready(function(){
+	
+	<!-- //为选中的li标签,添加.active -->
+	$("#nav_system").addClass("active");
+
+	<!-- //点击nav-pills中的各个按钮后，显示对应的页面-->
+	$(".nav-pills a").click(function(){
+        $(this).tab('show');
+		
+    });	
+
+});
+
+
+</script>
+
+
+{include file="../application/common/bg_footer.html"}

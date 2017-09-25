@@ -1,0 +1,108 @@
+Message-ID: <32619255.15.1476330536841.JavaMail.HYWORK$@HYWORK>
+Subject: Exported From Confluence
+MIME-Version: 1.0
+Content-Type: multipart/related; 
+	boundary="----=_Part_14_7312961.1476330536839"
+
+------=_Part_14_7312961.1476330536839
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/exported.html
+
+<html>
+    <head>
+        <!-- MS Word on Windows doesn't realise the encoding is UTF-8 unles=
+s this meta tag is present -->
+        <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Du=
+tf-8">
+        <title>Testing Report</title>
+        <style>
+            body, p, td, table, tr, .bodytext, .stepfield {
+=09            font-family: Arial, Helvetica, FreeSans, sans-serif;
+            }
+            .panel {
+                margin: 10px;
+                padding: 10px;
+                border: 1px solid #999;
+                background-color: #f0f0f0;
+            }
+            .noteMacro { border-style: solid; border-width: 1px; border-col=
+or: #F0C000; background-color: #FFFFCE; text-align:left;}
+            .warningMacro { border-style: solid; border-width: 1px; border-=
+color: #c00; background-color: #fcc; text-align:left;}
+            .infoMacro { border-style: solid; border-width: 1px; border-col=
+or: #69c; background-color: #D8E4F1; text-align:left;}
+            .tipMacro { border-style: solid; border-width: 1px; border-colo=
+r: #090; background-color: #dfd; text-align:left;}
+            .informationMacroPadding { padding: 5px 0 0 5px; }
+
+            table.infoMacro td, table.warningMacro td, table.tipMacro td, t=
+able.noteMacro td, table.sectionMacro td {
+                border: none;
+            }
+
+            .grid {
+                margin: 2px 0px 5px 0px;
+                border-collapse: collapse;
+            }
+            .grid th  {
+                border: 1px solid #ccc;
+                padding: 2px 4px 2px 4px;
+                background: #f0f0f0;
+                text-align: center;
+            }
+            .grid td  {
+                border: 1px solid #ccc;
+                padding: 3px 4px 3px 4px;
+            }           =20
+        </style>
+    </head>
+
+    <body style=3D"background-color: white; padding: 10px;">
+        <h1>Testing Report</h1>
+        <div class=3D'plugin-tabmeta-details'><div class=3D"table-wrap"><ta=
+ble class=3D"confluenceTable"><tbody><tr><th class=3D"confluenceTh">Target =
+release</th><td class=3D"confluenceTd"></td></tr><tr><th class=3D"confluenc=
+eTh">Theme</th><td class=3D"confluenceTd"></td></tr><tr><th class=3D"conflu=
+enceTh">Document status</th><td class=3D"confluenceTd"><span class=3D"statu=
+s-macro aui-lozenge">DRAFT</span></td></tr><tr><th class=3D"confluenceTh">D=
+ocument owner</th><td class=3D"confluenceTd"><p><a class=3D"confluence-user=
+link user-mention" data-username=3D"h_y" href=3D"/display/~h_y" data-linked=
+-resource-id=3D"819257" data-linked-resource-type=3D"userinfo" data-base-ur=
+l=3D"http://localhost:8090">huangyi</a></p></td></tr><tr><th class=3D"confl=
+uenceTh">Designer</th><td class=3D"confluenceTd"><a class=3D"confluence-use=
+rlink user-mention" data-username=3D"h_y" href=3D"/display/~h_y" data-linke=
+d-resource-id=3D"819257" data-linked-resource-type=3D"userinfo" data-base-u=
+rl=3D"http://localhost:8090">huangyi</a></td></tr><tr><th class=3D"confluen=
+ceTh">Developers</th><td class=3D"confluenceTd"><a class=3D"confluence-user=
+link user-mention" data-username=3D"h_y" href=3D"/display/~h_y" data-linked=
+-resource-id=3D"819257" data-linked-resource-type=3D"userinfo" data-base-ur=
+l=3D"http://localhost:8090">huangyi</a></td></tr><tr><th class=3D"confluenc=
+eTh">QA</th><td class=3D"confluenceTd"><a class=3D"confluence-userlink user=
+-mention" data-username=3D"h_y" href=3D"/display/~h_y" data-linked-resource=
+-id=3D"819257" data-linked-resource-type=3D"userinfo" data-base-url=3D"http=
+://localhost:8090">huangyi</a></td></tr></tbody></table></div></div><h2 id=
+=3D"TestingReport-Goals">Goals</h2><ul><li></li></ul><h2 id=3D"TestingRepor=
+t-Backgroundandstrategicfit">Background and strategic fit</h2><p></p><h2 id=
+=3D"TestingReport-Assumptions">Assumptions</h2><ul><li></li></ul><h2 id=3D"=
+TestingReport-Requirements">Requirements</h2><div class=3D"table-wrap"><tab=
+le class=3D"confluenceTable"><tbody><tr><th class=3D"confluenceTh">#</th><t=
+h class=3D"confluenceTh">User Story Title</th><th class=3D"confluenceTh">Us=
+er Story Description</th><th class=3D"confluenceTh">Priority</th><th class=
+=3D"confluenceTh">Notes</th></tr><tr><td class=3D"confluenceTd">1</td><td c=
+lass=3D"confluenceTd"></td><td class=3D"confluenceTd"></td><td class=3D"con=
+fluenceTd"></td><td class=3D"confluenceTd"><ul><li></li></ul></td></tr><tr>=
+<td class=3D"confluenceTd">=C2=A0</td><td class=3D"confluenceTd">=C2=A0</td=
+><td class=3D"confluenceTd">=C2=A0</td><td class=3D"confluenceTd">=C2=A0</t=
+d><td class=3D"confluenceTd">=C2=A0</td></tr></tbody></table></div><h2 id=
+=3D"TestingReport-Userinteractionanddesign">User interaction and design</h2=
+><p></p><h2 id=3D"TestingReport-Questions">Questions</h2><p>Below is a list=
+ of questions to be addressed as a result of this requirements document:</p=
+><div class=3D"table-wrap"><table class=3D"confluenceTable"><tbody><tr><th =
+class=3D"confluenceTh">Question</th><th class=3D"confluenceTh">Outcome</th>=
+</tr><tr><td class=3D"confluenceTd"></td><td class=3D"confluenceTd"></td></=
+tr></tbody></table></div><h2 id=3D"TestingReport-NotDoing">Not Doing</h2><u=
+l><li></li></ul>
+    </body>
+</html>
+------=_Part_14_7312961.1476330536839--

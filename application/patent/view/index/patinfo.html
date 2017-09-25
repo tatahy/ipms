@@ -1,0 +1,253 @@
+{include file="../application/common/header.html" title="专利信息" }
+
+<!-- pagewrap  -->
+<div class="container-fluid">
+	
+	<h3>
+		<span class="label label-warning glyphicon glyphicon-wrench">&nbsp;专利信息</span>
+		<button type="submit" class="btn btn-primary btn-sm btnClose" >关闭本页</button>
+	</h3>
+	<div class="tab-content">
+		
+		<!-- 专利基本信息表单 -->
+		<table class="table table-bordered table-striped table-responsive table-condensed">
+			<tbody>
+				<tr>
+					<td>
+						<div class="col-sm-4" ><p><strong>名称：</strong><span class="label label-warning" style="font-size:14px;">{$topic}</span></p></div>
+						<div class="col-sm-2" ><p><strong>类型：</strong>{$pattype}</p></div>
+						<div class="col-sm-2" ><p><strong>撰写人：</strong>{$author}</p></div>
+						<div class="col-sm-3" ><p><strong>所属部门：</strong>{$dept}</p></div>
+					</td>	
+				</tr>
+				
+				<tr>
+					<td>
+						<div class="col-sm-4"><p><strong>专利关键词：</strong>{$keyword}</p></div>
+						<div class="col-sm-6"><p><strong>专利简介：</strong>{$summary}</p></div>
+						
+					</td>					
+				</tr>
+				
+				<tr>
+					<td>
+						<div class="col-sm-2"><p><strong>专利编号：</strong>{$patnum}</p></div>
+						<div class="col-sm-2">
+							<a href="{$home}/patent/index/patrecords/id/{$id}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="专利过程">
+								<p><strong>状态：</strong>{$status}
+							</a>
+							
+							</p>
+						
+						</div>
+						<div class="col-sm-4">
+							<p><strong>关联项目：</strong>
+								{foreach $pronum as $num} 
+									{if $num eq '无'}
+										{$num}&nbsp;
+									{else /}
+										<a href="#" target="_blank" data-toggle="tooltip" data-placement="bottom" title="项目信息">{$num}&nbsp;</a>;
+									{/if}
+								{/foreach}
+							</p>
+						</div>
+						
+						<div class="col-sm-4">
+							<p><strong>关联事务：</strong>
+								{if $iss_id eq 0}
+									无
+								{else /}
+									<a href="{$home}/issue/index/issinfo/id/{$iss_id}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="事务信息">{$iss_topic}&nbsp;({$issnum})</a>	
+								{/if}
+								
+							</p>
+						</div>
+					</td>					
+				</tr>
+				
+				<tr>
+					<td>
+						
+						<div class="col-sm-4"><p><strong>专利所有人：</strong>{$patowner}</p></div>
+						<div class="col-sm-2"><p><strong>专利发明人：</strong>{$inventer} </p></div>
+						<div class="col-sm-4"><p><strong>其他专利发明人：</strong>{$otherinventer} </p></div>
+						
+						
+					</td>				
+				</tr>
+				
+				<tr>
+					<td>
+						<div id="divAddnewDate" class="col-sm-2"><p><strong>填报/修改日期：</strong>{$addnewdate}</p></div>
+						<div class="col-sm-2"><p><strong>提交日期：</strong>{$submitdate}</p></div>
+						<div class="col-sm-2"><p><strong>申请日期：</strong>{$applydate}</p></div>
+						<div id="divAJDate" class="col-sm-2"><p><strong>授权/驳回日期：</strong>{$authrejectdate}</p></div>
+						
+						<div id="divRADate" class="col-sm-2"><p><strong>续费/放弃日期：</strong>{$renewabandondate}</p></div>
+						<div id="divNextrenewDate" class="col-sm-2"><p><strong>下次续费日期：</strong>{$nextrenewdate}</p></div>
+						
+					</td>				
+				</tr>
+				
+				<tr id="trMaintainer">
+					<td>
+						<div id="divPatApplynum" class="col-sm-2"><p><strong>申请编号：</strong>{$patapplynum}</p></div>
+						<div id="divPatAuthnum" class="col-sm-2"><p><strong>授权编号：</strong>{$patauthnum}</p></div>
+						<div id="divPatAgency" class="col-sm-4"><p><strong>代理机构：</strong>{$patagency}</p></div>
+						<div id="divPatAdmin" class="col-sm-4"><p><strong>授权机构：</strong>{$patadmin}</p></div>
+						<div id="divRAReason" class="col-sm-4"><p><strong>放弃/驳回原因：</strong>{$abandonrejectreason}</p></div>
+						
+							
+					</td>		
+				</tr>
+				
+			</tbody>
+		</table>
+		
+		
+		
+		
+		<!-- 附件表单 -->
+		<h3><span class="label label-warning glyphicon glyphicon-wrench">&nbsp;专利附件</span></h3>
+		<div id="divAtt" class="table-responsive">
+			<table id="tblAtt" class="table table-bordered table-hover table-condensed">
+				<thead>
+					<tr>
+						<!-- <th>选择</th> -->
+						<th>序号</th>
+						<th>附件类型</th>
+						<th>附件名称</th>
+						<th>上传日期</th>
+						<th>上传人</th>
+						<th>系统角色</th>
+						{in name="$status" value="授权，放弃，续费，驳回"}
+							<th>操作</th>
+						{/in}
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="atts" id="vo" empty="暂无附件"}
+					<tr>
+						<!-- <td><input type="checkbox" check=""></td> -->
+						<td>{$i}</td>
+						<td>{$vo.atttype}</a></td>
+						<td>{$vo.name}</a></td>
+						<td>{$vo.uploaddate}</td>
+						<td>{$vo.uploader}</td>
+						<td>{$vo.rolename}</td>
+						{in name="$status" value="授权，放弃，续费，驳回"}
+							<td><a href="{$home}/attachment/index/download/id/{$vo.id}">下载</a>&nbsp;</td>
+						{/in}
+						
+					</tr>
+					{/volist}
+				
+				</tbody>
+				
+			</table>
+			
+		
+		</div>
+		
+		<hr>
+
+		<div class="btn-group-sm">
+			<button type="submit" class="btn btn-primary btnClose" >关闭本页</button>
+		</div>
+	
+</div>
+</div>
+
+</br>
+
+<!-- /pagewrap  -->
+
+<script>
+$(document).ready(function(){
+
+	$(".btnClose").click(function(){
+		window.close();
+	});
+	
+	<!--去除 "../application/common/header.html"中的#liSearch、#liQuit-->
+	$("#liSearch").remove();
+	$("#liQuit").remove();
+	
+	if("{$status}"=="填报" || "{$status}"=="新增"){
+		$("#trMaintainer").remove();
+	
+	}
+	
+	<!-- 专利状态非“填报”，页面显示微调-->
+	$("#trMaintainer").hide();
+	switch('{$status}'){
+
+		case '新增':
+			$("#divAddnewDate").html('<p><strong>填报日期：</strong>{$addnewdate}</p>');
+			
+		break;			
+		
+		case '申报':
+			$("#trMaintainer").show();
+			$("#divPatAuthnum").remove();
+			$("#divRAReason").remove();
+			
+		break;
+		
+		case '返回修改':
+			$("#divAddnewDate").html('<p><strong>修改日期：</strong>{$addnewdate}</p>');
+			$("#trMaintainer").show();
+			$("#divPatAuthnum").remove();
+			$("#divRAReason").remove();
+			
+		break;
+		
+		case '授权':
+			$("#divAddnewDate").html('<p><strong>填报日期：</strong>{$addnewdate}</p>');
+			$("#divAJDate").html('<p><strong>授权日期：</strong>{$authrejectdate}</p>');
+			$("#divRADate").html('<p><strong>续费日期：</strong>{$renewabandondate}</p>');
+			$("#trMaintainer").show();
+			$("#divRAReason").remove();
+			
+		break;
+		
+		case '放弃':
+			$("#divAddnewDate").html('<p><strong>填报日期：</strong>{$addnewdate}</p>');
+			$("#divAJDate").html('<p><strong>授权日期：</strong>{$authrejectdate}</p>');
+			$("#divRADate").html('<p><strong>放弃日期：</strong>{$renewabandondate}</p>');
+			$("#trMaintainer").show();
+			$("#divRAReason").html('<p><strong>放弃原因：</strong>{$abandonrejectreason}</p>').show();
+			
+		break;
+		
+		case '驳回':
+			$("#divAddnewDate").html('<p><strong>填报日期：</strong>{$addnewdate}</p>');
+			$("#divAJDate").html('<p><strong>驳回日期：</strong>{$authrejectdate}</p>');
+			$("#divRADate").remove();
+			$("#divPatAuthnum").remove();
+			$("#divNextrenewDate").remove();
+			$("#trMaintainer").show();
+			$("#divRAReason").html('<p><strong>驳回原因：</strong>{$abandonrejectreason}</p>').show();
+		break;
+		
+		case '续费':
+			$("#divAddnewDate").html('<p><strong>填报日期：</strong>{$addnewdate}</p>');
+			$("#divAJDate").html('<p><strong>授权日期：</strong>{$authrejectdate}</p>');
+			$("#divRADate").html('<p><strong>初次续费日期：</strong>{$renewabandondate}</p>');
+			$("#divNextrenewDate").html('<p><strong>下次续费日期：</strong>{$nextrenewdate}</p>');
+			$("#trMaintainer").show();
+			$("#divRAReason").remove();
+			
+		break;
+			
+		default:
+			
+		break;
+		
+	}
+	
+});
+</script>
+
+	
+{include file="../application/common/footer.html"}

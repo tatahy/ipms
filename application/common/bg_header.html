@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>[title]</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+   
+    {// TP5中的模板注释格式，单行。<!-- TP5的资源文件加载写法 -->内容不会出现在发送给浏览器的HTML文件中 }  
+  {js href="/admin/res/js/jquery1.12.4.min.js" }
+  {js href="/admin/res/js/bootstrap3.3.7.min.js" }
+  {css href="/admin/res/css/bootstrap3.3.7.min.css" }
+  {css href="/admin/res/css/style.css" }
+
+{/*<!-- 实现nav固定在页面顶端效果的补充代码块,
+同时还需设置nav的data-offset-top="-3"防止鼠标单击页面时出现跳动-->
+*/}
+  <style>
+  .affix {
+      top: 0;
+      width: 100%;
+  }
+
+  .affix + .container-fluid {
+      padding-top: 70px;
+  }
+  </style>
+  
+  <!-- Tooltips must be initialized with jQuery: select the specified element and call the tooltip() method.
+The following code will enable all tooltips in the document:-->
+<script>
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();   
+});
+</script>
+  
+</head>
+
+<body style="background-color:#eeeeee;">
+
+<nav class="navbar navbar-inverse navbar-fixed-top" data-spy="affix" data-offset-top="-3">
+  <div class="container-fluid">
+    <div class="navbar-header" >
+		<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>                        
+		</button>
+		
+      <a class="navbar-brand">IPMS 后台系统管理</a>
+	  <!-- <span class="bg-primary" style="corlor:red;">IPMS 后台管理系统</span> -->
+    </div>
+	
+	<div class="collapse navbar-collapse" id="myNavbar">
+	<ul class="nav navbar-nav navbar-right">
+		
+        <li><a><span class="glyphicon glyphicon-user"></span>&nbsp;欢迎：【{$username}】</a></li>	
+        <li id="liQuit"><a href="{$home}/admin/index/login"><span class="glyphicon glyphicon-log-out"></span>&nbsp;退出</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- 调试，输出结果显示代码-->
+
+<div class="container-fluid" data-offset-top="200">
+<h4>监控变量：</h4>
+<p>{$destr}</p>
+<p>分隔线--------------------------------------------------</p>
+</div>
+
+<!-- /调试，输出结果显示代码-->
+
+
+
+<!-- /pageheader  -->

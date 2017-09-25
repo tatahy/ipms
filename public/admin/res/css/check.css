@@ -1,0 +1,81 @@
+/*!
+ * suport Bootstrap v3.3.7 (http://getbootstrap.com)
+ * Copyright 2016-2017 huangyi0101@aliyun.com.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * Date 2017/3/27
+ */
+
+/*!
+ * check,from:(http://www.jq22.com/webqd2653)
+ * Date 2017/9/4
+ */ 
+
+@charset "utf-8";
+	/* track base Css */
+.container {
+	/* margin-top:15px; */
+	
+}
+.red {
+	color:red;
+}
+
+#loginbox{
+	margin-top:60px;
+	padding:40px 40px 10px 40px ;
+	background-color:#ffffff;
+	box-shadow:0 0 15px #ccc;
+	
+}
+
+#random-code-input {
+	width:42px;
+	letter-spacing:2px;
+	margin:0px 8px 0px 0px;
+}
+.random-idcode-val {
+	position:relative;
+	padding:1px 4px 1px 4px;
+	top:0px;
+	*top:-3px;
+	letter-spacing:8px;
+	display:inline;
+	cursor:pointer;
+	font-size:16px;
+	font-family:"Courier New",Courier,monospace;
+	text-decoration:none;
+	font-weight:bold;
+}
+.random-idcode-val0 {
+	border:solid 1px #A4CDED;
+	background-color:#ECFAFB;
+}
+.random-idcode-val1 {
+	border:solid 1px #A4CDED;
+	background-color:#FCEFCF;
+}
+.random-idcode-val2 {
+	border:solid 1px #6C9;
+	background-color:#D0F0DF;
+}
+.random-idcode-val3 {
+	border:solid 1px #6C9;
+	background-color:#DCDDD8;
+}
+.random-idcode-val4 {
+	border:solid 1px #6C9;
+	background-color:#F1DEFF;
+}
+.random-idcode-val5 {
+	border:solid 1px #6C9;
+	background-color:#ACE1F1;
+}
+.random-code-val-tip {
+	font-size:12px;
+	color:#1098EC;
+	top:0px;
+	*top:-3px;
+	position:relative;
+	margin:0px 0px 0px 4px;
+	cursor:pointer;
+}

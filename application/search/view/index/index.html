@@ -1,0 +1,721 @@
+{include file="../application/common/header.html" title="查询搜索" }
+
+<!-- pagewrap  -->
+
+<div class="container-fluid">
+	<h4>搜索条件&nbsp;<button type="submit" class="btn btn-primary btn-sm btnClose" >关闭本页</button></h4>
+	<!-- <div class="row" > -->
+		<form class="form col-sm-offset-0" role="form" method="post" action="{$home}/search/index/searchresult">
+			<table class="table table-bordered table-striped table-responsive table-condensed">
+				<tbody>
+					<tr>
+						<td>
+							<div class="form-group col-sm-2">
+								<label class="control-label" for="selType">分类</label>
+								<select class="form-control" id="selType" name="type">
+									<option value="all">…不限…</option>
+									<option value="project">项目</option>
+									<option value="patent">专利</option>
+									<option value="thesis">论文</option>
+									<option value="issue">事务</option>
+								</select>
+							</div>
+							
+							<!-- <div class="form-group col-sm-4"> -->
+								<!-- <label class="" for="topic">关键词（题目/作者/部门/简介…)</label> -->
+								<!-- <input class="form-control" id="topic" name="topic" type="text" placeholder="关键词（题目/作者/部门/简介…)"> -->
+							<!-- </div> -->
+							
+							<div class="form-group col-sm-4">
+								<label class="" for="topic">题目</label>
+								<input class="form-control" id="topic" name="topic" type="text" value="{$topic}" placeholder="题目（关键词）">
+							</div>
+							
+							<div class="form-group col-sm-2">
+								<label class="" for="writer">作者</label>
+								<input class="form-control" id="writer" name="writer" type="text" value="{$writer}" placeholder="姓名（撰写人）">
+							</div>
+							
+							<div class="form-group col-sm-3">
+								<label class="" for="dept">部门</label>
+								<input class="form-control" id="dept" name="dept" type="text" value="{$dept}" placeholder="部门（关键词）">
+							</div>
+							
+							<!-- <div class="date form-group col-sm-2"> -->
+								<!-- <label class="" for="date">查询日期的类型</label> -->
+								<!-- <select class="form-control" id="selDate" name="date" > -->
+									<!-- <option value="submitdate">提交日期</option> -->
+									<!-- <option value="auditdate">审查日期</option> -->
+									<!-- <option value="aprovedate">批准日期</option> -->
+									<!-- <option value="resultdate">完成日期</option> -->
+									
+								<!-- </select> -->
+							<!-- </div> -->
+							
+							<!-- class="date" -->
+							<div id="divDate" class="date form-group col-sm-2">
+								<label class="" for="date">查询</label>
+								<select class="form-control" id="date" name="date" value="submitdate" readonly>
+									<option value="submitdate" checked>提交日期</option>
+								</select>
+							</div>
+							
+							<div id="divDateRange"class="date form-group col-sm-1">
+								<input type="radio" name="daterange" value="leq"><span><strong>&nbsp;&le;</strong></span><br>
+								<input type="radio" name="daterange" value="geq"><span><strong>&nbsp;&ge;</strong></span><br>
+								<input type="radio" name="daterange" value="btw"><span><strong>&nbsp;介于</strong></span>	
+							</div>
+							
+							<div id="divStartDate" class="date form-group col-sm-2">
+								<label class="" for="startdate">（<span class="label label-info">起始</span>）日期</label>
+								<input class="form-control" id="startdate" name="startdate" type="text" value="{$startdate}" placeholder="yyyy-mm-dd">
+							</div>
+							
+							<div id="divEndDate" class="date form-group col-sm-2">
+								<label class="" for="enddate">（<span class="label label-info">截止</span>）日期</label>
+								<input class="form-control" id="enddate" name="enddate" type="text" value="{$enddate}" placeholder="yyyy-mm-dd">
+							</div>	
+							<!-- /class="date" -->
+							
+						</td>	
+					</tr>
+					
+					<tr class="project">
+						<td>
+							<div class="form-group col-sm-2">
+								<label class="bg-default" for="selProType">&nbsp;<span class="glyphicon glyphicon-inbox">&nbsp;<strong>项目类型</strong>&nbsp;</span></label>
+								<select class="form-control" id="selProType" name="protype" >
+									<option value="不限">…不限…</option>
+									<option value="发明专利">发明专利</option>
+									
+								</select>
+							</div>
+							
+							<div class="form-group col-sm-4">
+								<label class="" for="num">编号</label>
+								<input class="form-control" id="num" type="text" placeholder="">
+							</div>
+						</td>	
+					</tr>
+					
+					<tr id="trPatent" class="patent">
+						<td>
+							<!-- <h4><span class="glyphicon glyphicon-wrench">&nbsp;专利</span></h4> -->
+							<div class="form-group col-sm-2">
+								<label class="bg-warning" for="selPatType">&nbsp;<span class="glyphicon glyphicon-wrench">&nbsp;<strong>专利类型</strong>&nbsp;</span></label>
+								<select class="form-control" id="selPatType" name="pattype" >
+									<option value="不限">…不限…</option>
+									<option value="发明专利">发明专利</option>
+									<option value="实用新型专利">实用新型专利</option>
+									<option value="外观设计专利">外观设计专利</option>
+									<option value="软件版权">软件版权</option>
+									<option value="著作权">著作权</option>
+									<option value="集成电路图">集成电路图</option>
+								</select>
+							</div>
+							
+							<div id="divPatStatus" class="form-group col-sm-2">
+								<label class="" for="selPatStatus">状态</span></label>
+								<select class="form-control" id="selPatStatus" name="patstatus">
+									<option value="不限">…不限…</option>
+									<option value="新增">新增</option>
+									<option value="申报">申报</option>
+									<option value="返回修改">返回修改</option>
+									<option value="授权">授权</option>
+									<option value="续费中">续费中</option>
+									<option value="续费授权">续费授权</option>
+									<option value="驳回">驳回</option>
+									<option value="放弃">放弃</option>
+								</select>
+							</div>
+							
+							<div id="divPatDate" class="form-group col-sm-2">
+								<label class="" for="selPatDate">查询</label>
+								<select class="form-control" id="selPatDate" name="patdate">
+									<option value="submitdate">提交日期</option>
+									<option value="applydate">申报日期</option>
+									<option value="modifydate">修改日期</option>
+									<option value="authrejectdate">授权/驳回日期</option>
+									<option value="renewdeadlinedate">续费截止日期</option>
+									<option value="nextrenewdate">下一次续费日期</option>
+									<option value="renewabandondate">续费/放弃</option>
+									
+								</select>
+							</div>
+							
+							<div id="divPatDateRange" class="form-group col-sm-1">
+								<input type="radio" name="patdaterange" value="leq"><span><strong>&nbsp;&le;</strong></span><br>
+								<input type="radio" name="patdaterange" value="geq"><span><strong>&nbsp;&ge;</strong></span><br>
+								<input type="radio" name="patdaterange" value="btw"><span><strong>&nbsp;介于</strong></span>
+							</div>
+							
+							<div id="divPatStartDate" class="form-group col-sm-2">
+								<label class="" for="startdate">（<span class="label label-info">起始</span>）日期</label>
+								<input class="form-control" id="patstartdate" name="patstartdate" type="text" value="{$patstartdate}" placeholder="yyyy-mm-dd">
+							</div>
+							
+							<div id="divPatEndDate" class="form-group col-sm-2">
+								<label class="" for="enddate">（<span class="label label-info">截止</span>）日期</label>
+								<input class="form-control" id="patenddate" name="patenddate" type="text" value="{$patenddate}" placeholder="yyyy-mm-dd">
+							</div>	
+							
+						</td>	
+					</tr>
+					
+					<tr class="thesis">
+						<td>
+							<div class="form-group col-sm-2">
+								<label class="bg-info" for="selTheType">&nbsp;<span class="glyphicon glyphicon-list">&nbsp;<strong>论文类型</strong>&nbsp;</span></label>
+								<select class="form-control" id="selTheType" name="thetype" >
+									<option value="不限">…不限…</option>
+									<option value="发明专利">发明专利</option>
+									
+								</select>
+							</div>
+						</td>	
+					</tr>
+					
+					<tr id="trIssue"class="issue">
+						<td>
+							<div class="form-group col-sm-2">
+								<label class="bg-primary" for="selIssType">&nbsp;<span class="glyphicon glyphicon-pushpin">&nbsp;<strong>事务类型</strong>&nbsp;</span></label>
+								<select class="form-control" id="selIssType" name="isstype" >
+									<option value="不限">…不限…</option>
+									<option value="发明专利">发明专利</option>
+									
+								</select>
+							</div>
+						</td>	
+					</tr>
+					
+					<tr>
+						<td>
+							<button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span>&nbsp;搜索</button>
+							<!-- <button type="button" class="btn btn-primary" onclick="window.location.reload();">重0置</button> -->
+							<button id="btnReset" type="button" class="btn btn-primary">重置</button>
+							
+						</td>	
+					</tr>
+					
+				</tbody>
+			</table>
+		</form>
+	
+	<h4>搜索结果 <span id="spResult" class="badge">{$patsnum+$prosnum+$thesnum+$issesnum}</span></h4>
+	<div id="result">	
+		
+		<div class="project panel-group">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" href="#collapse1"><span class="glyphicon glyphicon-inbox">&nbsp;项目&nbsp;{$prosnum}</span></a>
+					</h4>
+				
+				</div>
+				<div id="collapse1" class="panel-collapse collapse">
+					<div class="panel-body">Panel Body
+						<div class="bs-callout bs-callout-primary" id="">
+							<h4>项目《xxxx》</h4>
+							<p>在 HTML5 中可以放心使用 <code>&lt;b&gt;</code> 和 <code>&lt;i&gt;</code> 标签。<code>&lt;b&gt;</code> 用于高亮单词或短语，不带有任何着重的意味；而 <code>&lt;i&gt;</code> 标签主要用于发言、技术词汇等。
+							</p>
+							<footer>项目《xxxx》，编号：prj2017001，部门：yy；申报时间：2015-1-2；现在状态：验收</footer>
+							
+						</div>
+					
+						<div class="bs-callout bs-callout-primary" id="callout-type-b-i-elems">
+							<h4>项目《xxxx》</h4>
+							<p>在 HTML5 中可以放心使用 <code>&lt;b&gt;</code> 和 <code>&lt;i&gt;</code> 标签。<code>&lt;b&gt;</code> 用于高亮单词或短语，不带有任何着重的意味；而 <code>&lt;i&gt;</code> 标签主要用于发言、技术词汇等。
+							</p>
+							<footer>项目《xxxx》，编号：prj2017001，部门：yy；申报时间：2015-1-2；现在状态：验收</footer>
+							
+						</div>
+				
+					</div>
+					<div class="panel-footer">Panel Footer</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="patent panel-group">
+			<div class="panel panel-warning">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+					  <a data-toggle="collapse" href="#collapse2"><span class="glyphicon glyphicon-wrench">&nbsp;专利&nbsp;{$patsnum}</span></a>
+					</h4>
+				</div>
+				
+				<div id="collapse2" class="panel-collapse collapse">
+					<div class="panel-body">
+						{volist name="pats" id="vo" empty="暂无专利"}
+						<div class="bs-callout bs-callout-warning">
+							<h4>
+								<span class="glyphicon glyphicon-wrench"></span>&nbsp;{$i}&nbsp;“{$vo.topic}”</h4>
+							<p>简介：{$vo.summary}</p>
+							<footer>
+								<!-- <a href="#" target="_blank" data-toggle="tooltip" data-placement="bottom" title="专利信息">{$vo.topic}</a>；  -->
+								<!-- <a href="#" target="_blank" data-toggle="tooltip" data-placement="bottom" title="专利过程">状态：{$vo.status}</a>；   -->
+								<!-- 编号：{$vo.patnum}；部门：{$vo.dept}；提交时间：{$vo.submitdate}； -->
+								
+								 <div class="row">
+									<div class="col-sm-3">
+										<a href="{$home}/patent/index/patinfo/id/{$vo.id}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="专利信息">查看详情</a>； 
+										状态：<a href="{$home}/patent/index/patrecords/id/{$vo.id}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="专利过程">{$vo.status}</a>
+									</div>
+									<div class="col-sm-3">撰写人：{$vo.author}；专利类型：{$vo.pattype}</div>
+									<div class="col-sm-3">编号：{$vo.patnum}；部门：{$vo.dept}</div>
+									<!-- <div class="col-sm-3">提交时间：{$vo.submitdate}</div> -->
+									
+									{switch name="$patdate"}
+										{case value="submitdate"}<div class="col-sm-3">提交时间：{$vo.submitdate}</div> {/case}
+										{case value="applydate"}<div class="col-sm-3">申报时间：{$vo.applydate}</div> {/case}
+										{case value="modifydate"}<div class="col-sm-3">修改时间：{$vo.modifydate}</div> {/case}
+										{case value="authrejectdate"}<div class="col-sm-3">授权/驳回时间：{$vo.authrejectdate}</div> {/case}
+										{case value="renewdeadlinedate"}<div class="col-sm-3">续费截止时间：{$vo.renewdeadlinedate}</div> {/case}
+										{case value="nextrenewdate"}<div class="col-sm-3">下一次续费时间：{$vo.nextrenewdate}</div> {/case}
+										{case value="renewabandondate"}<div class="col-sm-3">续费/放弃时间：{$vo.renewabandondate}</div> {/case}
+
+									{/switch}
+									
+									
+									
+								</div>
+							</footer>
+						
+						</div>
+						{/volist}		
+						
+						<!-- <div id="patpagetotal" class="patpage col-sm-10 text-right">
+							<ul class="pagination pagination-sm">
+								<li><a href="#">1</a></li>
+								<li class="active"><a href="#">2</a></li>
+								<li><a href="#">3</a></li>
+								<li><a href="#">4</a></li>
+								<li><a href="#">5</a></li>
+							</ul>
+						</div> -->
+					
+					</div>
+					
+					<div class="panel-footer">footer
+						
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		
+		<div class="thesis panel-group">
+			<div class="panel panel-info">
+			  <div class="panel-heading">
+				<h4 class="panel-title">
+				   <a data-toggle="collapse" href="#collapse3"><span class="glyphicon glyphicon-list">&nbsp;论文&nbsp;{$thesnum}</span></a>
+				</h4>
+			  </div>
+			  <div id="collapse3" class="panel-collapse collapse">
+				<div class="panel-body">Panel Body
+					<div class="bs-callout bs-callout-info" id="">
+						<h4>项目《xxxx》</h4>
+						<p>在 HTML5 中可以放心使用 <code>&lt;b&gt;</code> 和 <code>&lt;i&gt;</code> 标签。<code>&lt;b&gt;</code> 用于高亮单词或短语，不带有任何着重的意味；而 <code>&lt;i&gt;</code> 标签主要用于发言、技术词汇等。
+						</p>
+						<footer>项目《xxxx》，编号：prj2017001，部门：yy；申报时间：2015-1-2；现在状态：验收</footer>
+						
+					</div>
+					
+					<div class="bs-callout bs-callout-info" id="callout-type-b-i-elems">
+						<h4>项目《xxxx》</h4>
+						<p>在 HTML5 中可以放心使用 <code>&lt;b&gt;</code> 和 <code>&lt;i&gt;</code> 标签。<code>&lt;b&gt;</code> 用于高亮单词或短语，不带有任何着重的意味；而 <code>&lt;i&gt;</code> 标签主要用于发言、技术词汇等。
+						</p>
+						<footer>项目《xxxx》，编号：prj2017001，部门：yy；申报时间：2015-1-2；现在状态：验收</footer>
+						
+					</div>
+				</div>
+				<div class="panel-footer">Panel Footer</div>
+			  </div>
+			</div>
+		</div>
+		
+		<div class="issue panel-group">
+			<div class="panel panel-primary">
+			  <div class="panel-heading">
+				<h4 class="panel-title">
+				   <a data-toggle="collapse" href="#collapse4"><span class="glyphicon glyphicon-pushpin">&nbsp;事务&nbsp;{$issesnum}</span></a>
+				</h4>
+			  </div>
+			  <div id="collapse4" class="panel-collapse collapse">
+				<div class="panel-body">
+					{volist name="isses" id="vo" empty="暂无事务"}
+						<div class="bs-callout bs-callout-primary">
+							<h4><span class="glyphicon glyphicon-pushpin"></span>&nbsp;{$i}&nbsp;“{$vo.topic}”</h4>
+							<p>简介：{$vo.abstract}</p>
+							<footer>
+								 <div class="row">
+									<div class="col-sm-3">
+										<a href="{$home}/issue/index/issinfo/id/{$vo.id}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="事务信息">查看详情</a>； 
+										状态：<a href="{$home}/issue/index/issrecords/id/{$vo.id}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="事务过程">{$vo.status}</a>
+									</div>
+									<div class="col-sm-3">撰写人：{$vo.writer}；事务类型：{$vo.sub_num_type}</div>
+									<div class="col-sm-3">编号：{$vo.issnum}；部门：{$vo.dept}</div>
+									<div class="col-sm-3">提交时间：{$vo.submitdate}</div>
+									
+								</div>
+							</footer>
+						
+						</div>
+						{/volist}		
+				</div>
+				<div class="panel-footer">Panel Footer</div>
+			  </div>
+			</div>
+		</div>
+		
+</div>
+		
+<!-- <div class="btn-group"> -->
+			<button type="submit" class="btn btn-primary btn-sm btnClose" >关闭本页</button>
+<!-- </div> -->
+	
+<!-- /pagewrap -->
+
+<script>
+$(document).ready(function(){
+
+	$(".btnClose").click(function(){
+		window.close();
+	});
+	
+	<!--去除 "../application/common/header.html"中的#liSearch、#liQuit-->
+	$("#liSearch").remove();
+	$("#liQuit").remove();
+	
+	<!-- 设定#selType的显示值 -->
+	$("#selType").val('{$type}').attr('selected','selected');
+	
+	<!-- 调用函数，由#selType的初始显示值，决定页面显示的输入框 -->
+	typeShow($("#selType").val());
+	
+	<!-- #selType的值改变，页面显示微调-->
+	$("#selType").change(function(){
+		<!--调用函数，由#selType的显示值，决定页面显示的输入框 -->
+		typeShow($("#selType").val());
+		
+	});
+	
+	<!-- 设定#selPatType的显示值 -->
+	$("#selPatType").val('{$pattype}').attr('selected','selected');
+	
+	<!-- 设定#selPatStatus的显示值 -->
+	$("#selPatStatus").val('{$patstatus}').attr('selected','selected');
+	
+	<!-- 调用函数，根据#selPatStatus的初始显示值，页面显示微调-->
+	patDateShow($("#selPatStatus").val());
+	
+	<!-- 设定值为{$daterange}的一项为选中 -->
+	$("input:radio[name='daterange'][value={$daterange}]").attr("checked",true);
+	<!-- “radio” 选中值为{$daterange}的一项，调用函数dateRange()-->
+	dateRange($("input:radio[name='daterange']:checked").val(),$("#selType").val());
+	
+	<!-- 查询日期的输入框根据“radio”的不同而有区别-->
+	$("input:radio[name='daterange']").change(function (){
+		dateRange($("input:radio[name='daterange']:checked").val(),$("#selType").val());
+	});
+	
+	<!-- 设定值为{$patdaterange}的一项为选中 -->
+	$("input:radio[name='patdaterange'][value={$patdaterange}]").attr("checked",true);
+	<!-- “radio” 选中值为{$patdaterange}的一项，调用函数patDateRange() -->
+	patDateRange($("input:radio[name='patdaterange']:checked").val());
+	
+	<!-- 专利查询日期的输入框根据“radio”的不同而有区别-->
+	$("input:radio[name='patdaterange']").change(function (){ 
+		patDateRange($("input:radio[name='patdaterange']:checked").val());
+	});
+	
+	<!-- #selPatStatus的值改变，页面显示微调-->
+	$("#selPatStatus").change(function(){
+		<!--调用函数，由#selPatStatus的显示值，决定页面显示的输入框 -->
+		patDateShow($("#selPatStatus").val());
+		
+	});
+	
+	$("#btnReset").on({click: function(){
+			<!-- refresh(); -->
+			window.location.href="{$home}/search/index/index";
+			$("#result").hide();
+        }  
+    });
+	
+});
+
+
+<!-- jQuery functions -->
+	function refresh(){
+		window.location.reload();//刷新当前页面.
+		
+	}
+	
+	<!-- 函数，由#selType的初始显示值，决定页面显示的输入框 -->
+	function dateRange(range,type){
+		if(type=='all'){
+			$(".date").show();
+			switch(range){
+				case 'leq':
+					$("#divDateRange").find("span").removeClass("label label-info"); 
+					$("input:radio[name='daterange']:checked").next("span").addClass("label label-info");
+					
+					$("#divStartDate").hide();
+					$("#divEndDate").show();
+					
+				break;
+				
+				case 'geq':
+					
+					$("#divDateRange").find("span").removeClass("label label-info"); 
+					$("input:radio[name='daterange']:checked").next("span").addClass("label label-info");
+					$("#divStartDate").show();
+					$("#divEndDate").hide();
+				break;
+				
+				<!--  btw-->
+				default:
+					
+					$("#divDateRange").find("span").removeClass("label label-info"); 
+					$("input:radio[name='daterange']:checked").next("span").addClass("label label-info");
+					
+					$("#divStartDate").show();
+					$("#divEndDate").show();
+				break;
+			}
+			
+		}else{
+			$(".date").hide();
+			typeShow(type);
+		}
+		
+		
+	}
+	
+	<!-- 函数，由#selType的初始显示值，决定页面显示的输入框 -->
+	function patDateRange(range){
+		<!-- $(".date").hide(); -->
+		
+		switch(range){
+			case 'btw':
+				$("#divPatDateRange").find("span").removeClass("label label-info"); 
+				$("input:radio[name='patdaterange']:checked").next("span").addClass("label label-info");
+				$("#divPatStartDate").show();
+				$("#divPatEndDate").show();
+			break;
+			
+			case 'geq':
+				$("#divPatDateRange").find("span").removeClass("label label-info"); 
+				$("input:radio[name='patdaterange']:checked").next("span").addClass("label label-info");
+				$("#divPatStartDate").show();
+				$("#divPatEndDate").hide();
+			break;
+			
+			<!-- leq -->
+			default:
+				$("#divPatDateRange").find("span").removeClass("label label-info"); 
+				$("input:radio[name='patdaterange']:checked").next("span").addClass("label label-info");
+				$("#divPatStartDate").hide();
+				$("#divPatEndDate").show();
+			break;
+		}
+	}
+	
+	<!-- 函数，由#selType的初始显示值，决定页面显示的输入框 -->
+	function typeShow(type){
+		
+		switch(type){
+			case 'project':
+				$(".date").hide();
+				$(".project").show();
+				
+				$(".patent").hide();
+				$(".thesis").hide();
+				$(".issue").hide();
+				
+				$("#spResult").text('{$prosnum}');
+				<!-- $("#result").hide(); -->
+			break;
+			
+			case 'patent':
+				$(".date").hide();
+		
+				$(".project").hide();
+				
+				$(".patent").show();
+				
+				$(".thesis").hide();
+				$(".issue").hide();
+				
+				$("#spResult").text('{$patsnum}');
+				
+			break;
+			
+			case 'thesis':
+				$(".date").hide();
+				$(".project").hide();
+				
+				$(".patent").hide();
+				$(".thesis").show();
+				$(".issue").hide();
+				
+				$("#spResult").text('{$thesnum}');
+			break;
+			
+			case 'issue':
+				$(".date").hide();
+				$(".project").hide();
+				
+				$(".patent").hide();
+				$(".thesis").hide();
+				$(".issue").show();
+				
+				$("#spResult").text('{$issesnum}');
+			break;
+			
+			<!-- all -->
+			default:
+				<!-- 调用函数dateRange() -->
+				<!-- dateRange('{$daterange}','{$type}') -->
+				dateRange($("input:radio[name='daterange']:checked").val(),$("#selType").val());
+				
+				$(".project").hide();
+				$(".patent").hide();
+				$(".thesis").hide();
+				$(".issue").hide();
+				
+				<!-- #spResult的显示控制 -->
+				$("#spResult").text('{$patsnum+$prosnum+$thesnum+$issesnum}');
+				if({$patsnum+$prosnum+$thesnum+$issesnum}!=0){
+					<!-- $("#result" ).show(); -->
+					
+					if({$patsnum}){
+						$(".patent").show();
+						$("#trPatent").hide();
+					}else{
+						$(".patent").hide();
+					}
+					
+					if({$prosnum}){
+						$(".project").show();
+						$("#trProject").hide();
+					}else{
+						$(".project").hide();
+					}
+					
+					if({$thesnum}){
+						$(".thesis").show();
+						$("#trThesis").hide();
+					}else{
+						$(".thesis").hide();
+					}
+					
+					if({$issesnum}){
+						$(".issue").show();
+						$("#trIssue").hide();
+					}else{
+						$(".issue").hide();
+					}
+					
+				}
+				else{
+					$("#result").hide();
+				}
+				<!-- /#spResult的显示控制 -->
+				
+			break;
+			
+		}
+	}
+	
+	<!-- 函数，根据#selPatStatus的初始显示值，决定#selPatDate的选项内容； -->
+		<!-- 根据{$patdate}的值决定#selPatDate的显示值 -->
+	function patDateShow(patStatus){
+		switch(patStatus){
+			case '新增':
+				$("#selPatDate").empty();
+				$("#selPatDate").append('<option value="submitdate">提交日期</option>');
+			break;
+			
+			case '申报':
+				$("#selPatDate").empty();
+				$("#selPatDate").append('<option value="submitdate">提交日期</option>'+
+										'<option value="applydate">申报日期</option>');
+				$("#selPatDate").val('{$patdate}').attr('selected','selected');
+			break;
+			
+			case '返回修改':
+				$("#selPatDate").empty();
+				$("#selPatDate").append('<option value="submitdate">提交日期</option>'+
+									'<option value="applydate">申报日期</option>'+
+									'<option value="modifydate">修改日期</option>');
+				$("#selPatDate").val('{$patdate}').attr('selected','selected');
+			break;
+			
+			case '授权':
+				$("#selPatDate").empty();
+				$("#selPatDate").append('<option value="submitdate">提交日期</option>'+
+									'<option value="applydate">申报日期</option>'+
+									'<option value="modifydate">修改日期</option>'+
+									'<option value="authrejectdate">授权日期</option>');
+				$("#selPatDate").val('{$patdate}').attr('selected','selected');
+			break;
+			
+			case '续费中':
+				$("#selPatDate").empty();
+				$("#selPatDate").append('<option value="submitdate">提交日期</option>'+
+									'<option value="applydate">申报日期</option>'+
+									'<option value="modifydate">修改日期</option>'+
+									'<option value="authrejectdate">授权日期</option>'+
+									'<option value="renewdeadlinedate">续费截止日期</option>');
+				$("#selPatDate").val('{$patdate}').attr('selected','selected');
+			break;
+			
+			case '续费授权':
+				$("#selPatDate").empty();
+				$("#selPatDate").append('<option value="submitdate">提交日期</option>'+
+									'<option value="applydate">申报日期</option>'+
+									'<option value="modifydate">修改日期</option>'+
+									'<option value="authrejectdate">授权日期</option>'+
+									'<option value="renewdeadlinedate">续费截止日期</option>'+
+									'<option value="nextrenewdate">下一次续费日期</option>'+
+									'<option value="renewabandondate">续费日期</option>');
+				$("#selPatDate").val('{$patdate}').attr('selected','selected');
+			break;
+			
+			case '驳回':
+				$("#selPatDate").empty();
+				$("#selPatDate").append('<option value="submitdate">提交日期</option>'+
+									'<option value="applydate">申报日期</option>'+
+									'<option value="modifydate">修改日期</option>'+
+									'<option value="authrejectdate">驳回日期</option>');
+				$("#selPatDate").val('{$patdate}').attr('selected','selected');
+			break;
+			
+			case '放弃':
+				$("#selPatDate").empty();
+				$("#selPatDate").append('<option value="submitdate">提交日期</option>'+
+									'<option value="applydate">申报日期</option>'+
+									'<option value="modifydate">修改日期</option>'+
+									'<option value="authrejectdate">授权日期</option>'+
+									'<option value="renewdeadlinedate">续费截止日期</option>'+
+									'<option value="renewabandondate">放弃日期</option>');
+				$("#selPatDate").val('{$patdate}').attr('selected','selected');	
+			break;
+			
+			<!-- 不限 -->
+			default:
+				$("#selPatDate").empty();
+				$("#selPatDate").append('<option value="submitdate">提交日期</option>');
+				
+			break;
+			
+		}
+	}
+	
+<!-- /jQuery functions -->	
+
+</script>
+	
+{include file="../application/common/footer.html"}

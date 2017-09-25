@@ -1,0 +1,334 @@
+{include file="../application/common/headeruser.html" title="IP管理" }
+
+<!-- pagewrap  -->
+<div class="container-fluid">
+	<h4>
+		<span id="spanHead">{$username}【{$rolename}】<strong>“{$typename}”</strong>管理——总数<span class="badge">{$num_maintainer1+$num_maintainer2+$num_maintainer3}</span></span>
+		<a id="btnReturn" class="btn btn-primary btn-sm" role="button">返回个人事务中心</a>
+	</h4>
+	<ul class="nav nav-tabs inline">
+	 
+		<li id="maintainer1li"><a data-toggle="tab" href="#maintainer1div"><span class="glyphicon glyphicon-flash" ></span>&nbsp;待处理&nbsp;<span class="label label-warning">{$num_maintainer1}</span></a></li>
+		<li id="maintainer2li"><a data-toggle="tab" href="#maintainer2div"><span class="glyphicon glyphicon-send" ></span>&nbsp;审批中&nbsp;<span class="label label-danger">{$num_maintainer2}</span></a></li>
+		<li id="maintainer3li"><a data-toggle="tab" href="#maintainer3div"><span class="glyphicon glyphicon-ice-lolly-tasted" ></span>&nbsp;维护管理&nbsp;<span class="label label-info">{$num_maintainer3}</span></a></li>
+ 
+	</ul>
+	
+	<div id="maintainer" class="tab-content">
+		<div id="maintainer1div" class="tab-pane fade table-responsive">
+			<h4><span class="bg-warning">&nbsp;待处理{$typename}数<span class="badge">{$num_maintainer1}</span>&nbsp;</span></h4>
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>{$typename}</th>
+						<th>{$typename}状态</th>
+						<th>{$typename}类型</th>
+						<th>{$typename}提交日期</th>
+						<th>撰写人</th>
+						<th>所属部门</th>
+						<th>关联事务</th>
+						<th>事务执行人</th>
+						<th>操作</th>
+
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="maintainer1" id="vo" empty="暂时没有数据"}
+					<tr>
+						<td>{$i+($pagemaintainer1num-1)*$listrows}</td>
+						<td><a href="{$home}/patent/index/patinfo/id/{$vo.id}/role/{$role}/type/{$type}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="{$typename}信息">{$vo.topic}</a></td>
+						<td><a href="{$home}/patent/index/patrecords/id/{$vo.id}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="{$typename}过程">{$vo.status}</a></td>
+						<td>{$vo.pattype}</td>
+						<td>{$vo.submitdate}</td>
+						<td>{$vo.author}</td>
+						<td>{$vo.dept}</td>
+						<td><a href="{$home}/issue/index/issinfo/id/{$vo.issinfo_id}/role/{$role}/type/{$type}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="事务信息">{$vo.issinfo_topic}</a></td>
+						<td>{$vo.executer}</td>
+						<td id="operation{$i}">
+							<a href="{$home}/patent/index/patmaintain/id/{$vo.id}/role/{$role}" class="btn btn-primary btn-xs" role="button">处理</a>
+						</td>
+						
+					</tr>
+					{/volist}	
+				</tbody>
+				
+			</table>
+		
+		</div>
+		
+		<div id="maintainer2div" class="tab-pane fade table-responsive">
+			<h4><span class="bg-danger">&nbsp;审批中{$typename}数<span class="badge">{$num_maintainer2}</span>&nbsp;</span></h4>
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>{$typename}</th>
+						<th>{$typename}状态</th>
+						<th>{$typename}类型</th>
+						<!-- <th>事务填报日期</th> -->
+						<th>申报/续费日期</th>
+						<th>撰写人</th>
+						<th>所属部门</th>
+						<th>关联事务</th>
+						<th>事务执行人</th>
+						<th class="operation2">操作</th>
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="maintainer2" id="vo" empty="暂时没有数据"}
+					<tr>
+						<td>{$i+($pagemaintainer2num-1)*$listrows}</td>
+						<td><a href="{$home}/patent/index/patinfo/id/{$vo.id}/role/{$role}/type/{$type}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="{$typename}信息">{$vo.topic}</a></td>
+						<td><a href="{$home}/patent/index/patrecords/id/{$vo.id}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="{$typename}过程">{$vo.status}</a></td>
+						<td>{$vo.pattype}</td>
+						<td>
+							{eq name="$vo.status" value="申报"}
+								{$vo.applydate}
+							{else/}
+								{$vo.renewabandondate}
+							{/eq}
+							
+						</td>
+						<td>{$vo.author}</td>
+						<td>{$vo.dept}</td>
+						<td><a href="{$home}/issue/index/issinfo/id/{$vo.issinfo_id}/role/{$role}/type/{$type}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="事务信息">{$vo.issinfo_topic}</a></td>
+						<td>{$vo.executer}</td>
+						<td class="operation2">
+							
+							<a href="{$home}/patent/index/patmaintain/id/{$vo.id}/role/{$role}" class="btn btn-primary btn-xs" role="button">更新</a>
+						</td>
+						
+					</tr>
+					{/volist}
+				</tbody>
+			
+			</table>
+		
+		</div>
+		
+		<div id="maintainer3div" class="tab-pane fade table-responsive">
+			<h4><span class="bg-info">&nbsp;维护管理{$typename}数<span class="badge">{$num_maintainer3}</span>&nbsp;</span></h4>
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>{$typename}</th>
+						<th>{$typename}状态</th>
+						<th>{$typename}类型</th>
+						<th>审批日期</th>
+						<th>撰写人</th>
+						<th>所属部门</th>
+						<th>申报执行人</th>
+						<th>关联事务</th>
+						<th id="thMaintainer">操作</th>
+						
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="maintainer3" id="vo" empty="暂时没有数据"}
+					<tr>
+						<td>{$i+($pagemaintainer3num-1)*$listrows}</td>
+						<td><a href="{$home}/patent/index/patinfo/id/{$vo.id}/role/{$role}/type/{$type}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="{$typename}信息">{$vo.topic}</a></td>
+						<td>
+							<a href="{$home}/patent/index/patrecords/id/{$vo.id}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="{$typename}过程">
+								{eq name="$vo.status" value="驳回"}
+									<span class="label label-info">{$vo.status}</span>
+								{else/}
+									{$vo.status}
+								{/eq}
+								
+							</a>
+						</td>
+						<td>{$vo.pattype}</td>
+						<td>
+							{eq name="$vo.status" value="驳回"}
+								{$vo.renewabandondate}
+							{else/}
+								{$vo.authrejectdate}
+							{/eq}
+						
+						</td>
+						<td>{$vo.author}</td>
+						<td>{$vo.dept}</td>
+						<td>{$vo.executer}</td>
+						<td>
+							{if empty($vo.issinfo_topic)}
+								无
+							{else /}
+								<a href="{$home}/issue/index/issinfo/id/{$vo.issinfo_id}/role/{$role}/type/{$type}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="事务信息">{$vo.issinfo_topic}</a>
+							{/if}
+				
+						</td>
+						<td class="tdMaintainer">
+							{if $vo.status eq '驳回' || $vo.status eq '放弃' || $vo.status eq '返回修改'}
+								无
+							{else /}
+								<a href="{$home}/patent/index/patmaintain/id/{$vo.id}/role/{$role}" class="btn btn-primary btn-xs" role="button">维护</a>
+							{/if}
+						
+						</td>
+					</tr>
+					{/volist}
+				</tbody>
+			
+			</table>
+		
+		</div>
+	
+	</div>
+	
+	<!-- 分页显示 -->
+	<div id="pagemaintainer1" class="page col-sm-10 text-right">
+		{$pagemaintainer1}
+	</div>
+	
+	<div id="pagemaintainer2" class="page col-sm-10 text-right">
+		{$pagemaintainer2}
+	</div>
+	
+	<div id="pagemaintainer3" class="page col-sm-10 text-right">
+		{$pagemaintainer3}
+	</div>
+	
+	<!-- 选择每页显示条目数10、15、20、50 -->
+	<div id="listrows" class="form-group form-group-sm col-sm-1 page">
+		<span class="">每页条目数:</span>
+		<select class="form-control" id="rows">
+			<option value="10">10</option>
+			<option value="15">15</option>
+			<option value="20">20</option>
+			<option value="50">50</option>
+		</select>
+		
+	</div>
+	
+	<!-- Modal -->
+	<div class="modal fade modal-lg" id="statusModal" role="dialog">
+		<div class="modal-dialog">
+		
+		  <!-- Modal content-->
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <button type="button" class="close" data-dismiss="modal">&times;</button>
+			  <h4 class="modal-title">Modal Header</h4>
+			</div>
+			<div class="modal-body">
+			  <p>Some text in the modal.</p>
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		  </div>
+		  
+		</div>
+	</div>
+	<!-- /Modal -->
+	
+
+
+</div>
+<!-- /pagewrap  -->
+
+<script>
+$(document).ready(function(){
+	
+	<!-- 显示选项卡内容#{$pagex}div.active和.in，显示分页导航按钮#{$pagex} --> 
+	$("#maintainer{$active}li").addClass("active");
+	$("#maintainer{$active}div").addClass("active").addClass("in");
+	$(".page").hide();
+	$("#{$pagex}").show();
+	$("#listrows").show();
+	<!-- post新的type、active值 hy:不起作用 2017/6/7-->
+	$.post("{$home}/user/content/index/",
+		{
+			type:"2",
+			active:"{$active}"
+		});
+	
+	
+	<!-- 每页显示条目数 -->
+	$("#rows").val({$listrows}); 
+	
+	<!-- {$role}=operator/maintainer微调页面显示内容 -->
+	if("{$role}"=="operator"){
+		$("#maintainer3li a").html('<span class="glyphicon glyphicon-ice-lolly-tasted" ></span>&nbsp;审批结果');
+		$("#maintainer3div h4").html('<span class="bg-info">&nbsp;{$typename}审批结果数<span class="badge">{$num_maintainer3}</span>&nbsp;</span>');
+		$("#thMaintainer").remove();
+		$(".tdMaintainer").remove();
+		$("#spanHead").html('{$username}【{$rolename}】<strong>“{$typename}”</strong>管理——总数<span class="badge">{$num_maintainer1+$num_maintainer2}</span>');
+		$("#btnReturn").text("返回");
+		$("#btnReturn").click(function(){
+			window.location.href="{$home}/issue/index/index/role/operator/active/2/type/2";
+		});
+		
+		$(".operation2").remove();
+		{volist name="maintainer1" id="vo"}
+			$("#operation{$i}").children().remove();
+			$("#operation{$i}").append('<a href="{$home}/patent/index/patmod/issinfo_id/{$vo.issinfo_id}/role/{$role}/module/user" class="btn btn-primary btn-xs" role="button">提交</a>');
+		{/volist}
+		
+	}else{
+		
+		$("#btnReturn").click(function(){
+			window.location.href="{$home}/user/index/index/role/"+"{$role}";
+		});
+	}
+	
+	<!-- 通过选中的li实现选中的事务信息显示 -->
+	$("#maintainer1li").click(function(){
+		$(".page").hide();
+		$("#maintainer1div").addClass("active").addClass("in");
+		$("#pagemaintainer1").show();
+		$("#listrows").show();
+		
+		<!-- post新的type、active值 -->
+		$.post("{$home}/user/content/index",
+		{
+			type:"2",
+			active:"1"
+		});
+		
+	});
+	
+	<!-- 通过选中的li实现选中的事务信息显示 -->
+	$("#maintainer2li").click(function(){
+		$(".page").hide();
+		$("#maintainer2div").addClass("active").addClass("in");
+		$("#pagemaintainer2").show();
+		$("#listrows").show();
+		
+		<!-- post新的type、active值 -->
+		$.post("{$home}/user/content/index",
+		{
+			type:"2",
+			active:"2"
+		});
+	});
+	
+	<!-- 通过选中的li实现选中的事务信息显示 -->
+	$("#maintainer3li").click(function(){
+		$(".page").hide();
+		$("#maintainer3div").addClass("active").addClass("in");
+		$("#pagemaintainer3").show();
+		$("#listrows").show();
+		
+		<!-- post新的type、active值 -->
+		$.post("{$home}/user/content/index",
+		{
+			type:"2",
+			active:"3"
+		});
+	});
+	
+	<!-- 选择每页显示条目数后页面跳转并传参 -->
+	$("#rows").change(function(){
+		<!-- $.post("{$home}/patent/index/patlist",{role:{$role},type:{$type},active:{$active},listrows:$("#rows").val()});  -->
+		window.location.href="{$home}/user/content/index"+"/role/"+"{$role}"+"/type/"+"{$type}"+"/active/"+"{$active}"+"/listrows/"+$(this).val();//页面跳转并传参 
+		
+	});
+	
+});
+</script>
+
+{include file="../application/common/footer.html"}

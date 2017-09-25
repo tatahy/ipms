@@ -1,0 +1,400 @@
+{include file="../application/common/header.html" title="专利信息" }
+
+<!-- pagewrap  -->
+<div class="container-fluid">
+	<h4>专利情况 </h4>
+	<ul class="nav nav-tabs">
+		<li id="pagetotalli"><a data-toggle="tab" href="#pagetotaldiv">总体情况</a></li>
+		<li id="pagenewli"><a data-toggle="tab" href="#pagenewdiv">新增</a></li>
+		<li id="pageappli"><a data-toggle="tab" href="#pageappdiv">申报</a></li>
+		<li id="pageautli" ><a data-toggle="tab" href="#pageautdiv">授权（有效）</a></li>
+		<li id="pagerenli"><a data-toggle="tab" href="#pagerendiv">续费（有效）</a></li>
+		<li id="pageabali"><a data-toggle="tab" href="#pageabadiv">放弃</a></li>
+		<li id="pagerejli"><a data-toggle="tab" href="#pagerejdiv">驳回</a></li>
+	</ul>
+	
+
+	<div class="tab-content">
+		<div id="pagetotaldiv" class="tab-pane fade table-responsive">
+			<h4>专利总数<span class="badge">{$numtotal}</span></h4>
+			<table class="table table-bordered table-striped ">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>名称</th>
+						<th>类型</th>
+						<th>所有人</th>
+						<th>状态</th>
+						<th>提交日期</th>
+						<th>所属部门</th>
+						<th>关联项目</th>
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="listtotal" id="vo" empty="暂时没有数据"}
+					<tr>
+						<td>{$i+($pagetotalnum-1)*$listrows}</td>
+						<td>{$vo.topic}</td>
+						<td>{$vo.pattype}</td>
+						<td>{$vo.patowner}</td>
+						<td>{$vo.status}</td>
+						<td>{$vo.submitdate}</td>
+						<td>{$vo.dept}</td>
+						<td>{$vo.pronum}</td>
+					</tr>
+					{/volist}
+				</tbody>
+			</table>
+			
+		</div>
+		
+		<div id="pagenewdiv" class="tab-pane fade table-responsive">
+			<h4>新增专利数<span class="badge">{$numnew}</span></h4>
+			<table class="table table-bordered table-striped ">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>名称</th>
+						<th>类型</th>
+						<th>所有人</th>
+						<th>发明人</th>
+						<th>撰写人</th>
+						<th>提交日期</th>
+						<th>所属部门</th>
+						<th>关联项目</th>
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="listnew" id="vo" empty="没有'新增'专利"}
+					<tr>
+						<td>{$i+($pagenewnum-1)*$listrows}</td>
+						<td>{$vo.topic}</td>
+						<td>{$vo.pattype}</td>
+						<td>{$vo.patowner}</td>
+						<td>{$vo.inventor}</td>
+						<td>{$vo.author}</td>
+						<td>{$vo.submitdate}</td>
+						<td>{$vo.dept}</td>
+						<td>{$vo.pronum}</td>
+					</tr>
+					{/volist}
+				</tbody>
+			</table>
+			
+		</div>
+		
+		<div id="pageappdiv" class="tab-pane fade table-responsive">
+			<h4>申报专利数<span class="badge">{$numapp}</span></h4>
+			<table class="table table-bordered table-striped">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>名称</th>
+						<th>类型</th>
+						<th>所有人</th>
+						<th>发明人</th>
+						<th>撰写人</th>
+						<th>申报日期</th>
+						<th>所属部门</th>
+						<th>关联项目</th>
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="listapp" id="vo" empty="没有'申报'专利"}
+					<tr>
+						<td>{$i+($pageappnum-1)*$listrows}</td>
+						<td>{$vo.topic}</td>
+						<td>{$vo.pattype}</td>
+						<td>{$vo.patowner}</td>
+						<td>{$vo.inventor}</td>
+						<td>{$vo.author}</td>
+						<td>{$vo.applydate}</td>
+						<td>{$vo.dept}</td>
+						<td>{$vo.pronum}</td>
+					</tr>
+					{/volist}
+				</tbody>
+			</table>
+			
+		</div>
+		
+		<div id="pageautdiv" class="tab-pane fade table-responsive">
+			<h4><span class="bg-success">&nbsp;授权（有效期）专利数<span class="badge">{$numaut}</span>&nbsp;</span></h4>
+			<table class="table table-bordered table-striped">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>名称</th>
+						<th>类型</th>
+						<th>所有人</th>
+						<th>发明人</th>
+						<th>撰写人</th>
+						<th>授权日期</th>
+						<th>续费日期</th>
+						<th>所属部门</th>
+						<th>关联项目</th>
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="listaut" id="vo" empty="没有'授权'专利"}
+					<tr>
+						<td>{$i+($pageautnum-1)*$listrows}</td>
+						<td>{$vo.topic}</td>
+						<td>{$vo.pattype}</td>
+						<td>{$vo.patowner}</td>
+						<td>{$vo.inventor}</td>
+						<td>{$vo.author}</td>
+						<td>{$vo.authdate}</td>
+						<td>{$vo.renewdate}</td>
+						<td>{$vo.dept}</td>
+						<td>{$vo.pronum}</td>
+					</tr>
+					{/volist}
+				</tbody>
+			</table>
+			
+		</div>
+		
+		<div id="pagerendiv" class="tab-pane fade table-responsive">
+			<h4><span class="bg-success">&nbsp;续费（有效期）专利数<span class="badge">{$numren}</span>&nbsp;</span></h4>
+			<table class="table table-bordered table-striped">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>名称</th>
+						<th>类型</th>
+						<th>授权日期</th>
+						<th>续费日期</th>
+						<th>下一次续费日期</th>
+						<th>所属部门</th>
+						<th>关联项目</th>
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="listren" id="vo" empty="没有'续费'专利"}
+					<tr>
+						<td>{$i+($pagerennum-1)*$listrows}</td>
+						<td>{$vo.topic}</td>
+						<td>{$vo.pattype}</td>
+						<td>{$vo.authdate}</td>
+						<td>{$vo.renewdate}</td>
+						<td>{$vo.renewdate}+2</td>
+						<td>{$vo.dept}</td>
+						<td>{$vo.pronum}</td>
+					</tr>
+					{/volist}
+				</tbody>
+			</table>
+
+		</div>
+		
+		<div id="pageabadiv" class="tab-pane fade table-responsive">
+			<h4><span class="bg-danger">&nbsp;已放弃专利数<span class="badge">{$numaba}</span>&nbsp;</span></h4>
+			<table class="table table-bordered table-striped">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>名称</th>
+						<th>类型</th>
+						<th>授权日期</th>
+						<th>最后续费日期</th>
+						<th>放弃日期</th>
+						<th>放弃原因</th>
+						<th>所属部门</th>
+						<th>关联项目</th>
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="listaba" id="vo" empty="没有'放弃'专利"}
+					<tr>
+						<td>{$i+($pageabanum-1)*$listrows}</td>
+						<td>{$vo.topic}</td>
+						<td>{$vo.pattype}</td>
+						<td>{$vo.authdate}</td>
+						<td>{$vo.renewdate}</td>
+						<td>{$vo.abandonrejectdate}</td>
+						<td>{$vo.abandonrejectreason}</td>
+						<td>{$vo.dept}</td>
+						<td>{$vo.pronum}</td>
+					</tr>
+					{/volist}
+				</tbody>
+			</table>
+			
+		</div>
+		
+		<div id="pagerejdiv" class="tab-pane fade table-responsive">
+			<h4><span class="bg-danger">&nbsp;被驳回专利数<span class="badge">{$numrej}</span>&nbsp;</span></h4>
+			<table class="table table-bordered table-striped">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>名称</th>
+						<th>类型</th>
+						<th>发明人</th>
+						<th>撰写人</th>
+						<th>申报日期</th>
+						<th>驳回日期</th>
+						<th>驳回原因</th>
+						<th>所属部门</th>
+						<th>关联项目</th>
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="listrej" id="vo" empty="暂时没有数据"}
+					<tr>
+						<td>{$i+($pagerejnum-1)*$listrows}</td>
+						<td>{$vo.topic}</td>
+						<td>{$vo.pattype}</td>
+						<td>{$vo.inventor}</td>
+						<td>{$vo.author}</td>
+						<td>{$vo.applydate}</td>
+						<td>{$vo.abandonrejectdate}</td>
+						<td>{$vo.abandonrejectreason}</td>
+						<td>{$vo.dept}</td>
+						<td>{$vo.pronum}</td>
+					</tr>
+					{/volist}
+				</tbody>
+			</table>
+			
+		</div>
+	</div>
+	
+	<div id="pagetotal" class="patpage col-sm-10 text-right">
+		{$pagetotal}
+	</div>
+	
+	<div id="pagenew" class="patpage col-sm-10 text-right">
+		{$pagenew}
+	</div>
+	
+	<div id="pageapp" class="patpage col-sm-10 text-right">
+		{$pageapp}
+	</div>
+	
+	<div id="pageaba" class="patpage col-sm-10 text-right">
+		{$pageaba}
+	</div>
+	
+	<div id="pageaut" class="patpage col-sm-10 text-right">
+		{$pageaut}
+	</div>
+	
+	<div id="pagerej" class="patpage col-sm-10 text-right">
+		{$pagerej}
+	</div>
+	
+	<div id="pageren" class="patpage col-sm-10 text-right">
+		{$pageren}
+	</div>
+	
+	<!-- 选择每页显示条目数10、15、20、50 -->
+	<div id="listrows" class="form-group form-group-sm col-sm-1 patpage">
+		<!-- {$pagetotal} -->
+		<!-- <label for="sel1" class="control-label">每页条目数:</label> -->
+		<span class="">每页条目数:</span>
+		<select class="form-control" id="rows">
+			<option value="10">10</option>
+			<option value="15">15</option>
+			<option value="20">20</option>
+			<option value="50">50</option>
+		</select>
+		
+	</div>
+	
+</div>
+
+<!-- /pagewrap  -->
+
+<script>
+$(document).ready(function(){
+
+	<!-- 隐藏所有.patpage的标签（div标签）-->
+	$(".patpage").hide();
+		
+	<!-- 选中id为"nav_index"的标签（li标签）,添加.active -->
+	$("#nav_pat").addClass("active");
+
+	<!-- 显示选项卡标签：#{$pagex}li, -->
+	<!-- 显示选项卡内容#{$pagex}div.active和.in，显示分页导航按钮#{$pagex} --> 
+	$("#{$pagex}li").addClass("active");
+	$("#{$pagex}div").addClass("active").addClass("in");
+	$("#{$pagex}").show();
+	$("#listrows").show();
+	<!-- 每页显示条目数 -->
+	$("#rows").val({$listrows}); 
+	
+	<!-- 为Select插入一个Option(第一个位置)   -->
+	<!-- $("#rows").prepend("<option value='{$listrows}'>{$listrows}</option>"); -->
+	<!-- 设置Select索引值为0的项选中(第一个位置)  -->
+	<!-- $("#rows").get(0).selectedIndex=0;  -->
+		
+	<!-- 选择每页显示条目数后页面跳转并传参 -->
+	$("#rows").change(function(){
+		<!-- $(this).post("{$home}/patent/index/patlist",{listrows:$("#rows").val()});  -->
+		window.location.href="{$home}/patent/index/patlist"+"/listrows/"+$(this).val();//页面跳转并传参 
+		
+	});
+	
+	
+	<!-- 通过选中的li实现选中的事务信息显示 -->
+	$("#pagetotalli").click(function(){
+		$(".patpage").hide();
+		$("#pagetotaldiv").addClass("active").addClass("in");
+		$("#pagetotal").show();
+		$("#listrows").show();
+	});
+	
+	<!-- 通过选中的li实现选中的事务信息显示 -->
+	$("#pagenewli").click(function(){
+		$(".patpage").hide();
+		$("#pagenewdiv").addClass("active").addClass("in");
+		$("#pagenew").show();
+		$("#listrows").show();
+	});
+	
+	<!-- 通过选中的li实现选中的事务信息显示 -->
+	$("#pageappli").click(function(){
+		$(".patpage").hide();
+		$("#pageappdiv").addClass("active").addClass("in");
+		$("#pageapp").show();
+		$("#listrows").show();
+	});
+	
+	<!-- 通过选中的li实现选中的事务信息显示 -->
+	$("#pageautli").click(function(){
+		$(".patpage").hide();
+		$("#pageautdiv").addClass("active").addClass("in");
+		$("#pageaut").show();
+		$("#listrows").show();
+	});
+	
+	<!-- 通过选中的li实现选中的事务信息显示 -->
+	$("#pageabali").click(function(){
+		$(".patpage").hide();
+		$("#pageabadiv").addClass("active").addClass("in");
+		$("#pageaba").show();
+		$("#listrows").show();
+	});
+	
+	<!-- 通过选中的li实现选中的事务信息显示 -->
+	$("#pagerejli").click(function(){
+		$(".patpage").hide();
+		$("#pagerejdiv").addClass("active").addClass("in");
+		$("#pagerej").show();
+		$("#listrows").show();
+	});
+	
+	<!-- 通过选中的li实现选中的事务信息显示 -->
+	$("#pagerenli").click(function(){
+		$(".patpage").hide();
+		$("#pagerendiv").addClass("active").addClass("in");
+		$("#pageren").show();
+		$("#listrows").show();
+	});
+	
+});
+</script>
+
+{include file="../application/common/footer.html"}

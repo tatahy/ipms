@@ -1,0 +1,38 @@
+
+
+
+						<div id="divActdetail" class="form-group col-sm-2">
+							<label for="actdetail">审批意见</label>
+							<select  multiple size="6" class="form-control" id="actdetail" name="actdetail" value="">
+                               <select  class="form-control" id="actdetail" name="actdetail" value="">
+                                <option value="">
+									审核通过
+								</option>
+								<option value="">
+									退回修改
+								</option>
+                                <option value="pat2011011">
+									否决
+								</option>
+							
+							</select>
+						</div>
+						
+						
+		$("#btnDelete").click(function(){
+		con=confirm("确定进行此操作？");
+    });	
+	
+	$("#btnAudit").click(function(){
+	<!-- 弹出页面确定提交后跳转并传参  -->
+		con=confirm("确定进行此操作？");
+		if(con==true)window.location.href="{$home}/issue/index/isssave"+"/issnum/"+"{$issnum}"+"/operate/"+$this.val()+"/rolename/"+"{$rolename}"+"/actdetail/"+;
+    });
+	
+	<!-- #actdetail失去焦点时判断是否填入了内容，否则拉回填入内容  -->
+	$("#actdetail").focusout(function(){
+		if(empty($("#actdetail").val()){
+			alertalert("请填入审批意见。");
+		}
+		
+    });

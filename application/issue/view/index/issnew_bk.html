@@ -1,0 +1,706 @@
+{include file="../application/common/headeruser.html" title="事务" }
+
+<!-- pagewrap  -->
+<div class="container-fluid">
+	<h4>
+		{$username}&nbsp;【{$rolename}】的<mark>“{$topic}”</mark>
+		<button type="submit" class="btn btn-primary btn-xs btnReturn" >返回</button>
+	</h4>
+	<h3>
+		<!-- <span class="bg-info">{$typename}事务信息</span>  -->
+		<span class="label label-info">{$typename}事务信息</span>
+		
+		<!-- <a class="btn btn-primary btn-xs" role="button" href="{$home}/issue/index/index/role/{$role}/type/{$type}">返回</a> -->
+	</h3>
+	<div class="tab-content">
+    <div id="menu0" class="tab-pane fade in active">
+		<form class="" role="form" method="post" action="{$home}/issue/index/isssave" target="_blank">
+		<!-- 事务基本信息表单 -->
+		<table class="table table-bordered table-striped table-responsive table-condensed">
+			<tbody>
+				<tr>
+					<td>
+						<div class="form-group col-sm-4">
+							<label class="control-label" for="topic">名称</label>
+							<input class="form-control" id="topic" name="topic" value="{$topic}" type="text" placeholder="关于XX{$typename}的XX申请/报告" required>
+						</div>
+						
+						<div class="form-group col-sm-2">
+							<label for="num_type">类型</label>
+							<select class="form-control" id="num_type" name="num_type" >
+								<!-- <option value="{$type}.1">新增{$typename}申请</option>
+								<option value="{$type}.2">{$typename}一般申请</option>
+                                <option value="{$type}.3">{$typename}经费/预算申请</option>
+                                <option value="{$type}.4">其他{$typename}报告</option> -->
+								
+								<!-- <option value="{$type}">新增{$typename}申请</option>
+								<option value="{$type}">{$typename}一般申请</option>
+                                <option value="{$type}">{$typename}经费/预算申请</option>
+                                <option value="{$type}">其他{$typename}报告</option> -->
+							</select>
+						</div>
+						
+						<div class="form-group col-sm-3">
+							<label class="control-label" for="writer">撰写人</label>
+							<input class="form-control" id="writer" name="writer" value="{$writer}" type="text" readonly="" >
+						</div>
+						
+						<div class="form-group col-sm-3">
+							<label for="dept">所属部门</label>
+							<select class="form-control" id="dept" name="dept" value="{$dept}" readonly="">
+								<!-- <option value="{$dept}" select="selected">{$dept}</option> -->
+                                <option value="dept1">dept1</option>
+								<option value="dept2">dept2</option>
+                                <option value="dept3">dept3</option>
+                                <option value="dept4">dept4</option>
+                                <option value="dept5">dept5</option>
+                                <option value="dept6">3D打印技术服务中心</option>
+                                <option value="dept7">dept7</option>
+							</select>
+						</div>
+						
+					</td>		
+				</tr>
+
+				<tr>
+					<td>
+						<div class="form-group col-sm-6">
+							<label for="abstract">事务简介</label>
+							<textarea class="form-control" rows="5" id="abstract" name="abstract" placeholder="填写事务的主要内容，字数不超过100字。" required>{$abstract}</textarea>
+						</div>
+						
+						<div id="divSel" class="form-group col-sm-4">
+							<label for="num_id">关联{$typename}</label>
+							<select  multiple size="5" class="form-control" id="num_id" name="num_id">
+                                <option value="pat2011004">
+									<ol>
+										<!-- <li>pat2011004</li> -->
+										<li>“一种关于高尔夫发球机推球装置的发明专利”</li>
+										<li>发明专利</li>
+									</ol>
+								</option>
+								
+                                <option value="pat2011005">
+									<ul>
+										<!-- <li>pat2011004</li> -->
+										<li>“一种关于装置的发明专利”</li>
+										<li>发明专利</li>
+									</ul>
+								</option>
+								
+								<option value="pat2011010">
+									<ul>
+										<!-- <li>pat2011004</li> -->
+										<li>“一种关于推球装置的实用新型专利”</li>
+										<li>实用新型专利</li>
+									</ul>
+								</option>
+							</select>
+						</div>
+						
+						<div id="divIssnum" class="form-group col-sm-2">
+							<label class="control-label" for="issnum">事务编号</label>
+							<input class="form-control" id="issnum" name="issnum" value="{$issnum}" type="text" readonly>
+						</div>
+						
+					</td>		
+				</tr>
+				
+				<tr>
+					<td>
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="status">
+							 <a href="{$home}/issue/index/issrecords/id/{$id}" target="_blank" data-toggle="tooltip" data-placement="bottom" title="事务过程">状态</a>
+							</label>
+							<input class="form-control" id="status" name="status" value="{$status}" type="text" readonly>
+						</div>
+						
+						<div id="divActdetail" class="form-group col-sm-4">
+							<label for="actdetail">审批意见</label>
+							<input class="form-control" id="actdetail" name="actdetail" value="" list="actdetaildata" placeholder="单击选择或直接填写" required>
+								<datalist id="actdetaildata">
+									<option value="退回修改">
+									<option value="否决">
+									
+								</datalist>
+						
+						</div>
+						
+						<div id="divExecuter" class="form-group col-sm-4">
+							<label for="executer">指定&nbsp;“{$topic}”&nbsp;<mark>执行人</mark></label>
+							<select id="executer" size="6" class="form-control" name="executer" autofocus>
+                                {volist name="users" id="vo"}
+								<option value="{$vo.username}">
+									<ul>
+										<li class="col-sm-1">{$i}</li>
+										<li class="col-sm-1">{$vo.username}</li>
+										<li class="col-sm-2">“{$vo.dept}”</li>
+									</ul>
+								</option>
+								
+								{/volist}
+								
+							</select>
+						</div>
+						
+					</td>		
+				</tr>
+				
+				<tr>
+					<td>				
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="addnewdate">填报/修改日期</label>
+							<input class="form-control" id="addnewdate" name="addnewdate" value="{$addnewdate}" type="text" readonly>
+						</div>
+						
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="submitdate">提交日期</label>
+							<input class="form-control" id="submitte" name="submitdate" value="{$submitdate}" type="text" readonly>
+						</div>
+						
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="auditrejectdate">审核日期</label>
+							<input class="form-control" id="auditrejectdate" name="auditrejectdate" value="{$auditrejectdate}" type="text" readonly>
+						</div>
+						
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="resultdate">审批日期</label>
+							<input class="form-control" id="resultdate" name="resultdate" value="{$resultdate}" type="text" readonly>
+						</div>
+						
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="operatestartdate">执行开始日期</label>
+							<input class="form-control" id="operatestart" name="operatestart" value="{$operatestartdate}" type="text" readonly>
+						</div>
+						
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="finishdate">关闭日期</label>
+							<input class="form-control" id="finishdate" name="finishdate" value="{$finishdate}" type="text" readonly>
+						</div>
+						
+					</td>		
+				</tr>
+				
+				<tr>
+					<td>
+						<div id="divReport" class="form-group col-sm-6">
+							<label class="control-label" for="">事务执行情况简报</label>
+							<textarea class="form-control" rows="5" id="report" name="report" placeholder="填写事务执行过程中的重要事项，字数不超过100字。可上传详细的报告附件。" required></textarea>
+						</div>
+						
+						<div id="divReportdate" class="col-sm-4">
+							<label class="control-label" for="reportdate">简报日期</label>
+							<input class="form-control" id="reportdate" name="reportdate" value="{$reportdate}" type="text" readonly>
+						</div>
+						
+						<div id="btnSave" class="col-sm-2">
+							<input type="submit" class="btn btn-primary btn-xs" formenctype="multipart/form-data" value="保存（{$typename}事务信息）">						
+							<!-- <button type="submit" class="btn btn-primary btn-xs">保存（{$typename}事务信息）</button> -->
+						</div>
+					</td>		
+				</tr>
+				
+			</tbody>
+		</table>
+		</form>
+		
+		
+		
+		<!-- 附件表单 -->
+		<h3><span class="label label-info">{$typename}事务附件</span></h3>
+		<div id="divAtt" class="table-responsive">
+			<table id="tblAtt" class="table table-bordered table-hover table-condensed">
+				<thead>
+					
+					
+					<tr>
+						<!-- <th>选择</th> -->
+						<th>序号</th>
+						<th>附件类型</th>
+						<th>附件名称</th>
+						<th>上传日期</th>
+						<th>上传人</th>
+						<th>系统角色</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="atts" id="vo" empty="暂无附件"}
+					<tr>
+						<!-- <td><input type="checkbox" check=""></td> -->
+						<td>{$i}</td>
+						<td>{$vo.atttype}</a></td>
+						<td>{$vo.name}</a></td>
+						<td>{$vo.uploaddate}</td>
+						<td>{$vo.uploader}</td>
+						<td>{$vo.rolename}</td>
+						<td>
+							{eq name="vo.rolename" value="$rolename"}
+								<a href="{$home}/attachment/index/download/id/{$vo.id}">下载</a>&nbsp;
+								<!-- <a href="{$home}{$vo.attpath}">下载</a>&nbsp; -->
+								<a href="{$home}/attachment/index/delete/id/{$vo.id}">删除</a>
+							{else/}
+								<a href="{$home}/attachment/index/download/id/{$vo.id}">下载</a>
+							{/eq}
+						</td>
+					</tr>
+					{/volist}
+				
+				</tbody>
+				
+			</table>
+			
+			<div class="">
+				<button id="btnUpload" type="button" class="btn btn-primary btn-xs">添加附件</button>
+			</div>
+			<!-- <div class="btn-group-xs">
+				<button id="btnUpload" type="button" class="btn btn-primary">增加附件</button>
+				<button type="button" class="btn btn-primary" formaction="">上移</button>
+				<button type="button" class="btn btn-primary" formaction="">下移</button>
+				<button type="button" class="btn btn-primary" formaction="">删除</button>				
+			</div> -->
+			
+		</div>
+		
+		<hr>
+
+		<div id="btnRole" class="btn btn-group-sm">
+			<button id="btnSubmit" class="btn btn-primary" value="submit">提交申请</button>
+			<button id="btnDelete" class="btn btn-primary" value="delete">删除</button>
+		
+			<button id="btnAudit" class="btn btn-primary" value="audit">审核通过</button>
+			
+			<button id="btnApprove" class="btn btn-primary" value="approve">批准同意</button>
+			
+			<button id="btnReject" class="btn btn-primary" value="reject">退回修改</button>
+			<button id="btnRefuse" class="btn btn-primary" value="refuse">否决</button>
+			
+			<button id="btnAccept" class="btn btn-primary" value="accept">领受任务</button>
+			<button id="btnReport" class="btn btn-primary" value="report">任务报告</button>
+			<button id="btnClose" class="btn btn-primary" value="close">任务关闭</button>
+			
+			<!-- <a class="btn btn-primary" role="button" href="{$home}/issue/index/index/role/{$role}/type/{$type}">返回</a>				 -->
+			<button type="submit" class="btn btn-primary btn-xs btnReturn" >返回</button>
+		</div>
+		
+    </div>
+	
+</div>
+</div>
+
+</br>
+
+<!-- /pagewrap  -->
+
+<!-- Modal -->
+	<div class="modal fade modal-lg" id="uploadFile" role="dialog">
+		<div class="modal-dialog">
+		
+		  <!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+				  <button type="button" class="close" data-dismiss="modal">&times;</button>
+				  <h4 class="modal-title">{$typename}事务"{$topic}"——附件上传</h4>
+				</div>
+				
+				<div class="modal-body">
+					<blockquote>
+						<p>选择上传的文件。</p>
+						<footer>文件大小：<mark>10MB</mark>。文件类型：<mark>jpg,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx</mark></footer>
+					</blockquote>
+				  
+					<form class="" role="form" action="{$home}/attachment/index/upload" method="post">
+						
+						<table id="tblAtt" class="table table-bordered table-striped table-condensed">
+						<tbody>						
+							<tr>
+								<div class="form-group col-sm-5">
+									<label for="atttype">附件类型</label>
+									<select class="form-control" id="atttype" name="atttype" >
+										<option value="新增{$typename}申请">新增{$typename}申请</option>
+										<option value="{$typename}一般申请">{$typename}一般申请</option>
+										<option value="{$typename}经费/预算申请">{$typename}经费/预算申请</option>
+										<option value="{$typename}执行报告">{$typename}执行报告</option>
+										<option value="其他{$typename}报告">其他{$typename}报告</option>
+										
+									</select>
+								</div>
+								
+								<div class="form-group col-sm-7">
+									<label for="num_type">附件名称</label>
+									<input class="form-control" type="text" name="name" placeholder="填写附件的文件名" required/>
+								</div>
+								
+							</tr>
+							
+							<tr>
+								<div class="form-group col-sm-5">
+									<label class="control-label" for="uploaddate">上传日期</label>
+									<input class="form-control" id="uploaddate" name="uploaddate" value="{$uploaddate}" type="text" readonly>
+								</div>
+								
+								<div class="form-group col-sm-4">
+									<label class="control-label" for="num_id">对应事务编号</label>
+									<input class="form-control" id="num_id" name="num_id" value="{$issnum}" type="text" readonly>
+								</div>
+								
+								<div class="form-group col-sm-3" hidden>
+									<label class="control-label" for="num_type">事务类型</label>
+									<input class="form-control" id="num_type" name="num_type" value="{$type}" type="text" readonly>
+								</div>
+							</tr>
+								
+							<tr>	
+								<div class="form-group col-sm-5">
+									<label class="control-label" for="uploader">上传人</label>
+									<input class="form-control" id="uploader" name="uploader" value="{$username}" type="text" readonly>
+								</div>
+								
+								<div class="form-group col-sm-4">
+									<label class="control-label" for="rolename">系统角色</label>
+									<input class="form-control" id="rolename" name="rolename" value="{$rolename}" type="text" readonly>
+								</div>
+								
+							</tr>
+							
+							<tr>
+								<input type="file" name="file" > <br/>
+								<input type="submit" formenctype="multipart/form-data" value="上传" > 
+							</tr>
+						</tbody>
+					</table>
+						
+					</form> 
+				</div>
+			
+				<div class="modal-footer">
+				  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			
+			</div>
+		  
+		</div>
+	</div>
+	<!-- /Modal -->
+	
+<script>
+$(document).ready(function(){
+
+    $("#save").click(function() {
+        var sel = $("#pronum").val();
+		<!-- $("#pronum").val(sel); -->
+       <!--  alert(被选中的是:"+sel+"。") -->;
+    });
+	
+	$("#divSel").hide();
+	$("#divActdetail").hide();
+	$("#divExecuter").hide();
+	$("#divReport").hide();
+	$("#divReportdate").hide();
+	
+	<!-- #num_type的option根据{$typename}不同而不同。 -->
+	switch("{$typename}"){
+		case '项目':
+			$("#num_type").empty();
+			$("#num_type").append("<option value='1_1'>新增{$typename}申请</option><option value='1_2'>{$typename}一般申请</option><option value='1_3'>{$typename}经费/预算申请</option><option value='1_4'>其他{$typename}报告</option>");
+		break;
+		
+		case'专利':
+			$("#num_type").empty();
+			$("#num_type").append("<option value='2_1'>新增{$typename}申请</option><option value='2_2'>{$typename}一般申请</option><option value='2_3'>{$typename}经费/预算申请</option><option value='2_4'>其他{$typename}报告</option>");
+		break;
+		
+		case'论文':
+			$("#num_type").empty();
+			$("#num_type").append("<option value='3_1'>新增{$typename}申请</option><option value='3_2'>{$typename}一般申请</option><option value='3_3'>{$typename}经费/预算申请</option><option value='3_4'>其他{$typename}报告</option>");
+		break;
+		
+		default:
+			<!-- $("#btnSubmit").show(); -->
+			<!-- $("#btnDelete").show(); -->
+		break;
+	
+	}
+	
+	<!-- 显示选中#num_type后对应的内容 -->
+	$("#num_type").change(function(){		
+		if($(this).val()!="{$type}_1"){
+			$("#divSel").show();
+		}else{
+			$("#divSel").hide();
+		}
+	});
+	
+	$(".btnReturn").click(function(){
+		window.location.href="{$home}/issue/index/index/role/{$role}/type/{$type}";
+	
+	});
+	
+	$("#btnUpload").click(function(){
+        $("#uploadFile").modal();
+    });
+	
+	<!-- 新增的事务信息保存后再显示对应的附件材料界面，进行附件的上传 -->
+	if(1=={$flag}){
+		$("#divAtt").show();
+		$("#divIssnum").show();
+	}else{
+		$("#divAtt").hide();
+		$("#divIssnum").hide();
+	}
+	
+	<!-- 根据{$role}的值，显示不同的按钮 -->
+	var role="{$role}";
+	$("#btnRole :button").hide();
+	$(".btnReturn").show();
+	switch(role){
+		case 'writer':
+			if("{$status}"=="填报"){
+				$("#btnSubmit").show();
+				$("#btnDelete").show();
+				$("#divActdetail").remove();
+			}else{
+				$("#btnSubmit").show();
+				$("#divActdetail").remove();
+			}
+		break;
+		
+		case'reviewer':
+			$("#btnAudit").show();
+			$("#btnReject").show();
+			$("#btnRefuse").show();
+			$("#btnSave").hide();
+			$("#divActdetail").show();
+			
+			$("#actdetaildata").append("<option value='审核通过'>");
+		break;
+		
+		case'approver':
+			$("#btnApprove").show();
+			$("#btnReject").show();
+			$("#btnRefuse").show();
+			$("#btnSave").hide();
+			$("#divActdetail").show();
+			$("#divExecuter").show();
+			$("#actdetaildata").append("<option value='批准同意'>");
+		break;
+		
+		case'operator':
+			if("{$status}"=="批准"){
+				$("#btnAccept").show();
+				$("#btnSave").hide();
+				$("#divActdetail").show();
+				$("#actdetail").val("{$actdetail}").attr("readonly","readonly");
+			}else{
+				$("#btnReport").show();
+				$("#btnClose").show();
+				$("#btnSave").hide();
+				$("#divActdetail").show();
+				$("#actdetail").val("{$actdetail}").attr("readonly","readonly");
+				$("#divReport").show();
+				$("#divReportdate").show();
+			}
+		
+		
+			
+		break;
+		
+		default:
+			<!-- $("#btnSubmit").show(); -->
+			<!-- $("#btnDelete").show(); -->
+		break;
+	
+	}
+	
+	<!-- 提交申请 -->
+	$("#btnSubmit").click(function(){
+		if($("#topic").val()==''){
+			$.alert("‘名称’不能为空");
+			$("#topic").css('background','#00CCFF');
+		}else if($("#abstract").val()==''){
+			$.alert("‘事务简介’都不能为空");
+			$("#abstract").css('background','#00CCFF');
+		}else{
+			<!-- 弹出自定义提示页面，确定后跳转并传参  -->
+			$.confirm('确定&nbsp;‘提交申请’&nbsp;？',function(e){
+				con=e;
+				if(true==con)window.location.href="{$home}/issue/index/isssave"+"/operate/"+$("#btnSubmit").val()+"/issnum/"+"{$issnum}"+"/rolename/"+"{$rolename}";
+			
+			}).ok('同意').cancel('取消');
+		}
+		
+    });
+	
+	<!-- 删除 -->
+	$("#btnDelete").click(function(){
+		<!-- 弹出页面确定提交后跳转并传参  -->
+		$.confirm('消息弹窗',function(e){
+			con=e;
+			if(true==con)$.alert('同意');
+		
+		}).ok('同意').cancel('取消');
+	
+		
+    });	
+	
+	<!-- 审核通过 -->
+	$("#btnAudit").click(function(){
+		$("#actdetail").focus();
+		<!-- #actdetail失去焦点时判断是否填入了内容，否则拉回焦点填入内容  -->
+		$("#actdetail").focusout(function(){
+			if($("#actdetail").val()==''){
+				$.alert("请填入审核意见。默认为‘审核通过’。");
+				$("#actdetail").val("审核通过").css('background','#00CCFF');
+				$("#actdetail").focus();
+			}
+		});
+		
+		<!-- 弹出自定义提示页面，确定后跳转并传参  -->
+		$.confirm('确定&nbsp;‘审核通过’&nbsp;？',function(e){
+			con=e;
+			if(true==con)window.location.href="{$home}/issue/index/isssave"+"/issnum/"+"{$issnum}"+"/operate/"+$("#btnAudit").val()+"/rolename/"+"{$rolename}"+"/actdetail/"+$("#actdetail").val();
+		
+		}).ok('同意').cancel('取消');
+	
+		<!-- 弹出浏览器的提示页面，确定提交后跳转并传参  -->
+		<!-- con=confirm("确定进行此操作？"); -->
+		<!-- if(con==true)window.location.href="{$home}/issue/index/isssave"+"/issnum/"+"{$issnum}"+"/operate/"+$("#btnAudit").val()+"/rolename/"+"{$rolename}"+"/actdetail/"+$("#actdetail").val(); -->
+    });
+
+	<!-- 批准同意 -->
+	$("#btnApprove").click(function(){
+		
+		<!-- #executer已设置自动获取焦点“autofocus”，判断是否为null，不能写为$("#executer").val()==''  -->
+		if($("#executer").val()==null){
+			<!-- 弹出自定义提示页面，确认‘撰写人’  -->
+			$.confirm("请指定 '执行人'。默认为 '撰写人：{$writer}'。",function(e){
+				con=e;
+				if(true==con){
+					$("#executer").val("{$writer}").css('background','#00CCFF');
+					<!-- 判断#actdetail是否填入了内容(不能写为$("#actdetail").val()==null) -->
+					$("#actdetail").focus();
+					if($("#actdetail").val()==''){
+						<!-- $.alert("请填入审批意见。"); -->
+						$("#actdetail").val("批准同意").css('background','#00CCFF');
+						$("#actdetail").focus();
+							
+						<!-- 弹出自定义提示页面，确定后跳转并传参  -->
+						$.confirm('请填入审批意见。默认为：&nbsp;‘批准同意’&nbsp;？',function(e){
+							con=e;
+							if(true==con)window.location.href="{$home}/issue/index/isssave"+"/issnum/"+"{$issnum}"+"/operate/"+$("#btnApprove").val()+"/rolename/"+"{$rolename}"+"/actdetail/"+$("#actdetail").val()+"/executer/"+$("#executer").val();
+						}).ok('同意').cancel('取消');
+														
+					}
+						
+				}
+			}).ok('同意').cancel('取消');	
+		}else{
+			<!-- 判断#actdetail是否填入了内容(不能写为$("#actdetail").val()==null) -->
+			$("#actdetail").focus();
+			if($("#actdetail").val()==''){
+				<!-- $.alert("请填入审批意见。"); -->
+				$("#actdetail").val("批准同意").css('background','#00CCFF');
+				$("#actdetail").focus();
+							
+				<!-- 弹出自定义提示页面，确定后跳转并传参  -->
+				$.confirm('请填入审批意见。默认为：&nbsp;‘批准同意’&nbsp;？',function(e){
+					con=e;
+					if(true==con)window.location.href="{$home}/issue/index/isssave"+"/issnum/"+"{$issnum}"+"/operate/"+$("#btnApprove").val()+"/rolename/"+"{$rolename}"+"/actdetail/"+$("#actdetail").val()+"/executer/"+$("#executer").val();
+				}).ok('同意').cancel('取消');
+														
+			}else{
+				<!-- 弹出自定义提示页面，确定后跳转并传参  -->
+				$.confirm('请填入审批意见。默认为：&nbsp;‘批准同意’&nbsp;？',function(e){
+					con=e;
+					if(true==con)window.location.href="{$home}/issue/index/isssave"+"/issnum/"+"{$issnum}"+"/operate/"+$("#btnApprove").val()+"/rolename/"+"{$rolename}"+"/actdetail/"+$("#actdetail").val()+"/executer/"+$("#executer").val();
+				}).ok('同意').cancel('取消');
+			}
+			
+		}
+				
+    });
+	
+	<!-- 退回修改 -->
+	$("#btnReject").click(function(){
+		if($("#actdetail").val()==''){
+			$("#actdetail").focus();
+			$("#actdetail").focusout(function(){
+				if($("#actdetail").val()==''){
+					$.alert("请填入审核意见。默认为‘退回修改’。");
+					$("#actdetail").val("退回修改").css('background','#00CCFF');
+					$("#actdetail").focus();
+				}
+			});
+		}
+		<!-- 弹出自定义提示页面，确定后跳转并传参  -->
+		$.confirm('确定&nbsp;‘退回修改’&nbsp;？',function(e){
+			con=e;
+			if(true==con)window.location.href="{$home}/issue/index/isssave"+"/issnum/"+"{$issnum}"+"/operate/"+$("#btnReject").val()+"/rolename/"+"{$rolename}"+"/actdetail/"+$("#actdetail").val();
+		}).ok('同意').cancel('取消');	
+    });
+	
+	<!-- 否决 -->
+	$("#btnRefuse").click(function(){
+		$("#actdetail").focus();
+		<!-- #actdetail失去焦点时判断是否填入了内容，否则拉回焦点填入内容  -->
+		$("#actdetail").focusout(function(){
+			if($("#actdetail").val()==''){
+				$.alert("请填入审批意见。");
+				$("#actdetail").val("否决").css('background','#00CCFF');
+				$("#actdetail").focus();
+			}
+		});
+		<!-- 弹出自定义提示页面，确定后跳转并传参  -->
+		$.confirm('确定&nbsp;‘否决’&nbsp;？',function(e){
+			con=e;
+			if(true==con)window.location.href="{$home}/issue/index/isssave"+"/issnum/"+"{$issnum}"+"/operate/"+$("#btnRefuse").val()+"/rolename/"+"{$rolename}"+"/actdetail/"+$("#actdetail").val();
+		}).ok('同意').cancel('取消');		
+    });
+	
+	$("#btnAccept").click(function(){
+		<!-- 弹出自定义提示页面，确定后跳转并传参  -->
+		$.confirm('确定&nbsp;‘领受任务’&nbsp;？',function(e){
+			con=e;
+			if(true==con)window.location.href="{$home}/issue/index/isssave"+"/issnum/"+"{$issnum}"+"/operate/"+$("#btnAccept").val()+"/rolename/"+"{$rolename}"+"/actdetail/"+$("#btnAccept").val();
+		}).ok('同意').cancel('取消');		
+    });	
+
+	$("#btnReport").click(function(){
+		$("#report").css('background','#00CCFF');
+		if($("#report").val()==''){
+			$.alert("请填入简报内容。");
+			$("#report").val("执行《{$topic}》的情况简报：").css('background','#00CCFF');
+			$("#report").focus();
+			
+		}else{
+			<!-- 弹出自定义提示页面，确定后跳转并传参  -->
+			$.confirm('确定提交&nbsp;‘任务报告’&nbsp;？',function(e){
+				con=e;
+				if(true==con)window.location.href="{$home}/issue/index/isssave"+"/issnum/"+"{$issnum}"+"/operate/"+$("#btnReport").val()+"/rolename/"+"{$rolename}"+"/actdetail/"+$("#report").val();
+			}).ok('同意').cancel('取消');		
+		}
+    });
+	
+	$("#btnClose").click(function(){
+		$("#report").css('background','#99FF99');
+		if($("#report").val()==''){
+			$.alert("请填入关闭任务的简报内容。");
+			$("#report").val("关闭《{$topic}》的情况简报：").css('background','#99FF99');
+			$("#report").focus();
+			
+		}else{
+			<!-- 弹出自定义提示页面，确定后跳转并传参  -->
+			$.confirm('确定&nbsp;‘关闭任务’&nbsp;？',function(e){
+				con=e;
+				if(true==con)window.location.href="{$home}/issue/index/isssave"+"/issnum/"+"{$issnum}"+"/operate/"+$("#btnClose").val()+"/rolename/"+"{$rolename}"+"/actdetail/"+$("#report").val();
+			}).ok('同意').cancel('取消');		
+		}	
+    });
+	
+	
+	
+});
+</script>
+
+	
+{include file="../application/common/footer.html"}

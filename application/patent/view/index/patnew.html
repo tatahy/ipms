@@ -1,0 +1,250 @@
+{include file="../application/common/headeruser.html" title="新增专利" }
+
+<!-- pagewrap  -->
+<div class="container-fluid">
+	<h4>{$username}&nbsp;<span class="glyphicon glyphicon-folder-close"></span>&nbsp;【{$rolename}】新增专利 </h4>
+	<h3><span class="label label-info">新增专利信息</span></h3>
+	
+	<div class="tab-content">
+    <div id="menu0" class="tab-pane fade in active">
+		<form class="" role="form" method="post" action="{$home}/patent/index/patnew">
+		</br>
+		<!-- 专利基本信息表单 -->
+		<table class="table table-bordered table-striped table-responsive table-condensed">
+			<tbody>
+				<tr>
+					<td>
+						<div class="form-group col-sm-4">
+							<label class="control-label" for="topic">名称&nbsp;<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+							<input class="form-control" name="topic" id="topic" type="text" placeholder="">
+						</div>
+						
+						<div class="form-group col-sm-2">
+							<label for="pattype">类型&nbsp;<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+							<select class="form-control" name="pattype" id="pattype">
+                                <option value="发明专利">发明专利</option>
+								<option value="实用新型专利">实用新型专利</option>
+                                <option value="外观设计专利">外观设计专利</option>
+                                <option value="软件版权">软件版权</option>
+                                <option value="著作权">著作权</option>
+                                <option value="集成电路图">集成电路图</option>
+                                <option value="……">……</option>
+							</select>
+						</div>
+						
+						<div class="form-group col-sm-3">
+							<label class="control-label" for="patowner">所有人</label>
+							<input class="form-control" name="patowner" id="patowner" type="text" value="广州市光机电技术研究院" readonly>
+						</div>
+						
+						<div class="form-group col-sm-3">
+							<label for="dept">所属部门</label>
+							<select class="form-control" name="dept" id="dept">
+                                <option value="dept1">dept1</option>
+								<option value="dept2">dept2</option>
+                                <option value="dept3">dept3</option>
+                                <option value="dept4">dept4</option>
+                                <option value="dept5">dept5</option>
+                                <option value="dept6">dept6</option>
+                                <option value="dept7">dept7</option>
+							</select>
+						</div>
+						
+					</td>		
+				</tr>
+
+				<tr>
+					<td>
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="author">撰写人</label>
+							<input class="form-control" name="author" id="author" type="text" value="{$username}" readonly>
+						</div>
+						
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="inventor">发明人&nbsp;<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+							<input class="form-control" name="inventor" id="inventor" type="text" placeholder="">
+						</div>
+						
+						<div class="form-group col-sm-4">
+							<label class="control-label" for="otherinventor">其他发明人&nbsp;<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+							<input class="form-control" name="otherinventor" id="otherinventor" type="text" placeholder="">
+						</div>
+						
+					</td>		
+				</tr>
+				
+				<tr>
+					<td>
+						<div class="form-group col-sm-2">
+							<label for="keyword">关键词&nbsp;<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+							<textarea class="form-control" rows="3" name="keyword" id="keyword"></textarea>
+						</div>
+						
+						<div class="form-group col-sm-6">
+							<label for="abstract">专利简介&nbsp;<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+							<textarea class="form-control" rows="5" name="summary" id="summary" placeholder="填写专利的简要描述，字数不超过100字。"></textarea>
+						</div>
+						
+						<div class="form-group col-sm-4">
+							<label for="pronum">关联项目（在研）&nbsp;<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+							<select  multiple size="5" class="form-control" name="pronum[]" id="pronum">
+                                <option value="0">……无……</option>
+								
+								<option value="pro2011004">
+									<ul>
+										<!-- <li>pro2011004</li> -->
+										<li>《XXX设备研制》</li>
+										<li>纵向（市）</li>
+									</ul>
+								</option>
+								<option value="pro2011018">
+									<ul>
+										<!-- <li>pat2011005</li> -->
+										<li>“一种关于高尔夫发球机推球装置”</li>
+										<li>横向</li>
+									</ul>
+								</option>
+                                <option value="pro2013013">
+									<ul>
+										<!-- <li>pat2012005</li> -->
+										<li>“xxxxxxx关键技术研究”</li>
+										<li>纵向（省）</li>
+									</ul>
+								</option>
+								<option value="pro2014021">
+									<ul>
+										<!-- <li>pro2010012</li> -->
+										<li>“xxxxxxx技术开发”</li>
+										<li>纵向（市）</li>
+									</ul>
+								</option>
+			
+							</select>
+						</div>
+						
+					</td>		
+				</tr>
+				
+				<tr>
+					<td>
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="status">状态</label>
+							<input class="form-control" name="status" id="status" type="text" value="填报" readonly>
+						</div>
+						
+						<div id="" class="form-group col-sm-2">
+							<label class="control-label" for="patnum">专利编号</label>
+							<input class="form-control" id="patnum" name="patnum" value="{$patnum}" type="text" readonly>
+						</div>
+						
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="addnewdate">填报日期</label>
+							<input class="form-control" name="addnewdate" id="addnewdate" type="text" value="{$today}" readonly>
+						</div>
+						
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="focusedInput">申报日期</label>
+							<input class="form-control  " id="focusedInput" type="text" placeholder="" readonly>
+						</div>
+						
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="focusedInput">授权/驳回日期</label>
+							<input class="form-control  " id="focusedInput" type="text" placeholder="" readonly>
+						</div>
+						
+					</td>		
+				</tr>
+				
+				<tr>
+					<td>
+						
+						<div id="btnSave" class="col-sm-2">
+							<input type="submit" class="btn btn-primary btn-xs" formenctype="multipart/form-data" value="保存专利信息">						
+							<!-- <button type="submit" class="btn btn-primary btn-xs">保存专利信息</button> -->
+						</div>
+					
+						
+					</td>		
+				</tr>
+				
+				<!-- <tr>
+					<td>
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="focusedInput">填报日期</label>
+							<input class="form-control  " id="focusedInput" type="text" placeholder="">
+						</div>
+						
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="focusedInput">申报日期</label>
+							<input class="form-control  " id="focusedInput" type="text" placeholder="">
+						</div>
+						
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="focusedInput">授权/放弃日期</label>
+							<input class="form-control  " id="focusedInput" type="text" placeholder="">
+						</div>
+					</td>		
+				</tr> -->
+			</tbody>
+		</table>
+		
+		<!-- 附件表单 -->
+		<h3><span class="label label-info">专利附件材料</span></h3>
+		<table class="table table-bordered table-striped table-responsive table-condensed">
+			<thead>
+				<tr>
+					<th>选择</th>
+					<th>序号</th>
+					<th>附件类型</th>
+					<th>附件名称</th>
+					<th>上传日期</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><input type="checkbox" value=""></td>
+					<td>1</td>
+					<td>新增专利申请材料</td>
+					<td>专利申请表.doc</td>
+					<td>2017-01-02 11:30:21</td>
+					<td><a href="#">下载(专利申请表.doc)</a></td>
+				</tr>
+			</tbody>
+		</table>
+		<div class="btn-group-xs">
+			<button type="button" class="btn btn-primary" formaction="">增加附件</button>
+			<button type="button" class="btn btn-primary" formaction="">上移</button>
+			<button type="button" class="btn btn-primary" formaction="">下移</button>
+			<button type="button" class="btn btn-primary" formaction="">删除</button>				
+		</div>
+		<hr>
+
+		<div class="btn-group-sm">
+			<button id="save" type="submit" class="btn btn-primary" formaction="">保存专利信息及附件</button>
+			<button type="button" class="btn btn-primary" formaction="">提交申报专利申请</button>
+			<button type="button" class="btn btn-primary" formaction="">浏览</button>	
+			<button type="submit" class="btn btn-primary" formaction="{$home}/patent/index/index/role/{$role}">返回</button>				
+		</div>
+		</form>
+    </div>
+	
+</div>
+</div>
+
+</br>
+
+<!-- /pagewrap  -->
+
+<script>
+$(document).ready(function(){
+  $("#save").click(function() {
+        var sel = $("#pronum").val();
+		<!-- $("#pronum").val(sel); -->
+       <!--  alert(被选中的是:"+sel+"。") -->;
+    });
+});
+</script>
+
+	
+{include file="../application/common/footer.html"}
