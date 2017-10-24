@@ -5,10 +5,21 @@
 <div class="container-fluid" >
 	<div class="row content" >
 		<div class="col-sm-2">
+			<!-- nav 与 jQuery结合实现菜单栏导航效果-->
 			<ul class="nav nav-pills nav-stacked hy-box" >
 				<li id="li0" class="active"><a href="#div0"><span class="glyphicon glyphicon-inbox"></span>&nbsp;系统概况</a></li>
-				<li id="li1"><a href="#div1"><span class="glyphicon glyphicon-user"></span>&nbsp;系统用户管理</a></li>
-				<li id="li2"><a href="#div2"><span class="glyphicon glyphicon-wrench"></span>&nbsp;系统设置</a></li>
+				
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span>&nbsp;系统用户
+					<span class="caret"></span></a>
+					<ul class="dropdown-menu">
+					  <li id="li1" class="text-right"><a href="#div1">用户&nbsp;<span class="glyphicon glyphicon-file"></span></a></li>
+					  <li id="li2" class="text-right"><a href="#div2">用户组&nbsp;<span class="glyphicon glyphicon-duplicate"></span></a></li>
+					  <!-- //<li><a href="#"><span class="glyphicon glyphicon-link"></span>&nbsp;功能1-3</a></li> -->
+					</ul>
+				</li>
+				
+				<li id="li3"><a href="#div3"><span class="glyphicon glyphicon-wrench"></span>&nbsp;系统设置</a></li>
 			</ul>
 			
 		</div>
@@ -22,13 +33,20 @@
 			</div>
 	
 			<div id="div1" class="tab-pane fade">
-				<h4><strong>"系统用户管理"</strong></h4>
+				<!-- <h4><strong>"用户管理"</strong></h4> -->
 				{include file="../application/admin/view/index/sys_user.html"}
 							
 							
 			</div>
-					
+			
 			<div id="div2" class="tab-pane fade">
+				<!-- <h4><strong>"用户组管理"</strong></h4> -->
+				{include file="../application/admin/view/index/sys_usergroup.html"}
+							
+							
+			</div>
+					
+			<div id="div3" class="tab-pane fade">
 				<h4><strong>"系统设置"</strong>开发中</h4>
 				{include file="../application/admin/view/index/sys_param.html"}			
 							

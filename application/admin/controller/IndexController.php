@@ -5,6 +5,9 @@ use think\Request;
 use think\Session;
 use think\Model;
 use app\user\model\User as UserModel;
+use app\user\model\Rolety as RoletyModel;
+use app\admin\model\Dept as DeptModel;
+
 
 class IndexController extends \think\Controller
 {
@@ -40,18 +43,14 @@ class IndexController extends \think\Controller
     {
       //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
       
-      //通过$log判断是否是登录用户，非登录用户退回到登录页面
-        if(1!=$this->log){
-            $this->error('无用户名或密码，请先登录系统');
-            //$this->redirect($request->domain());
-        }else{
-            
-        }
-        
+      $this->_loginUser();
        
-        
         $this->assign([
           
+              'destr'=>$destrr= "请求方法:".$request->method()."</br>".
+                                "username:".$this->username."</br>".
+                                "log:".$this->log."</br>",
+              
               'home'=>$request->domain(),
               'username'=>$this->username,
               //获取服务器信息（操作系统、Apache版本、PHP版本）
@@ -89,6 +88,36 @@ class IndexController extends \think\Controller
         return $version[0]['ver'];
     }
     
+    // 判断是否为登录用户
+    private function _loginUser()
+    {
+      //通过$this->log判断是否是登录用户，非登录用户退回到登录页面
+      $this->log=Session::get('log');
+      
+      if(1!=$this->log){
+        return $this->error('无用户名或密码，请先登录系统');
+      }    
+    }
+    
+    // 获取所有部门信息,不能写成“_dept”，因为前端的HTML文件中的url里不能含有“_”开头的名称，否则就无法访问到，报错
+    public function dept()
+    {
+      $this->_loginUser();
+      
+      $dept=DeptModel::all();
+      // 将数组转化为json
+      return json($dept);
+    }
+    
+    // 获取所有用户组名称
+    public function userGroup()
+    {
+        $this->_loginUser();
+        
+        $groups=RoletyModel::field('id,name')->select();
+        return json($groups);
+    }
+    
     // 
     public function login(Request $request)
     {
@@ -122,14 +151,9 @@ class IndexController extends \think\Controller
       
       $user = UserModel::where('username',$username)
                             ->where('pwd',$pwd)
-                            ->where('roleid',0)
+                            ->where('rolety_id',8)
                             ->select();
-      
-       // 查出所有的用户
-        $users=UserModel::where('id','>',0)
-                            ->order('username asc')
-                            ->select();
-      
+                            
       if(empty($user)){
           $this->error('用户名或密码错误，请重新登录');
           //return view("login"); 
@@ -147,9 +171,24 @@ class IndexController extends \think\Controller
           $this->roles=Session::get('role');
           $this->dept=Session::get('dept');
           
-        //--在bg-head.html页面输出自定义信息的HTML代码块
+          // 查出所有的用户
+          $users = UserModel::where('id','>',0)
+                            ->order('username asc')
+                            ->select();
+ 
+          foreach($users as $v){
+            $user1 = UserModel::get($v['id']);
+            // 使用User模型中定义的关联关系(role)查出用户对应用户组名称(name)
+            $roleName=$user1->role->name;
+            // 将用户对应的用户组名称加入数据集中。
+            $v['rolename']=$roleName;
+          }          
           
-          
+          // 查出所有用户组
+          $groups = RoletyModel::where('id','>',0)
+                                    ->order('rolenum asc')
+                                    ->select();
+                                   
           $this->assign([
             //--在bg-head.html页面输出自定义信息的HTML代码块
               'destr'=>$destrr= "请求方法:".$request->method()."</br>".
@@ -174,6 +213,9 @@ class IndexController extends \think\Controller
               
               // 所有用户信息
               'users'=>$users,
+              
+              // 所有用户组信息
+              'groups'=>$groups,
           
           
           ]);
@@ -183,8 +225,126 @@ class IndexController extends \think\Controller
       
       
     }
+        
+    // 添加新用户组
+    public function addUserGroup(Request $request)
+    {
+      $this->_loginUser();  
+      
+      // 检查用户组名称是否已存在
+      return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
+      
+      
+    }
     
     
+     // 用户CDUR，接收客户端通过Ajax，post来的参数，返回json数据
+    public function oprtUser(Request $request)
+    {
+      $this->_loginUser();  
+      
+      $oprt=$request->param('oprt');
+      $username=$request->param('username');
+      $pwd=md5($request->param('pwd'));
+      $dept=$request->param('dept');
+      $roletyId=$request->param('userGroup');
+     
+      switch($oprt){
+        case "add":
+          $user=new UserModel;
+          $u=$user->where('username',$username)->select();
+          
+      // 模型方式返回的数据集包含每个User模型对象实例的数组。将数据集/数组$u转化为“，”分隔的字符串
+          //$str=implode(',',$u);
+          
+          // 遍历数据集$u中的'rolety_id'值是否存在$roletyId，
+          $roleBool=0;
+          foreach ($u as $v) {
+              if($v->rolety_id==$roletyId){
+                $roleBool=1;
+                break;
+              }
+          }
+          
+          //拟增加的用户组的名称，从RoletyModel中查出
+          $role=RoletyModel::get($roletyId);
+          $roleName=$role->name;
+          
+         // $result='error';
+    //      $msg= '数据集：'.$str.' \ '.$roleBool.' \ '.$roletyId;
+    //      return ['result'=>$result,'msg'=>$msg];
+          
+          // 数据集$u中的'username'值是否存在新增的$username
+          if($username==$u[0]['username'] && $dept!=$u[0]['dept']){
+            $result='error';
+            $msg='用户：【'.$username.'】已属于部门：['.$u[0]->dept.']，请重新选择。';
+          }else if($username==$u[0]->username && $dept==$u[0]->dept && $roleBool==1){
+            
+            $result="error";
+            $msg='用户：【'.$username.'】已在['.$roleName.']用户组，请重新选择。';
+          }else if($username==$u[0]->username && $dept==$u[0]->dept && $roleBool==0){
+            // 未与老用户的用户组重复，添加老用户的新用户组
+            // 保持老用户的密码不变
+            $pwd=$u[0]['pwd'];
+            // 用户信息写入数据表User
+            $user->save([
+              'username'  => $username,
+              'pwd' => $pwd,
+              'dept' => $dept,
+              'rolety_id' => $roletyId,
+            ]); 
+        
+            $result='success';
+            $msg='用户：【'.$username.' 】新用户组：['.$roleName.$roleBool.']添加成功。';
+          }else if($username!=$u[0]->username){
+            // 新用户添加。
+            $user->save([
+              'username'  => $username,
+              'pwd' => $pwd,
+              'dept' => $dept,
+              'rolety_id' => $roletyId,
+            ]); 
+            $id=$user->id;
+            $result='success';
+            $msg='用户：【'.$username.' 】创建成功。';
+          }
+         
+          // 返回前端JSON数据
+            return ['result'=>$result,'msg'=>$msg];
+            
+        break;
+        
+        case"delete":
+          $id=$request->param('id');
+          UserModel::destroy($id);
+          
+          $result='success';
+          // 返回前端JSON数据
+          return ['result'=>$result];
+        break;
+        
+        case"disable":
+          $id=$request->param('id');
+          UserModel::update(['enable'=> 0], ['id' => $id]);
+          
+          $result='success';
+          // 返回前端JSON数据
+          return ['result'=>$result,'uid'=>$id];
+          
+        break;
+        
+        case"enable":
+          $id=$request->param('id');
+          UserModel::update(['enable'=> 1], ['id' => $id]);
+          
+          $result='success';
+          // 返回前端JSON数据
+          return ['result'=>$result,'uid'=>$id];
+          
+        break;
+        
+      }
+    }
     
     
     
