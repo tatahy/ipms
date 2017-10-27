@@ -73,8 +73,25 @@ $(document).ready(function(){
 	<!-- //点击nav-pills中的各个按钮后，显示对应的页面-->
 	$(".nav-pills a").click(function(){
         $(this).tab('show');
-		
     });	
+	
+	//根据URL中的hash值（本页面中div的id值）显示对应的<div>
+	var hash = window.location.hash.toLocaleLowerCase();
+    switch (hash) {
+        case "#div1":
+            $('.nav-pills a[href="#div1"]').tab('show');
+        break;
+        case "#div2":
+            $('.nav-pills a[href="#div2"]').tab('show');
+        break;
+        case "#div3":
+             $('.nav-pills a[href="#div3"]').tab('show');
+         break;
+        default://#div0
+            $('.nav-pills a[href="#div0"]').tab('show');
+        break;
+    }
+	
 
 });
 

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>IPMS test</title>
+	<meta name="Author" content="HY" />
+	<meta charset="UTF-8" />
+   
+      
+  <script type="text/javascript" src="./res/js/jquery1.12.4.min.js"></script>
+  <script type="text/javascript" src="./res/js/bootstrap3.3.7.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="./res/css/bootstrap3.3.7.min.css" />
+  <link rel="stylesheet" type="text/css" href="./res/css/bs-callout.css" />
+  <link rel="stylesheet" type="text/css" href="./res/css/check.css" />
+
+</head>
+
+<body>
+<!-- pagewrap  -->
+
+<nav class="navbar navbar-inverse" style="border-radius:0;">
+  <div class="container-fluid">
+    <div class="navbar-header" >
+      <a class="navbar-brand">IPMS 后台管理系统</a>
+	  <!-- <span class="bg-primary" style="corlor:red;">IPMS 后台管理系统</span> -->
+    </div>
+    
+  </div>
+</nav>
+
+<div class="container-fluid" >
+
+	<div class="row content" >
+		<div class="col-sm-2">
+			<!-- nav 与 jQuery结合实现菜单栏导航效果-->
+			<ul class="nav nav-pills nav-stacked hy-box" >
+				<li id="li0" class="active"><a href="#div0"><span class="glyphicon glyphicon-inbox"></span>&nbsp;系统概况</a></li>
+				
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span>&nbsp;系统用户
+					<span class="caret"></span></a>
+					<ul class="dropdown-menu">
+					  <li id="li1" class="text-right"><a href="#div1">用户&nbsp;<span class="glyphicon glyphicon-file"></span></a></li>
+					  <li id="li2" class="text-right"><a href="#div2">用户组&nbsp;<span class="glyphicon glyphicon-duplicate"></span></a></li>
+					  <!-- //<li><a href="#"><span class="glyphicon glyphicon-link"></span>&nbsp;功能1-3</a></li> -->
+					</ul>
+				</li>
+				
+				<li id="li3"><a href="#div3"><span class="glyphicon glyphicon-wrench"></span>&nbsp;系统设置</a></li>
+			</ul>
+			
+		</div>
+		
+		<div class="col-sm-10 tab-content" >
+			
+			<div id="div0" class="tab-pane fade in active">
+				<h4><strong>"系统概况"</strong></h4>
+				
+				
+			</div>
+	
+			<div id="div1" class="tab-pane fade">
+				<h4><strong>"用户管理"</strong></h4>
+				
+			<div class="panel panel-default ">
+		<div class="panel-heading">
+			<h4><strong>用户管理</strong>&nbsp;
+			
+				<!--// bootstap通过button调用Model -->
+				<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addUser"><strong>新增用户</strong></button>
+				
+			</h4> 
+		</div>
+		
+		<div id="divUser" class="panel-body table-responsive">	
+					
+			<table class="table table-hover table-condensed">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>用户名</th>
+						<th>所属部门</th>
+						<!-- <th>用户组id</th> -->
+						<th>用户组</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+										<tr class="">
+						<td>1</td>
+						<td>a</td>
+						<td>dept1</td>
+						<!-- <td>1</td>  -->
+						<td>writer</td>
+						<td>
+							<button uid="1" class="del btn-link" style="display: inline-block;"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>&nbsp;
+							
+							<button uid="1" class="dis btn-link"><span class="text-warning glyphicon glyphicon-ban-circle"></span>禁用</button>
+							
+							<span style="display: none;">（已禁用）</span><button uid="1" class="en btn-link" value="1" style="display: none;"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
+							
+						</td>	
+					
+					</tr>
+										<tr class="">
+						<td>2</td>
+						<td>a</td>
+						<td>dept1</td>
+						<!-- <td>2</td>  -->
+						<td>reviewer</td>
+						<td>
+							<button uid="8" class="del btn-link" style="display: inline-block;"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>&nbsp;
+							
+							<button uid="8" class="dis btn-link"><span class="text-warning glyphicon glyphicon-ban-circle"></span>禁用</button>
+							
+							<span style="display: none;">（已禁用）</span><button uid="8" class="en btn-link" value="1" style="display: none;"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
+							
+						</td>	
+					
+					</tr>
+										<tr class="">
+						<td>3</td>
+						<td>a</td>
+						<td>dept1</td>
+						<!-- <td>7</td>  -->
+						<td>operator</td>
+						<td>
+							<button uid="9" class="del btn-link" style="display: inline-block;"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>&nbsp;
+							
+							<button uid="9" class="dis btn-link"><span class="text-warning glyphicon glyphicon-ban-circle"></span>禁用</button>
+							
+							<span style="display: none;">（已禁用）</span><button uid="9" class="en btn-link" value="1" style="display: none;"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
+							
+						</td>	
+					
+					</tr>
+										<tr class="">
+						<td>4</td>
+						<td>admin</td>
+						<td>0</td>
+						<!-- <td>8</td>  -->
+						<td>admin</td>
+						<td>
+							&nbsp;
+							
+							
+							
+							
+							
+						</td>	
+					
+					</tr>
+										<tr class="danger text-muted">
+						<td>5</td>
+						<td>admin1</td>
+						<td>deptmain</td>
+						<!-- <td>8</td>  -->
+						<td>admin</td>
+						<td>
+							<button uid="19" class="del btn-link" style="display: none;"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>&nbsp;
+							
+							<button uid="19" class="dis btn-link" style="display: none;"><span class="text-warning glyphicon glyphicon-ban-circle"></span>禁用</button>
+							
+							<span>（已禁用）</span><button uid="19" class="en btn-link" value="0"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
+							
+						</td>	
+					
+					</tr>
+										<tr class="danger text-muted">
+						<td>6</td>
+						<td>admin2</td>
+						<td>deptmain</td>
+						<!-- <td>8</td>  -->
+						<td>admin</td>
+						<td>
+							<button uid="20" class="del btn-link" style="display: none;"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>&nbsp;
+							
+							<button uid="20" class="dis btn-link" style="display: none;"><span class="text-warning glyphicon glyphicon-ban-circle"></span>禁用</button>
+							
+							<span>（已禁用）</span><button uid="20" class="en btn-link" value="0"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
+							
+						</td>	
+					
+					</tr>
+										<tr class="danger text-muted">
+						<td>7</td>
+						<td>admin3</td>
+						<td>deptmain</td>
+						<!-- <td>8</td>  -->
+						<td>admin</td>
+						<td>
+							<button uid="22" class="del btn-link" style="display: none;"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>&nbsp;
+							
+							<button uid="22" class="dis btn-link" style="display: none;"><span class="text-warning glyphicon glyphicon-ban-circle"></span>禁用</button>
+							
+							<span>（已禁用）</span><button uid="22" class="en btn-link" value="0"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
+							
+						</td>	
+					
+					</tr>
+										<tr class="danger text-muted">
+						<td>8</td>
+						<td>admin4</td>
+						<td>deptmain</td>
+						<!-- <td>8</td>  -->
+						<td>admin</td>
+						<td>
+							<button uid="24" class="del btn-link" style="display: none;"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>&nbsp;
+							
+							<button uid="24" class="dis btn-link" style="display: none;"><span class="text-warning glyphicon glyphicon-ban-circle"></span>禁用</button>
+							
+							<span>（已禁用）</span><button uid="24" class="en btn-link" value="0"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
+							
+						</td>	
+					
+					</tr>
+										<tr class="">
+						<td>9</td>
+						<td>bbbbbb</td>
+						<td>dept2</td>
+						<!-- <td>2</td>  -->
+						<td>reviewer</td>
+						<td>
+							<button uid="2" class="del btn-link" style="display: inline-block;"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>&nbsp;
+							
+							<button uid="2" class="dis btn-link"><span class="text-warning glyphicon glyphicon-ban-circle"></span>禁用</button>
+							
+							<span style="display: none;">（已禁用）</span><button uid="2" class="en btn-link" value="1" style="display: none;"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
+							
+						</td>	
+					
+					</tr>
+										<tr class="">
+						<td>10</td>
+						<td>bbbbbb</td>
+						<td>dept2</td>
+						<!-- <td>1</td>  -->
+						<td>writer</td>
+						<td>
+							<button uid="10" class="del btn-link" style="display: inline-block;"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>&nbsp;
+							
+							<button uid="10" class="dis btn-link"><span class="text-warning glyphicon glyphicon-ban-circle"></span>禁用</button>
+							
+							<span style="display: none;">（已禁用）</span><button uid="10" class="en btn-link" value="1" style="display: none;"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
+							
+						</td>	
+					
+					</tr>
+
+						
+									</tbody>
+				
+				<tfoot>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td><a id="link" href="#div3">go to #div3</a> <button id="btn1">go to #div3</button></td>
+					</tr>
+				</tfoot>
+				
+			</table>
+					
+		</div>
+</div>
+							
+							
+			</div>
+			
+			<div id="div2" class="tab-pane fade">
+				<h4><strong>"用户组管理 div2"</strong></h4>
+				
+							
+							
+			</div>
+					
+			<div id="div3" class="tab-pane fade">
+				<h4><strong>"系统设置 div3"</strong>开发中</h4>
+						
+							
+			</div>
+		
+		</div>
+		
+		
+		
+	</div>
+	
+
+</div>
+
+<!-- /pagewrap  -->
+
+
+<script>
+$(document).ready(function(){
+	
+	<!-- //为选中的li标签,添加.active -->
+	$("#nav_system").addClass("active");
+
+	<!-- //点击nav-pills中的各个按钮后，显示对应的页面-->
+	$(".nav-pills a").click(function(){
+       	$(this).tab('show');
+    });	
+	
+	//根据URL中的hash值显示对应的页面
+	var hash = window.location.hash.toLocaleLowerCase();
+            switch (hash) {
+                case "#div1":
+                    $('.nav-pills a[href="#div1"]').tab('show');
+                    break;
+                case "#div2":
+                    $('.nav-pills a[href="#div2"]').tab('show');
+                    break;
+                case "#div3":
+                    $('.nav-pills a[href="#div3"]').tab('show');
+                    break;
+                default:
+                    $('.nav-pills a[href="#div0"]').tab('show');
+                    break;
+            }
+	
+	<!-- $('.nav-pills a[href="#div2"]').tab('show'); -->
+	
+	function gototab(val){
+		//刷新页面并回到div,#div2
+		window.location.hash=val;
+		window.location.reload(true);
+		
+		<!-- $('.nav-pills a[href="#div3"]').tab('show'); -->
+	
+	}
+	
+	$("#link").click(function(event){
+		gototab("#div3");
+	});
+	
+	$("#btn1").click(function(){
+		gototab("#div0");
+	})
+	
+	$("#btn1").text("go to"+window.location.hash);
+
+});
+
+
+</script>
+
+</body>
+
+</html>

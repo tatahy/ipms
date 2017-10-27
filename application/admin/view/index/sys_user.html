@@ -13,7 +13,7 @@
 			<h4><strong>用户管理</strong>&nbsp;
 			
 				<!--// bootstap通过button调用Model -->
-				<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addUser"><strong>新增用户</strong></button>
+				<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addUser"><strong>新增用户</strong>&nbsp;<span class="glyphicon glyphicon-file"></span></button>
 				
 			</h4> 
 		</div>
@@ -24,10 +24,10 @@
 				<thead>
 					<tr>
 						<th>序号</th>
-						<th>用户名</th>
-						<th>所属部门</th>
+						<th><a href="{$home}/admin/index/index/order/username#div1" data-toggle="tooltip" order="username" data-placement="bottom" title="点击排序">用户名&nbsp;</a></th>
+						<th><a href="{$home}/admin/index/index/order/dept#div1" data-toggle="tooltip" order="dept" data-placement="bottom" title="点击排序">所属部门&nbsp;</a></th>
 						<!-- <th>用户组id</th> -->
-						<th>用户组</th>
+						<th><a href="{$home}/admin/index/index/order/usergroup#div1" data-toggle="tooltip" order="usergroup" data-placement="bottom" title="点击排序">用户组&nbsp;</a></th>
 						<th>操作</th>
 					</tr>
 				</thead>
@@ -35,7 +35,7 @@
 				<tbody><!-- 此处显示数据库查询后的数据集 -->
 					{volist name="users" id="vo" empty="暂时没有数据"}
 					<tr>
-						<td>{$i}</td>
+						<td>{$i+($pageUserNum-1)*$tableRows}</td>
 						<td>{$vo.username}</td>
 						<td>{$vo.dept}</td>
 						<!-- <td>{$vo.rolety_id}</td>  -->
@@ -64,7 +64,13 @@
 				</tfoot>
 				
 			</table>
-					
+			
+			<!-- <button type="button" class="btn btn-primary btn-sm">刷新&nbsp;<span class="glyphicon glyphicon-file"></span></button> -->
+			
+			<div class="pull-right">
+				
+				{$pageUser}
+			</div>
 		</div>
 </div>
 
@@ -183,7 +189,7 @@ $(document).ready(function(){
 		}
 	});
 	
-	// 用户表格中有"dept"内容为“0”的去除<button>及附属span,待完成
+	// 用户表格中有"dept"内容为“0”的去除<button>及附属span
 	$("#divUser tbody td").each(function(){
 		if($(this).text()=='0'){
 			$(this).nextAll().children("button").remove();
@@ -192,7 +198,21 @@ $(document).ready(function(){
 		}
 	});
 	
-	
+	// 向th中的a添加span，利用a中的“order”属性值与{$order}变量值保证页面刷新后也有效
+	$("#divUser thead th a").each(function(){
+		var str='<span class="small glyphicon glyphicon-sort"></span>';
+		var order=$(this).attr("order");
+		// a中的“order”属性值与{$order}变量值相等
+		if(order=="{$order}"){
+			// 清除所有a中的span
+			$(this).nextAll().find('span').remove();
+			$(this).prevAll().find('span').remove();
+			$(this).find('span').remove();
+			// 在a中添加span
+			$(this).append(str);
+		}		
+		
+	});
 	
 	<!-- // 在#addUser的model显示之前，应用show.bs.modal事件将#addUser的model内容准备好 -->
 	$("#addUser").on('show.bs.modal', function () {
@@ -380,7 +400,6 @@ $(document).ready(function(){
 				$.ajax({
 					type : "post",
 					async : true,  //异步请求
-					<!-- url : "{$home}/admin/index/addUser", -->
 					url : "{$home}/admin/index/oprtUser", 
 					<!-- // 发送到服务器的数据 -->
 					data : sendData,
@@ -389,24 +408,25 @@ $(document).ready(function(){
 					dataType:"json",
 					success:function(backData){
 						var data=backData;
+						<!-- alert(data.msg); -->
 						
 						if(data.result=='success'){
-						
+
 						//添加成功，弹出自定义提示页面 
-							$.confirm(data.msg+check,function(e){
+							$.confirm(data.msg,function(e){
 								con=e;
 								if(true==con){
-									//刷新页面
-									window.location.reload();
-									
-									// 显示“用户页面”
-									$('.nav-pills a[href="#div1"]').tab('show');
-									
-									// 清空"#addUser".modal页面的input内容
-									$('#btnReset').click();
-									
+									//刷新页面并回到"#div1"页面
+									window.location.hash="#div1";
+									window.location.reload(true);
 								}
-							}).ok('确认').cancel('取消');
+								else{
+									$('#btnReset').click();
+									//刷新页面并回到"#div0"页面
+									window.location.hash="#div0";
+									window.location.reload(true);
+								}
+							}).ok('继续添加').cancel('返回首页');
 							
 						}else{
 							// 添加不成功，弹出自定义提示页面 
@@ -416,7 +436,6 @@ $(document).ready(function(){
 									// 返回"#addUser".modal页面
 									$("#addUser").modal("show");
 								}else{
-									
 									$('#btnReset').click();
 								}
 							}).ok('返回').cancel('取消');	
@@ -517,31 +536,43 @@ $(document).ready(function(){
 	});
 	<!-- //<button class='del'> ajax事件-->
 	$("#divUser button.del").click(function() {
-  		
-		<!-- // 组装通过“post”提交的数据 -->
-		var sendData = {"oprt":"delete","id":$(this).attr("uid")};
-				
-		$.ajax({
-			type : "post",
-			async : true,  //异步请求
-			url : "{$home}/admin/index/oprtUser", 
-			<!-- // 发送到服务器的数据 -->
-			data : sendData,
-			timeout:1000,
-			<!-- // 指定服务器端response的数据类型为json -->
-			dataType:"json",
-			success:function(backData){
-				var data=backData;
-						
-			},
-			error: function() {
-               	alert("<button>.en.click失败，请稍后再试！");
-            }
-		});
+  		var id=$(this).attr("uid");
+		var selBtn='.del button[uid="'+id+'"]';
 		
-		<!-- //删除所在行<tr> -->
-		$(this).parent().parent().remove();
-	
+		<!-- // 组装通过“post”提交的数据 -->
+		var sendData = {"oprt":"delete","id":id};
+		
+		//弹出自定义提示页面 
+		$.confirm('确定删除该用户？',function(e){
+			var con=e;
+			if(true==con){
+				$.ajax({
+					type : "post",
+					async : true,  //异步请求
+					url : "{$home}/admin/index/oprtUser", 
+					<!-- // 发送到服务器的数据 -->
+					data : sendData,
+					timeout:1000,
+					<!-- // 指定服务器端response的数据类型为json -->
+					dataType:"json",
+					success:function(backData){
+						var data=backData;
+						//删除所在行<tr>
+						$(selBtn).parent().parent().remove();
+						//刷新页面并回到"#div1"页面
+						window.location.hash="#div1";
+						window.location.reload(true);
+					},
+					error: function() {
+               			alert("删除失败，请稍后再试！");
+            		}
+				});
+			}else{
+				
+				$('#btnReset').click();
+			}
+		}).ok('(Y)删除').cancel('(N)取消');
+		
 	});
 	
 });

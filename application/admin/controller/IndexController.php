@@ -41,25 +41,88 @@ class IndexController extends \think\Controller
     
     public function index(Request $request)
     {
-      //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
-      
+      //用户是否已经登录。
       $this->_loginUser();
        
-        $this->assign([
+      $username=Session::get('username');;
+      $pwd=Session::get('pwd');
+      
+      // 分页页数变量：“pageUserNum”
+      if(!empty($request->param('pageUserNum'))){
+          $pageUserNum=$request->param('pageUserNum');
+      }else{
+          $pageUserNum=1;
+      }
+      
+      $user = UserModel::where('username',$username)
+                            ->where('pwd',$pwd)
+                            ->where('rolety_id',8)
+                            ->select();
+                            
+      if(empty($user)){
+          $this->error('用户名或密码错误，请重新登录');
+          //return view("login"); 
+      }else{
           
+        //$tableRows接收页面传来的分页时每页表格显示的记录行数，初始值为10
+        if(!empty($request->param('tableRows'))){
+          $tableRows=$request->param('tableRows');
+        }else{
+          $tableRows=10;
+        }
+        
+        //$order接收页面传来的排序信息
+        $order=$request->param('order');
+        switch($order){
+          case 'username':
+            $strOrder='username asc';
+          break;
+          
+          case 'dept':
+            $strOrder='dept asc';
+          break;
+          
+          case 'usergroup':
+            $strOrder='rolety_id asc';
+          break;
+          //默认按字段“username”的升序
+          default:
+            $strOrder='username asc';  
+            $order="username";
+          break;
+        }
+        
+        // 查出所有的用户并分页，根据“strOrder”排序，设定前端页面显示的锚点（hash值）为“div1”，设定分页页数变量：“pageUserNum”
+        $users = UserModel::where('id','>',0)
+                            ->order($strOrder)
+                            ->paginate($tableRows,false,['type'=>'bootstrap','fragment'=>'div1','var_page'=>'pageUserNum',]); 
+          
+        // 分页变量
+        $pageUser = $users->render();       
+ 
+        foreach($users as $v){
+            $user1 = UserModel::get($v['id']);
+            // 使用User模型中定义的关联关系(role)查出用户对应用户组名称(name)
+            $roleName=$user1->role->name;
+            // 将用户对应的用户组名称加入数据集$users中。
+            $v['rolename']=$roleName;
+        }          
+          
+        // 查出所有用户组
+        $groups = RoletyModel::where('id','>',0)
+                                    ->order('rolenum asc')
+                                    ->select();
+                                   
+        $this->assign([
+            //--在bg-head.html页面输出自定义信息的HTML代码块
               'destr'=>$destrr= "请求方法:".$request->method()."</br>".
                                 "username:".$this->username."</br>".
                                 "log:".$this->log."</br>",
               
               'home'=>$request->domain(),
-              'username'=>$this->username,
-              //获取服务器信息（操作系统、Apache版本、PHP版本）
-              //'server_version' => $_SERVER['SERVER_SOFTWARE'],$_SERVER['SERVER_SOFTWARE']与apache_get_version()结果相同
+              'username'=>$username,
               
-              // 获取服务器操作系统
-              //'serverOS'=>PHP_OS,
-              
-              // 获取服务器域名 
+               // 获取服务器域名 
               'serverDomain'=>$_SERVER['SERVER_NAME'],
               //获取服务器操作系统类型及版本号,PHP 5
               'serverOS'=>php_uname('s').php_uname('v'),
@@ -72,11 +135,22 @@ class IndexController extends \think\Controller
               // 获取Apache版本信息，PHP 5
               'apacheVersion'=>apache_get_version(),
               
+              // 所有用户信息
+              'users'=>$users,
+              'tableRows'=>$tableRows,
+              'pageUser'=>$pageUser,
+              'pageUserNum'=>$pageUserNum,
               
+              // 排序信息
+              'order'=>$order,
+              
+              // 所有用户组信息
+              'groups'=>$groups,
           
-            ]);
-            return view();
-        
+          
+        ]);
+        return view('index');
+      }
         
     }
     
@@ -136,7 +210,7 @@ class IndexController extends \think\Controller
     {
       //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
       
-      //处理登录页面post来的数据
+      //处理登录页面传来的数据
       if(!empty($request->param('username'))){
             $username=$request->param('username');
       }else{
@@ -149,16 +223,17 @@ class IndexController extends \think\Controller
           $this->error('无用户名或密码，请先登录系统');
       }
       
+      // 查询数据库中是否存在页面传来的数据
       $user = UserModel::where('username',$username)
                             ->where('pwd',$pwd)
                             ->where('rolety_id',8)
                             ->select();
                             
       if(empty($user)){
-          $this->error('用户名或密码错误，请重新登录');
+        $this->error('用户名或密码错误，请重新登录');
           //return view("login"); 
       }else{
-          // 写入session
+        // 写入session
           Session::set('pwd',$user[0]['pwd']);
           Session::set('username',$user[0]['username']);
           Session::set('log',1);
@@ -171,58 +246,10 @@ class IndexController extends \think\Controller
           $this->roles=Session::get('role');
           $this->dept=Session::get('dept');
           
-          // 查出所有的用户
-          $users = UserModel::where('id','>',0)
-                            ->order('username asc')
-                            ->select();
- 
-          foreach($users as $v){
-            $user1 = UserModel::get($v['id']);
-            // 使用User模型中定义的关联关系(role)查出用户对应用户组名称(name)
-            $roleName=$user1->role->name;
-            // 将用户对应的用户组名称加入数据集中。
-            $v['rolename']=$roleName;
-          }          
-          
-          // 查出所有用户组
-          $groups = RoletyModel::where('id','>',0)
-                                    ->order('rolenum asc')
-                                    ->select();
-                                   
-          $this->assign([
-            //--在bg-head.html页面输出自定义信息的HTML代码块
-              'destr'=>$destrr= "请求方法:".$request->method()."</br>".
-                                "username:".$this->username."</br>".
-                                "log:".$this->log."</br>",
-              
-              'home'=>$request->domain(),
-              'username'=>$this->username,
-              
-               // 获取服务器域名 
-              'serverDomain'=>$_SERVER['SERVER_NAME'],
-              //获取服务器操作系统类型及版本号,PHP 5
-              'serverOS'=>php_uname('s').php_uname('v'),
-    			   // 获取MySQL版本信息
-              'mysqlVersion' => $this->_mysqlVersion(),
-    			   //获取服务器时间
-              'serverTime' => date('Y-m-d H:i:s', time()),
-              // 获取PHP版本信息，PHP 5
-              'phpVersion'=>phpversion(),
-              // 获取Apache版本信息，PHP 5
-              'apacheVersion'=>apache_get_version(),
-              
-              // 所有用户信息
-              'users'=>$users,
-              
-              // 所有用户组信息
-              'groups'=>$groups,
-          
-          
-          ]);
-          
-          return view('index');
+        // 重定向到index页面
+       // $this->redirect('index', ['username' => $username,'pwd' => $pwd]);
+       $this->redirect('index');
       }
-      
       
     }
         
@@ -255,7 +282,7 @@ class IndexController extends \think\Controller
           $u=$user->where('username',$username)->select();
           
       // 模型方式返回的数据集包含每个User模型对象实例的数组。将数据集/数组$u转化为“，”分隔的字符串
-          //$str=implode(',',$u);
+       //   $str=implode(',',$u);
           
           // 遍历数据集$u中的'rolety_id'值是否存在$roletyId，
           $roleBool=0;
@@ -270,22 +297,12 @@ class IndexController extends \think\Controller
           $role=RoletyModel::get($roletyId);
           $roleName=$role->name;
           
-         // $result='error';
-    //      $msg= '数据集：'.$str.' \ '.$roleBool.' \ '.$roletyId;
-    //      return ['result'=>$result,'msg'=>$msg];
+          //$result='error';
+//          $msg= '数据集：'.$str.' \ '.$roleBool.' \ ';
+//          return ['result'=>$result,'msg'=>$msg];
           
-          // 数据集$u中的'username'值是否存在新增的$username
-          if($username==$u[0]['username'] && $dept!=$u[0]['dept']){
-            $result='error';
-            $msg='用户：【'.$username.'】已属于部门：['.$u[0]->dept.']，请重新选择。';
-          }else if($username==$u[0]->username && $dept==$u[0]->dept && $roleBool==1){
-            
-            $result="error";
-            $msg='用户：【'.$username.'】已在['.$roleName.']用户组，请重新选择。';
-          }else if($username==$u[0]->username && $dept==$u[0]->dept && $roleBool==0){
-            // 未与老用户的用户组重复，添加老用户的新用户组
-            // 保持老用户的密码不变
-            $pwd=$u[0]['pwd'];
+          // 数据集$u为空，说明要添加全新的用户
+          if(empty($u)){
             // 用户信息写入数据表User
             $user->save([
               'username'  => $username,
@@ -295,8 +312,30 @@ class IndexController extends \think\Controller
             ]); 
         
             $result='success';
-            $msg='用户：【'.$username.' 】新用户组：['.$roleName.$roleBool.']添加成功。';
-          }else if($username!=$u[0]->username){
+            $msg='新用户：【'.$username.' 】，用户组：['.$roleName.']添加成功。';
+          }// 数据集$u中的'username'值是否存在新增的$username
+           else if($username==$u['0']['username'] && $dept!=$u['0']['dept']){ 
+            $result='error';
+            $msg='用户：【'.$username.'】已属于部门：['.$u['0']->dept.']，请重新选择。';
+          }else if($username==$u['0']->username && $dept==$u['0']->dept && $roleBool==1){
+            
+            $result="error";
+            $msg='用户：【'.$username.'】已在['.$roleName.']用户组，请重新选择。';
+          }else if($username==$u['0']->username && $dept==$u['0']->dept && $roleBool==0){
+            // 未与老用户的用户组重复，添加老用户的新用户组
+            // 保持老用户的密码不变
+            $pwd=$u['0']['pwd'];
+            // 用户信息写入数据表User
+            $user->save([
+              'username'  => $username,
+              'pwd' => $pwd,
+              'dept' => $dept,
+              'rolety_id' => $roletyId,
+            ]); 
+        
+            $result='success';
+            $msg='用户：【'.$username.' 】新用户组：['.$roleName.']添加成功。';
+          }else if($username!=$u['0']->username){
             // 新用户添加。
             $user->save([
               'username'  => $username,

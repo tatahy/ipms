@@ -1,0 +1,50 @@
+
+2017/10/26
+1.tp5 出错界面，框架返回的json数据，error页面使用。
+{"code":0,"msg":"无用户名或密码，请先登录系统","data":"","url":"javascript:history.back(-1);","wait":3}
+
+2.功能：
+根据URL“http://ipms.com/admin/index/check#div1”中的hash值“#div1”显示对应的页面，
+
+//jquery 代码
+<script>
+$(document).ready(function(){
+   //根据URL中的hash值显示对应的页面
+	var hash = window.location.hash.toLocaleLowerCase();
+    switch (hash) {
+        case "#div1":
+            $('.nav-pills a[href="#div1"]').tab('show');
+        break;
+        case "#div2":
+            $('.nav-pills a[href="#div2"]').tab('show');
+        break;
+        case "#div3":
+             $('.nav-pills a[href="#div3"]').tab('show');
+         break;
+        default:
+            $('.nav-pills a[href="#div0"]').tab('show');
+        break;
+    }
+	
+    //	异步更新成功后回到“#div1”页面
+	$.ajax({
+		type : "post",
+		async : true,  //异步请求
+		url : "{$home}/admin/index/oprtUser", 
+		<!-- // 发送到服务器的数据 -->
+		data : sendData,
+		timeout:1000,
+		<!-- // 指定服务器端response的数据类型为json -->
+		dataType:"json",
+		success:function(backData){
+			//刷新页面并回到"#div1"页面
+			window.location.hash="#div1";
+			window.location.reload(true);
+		},
+		error: function() {
+            alert("失败1，请稍后再试！");
+        }
+	});
+});	
+</script>
+
