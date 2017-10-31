@@ -2,7 +2,9 @@
 	<!-- <p><strong>sumary</strong> -->
 		
 	<div class="panel panel-default">
-		<div class="panel-heading"><strong>服务器信息</strong></div>
+		<div class="panel-heading">
+			<h4><strong>系统服务器信息</strong></h4>
+		</div>
 		<!-- <div class="panel-body"> -->
 			<ul class="list-group">
 						
@@ -19,40 +21,68 @@
 		<!-- </div> -->
 	</div>
 	
-	<!-- <div class="panel panel-default"> -->
-		<!-- <div class="panel-heading"><strong>系统概况</strong></div> -->
-		<!-- <div class="panel-body col-sm-6" > -->
-		<!-- <h5>服务器信息</h5> -->
-			<!-- <ul class="list-group"> -->
-						
-				<!-- <li class="list-group-item">系统环境：</li> -->
-				<!-- <li class="list-group-item">服务器时间：</li> -->
-				<!-- <li class="list-group-item">MySQL版本：</li> -->
-				<!-- <li class="list-group-item">文件上传限制：</li> -->
-				<!-- <li class="list-group-item">脚本执行时限：</li> -->
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4><strong>系统信息</strong></h4>
+		</div>
+		
+		<div class="panel-body " >
+		<h5><strong>总用户数：{$serverDomain}；</strong></h5>
+			<ul class="list-group">	
+				<li class="list-group-item">登录用户数：；</li>
+				<li class="list-group-item">禁用用户数：；</li>
+
+			</ul>
+		
+		<h5><strong>用户组总数：{$serverTime}；</strong></h5>
+			<ul class="list-group">
+				<li class="list-group-item">管理员组用户数：；</li>
+				<li class="list-group-item">超级管理员组用户数：；</li>
 					
-			<!-- </ul> -->
-		<!-- </div> -->
+			</ul>
+			
+		<h5><strong>部门总数：{$serverOS}；</strong></h5>
+			<ul class="list-group">
+				<li class="list-group-item">用户数前3的部门：；</li>
+				<li class="list-group-item">用户数后3的部门：；</li>
+					
+			</ul>
+		</div>
 		
 		
-	<!-- </div> -->
+	</div>
 	
 	<div class="panel panel-default ">
-		<div class="panel-heading"><strong>服务器信息2</strong></div>
+		<div class="panel-heading">
+			<h4><strong>系统开发维护</strong></h4>
+		</div>
+		
 		<div class="panel-body " >	
 					
-				<p >服务器域名：{$serverDomain}</p>
-				<p >服务器时间：{$serverTime}</p>
-				<p >服务器OS：{$serverOS}</p>
-				<p >Apache版本：{$apacheVersion}</p>
-				<p >MySQL版本：MySQL/{$mysqlVersion}</p>
-				<p >PHP版本：PHP/{$phpVersion}</p>
+				<p >开发人员：{$serverDomain}；
+					<li class="">登录用户数：；</li>
+					<li class="">禁用用户数：；</li>
+				</p>
+				<p >维护人员：{$serverTime}；
+					<li class="">管理员组用户数：；</li>
+					<li class="">超级管理员组用户数：；</li>
+	
+				</p>
+				<p >日常管理人员：{$serverOS}；
+					<li class="">用户数前3的部门：；</li>
+					<li class="">用户数后3的部门：；</li>
+				</p>
 				
-				<li class="">系统环境：</li>
-				<li class="">服务器时间：</li>
-				<li class="">MySQL版本：</li>
-				<li class="">文件上传限制：</li>
-				<li class="">脚本执行时限：</li>
+				<p >系统说明；
+					<li class="">用户数前3的部门：；</li>
+					<li class="">用户数后3的部门：；</li>
+				</p>
+				
+				<p >版本号；
+					<li class="">用户数前3的部门：；</li>
+					<li class="">用户数后3的部门：；</li>
+				</p>
+				
 					
 		</div>
 	</div>

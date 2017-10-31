@@ -54,9 +54,10 @@ class IndexController extends \think\Controller
           $pageUserNum=1;
       }
       
+      // 限制登录的用户必须rolety_id=8（admin）或9（superadmin）
       $user = UserModel::where('username',$username)
                             ->where('pwd',$pwd)
-                            ->where('rolety_id',8)
+                            //->where('rolety_id','in','8,9')
                             ->select();
                             
       if(empty($user)){
@@ -64,41 +65,145 @@ class IndexController extends \think\Controller
           //return view("login"); 
       }else{
           
-        //$tableRows接收页面传来的分页时每页表格显示的记录行数，初始值为10
-        if(!empty($request->param('tableRows'))){
-          $tableRows=$request->param('tableRows');
+        //$userTableRows接收页面传来的分页时每页表格显示的记录行数，初始值为10
+        if(!empty($request->param('userTableRows'))){
+          $userTableRows=$request->param('userTableRows');
         }else{
-          $tableRows=10;
+          $userTableRows=10;
         }
         
-        //$order接收页面传来的排序信息
+        // 查询词1，'searchUserName'
+        if(!empty($request->param('searchUserName'))){
+          $searchUserName=$request->param('searchUserName');
+        }else{
+          $searchUserName="";
+        } 
+        
+        // 查询词2，'searchDept'
+        if(!empty($request->param('searchDept'))){
+          $searchDept=$request->param('searchDept');
+        }else{
+          $searchDept=0;
+        } 
+        
+        // 查询词3，'searchUserGroup'
+        if(!empty($request->param('searchUserGroup'))){
+          $searchUserGroup=$request->param('searchUserGroup');
+        }else{
+          $searchUserGroup=0;
+        } 
+        
+        //$order、$sort接收页面传来的排序信息
         $order=$request->param('order');
-        switch($order){
-          case 'username':
-            $strOrder='username asc';
-          break;
+        $sort=$request->param('sort');
+        //  升序asc查询
+        if($sort=="asc"){
+          switch($order){
+            case 'username':
+              $strOrder='username asc';
+            break;
+            
+            case 'dept':
+              $strOrder='dept asc';
+            break;
+            
+            case 'usergroup':
+              $strOrder='rolety_id asc';
+            break;
+            //默认按字段“username”的升序
+            default:
+              $strOrder='username asc';  
+              $order="username";
+              $sort="asc";
+            break;
+          } 
+        }else{
+          // 降序desc查询
+          switch($order){
+            case 'username':
+              $strOrder='username desc';
+            break;
+            
+            case 'dept':
+              $strOrder='dept desc';
+            break;
+            
+            case 'usergroup':
+              $strOrder='rolety_id desc';
+            break;
+            //默认按字段“username”的升序
+            default:
+              $strOrder='username asc';  
+              $order="username";
+              $sort="asc";
+            break;
+          } 
+        }
+        
+        // 组合查询条件，
+        if($searchDept!='0'){
+          $map['dept'] = $searchDept;
+                
+          if(!empty($searchUserName) && $searchUserGroup!=0 ){
+            
+            $map['username'] = ['like','%'.$searchUserName.'%'];
+            $map['rolety_id'] = $searchUserGroup;
+            
+          }elseif(!empty($searchUserName) && $searchUserGroup==0  ){
+            
+            $map['username'] = ['like','%'.$searchUserName.'%'];
+            
+          }elseif($searchUserGroup!=0 && empty($searchUserName)){
+    
+            $map['rolety_id']  = $searchUserGroup;
+            
+          }else{
+            
+          }
           
-          case 'dept':
-            $strOrder='dept asc';
-          break;
+        }else{
           
-          case 'usergroup':
-            $strOrder='rolety_id asc';
-          break;
-          //默认按字段“username”的升序
-          default:
-            $strOrder='username asc';  
-            $order="username";
-          break;
+          if(!empty($searchUserName) && $searchUserGroup!=0 ){
+            $map['username'] = ['like','%'.$searchUserName.'%'];
+            $map['rolety_id'] = $searchUserGroup;
+            
+          }elseif(!empty($searchUserName) && $searchUserGroup==0  ){
+            $map['username'] = ['like','%'.$searchUserName.'%'];
+            
+          }elseif($searchUserGroup!=0 && empty($searchUserName)){
+            $map['rolety_id']  = $searchUserGroup;
+            
+          }else{
+            $map='';
+          }
+          
         }
         
         // 查出所有的用户并分页，根据“strOrder”排序，设定前端页面显示的锚点（hash值）为“div1”，设定分页页数变量：“pageUserNum”
+        // 带上每页显示记录行数$userTableRows和3个查询词，实现查询结果分页显示。
         $users = UserModel::where('id','>',0)
+                            //->where('dept',$searchDept)
+                            ->where($map)
                             ->order($strOrder)
-                            ->paginate($tableRows,false,['type'=>'bootstrap','fragment'=>'div1','var_page'=>'pageUserNum',]); 
+                            ->paginate($userTableRows,false,['type'=>'bootstrap','fragment'=>'div1','var_page'=>'pageUserNum',
+                            'query'=>['userTableRows'=>$userTableRows,'searchDept'=>$searchDept,'searchUserName'=>$searchUserName,'searchUserGroup'=>$searchUserGroup]]);                     
           
         // 分页变量
-        $pageUser = $users->render();       
+        $pageUser = $users->render();
+        
+        // 记录总数
+        $userRecords= UserModel::where('id','>',0)
+                            ->where($map)
+                            //->where('dept',$searchDept)
+                            ->count();
+        
+        // 查出所有的用户总数
+        $users1= UserModel::where('id','>',0)
+                            ->where($map)
+                            //->where('dept',$searchDept)
+                            ->group('username')
+                            ->select();
+        $usersNum=count($users1);       
  
         foreach($users as $v){
             $user1 = UserModel::get($v['id']);
@@ -137,12 +242,21 @@ class IndexController extends \think\Controller
               
               // 所有用户信息
               'users'=>$users,
-              'tableRows'=>$tableRows,
+              'usersNum'=>$usersNum,
+              'userRecords'=>$userRecords,
+              'userTableRows'=>$userTableRows,
               'pageUser'=>$pageUser,
               'pageUserNum'=>$pageUserNum,
               
+              //搜索信息
+              'searchUserName'=>$searchUserName,
+              'searchDept'=>$searchDept,
+              'searchUserGroup'=>$searchUserGroup,
+              
+              
               // 排序信息
               'order'=>$order,
+              'sort'=>$sort,
               
               // 所有用户组信息
               'groups'=>$groups,
@@ -224,9 +338,10 @@ class IndexController extends \think\Controller
       }
       
       // 查询数据库中是否存在页面传来的数据
+      // 限制登录的用户必须rolety_id=8（admin）或9（superadmin）
       $user = UserModel::where('username',$username)
                             ->where('pwd',$pwd)
-                            ->where('rolety_id',8)
+                            ->where('rolety_id','in','8,9')
                             ->select();
                             
       if(empty($user)){
@@ -383,6 +498,25 @@ class IndexController extends \think\Controller
         break;
         
       }
+    }
+    
+    // 搜索用户，将index里面有关搜索的代码抽取后完善
+    public function search(Request $request)
+    {
+      $this->_loginUser();  
+      
+      Route::rule('blog/:id','index/blog/read');
+
+      //就可以使用下面的方式来生成URL地址：
+      Url::build('index/blog/read','id=5&name=thinkphp');
+      Url::build('index/blog/read',['id'=>5,'name'=>'thinkphp']);
+      
+      // 重定向到index页面
+      $this->redirect('index', ['username' => $searUserName,'pwd' => $pwd]);
+      // 检查用户组名称是否已存在
+      return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
+      
+      
     }
     
     

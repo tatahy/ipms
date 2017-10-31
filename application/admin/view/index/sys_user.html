@@ -11,23 +11,55 @@
 <div class="panel panel-default ">
 		<div class="panel-heading">
 			<h4><strong>用户管理</strong>&nbsp;
-			
 				<!--// bootstap通过button调用Model -->
 				<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addUser"><strong>新增用户</strong>&nbsp;<span class="glyphicon glyphicon-file"></span></button>
-				
 			</h4> 
 		</div>
 		
-		<div id="divUser" class="panel-body table-responsive" >	
+		<div id="divUser" class="panel-body" >	
+			<form method="post" action="{$home}/admin/index/index#div1" id="userSearch" class="form-inline">
+				<div class="form-group">
+					<label class="" for="searchUserName">用户名</label>
+					<input class="form-control" id="searchUserName" name="searchUserName" type="text" value="{$searchUserName}" placeholder="...不限">
+										
+				</div>
 					
+				<div class="form-group">
+					<label class="control-label" for="searchDept">部门</label>
+					<select class="form-control" id="searchDept" name="searchDept">
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+											
+					</select>
+				</div>
+									
+				<div class="form-group">
+					<label class="control-label" for="searchUserGroup">用户组</label>
+					<select class="form-control" id="searchUserGroup" name="searchUserGroup">
+						<option value="_a">a</option>
+						<option value="_b">b</option>
+						<option value="_c">c</option>
+											
+					</select>
+				</div>
+				
+				<input type="submit" class="btn btn-primary btn-sm" value="用户搜索">
+				
+			</form>
+				
+
+			<hr>
+			
+			<div class="table-responsive" >
 			<table class="table table-hover">
 				<thead>
 					<tr>
 						<th>序号</th>
-						<th><a href="{$home}/admin/index/index/order/username#div1" data-toggle="tooltip" order="username" data-placement="bottom" title="点击排序">用户名&nbsp;</a></th>
-						<th><a href="{$home}/admin/index/index/order/dept#div1" data-toggle="tooltip" order="dept" data-placement="bottom" title="点击排序">所属部门&nbsp;</a></th>
+						<th><a href="{$home}/admin/index/index/order/username/sort/{$sort}#div1" order="username" sort="{$sort}">用户名&nbsp;</a></th>
+						<th><a href="{$home}/admin/index/index/order/dept/sort/{$sort}#div1" order="dept" sort="{$sort}">所属部门&nbsp;</a></th>
 						<!-- <th>用户组id</th> -->
-						<th><a href="{$home}/admin/index/index/order/usergroup#div1" data-toggle="tooltip" order="usergroup" data-placement="bottom" title="点击排序">用户组&nbsp;</a></th>
+						<th><a href="{$home}/admin/index/index/order/usergroup/sort/{$sort}#div1" order="usergroup" sort="{$sort}">用户组名（组#）&nbsp;</a></th>
 						<th>操作</th>
 					</tr>
 				</thead>
@@ -35,11 +67,11 @@
 				<tbody><!-- 此处显示数据库查询后的数据集 -->
 					{volist name="users" id="vo" empty="暂时没有数据"}
 					<tr>
-						<td>{$i+($pageUserNum-1)*$tableRows}</td>
+						<td>{$i+($pageUserNum-1)*$userTableRows}</td>
 						<td>{$vo.username}</td>
 						<td>{$vo.dept}</td>
 						<!-- <td>{$vo.rolety_id}</td>  -->
-						<td>{$vo.rolename}</td>
+						<td>{$vo.rolename}（{$vo.rolety_id}）</td>
 						<td>
 							<button uid="{$vo.id}" class="del btn-link"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>&nbsp;
 							
@@ -64,13 +96,29 @@
 				</tfoot>
 				
 			</table>
-			
+			</div>
 			<!-- <button type="button" class="btn btn-primary btn-sm">刷新&nbsp;<span class="glyphicon glyphicon-file"></span></button> -->
 			
-			<div class="pull-right">
-				
-				{$pageUser}
+			<label class="label label-warning" style="padding:5px;">用户记录总数：<span class="badge">{$userRecords}</span></label>
+			
+			<label class="label label-info" style="padding:5px;">用户总数：<span class="badge">{$usersNum}</span></label>
+			
+			<div id="divUserTableRows" class="col-sm-12 text-right search">
+				<div class="col-sm-10 text-right">{$pageUser}</div>
+						
+				<div class="form-group form-group-sm col-sm-2">
+					<span class="">每页记录行数：</span>
+					<select class="form-control" id="userTableRows">
+						<option value="5">5</option>
+						<option value="10">10</option>
+						<option value="15">15</option>
+						<option value="30">30</option>
+						<option value="50">50</option>
+					</select>
+						
+				</div>
 			</div>
+			
 		</div>
 </div>
 
@@ -189,34 +237,92 @@ $(document).ready(function(){
 		}
 	});
 	
-	// 用户表格中有"dept"内容为“0”的去除<button>及附属span
+	<!-- // 用户表格中<td>内容含“superadmin”的去除<button>及附ept属span -->
 	$("#divUser tbody td").each(function(){
-		if($(this).text()=='0'){
+		var str=$(this).text();
+		if(str.indexOf('superadmin')>=0){
 			$(this).nextAll().children("button").remove();
             $(this).nextAll().children("span").remove();
 		
 		}
 	});
 	
-	// 向th中的a添加span，利用a中的“order”属性值与{$order}变量值保证页面刷新后也有效
+	// 添加bootstrap的tooltip属性
+	$("#divUser thead th a").tooltip({title: "点击排序", placement: "bottom"}); 
+	
+	<!-- // 向th中的a添加span，利用a中的“order”、“sort”属性值与{$order}、{$sort}变量值保证页面刷新后也有效，页面加载时表格内容默认以“order”：“username”， “sort”：“asc”排序，但th的a中“sort”：“desc”，因为a点击后要与表格现有的排序方式相反。-->
 	$("#divUser thead th a").each(function(){
-		var str='<span class="small glyphicon glyphicon-sort"></span>';
+		var glyAsc='<span class="small glyphicon glyphicon-sort-by-attributes text-muted"></span>';
+		var glyDesc='<span class="small glyphicon glyphicon-sort-by-attributes-alt text-warning"></span>';
 		var order=$(this).attr("order");
-		// a中的“order”属性值与{$order}变量值相等
+		var sort=$(this).attr("sort");
+		
+		// 清除所有a中的span
+		$(this).nextAll().find('span').remove();
+		$(this).prevAll().find('span').remove();
+		$(this).find('span').remove();
+		
+		<!-- // a中的“order”属性值与{$order}变量值相等 -->
 		if(order=="{$order}"){
-			// 清除所有a中的span
-			$(this).nextAll().find('span').remove();
-			$(this).prevAll().find('span').remove();
-			$(this).find('span').remove();
-			// 在a中添加span
-			$(this).append(str);
-		}		
+			if(sort=="desc"){
+			// 表格内容显示为降序，<a>中设为升序			
+				// 在<a>中添加span
+				$(this).append(glyDesc);
+				// 修改a的属性值
+				<!-- $(this).attr("href","{$home}/admin/index/index/order/"+order+"/searchUserName/{$searchUserName}/searchDept/{$searchDept}/searchUserGroup/{$searchUserGroup}/sort/asc#div1"); -->
+				$(this).attr("sort","asc");
+				
+				$(this).attr("href","{$home}/admin/index/index/order/"+order+"/sort/asc#div1");
+				$(this).attr("sort","asc");
+				
+				<!-- // bootstap3中从命名空间“bs”修改tooltipd的title -->
+				<!-- $(this).attr('data-original-title','点击后升序'); -->
+				// bootstap3中修改tooltip的options属性值
+				$(this).data("bs.tooltip").options.title="点击后升序";
+				$(this).data("bs.tooltip").options.placement="top";
+				
+			}else{
+			// 表格内容显示为升序，<a>中设为降序
+				// 在<a>中添加span
+				$(this).append(glyAsc);
+				// 修改<a>的属性值
+				<!-- $(this).attr("href","{$home}/admin/index/index/order/"+order+"/searchUserName/{$searchUserName}/searchDept/{$searchDept}/searchUserGroup/{$searchUserGroup}/sort/desc#div1"); -->
+				
+				$(this).attr("href","{$home}/admin/index/index/order/"+order+"/sort/desc#div1");
+				
+				$(this).attr("sort","desc");
+				
+				<!-- // bootstap3中修改tooltipd的title -->
+				<!-- $(this).attr('data-original-title','点击后降序'); -->
+				
+				// bootstap3中从命名空间“bs”修改tooltip的options属性值
+				$(this).data("bs.tooltip").options.placement="top";
+				$(this).data("bs.tooltip").options.title="点击后降序";
+			}
+		}	
 		
 	});
+	// 单选框#searchDept的内容
+	showDept($("#searchDept"),[{"text":"...不限","val":"0"}],'{$searchDept}');
+	// 单选框#searchUserGroup的内容
+	showUserGroup($("#searchUserGroup"),[{"text":"...不限","val":"0"}],'{$searchUserGroup}');
 	
 	<!-- // 在#addUser的model显示之前，应用show.bs.modal事件将#addUser的model内容准备好 -->
 	$("#addUser").on('show.bs.modal', function () {
-        <!-- // 应用Ajax向服务器请求“部门”单选框内容所需数据，并组装好HTML语句 -->
+        // 单选框#selDept的内容
+		showDept($("#selDept"));
+		// 单选框#selUserGroup的内容
+		showUserGroup($("#selUserGroup"));
+	});	
+	
+	/**
+ 	* 向单选框填充"部门"的内容选项
+	* 参数1：Obj，必须。类型：对象，值：单选框的对象名称
+	* 参数2：attach，可为空。类型：json数组，值：需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
+	*参数3：selected，可为空。类型：字符，值：字符。
+ 	**/
+	function showDept(Obj,attach,selected){
+		<!-- // 应用Ajax向服务器请求“部门”单选框内容所需数据，并组装好HTML语句 -->
 		$.ajax({
 			type : "post",
 			async : true,  //异步请求
@@ -229,8 +335,15 @@ $(document).ready(function(){
 			success:function(backData){
 				var data=backData;
 
-				<!-- // 方法一：遍历data数组组装HTML语句 -->
 				var str="";
+				if(attach){
+					for(i=0;i<attach.length;i++){
+						str+="<option value='"+attach[i].val+"'>"+attach[i].text+"</option>";
+					}
+					
+				}
+				
+				<!-- // 遍历data数组组装HTML语句 -->
 				<!-- // data的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
 				$.each(data,function(n1,v1){
 					$.each(v1,function(n2,v2){
@@ -243,19 +356,29 @@ $(document).ready(function(){
 					});
 				});
 				
-				<!-- 清空$("#selDept") -->
-				$("#selDept").empty();
-				$("#selDept").append(str);
+				<!--// 清空单选框Obj的所有选项-->
+				Obj.empty();
+				<!--// 添加单选框Obj的新选项-->
+				Obj.append(str);
 				
-				<!-- // 方法二： 直接引用data数组值组装HTML语句-->
-				<!-- $("#selDept").append("<option value='_1'>"+data[0].name+"</option><option value='_2'>"+data[1].name+"</option><option value='_3'>"+data[2].name+"</option><option value='_4'>"+data[3].name+"</option>"); -->
-				
+				<!-- // value=selected 的项为选定项-->
+				if (selected){
+					Obj.val(selected).attr('selected','selected');
+				}
 			},
 			error: function() {
                alert("失败，请稍后再试！");
             }
 		});
-		
+	}
+	
+	/**
+ 	* 向单选框填充"用户组"的内容选项
+	* 参数1：Obj，必须。类型：对象，值：单选框的对象名称
+	* 参数2：attach，可为空。类型：json数组，值：需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
+	*参数3：selected，可为空。类型：字符，值：字符。
+ 	**/ 
+	function showUserGroup(Obj,attach,selected){
 		<!-- // 应用Ajax向服务器请求“用户组”单选框内容所需数据，并组装好HTML语句 -->
 		$.ajax({
 			type : "post",
@@ -269,8 +392,15 @@ $(document).ready(function(){
 			success:function(backData){
 				var data=backData;
 
-				<!-- // 方法一：遍历data数组组装HTML语句 -->
 				var str="";
+				if(attach){
+					for(i=0;i<attach.length;i++){
+						str+="<option value='"+attach[i].val+"'>"+attach[i].text+"</option>";
+					}
+					
+				}
+				
+				<!-- // 遍历data数组组装HTML语句 -->
 				<!-- // data的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
 				$.each(data,function(n1,v1){
 					$.each(v1,function(n2,v2){
@@ -283,19 +413,23 @@ $(document).ready(function(){
 					});
 				});
 				
-				<!-- 清空$("#selUserGroup") -->
-				$("#selUserGroup").empty();
-				$("#selUserGroup").append(str);
+				<!--// 清空单选框Obj的所有选项-->
+				Obj.empty();
+				<!--// 添加单选框Obj的新选项-->
+				Obj.append(str);
 				
-				<!-- // 方法二： 直接引用data数组值组装HTML语句-->
-				<!-- $("#selDept").append("<option value='_1'>"+data[0].name+"</option><option value='_2'>"+data[1].name+"</option><option value='_3'>"+data[2].name+"</option><option value='_4'>"+data[3].name+"</option>"); -->
+				<!-- // value=selected 的项为选定项-->
+				if (selected){
+					Obj.val(selected).attr('selected','selected');
+				}
+				<!-- Obj.val(selected).attr('selected','selected'); -->
 				
 			},
 			error: function() {
                alert("失败，请稍后再试！");
             }
 		});
-	});	
+	}
 		/**
  		* 校验“用户名”和“密码”输入框的内容
  		**/
@@ -559,7 +693,7 @@ $(document).ready(function(){
 						var data=backData;
 						//删除所在行<tr>
 						$(selBtn).parent().parent().remove();
-						//刷新页面并回到"#div1"页面
+						//刷新页面并回到锚点"#div1"页面
 						window.location.hash="#div1";
 						window.location.reload(true);
 					},
@@ -573,6 +707,61 @@ $(document).ready(function(){
 			}
 		}).ok('(Y)删除').cancel('(N)取消');
 		
+	});
+	
+	<!-- //表格每页显示记录行数 -->
+	$("#userTableRows").val('{$userTableRows}'); 
+	<!-- //选择每页显示记录行数后页面跳转并传参 -->
+	$("#userTableRows").change(function(){
+		// 每页显示的记录行数
+		var rows=$(this).val();
+		
+		// 本页的3个查询词
+		var searchUserName=$("#searchUserName").val();
+		var searchDept=$("#searchDept").val();
+		var searchUserGroup=$("#searchUserGroup").val();
+		
+		//利用js进行url拼装，实现“选择每页显示条目数”的功能。
+		<!-- //选择每页显示条目数后页面跳转并传参 -->
+		window.location.href="{$home}/admin/index/index?userTableRows="+rows+"&searchDept="+searchDept+"&searchUserName="+searchUserName+"&searchUserGroup="+searchUserGroup+"#div1";
+		
+		// 组装通过“post”提交的数据，名称与后端所用一致
+		var sendData = {"userTableRows":rows,"searchUserName":searchUserName,"searchDept":searchDept,"searchUserGroup":$(this).searchUserGroup};
+		
+		// jquery load()方法
+		<!-- $("#divContainer").load("{$home}/admin/index/index",sendData,function(){  -->
+			<!-- //刷新页面并回到锚点"#div1"页面  -->
+			<!-- window.location.hash="#div1"; -->
+			<!-- // "true"，从服务器读取数据，而非从本地缓存读取数据刷新页面 -->
+			 <!-- window.location.reload(true);	}); -->
+		
+		// jquery post()方法
+		<!-- $.post("{$home}/admin/index/index",sendData,function(){ //刷新页面并回到锚点"#div1"页面 -->
+			<!-- window.location.hash="#div1"; -->
+			<!-- // "true"，从服务器读取数据，而非从本地缓存读取数据刷新页面 -->
+			<!-- window.location.reload(true);	});			 -->
+				
+		<!-- $.ajax({ -->
+			<!-- type : "post", -->
+			<!-- async : true,  //异步请求 -->
+			<!-- url : "{$home}/admin/index/index",  -->
+			<!-- // 发送到服务器的数据 -->
+			<!-- data : sendData, -->
+			<!-- timeout:1000, -->
+			<!-- // 指定服务器端response的数据类型为json -->
+			<!-- dataType:"json", -->
+			<!-- success:function(){ -->
+				
+				<!-- //刷新页面并回到锚点"#div1"页面 -->
+				<!-- window.location.hash="#div1"; -->
+				<!-- // "true"，从服务器读取数据，而非从本地缓存读取数据刷新页面 -->
+				<!-- window.location.reload(true);				 -->
+			<!-- }, -->
+			<!-- error: function() { -->
+               	<!-- alert("失败11，请稍后再试！"); -->
+            <!-- } -->
+		<!-- }); -->
+	
 	});
 	
 });
