@@ -303,6 +303,7 @@ class IndexController extends \think\Controller
         $this->_loginUser();
         
         $groups=RoletyModel::field('id,name')->select();
+        // 将数组转化为json
         return json($groups);
     }
     
@@ -390,6 +391,7 @@ class IndexController extends \think\Controller
       $pwd=md5($request->param('pwd'));
       $dept=$request->param('dept');
       $roletyId=$request->param('userGroup');
+      $id=$request->param('id');
      
       switch($oprt){
         case "add":
@@ -469,7 +471,6 @@ class IndexController extends \think\Controller
         break;
         
         case"delete":
-          $id=$request->param('id');
           UserModel::destroy($id);
           
           $result='success';
@@ -478,7 +479,6 @@ class IndexController extends \think\Controller
         break;
         
         case"disable":
-          $id=$request->param('id');
           UserModel::update(['enable'=> 0], ['id' => $id]);
           
           $result='success';
@@ -488,12 +488,60 @@ class IndexController extends \think\Controller
         break;
         
         case"enable":
-          $id=$request->param('id');
           UserModel::update(['enable'=> 1], ['id' => $id]);
           
           $result='success';
           // 返回前端JSON数据
           return ['result'=>$result,'uid'=>$id];
+          
+        break;
+        
+      }
+    }
+    
+     // 用户CDUR，接收客户端通过Ajax，post来的参数，返回json数据
+    public function oprtDept(Request $request)
+    {
+      $this->_loginUser();  
+      
+      $oprt=$request->param('oprt');
+      $username=$request->param('username');
+      $pwd=md5($request->param('pwd'));
+      $id=$request->param('id');
+     
+      switch($oprt){
+        case "add":
+          $user=new DeptModel;
+          $u=$user->where('username',$username)->select();
+         
+          // 返回前端JSON数据
+            return ['result'=>$result,'msg'=>$msg];
+            
+        break;
+        
+        case"delete":
+          DeptModel::destroy($id);
+          
+          $result='success';
+          // 返回前端JSON数据
+          return ['result'=>$result];
+        break;
+        
+        case"disable":
+          DeptModel::update(['enable'=> 0], ['id' => $id]);
+          
+          $result='success';
+          // 返回前端JSON数据
+          return ['result'=>$result,'deptId'=>$id];
+          
+        break;
+        
+        case"enable":
+          DeptModel::update(['enable'=> 1], ['id' => $id]);
+          
+          $result='success';
+          // 返回前端JSON数据
+          return ['result'=>$result,'deptId'=>$id];
           
         break;
         

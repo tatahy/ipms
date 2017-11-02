@@ -1,7 +1,289 @@
-<div class="hy-box">
-	<p><strong>系统设置</strong></p>
+<div class="">
+	<!-- // bootstrap panel group+collapse -->
+	<div class="panel-group" id="sysParam">
+	
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4 class="panel-title">
+        		<a data-toggle="collapse" data-parent="#sysParam" href="#sysParam1"><strong>
+        		部门设置</strong></a>
+      		</h4>
+			
+		</div>
+		<div id="sysParam1" class="panel-collapse collapse in">
+			<ul class="list-group">
+						
+				<a class="list-group-item">服务器域名：{$serverDomain}</a>
+				<a id="display" class="list-group-item">服务器时间：{$serverTime}</a>
+				
+				
+					
+			</ul>
+			
+			<div class="panel-body " >
+				<h5>
+        		<strong>部门列表</strong>
+      			</h5>
+			
+				<div class="table-responsive" >
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>序号</th>
+							<th>部门全称</th>
+							<th>部门简称</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+				
+					<tbody><!-- 此处显示数据库查询后的数据集 -->
+						<tr>
+							<td>1</td>
+						
+							<td>操作</td>
+						</tr>
+						
+						<tr>
+							<td>2</td>
+						
+							<td>操作</td>
+						</tr>
+					</tbody>
+				
+				
+				</table>
+				</div>
+			
+		</div>
+			
+		</div>
+	</div>
+	
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4 class="panel-title">
+        		<a data-toggle="collapse" data-parent="#sysParam" href="#sysParam2"><strong>
+        		系统信息</strong></a>
+      		</h4>
+			
+		</div>
+		
+		<div id="sysParam2" class="panel-collapse collapse">
+		<div class="panel-body " >
+		<h5><strong>总用户数：{$serverDomain}；</strong></h5>
+			<ul class="list-group">	
+				<li class="list-group-item">登录用户数：；</li>
+				<li class="list-group-item">禁用用户数：；</li>
+
+			</ul>
+		
+		<h5><strong>用户组总数：{$serverTime}；</strong></h5>
+			<ul class="list-group">
+				<li class="list-group-item">管理员组用户数：；</li>
+				<li class="list-group-item">超级管理员组用户数：；</li>
+					
+			</ul>
+			
+		<h5><strong>部门总数：{$serverOS}；</strong></h5>
+			<ul class="list-group">
+				<li class="list-group-item">用户数前3的部门：；</li>
+				<li class="list-group-item">用户数后3的部门：；</li>
+					
+			</ul>
+		</div>
+		</div>
+		
+	</div>
+	
+	</div>	
 	
 	
 				
 </div>
 		
+<script>
+$(document).ready(function(){
+	
+	<!-- // 应用Ajax向服务器请求“部门”表格内容所需数据，并组装好HTML语句 -->
+	
+	$.ajax({
+		type : "post",
+		async : true,  //异步请求
+		url : "{$home}/admin/index/dept",
+		// 发送到服务器的数据，可无
+		<!-- data : data, -->
+		timeout:1000,
+		<!-- // 服务器端response的数据类型为json-->
+		dataType:"json",
+		success:function(backData){
+			var data=backData;
+
+			var str="";
+			var id=1;
+			
+			var strBtnMod='<button class="mod btn-link" deptId="'+id+'"><span class="text-primary glyphicon glyphicon-edit"></span>编辑</button>&nbsp;'
+	
+			var strBtnDel='<button class="del btn-link" deptId="'+id+'"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>&nbsp;'
+							
+			var strBtnDis='<button class="dis btn-link" deptId="'+id+'"><span class="text-warning glyphicon glyphicon-ban-circle"></span>停用</button>'
+							
+			var strBtnEn='<span>（已禁用）</span><button class="en btn-link" deptId="'+id+'"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>'
+			<!-- // 遍历data数组组装HTML语句 -->
+			<!-- // data的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
+			$.each(data,function(n1,v1){
+				
+				// 第i行开始及第1列
+				str+="<tr><td>"+i+"</td>";
+				
+				$.each(v1,function(n2,v2){
+					if(n2=="name"){
+						//第i行第2列
+						str+="<td>"+v2+"</td>";
+					}
+					if(n2=="abbr"){
+						//第i行第3列
+						str+="<td>"+v2+"</td>";
+					}
+					
+					if(n2=="id"){
+						//第i行第4列附加属性值"deptId"="v2"，便于点击buttons时的jQuery操作
+						<!-- $("#sysParam1 button").attr("deptId",v2) -->
+						id=v2;
+					}
+					
+					//第i行第4列，因enable的取值有不同的内容
+					if(n2=="enable"){
+						if(v2){
+							str+="<td>"+strBtnMod+strBtnDel+strBtnDis+"</td>";
+						}else{
+							str+="<td>"+strBtnEn+"</td>";
+						}
+					}
+					
+					
+
+				});
+				//第i行结束
+				str+="</tr>";
+				i++;
+		
+			});
+				
+			<!--// 清空#sysParam1 tbody的所有项-->
+			$("#sysParam1 tbody").empty();
+			<!--// 添加#sysParam1 tbody的新项-->
+			$("#sysParam1 tbody").append(str);
+			
+			<!-- // 显示data内数据记录的条数 -->
+			$("#display").text("部门总数："+data.length);
+			<!-- $("#display").text(str); -->
+		},
+		error: function() {
+            alert("失败，请稍后再试！");
+        }
+	});
+	
+	<!-- //<button class='en'> ajax事件-->
+	$("#sysParam1 button.en").click(function() {
+  		
+		<!-- // 组装通过“post”提交的数据 -->
+		var sendData = {"oprt":"enable","id":$(this).attr("deptId")};
+				
+		$.ajax({
+			type : "post",
+			async : true,  //异步请求
+			url : "{$home}/admin/index/oprtDept", 
+			<!-- // 发送到服务器的数据 -->
+			data : sendData,
+			timeout:1000,
+			<!-- // 指定服务器端response的数据类型为json -->
+			dataType:"json",
+			success:function(backData){
+				var data=backData;
+						
+			},
+			error: function() {
+               	alert("<button>.en.click失败，请稍后再试！");
+            }
+		});	
+		
+		$(this).prevAll('button').show();
+        $(this).prev('span').hide();
+		$(this).hide();
+		$(this).parent().parent().removeClass("danger text-muted");
+	
+	});
+	
+	<!-- //<button class='dis'> ajax事件-->
+	$("#sysParam1 button.dis").click(function() {
+  		
+		<!-- // 组装通过“post”提交的数据 -->
+		var sendData = {"oprt":"disable","id":$(this).attr("deptId")};
+				
+		$.ajax({
+			type : "post",
+			async : true,  //异步请求
+			url : "{$home}/admin/index/oprtDept", 
+			<!-- // 发送到服务器的数据 -->
+			data : sendData,
+			timeout:1000,
+			<!-- // 指定服务器端response的数据类型为json -->
+			dataType:"json",
+			success:function(backData){
+				var data=backData;
+						
+			},
+			error: function() {
+               	alert("<button>.en.click失败，请稍后再试！");
+            }
+		});
+		
+		$(this).prev().hide();
+		$(this).hide();
+		$(this).nextAll().show();
+		$(this).parent().parent().addClass("danger text-muted");
+	
+	});
+	<!-- //<button class='del'> ajax事件-->
+	$("#sysParam1 button.del").click(function() {
+  		var id=$(this).attr("deptId");
+		var selBtn='.del button[deptId="'+id+'"]';
+		
+		<!-- // 组装通过“post”提交的数据 -->
+		var sendData = {"oprt":"delete","id":id};
+		
+		//弹出自定义提示页面 
+		$.confirm('确定删除该部门？',function(e){
+			var con=e;
+			if(true==con){
+				$.ajax({
+					type : "post",
+					async : true,  //异步请求
+					url : "{$home}/admin/index/oprtDept", 
+					<!-- // 发送到服务器的数据 -->
+					data : sendData,
+					timeout:1000,
+					<!-- // 指定服务器端response的数据类型为json -->
+					dataType:"json",
+					success:function(backData){
+						var data=backData;
+						//删除所在行<tr>
+						$(selBtn).parent().parent().remove();
+						//刷新页面并回到锚点"#div1"页面
+						window.location.hash="#div1";
+						window.location.reload(true);
+					},
+					error: function() {
+               			alert("删除失败，请稍后再试！");
+            		}
+				});
+			}else{
+				
+				$('#btnReset').click();
+			}
+		}).ok('(Y)删除').cancel('(N)取消');
+		
+	});
+
+});
+</script>

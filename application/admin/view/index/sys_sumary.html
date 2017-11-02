@@ -1,11 +1,16 @@
 <div class="">
-	<!-- <p><strong>sumary</strong> -->
-		
+	<!-- // bootstrap panel group+collapse -->
+	<div class="panel-group" id="accordion">
+	
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h4><strong>系统服务器信息</strong></h4>
+			<h4 class="panel-title">
+        		<a data-toggle="collapse" data-parent="#accordion" href="#collapse1"><strong>
+        		系统服务器信息</strong></a>
+      		</h4>
+			
 		</div>
-		<!-- <div class="panel-body"> -->
+		<div id="collapse1" class="panel-collapse collapse in">
 			<ul class="list-group">
 						
 				<a class="list-group-item">服务器域名：{$serverDomain}</a>
@@ -18,14 +23,19 @@
 				
 					
 			</ul>
-		<!-- </div> -->
+		</div>
 	</div>
 	
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h4><strong>系统信息</strong></h4>
+			<h4 class="panel-title">
+        		<a data-toggle="collapse" data-parent="#accordion" href="#collapse2"><strong>
+        		系统信息</strong></a>
+      		</h4>
+			
 		</div>
 		
+		<div id="collapse2" class="panel-collapse collapse">
 		<div class="panel-body " >
 		<h5><strong>总用户数：{$serverDomain}；</strong></h5>
 			<ul class="list-group">	
@@ -48,15 +58,21 @@
 					
 			</ul>
 		</div>
-		
+		</div>
 		
 	</div>
 	
 	<div class="panel panel-default ">
+		
 		<div class="panel-heading">
-			<h4><strong>系统开发维护</strong></h4>
+			<h4 class="panel-title">
+        		<a data-toggle="collapse" data-parent="#accordion" href="#collapse3"><strong>
+        		系统开发维护</strong></a>
+      		</h4>
+			
 		</div>
 		
+		<div id="collapse3" class="panel-collapse collapse">
 		<div class="panel-body " >	
 					
 				<p >开发人员：{$serverDomain}；
@@ -85,7 +101,8 @@
 				
 					
 		</div>
+		</div>
 	</div>
-				
+	</div>			
 </div>
 		

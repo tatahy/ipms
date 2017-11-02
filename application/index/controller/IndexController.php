@@ -68,7 +68,7 @@ class IndexController extends \think\Controller
         //存在，则显示index.html页面，$username,$pwd,$log=1,所有的role都放入session
          //通过rolied找出对应的role
         for($i=0;$i<sizeof($user);$i++){
-            $roles[$i]=RoletyModel::where('rolenum',$user[$i]['roleid'])->find();
+            $roles[$i]=RoletyModel::where('rolenum',$user[$i]['rolety_id'])->find();
             $role[$i]=$roles[$i]['role'];
             //$dept=$user[$i]['dept'];
         }

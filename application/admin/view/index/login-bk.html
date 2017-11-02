@@ -4,15 +4,12 @@
 	<title>IPMS admin</title>
 	<meta name="Author" content="HY" />
 	<meta charset="UTF-8" />
-	<!-- // 开启bootstrap响应式布局 -->
-	<meta name="viewport" content="width=device-width, initial-scale=1">
    
     {// TP5中的模板注释格式，单行。<!-- TP5的资源文件加载写法 -->内容不会出现在发送给浏览器的HTML文件中 }  
   {js href="/admin/res/js/jquery1.12.4.min.js" }
   {js href="/admin/res/js/bootstrap3.3.7.min.js" }
   {css href="/admin/res/css/bootstrap3.3.7.min.css" }
   {css href="/admin/res/css/bs-callout.css" }
-  <!-- // 本页面输入框验证css文件 -->
   {css href="/admin/res/css/check.css" }
 
 </head>
@@ -32,10 +29,9 @@
   }
   </style>
 
-<!-- <body style="background-color:#eeeeee;"> -->
-<body>
+<body style="background-color:#eeeeee;">
 
-<nav class="navbar navbar-inverse navbar-fixed-top" data-spy="affix" data-offset-top="-3" >
+<nav class="navbar navbar-inverse navbar-fixed-top" data-spy="affix" data-offset-top="-3">
   <div class="container-fluid">
     <div class="navbar-header" >
 		<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
@@ -44,7 +40,7 @@
 				<span class="icon-bar"></span>                        
 		</button>
 		
-      <a class="navbar-brand"><strong>IPMS</strong>系统管理</a>
+      <a class="navbar-brand">IPMS 后台系统管理</a>
 	  <!-- <span class="bg-primary" style="corlor:red;">IPMS 后台管理系统</span> -->
     </div>
 	
@@ -58,17 +54,11 @@
 </nav>
 
 <div class="container-fluid">
-	
-	<div class="col-md-4 col-md-offset-4">
-	<div class="panel panel-primary"> 
-		<div class="panel-heading text-center">
-			<h4><strong>系统管理员登录</strong></h4>
-		</div>
-		<div class="panel-body">
-			
-			<form action="{$home}/admin/index/check" method="post" >
+
+	<div id="loginbox" class="col-md-4 col-md-offset-4">
+            <form action="{$home}/admin/index/check" method="post" >
                 <div class="form-group has-feedback">
-                    <label for="username">账号</label>
+                    <label for="username">管理员</label>
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
                         <input type="text" id="username" name="username" class="form-control" placeholder="请输入用户名" maxlength="20">
@@ -92,8 +82,8 @@
                 </div>
 
 
-                <!-- <div class="row"> -->
-                    
+                <div class="row">
+                    <div class="col-sm-7">
                         <div class="form-group has-feedback">
                             <label for="inIdcode">验证码</label>
                             <div class="input-group">
@@ -104,12 +94,11 @@
                             <span style="display: none;" class="glyphicon glyphicon-remove form-control-feedback"></span>
                             <span style="display: none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
                         </div>
-						
-						<div id="idcode" style="background: transparent;"></div>
-                    <!-- </div> -->
-
-                    
-                <!-- </div> -->
+                    </div>
+                    <div class="col-sm-5" style="padding-top: 30px;">
+                        <div id="idcode" style="background: transparent;"></div>
+                    </div>
+                </div>
 				
 				<br/>
 
@@ -119,11 +108,8 @@
                 </div>
 
             </form>
-			
-		</div>
+  
 	</div>
-	</div>
-	
 	
 </div>
 
