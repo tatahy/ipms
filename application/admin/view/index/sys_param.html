@@ -23,6 +23,8 @@
 			<div class="panel-body " >
 				<h5>
         		<strong>部门列表</strong>
+				<!--// bootstap通过button调用Model -->
+				<button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#modalDept">新增部门&nbsp;<span class="glyphicon glyphicon-tree-conifer"></span></button>
       			</h5>
 			
 				<div class="table-responsive" >
@@ -37,17 +39,25 @@
 					</thead>
 				
 					<tbody><!-- 此处显示数据库查询后的数据集 -->
+						{volist name="depts" id="vo" empty="暂时没有数据"}
 						<tr>
-							<td>1</td>
+							<td>{$i}</td>
+							<td>{$vo.name}</td>
+							<td>{$vo.abbr}</td>
 						
-							<td>操作</td>
-						</tr>
-						
-						<tr>
-							<td>2</td>
-						
-							<td>操作</td>
-						</tr>
+							<td>
+								<button deptId="{$vo.id}" class="edit btn-link" data-toggle="modal" data-target="#modalDept"><span class="text-primary glyphicon glyphicon-edit"></span>编辑</button>&nbsp;
+								
+								<button deptId="{$vo.id}" class="del btn-link"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>&nbsp;
+							
+								<button deptId="{$vo.id}" class="dis btn-link"><span class="text-warning glyphicon glyphicon-ban-circle"></span>停用</button>
+							
+								<span>（已停用）</span><button deptId="{$vo.id}" class="en btn-link" enable="{$vo.enable}"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
+							
+							</td>	
+					
+					</tr>
+					{/volist}
 					</tbody>
 				
 				
@@ -95,92 +105,90 @@
 		
 	</div>
 	
-	</div>	
-	
-	
-				
+	</div>
+			
 </div>
+
+<!-- Modal "addUser" -->
+<div class="modal fade" id="modalDept" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          	<button type="button" class="close" data-dismiss="modal">&times;</button>
+		  
+          	<h4><strong class="bg-info" style="padding:10px;border-radius: 5px;">新增部门</strong></h4>
+        </div>
+		
+        <div class="modal-body">
+			<form role="form" action="{$home}/admin/index/index" method="post">
+				<div class="form-group has-feedback">
+					<label for="deptName">部门全称</label>
+					<!-- // bootstrap实现矢量图在输入框开头 -->
+					<div class="input-group">
+						<span class="input-group-addon"><span class="glyphicon glyphicon-tree-conifer"></span></span>
+						<input type="text" class="form-control" id="deptName" name="deptName" placeholder="输入部门全称">
+						
+					</div>
+				  	
+				</div>
+				
+				<div class="form-group">
+				  	<label for="deptAbbr">部门简称</label>
+					
+					<div class="input-group">
+						<span class="input-group-addon"><span class="glyphicon glyphicon-grain"></span></span>
+						<input type="text" class="form-control" id="deptAbbr" name="deptAbbr" placeholder="输入部门简称">
+					</div>
+					
+				  	
+				</div>
+				
+				<div id="divDeptEn" class="form-group">
+				  	<label class="" for="deptEnable">部门启用:</label>
+					<label class="radio-inline">
+      					<input type="radio" name="deptEnable" value="1">是
+    				</label>
+    				<label class="radio-inline">
+      					<input type="radio" name="deptEnable" value="0">否
+    				</label>
+				</div>
+				
+				<button id="btnAddDept" type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-ok-circle"></span>&nbsp;新增</button>
+				
+				<button id="btnResetDept" type="reset" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-refresh"></span>&nbsp;重置</button>
+				
+				<button type="button" class="btn btn-danger btn-sm pull-right" data-dismiss="modal"><span class="glyphicon glyphicon-remove-circle"></span> 取消</button>
+			</form>
+        </div>
+		
+        <!-- <div class="modal-footer"> -->
+		
+          	<!-- <button type="button" class="btn btn-danger btn-default pull-right" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 取消</button> -->
+          
+        <!-- </div> -->
+      </div>
+      
+    </div>
+</div>
+<!-- / Modal "addUser" -->
 		
 <script>
 $(document).ready(function(){
 	
-	<!-- // 应用Ajax向服务器请求“部门”表格内容所需数据，并组装好HTML语句 -->
-	
-	$.ajax({
-		type : "post",
-		async : true,  //异步请求
-		url : "{$home}/admin/index/dept",
-		// 发送到服务器的数据，可无
-		<!-- data : data, -->
-		timeout:1000,
-		<!-- // 服务器端response的数据类型为json-->
-		dataType:"json",
-		success:function(backData){
-			var data=backData;
-
-			var str="";
-			var id=1;
-			
-			var strBtnMod='<button class="mod btn-link" deptId="'+id+'"><span class="text-primary glyphicon glyphicon-edit"></span>编辑</button>&nbsp;'
-	
-			var strBtnDel='<button class="del btn-link" deptId="'+id+'"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>&nbsp;'
-							
-			var strBtnDis='<button class="dis btn-link" deptId="'+id+'"><span class="text-warning glyphicon glyphicon-ban-circle"></span>停用</button>'
-							
-			var strBtnEn='<span>（已禁用）</span><button class="en btn-link" deptId="'+id+'"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>'
-			<!-- // 遍历data数组组装HTML语句 -->
-			<!-- // data的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
-			$.each(data,function(n1,v1){
-				
-				// 第i行开始及第1列
-				str+="<tr><td>"+i+"</td>";
-				
-				$.each(v1,function(n2,v2){
-					if(n2=="name"){
-						//第i行第2列
-						str+="<td>"+v2+"</td>";
-					}
-					if(n2=="abbr"){
-						//第i行第3列
-						str+="<td>"+v2+"</td>";
-					}
-					
-					if(n2=="id"){
-						//第i行第4列附加属性值"deptId"="v2"，便于点击buttons时的jQuery操作
-						<!-- $("#sysParam1 button").attr("deptId",v2) -->
-						id=v2;
-					}
-					
-					//第i行第4列，因enable的取值有不同的内容
-					if(n2=="enable"){
-						if(v2){
-							str+="<td>"+strBtnMod+strBtnDel+strBtnDis+"</td>";
-						}else{
-							str+="<td>"+strBtnEn+"</td>";
-						}
-					}
-					
-					
-
-				});
-				//第i行结束
-				str+="</tr>";
-				i++;
-		
-			});
-				
-			<!--// 清空#sysParam1 tbody的所有项-->
-			$("#sysParam1 tbody").empty();
-			<!--// 添加#sysParam1 tbody的新项-->
-			$("#sysParam1 tbody").append(str);
-			
-			<!-- // 显示data内数据记录的条数 -->
-			$("#display").text("部门总数："+data.length);
-			<!-- $("#display").text(str); -->
-		},
-		error: function() {
-            alert("失败，请稍后再试！");
-        }
+	<!-- // 对用户表格中<td>里的<button>进行格式设置 -->
+	$("#sysParam1 tbody td button").each(function(){
+		if($(this).attr("enable")=='1'){
+			$(this).prevAll('button').show();
+            $(this).prev('span').hide();
+			$(this).hide();
+			$(this).parent().parent().removeClass("danger text-muted");
+		}else{
+			$(this).prevAll('button').hide();
+			$(this).show();
+			$(this).parent().parent().addClass("danger text-muted");
+		}
 	});
 	
 	<!-- //<button class='en'> ajax事件-->
@@ -200,17 +208,17 @@ $(document).ready(function(){
 			dataType:"json",
 			success:function(backData){
 				var data=backData;
-						
 			},
 			error: function() {
                	alert("<button>.en.click失败，请稍后再试！");
             }
 		});	
-		
 		$(this).prevAll('button').show();
-        $(this).prev('span').hide();
+		$(this).prev('span').hide();
 		$(this).hide();
+		
 		$(this).parent().parent().removeClass("danger text-muted");
+		
 	
 	});
 	
@@ -238,12 +246,17 @@ $(document).ready(function(){
             }
 		});
 		
-		$(this).prev().hide();
+		$(this).prevAll().hide();
 		$(this).hide();
 		$(this).nextAll().show();
+		// “启用”有关按钮显示
+		<!-- $(this).nextAll().find('span').show(); -->
+		<!-- $(this).nextAll().find('.en').show(); -->
+		
 		$(this).parent().parent().addClass("danger text-muted");
 	
 	});
+	
 	<!-- //<button class='del'> ajax事件-->
 	$("#sysParam1 button.del").click(function() {
   		var id=$(this).attr("deptId");
@@ -269,8 +282,8 @@ $(document).ready(function(){
 						var data=backData;
 						//删除所在行<tr>
 						$(selBtn).parent().parent().remove();
-						//刷新页面并回到锚点"#div1"页面
-						window.location.hash="#div1";
+						//刷新页面并回到锚点"#div3"页面
+						window.location.hash="#div3";
 						window.location.reload(true);
 					},
 					error: function() {
@@ -282,6 +295,62 @@ $(document).ready(function(){
 				$('#btnReset').click();
 			}
 		}).ok('(Y)删除').cancel('(N)取消');
+		
+	});
+	
+	// 存储#modalDept标题
+	var hStr=$("#modalDept").find('h4').html();
+	// 存储#btnAddDept名称
+	var btnStr=$("#btnAddDept").html();
+	
+	<!-- //<button class='edit'> 事件-->
+	$("#sysParam1 h5 button").click(function() {
+	// 将#modalDept恢复
+	$("#modalDept").on('show.bs.modal', function () {
+        // #modalDept标题恢复
+		$(this).find('h4').html(hStr);
+		// #btnAddDept恢复
+		$("#btnAddDept").html(btnStr);
+			
+		$("#deptName").val('');
+		$("#deptAbbr").val('');
+		$("#btnResetDept").show();
+			
+		//设定radio
+		$("input:radio[name='deptEnable'][value='1']").attr("checked",true);
+			
+	});
+	});
+	
+	<!-- //<button class='edit'> 事件-->
+	$("#sysParam1 button.edit").click(function() {
+		var name=$(this).parent().prev().prev().text();
+		var abbr=$(this).parent().prev().text();
+		
+		<!-- // 在#modalDept的model显示之前，应用show.bs.modal事件将#modalDept的model内容准备好 -->
+		$("#modalDept").on('show.bs.modal', function () {
+        	
+			// #modalDept标题改名
+			$(this).find('h4').html("编辑部门信息");
+			
+			// #btnAddDept改名
+			$("#btnAddDept").html('<span class="glyphicon glyphicon-ok-circle"></span>&nbsp;保存');
+			
+			$("#deptName").val(name);
+			$("#deptAbbr").val(abbr);
+			$("#btnResetDept").hide();
+			
+			//设定radio
+			$("input:radio[name='deptEnable'][value='1']").attr("checked",true);
+			
+		});	
+		
+	});
+	
+	
+	$("#btnAddDept").click(function() {
+		
+			
 		
 	});
 

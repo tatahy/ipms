@@ -48,3 +48,198 @@ $(document).ready(function(){
 });	
 </script>
 
+2017/11/2
+1.bootstrap+jQuery+TP5+ajax，实现页面加载后的表格内容可动态加载，更进一步还可写分页<a>b标签。
+
+//HTML
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4 class="panel-title">
+        		<a data-toggle="collapse" data-parent="#sysParam" href="#sysParam1"><strong>
+        		部门设置</strong></a>
+      		</h4>
+			
+		</div>
+		<div id="sysParam1" class="panel-collapse collapse in">
+			<ul class="list-group">
+						
+				<a class="list-group-item">服务器域名：{$serverDomain}</a>
+				<a id="display" class="list-group-item">服务器时间：{$serverTime}</a>
+				
+				
+					
+			</ul>
+			
+			<div class="panel-body " >
+				<h5>
+        		<strong>部门列表</strong>
+      			</h5>
+			
+				<div class="table-responsive" >
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>序号</th>
+							<th>部门全称</th>
+							<th>部门简称</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+				
+					<tbody><!-- 此处显示数据库查询后的数据集 -->
+						<tr>
+							<td>1</td>
+						
+							<td>操作</td>
+						</tr>
+						
+						<tr>
+							<td>2</td>
+						
+							<td>操作</td>
+						</tr>
+					</tbody>
+				
+				
+				</table>
+				</div>
+			
+		</div>
+			
+		</div>
+	</div>
+
+//jquery 代码
+<script>
+$(document).ready(function(){
+   
+   // #sysParam1中的表格所需button的HTML代码
+	var strBtnMod1st='<button class="mod btn-link" deptId="';
+	var strBtnMod2nd='"><span class="text-primary glyphicon glyphicon-edit"></span>编辑</button>&nbsp;';
+	
+	var strBtnDel1st='<button class="del btn-link" deptId="';
+	var strBtnDel2nd='"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>&nbsp;';
+							
+	var strBtnDis1st='<button class="dis btn-link" deptId="';
+	var strBtnDis2nd='"><span class="text-warning glyphicon glyphicon-ban-circle"></span>停用</button>';
+							
+	var strBtnEn1st='<span>（已禁用）</span><button class="en btn-link " deptId="';
+	var strBtnEn2nd='"><span class="text-success glyphicon 
+   
+   <!-- // 应用Ajax向服务器请求#sysParam1中的表格内容所需数据，并组装好HTML语句 -->
+	$.ajax({
+		type : "post",
+		async : true,  //异步请求
+		url : "{$home}/admin/index/dept",
+		// 发送到服务器的数据，可无
+		<!-- data : data, -->
+		timeout:1000,
+		<!-- // 服务器端response的数据类型为json-->
+		dataType:"json",
+		success:function(backData){
+			var data=backData;
+
+			var str="";
+			
+			<!-- // 遍历data数组组装HTML语句 -->
+			<!-- // data的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
+			$.each(data,function(n1,v1){
+				
+				// 第i行开头及第1列
+				str+="<tr><td>"+i+"</td>";
+				$.each(v1,function(n2,v2){
+					
+					if(n2=="name"){
+						//第i行第2列
+						str+="<td>"+v2+"</td>";
+					}
+					if(n2=="abbr"){
+						//第i行第3列
+						str+="<td>"+v2+"</td>";
+					}
+					if(n2=="id"){
+						<!-- // 第i行第4列附加属性值"deptId"="v2"，便于点击buttons时的jQuery操作 -->
+						<!-- $("#sysParam1 button").attr("deptId",v2) -->
+						id=v2;
+					}
+					
+					//第i行第4列，因enable的取值有不同的内容
+					if(n2=="enable"){
+						if(v2){
+							str+="<td>"+strBtnMod1st+id+strBtnMod2nd+strBtnDel1st+id+strBtnDel2nd+strBtnDis1st+id+strBtnDis2nd+"</td>";
+						}else{
+							str+="<td>"+strBtnEn1st+id+strBtnEn2nd+"</td>";
+						}
+					}
+				});
+				//第i行结束
+				str+="</tr>";
+				i++;
+			});
+			// 显示表格行、列内容
+			$("#sysParam1 tbody").html(str);
+			
+			<!-- // 显示data内数据记录的条数，可由此开始考虑写分页<a>标签 -->
+			<!-- $("#display").text("部门总数："+data.length); -->
+			$("#display").text(str);
+		},
+		error: function() {
+            alert("失败，请稍后再试！");
+        }
+	});
+});	
+</script>
+
+// TP5
+// 用户CDUR，接收客户端通过Ajax，post来的参数，返回json数据
+    public function oprtDept(Request $request)
+    {
+      $this->_loginUser();  
+      
+      $oprt=$request->param('oprt');
+      $username=$request->param('username');
+      $pwd=md5($request->param('pwd'));
+      $id=$request->param('id');
+     
+      switch($oprt){
+        case "add":
+          $user=new DeptModel;
+          $u=$user->where('username',$username)->select();
+         
+          // 返回前端JSON数据
+            return ['result'=>$result,'msg'=>$msg];
+            
+        break;
+        
+        case"delete":
+          DeptModel::destroy($id);
+          
+          $result='success';
+          // 返回前端JSON数据
+          return ['result'=>$result];
+        break;
+        
+        case"disable":
+          DeptModel::update(['enable'=> 0], ['id' => $id]);
+          
+          $result='success';
+          // 返回前端JSON数据
+          return ['result'=>$result,'deptId'=>$id];
+          
+        break;
+        
+        case"enable":
+          DeptModel::update(['enable'=> 1], ['id' => $id]);
+          
+          $result='success';
+          // 返回前端JSON数据
+          return ['result'=>$result,'deptId'=>$id];
+          
+        break;
+        
+      }
+    }
+
+2.  开启bootstrap响应式布局 
+// HTML,在头部要添加的代码
+	<meta name="viewport" content="width=device-width, initial-scale=1">

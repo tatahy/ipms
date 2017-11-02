@@ -217,6 +217,9 @@ class IndexController extends \think\Controller
         $groups = RoletyModel::where('id','>',0)
                                     ->order('rolenum asc')
                                     ->select();
+                                    
+        // 查出所有部门信息
+        $depts = DeptModel::all();
                                    
         $this->assign([
             //--在bg-head.html页面输出自定义信息的HTML代码块
@@ -260,6 +263,9 @@ class IndexController extends \think\Controller
               
               // 所有用户组信息
               'groups'=>$groups,
+              
+              // 所有部门信息
+              'depts'=>$depts,
           
           
         ]);
@@ -515,7 +521,7 @@ class IndexController extends \think\Controller
           $u=$user->where('username',$username)->select();
          
           // 返回前端JSON数据
-            return ['result'=>$result,'msg'=>$msg];
+          return ['result'=>$result,'msg'=>$msg];
             
         break;
         

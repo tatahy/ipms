@@ -12,11 +12,16 @@
 		<div class="panel-heading">
 			<h4><strong>用户管理</strong>&nbsp;
 				<!--// bootstap通过button调用Model -->
-				<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addUser"><strong>新增用户</strong>&nbsp;<span class="glyphicon glyphicon-file"></span></button>
+				<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addUser">新增用户&nbsp;<span class="glyphicon glyphicon-file"></span></button>
+				
+				<button id="btnSearchInfo" type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divCollapse">显示搜索条件&nbsp;<span class="glyphicon glyphicon-collapse-down"></span>
+    			</button>
 			</h4> 
+			
 		</div>
 		
 		<div id="divUser" class="panel-body" >	
+			<div id="divCollapse" class="collapse">
 			<form method="post" action="{$home}/admin/index/index#div1" id="userSearch" class="form-inline">
 				<div class="form-group">
 					<label class="" for="searchUserName">用户名</label>
@@ -44,11 +49,11 @@
 					</select>
 				</div>
 				
-				<input type="submit" class="btn btn-primary btn-sm" value="用户搜索">
+				<input type="submit" class="btn btn-primary btn-sm" value="搜索 >">
 				
 			</form>
-				
-
+			</div>
+			
 			<hr>
 			
 			<div class="table-responsive" >
@@ -56,10 +61,10 @@
 				<thead>
 					<tr>
 						<th>序号</th>
-						<th><a href="{$home}/admin/index/index/order/username/sort/{$sort}#div1" order="username" sort="{$sort}">用户名&nbsp;</a></th>
-						<th><a href="{$home}/admin/index/index/order/dept/sort/{$sort}#div1" order="dept" sort="{$sort}">所属部门&nbsp;</a></th>
+						<th><a href="{$home}/admin/index/index/order/username/sort/{$sort}/userTableRows/{$userTableRows}#div1" order="username" sort="{$sort}">用户名&nbsp;</a></th>
+						<th><a href="{$home}/admin/index/index/order/dept/sort/{$sort}/userTableRows/{$userTableRows}#div1" order="dept" sort="{$sort}">所属部门&nbsp;</a></th>
 						<!-- <th>用户组id</th> -->
-						<th><a href="{$home}/admin/index/index/order/usergroup/sort/{$sort}#div1" order="usergroup" sort="{$sort}">用户组名（组#）&nbsp;</a></th>
+						<th><a href="{$home}/admin/index/index/order/usergroup/sort/{$sort}/userTableRows/{$userTableRows}#div1" order="usergroup" sort="{$sort}">用户组名（组#）&nbsp;</a></th>
 						<th>操作</th>
 					</tr>
 				</thead>
@@ -247,6 +252,16 @@ $(document).ready(function(){
 		}
 	});
 	
+	<!-- // 显示搜索条件的div，修改触发"显示"的btn内容-->
+	$("#divCollapse").on("hide.bs.collapse", function(){
+    	$("#btnSearchInfo").html('显示搜索条件&nbsp;<span class="glyphicon glyphicon-collapse-down"></span>');
+  	});
+	
+	<!-- // 隐藏搜索条件的div，修改触发"隐藏"的btn内容-->
+  	$("#divCollapse").on("show.bs.collapse", function(){
+    	$("#btnSearchInfo").html('隐藏搜索条件&nbsp;<span class="glyphicon glyphicon-collapse-up"></span>');
+  	});
+	
 	// 添加bootstrap的tooltip属性
 	$("#divUser thead th a").tooltip({title: "点击排序", placement: "bottom"}); 
 	
@@ -256,6 +271,7 @@ $(document).ready(function(){
 		var glyDesc='<span class="small glyphicon glyphicon-sort-by-attributes-alt text-warning"></span>';
 		var order=$(this).attr("order");
 		var sort=$(this).attr("sort");
+		var rows=$("#userTableRows").val();
 		
 		// 清除所有a中的span
 		$(this).nextAll().find('span').remove();
@@ -272,7 +288,7 @@ $(document).ready(function(){
 				<!-- $(this).attr("href","{$home}/admin/index/index/order/"+order+"/searchUserName/{$searchUserName}/searchDept/{$searchDept}/searchUserGroup/{$searchUserGroup}/sort/asc#div1"); -->
 				$(this).attr("sort","asc");
 				
-				$(this).attr("href","{$home}/admin/index/index/order/"+order+"/sort/asc#div1");
+				$(this).attr("href","{$home}/admin/index/index/order/"+order+"/userTableRows"+rows+"/sort/asc#div1");
 				$(this).attr("sort","asc");
 				
 				<!-- // bootstap3中从命名空间“bs”修改tooltipd的title -->
@@ -302,6 +318,7 @@ $(document).ready(function(){
 		}	
 		
 	});
+	
 	// 单选框#searchDept的内容
 	showDept($("#searchDept"),[{"text":"...不限","val":"0"}],'{$searchDept}');
 	// 单选框#searchUserGroup的内容
@@ -319,7 +336,7 @@ $(document).ready(function(){
  	* 向单选框填充"部门"的内容选项
 	* 参数1：Obj，必须。类型：对象，值：单选框的对象名称
 	* 参数2：attach，可为空。类型：json数组，值：需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
-	*参数3：selected，可为空。类型：字符，值：字符。
+	*参数3：selected，可为空。类型：字符，值：单选框拟选定option项的value值。
  	**/
 	function showDept(Obj,attach,selected){
 		<!-- // 应用Ajax向服务器请求“部门”单选框内容所需数据，并组装好HTML语句 -->
