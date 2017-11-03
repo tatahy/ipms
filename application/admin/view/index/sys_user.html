@@ -14,15 +14,16 @@
 				<!--// bootstap通过button调用Model -->
 				<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addUser">新增用户&nbsp;<span class="glyphicon glyphicon-file"></span></button>
 				
-				<button id="btnSearchInfo" type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divCollapse">显示搜索条件&nbsp;<span class="glyphicon glyphicon-collapse-down"></span>
-    			</button>
+				<button id="btnSearchInfo" type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divCollapse">显示搜索条件&nbsp;<span class="glyphicon glyphicon-collapse-down"></span></button>
+				
+				<button id="btnDiv1Reset" type="button" class="btn btn-primary btn-sm">页面重置&nbsp;<span class="glyphicon glyphicon-refresh"></span></button>
 			</h4> 
 			
 		</div>
 		
 		<div id="divUser" class="panel-body" >	
 			<div id="divCollapse" class="collapse">
-			<form method="post" action="{$home}/admin/index/index#div1" id="userSearch" class="form-inline">
+			<form method="get" action="{$home}/admin/index/index#div1" id="userSearch" class="form-inline">
 				<div class="form-group">
 					<label class="" for="searchUserName">用户名</label>
 					<input class="form-control" id="searchUserName" name="searchUserName" type="text" value="{$searchUserName}" placeholder="...不限">
@@ -50,6 +51,7 @@
 				</div>
 				
 				<input type="submit" class="btn btn-primary btn-sm" value="搜索 >">
+				<!-- <input type="reset" class="btn btn-primary btn-sm" value="重置" id="btnDiv1Reset"><span class="glyphicon glyphicon-refresh"></span> -->
 				
 			</form>
 			</div>
@@ -61,10 +63,10 @@
 				<thead>
 					<tr>
 						<th>序号</th>
-						<th><a href="{$home}/admin/index/index/order/username/sort/{$sort}/userTableRows/{$userTableRows}#div1" order="username" sort="{$sort}">用户名&nbsp;</a></th>
-						<th><a href="{$home}/admin/index/index/order/dept/sort/{$sort}/userTableRows/{$userTableRows}#div1" order="dept" sort="{$sort}">所属部门&nbsp;</a></th>
+						<th><a href="{$home}/admin/index/index/order/username/sort/{$sort}/userTableRows/{$userTableRows}/searchUserName/{$searchUserName}/searchDept/{$searchDept}/searchUserGroup/{$searchUserGroup}#div1" order="username" sort="{$sort}">用户名&nbsp;</a></th>
+						<th><a href="{$home}/admin/index/index/order/dept/sort/{$sort}/userTableRows/{$userTableRows}/searchUserName/{$searchUserName}/searchDept/{$searchDept}/searchUserGroup/{$searchUserGroup}#div1" order="dept" sort="{$sort}">所属部门&nbsp;</a></th>
 						<!-- <th>用户组id</th> -->
-						<th><a href="{$home}/admin/index/index/order/usergroup/sort/{$sort}/userTableRows/{$userTableRows}#div1" order="usergroup" sort="{$sort}">用户组名（组#）&nbsp;</a></th>
+						<th><a href="{$home}/admin/index/index/order/usergroup/sort/{$sort}/userTableRows/{$userTableRows}/searchUserName/{$searchUserName}/searchDept/{$searchDept}/searchUserGroup/{$searchUserGroup}#div1" order="usergroup" sort="{$sort}">用户组名（组#）&nbsp;</a></th>
 						<th>操作</th>
 					</tr>
 				</thead>
@@ -272,6 +274,10 @@ $(document).ready(function(){
 		var order=$(this).attr("order");
 		var sort=$(this).attr("sort");
 		var rows=$("#userTableRows").val();
+		// 查询条件
+		var searchUserName=$("#searchUserName").val();
+		var searchDept=$("#searchDept").val();
+		var searchUserGroup=$("#searchUserGroup").val();
 		
 		// 清除所有a中的span
 		$(this).nextAll().find('span').remove();
@@ -285,11 +291,10 @@ $(document).ready(function(){
 				// 在<a>中添加span
 				$(this).append(glyDesc);
 				// 修改a的属性值
-				<!-- $(this).attr("href","{$home}/admin/index/index/order/"+order+"/searchUserName/{$searchUserName}/searchDept/{$searchDept}/searchUserGroup/{$searchUserGroup}/sort/asc#div1"); -->
+				$(this).attr("href","{$home}/admin/index/index/order/"+order+"/userTableRows/"+rows+"/searchUserName/{$searchUserName}/searchDept/{$searchDept}/searchUserGroup/{$searchUserGroup}/sort/asc#div1");
 				$(this).attr("sort","asc");
 				
-				$(this).attr("href","{$home}/admin/index/index/order/"+order+"/userTableRows"+rows+"/sort/asc#div1");
-				$(this).attr("sort","asc");
+				<!-- $(this).attr("href","{$home}/admin/index/index/?order="+order+"&userTableRows="+rows+"&searchUserName="+searchUserName+"&searchDept="+searchDept+"&searchUserGroup="+searchUserGroup+"&sort=asc#div1"); -->
 				
 				<!-- // bootstap3中从命名空间“bs”修改tooltipd的title -->
 				<!-- $(this).attr('data-original-title','点击后升序'); -->
@@ -302,9 +307,9 @@ $(document).ready(function(){
 				// 在<a>中添加span
 				$(this).append(glyAsc);
 				// 修改<a>的属性值
-				<!-- $(this).attr("href","{$home}/admin/index/index/order/"+order+"/searchUserName/{$searchUserName}/searchDept/{$searchDept}/searchUserGroup/{$searchUserGroup}/sort/desc#div1"); -->
+				$(this).attr("href","{$home}/admin/index/index/order/"+order+"/userTableRows/"+rows+"/searchUserName/{$searchUserName}/searchDept/{$searchDept}/searchUserGroup/{$searchUserGroup}/sort/desc#div1");
 				
-				$(this).attr("href","{$home}/admin/index/index/order/"+order+"/sort/desc#div1");
+				<!-- $(this).attr("href","{$home}/admin/index/index/?order="+order+"&userTableRows="+rows+"&searchUserName="+searchUserName+"&searchDept="+searchDept+"&searchUserGroup="+searchUserGroup+"&sort=desc#div1"); -->
 				
 				$(this).attr("sort","desc");
 				
@@ -779,6 +784,20 @@ $(document).ready(function(){
             <!-- } -->
 		<!-- }); -->
 	
+	});
+	
+	<!-- // 页面重置-->
+	// 原理：搜索条件表单采用get方面提交改变url，刷新时再改变URL回到锚点。
+	$("#btnDiv1Reset").click(function(){
+		
+		<!-- //刷新页面并回到"#div1"页面 -->
+		window.location.href="{$home}/admin/index/index#div1";
+		
+		//刷新页面并回到"#div1"页面，这种形式的刷新不会改变URL
+		<!-- window.location.hash="#div1"; -->
+		<!-- window.location.reload(true); -->
+		
+		
 	});
 	
 });

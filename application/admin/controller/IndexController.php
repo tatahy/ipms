@@ -76,7 +76,7 @@ class IndexController extends \think\Controller
         if(!empty($request->param('searchUserName'))){
           $searchUserName=$request->param('searchUserName');
         }else{
-          $searchUserName="";
+          $searchUserName=0;
         } 
         
         // 查询词2，'searchDept'
