@@ -48,6 +48,7 @@ $(document).ready(function(){
 });	
 </script>
 
+<------------------------------------------------------------------>
 2017/11/2
 1.bootstrap+jQuery+TP5+ajax，实现页面加载后的表格内容可动态加载，更进一步还可写分页<a>b标签。
 
@@ -243,3 +244,71 @@ $(document).ready(function(){
 2.  开启bootstrap响应式布局 
 // HTML,在头部要添加的代码
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<------------------------------------------------------------------>
+2017/11/3
+1.jQuery+ajax实现动态加载，局部刷新,实现局部刷新，比如需要前后端交互等，主要用的是ajax里面的.load()。
+
+如果网页的左侧有一个列表，点击列表使右侧的内容进行切换，如果右侧的内容过多，不适合做选项卡，这时候用.load()局部刷新最好不过了。
+//user.html：
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>个人中心</title>
+        <meta charset="utf-8">
+        <script src="js/jquery-1.11.0.min.js"></script>
+        <script src="js/user.js"></script>
+    </head>
+    <body>
+
+        <div class="userWrap">
+            <ul class="userMenu">
+                <li class="current" data-id="center">用户中心</li>
+                <li data-id="account">账户信息</li>
+                <li data-id="trade">交易记录</li>
+                <li data-id="info">消息中心</li>
+            </ul>
+            <div id="content"></div>
+        </div>
+        
+    </body>
+</html>
+
+//user.js：
+$(function(){
+    $(".userMenu").on("click", "li", function(){
+        var sId = $(this).data("id");  //获取data-id的值
+        window.location.hash = sId;  //设置锚点
+        loadInner(sId);
+    });
+    function loadInner(sId){
+        var sId = window.location.hash;
+        var pathn, i;
+        switch(sId){
+            case "#center": pathn = "user_center.html"; i = 0; break;
+　　　　　　　case "#account": pathn = "user_account.html"; i = 1; break;
+            case "#trade": pathn = "user_trade.html"; i = 2; break;
+            case "#info": pathn = "user_info.html"; i = 3; break;
+　　　　　　  default: pathn = "user_center.html"; i = 0; break;
+        }
+        $("#content").load(pathn); //加载相对应的内容
+        $(".userMenu li").eq(i).addClass("current").siblings().removeClass("current"); //当前列表高亮
+    }
+    var sId = window.location.hash;
+    loadInner(sId);
+});
+
+//user_center.html：
+<div>
+    用户中心
+    ……
+</div>
+
+注：其他user_xxx.html的页面也是列表相对应的内容，此处不再赘述。
+该方法巧妙的借助data-*的自定义属性来存储数据，点击的时候修改锚点，因为地址有变，所以刷新的时候仍然会保持当前的页面内容而不是切换到第一个。
+
+2017/11/6
+
+
+
+

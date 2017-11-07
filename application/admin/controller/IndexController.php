@@ -47,6 +47,59 @@ class IndexController extends \think\Controller
       $username=Session::get('username');;
       $pwd=Session::get('pwd');
       
+      // 限制登录的用户必须rolety_id=8（admin）或9（superadmin）
+      $user = UserModel::where('username',$username)
+                            ->where('pwd',$pwd)
+                            ->where('rolety_id','in','8,9')
+                            ->select();
+                            
+      if(empty($user)){
+          $this->error('用户名或密码错误，请重新登录');
+          //return view("login"); 
+      }else{                     
+        $this->assign([
+            //--在bg-head.html页面输出自定义信息的HTML代码块
+              'destr'=>$destrr= "请求方法:".$request->method()."</br>".
+                                "username:".$this->username."</br>".
+                                "log:".$this->log."</br>",
+              
+              'home'=>$request->domain(),
+              'username'=>$username,
+              
+        ]);
+        return view('index');
+      }
+    }
+    
+     // 输出系统摘要模板
+    public function sys_sumary()
+    {
+      $this->_loginUser();
+      //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
+      
+      $this->assign([
+               // 获取服务器域名 
+              'serverDomain'=>$_SERVER['SERVER_NAME'],
+              //获取服务器操作系统类型及版本号,PHP 5
+              'serverOS'=>php_uname('s').php_uname('v'),
+    			   // 获取MySQL版本信息
+              'mysqlVersion' => $this->_mysqlVersion(),
+    			   //获取服务器时间
+              'serverTime' => date('Y-m-d H:i:s', time()),
+              // 获取PHP版本信息，PHP 5
+              'phpVersion'=>phpversion(),
+              // 获取Apache版本信息，PHP 5
+              'apacheVersion'=>apache_get_version(),
+        ]);
+      return view();
+    }
+    
+    // 输出系统用户模板
+    public function sys_user(Request $request)
+    {
+      $this->_loginUser();
+      //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
+      
       // 分页页数变量：“pageUserNum”
       if(!empty($request->param('pageUserNum'))){
           $pageUserNum=$request->param('pageUserNum');
@@ -54,18 +107,7 @@ class IndexController extends \think\Controller
           $pageUserNum=1;
       }
       
-      // 限制登录的用户必须rolety_id=8（admin）或9（superadmin）
-      $user = UserModel::where('username',$username)
-                            ->where('pwd',$pwd)
-                            //->where('rolety_id','in','8,9')
-                            ->select();
-                            
-      if(empty($user)){
-          $this->error('用户名或密码错误，请重新登录');
-          //return view("login"); 
-      }else{
-          
-        //$userTableRows接收页面传来的分页时每页表格显示的记录行数，初始值为10
+      //$userTableRows接收页面传来的分页时每页表格显示的记录行数，初始值为10
         if(!empty($request->param('userTableRows'))){
           $userTableRows=$request->param('userTableRows');
         }else{
@@ -93,49 +135,69 @@ class IndexController extends \think\Controller
           $searchUserGroup=0;
         } 
         
-        //$order、$sort接收页面传来的排序信息
-        $order=$request->param('order');
+        //$sortName、$sort接收页面传来的排序信息
+        $sortName=$request->param('sortName');
         $sort=$request->param('sort');
         //  升序asc查询
-        if($sort=="asc"){
-          switch($order){
-            case 'username':
+        if($sort=="_ASC"){
+          switch($sortName){
+            case '_USERNAME':
               $strOrder='username asc';
+              
             break;
             
-            case 'dept':
+            case '_DEPT':
               $strOrder='dept asc';
+              
             break;
             
-            case 'usergroup':
+            case '_USERGROUP':
               $strOrder='rolety_id asc';
+             
             break;
+            
+            case '_ENABLE':
+              $strOrder='enable asc';
+             
+            break;
+            
             //默认按字段“username”的升序
             default:
               $strOrder='username asc';  
-              $order="username";
-              $sort="asc";
+              $sortName="_USERNAME";
+              $sort="_ASC";
+             
             break;
           } 
         }else{
           // 降序desc查询
-          switch($order){
-            case 'username':
+          switch($sortName){
+            case '_USERNAME':
               $strOrder='username desc';
+              
             break;
             
-            case 'dept':
+            case '_DEPT':
               $strOrder='dept desc';
+              
             break;
             
-            case 'usergroup':
+            case '_USERGROUP':
               $strOrder='rolety_id desc';
+             
             break;
+            
+            case '_ENABLE':
+              $strOrder='enable desc';
+             
+            break;
+            
             //默认按字段“username”的升序
             default:
               $strOrder='username asc';  
-              $order="username";
-              $sort="asc";
+              $sortName="_USERNAME";
+              $sort="_ASC";
+              
             break;
           } 
         }
@@ -211,68 +273,70 @@ class IndexController extends \think\Controller
             $roleName=$user1->role->name;
             // 将用户对应的用户组名称加入数据集$users中。
             $v['rolename']=$roleName;
-        }          
-          
-        // 查出所有用户组
-        $groups = RoletyModel::where('id','>',0)
-                                    ->order('rolenum asc')
-                                    ->select();
-                                    
-        // 查出所有部门信息
-        $depts = DeptModel::all();
-                                   
-        $this->assign([
-            //--在bg-head.html页面输出自定义信息的HTML代码块
-              'destr'=>$destrr= "请求方法:".$request->method()."</br>".
-                                "username:".$this->username."</br>".
-                                "log:".$this->log."</br>",
-              
-              'home'=>$request->domain(),
-              'username'=>$username,
-              
-               // 获取服务器域名 
-              'serverDomain'=>$_SERVER['SERVER_NAME'],
-              //获取服务器操作系统类型及版本号,PHP 5
-              'serverOS'=>php_uname('s').php_uname('v'),
-    			   // 获取MySQL版本信息
-              'mysqlVersion' => $this->_mysqlVersion(),
-    			   //获取服务器时间
-              'serverTime' => date('Y-m-d H:i:s', time()),
-              // 获取PHP版本信息，PHP 5
-              'phpVersion'=>phpversion(),
-              // 获取Apache版本信息，PHP 5
-              'apacheVersion'=>apache_get_version(),
-              
-              // 所有用户信息
+        }
+      
+      $this->assign([
+             'home'=>$request->domain(),
+             
+             // 所有用户信息
               'users'=>$users,
               'usersNum'=>$usersNum,
               'userRecords'=>$userRecords,
-              'userTableRows'=>$userTableRows,
+              
               'pageUser'=>$pageUser,
               'pageUserNum'=>$pageUserNum,
               
-              //搜索信息
+              // 表格搜索字段
               'searchUserName'=>$searchUserName,
               'searchDept'=>$searchDept,
               'searchUserGroup'=>$searchUserGroup,
               
-              
-              // 排序信息
-              'order'=>$order,
+              // 表格排序信息
+              'sortName'=>$sortName,
               'sort'=>$sort,
-              
+              'userTableRows'=>$userTableRows,
+             
+        ]);
+      return view();
+    }
+    
+    // 输出系统用户组模板
+    public function sys_usergroup(Request $request)
+    {
+      $this->_loginUser();
+      //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
+      
+      // 查出所有用户组
+      $groups = RoletyModel::where('id','>',0)
+                              ->order('rolenum asc')
+                              ->select();
+ 
+      $this->assign([
+              'home'=>$request->domain(),
               // 所有用户组信息
               'groups'=>$groups,
-              
-              // 所有部门信息
-              'depts'=>$depts,
-          
-          
         ]);
-        return view('index');
-      }
-        
+      return view();
     }
+    
+    // 输出系统设置模板
+    public function sys_param(Request $request)
+    {
+      $this->_loginUser();
+      //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
+      
+      // 查出所有部门信息
+      $depts = DeptModel::all();
+      
+      $this->assign([
+              'home'=>$request->domain(),
+      
+              'depts'=>$depts,
+              
+        ]);
+      return view();
+    }
+    
     
     // 获取MySQL版本信息,通过查询语句的方式。
     private function _mysqlVersion()
@@ -362,11 +426,11 @@ class IndexController extends \think\Controller
           Session::set('role','管理员');
           Session::set('dept',$user[0]['dept']);
           
-          $this->username=Session::get('username');
-          $this->pwd=Session::get('pwd');
-          $this->log=Session::get('log');
-          $this->roles=Session::get('role');
-          $this->dept=Session::get('dept');
+          //$this->username=Session::get('username');
+//          $this->pwd=Session::get('pwd');
+//          $this->log=Session::get('log');
+//          $this->roles=Session::get('role');
+//          $this->dept=Session::get('dept');
           
         // 重定向到index页面
        // $this->redirect('index', ['username' => $username,'pwd' => $pwd]);
