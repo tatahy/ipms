@@ -308,9 +308,8 @@ class IndexController extends \think\Controller
       
       // 查出所有用户组
       $groups = RoletyModel::where('id','>',0)
-                              ->order('rolenum asc')
-                              ->select();
- 
+                              ->order('name asc')
+                              ->select(); 
       $this->assign([
               'home'=>$request->domain(),
               // 所有用户组信息
@@ -439,10 +438,64 @@ class IndexController extends \think\Controller
       
     }
         
-    // 添加新用户组
-    public function addUserGroup(Request $request)
+    // 用户组CDUR，接收客户端通过Ajax，post来的参数，返回json数据
+    public function oprtUserGroup(Request $request)
     {
       $this->_loginUser();  
+      
+       // 检查用户组名称是否已存在
+      //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
+      
+      $oprt=$request->param('oprt');
+      $id=$request->param('id');
+     
+      switch($oprt){
+        case "add":
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
+          $user=new DeptModel;
+          $u=$user->where('username',$username)->select();
+         
+          // 返回前端JSON数据
+          return ['result'=>$result,'msg'=>$msg];
+            
+        break;
+        
+        case"delete":
+          RoletyModel::destroy($id);
+          
+          $result='success';
+          // 返回前端JSON数据
+          return ['result'=>$result];
+        break;
+        
+        case"disable":
+          RoletyModel::update(['enable'=> 0], ['id' => $id]);
+          
+          $result='success';
+          // 返回前端JSON数据
+          return ['result'=>$result,'userGroupId'=>$id];
+          
+        break;
+        
+        case"enable":
+          RoletyModel::update(['enable'=> 1], ['id' => $id]);
+          
+          $result='success';
+          // 返回前端JSON数据
+          return ['result'=>$result,'userGroupId'=>$id];
+          
+        break;
+        
+        case"edit":
+          $result=RoletyModel::get($id);
+          
+          // $result='success';
+          // 返回前端JSON数据
+          return ['result'=>$result,'userGroupId'=>$id];
+          
+        break;
+        
+      }
       
       // 检查用户组名称是否已存在
       return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';

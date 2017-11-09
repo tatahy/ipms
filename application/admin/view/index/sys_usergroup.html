@@ -8,18 +8,18 @@
 				
 <!-- </div> -->
 
-<div class="panel panel-default ">
+<div id="sysUserGroup" class="panel panel-default ">
 		<div class="panel-heading">
 			<h4><strong>用户组管理</strong>&nbsp;
 				
 				<!--// bootstap通过button调用Model -->
-				<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addUserGroup"><strong>新增用户组</strong>&nbsp;<span class="glyphicon glyphicon-duplicate"></span></button>
+				<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalUserGroup"><strong>新增</strong>&nbsp;<span class="glyphicon glyphicon-duplicate"></span></button>
 				
 			</h4>
 		</div>
-		<div class="panel-body table-responsive" >	
-					
-			<table class="table table-hover">
+		<div class="panel-body">	
+			<div class="table-responsive">	
+			<table class="table table-hover ">
 				<thead>
 					<tr>
 						<th>序号</th>
@@ -35,123 +35,409 @@
 					<tr>
 						<td>{$i}</td>
 						<td>{$vo.name}</td>
-						<td>
-
-						<!-- <button type="button" class="btn btn-xs" value="{$vo.addnew}">新增</button> -->
-						<!-- <button type="button" class="btn btn-xs" value="{$vo.submit}">提交</button> -->
-						<!-- <button type="button" class="btn btn-xs" value="{$vo.modify}">修改</button> -->
-						<!-- <button type="button" class="btn btn-xs" value="{$vo.upfile}">上传</button> -->
-						<!-- <button type="button" class="btn btn-xs" value="{$vo.downfile}">下载</button> -->
-						<!-- <button type="button" class="btn btn-xs" value="{$vo.audit}">审核</button> -->
-						<!-- <button type="button" class="btn btn-xs" value="{$vo.refuse}">返回</button> -->
-						<!-- <button type="button" class="btn btn-xs" value="{$vo.reject}">驳回</button> -->
-						<!-- <button type="button" class="btn btn-xs" value="{$vo.check}">检查</button> -->
-						<!-- <button type="button" class="btn btn-xs" value="{$vo.approve}">批准</button> -->
-						
-						<span class="" title="新增" value="{$vo.addnew}">新增</span>
-						<span class="" value="{$vo.submit}">提交</span>
-						<span class="" value="{$vo.modify}">修改</span>
-						<span class="" value="{$vo.upfile}">上传</span>
-						<span class="" value="{$vo.downfile}">下载</span>
-						<span class="" value="{$vo.audit}">审核</span>
-						<span class="" value="{$vo.refuse}">返回</span>
-						<span class="" value="{$vo.reject}">驳回</span>
-						<span class="" value="{$vo.check}">检查</span>
-						<span class="" value="{$vo.approve}">批准</span>
-						
+						<td class="authority">
+							<span class="" title="add" value="{$vo.addnew}">新增</span>
+							<span class="" title="submit" value="{$vo.submit}">提交</span>
+							<span class="" title="modify" value="{$vo.modify}">修改</span>
+							<span class="" title="upload" value="{$vo.upfile}">上传</span>
+							<span class="" title="download" value="{$vo.downfile}">下载</span>
+							<span class="" title="audit" value="{$vo.audit}">审核</span>
+							<span class="" title="return" value="{$vo.refuse}">返回</span>
+							<span class="" title="reject" value="{$vo.reject}">驳回</span>
+							<span class="" title="check" value="{$vo.check}">检查</span>
+							<span class="" title="appove" value="{$vo.approve}">批准</span>
 						
 						</td>
-						<td>
-						
-						<!-- <button type="button" class="btn btn-xs" value="{$vo.bgo}">访问后台</button> -->
-
-						<span class="" value="{$vo.bgo}">访问后台</span>
+						<td class="authority">
+							<span class="" value="{$vo.bgo}">访问后台</span>
 						</td>
+						
 						<td>
+							<button type="button" class="edit btn-link btn-xs" userGroupId="{$vo.id}" data-toggle="modal" data-target="#modalUserGroup"><span class="glyphicon glyphicon-edit"></span>编辑</button>
 							
-							<a href="#"><span class="glyphicon glyphicon-edit"></span>编辑</a>&nbsp;
-							<a href="#" ><span class="text-danger glyphicon glyphicon-remove"></span>删除</a>&nbsp;
-							<a href="#" ><span class="text-warning glyphicon glyphicon-ban-circle"></span>禁用</a>
+							<button type="button" class="del btn-link btn-xs" userGroupId="{$vo.id}"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>
+							
+							<button type="button" class="dis btn-link btn-xs" userGroupId="{$vo.id}"><span class="text-warning glyphicon glyphicon-ban-circle"></span>禁用</button>
+							
+							<span>（已停用）</span><button class="en btn-link btn-xs" userGroupId="{$vo.id}" enable="{$vo.enable}"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
 						
 						</td>
 					</tr>
 					{/volist}
 				</tbody>
 			</table>
-				
+			</div>
 					
 		</div>
 </div>
 
-<!-- Modal "addUserGroup" -->
-<div class="modal fade" id="addUserGroup" role="dialog">
-    <div class="modal-dialog modal-lg">
+<!-- Modal "modalUserGroup" -->
+<div class="modal fade" id="modalUserGroup" role="dialog">
+    <div class="modal-dialog">
     
       <!-- Modal content-->
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header bg-info">
           	<button type="button" class="close" data-dismiss="modal">&times;</button>
 		  
-          	<h4><strong class="bg-info" style="padding:10px;border-radius: 5px;">新增用户</strong></h4>
+          	<h4><strong class="" style="padding:10px;border-radius: 5px;">新增用户组</strong></h4>
         </div>
 		
         <div class="modal-body">
-			<form role="form" action="{$home}/admin/index/addUser" method="post">
+			<form role="form" action="{$home}/admin/index/oprtUserGroup/oprt/add" method="post">
+			
 				<div class="form-group">
-				  <label for="usrname"><span class="glyphicon glyphicon-user"></span>&nbsp;用户名</label>
-				  <input type="text" class="form-control" id="usrname" name="username" placeholder="输入用户名">
-				</div>
-				<div class="form-group">
-				  <label for="psw"><span class="glyphicon glyphicon-eye-open"></span>&nbsp;密码</label>
-				  <input type="password" class="form-control" id="pwd" name="pwd" placeholder="输入密码">
+					<label for="userGroupName">用户组名</label>
+					<!-- // bootstrap实现矢量图在输入框开头 -->
+					<div class="input-group">
+						<span class="input-group-addon"><span class="glyphicon glyphicon-education"></span></span>
+						<input type="text" class="form-control" id="userGroupName" name="userGroupName" placeholder="输入用户组名">
+					</div>
+					
 				</div>
 				
-				<!-- <div class="checkbox">
-				  <label><input type="checkbox" value="" checked>Remember me</label>
-				</div> -->
+				<div class="form-group">
 				
-				<button type="submit" class="btn btn-info btn-block"><span class="glyphicon glyphicon-off"></span>&nbsp;登录</button>
+					<label for="feAu">前端权限</label>
+					</br>
+					
+					<div id="feAu" style="border:solid 1px #ccc; padding-left:10px;">
+					<label class="checkbox-inline"><input type="checkbox" name="addnew" value="1">新增</label>
+					<label class="checkbox-inline"><input type="checkbox" name="submit" value="1">提交</label>
+					<label class="checkbox-inline"><input type="checkbox" name="modify" value="1">修改</label>
+					<label class="checkbox-inline"><input type="checkbox" name="upfile" value="1">上传</label>
+					<label class="checkbox-inline"><input type="checkbox" name="downfile" value="1">下载</label>
+					
+					</br>
+					
+					<label class="checkbox-inline"><input type="checkbox" name="audit" value="1">审核</label>
+					<label class="checkbox-inline"><input type="checkbox" name="refuse" value="1">返回</label>
+					<label class="checkbox-inline"><input type="checkbox" name="reject" value="1">驳回</label>
+					<label class="checkbox-inline"><input type="checkbox" name="appove" value="1">批准</label>
+					<label class="checkbox-inline"><input type="checkbox" name="check" value="1">检查</label>
+					</div>
+				</div>
+				
+				<div id="divBeAu" class="form-group">
+				  	<label for="beAu">后端权限</label>
+				  	
+					<label class="radio-inline">
+      					<input type="radio" name="bgoEn" value="1"><span >是</span>
+    				</label>
+    				<label class="radio-inline">
+      					<input type="radio" name="bgoEn" value="0" checked><span>否</span>
+    				</label>
+					
+				</div>
+				
+				<div id="divUserGroupEn" class="form-group">
+				  	<label class="" for="deptEnable">用户组启用</label>
+					
+					<label class="radio-inline">
+      					<input type="radio" name="userGroupEn" value="1"><span>是</span>
+    				</label>
+    				<label class="radio-inline">
+      					<input type="radio" name="userGroupEn" value="0" checked><span>否</span>
+    				</label>
+					
+				</div>
+				
+				<hr>
+				
+				<button id="btnAddUserGroup" type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-ok-circle"></span>&nbsp;新增</button>
+				
+				<button id="btnResetUserGroup" type="reset" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-refresh"></span>&nbsp;重置</button>
+				
+				<button type="button" class="btn btn-danger btn-sm pull-right" data-dismiss="modal"><span class="glyphicon glyphicon-remove-circle"></span> 取消</button>
+				
 			</form>
+			
         </div>
 		
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-danger btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 取消</button>
+        <!-- <div class="modal-footer"> -->
+          <!-- <button type="submit" class="btn btn-danger btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 取消</button> -->
           
-        </div>
+        <!-- </div> -->
       </div>
       
     </div>
 </div>
-<!-- / Modal "addUserGroup" -->
+<!-- / Modal "modalUserGroup" -->
 	
 <script>
 $(document).ready(function(){
 		
-	<!-- // 对用户组页面中<td>里的<button>进行格式设置 -->
-	<!-- $("td button").each(function(){ -->
-    <!-- if($(this).val()==0){ -->
-		<!-- $(this).addClass("btn-default").remove(); -->
-	<!-- }else{  -->
-		<!-- $(this).addClass("btn-info"); -->
-	<!-- } -->
-   <!-- }); -->
+	<!-- // 对用户表格中<td>里的<button>进行格式设置 -->
+	$("tbody td button").each(function(){
+		if($(this).attr("enable")=='1'){
+			$(this).prevAll('button').show();
+            $(this).prev('span').hide();
+			$(this).hide();
+			$(this).parent().parent().removeClass("danger text-muted");
+		}else{
+			$(this).prevAll('button').hide();
+			$(this).show();
+			$(this).parent().parent().addClass("danger text-muted");
+		}
+	});
    
    <!-- // 对用户组页面中<td>里的<span>进行格式设置 -->
-	$("td span").each(function(){
-    if($(this).attr("value")=="0"){
-		$(this).addClass("text-muted");
-	}
-	
-	if($(this).attr("value")=="1"){
-		$(this).addClass("text-primary bg-success").css({"padding":"3px","border-radius":"3px"});
-	}
-	
+	$("td.authority span").each(function(){
+    	if($(this).attr("value")=="0"){
+			$(this).addClass("text-muted").css({"padding":"5px","border-radius":"3px"});
+		}else{
+			$(this).addClass("text-primary bg-info").css({"padding":"5px","border-radius":"3px"});
+		}	
+		
    	});
 	
-	<!-- $("#btnAddUserGroup").click(function(){ -->
-   		<!-- window.location.href="{$home}/admin/index/addUserGroup"; -->
-   	<!-- }); -->
+	// 存储#modalUserGroupDept标题
+	var hStr=$("#modalUserGroup").find('h4').html();
+	// 存储#btnAddUserGroup名称
+	var btnStr=$("#btnAddUserGroup").html();
+	
+	//新增用户组
+	$("h4 button").click(function() {
+		// #modalDept标题恢复
+		$("#modalUserGroup h4").html(hStr);
+			
+		//表单input:text元素设定初始值
+		$("#userGroupName").val('');
+		
+		// 表单input:check元素赋值
+		$("#modalUserGroup input:checkbox").each(function(){
+			$(this).prop("checked",false);
 
+		});
+		
+		// 表单input:radio:[name='bgoEn']元素赋值
+		$("#modalUserGroup input:radio[name='bgoEn'][value='1']").prop("checked",false);
+		$("#modalUserGroup input:radio[name='bgoEn'][value='0']").prop("checked",true);
+		
+		// 表单input:radio:[name='userGroupEn']元素赋值
+		$("#modalUserGroup input:radio[name='userGroupEn'][value='1']").prop("checked",true);
+		$("#modalUserGroup input:radio[name='userGroupEn'][value='0']").prop("checked",false);
+		
+		
+		//加上标题底色
+		$(".modal-header").addClass("bg-info");
+			
+		// #btnAddUserGroup恢复
+		$("#btnAddUserGroup").html(btnStr);
+		$("#btnResetUserGroup").show();
+	});
+	
+	<!-- //<button class='edit'> 事件-->
+	$("tbody button.edit").click(function() {
+		<!-- // 组装通过“post”提交的数据 -->
+		var sendData = {"oprt":"edit","id":$(this).attr("userGroupId")};
+		
+		$.ajax({
+			type : "post",
+			async : true,  //异步请求
+			url : "{$home}/admin/index/oprtUserGroup", 
+			<!-- // 发送到服务器的数据 -->
+			data : sendData,
+			timeout:1000,
+			<!-- // 指定服务器端response的数据类型为json -->
+			dataType:"json",
+			success:function(backData){	
+				var data=backData;
+				<!-- // 遍历data.result对象，其结构为{addnew: 0, submit: 0, … ,modify: 0}
+				$.each(data.result,function(k,v){
+				// 表单input:checkbox元素赋值
+				$("#modalUserGroup input:checkbox").each(function(){
+				
+					var n=$(this).attr("name");
+					if(k==n){
+						if(v==1){
+							$(this).prop("checked",true);
+						}else{
+							$(this).prop("checked",false);
+						}
+					}
+				});
+						
+				// 表单input:text元素赋值
+				if(k=="name"){
+					$("#userGroupName").val(v);
+				}
+						
+				// 表单input:radio:[name='bgoEn']元素赋值
+				if(k=="bgo"){
+					if(v){
+						$("#modalUserGroup input:radio[name='bgoEn'][value='1']").prop("checked",true);
+						$("#modalUserGroup input:radio[name='bgoEn'][value='0']").prop("checked",false);
+					}else{
+						$("#modalUserGroup input:radio[name='bgoEn'][value='1']").prop("checked",false);
+						$("#modalUserGroup input:radio[name='bgoEn'][value='0']").prop("checked",true);
+					}
+				}
+						
+				// 表单input:radio:[name='userGroupEn']元素赋值
+				if(k=="enable"){
+					if(v){
+						$("#modalUserGroup input:radio[name='userGroupEn'][value='1']").prop("checked",true);
+						$("#modalUserGroup input:radio[name='userGroupEn'][value='0']").prop("checked",false);
+					}else{
+						$("#modalUserGroup input:radio[name='userGroupEn'][value='1']").prop("checked",false);
+						$("#modalUserGroup input:radio[name='userGroupEn'][value='0']").prop("checked",true);
+					}
+				}
+		
+				});
+				
+				// 设置input:radio选中元素的背景色
+				$("input:radio[name='bgoEn']").each(function(){
+					var objChecked=$("input:radio[name='bgoEn']:checked");
+					radioBg(objChecked);
+				});
+		
+				// 设置input:radio选中元素的背景色
+				$("input:radio[name='userGroupEn']").each(function(){
+					var objChecked=$("input:radio[name='userGroupEn']:checked");
+					radioBg(objChecked);
+				});	
+			},
+			error: function() {
+               	alert("<button>.en.click失败，请稍后再试！");
+            }
+		});	
+			
+		// 标题改名
+		$("#modalUserGroup h4").text("编辑用户组信息");
+			
+		//去掉标题底色
+		$(".modal-header").removeClass("bg-info");
+			
+		$("#btnResetUserGroup").hide();
+		// #btnAddUserGroup改名
+		$("#btnAddUserGroup").html('<span class="glyphicon glyphicon-ok-circle"></span>&nbsp;保存');
+		
+		
+			
+	});
+	
+	$("#modalUserGroup").on('show.bs.modal', function () {
+        // 设置input:radio选中元素的背景色
+		$("input:radio[name='bgoEn']").each(function(){
+			var objChecked=$("input:radio[name='bgoEn']:checked");
+			radioBg(objChecked);
+		});
+		
+		// 设置input:radio选中元素的背景色
+		$("input:radio[name='userGroupEn']").each(function(){
+			var objChecked=$("input:radio[name='userGroupEn']:checked");
+			radioBg(objChecked);
+		});
+		
+		
+	});	
+	
+	// 表单input:radio选中元素加背景色
+	$("input:radio[name='bgoEn']").change(function(){
+		var objChecked=$("input:radio[name='bgoEn']:checked");
+		radioBg(objChecked);
+	});
+	
+	// 表单input:radio选中元素加背景色
+	$("input:radio[name='userGroupEn']").change(function(){
+		var objChecked=$("input:radio[name='userGroupEn']:checked");
+		radioBg(objChecked);
+	});
+	
+	<!-- // 提交按钮#btnAddUserGroup -->
+	$('#btnAddUserGroup').click(function(event){
+		// jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作
+        //event.preventDefault();
+	
+	});
+	
+	<!-- //<button class='en'> ajax事件-->
+	$("tbody button.en").click(function() {
+  		
+		<!-- // 组装通过“post”提交的数据 -->
+		var sendData = {"oprt":"enable","id":$(this).attr("userGroupId")};
+				
+		$.ajax({
+			type : "post",
+			async : true,  //异步请求
+			url : "{$home}/admin/index/oprtUserGroup", 
+			<!-- // 发送到服务器的数据 -->
+			data : sendData,
+			timeout:1000,
+			<!-- // 指定服务器端response的数据类型为json -->
+			dataType:"json",
+			success:function(backData){
+				var data=backData;
+						
+			},
+			error: function() {
+               	alert("<button>.en.click失败，请稍后再试！");
+            }
+		});	
+		
+		$(this).prevAll('button').show();
+        $(this).prev('span').hide();
+		$(this).hide();
+		$(this).parent().parent().removeClass("danger text-muted");
+	
+	});
+	
+	
+	<!-- //<button class='dis'> ajax事件-->
+	$("tbody button.dis").click(function() {
+  		
+		<!-- // 组装通过“post”提交的数据 -->
+		var sendData = {"oprt":"disable","id":$(this).attr("userGroupId")};
+				
+		$.ajax({
+			type : "post",
+			async : true,  //异步请求
+			url : "{$home}/admin/index/oprtUserGroup", 
+			<!-- // 发送到服务器的数据 -->
+			data : sendData,
+			timeout:1000,
+			<!-- // 指定服务器端response的数据类型为json -->
+			dataType:"json",
+			success:function(backData){
+				var data=backData;
+						
+			},
+			error: function() {
+               	alert("<button>.dis.click失败，请稍后再试！");
+            }
+		});
+		
+		$(this).prevAll().hide();
+		$(this).hide();
+		$(this).nextAll().show();
+		// “启用”有关按钮显示
+		<!-- $(this).nextAll().find('span').show(); -->
+		<!-- $(this).nextAll().find('.en').show(); -->
+		
+		$(this).parent().parent().addClass("danger text-muted");
+	
+	});
+	
+// 设置input:radio选中元素的背景色，适用于有2个radio，都带有“value”属性，第一个value=1，第二个为0。
+function radioBg(objChecked){
+	
+	var v=objChecked.val();
+	var y='<span class="lable label-info">&nbsp;是&nbsp;</span>'; 
+	var n='<span class="lable label-warning">&nbsp;否&nbsp;</span>';
+	objChecked.nextAll('span').remove();
+	if(v==1){
+		objChecked.after(y);
+		objChecked.parent().next().find('span').removeClass("lable label-warning");
+	}else{
+		objChecked.after(n);
+		objChecked.parent().prev().find('span').removeClass("lable label-info");
+	}	
+
+}
+	
+	
 });
 
 

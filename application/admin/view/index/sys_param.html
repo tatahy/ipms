@@ -115,10 +115,10 @@
     
       <!-- Modal content-->
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header bg-info">
           	<button type="button" class="close" data-dismiss="modal">&times;</button>
 		  
-          	<h4><strong class="bg-info" style="padding:10px;border-radius: 5px;">新增部门</strong></h4>
+          	<h4><strong class="" style="padding:10px;border-radius: 5px;">新增部门</strong></h4>
         </div>
 		
         <div class="modal-body">
@@ -154,6 +154,8 @@
       					<input type="radio" name="deptEnable" value="0">否
     				</label>
 				</div>
+				
+				<hr>
 				
 				<button id="btnAddDept" type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-ok-circle"></span>&nbsp;新增</button>
 				
@@ -303,23 +305,27 @@ $(document).ready(function(){
 	// 存储#btnAddDept名称
 	var btnStr=$("#btnAddDept").html();
 	
-	<!-- //<button class='edit'> 事件-->
+	<!-- //新增部门-->
 	$("#sysParam1 h5 button").click(function() {
 	// 将#modalDept恢复
-	$("#modalDept").on('show.bs.modal', function () {
-        // #modalDept标题恢复
-		$(this).find('h4').html(hStr);
-		// #btnAddDept恢复
-		$("#btnAddDept").html(btnStr);
+		$("#modalDept").on('show.bs.modal', function () {
+        	// #modalDept标题恢复
+			$(this).find('h4').html(hStr);
 			
-		$("#deptName").val('');
-		$("#deptAbbr").val('');
-		$("#btnResetDept").show();
+			//加上#modalDept标题底色
+			$(".modal-header").addClass("bg-info");
 			
-		//设定radio
-		$("input:radio[name='deptEnable'][value='1']").attr("checked",true);
+			// #btnAddDept恢复
+			$("#btnAddDept").html(btnStr);
 			
-	});
+			$("#deptName").val('');
+			$("#deptAbbr").val('');
+			$("#btnResetDept").show();
+			
+			//设定radio
+			$("input:radio[name='deptEnable'][value='1']").attr("checked",true);
+			
+		});
 	});
 	
 	<!-- //<button class='edit'> 事件-->
@@ -332,6 +338,9 @@ $(document).ready(function(){
         	
 			// #modalDept标题改名
 			$(this).find('h4').html("编辑部门信息");
+			
+			//去掉#modalDept标题底色
+			$(".modal-header").removeClass("bg-info");
 			
 			// #btnAddDept改名
 			$("#btnAddDept").html('<span class="glyphicon glyphicon-ok-circle"></span>&nbsp;保存');
@@ -347,12 +356,6 @@ $(document).ready(function(){
 		
 	});
 	
-	
-	$("#btnAddDept").click(function() {
-		
-			
-		
-	});
 
 });
 </script>

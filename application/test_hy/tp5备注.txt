@@ -307,7 +307,51 @@ $(function(){
 注：其他user_xxx.html的页面也是列表相对应的内容，此处不再赘述。
 该方法巧妙的借助data-*的自定义属性来存储数据，点击的时候修改锚点，因为地址有变，所以刷新的时候仍然会保持当前的页面内容而不是切换到第一个。
 
-2017/11/6
+2017/11/9
+设置input:radio背景色，共同部分提炼成函数
+	//
+	$("input:radio[name='bgoEn']").each(function(){
+		var objChecked=$("input:radio[name='bgoEn']:checked");
+		var v=objChecked.val();
+		
+		var y='<span class="label-info">&nbsp;是&nbsp;</span>'; 
+		var n='<span class="label-warning">&nbsp;否&nbsp;</span>';
+		objChecked.nextAll().remove();
+		if(v==1){
+			objChecked.after(y);
+			objChecked.parent().next().find('span').removeClass("label-warning");
+		}else{
+			objChecked.after(n);
+			objChecked.parent().prev().find('span').removeClass("label-info");
+		}
+	});
+		
+	//
+
+	$("input:radio[name='userGroupEn']").each(function(){
+		var objChecked=$("input:radio[name='userGroupEn']:checked");
+		radioBg(objChecked);
+	});
+	
+// 设置input:radio选中元素的背景色，适用于有2个radio，都带有“value”属性，第一个value=1，第二个为0。
+function radioBg(objChecked){
+	
+		var v=objChecked.val();
+		var y='<span class="lable label-info">&nbsp;是&nbsp;</span>'; 
+		var n='<span class="lable label-warning">&nbsp;否&nbsp;</span>';
+		objChecked.nextAll('span').remove();
+		if(v==1){
+			objChecked.after(y);
+			objChecked.parent().next().find('span').removeClass("lable label-warning");
+		}else{
+			objChecked.after(n);
+			objChecked.parent().prev().find('span').removeClass("lable label-info");
+		}	
+
+}
+
+
+
 
 
 

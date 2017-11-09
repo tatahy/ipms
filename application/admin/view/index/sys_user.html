@@ -12,16 +12,17 @@
 		<div class="panel-heading">
 			<h4><strong>用户管理</strong>&nbsp;
 				<!--// bootstap通过button调用Model -->
-				<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addUser">新增用户&nbsp;<span class="glyphicon glyphicon-file"></span></button>
+				<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addUser">新增&nbsp;<span class="glyphicon glyphicon-file"></span></button>
 				
-				<button id="btnSearchInfo" type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divCollapse">显示搜索条件&nbsp;<span class="glyphicon glyphicon-collapse-down"></span></button>
+				<button id="btnSearchInfo" type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divCollapse">显示搜索&nbsp;<span class="glyphicon glyphicon-collapse-down"></span></button>
 				
-				<button id="btnDiv1Reset" type="button" class="btn btn-primary btn-sm">页面重置&nbsp;<span class="glyphicon glyphicon-refresh"></span></button>
+				<button id="btnDiv1Reset" type="button" class="btn btn-primary btn-sm">重置&nbsp;<span class="glyphicon glyphicon-refresh"></span></button>
 			</h4> 
 			
 		</div>
 		
 		<div id="divUser" class="panel-body" >	
+			
 			<div id="divCollapse" class="collapse">
 			<form method="get" action="{$home}/admin/index/sys_user#div1" id="userSearch" class="form-inline">
 				<div class="form-group">
@@ -57,12 +58,18 @@
 				<!-- <input type="reset" class="btn btn-primary btn-sm" value="重置" id="btnDiv1Reset"><span class="glyphicon glyphicon-refresh"></span> -->
 				
 			</form>
+			<hr>
 			</div>
 			
-			<hr>
+			<label class="label label-warning" style="padding:5px;">用户记录总数：<span class="badge">{$userRecords}</span></label>
+			
+			<label class="label label-info" style="padding:5px;">用户总数：<span class="badge">{$usersNum}</span></label>
+				
+			</br>
+			</br>
 			
 			<div class="table-responsive" >
-			<table class="table table-hover">
+			<table class="table table-hover table-condensed">
 				<thead>
 					<tr>
 						<th>序号</th>
@@ -110,11 +117,6 @@
 				
 			</table>
 			</div>
-			<!-- <button type="button" class="btn btn-primary btn-sm">刷新&nbsp;<span class="glyphicon glyphicon-file"></span></button> -->
-			
-			<label class="label label-warning" style="padding:5px;">用户记录总数：<span class="badge">{$userRecords}</span></label>
-			
-			<label class="label label-info" style="padding:5px;">用户总数：<span class="badge">{$usersNum}</span></label>
 			
 			<div id="divUserTableRows" class="col-sm-12 text-right search">
 				<div class="col-sm-10 text-right">{$pageUser}</div>
@@ -132,6 +134,7 @@
 				</div>
 			</div>
 			
+			
 		</div>
 </div>
 
@@ -141,10 +144,10 @@
     
       <!-- Modal content-->
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header bg-info">
           	<button type="button" class="close" data-dismiss="modal">&times;</button>
 		  
-          	<h4><strong class="bg-info" style="padding:10px;border-radius: 5px;">新增用户</strong></h4>
+          	<h4><strong class="" style="padding:10px;border-radius: 5px;">新增用户</strong></h4>
         </div>
 		
         <div class="modal-body">
@@ -263,12 +266,12 @@ $(function(){
 	
 	<!-- // 显示搜索条件的div，修改触发"显示"的btn内容-->
 	$("#divCollapse").on("hide.bs.collapse", function(){
-    	$("#btnSearchInfo").html('显示搜索条件&nbsp;<span class="glyphicon glyphicon-collapse-down"></span>');
+    	$("#btnSearchInfo").html('显示搜索&nbsp;<span class="glyphicon glyphicon-collapse-down"></span>');
   	});
 	
 	<!-- // 隐藏搜索条件的div，修改触发"隐藏"的btn内容-->
   	$("#divCollapse").on("show.bs.collapse", function(){
-    	$("#btnSearchInfo").html('隐藏搜索条件&nbsp;<span class="glyphicon glyphicon-collapse-up"></span>');
+    	$("#btnSearchInfo").html('隐藏搜索&nbsp;<span class="glyphicon glyphicon-collapse-up"></span>');
   	});
 	
 	<!-- // bootstrap3，enable所有的tooltip -->
@@ -575,10 +578,6 @@ $(function(){
         		}
     		}
 			else{
-			<!-- // 数组check中不存在false，都为true -->
-				<!-- // input用“has-success”突出显示 -->
-				<!-- $("#addUser").find("input").eq(key).parent().parent().removeClass("has-error").addClass("has-success"); -->
-				
 				<!-- // jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作 -->
         		event.preventDefault();
 				<!-- // 组装通过“post”提交的数据 -->
@@ -641,24 +640,17 @@ $(function(){
 
 		});
 	
-	<!-- // 在#addUser的model隐藏后，应用hidden.bs.modal事件将#addUser的model内容准备好 -->	
-	<!-- $("#myModal").on('hide.bs.modal', function () { -->
-        
-    <!-- });	 -->
-	
 	$('#btnReset').click(function() {
 		// 应用jQuery的slice()方法将匹配元素的子集构造一个新的jQuery对象
-	
-    		<!-- $('#addUser input').slice(0,2).parent().parent().removeClass('has-error has-success'); -->
+		<!-- $('#addUser input').slice(0,2).parent().parent().removeClass('has-error has-success'); -->
 			
-			for (key in check) {
-            	$("#addUser").find("input").eq(key).parent().parent().removeClass("has-success has-error");
-        	}
-			
-    		$('#addUser .tips').hide();
-    		$('#addUser .glyphicon-ok').hide();
-    		$('#addUser .glyphicon-remove').hide();
-    		check = [false, false];
+		for (key in check) {
+            $("#addUser").find("input").eq(key).parent().parent().removeClass("has-success has-error");
+        }
+    	$('#addUser .tips').hide();
+    	$('#addUser .glyphicon-ok').hide();
+    	$('#addUser .glyphicon-remove').hide();
+    	check = [false, false];
 	
 	});
 
@@ -786,8 +778,6 @@ $(function(){
 	});
 	
 	//加载sys_user.html页面内容到index.html页面中<div id="content"></div>
-	
-	
 	function loadSysUser(rows,sortName,sort,pageUserNum){
 		// 每页显示的记录行数
 		var rows=rows;
@@ -806,7 +796,7 @@ $(function(){
 		if(sort){}else{sort='_ASC';}
 		
 		// 排序的关键词
-		if(sort){}else{sortName='_USERNAME';}
+		if(sortName){}else{sortName='_USERNAME';}
 		
 		// 组装通过“post”提交的数据，名称与后端所用一致
 		var sendData = {"sortName":sortName,"sort":sort,"userTableRows":rows,"searchUserName":searchUserName,"searchDept":searchDept,"searchUserGroup":searchUserGroup,"pageUserNum":pageUserNum};
