@@ -192,7 +192,7 @@ $(document).ready(function(){
 	//对“superadmin”组只有编辑权限。进一步优化：若登录用户属于“superadmin”组才有，其他的用户都没有。
 	$("tbody tr").each(function(){
 		var name=$(this).find("td.name").text();
-		var str='<button type="button" class="edit btn-link" userGroupId="{$vo.id}" data-toggle="modal" data-target="#modalUserGroup"><span class="glyphicon glyphicon-edit"></span>编辑</button>';
+		var str='<button type="button" class="edit btn-link" userGroupId="9" data-toggle="modal" data-target="#modalUserGroup"><span class="glyphicon glyphicon-edit"></span>编辑</button>';
 		
 		if("superadmin"==name){
 			$(this).find("td.button").children().remove();
