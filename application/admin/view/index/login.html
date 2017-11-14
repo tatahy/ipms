@@ -309,6 +309,8 @@ var regPasswordSpecial = /[~!@#%&=;':",./<>_\}\]\-\$\(\)\*\+\.\[\?\\\^\{\|]/;
 var regPasswordAlpha = /[a-zA-Z]/;
 var regPasswordNum = /[0-9]/;
 var password;
+
+// 数组的作用是在表单提交时对各个输入框的校验结果进行检查，数组值对应各个输入框的校验结果，全部为true才触发提交表单事件。
 var check = [false, false, false];
 
 //校验成功函数
@@ -333,7 +335,7 @@ function fail(Obj, counter, msg) {
 // 用户名匹配
 <!-- $('.container').find('input').eq(0).change(function() { -->
 $("#username").change(function() { 
-    //test(),正则的验证函数，验证value是否符合regUsername要求。
+    //test(),JavaScript的正则验证函数，验证value是否符合regUsername要求。
     //jquery的test()是获取或设置标签内文本既等于innerText。
     //HY,待确认
     if (regUsername.test($(this).val())) {
@@ -398,7 +400,7 @@ $('#submit').click(function(event) {
         event.preventDefault();
         for (key in check) {
             if (!check[key]) {
-                $(".container").find("input").eq(key).parent().parent().removeClass("has-success").addClass("has-error");
+                $("form").find("input").eq(key).parent().parent().removeClass("has-success").addClass("has-error");
             }
         }
     }
@@ -407,7 +409,7 @@ $('#submit').click(function(event) {
 $('#reset').click(function() {
 	// 应用jQuery的slice()方法将匹配元素的子集构造一个新的jQuery对象
 	
-    $('input').slice(0, 6).parent().parent().removeClass('has-error has-success');
+    $('input').slice(0, 3).parent().parent().removeClass('has-error has-success');
     $('.tips').hide();
     $('.glyphicon-ok').hide();
     $('.glyphicon-remove').hide();

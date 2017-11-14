@@ -350,6 +350,67 @@ function radioBg(objChecked){
 
 }
 
+2017/11/10
+可以进一步扩展到任意数量的radio元素，
+
+//html:
+<div id="divUserGroupEn" class="form-group">
+	<label class="" for="deptEnable">用户组启用</label>
+					
+	<label class="radio-inline">
+    	<input type="radio" name="userGroupEn" value="1"><span>1</span>
+    </label>
+	
+    <label class="radio-inline">
+      	<input type="radio" name="userGroupEn" value="2"><span>2</span>
+    </label>
+					
+	<label class="radio-inline">
+      	<input type="radio" name="userGroupEn" value="3"><span>3</span>
+    </label>
+					
+</div>
+
+//jQuery:				
+// 设置input:radio选中元素及其背景色
+		// 默认value='0'选中
+		$("input:radio[name='bgoEn'][value='0']").prop("checked",true)
+		$("input:radio[name='bgoEn']").each(function(){
+			var n=$(this).is(":checked");
+			if(n){radioBg($(this),'有','无');}
+			if(n){radioBg($(this),['有','无']);}
+		});
+		
+// 设置input:radio选中元素的背景色，适用于有2个radio，都带有“value”属性，第一个value=1，第二个为0。function radioBg(objChecked,str[])
+function radioBg(objChecked,str1st,str2nd){
+	
+	var v=objChecked.val();
+	var str1=str1st;
+	var str2=str2nd;
+	
+	// 默认第一个radio后显示的字符
+	if(str1==null){
+		str1="是";
+	}
+	
+	// 默认第二个radio后显示的字符
+	if(str2==null){
+		str2="否";
+	} 	
+	
+	var y='<span class="lable label-info" style="padding:2px;border-radius:3px;">&nbsp;'+str1+'&nbsp;</span>'; 
+	var n='<span class="lable label-warning" style="padding:2px;border-radius: 3px;">&nbsp;'+str2+'&nbsp;</span>';
+	objChecked.nextAll('span').remove();
+	if(v==1){
+		objChecked.after(y);
+		objChecked.parent().next().find('span').removeClass("lable label-warning");
+	}else{
+		objChecked.after(n);
+		objChecked.parent().prev().find('span').removeClass("lable label-info");
+	}	
+
+}
+
 
 
 

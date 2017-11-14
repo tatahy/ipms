@@ -44,7 +44,7 @@ class IndexController extends \think\Controller
       //用户是否已经登录。
       $this->_loginUser();
        
-      $username=Session::get('username');;
+      $username=Session::get('username');
       $pwd=Session::get('pwd');
       
       // 限制登录的用户必须rolety_id=8（admin）或9（superadmin）
@@ -305,7 +305,7 @@ class IndexController extends \think\Controller
     {
       $this->_loginUser();
       //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
-      
+     
       // 查出所有用户组
       $groups = RoletyModel::where('id','>',0)
                               ->order('name asc')
@@ -356,7 +356,7 @@ class IndexController extends \think\Controller
       }    
     }
     
-    // 获取所有部门信息,不能写成“_dept”，因为前端的HTML文件中的url里不能含有“_”开头的名称，否则就无法访问到，报错
+    // 获取所有部门信息,不能写成“_dept”，因为前端的HTML文件中的url里不能含有“_”开头的名称，否则就无法访问到，会报错
     public function dept()
     {
       $this->_loginUser();
@@ -447,28 +447,161 @@ class IndexController extends \think\Controller
       //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
       
       $oprt=$request->param('oprt');
-      $id=$request->param('id');
+      $id=$request->param('id');      
+      
+      // 表单提交数据
+      if(!empty($request->param('userGroupName'))){
+        $userGroupName=$request->param('userGroupName');
+      }else{
+        $userGroupName='';
+      }
+      // 前台addnew权限
+      if($request->param('addnew')=="true"){
+        $addNew=1;
+      }else{
+        $addNew=0;
+      }
+      // 前台submit权限
+      if($request->param('submit')=="true"){
+        $submit=1;
+      }else{
+        $submit=0;
+      }
+      // 前台modify权限
+      if($request->param('modify')=="true"){
+        $modify=1;
+      }else{
+        $modify=0;
+      }
+      // 前台upfile权限
+      if($request->param('upfile')=="true"){
+        $upFile=1;
+      }else{
+        $upFile=0;
+      }
+      // 前台downfile权限
+      if($request->param('downfile')=="true"){
+        $downFile=1;
+      }else{
+        $downFile=0;
+      }
+      // 前台audit权限
+      if($request->param('audit')=="true"){
+        $audit=1;
+      }else{
+        $audit=0;
+      }
+      // 前台refuse权限
+      if($request->param('refuse')=="true"){
+        $refuse=1;
+      }else{
+        $refuse=0;
+      }
+      //前台reject权限
+      if($request->param('reject')=="true"){
+        $reject=1;
+      }else{
+        $reject=0;
+      }
+      // 前台approve权限
+      if($request->param('approve')=="true"){
+        $approve=1;
+      }else{
+        $approve=0;
+      }
+      // 前台inspect权限
+      if($request->param('inspect')=="true"){
+        $inspect=1;
+      }else{
+        $inspect=0;
+      }
+      // 后台权限
+      if($request->param('bgoEn')=="true"){
+        $bgoEn=1;
+      }else{
+        $bgoEn=0;
+      }
+      //用户组启用
+      if($request->param('userGroupEn')=="true"){
+        $userGroupEn=1;
+      }else{
+        $userGroupEn=0;
+      }
      
       switch($oprt){
         case "add":
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
-          $user=new DeptModel;
-          $u=$user->where('username',$username)->select();
-         
+          //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
+          $userGroups =new RoletyModel;
+          $group = $userGroups->where('name',$userGroupName)->find();
+          // save操作之前的id
+          $bfId=$group['id'];
+          
+          // 用户组不存在
+          if(empty($group)){
+            // 添加/更新新用户组数据库对应数据表字段值,save方法的返回值是影响的记录数
+            $n=$userGroups->save([
+              'name'  => $userGroupName,
+              'addnew' => $addNew,
+              'submit' => $submit,
+              'modify' => $modify,
+              'upfile' => $upFile,
+              'downfile' => $downFile,
+              'audit' => $audit,
+              'refuse' => $refuse,
+              'reject' => $reject,
+              'approve' => $approve,
+              'inspect' => $inspect,
+              'bgo' => $bgoEn,
+              'enable' => $userGroupEn,
+            ]);
+            // save操作以后的id 
+            $afId=$userGroups->id;
+            
+            // save是进行更新
+            if($afId==$bfId){
+              if($n){
+                $result='success';
+                $msg='用户组：【'.$userGroups->name.'】更新成功。';
+              }else{
+                 $result='error';
+                 $msg='用户组：【'.$userGroups->name.'】没有更新。';
+              }  
+            }else{
+              // save是进行新增
+              if($n){
+                $result='success';
+                $msg='新用户组：【'.$userGroups->name.'】添加成功。';
+              }else{
+                $result='error';
+                $msg='新用户组：【'.$userGroups->name.'】添加失败。';
+              }   
+            }
+          }else{
+            // 用户组已存在
+            $result='error';
+            $msg='用户组：【'.$userGroupName.'】已存在，请重新添加。';
+            
+          }  
+                    
           // 返回前端JSON数据
           return ['result'=>$result,'msg'=>$msg];
             
         break;
         
-        case"delete":
-          RoletyModel::destroy($id);
-          
-          $result='success';
+        case "delete":
+          $n=RoletyModel::destroy($id);
+          if($n){
+            $result='success';
+            $msg='成功删除用户组【'.$userGroupName.'】。';
+          }else{
+            $result='error';
+            $msg='用户组【'.$userGroupName.'】删除失败。';
+          }
           // 返回前端JSON数据
-          return ['result'=>$result];
+          return ['result'=>$result,'msg'=>$msg];
         break;
         
-        case"disable":
+        case "disable":
           RoletyModel::update(['enable'=> 0], ['id' => $id]);
           
           $result='success';
@@ -496,13 +629,9 @@ class IndexController extends \think\Controller
         break;
         
       }
-      
       // 检查用户组名称是否已存在
-      return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
-      
-      
+      //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
     }
-    
     
      // 用户CDUR，接收客户端通过Ajax，post来的参数，返回json数据
     public function oprtUser(Request $request)
