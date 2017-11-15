@@ -564,10 +564,11 @@ $(function(){
 			var flag=check.every(function(value) {
             	return value == true
         	});
+			
+			<!-- // jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作 -->
+        	event.preventDefault();
 	
 			if (!flag) {
-				// jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作
-        		event.preventDefault();
 				<!-- //check中存在false,对应的input用“has-error”突出显示。 -->
         		for (key in check) {
             		if (!check[key]) {
@@ -578,8 +579,7 @@ $(function(){
         		}
     		}
 			else{
-				<!-- // jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作 -->
-        		event.preventDefault();
+				
 				<!-- // 组装通过“post”提交的数据 -->
 				var sendData = {"oprt":"add","username":$("#username").val(),"pwd":$("#pwd").val(),"dept":$("#selDept").val(),"userGroup":$("#selUserGroup").val()};
 				
@@ -776,7 +776,8 @@ $(function(){
 		$("#content").load("sys_user");
 		
 	});
-	
+
+<!-- function -->
 	//加载sys_user.html页面内容到index.html页面中<div id="content"></div>
 	function loadSysUser(rows,sortName,sort,pageUserNum){
 		// 每页显示的记录行数
@@ -805,7 +806,7 @@ $(function(){
 		$("#content").load("sys_user",sendData);
 	
 	}
-	
+<!--/ function -->
 	
 });
 

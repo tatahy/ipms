@@ -1,6 +1,5 @@
-<div class="">
 	<!-- // bootstrap panel group+collapse -->
-	<div class="panel-group" id="sysParam">
+<div id="sysParam" class="panel-group" >
 	
 	<div class="panel panel-default">
 		<div class="panel-heading">
@@ -11,20 +10,12 @@
 			
 		</div>
 		<div id="sysParam1" class="panel-collapse collapse in">
-			<ul class="list-group">
-						
-				<a class="list-group-item">服务器域名：serverDomain</a>
-				<a id="display" class="list-group-item">服务器时间：serverTime</a>
-				
-				
-					
-			</ul>
 			
 			<div class="panel-body " >
 				<h5>
         		<strong>部门列表</strong>
 				<!--// bootstap通过button调用Model -->
-				<button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#modalDept">新增部门&nbsp;<span class="glyphicon glyphicon-tree-conifer"></span></button>
+				<button id="btnModalOut" type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#modalDept">新增&nbsp;<span class="glyphicon glyphicon-tree-conifer"></span></button>
       			</h5>
 			
 				<div class="table-responsive" >
@@ -107,51 +98,63 @@
 	
 	</div>
 			
-</div>
+<!-- </div> -->
 
-<!-- Modal "addUser" -->
+<!-- Modal "modalDept" -->
 <div class="modal fade" id="modalDept" role="dialog">
     <div class="modal-dialog">
     
       <!-- Modal content-->
       <div class="modal-content">
-        <div class="modal-header bg-info">
+        <div class="modal-header bg-info" style="border-radius: 5px;">
           	<button type="button" class="close" data-dismiss="modal">&times;</button>
 		  
-          	<h4><strong class="" style="padding:10px;border-radius: 5px;">新增部门</strong></h4>
+          	<h4><strong>新增部门</strong></h4>
         </div>
 		
         <div class="modal-body">
 			<form role="form" action="{$home}/admin/index/index" method="post">
+				<input id="oprtId" type="text" hidden disabled>
+				
 				<div class="form-group has-feedback">
 					<label for="deptName">部门全称</label>
 					<!-- // bootstrap实现矢量图在输入框开头 -->
 					<div class="input-group">
 						<span class="input-group-addon"><span class="glyphicon glyphicon-tree-conifer"></span></span>
-						<input type="text" class="form-control" id="deptName" name="deptName" placeholder="输入部门全称">
+						<input type="text" class="form-control textDept" id="deptName" name="deptName" placeholder="输入部门全称">
 						
 					</div>
+					
+					<!-- // 配合jQuery 中的内容验证代码-->
+					<span style="color:red;display: none;" class="tips"></span>
+      				<span style="display: none;"  class="glyphicon glyphicon-ok form-control-feedback"></span>
+					<span style="display: none;" class="glyphicon glyphicon-remove form-control-feedback"></span>
 				  	
 				</div>
 				
-				<div class="form-group">
+				<div class="form-group has-feedback">
 				  	<label for="deptAbbr">部门简称</label>
 					
 					<div class="input-group">
 						<span class="input-group-addon"><span class="glyphicon glyphicon-grain"></span></span>
-						<input type="text" class="form-control" id="deptAbbr" name="deptAbbr" placeholder="输入部门简称">
+						<input type="text" class="form-control textDept" id="deptAbbr" name="deptAbbr" placeholder="输入部门简称">
 					</div>
+					
+					<!-- // 配合jQuery 中的内容验证代码-->
+					<span style="color:red;display: none;" class="tips"></span>
+      				<span style="display: none;"  class="glyphicon glyphicon-ok form-control-feedback"></span>
+					<span style="display: none;" class="glyphicon glyphicon-remove form-control-feedback"></span>
 					
 				  	
 				</div>
 				
-				<div id="divDeptEn" class="form-group">
-				  	<label class="" for="deptEnable">部门启用:</label>
+				<div id="divDeptEn" class="form-group ">
+				  	<label class="" for="deptEn">部门启用:</label>
 					<label class="radio-inline">
-      					<input type="radio" name="deptEnable" value="1">是
+      					<input type="radio" name="deptEn" value="1"checked>是
     				</label>
     				<label class="radio-inline">
-      					<input type="radio" name="deptEnable" value="0">否
+      					<input type="radio" name="deptEn" value="0">否
     				</label>
 				</div>
 				
@@ -172,14 +175,14 @@
         <!-- </div> -->
       </div>
       
-    </div>
 </div>
-<!-- / Modal "addUser" -->
+
+<!-- / Modal "modalDept" -->
 		
 <script>
 $(document).ready(function(){
 	
-	<!-- // 对用户表格中<td>里的<button>进行格式设置 -->
+	<!-- // 对部门表格中<td>里的<button>进行格式设置 -->
 	$("#sysParam1 tbody td button").each(function(){
 		if($(this).attr("enable")=='1'){
 			$(this).prevAll('button').show();
@@ -212,7 +215,7 @@ $(document).ready(function(){
 				var data=backData;
 			},
 			error: function() {
-               	alert("<button>.en.click失败，请稍后再试！");
+               	$.alert("<button>.en.click失败，请稍后再试！");
             }
 		});	
 		$(this).prevAll('button').show();
@@ -261,11 +264,10 @@ $(document).ready(function(){
 	
 	<!-- //<button class='del'> ajax事件-->
 	$("#sysParam1 button.del").click(function() {
-  		var id=$(this).attr("deptId");
-		var selBtn='.del button[deptId="'+id+'"]';
+		<!-- var selBtn='.del button[deptId="'+id+'"]'; -->
 		
 		<!-- // 组装通过“post”提交的数据 -->
-		var sendData = {"oprt":"delete","id":id};
+		var sendData = {"oprt":"delete","id":$(this).attr("deptId")};
 		
 		//弹出自定义提示页面 
 		$.confirm('确定删除该部门？',function(e){
@@ -281,12 +283,16 @@ $(document).ready(function(){
 					<!-- // 指定服务器端response的数据类型为json -->
 					dataType:"json",
 					success:function(backData){
+					
 						var data=backData;
-						//删除所在行<tr>
-						$(selBtn).parent().parent().remove();
-						//刷新页面并回到锚点"#div3"页面
-						window.location.hash="#div3";
-						window.location.reload(true);
+						//刷新页面
+						$("#content").load("sys_param");
+						
+						<!-- //删除所在行<tr> -->
+						<!-- $(selBtn).parent().parent().remove(); -->
+						<!-- //刷新页面并回到锚点"#div3"页面 -->
+						<!-- window.location.hash="#div3"; -->
+						<!-- window.location.reload(true); -->
 					},
 					error: function() {
                			alert("删除失败，请稍后再试！");
@@ -305,56 +311,274 @@ $(document).ready(function(){
 	// 存储#btnAddDept名称
 	var btnStr=$("#btnAddDept").html();
 	
-	<!-- //新增部门-->
-	$("#sysParam1 h5 button").click(function() {
-	// 将#modalDept恢复
-		$("#modalDept").on('show.bs.modal', function () {
-        	// #modalDept标题恢复
-			$(this).find('h4').html(hStr);
-			
-			//加上#modalDept标题底色
-			$(".modal-header").addClass("bg-info");
-			
-			// #btnAddDept恢复
-			$("#btnAddDept").html(btnStr);
-			
-			$("#deptName").val('');
-			$("#deptAbbr").val('');
-			$("#btnResetDept").show();
-			
-			//设定radio
-			$("input:radio[name='deptEnable'][value='1']").attr("checked",true);
-			
-		});
+	<!-- // 点击新增部门按钮-->
+	$("#btnModalOut").click(function() {
+	
+		// #modalDept标题内容恢复
+		$("#modalDept h4").html(hStr);
+		// #modalDept标题底色恢复
+		$(".modal-header").addClass('bg-info')
+		
+		// 表单元素赋值	
+		$("#oprtId").val('');		
+		<!-- $("#deptName").val(''); -->
+		$("#deptAbbr").val('');
+
+		// 表单input:radio:[name='deptEn']元素赋值
+		$("#modalUserGroup input:radio[name='deptEn'][value='1']").prop("checked",false);
+		$("#modalUserGroup input:radio[name='deptEn'][value='0']").prop("checked",true);
+		
+		// #btnAddDept恢复
+		$("#btnAddDept").html(btnStr);
+		$("#btnResetDept").show();
+		
+		// 清除输入框的格式
+		$(".modal input").parent().parent().removeClass("has-success").removeClass("has-error"); 
+		//注意限定.tips/glyphicon-ok/glyphicon-remove所在标签.modal，否则会殃及其他标签的.tips/glyphicon-ok/glyphicon-remove
+    	$('.modal .tips').hide();
+    	$('.modal .glyphicon-ok').hide();
+    	$('.modal .glyphicon-remove').hide();
+		
+		
+		
 	});
 	
 	<!-- //<button class='edit'> 事件-->
 	$("#sysParam1 button.edit").click(function() {
-		var name=$(this).parent().prev().prev().text();
-		var abbr=$(this).parent().prev().text();
+		<!-- // 组装通过“post”提交的数据 -->
+		var sendData = {"oprt":"edit","id":$(this).attr("deptId")};
+		var oprtId;
 		
-		<!-- // 在#modalDept的model显示之前，应用show.bs.modal事件将#modalDept的model内容准备好 -->
-		$("#modalDept").on('show.bs.modal', function () {
-        	
-			// #modalDept标题改名
-			$(this).find('h4').html("编辑部门信息");
-			
-			//去掉#modalDept标题底色
-			$(".modal-header").removeClass("bg-info");
-			
-			// #btnAddDept改名
-			$("#btnAddDept").html('<span class="glyphicon glyphicon-ok-circle"></span>&nbsp;保存');
-			
-			$("#deptName").val(name);
-			$("#deptAbbr").val(abbr);
-			$("#btnResetDept").hide();
-			
-			//设定radio
-			$("input:radio[name='deptEnable'][value='1']").attr("checked",true);
-			
+		$.ajax({
+			type : "post",
+			async : true,  //异步请求
+			url : "{$home}/admin/index/oprtDept", 
+			<!-- // 发送到服务器的数据 -->
+			data : sendData,
+			timeout:1000,
+			<!-- // 指定服务器端response的数据类型为json -->
+			dataType:"json",
+			success:function(backData){	
+				var data=backData;
+				<!-- // 遍历data.result对象，其结构为{id:0,name:0,abbr: 0,enable:1}
+				$.each(data.result,function(k,v){
+				
+					// 表单#oprtId赋值
+					if(k=="id"){
+						<!-- oprtId=v; -->
+						// 表单#oprtId赋值
+						$("#oprtId").val(v);
+					}
+					
+					// 表单#deptName赋值
+					if(k=="name"){
+						$("#deptName").val(v);
+					}
+					
+					// 表单#deptName赋值
+					if(k=="abbr"){
+						$("#deptAbbr").val(v);
+					}
+					// 表单input:radio:[name='deptEn']元素赋值
+					if(k=="enable"){
+						if(v){
+							$("#modalUserGroup input:radio[name='deptEn'][value='1']").prop("checked",true);
+							$("#modalUserGroup input:radio[name='deptEn'][value='0']").prop("checked",false);
+						}else{
+							$("#modalUserGroup input:radio[name='deptEn'][value='1']").prop("checked",false);
+							$("#modalUserGroup input:radio[name='deptEn'][value='0']").prop("checked",true);
+						}
+					}
+				});		
+			},
+			error: function() {
+               	alert("<button>.en.click失败，请稍后再试！");
+            }
 		});	
+			
+		// 标题改名
+		$("#modalDept h4").text("编辑部门信息");
+			
+		//去掉标题底色
+		$(".modal-header").removeClass("bg-info");
+			
+		$("#btnResetDept").hide();
+		// #btnAddUserGroup改名
+		$("#btnAddDept").html('<span class="glyphicon glyphicon-ok-circle"></span>&nbsp;保存');
+		
+		// 清除输入框的格式
+		$(".modal input").parent().parent().removeClass("has-success").removeClass("has-error"); 
+		// 注意限定.tips/glyphicon-ok/glyphicon-remove所在标签.modal，否则会殃及其他标签的.tips/glyphicon-ok/glyphicon-remove
+    	$('.modal .tips').hide();
+    	$('.modal .glyphicon-ok').hide();
+    	$('.modal .glyphicon-remove').hide();
 		
 	});
+	
+	<!-- // 提交按钮#btnAddDept -->
+	$('#btnAddDept').click(function(event){
+		//JavaScript的数组处理方法every(callback)，对数组中的每个元素都执行一次
+		//callback函数，直到callback返回false，every就返回false；
+		//若全部元素执行callback后都返回ture，every就返回true。
+		//此处的用意是只要数组check中存在false，将该项找出，并把该项对应的input用“has-error”突出显示。
+		
+		var flag=check.every(function(value) {
+            return value == true
+        });
+		
+		
+		<!-- // jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作 -->
+        event.preventDefault();
+	
+		if (!flag) {
+			<!-- //check中存在false,对应的input用“has-error”突出显示。 -->
+        	for (key in check) {
+            	if (!check[key]) {
+                	$(".modal").find(".textDept").eq(key).parent().parent().removeClass("has-success").addClass("has-error");
+            	}
+        	}
+		}else{
+			<!-- // 组装通过“post”提交的数据 -->
+			var sendData = {"oprt":"add","deptName":$("#deptName").val(),"deptAbbr":$("#deptAbbr").val(),"deptEn":$("input:radio[name='deptEn']").prop("checked"),"oprtId":$("#oprtId").val()
+			};
+						
+			$("#modalDept").modal("hide");
+			
+			$.ajax({
+				type : "post",
+				async : true,  //异步请求
+				url : "{$home}/admin/index/oprtDept", 
+				<!-- // 发送到服务器的数据 -->
+				data : sendData,
+				timeout:1000,
+				<!-- // 指定服务器端response的数据类型为json -->
+				dataType:"json",
+				success:function(backData){
+					var data=backData;
+					<!-- alert(data.msg); -->
+							
+					if(data.result=='success'){
+
+					//添加成功，弹出自定义提示页面 
+						$.confirm(data.msg,function(e){
+							con=e;
+							if(true==con){								
+								$("#modalDept").modal("show");
+							}else{
+								$("#content").load("sys_param");
+								<!-- $('#btnResetUserGroup').click(); -->
+								//刷新页面并回到"#div0"页面
+								<!-- window.location.hash="#div0"; -->
+								<!-- window.location.reload(true); -->
+									
+							}
+						}).ok('继续').cancel('完成');
+							
+					}else{
+						// 添加不成功，弹出自定义提示页面 
+						$.confirm(data.msg,function(e){
+							con=e;
+							if(true==con){
+								// 返回"#addUser".modal页面
+								$("#modalDept").modal("show");
+							}else{
+								$('#btnResetDept').click();
+							}
+						}).ok('继续').cancel('取消');	
+						
+					}
+
+				},
+					error: function() {
+               			// 应用自定义的alert提示框
+						$.alert("失败1，请稍后再试！");
+            		}
+			});
+		}
+	
+	});
+	
+	// 设置重置后modal中各元素默认格式
+	$('#btnResetDept').click(function() {
+		
+		// 清除输入框的格式
+		$(".modal input").parent().parent().removeClass("has-success").removeClass("has-error"); 
+		
+		// 注意限定.tips/glyphicon-ok/glyphicon-remove所在标签.modal，否则会殃及其他标签的.tips/glyphicon-ok/glyphicon-remove
+    	$('.modal .tips').hide();
+    	$('.modal .glyphicon-ok').hide();
+    	$('.modal .glyphicon-remove').hide();
+		
+		check=[false,false];
+		
+	});	
+	
+	<!-- deptName内容验证 -->
+	$("#deptName").change(function(){
+        if(regDeptName.test($(this).val())){
+			success($(this),0);	
+		}else if ($(this).val().length < 5) {
+        	if($(this).val()==''){
+				fail($(this), 0, '部门全称不能为空。');
+			}else{
+				fail($(this), 0, '部门全称太短，不能少于5个字符。');
+			}
+		}
+		else {
+        	fail($(this), 0, '部门全称为英文、数字、中文和下划线，但不能以数字开头。')
+    	}
+  	});
+	
+	<!-- deptAbbr内容验证 -->
+	$("#deptAbbr").change(function(){
+        if(regDeptAbbr.test($(this).val())){
+			success($(this),1);	
+		}else if ($(this).val().length < 2) {
+        	if($(this).val()==''){
+				fail($(this), 1, '部门简称不能为空。');
+			}else{
+				fail($(this), 1, '部门简称太短，不能少于2个字符。');
+			}
+		}
+		else {
+        	fail($(this), 1, '部门简称为英文、数字、中文和下划线，但不能以数字开头。')
+    	}
+  	});
+	
+<!-- function -->
+
+// 正则表达式，可以为英文、数字、中文和下划线,但不能以数字开头,unicode编码中的汉字范围:\u2E80-\u9FFF
+var regDeptName = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{4,19}$/;
+var regDeptAbbr = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{1,19}$/;
+
+// 数组，存储表单中输入框内容验证结果“true/false”。数组下标应与输入框下标一致，便于编程选择输入框
+var check = [false,false];
+
+	//校验成功函数
+function success(Obj, counter) {
+    Obj.parent().parent().removeClass('has-error').addClass('has-success');
+	
+	// 注意限定.tips/glyphicon-ok/glyphicon-remove所在标签.modal，否则会殃及其他标签的.tips/glyphicon-ok/glyphicon-remove
+	$('.modal .tips').eq(counter).hide();
+    $('.modal .glyphicon-ok').eq(counter).show();
+    $('.modal .glyphicon-remove').eq(counter).hide();
+    check[counter] = true;
+
+}
+
+// 校验失败函数
+function fail(Obj, counter, msg) {
+    Obj.parent().parent().removeClass('has-success').addClass('has-error');
+   
+   // 注意限定.tips/glyphicon-ok/glyphicon-remove所在标签.modal，否则会殃及其他标签的.tips/glyphicon-ok/glyphicon-remove
+	$('.modal .glyphicon-remove').eq(counter).show();
+    $('.modal .glyphicon-ok').eq(counter).hide();
+    $('.modal .tips').eq(counter).text(msg).show();
+    check[counter] = false;
+}
+
+
+<!--/ function -->	
 	
 
 });

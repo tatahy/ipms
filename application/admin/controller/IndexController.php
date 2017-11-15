@@ -443,7 +443,6 @@ class IndexController extends \think\Controller
     {
       $this->_loginUser();  
       
-       // 检查用户组名称是否已存在
       //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
       
       $oprt=$request->param('oprt');
@@ -527,19 +526,21 @@ class IndexController extends \think\Controller
       }else{
         $userGroupEn=0;
       }
-     
+      
+       // $oprtId=0进行添加，否则是更新
+      if($request->param('oprtId')){
+        $oprtId=$request->param('oprtId');
+      }else{
+        $oprtId=0;
+      }   
+      
       switch($oprt){
-        case "add":
+          case "add":
           //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
-          $userGroups =new RoletyModel;
-          $group = $userGroups->where('name',$userGroupName)->find();
-          // save操作之前的id
-          $bfId=$group['id'];
-          
-          // 用户组不存在
-          if(empty($group)){
-            // 添加/更新新用户组数据库对应数据表字段值,save方法的返回值是影响的记录数
-            $n=$userGroups->save([
+          if($oprtId){
+            // save为更新操作，save操作后返回的是受影响的行数
+            $userGroup = RoletyModel::get($oprtId);
+            $n=$userGroup->save([
               'name'  => $userGroupName,
               'addnew' => $addNew,
               'submit' => $submit,
@@ -554,35 +555,47 @@ class IndexController extends \think\Controller
               'bgo' => $bgoEn,
               'enable' => $userGroupEn,
             ]);
-            // save操作以后的id 
-            $afId=$userGroups->id;
-            
-            // save是进行更新
-            if($afId==$bfId){
-              if($n){
-                $result='success';
-                $msg='用户组：【'.$userGroups->name.'】更新成功。';
-              }else{
-                 $result='error';
-                 $msg='用户组：【'.$userGroups->name.'】没有更新。';
-              }  
+
+            if($n){
+              $result='success';
+              $msg='用户组：【'.$userGroup->name.'】更新成功。继续更新？';
             }else{
-              // save是进行新增
+              $result='error';
+              $msg='用户组：【'.$userGroupName.'】没有更新。继续更新？';
+            }   
+          }else{
+            // save为添加操作
+            $userGroups =new RoletyModel;    
+            $userGroup = $userGroups->where('name',$userGroupName)->find();
+            if(!empty($userGroup)){
+              $result='error';
+              $msg='用户组：【'.$userGroupName.'】已存在。重新添加？';
+            }else{
+              $n=$userGroups->save([
+                'name'  => $userGroupName,
+                'addnew' => $addNew,
+                'submit' => $submit,
+                'modify' => $modify,
+                'upfile' => $upFile,
+                'downfile' => $downFile,
+                'audit' => $audit,
+                'refuse' => $refuse,
+                'reject' => $reject,
+                'approve' => $approve,
+                'inspect' => $inspect,
+                'bgo' => $bgoEn,
+                'enable' => $userGroupEn,
+              ]);
               if($n){
                 $result='success';
-                $msg='新用户组：【'.$userGroups->name.'】添加成功。';
+                $msg='新用户组：【'.$userGroups->name.'】添加成功。继续添加？';
               }else{
                 $result='error';
-                $msg='新用户组：【'.$userGroups->name.'】添加失败。';
-              }   
+                $msg='新用户组：【'.$userGroupName.'】添加失败。重新添加？';
+              } 
+                
             }
-          }else{
-            // 用户组已存在
-            $result='error';
-            $msg='用户组：【'.$userGroupName.'】已存在，请重新添加。';
-            
-          }  
-                    
+          }    
           // 返回前端JSON数据
           return ['result'=>$result,'msg'=>$msg];
             
@@ -760,12 +773,75 @@ class IndexController extends \think\Controller
       $username=$request->param('username');
       $pwd=md5($request->param('pwd'));
       $id=$request->param('id');
+      
+      // 表单提交数据
+      // 部门全称
+      if(!empty($request->param('deptName'))){
+        $deptName=$request->param('deptName');
+      }else{
+        $deptName='';
+      }
+      // 部门简称
+      if(!empty($request->param('deptAbbr'))){
+        $deptAbbr=$request->param('deptAbbr');
+      }else{
+        $deptAbbr='';
+      }
+      //部门启用
+      if($request->param('deptEn')=="true"){
+        $deptEn=1;
+      }else{
+        $deptEn=0;
+      }
+      // $oprtId=0进行添加，否则是更新
+      if($request->param('oprtId')){
+        $oprtId=$request->param('oprtId');
+      }else{
+        $oprtId=0;
+      }   
      
       switch($oprt){
         case "add":
-          $user=new DeptModel;
-          $u=$user->where('username',$username)->select();
-         
+          //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
+          if($oprtId){
+            // save为更新操作，save操作后返回的是受影响的行数
+            $dept = DeptModel::get($oprtId);
+            $n=$dept->save([
+              'name'  => $deptName,
+              'abbr' => $deptAbbr,
+              'enable' => $deptEn,
+            ]);
+
+            if($n){
+              $result='success';
+              $msg='部门：【'.$dept->name.'】更新成功。继续更新？';
+            }else{
+              $result='error';
+              $msg='部门：【'.$deptName.'】没有更新。继续更新？';
+            }   
+          }else{
+            // save为添加操作
+            $depts =new DeptModel;    
+            $dept = $depts->where('name',$deptName)->find();
+            if(!empty($dept)){
+              $result='error';
+              $msg='部门：【'.$deptName.'】已存在，重新添加？';
+            }else{
+              $n=$depts->save([
+                'name'  => $deptName,
+                'abbr' => $deptAbbr,
+                'enable' => $deptEn,
+              ]);
+              if($n){
+                $result='success';
+                $msg='新部门：【'.$depts->name.'】添加成功。继续添加？';
+              }else{
+                $result='error';
+                $msg='新部门：【'.$deptName.'】添加失败。重新添加？';
+              } 
+                
+            }
+          }
           // 返回前端JSON数据
           return ['result'=>$result,'msg'=>$msg];
             
@@ -792,6 +868,13 @@ class IndexController extends \think\Controller
           DeptModel::update(['enable'=> 1], ['id' => $id]);
           
           $result='success';
+          // 返回前端JSON数据
+          return ['result'=>$result,'deptId'=>$id];
+          
+        break;
+        
+        case"edit":
+          $result=DeptModel::get($id);
           // 返回前端JSON数据
           return ['result'=>$result,'deptId'=>$id];
           

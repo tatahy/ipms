@@ -15,8 +15,9 @@
 	
 
 	<div class="tab-content">
-		<div id="pagetotaldiv" class="tab-pane fade table-responsive">
+		<div id="pagetotaldiv" class="tab-pane fade">
 			<h4>专利总数<span class="badge">{$numtotal}</span></h4>
+			<div class="table-responsive">
 			<table class="table table-bordered table-striped ">
 				<thead>
 					<tr>
@@ -53,11 +54,13 @@
 					{/volist}
 				</tbody>
 			</table>
+			</div>
 			
 		</div>
 		
-		<div id="pagenewdiv" class="tab-pane fade table-responsive">
+		<div id="pagenewdiv" class="tab-pane fade">
 			<h4>新增专利数<span class="badge">{$numnew}</span></h4>
+			<div class="table-responsive">
 			<table class="table table-bordered table-striped ">
 				<thead>
 					<tr>
@@ -97,11 +100,13 @@
 					{/volist}
 				</tbody>
 			</table>
+			</div>
 			
 		</div>
 		
-		<div id="pageappdiv" class="tab-pane fade table-responsive">
+		<div id="pageappdiv" class="tab-pane fade">
 			<h4>申报专利数<span class="badge">{$numapp}</span></h4>
+			<div class="table-responsive">
 			<table class="table table-bordered table-striped">
 				<thead>
 					<tr>
@@ -140,11 +145,12 @@
 					{/volist}
 				</tbody>
 			</table>
-			
+			</div>
 		</div>
 		
-		<div id="pageautdiv" class="tab-pane fade table-responsive">
+		<div id="pageautdiv" class="tab-pane fade">
 			<h4><span class="bg-success">&nbsp;授权（有效期）专利数<span class="badge">{$numaut}</span>&nbsp;</span></h4>
+			<div class="table-responsive">
 			<table class="table table-bordered table-striped">
 				<thead>
 					<tr>
@@ -186,11 +192,12 @@
 					{/volist}
 				</tbody>
 			</table>
-			
+			</div>
 		</div>
 		
-		<div id="pagerendiv" class="tab-pane fade table-responsive">
+		<div id="pagerendiv" class="tab-pane fade">
 			<h4><span class="bg-success">&nbsp;续费授权（有效期）专利数<span class="badge">{$numren}</span>&nbsp;</span></h4>
+			<div class="table-responsive">
 			<table class="table table-bordered table-striped">
 				<thead>
 					<tr>
@@ -227,11 +234,13 @@
 					{/volist}
 				</tbody>
 			</table>
+			</div>
 
 		</div>
 		
-		<div id="pageabadiv" class="tab-pane fade table-responsive">
+		<div id="pageabadiv" class="tab-pane fade">
 			<h4><span class="bg-danger">&nbsp;已放弃专利数<span class="badge">{$numaba}</span>&nbsp;</span></h4>
+			<div class="table-responsive">
 			<table class="table table-bordered table-striped">
 				<thead>
 					<tr>
@@ -270,11 +279,13 @@
 					{/volist}
 				</tbody>
 			</table>
+			</div>
 			
 		</div>
 		
-		<div id="pagerejdiv" class="tab-pane fade table-responsive">
+		<div id="pagerejdiv" class="tab-pane fade">
 			<h4><span class="bg-danger">&nbsp;被驳回专利数<span class="badge">{$numrej}</span>&nbsp;</span></h4>
+			<div class="table-responsive">
 			<table class="table table-bordered table-striped">
 				<thead>
 					<tr>
@@ -315,6 +326,7 @@
 					{/volist}
 				</tbody>
 			</table>
+			</div>
 			
 		</div>
 	</div>
