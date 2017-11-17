@@ -6,10 +6,16 @@
 	<h4> 
 		<ul class="list-inline">
 			<li><strong>【{$username}】的系统角色：</strong></li>
-			<li><select class="form-control" id="roleselect">
-						<option>1</option>
-						<option>2</option>
-					</select></li>
+			<li>
+				<select class="form-control" id="roleselect">
+\
+					{foreach name="roles" item="vo"}
+						<option>{$vo}</option>
+					
+					{/foreach}
+					
+				</select>
+			</li>
 			<li><button class="btn btn-primary">更新个人信息(开发中)</button></li>
 		</ul>
 	</h4>
@@ -431,10 +437,10 @@
 
 <script>
 $(document).ready(function(){
-	<!-- 隐藏所有.nav-tabs里的li标签 -->
+	<!-- //隐藏所有.nav-tabs里的li标签 -->
 	$(".nav-tabs li").hide();
 	
-	<!-- 显示选中rolename对应的标签 -->
+	//显示选中rolename对应的标签
 	$("#roleselect").change(function(){
 		var role = $(this).val();
 		$(".nav-tabs li").hide();
@@ -448,26 +454,26 @@ $(document).ready(function(){
 	});
 	
 	if({$role}){
-		<!-- 动态填充#roleselect的select标签 -->
+		// 动态填充#roleselect的select标签
 		$("#roleselect").empty();
 		{foreach name="roles" item="vo"}
 			$("#roleselect").append($("<option value='{$vo}'>"+ $(".{$vo}").text() + "</option>"));
 		{/foreach}
 	
-		<!-- 显示{$role}对应的option -->
+		// 显示{$role}对应的option
 		$("#roleselect option[value={$role}]").attr("selected","selected");
 		
 		$(".{$role}").show();
 		$(".{$role}").addClass("active");
 		$("#{$role}").addClass("active").addClass("in");
 	}else{
-		<!-- 动态填充#roleselect的select标签 -->
+		// 动态填充#roleselect的select标签
 		$("#roleselect").empty();
 		{foreach name="roles" item="vo"}
 			$("#roleselect").append($("<option value='{$vo}'>"+ $(".{$vo}").text() + "</option>"));
 		{/foreach}
 	
-		<!-- 默认显示role1st的标签及其内容 -->
+		// 默认显示role1st的标签及其内容
 		$(".{$role1st}").show();
 		$(".{$role1st}").addClass("active");
 		$("#{$role1st}").addClass("active").addClass("in");

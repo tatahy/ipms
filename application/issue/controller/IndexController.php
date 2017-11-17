@@ -439,7 +439,7 @@ class IndexController extends \think\Controller
             
             //为approver指定executer查出所有撰写人名单                    
             if($role=='approver'){
-                $users=UserModel::where('roleid',"rolety1")
+                $users=UserModel::where('rolety_id',"rolety1")
                                 ->order('dept asc')
                                 ->select();
             }else{

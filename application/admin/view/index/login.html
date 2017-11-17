@@ -4,34 +4,71 @@
 	<title>IPMS admin</title>
 	<meta name="Author" content="HY" />
 	<meta charset="UTF-8" />
+	<!-- // 开启bootstrap响应式布局 -->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
    
     {// TP5中的模板注释格式，单行。<!-- TP5的资源文件加载写法 -->内容不会出现在发送给浏览器的HTML文件中 }  
   {js href="/admin/res/js/jquery1.12.4.min.js" }
   {js href="/admin/res/js/bootstrap3.3.7.min.js" }
   {css href="/admin/res/css/bootstrap3.3.7.min.css" }
   {css href="/admin/res/css/bs-callout.css" }
+  <!-- // 本页面输入框验证css文件 -->
   {css href="/admin/res/css/check.css" }
 
 </head>
 
-<body style="background-color:#eeeeee;">
+{/*<!-- 实现nav固定在页面顶端效果的补充代码块,
+同时还需设置nav的data-offset-top="-3"防止鼠标单击页面时出现跳动-->
+*/}
 
-<nav class="navbar navbar-inverse" style="border-radius:0;">
+ <style>
+  .affix {
+      top: 0;
+      width: 100%;
+  }
+
+  .affix + .container-fluid {
+      padding-top: 70px;
+  }
+  </style>
+
+<!-- <body style="background-color:#eeeeee;"> -->
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top" data-spy="affix" data-offset-top="-3" >
   <div class="container-fluid">
     <div class="navbar-header" >
-      <a class="navbar-brand">IPMS 后台管理系统</a>
+		<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>                        
+		</button>
+		
+      <a class="navbar-brand"><strong>IPMS</strong>系统管理</a>
 	  <!-- <span class="bg-primary" style="corlor:red;">IPMS 后台管理系统</span> -->
     </div>
-    
+	
+	<div class="collapse navbar-collapse" id="myNavbar">
+		<ul class="nav navbar-nav navbar-right">
+			<li id="liQuit"><a href="{$home}"><span class="glyphicon glyphicon-home"></span>&nbsp;首页</a></li>
+        
+      	</ul>
+    </div>
   </div>
 </nav>
 
-<div class="container">
-
-	<div id="loginbox" class=" col-md-6 col-md-offset-3">
-            <form action="{$home}/admin/index/check" method="post" ss="">
+<div class="container-fluid">
+	
+	<div class="col-md-4 col-md-offset-4">
+	<div class="panel panel-primary"> 
+		<div class="panel-heading text-center">
+			<h4><strong>系统管理员登录</strong></h4>
+		</div>
+		<div class="panel-body">
+			
+			<form action="{$home}/admin/index/check" method="post" >
                 <div class="form-group has-feedback">
-                    <label for="username">管理员</label>
+                    <label for="username">账号</label>
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
                         <input type="text" id="username" name="username" class="form-control" placeholder="请输入用户名" maxlength="20">
@@ -55,8 +92,8 @@
                 </div>
 
 
-                <div class="row">
-                    <div class="col-sm-7">
+                <!-- <div class="row"> -->
+                    
                         <div class="form-group has-feedback">
                             <label for="inIdcode">验证码</label>
                             <div class="input-group">
@@ -67,11 +104,11 @@
                             <span style="display: none;" class="glyphicon glyphicon-remove form-control-feedback"></span>
                             <span style="display: none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
                         </div>
-                    </div>
-                    <div class="col-sm-5" style="padding-top: 30px;">
-                        <div id="idcode" style="background: transparent;"></div>
-                    </div>
-                </div>
+						
+						<div id="idcode" style="background: transparent;"></div>
+                    <!-- </div> -->
+                    
+                <!-- </div> -->
 				
 				<br/>
 
@@ -81,9 +118,12 @@
                 </div>
 
             </form>
-  
+			
+		</div>
 	</div>
-
+	</div>
+	
+	
 </div>
 
 
@@ -268,6 +308,8 @@ var regPasswordSpecial = /[~!@#%&=;':",./<>_\}\]\-\$\(\)\*\+\.\[\?\\\^\{\|]/;
 var regPasswordAlpha = /[a-zA-Z]/;
 var regPasswordNum = /[0-9]/;
 var password;
+
+// 数组的作用是在表单提交时对各个输入框的校验结果进行检查，数组值对应各个输入框的校验结果，全部为true才触发提交表单事件。
 var check = [false, false, false];
 
 //校验成功函数
@@ -292,7 +334,7 @@ function fail(Obj, counter, msg) {
 // 用户名匹配
 <!-- $('.container').find('input').eq(0).change(function() { -->
 $("#username").change(function() { 
-    //test(),正则的验证函数，验证value是否符合regUsername要求。
+    //test(),JavaScript的正则验证函数，验证value是否符合regUsername要求。
     //jquery的test()是获取或设置标签内文本既等于innerText。
     //HY,待确认
     if (regUsername.test($(this).val())) {
@@ -357,7 +399,7 @@ $('#submit').click(function(event) {
         event.preventDefault();
         for (key in check) {
             if (!check[key]) {
-                $(".container").find("input").eq(key).parent().parent().removeClass("has-success").addClass("has-error");
+                $("form").find("input").eq(key).parent().parent().removeClass("has-success").addClass("has-error");
             }
         }
     }
@@ -366,7 +408,7 @@ $('#submit').click(function(event) {
 $('#reset').click(function() {
 	// 应用jQuery的slice()方法将匹配元素的子集构造一个新的jQuery对象
 	
-    $('input').slice(0, 6).parent().parent().removeClass('has-error has-success');
+    $('input').slice(0, 3).parent().parent().removeClass('has-error has-success');
     $('.tips').hide();
     $('.glyphicon-ok').hide();
     $('.glyphicon-remove').hide();

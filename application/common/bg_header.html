@@ -8,6 +8,7 @@
     {// TP5中的模板注释格式，单行。<!-- TP5的资源文件加载写法 -->内容不会出现在发送给浏览器的HTML文件中 }  
   {js href="/admin/res/js/jquery1.12.4.min.js" }
   {js href="/admin/res/js/bootstrap3.3.7.min.js" }
+  {js href="/admin/res/js/alert.min.js" }
   {css href="/admin/res/css/bootstrap3.3.7.min.css" }
   {css href="/admin/res/css/style.css" }
 
@@ -46,14 +47,14 @@ $(document).ready(function(){
 				<span class="icon-bar"></span>                        
 		</button>
 		
-      <a class="navbar-brand">IPMS 后台系统管理</a>
-	  <!-- <span class="bg-primary" style="corlor:red;">IPMS 后台管理系统</span> -->
+      <a class="navbar-brand"><strong>IPMS</strong>系统管理</a>
+	
     </div>
 	
 	<div class="collapse navbar-collapse" id="myNavbar">
 	<ul class="nav navbar-nav navbar-right">
 		
-        <li><a><span class="glyphicon glyphicon-user"></span>&nbsp;欢迎：【{$username}】</a></li>	
+        <li><a>欢迎：<span class="glyphicon glyphicon-user"></span>【{$username}】</a></li>	
         <li id="liQuit"><a href="{$home}/admin/index/login"><span class="glyphicon glyphicon-log-out"></span>&nbsp;退出</a></li>
       </ul>
     </div>
@@ -62,11 +63,11 @@ $(document).ready(function(){
 
 <!-- 调试，输出结果显示代码-->
 
-<div class="container-fluid" data-offset-top="200">
-<h4>监控变量：</h4>
-<p>{$destr}</p>
-<p>分隔线--------------------------------------------------</p>
-</div>
+<!-- <div class="container-fluid" data-offset-top="200"> -->
+<!-- <h4>监控变量：</h4> -->
+<!-- <p>{$destr}</p> -->
+<!-- <p>分隔线--------------------------------------------------</p> -->
+<!-- </div> -->
 
 <!-- /调试，输出结果显示代码-->
 

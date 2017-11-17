@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>window.location.hash在Ajax页面中的作用</title>
+	<meta name="Author" content="HY" />
+	<meta charset="UTF-8" />
+   
+      
+  <script type="text/javascript" src="./res/js/jquery1.12.4.min.js"></script>
+  <script type="text/javascript" src="./res/js/bootstrap3.3.7.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="./res/css/bootstrap3.3.7.min.css" />
+  <link rel="stylesheet" type="text/css" href="./res/css/bs-callout.css" />
+  <link rel="stylesheet" type="text/css" href="./res/css/check.css" />
+
+
+
+
+</head>
+<body>
+<!-- pagewrap  -->
+
+<nav class="navbar navbar-inverse" style="border-radius:0;">
+  <div class="container-fluid">
+    <div class="navbar-header" >
+      <a class="navbar-brand">IPMS 后台管理系统</a>
+	  <!-- <span class="bg-primary" style="corlor:red;">IPMS 后台管理系统</span> -->
+    </div>
+    
+  </div>
+</nav>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var initPage1 = function () { $("#content").text("Page1"); };
+            var initPage2 = function () { $("#content").text("Page2"); };
+            var initPage3 = function () { $("#content").text("Page3"); };
+
+            //1.页面初始化
+            var hash = window.location.hash.toLocaleLowerCase();
+            switch (hash) {
+                case "#page1":
+                    initPage1();
+                    break;
+                case "#page2":
+                    initPage2();
+                    break;
+                case "#page3":
+                    initPage3();
+                    break;
+                default:
+                    initPage1();
+                    break;
+            }
+
+            //2.链接点击事件
+            <!-- $(document).delegate("#link1", "click", initPage1); -->
+            <!-- $(document).delegate("#link2", "click", initPage2); -->
+            <!-- $(document).delegate("#link3", "click", initPage3); -->
+			
+			$("#link1").click(function(){
+			initPage1();
+			});
+			
+			$("#link2").click(function(){
+			initPage2();
+			});
+			
+			$("#link3").click(function(){
+			initPage3();
+			});
+        });
+    </script>
+    <a id="link1" href="#page1">page1</a> <a id="link2" href="#page2">page2</a> <a id="link3" href="#page3">page3</a>
+
+    <div id="content"></div>
+</body>
+
+</html>
