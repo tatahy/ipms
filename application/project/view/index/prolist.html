@@ -7,17 +7,19 @@
 	
 	<ul class="nav nav-tabs">
 		<li><a class="aTab" href="#total">总体情况&nbsp;<span class="glyphicon glyphicon-search"></span></a></li>
-		<li><a class="aTab" href="#newAdd">新增&nbsp;<span class="label label-warning">{$numnew}</span></a></li>
-		<li><a class="aTab" href="#apply">申报&nbsp;<span class="label label-warning">{$numapp}</span></a></li>
-		<li><a class="aTab" href="#authorize">授权（有效）&nbsp;<span class="label label-warning">{$numaut}</a></span></li>
-		<li><a class="aTab" href="#render">续费授权（有效）&nbsp;<span class="label label-warning">{$numren}</a></span></li>
-		<li><a class="aTab" href="#abandon">放弃</a></li>
+		<li><a class="aTab" href="#plan">拟申报&nbsp;<span class="label label-warning">...</span></a></li>
+		<li><a class="aTab" href="#apply">申报&nbsp;<span class="label label-warning">...</span></a></li>
+		<li><a class="aTab" href="#approve">立项&nbsp;<span class="label label-warning">...</a></span></li>
+		<li><a class="aTab" href="#process">在研&nbsp;<span class="label label-warning">...</a></span></li>
+		<li><a class="aTab" href="#inspect">验收</a></li>
+		<li><a class="aTab" href="#done">结题</a></li>
+		<li><a class="aTab" href="#terminate">终止</a></li>
 		<li><a class="aTab" href="#reject">驳回</a></li>
 	</ul>
 		
 
 	<div class="tab-content">
-		<div id="patlist"></div>
+		<div id="prolist"></div>
 	</div>
 	
 </div>
@@ -28,11 +30,11 @@
 $(document).ready(function(){
 
 	<!-- 选中id为"nav_pat"的标签（header.html文件中的li标签）,添加.active -->
-	$("#nav_pat").addClass("active");
+	$("#nav_pro").addClass("active");
 
 	<!-- // 锚点值sId对应于pat的不同状态，jquery load()方法，加载total.html页面内容到本页面中<div id="patlist"></div>位置  -->
 	var sId = window.location.hash;
-    $("#patlist").load('total',{"patStatus":sId});
+    $("#prolist").load('total',{"proStatus":sId});
 	
 	<!-- //点击.aTab中的各个按钮后，显示相应状态的pat内容-->
 	$(".aTab").click(function(){
@@ -40,7 +42,7 @@ $(document).ready(function(){
 		window.location.hash = sId;  //设置锚点
 		$(this).tab('show');
 		
-		$("#patlist").load('total',{"patStatus":sId});
+		$("#prolist").load('total',{"proStatus":sId});
 		
     });	
 	
@@ -50,12 +52,6 @@ $(document).ready(function(){
 			$(this).parent().addClass('active');
 		}	
 	});
-		
-	
-<!-- function  -->
-
-
-<!-- /function  -->
 	
 });
 </script>

@@ -6,15 +6,15 @@
 		<div class="col-sm-12">
 			<div class="panel-group">
 				<div class="panel panel-default">
-					<div class="panel-heading"><span class="glyphicon glyphicon-inbox">&nbsp;</span><strong>项目概况</strong>&nbsp;<span class="label label-info">(开发中)</span></div>
+					<div class="panel-heading"><span class="glyphicon glyphicon-inbox"></span>&nbsp;<strong>项目概况</strong>&nbsp;<span class="label label-info">(开发中)</span></div>
 					
 					<div class="panel-body">
-						<a href="#"><span class="label label-default">新增项目数：<span class="badge">6</span></span></a>
-						<a href="#"><span class="label label-info" >申报项目数：<span class="badge">5</span></span></a>
-						<a href="#"><span class="label label-warning" >立项项目数：<span class="badge">8</span></span></a>
-						<a href="#"><span class="label label-primary" >在研项目数：<span class="badge">10</span></span></a>
-						<!-- <a href="#"><span class="label label-danger">验收项目数：<span class="badge">6</span></span></a> -->
-							<!-- <a href="#"><span class="label label-success">结题项目数：<span class="badge">12</span></span></a> -->
+						<a href="{$home}/project/index/prolist#plan"><span class="label label-default">拟申报项目数：<span class="badge">6</span></span></a>
+						<a href="{$home}/project/index/prolist#apply"><span class="label label-info" >申报项目数：<span class="badge">5</span></span></a>
+						<a href="{$home}/project/index/prolist#approve"><span class="label label-warning" >立项项目数：<span class="badge">8</span></span></a>
+						<a href="{$home}/project/index/prolist#process"><span class="label label-primary" >在研项目数：<span class="badge">10</span></span></a>
+						<!-- <a href="{$home}/project/index/prolist#terminate"><span class="label label-danger">终止项目数：<span class="badge">6</span></span></a> -->
+						
 					</div>
 				</div>
 			</div>
@@ -25,9 +25,9 @@
 		<div class="col-sm-6">
 			<div class="panel-group">
 				<div class="panel panel-default">
-					<div class="panel-heading"><span class="glyphicon glyphicon-wrench">&nbsp;</span><strong>专利概况</strong></div>
+					<div class="panel-heading"><span class="glyphicon glyphicon-wrench"></span>&nbsp;<strong>专利概况</strong></div>
 						<div class="panel-body">
-							<a href="{$home}/patent/index/patlist#newAdd"><span class="label label-default" >新增专利数：<span class="badge">{$numpatadd}</span></span></a>
+							<a href="{$home}/patent/index/patlist#newAdd"><span class="label label-default" >拟申报专利数：<span class="badge">{$numpatadd}</span></span></a>
 							<a href="{$home}/patent/index/patlist#apply"><span class="label label-info" >申报专利数：<span class="badge">{$numpatapp}</span></span></a>
 							<a href="{$home}/patent/index/patlist#authorize"><span class="label label-success" >有效专利数：<span class="badge">{$numpataut+$numpatren}</span></span></a>
 						</div>
@@ -38,11 +38,11 @@
 		<div class="col-sm-6">
 			<div class="panel-group">
 				<div class="panel panel-default">
-					<div class="panel-heading"><span class="glyphicon glyphicon-list">&nbsp;</span><strong>论文概况</strong>&nbsp;<span class="label label-info">(开发中)</span></div>
+					<div class="panel-heading"><span class="glyphicon glyphicon-list"></span>&nbsp;<strong>论文概况</strong>&nbsp;<span class="label label-info">(开发中)</span></div>
 						<div class="panel-body">
-							<a href="#"><span class="label label-default" >新增论文数：<span class="badge">3</span></span></a>
-							<a href="#"><span class="label label-info" >投稿论文数：<span class="badge">6</span></span></a>
-							<a href="#"><span class="label label-success" >发表论文数：<span class="badge">3</span></span></a>
+							<a href="{$home}/thesis/index/thelist#plan"><span class="label label-default" >拟发表论文数：<span class="badge">3</span></span></a>
+							<a href="{$home}/thesis/index/thelist#apply"><span class="label label-info" >投稿论文数：<span class="badge">6</span></span></a>
+							<a href="{$home}/thesis/index/thelist#publish"><span class="label label-success" >发表论文数：<span class="badge">3</span></span></a>
 						</div>
 				</div>
 			</div>

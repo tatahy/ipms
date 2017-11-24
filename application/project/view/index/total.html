@@ -1,8 +1,8 @@
 <div id="divTotal" class="tab-pane">
 	
-	<h4>专利总数<span class="badge">{$numTotal}</span></h4>
+	<h4>专利总数<span class="badge">...</span></h4>
 
-	<!-- // 搜索区域，仅“专利总数”页面显示 -->
+	<!-- // 搜索区域，仅“项目总数”页面显示 -->
 	<div id="divCollapse" class="collapse">
 			<form method="get" action="{$home}/admin/index/sys_user#div1" id="userSearch" class="form-inline">
 				<div class="form-group">
@@ -241,7 +241,7 @@ $(document).ready(function(){
 		// 得到页面锚点值
 		var fragment = window.location.hash;	
 		
-		<!-- //根据每页显示记录行数，pat状态，排序字段，排序方式加载页面 -->
+		<!-- //根据每页显示记录行数，排序字段，排序方式加载页面 -->
 		loadTotal($("#totalTableRows").val(),patStatus,sortName,sort);
 		
 	});
@@ -250,7 +250,7 @@ $(document).ready(function(){
 	$("#totalTableRows").val('{$totalTableRows}'); 
 	
 	$("#totalTableRows").change(function(){
-		<!-- //根据每页显示记录行数及本页面显示的pat状态“patStatus”加载页面 -->
+		<!-- //根据每页显示记录行数加载页面 -->
 		loadTotal($(this).val(),patStatus);
 	
 	});	
