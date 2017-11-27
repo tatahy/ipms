@@ -1,12 +1,12 @@
 {include file="../application/common/header.html" title="专利信息" }
 
 <!-- pagewrap  -->
-<div class="container-fluid" style="padding-top: 50px;">
+<div class="container-fluid" style="padding-top: 55px;">
 	<!-- <h3><span class="label label-warning"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利情况</span></h3> -->
 	<!-- <ul class="nav nav-tabs"> -->
 	
-	<ul class="nav nav-tabs">
-		<li><a class="aTab" href="#total">总体情况&nbsp;<span class="glyphicon glyphicon-search"></span></a></li>
+	<ul class="nav nav-pills nav-justified" style="border-bottom:solid 0.1px #ddd;">
+		<li><a class="aTab" href="#total">专利概况&nbsp;|&nbsp;<span class="glyphicon glyphicon-search"></span></a></li>
 		<li><a class="aTab" href="#newAdd">新增&nbsp;<span class="label label-warning">{$numnew}</span></a></li>
 		<li><a class="aTab" href="#apply">申报&nbsp;<span class="label label-warning">{$numapp}</span></a></li>
 		<li><a class="aTab" href="#authorize">授权（有效）&nbsp;<span class="label label-warning">{$numaut}</a></span></li>
@@ -14,7 +14,6 @@
 		<li><a class="aTab" href="#abandon">放弃</a></li>
 		<li><a class="aTab" href="#reject">驳回</a></li>
 	</ul>
-		
 
 	<div class="tab-content">
 		<div id="patlist"></div>
@@ -29,10 +28,9 @@ $(document).ready(function(){
 
 	<!-- 选中id为"nav_pat"的标签（header.html文件中的li标签）,添加.active -->
 	$("#nav_pat").addClass("active");
-
-	<!-- // 锚点值sId对应于pat的不同状态，jquery load()方法，加载total.html页面内容到本页面中<div id="patlist"></div>位置  -->
-	var sId = window.location.hash;
-    $("#patlist").load('total',{"patStatus":sId});
+	
+	<!-- // 锚点值对应于pat的不同状态，jquery load()方法，加载total.html页面内容到本页面中<div id="patlist"></div>位置  -->
+    $("#patlist").load('total',{"patStatus":window.location.hash});
 	
 	<!-- //点击.aTab中的各个按钮后，显示相应状态的pat内容-->
 	$(".aTab").click(function(){
@@ -44,13 +42,15 @@ $(document).ready(function(){
 		
     });	
 	
-	<!-- //	为sId对应的li添加.active-->
 	$('.aTab').each(function(){
-		if($(this).attr('href')==sId){
+		// 显示边框
+		$(this).css("border","solid 1px #ddd");
+		//	为sId对应的li添加.active
+		if($(this).attr('href')==window.location.hash){
 			$(this).parent().addClass('active');
 		}	
 	});
-		
+	
 	
 <!-- function  -->
 

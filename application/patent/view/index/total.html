@@ -131,32 +131,32 @@ $(document).ready(function(){
 	// 根据本页面的pat状态值patStatus，决定<h4>的内容
 	switch(patStatus){
 		case "#newAdd":
-			$("h4").html('<span class="label label-default" style="padding:8px;">新增专利</span>');
+			$("h4").html('<span class="label label-default" style="padding:6px;">新增专利</span>');
 		break;
 		
 		case "#apply": 
-			$("h4").html('<span class="label label-primary" style="padding:8px;">申报专利</span>');
+			$("h4").html('<span class="label label-primary" style="padding:6px;">申报专利</span>');
 		break;
 		
 		case "#authorize": 
-			$("h4").html('<span class="label label-success" style="padding:8px;">授权（有效期）专利</span>');
+			$("h4").html('<span class="label label-success" style="padding:6px;">授权（有效期）专利</span>');
 		break;
 		
 		case "#render": 
-			$("h4").html('<span class="label label-success" style="padding:8px;">续费授权（有效期）专利</span>');
+			$("h4").html('<span class="label label-success" style="padding:6px;">续费授权（有效期）专利</span>');
 		break;
 		
 		case "#abandon": 
-			$("h4").html('<span class="label label-info" style="padding:8px;">已放弃专利数&nbsp;<span class="badge">{$numTotal}</span></span>');
+			$("h4").html('<span class="label label-info" style="padding:6px;">已放弃专利数&nbsp;<span class="badge">{$numTotal}</span></span>');
 		break;
 		
 		case "#reject": 
-			$("h4").html('<span class="label label-info" style="padding:8px;">被驳回专利数&nbsp;<span class="badge">{$numTotal}</span></span>');
+			$("h4").html('<span class="label label-info" style="padding:6px;">被驳回专利数&nbsp;<span class="badge">{$numTotal}</span></span>');
 		break;
 		
 		<!-- // 带入“显示搜索”和“重置”按钮 -->
 　　	default: 
-			$("h4").html('<span class="label label-default" style="padding:8px;">专利总数&nbsp;<span class="badge">{$numTotal}</span></span>&nbsp;<button id="btnSearchInfo" type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divCollapse">显示搜索&nbsp;<span class="caret"></span></button>&nbsp;<button id="btnSearchReset" type="button" class="btn btn-primary btn-sm">重置&nbsp;<span class="glyphicon glyphicon-refresh"></span></button>');
+			$("h4").html('<span class="label label-default" style="padding:6px;">专利总数&nbsp;<span class="badge">{$numTotal}</span></span>&nbsp;<button id="btnSearchInfo" type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divCollapse">显示搜索&nbsp;<span class="caret"></span></button>&nbsp;<button id="btnSearchReset" type="button" class="btn btn-primary btn-sm">重置&nbsp;<span class="glyphicon glyphicon-refresh"></span></button>');
 		break;
 	
 	}
