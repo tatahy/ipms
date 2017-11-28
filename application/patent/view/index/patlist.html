@@ -7,7 +7,7 @@
 	
 	<ul class="nav nav-pills nav-justified" style="border-bottom:solid 0.1px #ddd;">
 		<li><a class="aTab" href="#total">专利概况&nbsp;|&nbsp;<span class="glyphicon glyphicon-search"></span></a></li>
-		<li><a class="aTab" href="#newAdd">新增&nbsp;<span class="label label-warning">{$numnew}</span></a></li>
+		<li><a class="aTab" href="#newAdd">拟申报&nbsp;<span class="label label-warning">{$numnew}</span></a></li>
 		<li><a class="aTab" href="#apply">申报&nbsp;<span class="label label-warning">{$numapp}</span></a></li>
 		<li><a class="aTab" href="#authorize">授权（有效）&nbsp;<span class="label label-warning">{$numaut}</a></span></li>
 		<li><a class="aTab" href="#render">续费授权（有效）&nbsp;<span class="label label-warning">{$numren}</a></span></li>
@@ -45,7 +45,7 @@ $(document).ready(function(){
 	$('.aTab').each(function(){
 		// 显示边框
 		$(this).css("border","solid 1px #ddd");
-		//	为sId对应的li添加.active
+		//	为锚点值对应的li添加.active
 		if($(this).attr('href')==window.location.hash){
 			$(this).parent().addClass('active');
 		}	

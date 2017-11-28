@@ -113,8 +113,7 @@
 				<select class="form-control" id="totalTableRows">
 					<option value="5">5</option>
 					<option value="10">10</option>
-					<option value="15">15</option>
-					<option value="30">30</option>
+					<option value="20">20</option>
 					<option value="50">50</option>
 				</select>
 						
@@ -131,7 +130,7 @@ $(document).ready(function(){
 	// 根据本页面的pat状态值patStatus，决定<h4>的内容
 	switch(patStatus){
 		case "#newAdd":
-			$("h4").html('<span class="label label-default" style="padding:6px;">新增专利</span>');
+			$("h4").html('<span class="label label-default" style="padding:6px;">拟申报专利</span>');
 		break;
 		
 		case "#apply": 

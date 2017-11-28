@@ -1309,6 +1309,5 @@ class IndexController extends \think\Controller
             return json($type);
         }
     }
-    
-        
+
 }
