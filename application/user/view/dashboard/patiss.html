@@ -8,42 +8,32 @@
 			<thead>
 				<tr>
 					<th>序号</th>
-					<th><a data-toggle="tooltip" href="#"  sortName="_PATNAME" sort="{$sort}">名称</a></th>
-					<th><a data-toggle="tooltip" href="#"  sortName="_PATTYPE" sort="{$sort}">类型</a></th>
-					<th><a data-toggle="tooltip" href="#"  sortName="_PATSTATUS" sort="{$sort}">状态</a></th>
+					<th><a data-toggle="tooltip" href="#"  sortName="_TOPIC" sort="{$sort}">名称</a></th>
+					<th><a data-toggle="tooltip" href="#"  sortName="_ABSTRACT" sort="{$sort}">摘要</a></th>
+					<th><a data-toggle="tooltip" href="#"  sortName="_STATUS" sort="{$sort}">状态</a></th>
 					<th><a data-toggle="tooltip" href="#"  sortName="_SUBMITDATE" sort="{$sort}">提交日期</a></th>
 					
-					<th><a data-toggle="tooltip" href="#"  sortName="_AUTHOR" sort="{$sort}">撰写人</a></th>
-					<th><a data-toggle="tooltip" href="#"  sortName="_INVENTOR" sort="{$sort}">发明人</a></th>
-					<th><a data-toggle="tooltip" href="#"  sortName="_PATOWNER" sort="{$sort}">所有人</a></th>
+					<th><a data-toggle="tooltip" href="#"  sortName="_WRITER" sort="{$sort}">撰写人</a></th>
+					<th><a data-toggle="tooltip" href="#"  sortName="_EXECUTER" sort="{$sort}">执行人</a></th>
 					
 					<th><a data-toggle="tooltip" href="#"  sortName="_DEPT" sort="{$sort}">所属部门</a></th>
-					<th><a data-toggle="tooltip" href="#"  sortName="_PROJECT" sort="{$sort}">关联项目</a></th>
+					
 				</tr>
 			</thead>
 			<tbody><!-- 此处显示数据库查询后的数据集 -->
-				{volist name="patTotal" id="vo" empty="暂时没有数据"}
+				{volist name="patIssTotal" id="vo" empty="暂时没有数据"}
 				<tr>
 					<td>{$i+($pageTotalNum-1)*$patIssTableRows}</a></td>
 					<td><a href="{$home}/patent/index/patinfo/id/{$vo.id}" target="_blank" data-toggle="tooltip" title="专利信息">{$vo.topic}</a></td>
-					<td>{$vo.pattype}</td>
+					<td>{$vo.abstract}</td>
 					<td>{$vo.status}</td>
 					<td>{$vo.submitdate}</td>
 					
-					<td>{$vo.author}</td>
-					<td>{$vo.inventor}</td>
-					<td>{$vo.patowner}</td>
+					<td>{$vo.writer}</td>
+					<td>{$vo.executer}</td>
 					
 					<td>{$vo.dept}</td>
-					<td>
-						{foreach $vo.pronum as $num} 
-							{if $num eq '无'}
-								无
-							{else /}
-								<a href="#" data-toggle="tooltip" title="项目信息">{$num}</a>
-							{/if}
-						{/foreach}
-					</td>
+					
 				</tr>
 				{/volist}
 			</tbody>

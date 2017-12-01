@@ -409,46 +409,38 @@ class DashboardController extends \think\Controller
       
       // 选择排序字段
       switch($sortName){
-        case '_PATNAME':
+        case '_TOPIC':
           $strOrder='topic';
         break;
             
-        case '_PATTYPE':
-          $strOrder='pattype';
+        case '_ABSTRACT':
+          $strOrder='abstract';
         break;
         
-        case '_AUTHOR':
-          $strOrder='author';
+        case '_WRITER':
+          $strOrder='writer';
         break;
         
-        case '_INVENTOR':
-          $strOrder='inventor';
-        break;
-            
-        case '_PATOWNER':
-          $strOrder='patowner';
+        case '_EXECUTER':
+          $strOrder='executer';
         break;
             
         case '_SUBMITDATE':
           $strOrder='submitdate';
+        break;
+        
+        case '_STATUS':
+          $strOrder='status';
         break;
             
         case '_DEPT':
           $strOrder='dept';
         break;
             
-        case '_PROJECT':
-          $strOrder='pronum';
-        break;
-        
-        case '_PATSTATUS':
-          $strOrder='status';
-        break;
-            
         //默认按字段“topic”
         default:
           $strOrder='topic';  
-          $sortName="_PATNAME";
+          $sortName="_TOPIC";
         break;
       } 
       
@@ -502,6 +494,7 @@ class DashboardController extends \think\Controller
         break;
             
         case'operator':
+          $map['executer'] =$this->username;
           switch($issStatus){            
             case '_OPERATE_INPROCESS':
               $map['status'] ='申报执行';
@@ -537,7 +530,7 @@ class DashboardController extends \think\Controller
         
         // 默认为writer
         default:
-          $map['author'] =$this->username;
+          $map['writer'] =$this->username;
           switch($issStatus){
             case '_INPROCESS':
               $map['status'] =['in',['拟申报','审核通过','不予推荐']];
@@ -565,18 +558,18 @@ class DashboardController extends \think\Controller
       }
       
       //使用模型Patinfo
-      $pats = new PatinfoModel;
+      $pats = new IssinfoModel;
       
       // 查出所有的用户并分页，根据“strOrder”排序，前端页面显示的锚点（hash值）为$fragment，设定分页页数变量：“pageTotalNum”
       // 带上每页显示记录行数$totalTableRows，实现查询结果分页显示。
-      $patTotal = $pats->where('id','>',0)
+      $patIssTotal = $pats->where('id','>',0)
                         ->where($map)
                         ->order($strOrder)
                         ->paginate($patIssTableRows,false,['type'=>'bootstrap','var_page' => 'pageTotalNum',
                         'query'=>['patIssTableRows'=>$patIssTableRows]]);
                         
       // 获取分页显示
-      $pageTotal = $patTotal->render();
+      $pageTotal = $patIssTotal->render();
       // 记录总数
       $numTotal = $pats->where('id','>',0)->where($map)->count();
       
@@ -584,7 +577,7 @@ class DashboardController extends \think\Controller
               'home'=>$request->domain(),
               
               // 分页显示所需参数
-              'patTotal'=>$patTotal,
+              'patIssTotal'=>$patIssTotal,
               'numTotal'=>$numTotal,
               'pageTotal'=>$pageTotal,
               'patIssTableRows'=>$patIssTableRows,
