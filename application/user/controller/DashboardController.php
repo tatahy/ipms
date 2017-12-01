@@ -315,7 +315,7 @@ class DashboardController extends \think\Controller
       return view($role);
     }
     
-     // 输出patiss模板
+     // 输出patiss模板显示pat数据集。数据集记录，根据role的不同，选择对应pat的“status”来构成。
     public function patIss(Request $request)
     {
        $this->_loginUser();
@@ -327,21 +327,290 @@ class DashboardController extends \think\Controller
           $role=$this->roles[0];
       }
       
-      // $issType接收前端页面传来的issType值
-      if(!empty($request->param('issType'))){
-        $issType=$request->param('issType');
-      }else{
-          $issType='_PATENT';
-      }
-      
       // $issStatus接收前端页面传来的issStatus值
       if(!empty($request->param('issStatus'))){
         $issStatus=$request->param('issStatus');
       }else{
-          $issStatus='_TODO';
+        $issStatus='_TODO';
       }
       
-      return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div> '.$role.$issType.$issStatus;
+      // 忽略前端页面传来的issType值，直接赋值为'_PATENT'
+      $issType='_PATENT';
+      
+      //$totalTableRows接收前端页面传来的分页时每页显示的记录数，默认为10
+        if(!empty($request->param('patIssTableRows'))){
+          $patIssTableRows=$request->param('patIssTableRows');
+        }else{
+          $patIssTableRows=10;
+        }
+        
+         // 接收前端分页页数变量：“pageUserNum”
+        if(!empty($request->param('pageTotalNum'))){
+          $pageTotalNum=$request->param('pageTotalNum');
+        }else{
+          $pageTotalNum=1;
+        }
+        
+        // $sortName接收前端页面传来的排序字段名
+        if(!empty($request->param('sortName'))){
+          $sortName=$request->param('sortName');
+        }else{
+          $sortName='_PATNAME';
+        }
+        
+        // $sort接收前端页面传来的排序顺序
+        if(!empty($request->param('sort'))){
+          $sort=$request->param('sort');
+        }else{
+          $sort='_ASC';
+        }
+        
+        // $issStatus接收前端页面传来的专利状态值
+        if(!empty($request->param('issStatus'))){
+          $issStatus=$request->param('issStatus');
+        }else{
+          $issStatus='_TODO';
+        }
+        
+         // 查询词1，'searchPatName'
+        if(!empty($request->param('searchPatName'))){
+          $searchPatName=$request->param('searchPatName');
+        }else{
+          $searchPatName='';
+        } 
+        
+        // 查询词2，'searchDept'
+        if(!empty($request->param('searchDept'))){
+          $searchDept=$request->param('searchDept');
+        }else{
+          $searchDept=0;
+        } 
+        
+        // 查询词3，'searchPatStatus'
+        if(!empty($request->param('searchPatStatus'))){
+          $searchPatStatus=$request->param('searchPatStatus');
+        }else{
+          $searchPatStatus=0;
+        }
+        
+        // 查询词4，'searchPatType'
+        if(!empty($request->param('searchPatType'))){
+          $searchPatType=$request->param('searchPatType');
+        }else{
+          $searchPatType=0;
+        } 
+        
+        // 查询词5，'searchWriter'
+        if(!empty($request->param('searchWriter'))){
+          $searchWriter=$request->param('searchWriter');
+        }else{
+          $searchWriter='';
+        }  
+      
+      // 选择排序字段
+      switch($sortName){
+        case '_PATNAME':
+          $strOrder='topic';
+        break;
+            
+        case '_PATTYPE':
+          $strOrder='pattype';
+        break;
+        
+        case '_AUTHOR':
+          $strOrder='author';
+        break;
+        
+        case '_INVENTOR':
+          $strOrder='inventor';
+        break;
+            
+        case '_PATOWNER':
+          $strOrder='patowner';
+        break;
+            
+        case '_SUBMITDATE':
+          $strOrder='submitdate';
+        break;
+            
+        case '_DEPT':
+          $strOrder='dept';
+        break;
+            
+        case '_PROJECT':
+          $strOrder='pronum';
+        break;
+        
+        case '_PATSTATUS':
+          $strOrder='status';
+        break;
+            
+        //默认按字段“topic”
+        default:
+          $strOrder='topic';  
+          $sortName="_PATNAME";
+        break;
+      } 
+      
+      //  组合升序or降序查询
+      if($sort=="_ASC"){
+          $strOrder=$strOrder.' asc';
+      }else{
+          $strOrder=$strOrder.' desc';
+          
+      }
+      
+      // 组合状态查询条件，根据role值和issStatus不同，查询的pat的“status”值不同
+      switch($role){            
+        case'reviewer':
+          $map['dept'] =$this->dept;
+          switch($issStatus){
+            case '_INPROCESS':
+              $map['status'] =['in',['不予推荐','审核通过','返回修改']];
+            break;
+           
+            case '_DONE':
+              $map['status'] =['in',['准予申报','否决','修改完善']];
+            break;
+            
+            case '_OPERATE':
+              $map['status'] =['in',['申报执行','申报复核','申报修改','申报提交','授权','驳回']];
+            break;
+                
+            //默认'_TODO':
+            default:
+              $map['status'] ='拟申报';
+            break;
+          }  
+        break;
+            
+        case'approver':
+          switch($issStatus){
+            case '_DONE':
+              $map['status'] =['in',['准予申报','否决','修改完善']];
+            break;
+            
+            case '_OPERATE':
+              $map['status'] =['in',['申报执行','申报复核','申报修改','申报提交','授权','驳回']];
+            break;
+                
+            //默认'_TODO':
+            default:
+              $map['status'] =['in',['审核通过','不予推荐']];
+            break;
+          }  
+        break;
+            
+        case'operator':
+          switch($issStatus){            
+            case '_OPERATE_INPROCESS':
+              $map['status'] ='申报执行';
+            break;
+            
+            case '_OPERATE_DONE':
+              $map['status'] ='申报复核';
+            break;
+                
+            //默认'_OPERATE_TODO':
+            default:
+              $map['status'] =['in',['准予申报','申报修改']];
+            break;
+          }  
+        break;
+            
+        case'maintainer':
+          switch($issStatus){
+            case '_INPROCESS':
+              $map['status'] ='申报提交';
+            break;
+           
+            case '_DONE':
+              $map['status'] =['in',['申报修改','授权','驳回']];
+            break;
+                
+            //默认'_TODO':
+            default:
+              $map['status'] =['in',['申报执行','申报复核']];
+            break;
+          }     
+        break;
+        
+        // 默认为writer
+        default:
+          $map['author'] =$this->username;
+          switch($issStatus){
+            case '_INPROCESS':
+              $map['status'] =['in',['拟申报','审核通过','不予推荐']];
+              
+            break;
+           
+            case '_DONE':
+              $map['status'] =['in',['准予申报','否决']];
+             
+            break;
+            
+            case '_OPERATE':
+              $map['status'] =['in',['申报执行','申报复核','申报修改','申报提交','授权','驳回']];
+              
+            break;
+                
+            //默认'_TODO':
+            default:
+              $map['status'] =['in',['返回修改','填报','修改完善']];
+              
+            break;
+          }  
+        break;
+            
+      }
+      
+      //使用模型Patinfo
+      $pats = new PatinfoModel;
+      
+      // 查出所有的用户并分页，根据“strOrder”排序，前端页面显示的锚点（hash值）为$fragment，设定分页页数变量：“pageTotalNum”
+      // 带上每页显示记录行数$totalTableRows，实现查询结果分页显示。
+      $patTotal = $pats->where('id','>',0)
+                        ->where($map)
+                        ->order($strOrder)
+                        ->paginate($patIssTableRows,false,['type'=>'bootstrap','var_page' => 'pageTotalNum',
+                        'query'=>['patIssTableRows'=>$patIssTableRows]]);
+                        
+      // 获取分页显示
+      $pageTotal = $patTotal->render();
+      // 记录总数
+      $numTotal = $pats->where('id','>',0)->where($map)->count();
+      
+      $this->assign([
+              'home'=>$request->domain(),
+              
+              // 分页显示所需参数
+              'patTotal'=>$patTotal,
+              'numTotal'=>$numTotal,
+              'pageTotal'=>$pageTotal,
+              'patIssTableRows'=>$patIssTableRows,
+              'pageTotalNum'=>$pageTotalNum,
+              
+              // 表格搜索字段
+              'searchPatName'=>$searchPatName,
+              'searchDept'=>$searchDept,
+              'searchPatStatus'=>$searchPatStatus,
+              'searchPatType'=>$searchPatType,
+              'searchWriter'=>$searchWriter,
+              
+    
+              
+              // 表格排序信息
+              'sortName'=>$sortName,
+              'sort'=>$sort,
+              //'patIssTableRows'=>$patIssTableRows,
+              
+              // 所return的页面显示的iss状态值$issStatus
+              'issStatus'=>$issStatus,
+              
+        ]);
+      
+      //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p>'.$role.$issType.$issStatus.'</div> ';
+      // return '<div style="padding: 24px 48px;">模块开发中……'.$role.$issType.$issStatus.'</div>';
       return view();
         
     } 
@@ -350,7 +619,6 @@ class DashboardController extends \think\Controller
     public function patOprt(Request $request)
     {
       $this->_loginUser();
-       
       
       return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div> ';
       return view();
@@ -369,19 +637,15 @@ class DashboardController extends \think\Controller
           $role=$this->roles[0];
       }
       
-      // $issType接收前端页面传来的issType值
-      if(!empty($request->param('issType'))){
-        $issType=$request->param('issType');
-      }else{
-          $issType='_THESIS';
-      }
-      
       // $issStatus接收前端页面传来的issStatus值
       if(!empty($request->param('issStatus'))){
         $issStatus=$request->param('issStatus');
       }else{
           $issStatus='_TODO';
       }
+      
+      // 忽略前端页面传来的issType值，直接赋值为'_THESIS'
+      $issType='_THESIS';
       
       return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div> '.$role.$issType.$issStatus;
       return view();
@@ -411,19 +675,15 @@ class DashboardController extends \think\Controller
           $role=$this->roles[0];
       }
       
-      // $issType接收前端页面传来的issType值
-      if(!empty($request->param('issType'))){
-        $issType=$request->param('issType');
-      }else{
-          $issType='_PATENT';
-      }
-      
       // $issStatus接收前端页面传来的issStatus值
       if(!empty($request->param('issStatus'))){
         $issStatus=$request->param('issStatus');
       }else{
           $issStatus='_TODO';
       }
+      
+      // 忽略前端页面传来的issType值，直接赋值为'_PROJECT'
+      $issType='_PROJECT';
       
       return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div> '.$role.$issType.$issStatus;
       return view();
