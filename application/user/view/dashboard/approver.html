@@ -1,0 +1,147 @@
+<!-- // approver.html -->
+<div class="panel-group" id="accordion">
+	
+	<div class="panel panel-default">
+		
+		<div class="panel-heading">
+			<h4 class="panel-title">
+        		<a data-toggle="collapse" data-parent="#accordion" href="#collapsePro"><span class="glyphicon glyphicon-inbox"></span>&nbsp;<strong>
+        		项目事务</strong>&nbsp;<span class="span0">0</span></a>
+      		</h4>
+			
+		</div>
+		
+		<div id="collapsePro" class="panel-collapse collapse">
+		<div class="panel-body " >	
+			<ul class="nav nav-tabs nav-justified">
+				<li class="active"><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-status="_TODO"><span class="glyphicon glyphicon-pencil"></span>&nbsp;待处理&nbsp;<span class="badge span_TODO">0</span></a></li>
+				<li><a class="aTab" href="#"  data-issue-type="_PATENT" data-issue-status="_DONE"><span class="glyphicon glyphicon-road"></span>&nbsp;审批结果&nbsp;<span class="label label-warning span_DONE">&nbsp;</span></a></li>
+				<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-status="_OPERATE"><span class="glyphicon glyphicon-bell"></span>&nbsp;执行情况&nbsp;<span class="label label-info span_OPERATE">&nbsp;</span></a></li>
+		
+			</ul>
+			
+			<div class="tab-content">
+				<div id="proIss"></div>
+			</div>	
+		</div>
+		</div>
+	</div>
+	
+	<div id="panelPatIss" class="panel panel-warning">
+		<div class="panel-heading">
+			<h4 class="panel-title">
+        		<a data-toggle="collapse" data-parent="#accordion" href="#collapsePat"><span class="glyphicon glyphicon-wrench"></span>&nbsp;<strong>
+        		专利事务</strong>&nbsp;<span class="span0">0</span></a>
+      		</h4>
+			
+		</div>
+		<div id="collapsePat" class="panel-collapse collapse in">
+		<div class="panel-body " >	
+			<ul class="nav nav-tabs nav-justified">
+				<li class="active"><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-status="_TODO"><span class="glyphicon glyphicon-pencil"></span>&nbsp;待处理&nbsp;<span class="badge span_TODO">0</span></a></li>
+				<li><a class="aTab" href="#"  data-issue-type="_PATENT" data-issue-status="_DONE"><span class="glyphicon glyphicon-road"></span>&nbsp;审批结果&nbsp;<span class="label label-warning span_DONE">&nbsp;</span></a></li>
+				<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-status="_OPERATE"><span class="glyphicon glyphicon-bell"></span>&nbsp;执行情况&nbsp;<span class="label label-info span_OPERATE">&nbsp;</span></a></li>
+		
+			</ul>
+			
+			<div class="tab-content">
+				<div id="patIss"></div>
+			</div>
+			
+		</div>
+		</div>
+	</div>
+	
+	<div class="panel panel-info">
+		<div class="panel-heading">
+			<h4 class="panel-title">
+        		<a data-toggle="collapse" data-parent="#accordion" href="#collapseThe"><span class="glyphicon glyphicon-list"></span>&nbsp;<strong>
+        		论文事务</strong>&nbsp;<span class="span0">0</span></a>
+      		</h4>
+			
+		</div>
+		
+		<div id="collapseThe" class="panel-collapse collapse">
+		<div class="panel-body " >
+			<ul class="nav nav-tabs nav-justified">
+				<li class="active"><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-status="_TODO"><span class="glyphicon glyphicon-pencil"></span>&nbsp;待处理&nbsp;<span class="badge span_TODO">0</span></a></li>
+				<li><a class="aTab" href="#"  data-issue-type="_PATENT" data-issue-status="_DONE"><span class="glyphicon glyphicon-road"></span>&nbsp;审批结果&nbsp;<span class="label label-warning span_DONE">&nbsp;</span></a></li>
+				<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-status="_OPERATE"><span class="glyphicon glyphicon-bell"></span>&nbsp;执行情况&nbsp;<span class="label label-info span_OPERATE">&nbsp;</span></a></li>
+		
+			</ul>
+			
+			<div class="tab-content">
+				<div id="theIss"></div>
+			</div>
+			
+		</div>
+		</div>
+		
+	</div>
+	
+	
+	</div>	
+
+<script>
+$(document).ready(function(){
+	
+	// 本页面载入时默认load文件为patiss.html
+	var sendData={"role":'{$role}',"issType":'_PATENT',"issStatus":'_TODO'};	
+	$("#patIss").load('patIss',sendData);
+
+	// 点击.aTab的a标签，jQuery的load方法得到对应页面
+	$('.aTab').click(function(){	
+		// 组装post的数据
+		var role='{$role}';
+		var issType=$(this).attr("data-issue-type");
+		var issStatus=$(this).attr("data-issue-status");
+		var sendData={"role":role,"issType":issType,"issStatus":issStatus};
+		
+		switch(issType){
+			case '_PATENT':
+				$(this).tab('show');
+				$(this).parent().addClass('active');
+				$("#patIss").load('patIss',sendData);
+			break;
+			
+			case '_PROJECT':
+				$(this).tab('show');
+				$(this).parent().addClass('active');
+				$("#proIss").load('proIss',sendData);
+			break;
+			
+			case '_THESIS':
+				$(this).tab('show');
+				$(this).parent().addClass('active');
+				$("#theIss").load('theIss',sendData);
+			break;
+		
+		}
+		
+	
+	});
+	
+	// 在collapsePat出现前应用jQuery的load方法加载对应文件。
+	$("#collapsePat").on("show.bs.collapse", function(){
+    	var sendData={"role":'{$role}',"issType":'_PATENT',"issStatus":'_TODO'};
+		
+		$("#patIss").load('patIss',sendData);
+  	});
+	
+	// 在collapsePro出现前应用jQuery的load方法加载对应文件。
+	$("#collapsePro").on("show.bs.collapse", function(){
+    	var sendData={"role":'{$role}',"issType":'_PROJECT',"issStatus":'_TODO'};
+		
+		$("#proIss").load('proIss',sendData);
+  	});
+	
+	// 在collapseThe出现前应用jQuery的load方法加载对应文件。
+	$("#collapseThe").on("show.bs.collapse", function(){
+    	var sendData={"role":'{$role}',"issType":'_THESIS',"issStatus":'_TODO'};
+		
+		$("#theIss").load('theIss',sendData);
+  	});
+
+	
+});
+</script>	
