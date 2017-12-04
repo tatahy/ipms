@@ -365,7 +365,7 @@ class DashboardController extends \think\Controller
           $sort='_ASC';
         }
         
-        // $issStatus接收前端页面传来的专利状态值
+        // $issStatus接收前端页面传来的事务状态值
         if(!empty($request->param('issStatus'))){
           $issStatus=$request->param('issStatus');
         }else{
@@ -409,9 +409,9 @@ class DashboardController extends \think\Controller
       
       // 选择排序字段
       switch($sortName){
-        case '_TOPIC':
-          $strOrder='topic';
-        break;
+        //case '_TOPIC':
+//          $strOrder='topic';
+//        break;
             
         case '_ABSTRACT':
           $strOrder='abstract';
@@ -452,7 +452,7 @@ class DashboardController extends \think\Controller
           
       }
       
-      // 组合状态查询条件，根据role值和issStatus不同，查询的pat的“status”值不同
+      // 组合状态查询条件，根据role值和issStatus不同，查询的patIss的“status”值不同
       switch($role){            
         case'reviewer':
           $map['dept'] =$this->dept;
@@ -475,20 +475,21 @@ class DashboardController extends \think\Controller
             break;
           }  
         break;
-            
+        
+        // approver要处理专利授权，专利续费2类事务    
         case'approver':
           switch($issStatus){
             case '_DONE':
-              $map['status'] =['in',['准予申报','否决','修改完善']];
+              $map['status'] =['in',['准予申报','否决','修改完善','准予续费','放弃']];
             break;
             
             case '_OPERATE':
-              $map['status'] =['in',['申报执行','申报复核','申报修改','申报提交','授权','驳回']];
+              $map['status'] =['in',['申报执行','申报复核','申报修改','申报提交','授权','驳回','续费提交','续费授权']];
             break;
                 
             //默认'_TODO':
             default:
-              $map['status'] =['in',['审核通过','不予推荐']];
+              $map['status'] =['in',['审核通过','不予推荐','拟续费']];
             break;
           }  
         break;
@@ -510,20 +511,21 @@ class DashboardController extends \think\Controller
             break;
           }  
         break;
-            
+        
+        // maintainer要处理专利授权，专利续费2类事务    
         case'maintainer':
           switch($issStatus){
             case '_INPROCESS':
-              $map['status'] ='申报提交';
+              $map['status'] =['in',['申报提交','续费提交','拟续费']];
             break;
            
             case '_DONE':
-              $map['status'] =['in',['申报修改','授权','驳回']];
+              $map['status'] =['in',['申报修改','授权','驳回','续费授权','放弃']];
             break;
                 
-            //默认'_TODO':
+            //默认'_TODO'，对到期时间在半年内的“授权”或“续费授权”的专利，系统自动放入_TODO里！！考虑代码实现？？
             default:
-              $map['status'] =['in',['申报执行','申报复核']];
+              $map['status'] =['in',['申报执行','申报复核','准予续费']];
             break;
           }     
         break;
