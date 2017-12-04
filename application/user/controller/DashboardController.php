@@ -455,6 +455,7 @@ class DashboardController extends \think\Controller
       // 组合状态查询条件，根据role值和issStatus不同，查询的patIss的“status”值不同
       switch($role){            
         case'reviewer':
+          // reviewer只能审查本部门的iss
           $map['dept'] =$this->dept;
           switch($issStatus){
             case '_INPROCESS':
@@ -532,6 +533,7 @@ class DashboardController extends \think\Controller
         
         // 默认为writer
         default:
+          // writer只能查看自己撰写的iss
           $map['writer'] =$this->username;
           switch($issStatus){
             case '_INPROCESS':

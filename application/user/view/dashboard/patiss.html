@@ -72,36 +72,36 @@ $(document).ready(function(){
 		
 		case '_INPROCESS':
 			$('#divPatIss h4').text('审批中专利事务');
-			$('#panelPatIss').find('.span2').text({$numTotal});
+			$('#panelPatIss').find('.span_INPROCESS').text({$numTotal});
 		break;
 		
 		case '_DONE': 
 			$('#divPatIss h4').text('审批完专利事务');
-			$('#panelPatIss').find('.span3').text({$numTotal});
+			$('#panelPatIss').find('.span_DONE').text({$numTotal});
 		break;
 		
 		case '_OPERATE': 
 			$('#divPatIss h4').text('专利事务执行情况');
-			$('#panelPatIss').find('.span4').text({$numTotal});
+			$('#panelPatIss').find('.span_OPERATE').text({$numTotal});
 		break;
 		
 		case '_OPERATE_TODO': 
 			$('#divPatIss h4').text('待执行专利事务');
 			
-			$('#panelPatIss').find('.span1').text({$numTotal}).css("background-color","red");
+			$('#panelPatIss').find('.span_OPERATE_TODO').text({$numTotal}).css("background-color","red");
 			$('#panelPatIss').find('.span0').text({$numTotal}).addClass('badge');
 		break;
 		
 		case '_OPERATE_INPROCESS': 
 			$('#divPatIss h4').text('执行中专利事务');
 			
-			$('#panelPatIss').find('.span2').text({$numTotal});
+			$('#panelPatIss').find('.span_OPERATE_INPROCESS').text({$numTotal});
 		break;
 		
 		case '_OPERATE_DONE': 
 			$('#divPatIss h4').text('执行完毕专利事务');
 			
-			$('#panelPatIss').find('.span3').text({$numTotal});
+			$('#panelPatIss').find('.span_OPERATE_DONE').text({$numTotal});
 			
 		break;
 		
@@ -109,7 +109,7 @@ $(document).ready(function(){
 　　	default: 
 			$('#divPatIss h4').text('待处理专利事务');
 			
-			$('#panelPatIss').find('.span1').text({$numTotal}).css("background-color","red");
+			$('#panelPatIss').find('.span_TODO').text({$numTotal}).css("background-color","red");
 			$('#panelPatIss').find('.span0').text({$numTotal}).addClass('badge');
 		break;
 	
