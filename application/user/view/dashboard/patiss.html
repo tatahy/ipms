@@ -18,6 +18,8 @@
 					
 					<th><a data-toggle="tooltip" href="#"  sortName="_DEPT" sort="{$sort}">所属部门</a></th>
 					
+					<th class="oprt">操作</th>
+					
 				</tr>
 			</thead>
 			<tbody><!-- 此处显示数据库查询后的数据集 -->
@@ -26,13 +28,20 @@
 					<td>{$i+($pageTotalNum-1)*$patIssTableRows}</a></td>
 					<td><a href="{$home}/patent/index/patinfo/id/{$vo.id}" target="_blank" data-toggle="tooltip" title="专利信息">{$vo.topic}</a></td>
 					<td>{$vo.abstract}</td>
-					<td>{$vo.status}</td>
+					<td class="patIssStatus">{$vo.status}</td>
 					<td>{$vo.submitdate}</td>
 					
 					<td>{$vo.writer}</td>
 					<td>{$vo.executer}</td>
 					
 					<td>{$vo.dept}</td>
+					
+					<td class="btnOprt">
+						<button type="button" class="edit btn-link" data-patIssId="{$vo.id}" data-toggle="modal" data-target="#modalPatIss"><span class="glyphicon glyphicon-edit"></span>编辑</button>
+							
+						<button type="button" class="sub btn-link" data-patIssId="{$vo.id}"><span class=" text-success glyphicon glyphicon-level-up"></span>提交</button>
+						
+					</td>
 					
 				</tr>
 				{/volist}
@@ -63,27 +72,39 @@ $(document).ready(function(){
 	// 本页面的pat状态
 	var issStatus='{$issStatus}';
 	
+	// 本页面的role值
+	var role='{$role}';
+	
 	<!-- //表格每页显示记录行数 -->
 	$('#patIssTableRows').val('{$patIssTableRows}'); 
 	
 	
-	// 根据本页面的issStatus状态值，决定<h4>的内容
+	// 根据本页面的issStatus状态值，决定<h4>的内容、th.oprt、td.btnOprt的内容
 	switch(issStatus){
 		
 		case '_INPROCESS':
 			$('#divPatIss h4').text('审批中专利事务');
 			$('#panelPatIss').find('.span_INPROCESS').text({$numTotal});
+			
+			$('.oprt').remove();
+			$('.btnOprt').remove();
 		break;
 		
 		case '_DONE': 
 			$('#divPatIss h4').text('审批完专利事务');
 			$('#panelPatIss').find('.span_DONE').text({$numTotal});
+			
+			$('.oprt').remove();
+			$('.btnOprt').remove();
 		break;
 		
 		case '_OPERATE': 
 			$('#divPatIss h4').text('专利事务执行情况');
 			$('#panelPatIss').find('.span_OPERATE').text({$numTotal});
+			$('.oprt').remove();
+			$('.btnOprt').remove();
 		break;
+		
 		
 		case '_OPERATE_TODO': 
 			$('#divPatIss h4').text('待执行专利事务');
@@ -100,8 +121,9 @@ $(document).ready(function(){
 		
 		case '_OPERATE_DONE': 
 			$('#divPatIss h4').text('执行完毕专利事务');
-			
 			$('#panelPatIss').find('.span_OPERATE_DONE').text({$numTotal});
+			$('.oprt').remove();
+			$('.btnOprt').remove();
 			
 		break;
 		
@@ -111,9 +133,57 @@ $(document).ready(function(){
 			
 			$('#panelPatIss').find('.span_TODO').text({$numTotal}).css("background-color","red");
 			$('#panelPatIss').find('.span0').text({$numTotal}).addClass('badge');
+			
 		break;
 	
 	}
+	
+	<!-- // patIss表格中<td>里的<button>进行增、删 -->
+	$(".btnOprt").each(function(){
+		var patIssStatus=$(this).siblings('.patIssStatus').text();
+		
+		switch(role){
+			case 'writer':
+				if(patIssStatus=="填报"){
+					$(this).append('<button type="button" class="del btn-link" data-patIssId="{$vo.id}"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>');
+				}	
+			break;
+			
+			case 'reviewer':
+				if(patIssStatus=="拟申报"){
+					<!-- $(this).children('.sub').html('<span class="text-danger glyphicon glyphicon-remove"></span>不予推荐'); -->
+					
+					$(this).children().remove();
+					
+					$(this).append('<button type="button" class="edit btn-link" data-patIssId="{$vo.id}" data-toggle="modal" data-target="#modalPatIss"><span class="glyphicon glyphicon-edit"></span>审核通过</button><button type="button" class="sub btn-link" data-patIssId="{$vo.id}"><span class=" text-success glyphicon glyphicon-level-up"></span>返回修改</button><button type="button" class="sub btn-link" data-patIssId="{$vo.id}"><span class=" text-success glyphicon glyphicon-level-up"></span>不予推荐</button>');
+					
+				}		
+			break;
+				
+			case 'approver':
+				if(patIssStatus=="审核通过" || patIssStatus=="不予推荐"){
+					<!-- $(this).children('.sub').html('<span class="text-danger glyphicon glyphicon-remove"></span>否决'); -->
+					
+					$(this).children().remove();
+					
+					$(this).append('<button type="button" class="edit btn-link" data-patIssId="{$vo.id}" data-toggle="modal" data-target="#modalPatIss"><span class="glyphicon glyphicon-edit"></span>准予审报</button><button type="button" class="sub btn-link" data-patIssId="{$vo.id}"><span class=" text-success glyphicon glyphicon-level-up"></span>修改完善</button><button type="button" class="sub btn-link" data-patIssId="{$vo.id}"><span class=" text-success glyphicon glyphicon-level-up"></span>否决</button>');
+				}else if(patIssStatus=="拟续费"){
+					$(this).append('<button type="button" class="edit btn-link" data-patIssId="{$vo.id}" data-toggle="modal" data-target="#modalPatIss"><span class="glyphicon glyphicon-edit"></span>准予续费</button><button type="button" class="sub btn-link" data-patIssId="{$vo.id}"><span class=" text-success glyphicon glyphicon-level-up"></span>放弃</button>');
+				}	
+			break;
+			
+			case '':
+					
+			break;
+				
+			default:
+				
+			break;
+			
+		}
+		
+		
+	});
 	
 
 	
@@ -161,13 +231,13 @@ $(document).ready(function(){
 		<!-- var fragment = window.location.hash;	 -->
 		
 		<!-- //根据每页显示记录行数，pat状态，排序字段，排序方式加载页面 -->
-		loadPatIss($('#patIssTableRows').val(),issStatus,sortName,sort);
+		loadMe($('#patIssTableRows').val(),issStatus,sortName,sort);
 		
 	});
 	
 	<!-- //根据每页显示记录行数和issStatus加载页面 -->
 	$('#patIssTableRows').change(function(){
-		loadPatIss($(this).val(),issStatus);
+		loadMe($(this).val(),issStatus);
 	
 	});	
 	
@@ -201,22 +271,22 @@ $(document).ready(function(){
 		<!-- alert("pageNum:"+pageNum); -->
 		
 		<!-- //根据每页显示记录行数，排序字段，排序方式，分页页数加载页面 -->
-		loadPatIss($('#patIssTableRows').val(),issStatus,'{$sortName}','{$sort}',pageNum)
+		loadMe($('#patIssTableRows').val(),issStatus,'{$sortName}','{$sort}',pageNum)
 	
 	});
 
 
 <!-- function -->
 	
-	//**函数名：loadPatIss
- 	//* 作用：加载patiss.html页面内容到writer.html页面中<div id="patIss"></div>
+	//**函数名：loadMe
+ 	//* 作用：加载本页面内容到load本页面的上一级页面（writer/reviewer/operator.html…）中<div id="patIss"></div>
 	//* 参数1：rows，类型：数值。值：可为空，默认为10。
 	//* 参数2：issStatus，类型：字符。值：可为空，默认为'_TODO'。
 	//* 参数3：sortName，类型：字符。值：可为空，默认为‘_PATNAME’。
 	//* 参数4：sort，类型：字符。值：可为空，默认为'_ASC'。
 	//* 参数5：pageTotalNum，类型：数值。值：可为空，默认为1。
 	
-	function loadPatIss(rows,issStatus,sortName,sort,pageTotalNum){
+	function loadMe(rows,issStatus,sortName,sort,pageTotalNum){
 		// 为函数的参数赋值
 		var rows=rows;               // 每页显示的记录行数
 		var issStatus=issStatus;

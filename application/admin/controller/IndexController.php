@@ -362,7 +362,7 @@ class IndexController extends \think\Controller
     {
       $this->_loginUser();
       
-      $dept=DeptModel::all();
+      $dept=DeptModel::where('enable','1')->select();
       // 将数组转化为json
       return json($dept);
     }

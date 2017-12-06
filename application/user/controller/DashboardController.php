@@ -324,7 +324,7 @@ class DashboardController extends \think\Controller
       if(!empty($request->param('role'))){
         $role=$request->param('role');
       }else{
-          $role=$this->roles[0];
+        $role=$this->roles[0];
       }
       
       // $issStatus接收前端页面传来的issStatus值
@@ -603,6 +603,9 @@ class DashboardController extends \think\Controller
               
               // 所return的页面显示的iss状态值$issStatus
               'issStatus'=>$issStatus,
+              
+              // 返回前端role值
+              'role'=>$role,
               
         ]);
       
