@@ -320,7 +320,14 @@ class DashboardController extends \think\Controller
     {
        $this->_loginUser();
        
-       // $role接收前端页面传来的role值
+      // $returnType接收前端页面传来的returnType值，‘0’为模板文件，‘1’为数据
+      if(!empty($request->param('returnType'))){
+        $returnType=$request->param('returnType');
+      }else{
+        $returnType=0;
+      }
+      
+      // $role接收前端页面传来的role值
       if(!empty($request->param('role'))){
         $role=$request->param('role');
       }else{
@@ -455,7 +462,7 @@ class DashboardController extends \think\Controller
       // 组合状态查询条件，根据role值和issStatus不同，查询的patIss的“status”值不同
       switch($role){            
         case'reviewer':
-          // reviewer只能审查本部门的iss
+           // reviewer只能审查本部门的iss
           $map['dept'] =$this->dept;
           switch($issStatus){
             case '_INPROCESS':
@@ -499,7 +506,7 @@ class DashboardController extends \think\Controller
           $map['executer'] =$this->username;
           switch($issStatus){            
             case '_OPERATE_INPROCESS':
-              $map['status'] ='申报执行';
+              $map['status'] =['in',['申报执行','申报修改']];
             break;
             
             case '_OPERATE_DONE':
@@ -508,7 +515,7 @@ class DashboardController extends \think\Controller
                 
             //默认'_OPERATE_TODO':
             default:
-              $map['status'] =['in',['准予申报','申报修改']];
+              $map['status'] ='准予申报';
             break;
           }  
         break;
@@ -534,8 +541,9 @@ class DashboardController extends \think\Controller
         // 默认为writer
         default:
           // writer只能查看自己撰写的iss
-          $map['writer'] =$this->username;
+            $map['writer'] =$this->username;
           switch($issStatus){
+            
             case '_INPROCESS':
               $map['status'] =['in',['拟申报','审核通过','不予推荐']];
               
@@ -577,7 +585,11 @@ class DashboardController extends \think\Controller
       // 记录总数
       $numTotal = $pats->where('id','>',0)->where($map)->count();
       
-      $this->assign([
+      //返回数据还是模板文件,‘0’为模板文件，‘1’为数据
+      if($returnType){
+        return ($numTotal);
+      }else{
+        $this->assign([
               'home'=>$request->domain(),
               
               // 分页显示所需参数
@@ -609,10 +621,12 @@ class DashboardController extends \think\Controller
               
         ]);
       
-      //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p>'.$role.$issType.$issStatus.'</div> ';
-      // return '<div style="padding: 24px 48px;">模块开发中……'.$role.$issType.$issStatus.'</div>';
-      return view();
+        //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p>'.$role.$issType.$issStatus.'</div> ';
+        // return '<div style="padding: 24px 48px;">模块开发中……'.$role.$issType.$issStatus.'</div>';
+        return view();
         
+      }
+    
     } 
     
     // patent的issue的增删改查
