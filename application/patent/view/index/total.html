@@ -80,7 +80,7 @@
 				{volist name="patTotal" id="vo" empty="暂时没有数据"}
 				<tr>
 					<td>{$i+($pageTotalNum-1)*$totalTableRows}</a></td>
-					<td><a href="{$home}/patent/index/patinfo/id/{$vo.id}" target="_blank" data-toggle="tooltip" title="专利信息">{$vo.topic}</a></td>
+					<td class="patInfo"><a href="{$home}/patent/index/patinfo/id/{$vo.id}" target="_blank" data-toggle="tooltip">{$vo.topic}</a></td>
 					<td>{$vo.pattype}</td>
 					<td>{$vo.status}</td>
 					<td>{$vo.submitdate}</td>
@@ -90,12 +90,12 @@
 					<td>{$vo.patowner}</td>
 					
 					<td>{$vo.dept}</td>
-					<td>
+					<td class="proInfo">
 						{foreach $vo.pronum as $num} 
 							{if $num eq '无'}
 								无
 							{else /}
-								<a href="#" data-toggle="tooltip" title="项目信息">{$num}</a>
+								<a href="#" data-toggle="tooltip">{$num}</a>
 							{/if}
 						{/foreach}
 					</td>
@@ -200,6 +200,10 @@ $(document).ready(function(){
 	
 	// 添加bootstrap的tooltip属性
 	$("#divTotal thead th a").tooltip({title: "点击排序", placement: "bottom"});
+	
+	$('.patInfo a').tooltip({title: '专利信息', placement: 'bottom'});
+	
+	$('.proInfo a').tooltip({title: '项目信息', placement: 'bottom'});
 
 	// 根据后端控制器给出的排序字段{$sortName},排序方式{$sort}，修改th中a的显示形式
 	$("#divTotal thead a").each(function(){

@@ -3,6 +3,7 @@ namespace app\user\controller;
 
 use think\Request;
 use think\Session;
+
 use app\user\model\User as UserModel;
 use app\user\model\Rolety as RoletyModel;
 use app\issue\model\Issinfo as IssinfoModel;
@@ -630,12 +631,89 @@ class DashboardController extends \think\Controller
     } 
     
     // patent的issue的增删改查
-    public function patOprt(Request $request)
+    public function patIssOprt(Request $request)
     {
       $this->_loginUser();
       
-      return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div> ';
-      return view();
+      // $role接收前端页面传来的role值，‘0’为模板文件，‘1’为数据
+      if(!empty($request->param('role'))){
+        $role=$request->param('role');
+      }else{
+        $role=0;
+      }
+
+      // $oprt接收前端页面传来的oprt值，‘0’为模板文件，‘1’为数据
+      if(!empty($request->param('oprt'))){
+        $oprt=$request->param('oprt');
+      }else{
+        $oprt=0;
+      }
+      
+      // $returnType接收前端页面传来的returnType值，‘0’为模板文件，‘1’为数据
+      if(!empty($request->param('returnType'))){
+        $returnType=$request->param('returnType');
+      }else{
+        $returnType=0;
+      }
+      
+      // $patIssId接收前端页面传来的patIssId值，‘0’为模板文件，‘1’为数据
+      if(!empty($request->param('patIssId'))){
+        $patIssId=$request->param('patIssId');
+      }else{
+        $patIssId=0;
+      }
+      
+      //返回数据还是模板文件,‘0’为模板文件，‘1’为数据
+      if($returnType){
+        //return json(array('role'=>$role,'oprt'=>$oprt));
+        return $oprt;
+      }else{
+        // 按照role/oprt值的不同，渲染不同的模板文件并对数据库进行不同的操作
+        switch($role){
+          
+          case "writer":
+              switch($oprt){
+                // writer 新增专利申报事务
+                case "addNew":
+                
+                break;
+                
+                case "":
+                
+                break;
+                
+                default:
+                
+                break;
+                
+              }
+          break;
+          
+          case "reviewer":
+          
+          break;
+          
+          case "approver":
+          
+          break;
+          
+          case "operator":
+          
+          break;
+          
+          case "maintainer":
+          
+          break;
+          
+          default:
+          
+          break;
+          
+        }
+        
+        return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div> ';
+        //return view($oprt);
+      }
         
     } 
     
