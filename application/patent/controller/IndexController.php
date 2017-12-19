@@ -149,16 +149,16 @@ class IndexController extends \think\Controller
         //利用模型对象得到非“填报”状态的patent总数
         $numtotal=$pats->where('status','neq','填报')->count();
         //分页,每页$listrows条记录
-		$patstotal = $pats->where('status','neq','填报')
+		    $patstotal = $pats->where('status','neq','填报')
                             ->order('submitdate', 'desc')
                             ->paginate($listrows,false,['type'=>'bootstrap','var_page'=>'pagetotal',]);             
         // 获取分页显示
         $pagetotal = $patstotal->render(); 
         
-        //利用模型对象得到状态status"="新增"）的patent总数
-        $numnew=$pats->where('status','新增')->count();
+        //利用模型对象得到状态status"="拟申报"）的patent总数
+        $numnew=$pats->where('status','拟申报')->count();
         //分页,每页$listrows条记录
-        $patsnew = $pats->where('status','新增')
+        $patsnew = $pats->where('status','拟申报')
                             ->order('submitdate', 'desc')
                             ->paginate($listrows,false,['type'=>'bootstrap','var_page'=>'pagenew',]);
         // 获取分页显示
@@ -1190,9 +1190,13 @@ class IndexController extends \think\Controller
           }
           
         break;
-        // '新增'   
+        // '内审'   
+        case '#audit':
+          $map['status'] =['in',['内审','内审否决']];
+        break;
+        // '拟申报'   
         case '#newAdd':
-          $map['status'] ='新增';
+          $map['status'] ='拟申报';
         break;
         // ''    
         case '#apply':

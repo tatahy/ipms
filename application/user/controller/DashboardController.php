@@ -8,6 +8,7 @@ use app\user\model\User as UserModel;
 use app\user\model\Rolety as RoletyModel;
 use app\issue\model\Issinfo as IssinfoModel;
 use app\patent\model\Patinfo as PatinfoModel;
+use app\attachment\model\Attinfo as AttinfoModel;
 
 class DashboardController extends \think\Controller
 {
@@ -55,8 +56,6 @@ class DashboardController extends \think\Controller
         $dept=Session::get('dept');
         $role=$request->param('role');
         
-       
-        
          //传来的role值是否在$roles中
         if(!empty($role)){
             
@@ -76,7 +75,6 @@ class DashboardController extends \think\Controller
         
         //实例化PatinfoModel模型类
         $pats = new PatinfoModel; 
-        
         
         //登录用户各角色涉及专利类事务的总数赋初值
         $num_writer1type2=0;
@@ -316,7 +314,7 @@ class DashboardController extends \think\Controller
       return view($role);
     }
     
-     // 输出patiss模板显示pat数据集。数据集记录，根据role的不同，选择对应pat的“status”来构成。
+     // 输出patiss模板显示issue中与pat相关的数据集。数据集记录，根据role的不同，选择对应iss的“status”来构成。
     public function patIss(Request $request)
     {
        $this->_loginUser();
@@ -371,13 +369,6 @@ class DashboardController extends \think\Controller
           $sort=$request->param('sort');
         }else{
           $sort='_ASC';
-        }
-        
-        // $issStatus接收前端页面传来的事务状态值
-        if(!empty($request->param('issStatus'))){
-          $issStatus=$request->param('issStatus');
-        }else{
-          $issStatus='_TODO';
         }
         
          // 查询词1，'searchPatName'
@@ -524,11 +515,11 @@ class DashboardController extends \think\Controller
         // maintainer要处理专利授权，专利续费2类事务    
         case'maintainer':
           switch($issStatus){
-            case '_INPROCESS':
+            case '_OPERATE_INPROCESS':
               $map['status'] =['in',['申报提交','续费提交','拟续费']];
             break;
            
-            case '_DONE':
+            case '_OPERATE_DONE':
               $map['status'] =['in',['申报修改','授权','驳回','续费授权','放弃']];
             break;
                 
@@ -628,21 +619,21 @@ class DashboardController extends \think\Controller
         
       }
     
-    } 
+    }
     
-    // patent的issue的增删改查
+    // 各个role的patIss的增删改查操作
     public function patIssOprt(Request $request)
     {
       $this->_loginUser();
       
-      // $role接收前端页面传来的role值，‘0’为模板文件，‘1’为数据
+      // $role接收前端页面传来的role值
       if(!empty($request->param('role'))){
         $role=$request->param('role');
       }else{
         $role=0;
       }
 
-      // $oprt接收前端页面传来的oprt值，‘0’为模板文件，‘1’为数据
+      // $oprt接收前端页面传来的oprt值
       if(!empty($request->param('oprt'))){
         $oprt=$request->param('oprt');
       }else{
@@ -656,7 +647,125 @@ class DashboardController extends \think\Controller
         $returnType=0;
       }
       
-      // $patIssId接收前端页面传来的patIssId值，‘0’为模板文件，‘1’为数据
+      // $patIssId接收前端页面传来的patIssId值
+      if(!empty($request->param('patIssId'))){
+        $patIssId=$request->param('patIssId');
+      }else{
+        $patIssId=0;
+      }
+      
+      // 获取表单上传附件文件
+     // if(!empty($request->file('att'))){
+//        $att=$request->file('att');
+//      }else{
+//        $att=0;
+//      }
+      
+      //返回数据还是模板文件,‘0’为模板文件，‘1’为数据
+      if($returnType){
+        //return json(array('role'=>$role,'oprt'=>$oprt));
+        $data=array('result'=>'success','msg'=>'专利事务保存成功！');
+        return json($data);
+        //return ($returnType);
+      }else{
+        // 按照role/oprt值的不同，渲染不同的模板文件并对数据库进行不同的操作
+        switch($role){
+          
+          case "writer":
+              switch($oprt){
+                // writer 删除专利事务
+                case "delete":
+                  
+                break;
+                
+                case "save":
+                
+                //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div> ';
+                
+                return ('success');  
+                break;
+                
+                case "submit":
+                  
+                break;
+                
+                // 默认为‘addNew’
+                default:
+                  // 向issinfo表写入信息
+                  
+                  
+                  // 向patinfo表写入信息
+                  
+                  
+                  // 向attinfo表写入信息
+                  
+                  
+                  // 存储上传的附件
+                  
+                  
+                break;
+                
+              }
+              
+              
+          break;
+          
+          case "reviewer":
+          
+          break;
+          
+          case "approver":
+          
+          break;
+          
+          case "operator":
+          
+          break;
+          
+          case "maintainer":
+          
+          break;
+          
+          default:
+          
+          break;
+          
+        }
+        
+        //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div> ';
+        // 输出对应的模板文件
+        //return view($role.'_'.$oprt);
+      }
+        
+    }  
+    
+    // 各个role的patIss的增删改查模板文件
+    public function patIssTpl(Request $request)
+    {
+      $this->_loginUser();
+      
+      // $role接收前端页面传来的role值
+      if(!empty($request->param('role'))){
+        $role=$request->param('role');
+      }else{
+        $role=0;
+      }
+
+      // $tpl接收前端页面传来的tpl值
+      if(!empty($request->param('tpl'))){
+        $tpl=$request->param('tpl');
+      }else{
+        $tpl=0;
+      }
+      
+      // $returnType接收前端页面传来的returnType值，‘0’为模板文件，‘1’为数据
+      if(!empty($request->param('returnType'))){
+        $returnType=$request->param('returnType');
+      }else{
+        $returnType=0;
+      }
+      
+      // $patIssId接收前端页面传来的patIssId值
       if(!empty($request->param('patIssId'))){
         $patIssId=$request->param('patIssId');
       }else{
@@ -665,21 +774,49 @@ class DashboardController extends \think\Controller
       
       //返回数据还是模板文件,‘0’为模板文件，‘1’为数据
       if($returnType){
-        //return json(array('role'=>$role,'oprt'=>$oprt));
-        return $oprt;
+        //return json(array('role'=>$role,'tpl'=>$tpl));
+        return $tpl;
       }else{
-        // 按照role/oprt值的不同，渲染不同的模板文件并对数据库进行不同的操作
+        // 按照role/tpl值的不同，渲染不同的模板文件并对数据库进行不同的操作
         switch($role){
           
           case "writer":
-              switch($oprt){
+              switch($tpl){
                 // writer 新增专利申报事务
                 case "addNew":
                 
+                  $this->assign([
+                    'home'=>$request->domain(),
+
+                    // 
+                    'writer'=>$this->username,
+                    'dept'=>$this->dept,
+              
+                  ]);
                 break;
                 
-                case "":
-                
+                case "edit":
+                  // 查出所编辑的issue的数据：
+                  $iss= IssinfoModel::get($patIssId);
+                  
+                  // 查出issue所对应的patent
+                  $pat= PatinfoModel::get($iss->num_id);
+                  
+                  // 查出issue所对应的attachment
+                  $attSet= AttinfoModel::where('num_type','_ATTT1')->where('num_id',$patIssId)->select();
+                  
+                  $this->assign([
+                    'home'=>$request->domain(),
+
+                    // 
+                    'writer'=>$this->username,
+                    'dept'=>$this->dept,
+                    //'issStatus'=>$iss->status,
+                    'iss'=>$iss,
+                    'pat'=>$pat,
+                    'attSet'=>$attSet,
+              
+                  ]);
                 break;
                 
                 default:
@@ -711,8 +848,9 @@ class DashboardController extends \think\Controller
           
         }
         
-        return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div> ';
-        //return view($oprt);
+        //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div> ';
+        // 输出对应的模板文件
+        return view($role.'_'.$tpl);
       }
         
     } 

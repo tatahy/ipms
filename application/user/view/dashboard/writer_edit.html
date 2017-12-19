@@ -1,0 +1,359 @@
+<!-- // writer_edit.html -->
+<div class="container-fluid">
+	<!-- <div class="rows col-sm-12"> -->
+	<form action="" role="form">
+		<div class="row">
+		<div class="form-group col-sm-3">
+			<h4>撰写人：{$iss.writer}</h4>
+		</div>
+		
+		<div class="form-group col-sm-5">
+			<h4>所属部门：{$iss.dept}</h4>
+		</div>
+		
+		<div class="form-group col-sm-4">
+			<h4>事务状态：<span class="text-warning"><strong>{$iss.status}</strong></span></h4>
+		</div>
+		</div>
+		
+		<h4><span class="label label-warning"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利信息</span></h4>
+		<div class="row">
+		<div class="form-group col-sm-8">
+			<label class="control-label" for="patTopic">专利名称<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<input class="form-control" id="patTopic" name="patTopic" value="{$pat.topic}" type="text" placeholder="一种ZZZ的____专利" required>
+			
+			<span style="color:red;display: none;" class="tips">"专利名称"不能为空</span>
+		</div>
+		
+		<div class="form-group col-sm-4">
+			<label for="patType">专利类型</label>
+			<select class="form-control" id="patType" name="patType">
+				{present name="pat.pattype"}
+					<option value="{$pat.pattype}" selected>{$pat.pattype}</option>
+				{/present}
+				
+				<option value="0">……</option>
+				<option value="_PATT1">发明专利</option>
+				<option value="_PATT2">实用新型专利</option>
+                <option value="_PATT3">外观设计专利</option>
+                <option value="_PATT4">软件版权</option>
+                <option value="_PATT5">著作权</option>
+                <option value="_PATT6">集成电路图</option>
+                
+			</select>
+		</div>
+		</div>
+	
+		<h4><span class="label label-warning">事务信息</span></h4>
+		<div class="row">
+		<div class="form-group col-sm-8">
+			<label class="control-label" for="topic">名称<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<input class="form-control" id="topic" name="topic" value="{$iss.topic}" type="text" placeholder="关于XX专利的YY申请" required>
+			
+			<span style="color:red;display: none;" class="tips">"名称"不能为空</span>
+		</div>
+		
+		<div class="form-group col-sm-4">
+			<label for="issType">类型</label>
+			<select class="form-control" id="issType" name="issType" >
+				<option value="_ISST_PAT1">专利授权申报</option>
+				<option value="_ISST_PAT2">专利授权续费</option>
+               
+			</select>
+		</div>
+		</div>
+		
+		<div class="row">
+		<div class="form-group col-sm-12">
+			<label class="control-label" for="abstract">事务简介<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<textarea class="form-control" rows="5" id="abstract" name="abstract" placeholder="填写事务的主要内容，字数不超过100字。" required>{$iss.abstract}</textarea>
+			
+			<span style="color:red;display: none;" class="tips">"事务简介"不能为空</span>
+		</div>
+		</div>
+		
+				
+		<label class="label label-warning" for="">事务附件</label>
+		
+		<label class="radio-inline">
+      		<input type="radio" name="attUpload" value="1">上传
+    	</label>
+    	<label class="radio-inline">
+      		<input type="radio" name="attUpload" value="0" checked>无
+    	</label>
+			
+			<div id="divAtt" hidden="true">
+				<div class="row">
+				<div class="form-group col-sm-6">
+					<label for="att">选择附件</label>
+					<input type="file" name="att" id="att">	
+					<blockquote>
+						<footer>附件小于等于：<mark class="text-danger">10MB</mark></footer>
+						<footer>附件类型：<mark>jpg,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx</mark></footer>
+					</blockquote>			
+			
+				</div>
+		
+				<div class="form-group col-sm-4">
+					<label for="attName">附件名称</label>
+					<input class="form-control" id="attName" name="attName" value="" type="text">
+				</div>
+				
+				<div class="form-group col-sm-2">
+					
+					<label for="">附件类型</label>
+					<select class="form-control" id="" name="attSubType">
+						<option value="">报告</option>
+						<option value="">申请</option>
+						<option value="">请示</option>
+               
+					</select>
+					
+				</div>
+		
+				<input id="attType" name="attType" value="_ATTT1" type="text" hidden="true">
+		
+				</div>
+				
+			</div>
+		
+		<h4><span class="label label-warning">事务附件列表</span></h4>
+		<div class="row col-sm-12">
+			<div class="table-responsive ">
+			<table class="table table-bordered table-striped table-hover">
+				<thead>
+					<tr>
+						<!-- <th>选择</th> -->
+						<th>序号</th>
+						<th>附件类型</th>
+						<th>附件名称</th>
+						<th>上传日期</th>
+						<th>上传人</th>
+						<th>系统角色</th>
+						{in name="$iss.status" value="填报"}
+							<th>操作</th>
+						{/in}
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="attSet" id="vo" empty="暂无附件"}
+					<tr>
+						<!-- <td><input type="checkbox" check=""></td> -->
+						<td>{$i}</td>
+						<td>{$vo.atttype}</a></td>
+						<td>{$vo.name}</a></td>
+						<td>{$vo.uploaddate}</td>
+						<td>{$vo.uploader}</td>
+						<td>{$vo.rolename}</td>
+						{in name="$iss.status" value="填报"}
+							<td><a href="{$home}/attachment/index/download/id/{$vo.id}">下载</a>&nbsp;</td>
+						{/in}
+					</tr>	
+					{/volist}
+				</tbody>
+			</table>
+			</div>
+			<hr>
+		</div>
+		
+		<div class="row">
+		<div class="form-group col-sm-12">
+			<input type="submit" class="btn btn-primary btn-sm" formenctype="multipart/form-data" value="保存" > 
+			<input type="reset" class="btn btn-primary btn-sm" value="重置" >
+			
+			<button type="submit" id="btnSubmit" class="btn btn-primary btn-sm" type="button"><span class="glyphicon glyphicon-ok"></span>提交</button>
+ 			
+			<input type="button" class="btn btn-warning btn-sm pull-right" data-dismiss="modal" value="取消">
+		</div>
+		</div>
+	</form>
+	<!-- </div> -->
+
+</div>
+
+<script>
+$(document).ready(function(){
+	<!-- // 应用jQuery的$.post提交表单，进行后续处理 -->
+	// 方法:1，需要输入框的“required”属性
+	$('form').submit(function(event){					
+		//jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作
+        event.preventDefault();
+		
+		// 检查附件后缀名是否符合要求
+		
+			
+		$.post('patIssOprt',
+			{
+				'returnType':0,
+				'role':'writer',
+				'oprt':'save',
+				'topic':$('#topic').val(),
+				'issType':$('#issType').val(),
+				'abstract':$('#abstract').val(),
+				'patTopic':$('#patTopic').val(),
+				'patType':$('#patType').val(),
+				'writer':$('#writer').val(),
+				'dept':$('#dept').val(),
+				'att':$('#att').val(),
+				'attName':$('#attName').val(),
+				'attType':'_ATTT1'
+			},
+			function(data){
+				if(data=='success'){
+					$("#modalPatIssTpl").modal("hide");
+					// 重新载入文件
+					$('#divPatIss').load('patIss',{'role':'writer','returnType':0});
+					$.alert(data);
+				}else{
+					<!-- $("#modalPatIssTpl").modal(); -->
+					$("#modalPatIssTpl").modal("hide");
+					$.alert('保存不成功');
+				}
+			}
+		);
+	});
+	
+	// 只有专利事务状态为‘填报’才能有‘删除’按钮。
+	if('填报'=='{$iss.status}'){		
+		$('#btnSubmit').after('&nbsp;<button id="btnDelete" class="btn btn-danger btn-sm" type="button"><span class="glyphicon glyphicon-remove"></span>删除</button>');
+	}
+	
+	// 单选按钮选中“上传”项后，出现附件上传的输入框们。
+	$('input:radio[name="attUpload"]').change(function(){
+		// 选中的单选按钮的value值，值为“1”是选中的“上传”项
+		var v=$(this).attr("value");
+		if(v==1){
+			// 为'#attName'和'#att'添加'required'属性，其值为true，保证在表单提交时必填
+			$('#att').attr('required',true);
+			$('#attName').attr('required',true);
+			// '#attName'和'#att'前的标签，去除内容里添加的span
+			$('#attName').prev('label').children('span').remove();
+			$('#att').prev('label').children('span').remove();
+			// '#attName'和'#att'前的标签，在标签内容后面添加glyphicon并设置颜色为text-danger
+			$('#attName').prev('label').append('<span class="glyphicon glyphicon-asterisk text-danger"></span>');
+			$('#att').prev('label').append('<span class="glyphicon glyphicon-asterisk text-danger"></span>');
+			// 上传的输入框们现身
+			$('#divAtt').show();
+		}else{
+			// 为'#attName'和'#att'添加'required'属性，其值为false，保证在表单提交时忽略
+			$('#attName').attr('required',false);
+			$('#att').attr('required',false);
+			// 上传的输入框们退场
+			$('#divAtt').hide();
+			
+		}
+	});
+	
+	// 重置按钮点击时附加
+	$('input:reset').click(function(){
+		//为'#attName'添加'required'属性，其值为false，保证在表单提交时忽略
+		$('#attName').attr('required',false);
+		
+		// 上传的输入框们退场
+		$('#divAtt').hide();
+	});
+
+    // 方法2：无需输入框的“required”属性，但要在输入框下添加span配合代码规定特定情况出现时的动作和显示内容。
+	//验证$('#topic').val()不能为空
+	<!-- $('#topic').change(function(){ -->
+		<!-- if($(this).val()==''){ -->
+			<!-- inputEmpty($(this)); -->
+		<!-- }else{ -->
+			<!-- inputNotEmpty($(this)); -->
+		<!-- } -->
+	<!-- }); -->
+	
+	// $('#abstract').val()不能为空
+	<!-- $('#abstract').change(function(){ -->
+		<!-- if($(this).val()==''){ -->
+			<!-- inputEmpty($(this)); -->
+			
+		<!-- }else{ -->
+			<!-- inputNotEmpty($(this)); -->
+		<!-- } -->
+	<!-- }); -->
+	
+	// $('#patTopic').val()不能为空
+	<!-- $('#patTopic').change(function(){ -->
+		<!-- if($(this).val()==''){ -->
+			<!-- inputEmpty($(this)); -->
+			
+		<!-- }else{ -->
+			<!-- inputNotEmpty($(this)); -->
+		<!-- } -->
+	<!-- }); -->
+	
+	// 应用jQuery的$.post提交表单，进行后续处理
+	<!-- $('input[type="submit"]').click(function(event) { -->
+		<!-- // jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作 -->
+        <!-- event.preventDefault(); -->
+		<!-- var obj1=$('#topic'); -->
+		<!-- var obj2=$('#abstract'); -->
+		<!-- var obj3=$('#patTopic'); -->
+		
+		<!-- // 3个必须输入的输入框都不为空才能post提交表单 -->
+		<!-- if(obj1.val()==''){ -->
+			<!-- inputEmpty(obj1); -->
+		<!-- }else if(obj2.val()==''){ -->
+			<!-- inputEmpty(obj2); -->
+		<!-- }else if(obj3.val()==''){ -->
+			<!-- inputEmpty(obj3); -->
+		<!-- }else{ -->
+			<!-- $.post('patIssOprt', -->
+				<!-- { -->
+					<!-- 'returnType':1, -->
+					<!-- 'role':'writer', -->
+					<!-- 'oprt':'addNew', -->
+					<!-- 'topic':$('#topic').val(), -->
+					<!-- 'issType':$('#issType').val(), -->
+					<!-- 'abstract':$('#abstract').val(), -->
+					<!-- 'patTopic':$('#patTopic').val(), -->
+					<!-- 'patType':$('#patType').val(), -->
+					<!-- 'writer':$('#writer').val(), -->
+					<!-- 'dept':$('#dept').val(), -->
+					<!-- 'patIssFile':$('#patIssFile').val() -->
+				<!-- }, -->
+				<!-- function(data){ -->
+					<!-- if(data=='success'){ -->
+						<!-- $("#modalPatIssTpl").modal("hide"); -->
+						<!-- // 重新载入文件 -->
+						<!-- $('#divPatIssTpl').load('patIssTpl',{'role':'writer','oprt':'addNew','returnType':0}); -->
+						<!-- $.alert(data); -->
+					<!-- }else{ -->
+						<!-- $("#modalPatIssTpl").modal(); -->
+				<!-- } -->
+				
+				<!-- } -->
+			<!-- ); -->
+		
+		<!-- } -->
+		
+	<!-- }); -->
+
+<!-- function -->
+	//**函数名：inputEmpty
+ 	//* 作用：检查带“*”输入框的值为空时，整个界面的提醒和显示
+	//* 参数1：obj，类型：对象。值：不为空。
+	<!-- function inputEmpty(obj){ -->
+		<!-- obj.parent().addClass('has-error'); -->
+		<!-- $('input[type="submit"]').hide(); -->
+		<!-- obj.next().show(); -->
+	<!-- } -->
+	
+	<!-- //**函数名：inputNotEmpty -->
+ 	<!-- //* 作用：检查带“*”输入框的值不为空时，整个界面的提醒和显示 -->
+	<!-- //* 参数1：obj，类型：对象。值：不为空。 -->
+	<!-- function inputNotEmpty(obj){ -->
+		<!-- obj.parent().removeClass('has-error'); -->
+		<!-- obj.next().hide(); -->
+		<!-- $('input[type="submit"]').show(); -->
+	<!-- } -->
+
+
+<!-- function -->
+	
+});
+
+
+</script>
+
