@@ -40,14 +40,14 @@
 		<h4><span class="label label-warning">事务信息</span></h4>
 		<div class="row">
 		<div class="form-group col-sm-8">
-			<label class="control-label" for="topic">名称<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<label class="control-label" for="topic">事务标题<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 			<input class="form-control" id="topic" name="topic" value="" type="text" placeholder="关于XX专利的YY申请" required>
 			
-			<span style="color:red;display: none;" class="tips">"名称"不能为空</span>
+			<span style="color:red;display: none;" class="tips">"事务标题"不能为空</span>
 		</div>
 		
 		<div class="form-group col-sm-4">
-			<label for="issType">类型</label>
+			<label for="issType">事务类型</label>
 			<select class="form-control" id="issType" name="issType" >
 				<option value="_ISST_PAT1">专利授权申报</option>
 				<option value="_ISST_PAT2">专利授权续费</option>
@@ -82,7 +82,7 @@
 				<div class="row">
 				<div class="form-group col-sm-6">
 					<label for="att">选择上传附件</label>
-					<input type="file" name="att" id="att" multiple="multiple">	
+					<input type="file" name="att" id="att" accept=".jpg,.jpeg,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">	
 					<blockquote>
 						<footer>附件小于等于：<mark class="text-danger">10MB</mark></footer>
 						<footer>附件文件类型：<mark>jpg,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx</mark></footer>
@@ -104,16 +104,16 @@
 				<div class="form-group col-sm-2">
 					
 					<label for="">附件类型</label>
-					<select class="form-control" id="" name="attSubType">
-						<option value="">报告</option>
-						<option value="">申请</option>
-						<option value="">请示</option>
-               
+					<select class="form-control" id="" name="attType">
+						<option value="_ATTT1">申请</option>
+						<option value="_ATTT2">请示</option>
+						<option value="_ATTT3">报告</option>
+						<option value="_ATTT4">预算报告</option>
 					</select>
 					
 				</div>
 		
-				<input id="attType" name="attType" value="_ATTT1" type="text" hidden="true">
+				<input id="attObj" name="attObj" value="_ATTO1" type="text" hidden="true">
 		
 				</div>
 				
@@ -122,7 +122,7 @@
 		
 		<div class="row">
 		<div class="form-group col-sm-12">
-			<input type="submit" class="btn btn-primary btn-sm" formenctype="multipart/form-data" value="保存"> 
+			<input type="submit" class="btn btn-primary btn-sm" value="保存"> 
 			<input type="reset" class="btn btn-primary btn-sm" value="重置" > 
 			<input type="button" class="btn btn-warning btn-sm pull-right" data-dismiss="modal" value="取消">
 		</div>
@@ -146,7 +146,7 @@ $(document).ready(function(){
 	
 	<!-- }); -->
 
-	// 监听上传进度，用回调函数实现？？
+	// 监听文件上传进度，用回调函数实现？？
     var xhrOnProgress = function(fun) {
         xhrOnProgress.onprogress = fun; //绑定监听
         return function(){
@@ -163,10 +163,9 @@ $(document).ready(function(){
         }
     };
 
-	<!-- // 应用jQuery的$.ajax提交表单，提交前进行一些验证准备 -->
-	// 需要输入框的“required”属性
+	<!-- // 应用jQuery的$.ajax提交表单，提交前进行一些验证准备。利用输入框的“required”属性避免输入框无内容 -->
 	$('#fmIssPat').submit(function(event){					
-		//jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作
+		//jQuery的preventDefault()方法阻止元素发生默认的行为——表单提交
         event.preventDefault();
 		
 		// 检查是否存在附件？？
@@ -175,9 +174,14 @@ $(document).ready(function(){
 		// 检查附件后缀名是否符合要求？？
 		
 		
-		// formdata形式上传表单数据
-		var formData = new FormData($('#fmIssPat')[0]);// 自动搜索表单信息(表单内没有name属性的input不会被搜索到)，IE<=9不支持FormData
-        formData.append('returnType', 1);// 还可以添加额外的表单数据
+		// formdata形式上传表单数据,自动搜索表单信息(表单内没有name属性的input不会被搜索到)，IE<=9不支持FormData
+		var formData = new FormData($('#fmIssPat')[0]);
+		// 添加表单内没有的内容
+        formData.append('returnType',0);
+		formData.append('role','writer');
+		formData.append('username','{$writer}');
+		formData.append('dept','{$dept}');
+		formData.append('oprt','addNew');
 			
         $.ajax({
             type: 'post',
@@ -194,9 +198,10 @@ $(document).ready(function(){
                 if(data.result=='success'){
 					$("#modalPatIssTpl").modal("hide");
 					// 重新载入文件
-					<!-- $('#divPatIss').load('patIss',{'role':'writer','oprt':'addNew','returnType':0}); -->
-					$('#divPatIss').load('patIss',{'role':'writer','returnType':0});
-					<!-- $.alert(data.msg+data.att); -->
+					$("#modalPatIssTpl").on('hidden.bs.modal',function(){
+						$('#patIss').load('{$home}/user/dashboard/patIss',{'role':'writer','returnType':0});
+					});
+					
 					$.alert(data.msg);
 				}else{
 					$("#modalPatIssTpl").modal();

@@ -100,27 +100,27 @@ $(document).ready(function(){
 		
 		// 组装post的数据
 		var role='{$role}';
-		var issType=$(this).attr("data-issue-type");
-		var issStatus=$(this).attr("data-issue-status");
-		var sendData={"role":role,"issType":issType,"issStatus":issStatus};
+		var issType=$(this).attr('data-issue-type');
+		var issStatus=$(this).attr('data-issue-status');
+		var sendData={'role':role,'issType':issType,'issStatus':issStatus};
 		
 		switch(issType){
 			case '_PATENT':
 				$(this).tab('show');
 				$(this).parent().addClass('active');
-				$("#patIss").load('patIss',sendData);
+				$('#patIss').load('patIss',sendData);
 			break;
 			
 			case '_PROJECT':
 				$(this).tab('show');
 				$(this).parent().addClass('active');
-				$("#proIss").load('proIss',sendData);
+				$('#proIss').load('proIss',sendData);
 			break;
 			
 			case '_THESIS':
 				$(this).tab('show');
 				$(this).parent().addClass('active');
-				$("#theIss").load('theIss',sendData);
+				$('#theIss').load('theIss',sendData);
 			break;
 		
 		}

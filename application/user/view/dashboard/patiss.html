@@ -1,5 +1,5 @@
 <!-- // patiss.html  -->
-<div id="divPatIss" class="tab-pane">
+<div id="divPatIss">
 	
 	<h4>专利总数<span class="badge">{$numTotal}</span></h4>
 	
@@ -18,7 +18,7 @@
 					
 					<th><a data-toggle="tooltip" href="#"  sortName="_DEPT" sort="{$sort}">所属部门</a></th>
 					
-					<th class="tpl">视图</th>
+					<th class="tpl">操作视图</th>
 					
 				</tr>
 			</thead>
@@ -62,11 +62,11 @@
 						
 		</div>
 	</div>
-			
-</div>
+</div>		
+
 
 <!-- Modal "modalPatIssTpl" -->
-<div class="modal fade " id="modalPatIssTpl" role="dialog">
+<div class="modal fade" id="modalPatIssTpl" role="dialog">
     <div class="modal-dialog modal-lg">
     
       <!-- Modal content-->
@@ -90,6 +90,7 @@
 	</div>
 </div>
 <!--/ Modal "modalPatIssTpl" -->
+
 
 <script>
 $(document).ready(function(){

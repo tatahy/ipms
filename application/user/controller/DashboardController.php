@@ -562,11 +562,11 @@ class DashboardController extends \think\Controller
       }
       
       //使用模型Patinfo
-      $pats = new IssinfoModel;
+      $issSet = new IssinfoModel;
       
       // 查出所有的用户并分页，根据“strOrder”排序，前端页面显示的锚点（hash值）为$fragment，设定分页页数变量：“pageTotalNum”
       // 带上每页显示记录行数$totalTableRows，实现查询结果分页显示。
-      $patIssTotal = $pats->where('id','>',0)
+      $patIssTotal = $issSet->where('id','>',0)
                         ->where($map)
                         ->order($strOrder)
                         ->paginate($patIssTableRows,false,['type'=>'bootstrap','var_page' => 'pageTotalNum',
@@ -575,7 +575,7 @@ class DashboardController extends \think\Controller
       // 获取分页显示
       $pageTotal = $patIssTotal->render();
       // 记录总数
-      $numTotal = $pats->where('id','>',0)->where($map)->count();
+      $numTotal = $issSet->where('id','>',0)->where($map)->count();
       
       //返回数据还是模板文件,‘0’为模板文件，‘1’为数据
       if($returnType){
@@ -654,55 +654,185 @@ class DashboardController extends \think\Controller
         $patIssId=0;
       }
       
-      // 获取表单上传附件文件
-     // if(!empty($request->file('att'))){
-//        $att=$request->file('att');
-//      }else{
-//        $att=0;
-//      }
+      // $attUpload接收前端页面传来的attUpload值，值为1表示后续有上传文件，为0表示后续无上传文件
+      if(!empty($request->param('attUpload'))){
+        $attUpload=$request->param('attUpload');
+      }else{
+        $attUpload=0;
+      }
       
-      //返回数据还是模板文件,‘0’为模板文件，‘1’为数据
+      // 获取表单上传附件文件
+      if(!empty($request->file('att'))){
+        $att=$request->file('att');
+      }else{
+        $att=0;
+      }
+      
+      //$returnType控制返回前端的数据，便于调试
       if($returnType){
         //return json(array('role'=>$role,'oprt'=>$oprt));
-        $data=array('result'=>'success','msg'=>'专利事务保存成功！');
+        $data=array('result'=>'success','msg'=>'专利事务保存成功'.' att:');
         return json($data);
         //return ($returnType);
       }else{
         // 按照role/oprt值的不同，渲染不同的模板文件并对数据库进行不同的操作
+        $today=date('Y-m-d H:i:s');
+        $result='';
+        $msg='';
         switch($role){
           
-          case "writer":
+          case 'writer':
               switch($oprt){
                 // writer 删除专利事务
-                case "delete":
+                case 'delete':
                   
+                  // 使用静态方法，向patinfo表删除
+                  PatinfoModel::destroy($request->request('patId'));
+                  
+                  // 使用静态方法，向issinfo表删除
+                  IssinfoModel::destroy($request->request('issId'));
+                  
+                  $result='success';
+                  $msg='专利事务已删除。<br>'.$oprt;
                 break;
                 
-                case "save":
+                case 'save':
                 
-                //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div> ';
+                  // 使用静态方法，向patinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
+                  $patSet = PatinfoModel::update([
+                      'topic'  => $request->request('patTopic'),
+                      'status' => '内审',
+                      'pattype'  => $request->request('patType'),
+                      //'addnewdate'=> $today,
+                      'author' => $request->request('username'),
+                      'dept' => $request->request('dept'),
+                  ], ['id' => $request->request('patId')]);
+                  if(!empty($patSet)){
+                    $result='success';
+                    $msg='专利信息已保存。<br>';
+                  }else{
+                    $msg='专利信息没有变化。<br>';
+                  }
+                  
+                  // 使用静态方法，向issinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
+                  $issSet = IssinfoModel::update([
+                      'topic'  => $request->request('topic'),
+                      'status' => '填报',
+                      'isstype'=>$request->request('issType'),
+                      //'objid'=>$request->request('patId'),
+//                      // 兼容之前的代码
+//                      'num_id'=>$request->request('patId'),
+                      'abstract'=>$request->request('abstract'),
+                      //'addnewdate'=> $today,
+                      'writer' => $request->request('username'),
+                      'dept' => $request->request('dept'),
+                  ], ['id' => $request->request('issId')]);
+                  if(!empty($issSet)){
+                    $result='success';
+                    $msg.='事务信息已保存。<br>';
+                  }else{
+                    $msg.='事务信息没有变化。<br>';
+                  }
+                  
+                  // 存储上传的附件    
+                  if($attUpload){
+                  // 使用静态方法，向attinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回
+                    $attSet = AttinfoModel::update([
+                      'num_id'  => $issSet->issnum,
+                      'name'  => $request->request('attName'),
+                      'atttype' => $request->request('attType'),
+                      'obj' => $request->request('attObj'),
+                      'objid' => $issId,
+                      //'uploaddate'=> $today,
+                      'uploader'=> $request->request('username'),
+                      'rolename'=> $role,
+                    ]);
+                    //完成附件上传
+                    $result=$this->_upload($att,$attSet->num_id);
+                      
+                    if($result=='success'){
+                      $msg.='附件上传成功。';
+                    }else{
+                      $msg.=$result;
+                    }
+                    
+                  }else{
+                    $result='success';
+                    $msg.='无附件上传。';
+                  }  
                 
-                return ('success');  
                 break;
                 
-                case "submit":
+                case 'submit':
                   
+                  $result='success';
+                  $msg='专利事务已提交。<br>'.$oprt;
                 break;
                 
                 // 默认为‘addNew’
                 default:
-                  // 向issinfo表写入信息
+                  // 因为专利id与事务id是1对多的关系，所以先写入patinfo表
                   
+                  // 使用静态方法，向patinfo表写入新pat信息
+                  $patSet = PatinfoModel::create([
+                    'topic'  => $request->param('patTopic'),
+                    'status' => '内审',
+                    'pattype'  => $request->param('patType'),
+                    'addnewdate'=> $today,
+                    'author' => $request->param('username'),
+                    'dept' => $request->param('dept'),
+                  ]);
+                  //静态方法创建新对象后，返回对象id
+                  $patId= $patSet->id;
                   
-                  // 向patinfo表写入信息
+                  // 使用静态方法，向issinfo表写入新iss信息
+                  $issSet = IssinfoModel::create([
+                    'topic'  => $request->param('topic'),
+                    'status' => '填报',
+                    'isstype'=>$request->param('issType'),
+                    'objid'=>$patId,
+                    // 兼容之前的代码
+                    'num_id'=>$patId,
+                    'abstract'=>$request->param('abstract'),
+                    'addnewdate'=> $today,
+                    'writer' => $request->param('username'),
+                    'dept' => $request->param('dept'),
+                  ]);
+                  //静态方法创建新对象后，返回对象id
+                  $issId= $issSet->id;
                   
-                  
-                  // 向attinfo表写入信息
-                  
-                  
-                  // 存储上传的附件
-                  
-                  
+                  // 存储上传的附件    
+                  if($attUpload){
+                    // 使用静态方法，向attinfo表写入新att信息，要用到$issId，因为attId与issId是多对一的关系
+                    $attSet = AttinfoModel::create([
+                      'num_id'  => $issSet->issnum,
+                      'name'  => $request->param('attName'),
+                      'atttype' => $request->param('attType'),
+                      'obj' => $request->param('attObj'),
+                      'objid' => $issId,
+                      'uploaddate'=> $today,
+                      'uploader'=> $request->param('username'),
+                      'rolename'=> $role,
+                    ]);
+                    //静态方法创建新对象后，返回对象id
+                    $attId= $attSet->id;
+                    
+                    //完成附件上传
+                    $result=$this->_upload($att,$attSet->num_id);
+                    
+                    if($result=='success'){
+                      $msg='添加专利事务成功。<br>附件上传成功。';
+                    }else{
+                      $msg=$result;
+                    }
+                    
+                  }else{
+                    $result='success';
+                    $msg='添加专利事务成功。<br>无附件上传。';
+                  }
+                
+               // $data=array('result'=>$result,'msg'=>$msg);
+//                return json($data);  
                 break;
                 
               }
@@ -710,19 +840,19 @@ class DashboardController extends \think\Controller
               
           break;
           
-          case "reviewer":
+          case 'reviewer':
           
           break;
           
-          case "approver":
+          case 'approver':
           
           break;
           
-          case "operator":
+          case 'operator':
           
           break;
           
-          case "maintainer":
+          case 'maintainer':
           
           break;
           
@@ -731,6 +861,9 @@ class DashboardController extends \think\Controller
           break;
           
         }
+        
+        $data=array('result'=>$result,'msg'=>$msg);
+        return json($data); 
         
         //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div> ';
         // 输出对应的模板文件
@@ -803,7 +936,7 @@ class DashboardController extends \think\Controller
                   $pat= PatinfoModel::get($iss->num_id);
                   
                   // 查出issue所对应的attachment
-                  $attSet= AttinfoModel::where('num_type','_ATTT1')->where('num_id',$patIssId)->select();
+                  $attSet= AttinfoModel::where('obj','_ATTO1')->where('objid',$patIssId)->select();
                   
                   $this->assign([
                     'home'=>$request->domain(),
@@ -929,7 +1062,50 @@ class DashboardController extends \think\Controller
       return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div> ';
       return view();
         
-    }     
+    }
+    
+     //上传文件
+    private function _upload($fileSet,$num_id)
+    {
+      
+      if(!empty($fileSet)){
+            // 移动到框架根目录的uploads/ 目录下,系统重新命名文件名
+            $info = $fileSet->validate(['size'=>10485760,'ext'=>'jpg,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx'])
+                        ->move(ROOT_PATH.DS.'uploads'.DS.$num_id);
+        }else{
+            $this->error('未选择文件，请选择需上传的文件。');
+        }
+        
+        if($info){
+            // 成功上传后 获取上传信息
+            // 文件的后缀名
+            $info->getExtension()."<br/>";
+            // 文件存放的文件夹路径：类似20160820/42a79759f284b767dfcb2a0197904287.jpg
+            $info->getSaveName()."<br/>";
+            // 完整的文件名
+            $info->getFilename(); 
+            
+            $path= '..'.DS.'uploads'. DS.$num_id.DS.$info->getSaveName();
+            
+            $attSet = AttinfoModel::where('num_id',$num_id)->find(); 
+            $attSet->save([
+              'attpath'=>$path,
+            ]);
+             
+            // 静态调用更新
+            //$attSet=AttinfoModel::update([
+//              'name'  => 'topthink',
+//              'email' => 'topthink@qq.com',
+//            ], ['num_id'=>$num_id]);
+            return "success";
+            
+        }else{
+            // 上传失败获取错误信息
+            //echo $file->getError();
+            return $fileSet->getError();
+        }
+      
+    }
     
     
     
