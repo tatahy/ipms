@@ -88,7 +88,7 @@
 						<footer>附件文件类型：<mark>jpg,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx</mark></footer>
 					</blockquote>
 					
-					<label for="att">上传进度</label>
+					<label for="">上传进度</label>
 					
 					<div class="progress progress-striped active">
     					<div id="divUpLoadProcess" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><span class="text-info">0%</span></div>
@@ -197,9 +197,9 @@ $(document).ready(function(){
             success: function(data) {
                 if(data.result=='success'){
 					$("#modalPatIssTpl").modal("hide");
-					// 重新载入文件
+					// 重新载入文件,data.patIssId为后端传来的新生成的issId
 					$("#modalPatIssTpl").on('hidden.bs.modal',function(){
-						$('#patIss').load('{$home}/user/dashboard/patIss',{'role':'writer','returnType':0});
+						$('#patIss').load('{$home}/user/dashboard/patIss',{'role':'writer','returnType':0,'patIssId':data.patIssId});
 					});
 					
 					$.alert(data.msg);
