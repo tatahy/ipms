@@ -5,7 +5,7 @@
  * @copyright 2017
  */
 
-namespace app\issue\model;
+namespace app\user\model;
 
 use think\Model;
 

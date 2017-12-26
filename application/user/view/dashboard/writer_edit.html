@@ -70,17 +70,18 @@
 		</div>
 		
 				
-		<label class="label label-warning" for="">事务附件</label>
-		
-		<label class="radio-inline">
-      		<input type="radio" name="attUpload" value="1">上传
-    	</label>
-    	<label class="radio-inline">
-      		<input type="radio" name="attUpload" value="0" checked>无
-    	</label>
-			
-			<div id="divAtt" hidden="true">
-				<div class="row">
+		<h4><span class="label label-warning">事务附件</span>
+			<label class="radio-inline ">
+      			<input type="radio" name="attUpload" value="0" checked><span class="label label-default">无</span>
+    		</label>
+			<label class="radio-inline">
+      			<input type="radio" name="attUpload" value="1"><span class="label label-default">上传</span>
+    		</label>
+    		
+		</h4>
+
+		<div id="divAtt" hidden="true">
+			<div class="row">
 				<div class="form-group col-sm-6">
 					<label for="att">选择附件</label>
 					<input type="file" name="att" id="att">	
@@ -120,9 +121,9 @@
 				<!-- // 与本页的formDataAjax函数配合，传递本页所编辑的信息对应的pasIssId值到后端 -->
 				<input id="trId" value="{$patIssId}" type="text" hidden="true">
 		
-				</div>
-				
 			</div>
+				
+		</div>
 		
 		<h4><span class="label label-warning">事务附件列表</span></h4>
 		<div class="row col-sm-12">
@@ -202,7 +203,7 @@ $(document).ready(function(){
         }
     };
 
-	<!-- // 应用jQuery的$.ajax提交表单，提交前进行一些验证准备。利用输入框的“required”属性避免输入框无内容 -->
+	<!-- // 应用jQuery的$.ajax提交表单，提交前进行一些验证准备。结合输入框的“required”属性避免输入框无内容 -->
 	$('#fmIssPat').submit(function(event){					
 		//jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作
         event.preventDefault();
@@ -214,19 +215,22 @@ $(document).ready(function(){
 		
 		var oprt=$('#oprt').val();
 		var str='确定';
+		var title=oprt;
 		switch(oprt){
 			case 'delete':
 				str='确定【<span class="glyphicon glyphicon-remove text-danger"></span>删除】操作？<hr>该操作将会同时删除已上传附件。';
+				title='【<span class="glyphicon glyphicon-remove text-danger"></span>删除】操作'
 			break;
 			
 			case 'submit':
 				str='确定【<span class="glyphicon glyphicon-ok text-success"></span>提交】操作？';
+				title='【<span class="glyphicon glyphicon-ok text-success"></span>提交】操作';
 			break;
 			
 			// oprt=='update'
 			default:
 				str='确定【更新】？';
-
+				title='【更新】操作';
 			break;
 		
 		}
@@ -235,7 +239,7 @@ $(document).ready(function(){
 		$.confirm(str,function(e){
 			con=e;
 			if(true==con){
-				formDataAjax(oprt,$('#fmIssPat'));
+				formDataAjax(oprt,$('#fmIssPat'),title);
 			}else{
 				$('#modalPatIssTpl').modal('show');
 			}
@@ -262,13 +266,13 @@ $(document).ready(function(){
 		$('#oprt').val($(this).attr('data-oprt'));
 	});
 	
-	
-	
 	// 单选按钮选中“上传”项后，出现附件上传的输入框们。
 	$('input:radio[name="attUpload"]').change(function(){
 		// 选中的单选按钮的value值，值为“1”是选中的“上传”项
 		var v=$(this).attr('value');
 		if(v==1){
+			$(this).next().addClass('label-warning');
+			
 			// 为'#attName'和'#att'添加'required'属性，其值为true，保证在表单提交时必填
 			$('#att').attr('required',true);
 			$('#attName').attr('required',true);
@@ -281,7 +285,8 @@ $(document).ready(function(){
 			// 上传的输入框们现身
 			$('#divAtt').show();
 		}else{
-			// 为'#attName'和'#att'添加'required'属性，其值为false，保证在表单提交时忽略
+			$('input:radio[name="attUpload"][value="1"]').next().removeClass('label-warning');
+			//为'#attName'和'#att'添加'required'属性，其值为false，保证在表单提交时忽略
 			$('#attName').attr('required',false);
 			$('#att').attr('required',false);
 			// 上传的输入框们退场
@@ -306,7 +311,8 @@ $(document).ready(function(){
  	//* 作用：应用jQuery的$.ajax向后端提交formData数据
 	//* 参数1：oprt，类型：字符。值：不为空。说明：表示触发本函数的‘操作’
 	//* 参数2：fmObj，类型：对象。值：可为空，默认为空。说明：表示需要一起提交的表单。
-	function formDataAjax(oprt,fmObj){
+	//* 参数3：title，类型：字符。值：不为空。说明：本函数显示的提示框$.alert的标题内容。
+	function formDataAjax(oprt,fmObj,title){
 	// formdata形式上传表单数据,自动搜索表单信息(表单内没有name属性的input不会被搜索到)，IE<=9不支持FormData
 		if(fmObj){
 			var formData = new FormData(fmObj[0]);
@@ -354,8 +360,8 @@ $(document).ready(function(){
 						// 重新载入文件
 						$('#patIss').load('{$home}/user/dashboard/patIss',{'role':'writer','returnType':0,'issType':'_PATENT','issStatus':'_TODO','patIssId':'{$iss.id}'});
 					}
-	
-					$.alert(data.msg);
+					// 操作成功，提示框显示信息
+					$.alert(title+'成功<span class="glyphicon glyphicon-ok text-success"></span><hr>'+data.msg);
 				}else{
 					$('#modalPatIssTpl').modal();
 					<!-- $.alert(data.msg); -->

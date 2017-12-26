@@ -6,9 +6,11 @@ use think\Session;
 
 use app\user\model\User as UserModel;
 use app\user\model\Rolety as RoletyModel;
-use app\issue\model\Issinfo as IssinfoModel;
-use app\patent\model\Patinfo as PatinfoModel;
-use app\attachment\model\Attinfo as AttinfoModel;
+use app\user\model\Issinfo as IssinfoModel;
+use app\user\model\Issrecord as IssrecordModel;
+use app\user\model\Patinfo as PatinfoModel;
+use app\user\model\Patrecord as PatrecordModel;
+use app\user\model\Attinfo as AttinfoModel;
 
 class DashboardController extends \think\Controller
 {
@@ -478,7 +480,7 @@ class DashboardController extends \think\Controller
                 
             //默认'_TODO':
             default:
-              $map['status'] ='拟申报';
+              $map['status'] ='待审核';
             break;
           }  
         break;
@@ -544,7 +546,7 @@ class DashboardController extends \think\Controller
           switch($issStatus){
             
             case '_INPROCESS':
-              $map['status'] =['in',['拟申报','审核通过','不予推荐']];
+              $map['status'] =['in',['待审核','审核通过','不予推荐']];
               
             break;
            
@@ -576,6 +578,7 @@ class DashboardController extends \think\Controller
       $patIssTotal = $issSet->where('id','>',0)
                         ->where($map)
                         ->order($strOrder)
+                        //->with('patinfo')
                         ->paginate($patIssTableRows,false,['type'=>'bootstrap','var_page' => 'pageTotalNum',
                         'query'=>['patIssTableRows'=>$patIssTableRows]]);
                         
@@ -702,34 +705,36 @@ class DashboardController extends \think\Controller
                   
                   $issSet=IssinfoModel::get($request->request('issId'));
                   $numId=$issSet->issnum;
-                  // 删除step1，删除所有附件文件
-                  $attSet= AttinfoModel::where('num_id',$numId)->select();
-                  for($i=0;$i<count($attSet);$i++){
-                    $result=$this->_deleteAtt($attSet[$i]->attpath);
+                  // 删除step1，删除由$dirName指定的目录及其文件
+                  $dirName=ROOT_PATH.DS.'uploads'.DS.$numId;
+                  if(is_dir($dirName)){
+                    $result=$this->_deleteDirs($dirName);
+                    $msg='附件删除。<br>';
+                  }else{
+                    $result="error";
+                    // "text-danger"为前端已定义好的css标签
+                    $msg='事务删除失败。<br><span class="text-danger">附件文件不存在。</span>';
+                    // 中断删除操作，向前端反馈信息。
+                    $data=array('result'=>$result,'msg'=>$msg,'patIssId'=>$issId);
+                    return json($data);  
                   }
                   
-                  // 删除step2，使用静态方法的闭包查询条件，向attinfo表删除
+                  // 删除step2，指定条件删除数据，向attinfo表删除
                   AttinfoModel::destroy([
                     'num_id' => $numId,
                   ]);
                                     
                   // 删除step3，使用静态方法，向patinfo表删除
-                  //PatinfoModel::destroy($request->request('patId'));
+                  PatinfoModel::destroy($request->request('patId'));
                   
                  
                   // 删除step4，使用静态方法，向issinfo表删除
                   IssinfoModel::destroy($request->request('issId'));
-                  
-                  // 删除step5，删除$numId的文件夹
-                  if(is_dir(ROOT_PATH.DS.'uploads'.DS.$numId)){
-                    rmdir(ROOT_PATH.DS.'uploads'.DS.$numId); 
-                  }
-                  
-                  
+                 
                   if('success'==$result){
-                    $msg='专利事务已删除。<br>';
+                    $msg.='专利事务删除成功。<br>';
                   }else{
-                    $msg='专利事务删除出错。<br>'.$oprt;
+                    $msg='专利事务删除出错。<br>';
                   }
                   
                 break;
@@ -796,9 +801,80 @@ class DashboardController extends \think\Controller
                 break;
                 
                 case 'submit':
+                // 使用静态方法，向patinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
+                  PatinfoModel::update([
+                      'topic'  => $request->request('patTopic'),
+                      'status' => '内审',
+                      'pattype'  => $request->request('patType'),
+                      'addnewdate'=> $today,
+                      'author' => $request->request('username'),
+                      'dept' => $request->request('dept'),
+                  ], ['id' => $request->request('patId')]);
+                  $result='success';
+                  $msg='专利信息已更新。<br>';
+                  
+                  // 使用静态方法，向issinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
+                  IssinfoModel::update([
+                      'topic'  => $request->request('topic'),
+                      'status' => '待审核',
+                      'isstype'=>$request->request('issType'),
+                      'abstract'=>$request->request('abstract'),
+                      'submitdate'=> $today,
+                      'writer' => $request->request('username'),
+                      'dept' => $request->request('dept'),
+                  ], ['id' => $request->request('issId')]);
+                  $result='success';
+                  $msg.='事务信息已更新。<br>';
+                  
+                  $issSet = IssinfoModel::get($request->request('issId'));
+                  
+                  $issId=$request->request('issId');
+                  $num=$issSet->issnum;
+                  
+                  // 使用静态方法，向issrecord表新增信息。
+                  $issRecordSet=IssrecordModel::create([
+                    'num'=>$num,
+                    'act'=>'提交',
+                    'actdetail'=>'专利事务"'.$request->request('topic').'"提交审查',
+                    'acttime'=>$today,
+                    'username'=>$request->param('username'),
+                    'rolename'=>$role,
+                    'issinfo_id'=>$issId,
+                  ]);
+                  //静态方法创建新对象后，返回对象id
+                  $issRecordId= $issRecordSet->id;
+                  
+                  // 存储上传的附件    
+                  if($attUpload){
+                  $issSet = IssinfoModel::get($request->request('issId'));
+                  
+                  // 使用静态方法，向attinfo表新增附件文件
+                    $attSet = AttinfoModel::create([
+                      'num_id'  => $issSet->issnum,
+                      'name'  => $request->request('attName'),
+                      'atttype' => $request->request('attType'),
+                      'obj' => $request->request('attObj'),
+                      'objid' => $request->request('issId'),
+                      'uploaddate'=> $today,
+                      'uploader'=> $request->request('username'),
+                      'rolename'=> $role,
+                    ]);
+                    //完成附件上传
+                    $result=$this->_uploadAtt($att,$attSet->num_id);
+                      
+                    if($result=='success'){
+                      $msg.='新附件上传成功。<br>';
+                    }else{
+                      $msg.=$result;
+                    }
+                    
+                  }else{
+                    $result='success';
+                    $msg.='无新附件上传。<br>';
+                  }  
                   
                   $result='success';
-                  $msg='专利事务已提交。<br>';
+                  $msg.='专利事务<strong>"'.$request->request('topic').'"</strong>已提交。请留意后续审批结果。<br>';
                 break;
                 
                 // 默认为‘addNew’
@@ -817,6 +893,19 @@ class DashboardController extends \think\Controller
                   //静态方法创建新对象后，返回对象id
                   $patId= $patSet->id;
                   
+                  // 使用静态方法，向patrecord表新增信息。
+                  $patRecordSet=PatrecordModel::create([
+                    'num'=>$patSet->patnum,
+                    'act'=>'填报',
+                    'actdetail'=>'专利"'.$request->param('patTopic').'"填报',
+                    'acttime'=>$today,
+                    'username'=>$request->param('username'),
+                    'rolename'=>$role,
+                    'patinfo_id'=>$patId,
+                  ]);
+                  //静态方法创建新对象后，返回对象id
+                  $patRecordId= $patRecordSet->id;
+                  
                   // 使用静态方法，向issinfo表写入新iss信息
                   $issSet = IssinfoModel::create([
                     'topic'  => $request->param('topic'),
@@ -832,6 +921,19 @@ class DashboardController extends \think\Controller
                   ]);
                   //静态方法创建新对象后，取得返回对象的id
                   $issId= $issSet->id;
+                  
+                  // 使用静态方法，向issrecord表新增信息。
+                  $issRecordSet=IssrecordModel::create([
+                    'num'=>$issSet->issnum,
+                    'act'=>'填报',
+                    'actdetail'=>'专利事务"'.$request->request('topic').'"填报',
+                    'acttime'=>$today,
+                    'username'=>$request->param('username'),
+                    'rolename'=>$role,
+                    'issinfo_id'=>$issId,
+                  ]);
+                  //静态方法创建新对象后，返回对象id
+                  $issRecordId= $issRecordSet->id;
                   
                   // 存储上传的附件    
                   if($attUpload){
@@ -864,7 +966,7 @@ class DashboardController extends \think\Controller
                   }
                 
                 $data=array('result'=>$result,'msg'=>$msg,'patIssId'=>$issId);
-                return json($data);  
+                ///return json($data);  
                 break;
                 
               }
@@ -1143,23 +1245,36 @@ class DashboardController extends \think\Controller
       
     }
     
-    //删除附件文件
-    private function _deleteAtt($attpath)
+    //删除$dirName目录及其文件
+    // 应用php5里的dir,is_dir,unlink,rmdir
+    private function _deleteDirs($dirName)
     {
-        //删除文件，成功后返回
-        if(file_exists($attpath)){
-          unlink($attpath);
-          
-          return "success";	
-        }else{
-          //exit();
-          return 0;	       
+        //循环删除目录和文件，成功后返回 "success"
+        $d=dir($dirName);
+        $result=0;
+        while(false!==($child=$d->read())){
+          // 清除目录里所有的文件
+          if($child!="."&&$child!=".."){
+            if(is_dir($dirName.DS.$child)){
+              // 递归调用自己
+              $this->_deleteDirs($dirName.DS.$child);
+            }else{
+              unlink($dirName.DS.$child);
+              
+            }
+          }
         }
+        $d->close();
         
-        //return '<style type="text/css">*{ padding: 0; margin: 0; } div{ padding: 4px 48px;} a{color:#2E5CD5;cursor: pointer;text-decoration: none} a:hover{text-decoration:underline; } body{ background: #fff; font-family: "Century Gothic","Microsoft yahei"; color: #333;font-size:18px;} h1{ font-size: 100px; font-weight: normal; margin-bottom: 12px; } p{ line-height: 1.6em; font-size: 42px }</style><div style="padding: 24px 48px;"> <h1>:)</h1><p> ThinkPHP V5<br/><span style="font-size:30px">十年磨一剑 - 为API开发设计的高性能框架</span></p><span style="font-size:22px;">[ V5.0 版本由 <a href="http://www.qiniu.com" target="qiniu">七牛云</a> 独家赞助发布 ]</span></div><script type="text/javascript" src="http://tajs.qq.com/stats?sId=9347272" charset="UTF-8"></script><script type="text/javascript" src="http://ad.topthink.com/Public/static/client.js"></script><thinkad id="ad_bd568ce7058a1091"></thinkad>';
+        //清除目录
+        rmdir($dirName);
+        
+        if(is_dir($dirName)){
+          $result=$dirName;
+        }else{
+          $result="success";
+        }
+        return $result;
     }
-    
-    
-    
     
 }

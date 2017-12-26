@@ -11,6 +11,10 @@
 					<th><a data-toggle="tooltip" href="#"  sortName="_TOPIC" sort="{$sort}">标题</a></th>
 					<th><a data-toggle="tooltip" href="#"  sortName="_ABSTRACT" sort="{$sort}">摘要</a></th>
 					<th><a data-toggle="tooltip" href="#"  sortName="_STATUS" sort="{$sort}">状态</a></th>
+					
+					<th><a data-toggle="tooltip" href="#"  sortName="_STATUS" sort="{$sort}">专利名称</a></th>
+					<th><a data-toggle="tooltip" href="#"  sortName="_STATUS" sort="{$sort}">专利类型</a></th>
+					
 					<th><a data-toggle="tooltip" href="#"  sortName="_SUBMITDATE" sort="{$sort}">提交日期</a></th>
 					
 					<th><a data-toggle="tooltip" href="#"  sortName="_WRITER" sort="{$sort}">撰写人</a></th>
@@ -26,9 +30,13 @@
 				{volist name="patIssTotal" id="vo" empty="暂时没有数据"}
 				<tr>
 					<td>{$i+($pageTotalNum-1)*$patIssTableRows}</a></td>
-					<td class="patInfo"><a href="{$home}/patent/index/patinfo/id/{$vo.num_id}" target="_blank" data-toggle="tooltip">{$vo.topic}</a></td>
+					<td class="issInfo"><a href="{$home}/issue/index/issinfo/id/{$vo.id}" target="_blank" data-toggle="tooltip">{$vo.topic}</a></td>
 					<td>{$vo.abstract}</td>
 					<td class="patIssStatus">{$vo.status}</td>
+					
+					<td class="patInfo"><a href="{$home}/patent/index/patinfo/id/{$vo.num_id}" target="_blank" data-toggle="tooltip">xx</a></td>
+					<td>xx</td>
+					
 					<td>{$vo.submitdate}</td>
 					
 					<td>{$vo.writer}</td>
@@ -297,7 +305,8 @@ $(document).ready(function(){
 	// 添加bootstrap的tooltip属性
 	$('#divPatIss thead th a').tooltip({title: '点击排序', placement: 'bottom'});
 	
-	$('.patInfo a').tooltip({title: '对应的专利信息', placement: 'bottom'});
+	$('.patInfo a').tooltip({title: '专利信息', placement: 'bottom'});
+	$('.issInfo a').tooltip({title: '事务信息', placement: 'bottom'});
 
 	// 根据后端控制器给出的排序字段{$sortName},排序方式{$sort}，修改th中a的显示形式
 	$('#divPatIss thead a').each(function(){

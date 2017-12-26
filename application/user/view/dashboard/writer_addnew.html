@@ -65,18 +65,15 @@
 		</div>
 		</div>
 		
-		<!-- <div id="divUpload" class="form-group"> -->
-			<label class="label label-warning" for="" >事务附件</label>
-		
-			<label class="radio-inline">
-      			<input type="radio" name="attUpload" value="1">上传
+		<h4><span class="label label-warning">事务附件</span>
+			<label class="radio-inline ">
+      			<input type="radio" name="attUpload" value="0" checked><span class="label label-default">无</span>
     		</label>
-    		<label class="radio-inline">
-      			<input type="radio" name="attUpload" value="0" checked>无
+			<label class="radio-inline">
+      			<input type="radio" name="attUpload" value="1"><span class="label label-default">上传</span>
     		</label>
     		
-
-		<!-- </div> -->
+		</h4>
 			
 			<div id="divAtt" hidden="true">
 				<div class="row">
@@ -215,9 +212,10 @@ $(document).ready(function(){
 	// 单选按钮选中“上传”项后，出现附件上传的输入框们。
 	$('input:radio[name="attUpload"]').change(function(){
 		// 选中的单选按钮的value值，值为“1”是选中的“上传”项
-		var v=$(this).attr("value");
-		
+		var v=$(this).attr('value');
 		if(v==1){
+			$(this).next().addClass('label-warning');
+			
 			// 为'#attName'和'#att'添加'required'属性，其值为true，保证在表单提交时必填
 			$('#att').attr('required',true);
 			$('#attName').attr('required',true);
@@ -230,7 +228,8 @@ $(document).ready(function(){
 			// 上传的输入框们现身
 			$('#divAtt').show();
 		}else{
-			// 为'#attName'和'#att'添加'required'属性，其值为false，保证在表单提交时忽略
+			$('input:radio[name="attUpload"][value="1"]').next().removeClass('label-warning');
+			//为'#attName'和'#att'添加'required'属性，其值为false，保证在表单提交时忽略
 			$('#attName').attr('required',false);
 			$('#att').attr('required',false);
 			// 上传的输入框们退场

@@ -1,0 +1,109 @@
+$("#actdetail").focus();
+		<!-- #actdetail失去焦点时判断是否填入了内容，否则拉回焦点填入内容  -->
+		$("#actdetail").focusout(function(){
+			if($("#actdetail").val()==''){
+				$.alert("请填入审批意见。");
+				$("#actdetail").val("退回修改").css('background','#00CCFF');
+				$("#actdetail").focus();
+			}
+		});
+
+<!-- //ThinkPHP V5的渲染页面	 -->
+return '<style type="text/css">*{ padding: 0; margin: 0; } div{ padding: 4px 48px;} a{color:#2E5CD5;cursor: pointer;text-decoration: none} a:hover{text-decoration:underline; } body{ background: #fff; font-family: "Century Gothic","Microsoft yahei"; color: #333;font-size:18px;} h1{ font-size: 100px; font-weight: normal; margin-bottom: 12px; } p{ line-height: 1.6em; font-size: 42px }</style><div style="padding: 24px 48px;"> <h1>:)</h1><p> ThinkPHP V5<br/><span style="font-size:30px">十年磨一剑 - 为API开发设计的高性能框架</span></p><span style="font-size:22px;">[ V5.0 版本由 <a href="http://www.qiniu.com" target="qiniu">七牛云</a> 独家赞助发布 ]</span></div><script type="text/javascript" src="http://tajs.qq.com/stats?sId=9347272" charset="UTF-8"></script><script type="text/javascript" src="http://ad.topthink.com/Public/static/client.js"></script><thinkad id="ad_bd568ce7058a1091"></thinkad>';		
+		
+<!-- //简单渲染页面，IPMS V3	 -->
+return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
+
+$("#report").focusout(function(){
+				if($("#report").text()!=''){
+					<!-- 弹出自定义提示页面，确定后跳转并传参  -->
+					$.confirm('确定提交&nbsp;‘任务报告’&nbsp;？',function(e){
+						con=e;
+						if(true==con)window.location.href="<{$home}>/issue/index/isssave"+"/issnum/"+"<{$issnum}>"+"/operate/"+$("#btnReport").val()+"/rolename/"+"<{$rolename}>"+"/actdetail/"+$("#report").text();
+					}).ok('同意').cancel('取消');
+				}
+});
+
+
+
+<!-- ?? HY 2017/5/27 -->
+	<!-- 接受任务 -->
+	$("#btnAccept").click(function(){
+		<!-- 弹出自定义提示页面，确定后跳转并传参  -->
+		$.confirm('确定&nbsp;‘领受任务’&nbsp;？',function(e){
+			con=e;
+			if(true==con)window.location.href="<{$home}>/issue/index/isssave"+"/issnum/"+"<{$issnum}>"+"/operate/"+$("#btnAccept").val()+"/rolename/"+"<{$rolename}>"+"/actdetail/"+$("#btnAccept").val();
+			
+		}).ok('同意').cancel('取消');		
+    });	
+
+			<!-- 用ajax实现上述代码块if(true==con)的功能 -->
+			if(true==con){
+				$.post("<{$home}>/issue/index/isssave",
+					{
+						issnum: "<{$issnum}>",
+						operate: $("#btnReject").val(),
+						rolename: "<{$rolename}>",
+						actdetail: $("#actdetail").val()
+				
+					},function(id){window.location.href="<{$home}>/issue/index/issinfo"+"/id/"+id});
+				
+			}
+<!-- /?? -->
+
+<!-- maintainer专利管理页面，根据专利状态不同需调整页面的输入框			 -->
+$("#divAddnewDate").show().html('<p><strong>填报日期：</strong><{$addnewdate}></p>');
+$(".statusShow td").children().hide();
+				
+				$("#divStatusChange").show();
+				<!-- $("#divApplyDate").hide(); 申请日期-->
+				<!-- $("#divModifyDate").hide(); 返回修改日期-->
+				<!-- $("#divAJDate").hide(); 授权/驳回日期：-->
+				<!-- $("#divdivRenewdlDate").hide(); 授权续费截止日期：-->
+				<!-- $("#divRADate").hide(); 续费/放弃日期：-->
+				<!-- $("#divNextrenewDate").hide(); 下次续费日期：-->
+				
+				
+				$("#divPatNum").show();
+				<!-- $("#divPatApplynum").hide(); 申请编号-->
+				<!-- $("#divPatAuthnum").hide(); 授权编号-->
+				<!-- $("#divPatAgency").hide(); 代理机构-->
+				<!-- $("#divPatAdmin").hide(); 授权机构-->
+				<!-- $("#divRAReason").hide(); 放弃/驳回原因-->
+				<!-- $("#divModSuggestion").hide(); 修改建议-->
+		
+
+<!-- /maintainer专利管理页面，根据专利状态不同需调整页面的输入框			 -->
+
+switch(){
+                    case '':
+                    
+                    break;
+                    
+                    case '':
+                    
+                    break;
+                    
+                    default:
+                    
+                    break;
+                    
+                    
+                }
+
+<{switch name="变量" }>
+    <{case value="值1" break="0或1"}>输出内容1<{/case}>
+    <{case value="值2"}>输出内容2<{/case}>
+    <{default /}>默认情况
+<{/switch}>
+
+简洁的用法
+<{switch $User.userId}>
+    <{case $adminId}> admin<{/case}>
+    <{case $memberId}> member<{/case}>
+<{/switch}>
+
+
+
+				
+				
