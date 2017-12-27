@@ -38,22 +38,27 @@ class Attinfo extends Model
 //    }
     
     //获取issinfo的多态模型,涉及issinfo表中的num_id和num_type两个字段内容
-     public function num()
+    // public function num()
+//    {
+//        return $this->morphTo(null, [
+//            '0' => 'app\issue\model\Issinfo',
+//            '1' => 'app\project\model\Proinfo',
+//            '2' => 'app\patent\model\Patinfo',
+//            
+//        ]);
+//    }
+    
+    //获取attachment的多态模型,涉及attinfo表中的attmap_id和attmap_type两个字段内容
+     public function attmap()
     {
         return $this->morphTo(null, [
-            '0' => 'app\issue\model\Issinfo',
-            '1' => 'app\project\model\Proinfo',
-            '2' => 'app\patent\model\Patinfo',
-            
+            '_ATTO1' => 'Issinfo',
+            '_ATTO2' => 'Patinfo',
+            '_ATTO3' => 'Proinfo',
+            '_ATTO4' => 'Theinfo',
         ]);
     }
 
-
-    
-    
 }
-    
-
-
 
 ?>

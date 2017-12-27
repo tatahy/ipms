@@ -27,9 +27,9 @@
 		<div class="form-group col-sm-4">
 			<label for="patType">专利类型</label>
 			<select class="form-control" id="patType" name="patType">
-				{present name="pat.pattype"}
-					<option value="{$pat.pattype}" selected>{$pat.pattype}</option>
-				{/present}
+				<!-- {present name="pat.pattype"} -->
+					<!-- <option value="{$pat.pattype}" selected>{$pat.pattype}</option> -->
+				<!-- {/present} -->
 				
 				<option value="0">……</option>
 				<option value="_PATT1">发明专利</option>
@@ -55,7 +55,7 @@
 			<label for="issType">事务类型</label>
 			<select class="form-control" id="issType" name="issType" >
 				<option value="_ISST_PAT1">专利授权申报</option>
-				<option value="_ISST_PAT2">专利授权续费</option>
+				<option value="_ISST_PAT2">专利授权到期续费</option>
                
 			</select>
 		</div>
@@ -70,7 +70,7 @@
 		</div>
 		
 				
-		<h4><span class="label label-warning">事务附件</span>
+		<h4><span class="label label-warning">事务附件上传</span>
 			<label class="radio-inline ">
       			<input type="radio" name="attUpload" value="0" checked><span class="label label-default">无</span>
     		</label>
@@ -106,7 +106,7 @@
 				<div class="form-group col-sm-2">
 					
 					<label for="">附件类型</label>
-					<select class="form-control" id="" name="attType">
+					<select class="form-control" id="attType" name="attType">
 						<option value="_ATTT1">申请</option>
 						<option value="_ATTT2">请示</option>
 						<option value="_ATTT3">报告</option>
@@ -144,7 +144,7 @@
 					</tr>
 				</thead>
 				<tbody><!-- 此处显示数据库查询后的数据集 -->
-					{volist name="attSet" id="vo" empty="暂无附件"}
+					{volist name="att" id="vo" empty="暂无附件"}
 					<tr>
 						<!-- <td><input type="checkbox" check=""></td> -->
 						<td>{$i}</td>
@@ -250,6 +250,13 @@ $(document).ready(function(){
 	if('填报'=='{$iss.status}'){		
 		$('#btnSubmit').after('&nbsp;<button type="submit" id="btnDelete" class="btn btn-danger btn-sm" data-oprt="delete"><span class="glyphicon glyphicon-remove"></span>删除</button>');
 	}
+	
+	// select显示为后端传来的内容
+	$('#patType').val('{$pat->getData('pattype')}').attr('selected');
+	$('#issType').val('{$iss.issmap_type}').attr('selected');
+	
+	//$('#patType').text('{$pat.pattype}').attr('selected');
+	//$('#issType').text('{$iss.issmap_type}').attr('selected');
 	
 	// 点击删除按钮，与form的submit()配合确定传给后端的oprt='delete'
 	$('#btnDelete').click(function(){

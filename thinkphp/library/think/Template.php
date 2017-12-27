@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006~2016 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006~2017 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -12,6 +12,7 @@
 namespace think;
 
 use think\exception\TemplateNotFoundException;
+use think\template\TagLib;
 
 /**
  * ThinkPHP分离出来的模板引擎
@@ -25,6 +26,7 @@ class Template
     // 引擎配置
     protected $config = [
         'view_path'          => '', // 模板路径
+        'view_base'          => '',
         'view_suffix'        => 'html', // 默认模板文件后缀
         'view_depr'          => DS,
         'cache_suffix'       => 'php', // 默认模板缓存后缀
@@ -33,7 +35,7 @@ class Template
         'tpl_begin'          => '{', // 模板引擎普通标签开始标记
         'tpl_end'            => '}', // 模板引擎普通标签结束标记
         'strip_space'        => false, // 是否去除模板文件里面的html空格与换行
-        'tpl_cache'          => false, // 是否开启模板编译缓存,设为false则每次都会重新编译
+        'tpl_cache'          => true, // 是否开启模板编译缓存,设为false则每次都会重新编译
         'compile_type'       => 'file', // 模板编译类型
         'cache_prefix'       => '', // 模板缓存前缀标识，可以动态改变
         'cache_time'         => 0, // 模板缓存有效期 0 为永久，(以数字为值，单位:秒)
@@ -56,8 +58,9 @@ class Template
     protected $storage;
 
     /**
-     * 架构函数
+     * 构造函数
      * @access public
+     * @param array $config
      */
     public function __construct(array $config = [])
     {
@@ -119,7 +122,7 @@ class Template
      * 模板引擎配置项
      * @access public
      * @param array|string $config
-     * @return void|array
+     * @return string|void|array
      */
     public function config($config)
     {
@@ -127,6 +130,8 @@ class Template
             $this->config = array_merge($this->config, $config);
         } elseif (isset($this->config[$config])) {
             return $this->config[$config];
+        } else {
+            return;
         }
     }
 
@@ -231,7 +236,7 @@ class Template
      * @access public
      * @param mixed     $name 布局模板名称 false 则关闭布局
      * @param string    $replace 布局模板内容替换标识
-     * @return object
+     * @return Template
      */
     public function layout($name, $replace = '')
     {
@@ -665,7 +670,7 @@ class Template
             $content = str_replace($matches[0], '', $content);
             return explode(',', $matches['name']);
         }
-        return null;
+        return;
     }
 
     /**
@@ -685,6 +690,7 @@ class Template
         } else {
             $className = '\\think\\template\\taglib\\' . ucwords($tagLib);
         }
+        /** @var Taglib $tLib */
         $tLib = new $className($this);
         $tLib->parseTag($content, $hide ? '' : $tagLib);
         return;
@@ -760,31 +766,26 @@ class Template
                             } else {
                                 if (isset($array[1])) {
                                     $this->parseVar($array[2]);
-                                    $_name = ' && ' . $name . $array[1] . $array[2];
+                                    $express = $name . $array[1] . $array[2];
                                 } else {
-                                    $_name = '';
+                                    $express = false;
                                 }
                                 // $name为数组
                                 switch ($first) {
                                     case '?':
                                         // {$varname??'xxx'} $varname有定义则输出$varname,否则输出xxx
-                                        $str = '<?php echo isset(' . $name . ')' . $_name . ' ? ' . $name . ' : ' . substr($str, 1) . '; ?>';
+                                        $str = '<?php echo ' . ($express ?: 'isset(' . $name . ')') . '?' . $name . ':' . substr($str, 1) . '; ?>';
                                         break;
                                     case '=':
                                         // {$varname?='xxx'} $varname为真时才输出xxx
-                                        $str = '<?php if(!empty(' . $name . ')' . $_name . ') echo ' . substr($str, 1) . '; ?>';
+                                        $str = '<?php if(' . ($express ?: '!empty(' . $name . ')') . ') echo ' . substr($str, 1) . '; ?>';
                                         break;
                                     case ':':
                                         // {$varname?:'xxx'} $varname为真时输出$varname,否则输出xxx
-                                        $str = '<?php echo !empty(' . $name . ')' . $_name . '?' . $name . $str . '; ?>';
+                                        $str = '<?php echo ' . ($express ?: '!empty(' . $name . ')') . '?' . $name . $str . '; ?>';
                                         break;
                                     default:
-                                        if (strpos($str, ':')) {
-                                            // {$varname ? 'a' : 'b'} $varname为真时输出a,否则输出b
-                                            $str = '<?php echo !empty(' . $name . ')' . $_name . '?' . $str . '; ?>';
-                                        } else {
-                                            $str = '<?php echo ' . $_name . '?' . $str . '; ?>';
-                                        }
+                                        $str = '<?php echo ' . ($express ?: '!empty(' . $name . ')') . '?' . $str . '; ?>';
                                 }
                             }
                         } else {
@@ -924,7 +925,7 @@ class Template
                         if (false === strpos($name, '(')) {
                             $name = '(isset(' . $name . ') && (' . $name . ' !== \'\')?' . $name . ':' . $args[1] . ')';
                         } else {
-                            $name = '(' . $name . ' !== \'\'?' . $name . ':' . $args[1] . ')';
+                            $name = '(' . $name . ' ?: ' . $args[1] . ')';
                         }
                         break;
                     default: // 通用模板函数
@@ -957,78 +958,66 @@ class Template
      * @param  array $vars 变量数组
      * @return string
      */
-    public function parseThinkVar(&$vars)
+    public function parseThinkVar($vars)
     {
-        $vars[0]  = strtoupper(trim($vars[0]));
-        $parseStr = '';
-        if (count($vars) >= 2) {
-            $vars[1] = trim($vars[1]);
-            switch ($vars[0]) {
+        $type  = strtoupper(trim(array_shift($vars)));
+        $param = implode('.', $vars);
+        if ($vars) {
+            switch ($type) {
                 case 'SERVER':
-                    $parseStr = '$_SERVER[\'' . strtoupper($vars[1]) . '\']';
+                    $parseStr = '\\think\\Request::instance()->server(\'' . $param . '\')';
                     break;
                 case 'GET':
-                    $parseStr = '$_GET[\'' . $vars[1] . '\']';
+                    $parseStr = '\\think\\Request::instance()->get(\'' . $param . '\')';
                     break;
                 case 'POST':
-                    $parseStr = '$_POST[\'' . $vars[1] . '\']';
+                    $parseStr = '\\think\\Request::instance()->post(\'' . $param . '\')';
                     break;
                 case 'COOKIE':
-                    if (isset($vars[2])) {
-                        $parseStr = '$_COOKIE[\'' . $vars[1] . '\'][\'' . $vars[2] . '\']';
-                    } else {
-                        $parseStr = '\\think\\Cookie::get(\'' . $vars[1] . '\')';
-                    }
+                    $parseStr = '\\think\\Cookie::get(\'' . $param . '\')';
                     break;
                 case 'SESSION':
-                    if (isset($vars[2])) {
-                        $parseStr = '$_SESSION[\'' . $vars[1] . '\'][\'' . $vars[2] . '\']';
-                    } else {
-                        $parseStr = '\\think\\Session::get(\'' . $vars[1] . '\')';
-                    }
+                    $parseStr = '\\think\\Session::get(\'' . $param . '\')';
                     break;
                 case 'ENV':
-                    $parseStr = '$_ENV[\'' . strtoupper($vars[1]) . '\']';
+                    $parseStr = '\\think\\Request::instance()->env(\'' . $param . '\')';
                     break;
                 case 'REQUEST':
-                    $parseStr = '$_REQUEST[\'' . $vars[1] . '\']';
+                    $parseStr = '\\think\\Request::instance()->request(\'' . $param . '\')';
                     break;
                 case 'CONST':
-                    $parseStr = strtoupper($vars[1]);
+                    $parseStr = strtoupper($param);
                     break;
                 case 'LANG':
-                    $parseStr = '\\think\\Lang::get(\'' . $vars[1] . '\')';
+                    $parseStr = '\\think\\Lang::get(\'' . $param . '\')';
                     break;
                 case 'CONFIG':
-                    if (isset($vars[2])) {
-                        $vars[1] .= '.' . $vars[2];
-                    }
-                    $parseStr = '\\think\\Config::get(\'' . $vars[1] . '\')';
+                    $parseStr = '\\think\\Config::get(\'' . $param . '\')';
                     break;
                 default:
                     $parseStr = '\'\'';
                     break;
             }
         } else {
-            if (count($vars) == 1) {
-                switch ($vars[0]) {
-                    case 'NOW':
-                        $parseStr = "date('Y-m-d g:i a',time())";
-                        break;
-                    case 'VERSION':
-                        $parseStr = 'THINK_VERSION';
-                        break;
-                    case 'LDELIM':
-                        $parseStr = '\'' . ltrim($this->config['tpl_begin'], '\\') . '\'';
-                        break;
-                    case 'RDELIM':
-                        $parseStr = '\'' . ltrim($this->config['tpl_end'], '\\') . '\'';
-                        break;
-                    default:
-                        if (defined($vars[0])) {
-                            $parseStr = $vars[0];
-                        }
-                }
+            switch ($type) {
+                case 'NOW':
+                    $parseStr = "date('Y-m-d g:i a',time())";
+                    break;
+                case 'VERSION':
+                    $parseStr = 'THINK_VERSION';
+                    break;
+                case 'LDELIM':
+                    $parseStr = '\'' . ltrim($this->config['tpl_begin'], '\\') . '\'';
+                    break;
+                case 'RDELIM':
+                    $parseStr = '\'' . ltrim($this->config['tpl_end'], '\\') . '\'';
+                    break;
+                default:
+                    if (defined($type)) {
+                        $parseStr = $type;
+                    } else {
+                        $parseStr = '';
+                    }
             }
         }
         return $parseStr;
@@ -1071,14 +1060,20 @@ class Template
     {
         if ('' == pathinfo($template, PATHINFO_EXTENSION)) {
             if (strpos($template, '@')) {
-                // 跨模块调用模板
-                $template = str_replace(['/', ':'], $this->config['view_depr'], $template);
-                $template = APP_PATH . str_replace('@', '/' . basename($this->config['view_path']) . '/', $template);
-            } else {
-                $template = str_replace(['/', ':'], $this->config['view_depr'], $template);
-                $template = $this->config['view_path'] . $template;
+                list($module, $template) = explode('@', $template);
             }
-            $template .= '.' . ltrim($this->config['view_suffix'], '.');
+            if (0 !== strpos($template, '/')) {
+                $template = str_replace(['/', ':'], $this->config['view_depr'], $template);
+            } else {
+                $template = str_replace(['/', ':'], $this->config['view_depr'], substr($template, 1));
+            }
+            if ($this->config['view_base']) {
+                $module = isset($module) ? $module : Request::instance()->module();
+                $path   = $this->config['view_base'] . ($module ? $module . DS : '');
+            } else {
+                $path = isset($module) ? APP_PATH . $module . DS . basename($this->config['view_path']) . DS : $this->config['view_path'];
+            }
+            $template = realpath($path . $template . '.' . ltrim($this->config['view_suffix'], '.'));
         }
 
         if (is_file($template)) {

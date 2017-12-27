@@ -18,7 +18,7 @@ class Issinfo extends Model
     //只读字段，这个字段的值一旦写入，就无法更改。
     protected $readonly = ['issnum'];
     
-    //设置issnum字段的值为iss+yyyy+0000的形式，即是在当年进行流水编号
+    //修改器，设置issnum字段的值为iss+yyyy+0000的形式，即是在当年进行流水编号
     protected function setIssnumAttr()
     {
         
@@ -37,13 +37,60 @@ class Issinfo extends Model
         return ($result);
     }
     
+    //获取器，获取数据表issinfo中issmap_type字段值，转换为中文输出
+    protected function getPattypeAttr($value)
+    {
+      $outPut='……';
+      switch($value){
+        case '_ISST_PAT1':
+          $outPut='专利授权申报';
+        break;
+        
+        case '_ISST_PAT2':
+          $outPut='专利授权到期续费';
+        break;
+        
+        case '_ISST_THE1':
+          $outPut='论文审查';
+        break;
+        
+        case '_ISST_THE2':
+          $outPut='论文发表';
+        break;
+        
+        case '_ISST_PRO1':
+          $outPut='项目申报';
+        break;
+        
+        case '_ISST_PRO2':
+          $outPut='项目立项';
+        break;
+        
+        case '_ISST_PRO3':
+          $outPut='项目执行';
+        break;
+        
+        case '_ISST_PRO4':
+          $outPut='项目验收';
+        break;
+        
+        
+        default:
+          $outPut='……';
+        break;
+        
+      }
+      return $outPut;
+    }
+    
+    
+    
     /**
      * 获取对应patent的内容
      */    
     public function patinfo()
     {
-        return $this->hasOne('app\patent\model\Patinfo');
-        //return $this->hasOne('Patinfo');
+        return $this->hasOne('Patinfo');
     }    
     
     /**
@@ -55,19 +102,34 @@ class Issinfo extends Model
     }
     
     //获取issinfo的多态模型,涉及issinfo表中的num_id和num_type两个字段内容
-     public function num()
+  //   public function num()
+//    {
+//        return $this->morphTo(null, [
+//            '0' => 'app\issue\model\Issinfo',
+//            '1' => 'app\project\model\Proinfo',
+//            '2' => 'app\patent\model\Patinfo',
+//        ]);
+//    }
+    
+    //获取issinfo的多态模型,涉及issinfo表中的issmap_id和issmap_type两个字段内容
+     public function issmap()
     {
         return $this->morphTo(null, [
-            '0' => 'app\issue\model\Issinfo',
-            '1' => 'app\project\model\Proinfo',
-            '2' => 'app\patent\model\Patinfo',
+            '_ISST_PAT1' => 'Patinfo',
+            '_ISST_PAT2' => 'Patinfo',
+            '_ISST_PRO1' => 'Proinfo',
+            '_ISST_THE1' => 'Theinfo',
         ]);
     }
-
+    
+    /**
+     * 获取issue的附件
+     */
+    public function attachments()
+    {
+      return $this->morphMany('Attinfo','attmap','_ATTO1');
+    }
     
 }
-    
-
-
 
 ?>

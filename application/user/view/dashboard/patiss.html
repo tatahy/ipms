@@ -12,8 +12,8 @@
 					<th><a data-toggle="tooltip" href="#"  sortName="_ABSTRACT" sort="{$sort}">摘要</a></th>
 					<th><a data-toggle="tooltip" href="#"  sortName="_STATUS" sort="{$sort}">状态</a></th>
 					
-					<th><a data-toggle="tooltip" href="#"  sortName="_STATUS" sort="{$sort}">专利名称</a></th>
-					<th><a data-toggle="tooltip" href="#"  sortName="_STATUS" sort="{$sort}">专利类型</a></th>
+					<th><a data-toggle="tooltip" href="#"  sortName="_PATNAME" sort="{$sort}">专利名称</a></th>
+					<th><a data-toggle="tooltip" href="#"  sortName="_PATSTATUS" sort="{$sort}">专利类型</a></th>
 					
 					<th><a data-toggle="tooltip" href="#"  sortName="_SUBMITDATE" sort="{$sort}">提交日期</a></th>
 					
@@ -32,10 +32,13 @@
 					<td>{$i+($pageTotalNum-1)*$patIssTableRows}</a></td>
 					<td class="issInfo"><a href="{$home}/issue/index/issinfo/id/{$vo.id}" target="_blank" data-toggle="tooltip">{$vo.topic}</a></td>
 					<td>{$vo.abstract}</td>
-					<td class="patIssStatus">{$vo.status}</td>
+					<td class="patIssStatus"><a href="{$home}/issue/index/issrecords/id/{$vo.id}" target="_blank" data-toggle="tooltip">{$vo.status}</td>
 					
-					<td class="patInfo"><a href="{$home}/patent/index/patinfo/id/{$vo.num_id}" target="_blank" data-toggle="tooltip">xx</a></td>
-					<td>xx</td>
+					{//应用TP5中模型的多态1对多关联得到专利事务对应的专利名称$vo.issmap.topic，关键是要在issinfo模型中定义morphTo的方法名"issmap"，就可"." 出$vo.issmap.topic}
+					<td class="patInfo"><a href="{$home}/patent/index/patinfo/id/{$vo.issmap_id}" target="_blank" data-toggle="tooltip">{$vo.issmap.topic}</a></td>
+					
+					{//同上得到$vo.issmap.pattype}
+					<td>{$vo.issmap.pattype}</td>
 					
 					<td>{$vo.submitdate}</td>
 					
@@ -44,8 +47,13 @@
 					
 					<td>{$vo.dept}</td>
 					
+					<!-- <td class="btnTpl"> -->
+						<!-- <button type="button" class="edit btn-link" data-patIssId="{$vo.id}" data-toggle="modal" data-target="#modalPatIssTpl"><span class="glyphicon glyphicon-edit"></span>编辑</button> -->
+						
+					<!-- </td> -->
+					
 					<td class="btnTpl">
-						<button type="button" class="edit btn-link" data-patIssId="{$vo.id}" data-toggle="modal" data-target="#modalPatIssTpl"><span class="glyphicon glyphicon-edit"></span>编辑</button>
+						<a class="edit" href="#modalPatIssTpl" data-patIssId="{$vo.id}" data-toggle="modal" ><span class="glyphicon glyphicon-edit"></span>编辑</a>
 						
 					</td>
 					
@@ -209,14 +217,16 @@ $(document).ready(function(){
 		<!-- $('#divPatIssTpl').load('patIssTpl',{'role':role,'tpl':tpl,'returnType':1}); -->
 	});
 	
-	<!-- // patIss表格中<td>里的<button>按role、patIssStatus的不同进行配置 -->
+	<!-- // patIss表格中<td>里的<a>按role、patIssStatus的不同进行配置 -->
 	$('.btnTpl').each(function(){
 		var patIssStatus=$(this).siblings('.patIssStatus').text();
 		var id=$(this).children().attr('data-patIssId');
 		$(this).children().remove();
 		switch(role){
 			case 'writer':
-				$(this).append('<button type="button" class="btn-link" data-tpl="edit" data-patIssId="'+id+'"><span class="glyphicon glyphicon-edit">编辑</span></button>');
+				<!-- $(this).append('<button type="button" class="btn-link" data-tpl="edit" data-patIssId="'+id+'"><span class="glyphicon glyphicon-edit">编辑</span></button>'); -->
+				
+				$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="edit" data-patIssId="'+id+'"><span class="glyphicon glyphicon-edit">编辑</span></a>');
 				
 				// 按钮的data-patIssId值与后端传来的{$patIssId}值相等，则所在行上色bg-warning。作用：在本文件重新加载时，之前已上色的行保持上色。
 				if(id=='{$patIssId}'){
@@ -225,8 +235,10 @@ $(document).ready(function(){
 			break;
 			
 			case 'reviewer':
-				if(patIssStatus=="拟申报"){
-					$(this).append('<button type="button" class="btn-link" data-tpl="pass" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class="text-success glyphicon glyphicon-check"></span>审核通过</button><button type="button" class="btn-link" data-tpl="modify" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class="text-warning glyphicon glyphicon-erase"></span>返回修改</button><button type="button" class="btn-link" data-tpl="refuse" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class="text-danger glyphicon glyphicon-ban-circle"></span>不予推荐</button>');
+				if(patIssStatus=="待审核"){
+					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="audit" data-patIssId="'+id+'"><span class="glyphicon glyphicon-check text-warning"></span>审核</a>');
+					
+					<!-- $(this).append('<button type="button" class="btn-link" data-tpl="pass" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class="text-success glyphicon glyphicon-check"></span>审核通过</button><button type="button" class="btn-link" data-tpl="modify" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class="text-warning glyphicon glyphicon-erase"></span>返回修改</button><button type="button" class="btn-link" data-tpl="refuse" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class="text-danger glyphicon glyphicon-ban-circle"></span>不予推荐</button>'); -->
 					
 				}
 			break;
@@ -275,14 +287,25 @@ $(document).ready(function(){
 		
 	});
 	
+	// patIss表格中<td>里<a>标签的click事件,给标签所在行上色
+	$("td a").click(function(){
+		var str=$(this).html();
+		
+		// 所有行去掉附加的bg-warning
+		$('tr').removeClass('bg-warning');
+		// 本<a>标签所在行上色bg-warning
+		$(this).parent().parent().addClass('bg-warning');
+	});
+	
 	// patIss表格中<td>里<button>按扭的click事件,Ajax处理数据引入内容
-	$(".btnTpl button").click(function(){
+	<!-- $(".btnTpl button").click(function(){ -->
+	$(".btnTpl a").click(function(){
 		var tpl=$(this).attr('data-tpl');
 		var patIssId=$(this).attr('data-patIssId');
 		var str=$(this).html();
 		
-		// 所有按钮所在行去掉附加的bg-warning
-		$('.btnTpl').parent().removeClass('bg-warning');
+		// 所有行去掉附加的bg-warning
+		$('tr').removeClass('bg-warning');
 		// 本按钮所在行上色bg-warning
 		$(this).parent().parent().addClass('bg-warning');
 		
@@ -307,6 +330,7 @@ $(document).ready(function(){
 	
 	$('.patInfo a').tooltip({title: '专利信息', placement: 'bottom'});
 	$('.issInfo a').tooltip({title: '事务信息', placement: 'bottom'});
+	$('.patIssStatus a').tooltip({title: '事务过程记录', placement: 'bottom'});
 
 	// 根据后端控制器给出的排序字段{$sortName},排序方式{$sort}，修改th中a的显示形式
 	$('#divPatIss thead a').each(function(){
@@ -400,7 +424,7 @@ $(document).ready(function(){
  	//* 作用：加载本页面内容到load本页面的上一级页面（writer/reviewer/operator.html…）中<div id="patIss"></div>
 	//* 参数1：rows，类型：数值。值：可为空，默认为10。
 	//* 参数2：issStatus，类型：字符。值：可为空，默认为'_TODO'。
-	//* 参数3：sortName，类型：字符。值：可为空，默认为‘_PATNAME’。
+	//* 参数3：sortName，类型：字符。值：可为空，默认为‘_TOPIC’。
 	//* 参数4：sort，类型：字符。值：可为空，默认为'_ASC'。
 	//* 参数5：pageTotalNum，类型：数值。值：可为空，默认为1。
 	
@@ -420,7 +444,7 @@ $(document).ready(function(){
 		
 		if(rows){}else{rows=10;}
 		if(issStatus){}else{issStatus='_TODO';}
-		if(sortName){}else{sortName='_PATNAME';}
+		if(sortName){}else{sortName='_TOPIC';}
 		// 升序or降序
 		if(sort){}else{sort='_ASC';}
 		if(pageTotalNum){}else{pageTotalNum=1;}

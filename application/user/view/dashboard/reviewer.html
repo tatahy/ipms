@@ -90,6 +90,7 @@ $(document).ready(function(){
 	
 	// 本页面载入时默认load的文件为patiss.html
 	var sendData={"role":'{$role}',"issType":'_PATENT',"issStatus":'_TODO'};	
+	<!-- //TP5中 'patIss'='{$home}/user/dashboard/patiss' -->
 	$("#patIss").load('patIss',sendData);
 
 	// 点击.aTab的a标签，jQuery的load方法得到对应页面
@@ -118,10 +119,7 @@ $(document).ready(function(){
 				$(this).parent().addClass('active');
 				$("#theIss").load('theIss',sendData);
 			break;
-		
 		}
-		
-	
 	});
 	
 	// 在collapsePat出现前应用jQuery的load方法加载对应文件。

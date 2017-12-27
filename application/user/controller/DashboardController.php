@@ -370,7 +370,7 @@ class DashboardController extends \think\Controller
         if(!empty($request->param('sortName'))){
           $sortName=$request->param('sortName');
         }else{
-          $sortName='_PATNAME';
+          $sortName='_TOPIC';
         }
         
         // $sort接收前端页面传来的排序顺序
@@ -420,6 +420,13 @@ class DashboardController extends \think\Controller
         //case '_TOPIC':
 //          $strOrder='topic';
 //        break;
+        case '_PATNAME':
+          $strOrder='abstract';
+        break;
+        
+        case '_PATSTATUS':
+          $strOrder='abstract';
+        break;
             
         case '_ABSTRACT':
           $strOrder='abstract';
@@ -570,17 +577,22 @@ class DashboardController extends \think\Controller
             
       }
       
-      //使用模型Patinfo
+      //使用模型Issinfo
       $issSet = new IssinfoModel;
       
       // 查出所有的用户并分页，根据“strOrder”排序，前端页面显示的锚点（hash值）为$fragment，设定分页页数变量：“pageTotalNum”
       // 带上每页显示记录行数$totalTableRows，实现查询结果分页显示。
       $patIssTotal = $issSet->where('id','>',0)
+                        //->issmap
                         ->where($map)
                         ->order($strOrder)
-                        //->with('patinfo')
                         ->paginate($patIssTableRows,false,['type'=>'bootstrap','var_page' => 'pageTotalNum',
                         'query'=>['patIssTableRows'=>$patIssTableRows]]);
+
+      //foreach ($patIssTotal as $obj) {
+//          $issmap=$obj->issmap;
+//          dump($issmap->topic.$issmap->status);
+//      }
                         
       // 获取分页显示
       $pageTotal = $patIssTotal->render();
@@ -626,7 +638,7 @@ class DashboardController extends \think\Controller
               
         ]);
       
-        //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p>'.$role.$issType.$issStatus.'</div> ';
+        //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p>'.$role.$issmap_type.$issStatus.'</div> ';
         // return '<div style="padding: 24px 48px;">模块开发中……'.$role.$issType.$issStatus.'</div>';
         return view();
         
@@ -758,7 +770,7 @@ class DashboardController extends \think\Controller
                   $issSet = IssinfoModel::update([
                       'topic'  => $request->request('topic'),
                       'status' => '填报',
-                      'isstype'=>$request->request('issType'),
+                      'issmap_type'=>$request->request('issType'),
                       'abstract'=>$request->request('abstract'),
                       'addnewdate'=> $today,
                       'writer' => $request->request('username'),
@@ -778,8 +790,8 @@ class DashboardController extends \think\Controller
                       'num_id'  => $issSet->issnum,
                       'name'  => $request->request('attName'),
                       'atttype' => $request->request('attType'),
-                      'obj' => $request->request('attObj'),
-                      'objid' => $request->request('issId'),
+                      'attmap_type' => $request->request('attObj'),
+                      'attmap_id' => $request->request('issId'),
                       'uploaddate'=> $today,
                       'uploader'=> $request->request('username'),
                       'rolename'=> $role,
@@ -817,7 +829,7 @@ class DashboardController extends \think\Controller
                   IssinfoModel::update([
                       'topic'  => $request->request('topic'),
                       'status' => '待审核',
-                      'isstype'=>$request->request('issType'),
+                      'issmap_type'=>$request->request('issType'),
                       'abstract'=>$request->request('abstract'),
                       'submitdate'=> $today,
                       'writer' => $request->request('username'),
@@ -853,8 +865,8 @@ class DashboardController extends \think\Controller
                       'num_id'  => $issSet->issnum,
                       'name'  => $request->request('attName'),
                       'atttype' => $request->request('attType'),
-                      'obj' => $request->request('attObj'),
-                      'objid' => $request->request('issId'),
+                      'attmap_type' => $request->request('attObj'),
+                      'attmap_id' => $request->request('issId'),
                       'uploaddate'=> $today,
                       'uploader'=> $request->request('username'),
                       'rolename'=> $role,
@@ -910,8 +922,8 @@ class DashboardController extends \think\Controller
                   $issSet = IssinfoModel::create([
                     'topic'  => $request->param('topic'),
                     'status' => '填报',
-                    'isstype'=>$request->param('issType'),
-                    'objid'=>$patId,
+                    'issmap_type'=>$request->param('issType'),
+                    'issmap_id'=>$patId,
                     // 兼容之前的代码
                     'num_id'=>$patId,
                     'abstract'=>$request->param('abstract'),
@@ -942,8 +954,8 @@ class DashboardController extends \think\Controller
                       'num_id'  => $issSet->issnum,
                       'name'  => $request->param('attName'),
                       'atttype' => $request->param('attType'),
-                      'obj' => $request->param('attObj'),
-                      'objid' => $issId,
+                      'attmap_type' => $request->param('attObj'),
+                      'attmap_id' => $issId,
                       'uploaddate'=> $today,
                       'uploader'=> $request->param('username'),
                       'rolename'=> $role,
@@ -1068,10 +1080,10 @@ class DashboardController extends \think\Controller
                   $iss= IssinfoModel::get($patIssId);
                   
                   // 查出issue所对应的patent
-                  $pat= PatinfoModel::get($iss->num_id);
+                  $pat= PatinfoModel::get($iss->issmap_id);
                   
                   // 查出issue所对应的attachment
-                  $attSet= AttinfoModel::where('obj','_ATTO1')->where('objid',$patIssId)->select();
+                  $att= AttinfoModel::where('attmap_type','_ATTO1')->where('attmap_id',$patIssId)->select();
                   
                   $this->assign([
                     'home'=>$request->domain(),
@@ -1085,20 +1097,44 @@ class DashboardController extends \think\Controller
                     
                     'iss'=>$iss,
                     'pat'=>$pat,
-                    'attSet'=>$attSet,
+                    'att'=>$att,
               
                   ]);
-                break;
-                
-                default:
-                
                 break;
                 
               }
           break;
           
           case "reviewer":
-          
+            switch($tpl){                
+                case "audit":
+                  // 查出所审核的issue的数据：
+                  $iss= IssinfoModel::get($patIssId);
+                  
+                  // 查出issue所对应的patent
+                  $pat= PatinfoModel::get($iss->issmap_id);
+                  
+                  // 查出issue所对应的attachment
+                  $att= AttinfoModel::where('attmap_type','_ATTO1')->where('attmap_id',$patIssId)->select();
+                  
+                  $this->assign([
+                    'home'=>$request->domain(),
+                    // 
+                    'reviewer'=>$this->username,
+                    'dept'=>$this->dept,
+                    //'issStatus'=>$iss->status,
+                    
+                    //
+                    'patIssId'=>$patIssId,
+                    
+                    'iss'=>$iss,
+                    'pat'=>$pat,
+                    'att'=>$att,
+              
+                  ]);
+                break;
+                
+              }
           break;
           
           case "approver":

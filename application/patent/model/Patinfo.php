@@ -56,6 +56,43 @@ class Patinfo extends Model
         return explode(",",$value);
     }
     
+    //获取器，获取数据表patinfo中pattype字段值，转换为中文输出
+    protected function getPattypeAttr($value)
+    {
+      $outPut='……';
+      switch($value){
+        case '_PATT1':
+          $outPut='发明专利';
+        break;
+        
+        case '_PATT2':
+          $outPut='实用新型专利';
+        break;
+          
+        case '_PATT3':
+          $outPut='外观设计专利';
+        break;
+        
+        case '_PATT4':
+          $outPut='软件版权';
+        break;
+        
+        case '_PATT5':
+          $outPut='著作权';
+        break;
+        
+        case '_PATT6':
+          $outPut='集成电路图';
+        break;
+        
+        default:
+          $outPut='……';
+        break;
+        
+      }
+      return $outPut;
+    }
+    
     /**
      * 获取内容所属的issue信息
      */
