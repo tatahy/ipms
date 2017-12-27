@@ -171,11 +171,15 @@
 		<div class="form-group col-sm-12">
 			<input type="submit" id="btnSave" class="btn btn-primary btn-sm" data-oprt="update" value="更新"> 
 			
-			<input type="reset" class="btn btn-primary btn-sm" value="重置">
+			
 			
 			<button type="submit" id="btnSubmit" class="btn btn-primary btn-sm" data-oprt="submit"><span class="glyphicon glyphicon-ok"></span>提交</button>
  			
-			<input type="button" class="btn btn-warning btn-sm pull-right" data-dismiss="modal" value="取消">
+			<div  class="pull-right">
+				<input type="reset" class="btn btn-primary btn-sm" value="重置">
+				<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
+			</div>
+			
 		</div>
 		</div>
 	</form>
@@ -251,9 +255,9 @@ $(document).ready(function(){
 		$('#btnSubmit').after('&nbsp;<button type="submit" id="btnDelete" class="btn btn-danger btn-sm" data-oprt="delete"><span class="glyphicon glyphicon-remove"></span>删除</button>');
 	}
 	
-	// select显示为后端传来的内容
+	// select显示为后端传来的内容,后端patinfo模型中对pattpye字段有定义获取器，所以$pat.pattype的值不是数据库中的值，$pat->getData('pattype')才是。同理$iss->getData('issmap_type')
 	$('#patType').val('{$pat->getData('pattype')}').attr('selected');
-	$('#issType').val('{$iss.issmap_type}').attr('selected');
+	$('#issType').val('{$iss->getData('issmap_type')}').attr('selected');
 	
 	//$('#patType').text('{$pat.pattype}').attr('selected');
 	//$('#issType').text('{$iss.issmap_type}').attr('selected');

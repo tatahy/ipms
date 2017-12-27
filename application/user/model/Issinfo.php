@@ -38,7 +38,7 @@ class Issinfo extends Model
     }
     
     //获取器，获取数据表issinfo中issmap_type字段值，转换为中文输出
-    protected function getPattypeAttr($value)
+    protected function getIssmapTypeAttr($value)
     {
       $outPut='……';
       switch($value){
@@ -74,7 +74,6 @@ class Issinfo extends Model
           $outPut='项目验收';
         break;
         
-        
         default:
           $outPut='……';
         break;
@@ -82,8 +81,6 @@ class Issinfo extends Model
       }
       return $outPut;
     }
-    
-    
     
     /**
      * 获取对应patent的内容
@@ -111,15 +108,20 @@ class Issinfo extends Model
 //        ]);
 //    }
     
-    //获取issinfo的多态模型,涉及issinfo表中的issmap_id和issmap_type两个字段内容
+    //获取issinfo的多态模型,涉及issinfo表中的issmap_id和issmap_type两个字段内容。
      public function issmap()
     {
-        return $this->morphTo(null, [
-            '_ISST_PAT1' => 'Patinfo',
-            '_ISST_PAT2' => 'Patinfo',
-            '_ISST_PRO1' => 'Proinfo',
-            '_ISST_THE1' => 'Theinfo',
-        ]);
+        $this->getData('issmap_type');
+        $data=['专利授权申报' => 'Patinfo','专利授权到期续费' => 'Patinfo','项目申报' => 'Proinfo','论文审查' => 'Theinfo'];
+        return $this->morphTo(null, $data);
+        
+        //return $this->morphTo(null, [
+//            //已定义获取器getIssmapTypeAttr,本属性读取的是获取器输出的issmap_type字段值，所以要以获取器的输出值来对应模型
+//            '专利授权申报' => 'Patinfo',
+//            '专利授权到期续费' => 'Patinfo',
+//            '项目申报' => 'Proinfo',
+//            '论文审查' => 'Theinfo',
+//        ]);
     }
     
     /**

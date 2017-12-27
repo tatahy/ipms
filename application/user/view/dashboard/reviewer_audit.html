@@ -3,72 +3,58 @@
 	<!-- <div class="rows col-sm-12"> -->
 	<form id="fmIssPat" action="" role="form" enctype="multipart/form-data">
 		<div class="row">
-		<div class="form-group col-sm-3">
-			<h4>撰写人：{$iss.writer}</h4>
+			<div class="form-group col-sm-3">
+				<h4>撰写人：{$iss.writer}</h4>
+			</div>
+		
+			<div class="form-group col-sm-5">
+				<h4>所属部门：{$iss.dept}</h4>
+			</div>
+		
+			<div class="form-group col-sm-4">
+				<h4>事务状态：<span class="text-warning"><strong>{$iss.status}</strong></span></h4>
+			</div>
 		</div>
 		
-		<div class="form-group col-sm-5">
-			<h4>所属部门：{$iss.dept}</h4>
-		</div>
-		
-		<div class="form-group col-sm-4">
-			<h4>事务状态：<span class="text-warning"><strong>{$iss.status}</strong></span></h4>
-		</div>
-		</div>
-		
-		<h4><span class="label label-warning"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利信息</span></h4>
-		<div class="row">
-		<div class="form-group col-sm-8">
-			<label class="control-label" for="patTopic">专利名称<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-			<input class="form-control" id="patTopic" name="patTopic" value="{$pat.topic}" type="text" placeholder="一种ZZZ的____专利" required>
-			
-		</div>
-		
-		<div class="form-group col-sm-4">
-			<label for="patType">专利类型</label>
-			<select class="form-control" id="patType" name="patType">
-				<!-- {present name="pat.pattype"} -->
-					<!-- <option value="{$pat.pattype}" selected>{$pat.pattype}</option> -->
-				<!-- {/present} -->
-				
-				<option value="0">……</option>
-				<option value="_PATT1">发明专利</option>
-				<option value="_PATT2">实用新型专利</option>
-                <option value="_PATT3">外观设计专利</option>
-                <option value="_PATT4">软件版权</option>
-                <option value="_PATT5">著作权</option>
-                <option value="_PATT6">集成电路图</option>
-                
-			</select>
-		</div>
+		<h4><span class="label label-warning"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利摘要</span></h4>
+		<div class="table-responsive ">
+			<table class="table table-bordered table-striped table-hover">
+				<thead>
+					<tr>
+						<th>专利名称</th>
+						<th>专利类型</th>
+						<th>专利关键词</th>
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					<tr>
+						<td>{$pat.topic}</td>
+						<td>{$pat.pattype}</td>
+						<td>{$pat.keyword}</td>
+					</tr>	
+				</tbody>
+			</table>
 		</div>
 	
-		<h4><span class="label label-warning">事务信息</span></h4>
-		<div class="row">
-		<div class="form-group col-sm-8">
-			<label class="control-label" for="topic">事务标题<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-			<input class="form-control" id="topic" name="topic" value="{$iss.topic}" type="text" placeholder="关于XX专利的YY申请" required>
-			
-		</div>
-		
-		<div class="form-group col-sm-4">
-			<label for="issType">事务类型</label>
-			<select class="form-control" id="issType" name="issType" >
-				<option value="_ISST_PAT1">专利授权申报</option>
-				<option value="_ISST_PAT2">专利授权到期续费</option>
-               
-			</select>
-		</div>
-		</div>
-		
-		<div class="row">
-		<div class="form-group col-sm-12">
-			<label class="control-label" for="abstract">事务简介<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-			<textarea class="form-control" rows="5" id="abstract" name="abstract" placeholder="填写事务的主要内容，字数不超过100字。" required>{$iss.abstract}</textarea>
-			
-		</div>
-		</div>
-		
+		<h4><span class="label label-warning">事务摘要</span></h4>
+		<div class="table-responsive ">
+			<table class="table table-bordered table-striped table-hover">
+				<thead>
+					<tr>
+						<th>事务标题</th>
+						<th>事务类型</th>
+						<th>事务简介</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>{$iss.topic}</td>
+						<td>{$iss.issmap_type}</td>
+						<td>{$iss.abstract}</td>
+					</tr>	
+				</tbody>
+			</table>
+		</div>	
 				
 		<h4><span class="label label-warning">事务附件上传</span>
 			<label class="radio-inline ">
@@ -171,24 +157,35 @@
 		</div>
 		
 		<div class="row">
-		<div class="form-group col-sm-12">
-			<!-- <input type="submit" id="btnSave" class="btn btn-primary btn-sm" data-oprt="update" value="更新">  -->
+			<div class="form-group col-sm-4">
+				<label for="auditResult">审核结果</label>
+				<select class="form-control" id="auditResult" name="auditResult" >
+					<option value="pass">审核通过</option>
+					<option value="fail">审核不通过</option>
+					<option value="modify">返回修改</option>
+				</select>
+			</div>
+		
+			<div id="divAuditMsg" class="form-group col-sm-8" hidden="true">
+				<label class="control-label" for="auditMsg">审核意见<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<textarea class="form-control" id="auditMsg" name="auditMsg" value="" type="text" placeholder="请填入具体的审核意见"></textarea>
 			
-			<!-- <input type="reset" class="btn btn-primary btn-sm" value="重置"> -->
-			
-			<!-- <button type="submit" id="btnSubmit" class="btn btn-primary btn-sm" data-oprt="submit"><span class="glyphicon glyphicon-ok"></span>提交</button> -->
- 			
-			<!-- <input type="button" class="btn btn-warning btn-sm pull-right" data-dismiss="modal" value="取消"> -->
-			
+			</div>
+		</div>
+		
+		<div class="row">
+		<div class="form-group col-sm-12">			
 			
 			<button type="submit" id="btnPass" class="btn btn-success btn-sm" data-oprt="pass"><span class="glyphicon glyphicon-check"></span>通过</button>
 			
-			<button type="submit" id="btnFail" class="btn btn-danger btn-sm" data-oprt="fail"><span class="glyphicon glyphicon-ban-circle"></span>未通过</button>
+			<button type="submit" id="btnFail" class="btn btn-danger btn-sm" data-oprt="fail" hidden="true"><span class="glyphicon glyphicon-ban-circle"></span>未通过</button>
 			
-			<button type="submit" id="btnFail" class="btn btn-primary btn-sm" data-oprt="fail"><span class="glyphicon glyphicon-erase"></span>修改</button>
- 			
-			<input type="button" class="btn btn-warning btn-sm pull-right" data-dismiss="modal" value="取消">&nbsp;&nbsp;&nbsp;
-			<input type="reset" class="btn btn-primary btn-sm pull-right" value="重置">
+			<button type="submit" id="btnModify" class="btn btn-primary btn-sm" data-oprt="modify" hidden="true"><span class="glyphicon glyphicon-erase"></span>修改</button>
+			
+ 			<div  class="pull-right">
+				<input type="reset" class="btn btn-primary btn-sm" value="重置">
+				<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
+			</div>
 		</div>
 		</div>
 	</form>
@@ -199,6 +196,9 @@
 <script>
 $(document).ready(function(){
 
+	$('#btnFail').hide();
+	$('#btnModify').hide();
+				
 	// 监听文件上传进度，用回调函数实现？？
     var xhrOnProgress = function(fun) {
         xhrOnProgress.onprogress = fun; //绑定监听
@@ -230,20 +230,20 @@ $(document).ready(function(){
 		var str='确定';
 		var title=oprt;
 		switch(oprt){
-			case 'delete':
-				str='确定【<span class="glyphicon glyphicon-remove text-danger"></span>删除】操作？<hr>该操作将会同时删除已上传附件。';
-				title='【<span class="glyphicon glyphicon-remove text-danger"></span>删除】操作'
+			case 'pass':
+				str='确定【<span class="glyphicon glyphicon-check text-success"></span>通过】操作？';
+				title='【<span class="glyphicon glyphicon-check text-success"></span>通过】操作'
 			break;
 			
-			case 'submit':
-				str='确定【<span class="glyphicon glyphicon-ok text-success"></span>提交】操作？';
-				title='【<span class="glyphicon glyphicon-ok text-success"></span>提交】操作';
+			case 'fail':
+				str='确定【<span class="glyphicon glyphicon-ban-circle text-danger"></span>未通过】操作？';
+				title='【<span class="glyphicon glyphicon-ban-circle text-danger"></span>未通过】操作';
 			break;
 			
-			// oprt=='update'
+			// oprt=='modify'
 			default:
-				str='确定【更新】？';
-				title='【更新】操作';
+				str='确定【<span class="glyphicon glyphicon-erase"></span>修改】操作？';
+				title='【<span class="glyphicon glyphicon-erase"></span>修改】操作';
 			break;
 		
 		}
@@ -259,27 +259,19 @@ $(document).ready(function(){
 		}).cancel('否(N)').ok('是(Y)');
 	});
 	
-	// 只有专利事务状态为‘填报’才能有‘删除’按钮。
-	if('填报'=='{$iss.status}'){		
-		$('#btnSubmit').after('&nbsp;<button type="submit" id="btnDelete" class="btn btn-danger btn-sm" data-oprt="delete"><span class="glyphicon glyphicon-remove"></span>删除</button>');
-	}
 	
-	// select显示为后端传来的内容
-	$('#patType').val('{$pat->getData('pattype')}').attr('selected');
-	$('#issType').val('{$iss.issmap_type}').attr('selected');
-	
-	// 点击删除按钮，与form的submit()配合确定传给后端的oprt='delete'
-	$('#btnDelete').click(function(){
+	// 点击通过按钮，与form的submit()配合确定传给后端的oprt='pass'
+	$('#btnPass').click(function(){
 		$('#oprt').val($(this).attr('data-oprt'));
 	});
 	
-	// 点击提交按钮，与form的submit()配合确定传给后端的oprt='submit'
-	$('#btnSubmit').click(function(){
+	// 点击未通过按钮，与form的submit()配合确定传给后端的oprt='fail'
+	$('#btnFail').click(function(){
 		$('#oprt').val($(this).attr('data-oprt'));
 	});
 	
-	// 点击保存按钮，与form的submit()配合确定传给后端的oprt='update'
-	$('#btnSave').click(function(){
+	// 点击修改按钮，与form的submit()配合确定传给后端的oprt='modify'
+	$('#btnModify').click(function(){
 		$('#oprt').val($(this).attr('data-oprt'));
 	});
 	
@@ -312,13 +304,52 @@ $(document).ready(function(){
 		}
 	});
 	
+	// 单选框auditResult选中变化满足条件时，出现auditMsg输入框。
+	$('#auditResult').change(function(){
+		$(':submit').hide();
+	
+		switch($(this).val()){
+			case 'fail':
+				//为'#auditMsg'添加'required'属性，其值为true，保证在表单提交时必填
+				$('#auditMsg').attr('required',true);
+				
+				$('#divAuditMsg').show();
+				$('#btnFail').show();
+				$('#auditMsg').text($(this).val());
+			break;
+			
+			case 'modify':
+				//为'#auditMsg'添加'required'属性，其值为true，保证在表单提交时必填
+				$('#auditMsg').attr('required',true);
+				
+				$('#divAuditMsg').show();
+				$('#btnModify').show();
+				$('#auditMsg').text($(this).val());
+			break;
+			// pass
+			default:
+				$('#divAuditMsg').hide();
+				$('#btnPass').show();
+				
+			break;
+		}
+		
+	});
+	
 	// 重置按钮点击时附加
 	$('input:reset').click(function(){
-		//为'#attName'添加'required'属性，其值为false，保证在表单提交时忽略
+		//为'#attName'、'#auditMsg'添加'required'属性，其值为false，保证在表单提交时忽略
 		$('#attName').attr('required',false);
+		$('#auditMsg').attr('required',false);
 		
-		// 上传的输入框们退场
+		$(':submit').hide();
+		$('#btnPass').show();
+		<!-- $('#btnFail').hide(); -->
+		<!-- $('#btnModify').hide(); -->
+		
+		// 上传的输入框们和审查意见框退场
 		$('#divAtt').hide();
+		$('#divAuditMsg').hide();
 	});
 
    
