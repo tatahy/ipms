@@ -440,8 +440,8 @@ class DashboardController extends \think\Controller
           $strOrder='executer';
         break;
             
-        case '_SUBMITDATE':
-          $strOrder='submitdate';
+        case '_ADDNEWDATE':
+          $strOrder='addnewdate';
         break;
         
         case '_STATUS':
@@ -717,6 +717,7 @@ class DashboardController extends \think\Controller
                   
                   $issSet=IssinfoModel::get($request->request('issId'));
                   $numId=$issSet->issnum;
+                  
                   // 删除step1，删除由$dirName指定的目录及其文件
                   $dirName=ROOT_PATH.DS.'uploads'.DS.$numId;
                   if(is_dir($dirName)){
@@ -753,7 +754,7 @@ class DashboardController extends \think\Controller
                 
                 // writer 更新专利事务
                 case 'update':
-                
+                  
                   // 使用静态方法，向patinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
                   $patSet = PatinfoModel::update([
                       'topic'  => $request->request('patTopic'),
@@ -769,46 +770,31 @@ class DashboardController extends \think\Controller
                   // 使用静态方法，向issinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
                   $issSet = IssinfoModel::update([
                       'topic'  => $request->request('topic'),
-                      'status' => '填报',
+                     // 'status' => '填报',
                       'issmap_type'=>$request->request('issType'),
                       'abstract'=>$request->request('abstract'),
                       'addnewdate'=> $today,
                       'writer' => $request->request('username'),
                       'dept' => $request->request('dept'),
                   ], ['id' => $request->request('issId')]);
+          
                   $result='success';
                   $msg.='事务信息已更新。<br>';
                   
                   $issId=$request->request('issId');
+                  // 设置att的num_id字段值
+                  $issSet=IssinfoModel::get($issId);
+                  $numId=$issSet->issnum;
                   
-                  // 存储上传的附件    
-                  if($attUpload){
-                  $issSet = IssinfoModel::get($request->request('issId'));
-                  
-                  // 使用静态方法，向attinfo表新增附件文件
-                    $attSet = AttinfoModel::create([
-                      'num_id'  => $issSet->issnum,
-                      'name'  => $request->request('attName'),
-                      'atttype' => $request->request('attType'),
-                      'attmap_type' => $request->request('attObj'),
-                      'attmap_id' => $request->request('issId'),
-                      'uploaddate'=> $today,
-                      'uploader'=> $request->request('username'),
-                      'rolename'=> $role,
-                    ]);
-                    //完成附件上传
-                    $result=$this->_uploadAtt($att,$attSet->num_id);
-                      
-                    if($result=='success'){
-                      $msg.='附件上传成功。';
-                    }else{
-                      $msg.=$result;
-                    }
-                    
-                  }else{
-                    $result='success';
-                    $msg.='无附件上传。';
-                  }  
+                  // $issSet->status=='填报'时，使用静态方法，向issrecord表更新acttime。
+                  if($issSet->status=='填报'){
+                    IssrecordModel::update([
+                    'acttime'=>$today,
+                    ],['num' => $numId]);
+                  }
+                  // 设置att的deldisplay的字段值。用于前端页面判断是否显示“删除”按钮。0为不显示。
+                  $deldisplay=1;
+                 
                 
                 break;
                 
@@ -838,16 +824,16 @@ class DashboardController extends \think\Controller
                   $result='success';
                   $msg.='事务信息已更新。<br>';
                   
-                  $issSet = IssinfoModel::get($request->request('issId'));
-                  
                   $issId=$request->request('issId');
-                  $num=$issSet->issnum;
+                  $issSet = IssinfoModel::get($issId);
+                  // 设置att的num_id字段值
+                  $numId=$issSet->issnum;
                   
                   // 使用静态方法，向issrecord表新增信息。
                   $issRecordSet=IssrecordModel::create([
-                    'num'=>$num,
+                    'num'=>$numId,
                     'act'=>'提交',
-                    'actdetail'=>'专利事务"'.$request->request('topic').'"提交审查',
+                    'actdetail'=>'专利事务"'.$request->request('topic').'"提交审核',
                     'acttime'=>$today,
                     'username'=>$request->param('username'),
                     'rolename'=>$role,
@@ -856,34 +842,13 @@ class DashboardController extends \think\Controller
                   //静态方法创建新对象后，返回对象id
                   $issRecordId= $issRecordSet->id;
                   
-                  // 存储上传的附件    
-                  if($attUpload){
-                  $issSet = IssinfoModel::get($request->request('issId'));
+                  // 设置att的deldisplay字段值。用于新附件上传后，前端页面判断是否显示“删除”按钮。0为不显示。
+                  $deldisplay=0;
                   
-                  // 使用静态方法，向attinfo表新增附件文件
-                    $attSet = AttinfoModel::create([
-                      'num_id'  => $issSet->issnum,
-                      'name'  => $request->request('attName'),
-                      'atttype' => $request->request('attType'),
-                      'attmap_type' => $request->request('attObj'),
-                      'attmap_id' => $request->request('issId'),
-                      'uploaddate'=> $today,
-                      'uploader'=> $request->request('username'),
-                      'rolename'=> $role,
-                    ]);
-                    //完成附件上传
-                    $result=$this->_uploadAtt($att,$attSet->num_id);
-                      
-                    if($result=='success'){
-                      $msg.='新附件上传成功。<br>';
-                    }else{
-                      $msg.=$result;
-                    }
-                    
-                  }else{
-                    $result='success';
-                    $msg.='无新附件上传。<br>';
-                  }  
+                  //设置所有已上传附件的deldisplay字段值为0
+                  AttinfoModel::update([
+                    'deldisplay'=>0
+                  ],['num_id'=>$numId]);
                   
                   $result='success';
                   $msg.='专利事务<strong>"'.$request->request('topic').'"</strong>已提交。请留意后续审批结果。<br>';
@@ -947,46 +912,176 @@ class DashboardController extends \think\Controller
                   //静态方法创建新对象后，返回对象id
                   $issRecordId= $issRecordSet->id;
                   
-                  // 存储上传的附件    
-                  if($attUpload){
-                    // 使用静态方法，向attinfo表写入新att信息，要用到$issId，因为attId与issId是多对一的关系
-                    $attSet = AttinfoModel::create([
-                      'num_id'  => $issSet->issnum,
-                      'name'  => $request->param('attName'),
-                      'atttype' => $request->param('attType'),
-                      'attmap_type' => $request->param('attObj'),
-                      'attmap_id' => $issId,
-                      'uploaddate'=> $today,
-                      'uploader'=> $request->param('username'),
-                      'rolename'=> $role,
-                    ]);
-                    //静态方法创建新对象后，返回对象id
-                    $attId= $attSet->id;
-                    
-                    //完成附件上传
-                    $result=$this->_uploadAtt($att,$attSet->num_id);
-                    
-                    if($result=='success'){
-                      $msg='添加专利事务成功。<br>附件上传成功。';
-                    }else{
-                      $msg=$result;
-                    }
-                    
-                  }else{
-                    $result='success';
-                    $msg='添加专利事务成功。<br>无附件上传。';
-                  }
-                
-                $data=array('result'=>$result,'msg'=>$msg,'patIssId'=>$issId);
-                ///return json($data);  
+                  // 设置att的deldisplay字段值。用于前端页面判断是否显示“删除”按钮。0为不显示。
+                  $deldisplay=1;
+                  // 设置att的num_id字段值
+                  $numId=$issSet->issnum;
+                  
+                  $result='success';
+                  $msg.='专利事务<strong>"'.$request->request('topic').'"</strong>已填报。<br>请尽快提交审核。<br>';
                 break;
                 
               }
               
+              // 存储上传的附件    
+              if($attUpload){
+                // 使用静态方法，向attinfo表写入新att信息，要用到$issId，因为attId与issId是多对一的关系
+                $attSet = AttinfoModel::create([
+                'num_id'  =>$numId,
+                'name'  => $request->param('attName'),
+                'atttype' => $request->param('attType'),
+                'attmap_type' => $request->param('attObj'),
+                'attmap_id' => $issId,
+                'uploaddate'=> $today,
+                'uploader'=> $request->param('username'),
+                'rolename'=> $role,
+                'deldisplay'=>$deldisplay,
+                ]);
+                //静态方法创建新对象后，返回对象id
+                $attId= $attSet->id;
+                
+                //完成附件上传
+                $result=$this->_uploadAtt($att,$attSet->num_id,$attSet->id);
+                
+                if($result=='success'){
+                  $msg.='附件上传成功。<br>';
+                }else{
+                  $msg.=$result;
+                }
+                    
+              }else{
+              $result='success';
+              $msg.='无附件上传。<br>';
+              }
               
           break;
           
           case 'reviewer':
+            switch($oprt){
+              case 'fail':
+                // 使用静态方法，向issinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
+                  IssinfoModel::update([
+                      'status' => '审核未通过',
+                      'auditrejectdate'=> $today,
+                  ], ['id' => $request->request('issId')]);
+                  $result='success';
+                  $msg.='审核结果：<strong class="text-warning">未通过</strong>。<br>具体审核意见：<span class="text-info">'.$request->request('auditMsg').'</span><br>';
+                  
+                  $issId=$request->request('issId');
+                  $issSet = IssinfoModel::get($issId);
+                  //
+                  $numId=$issSet->issnum;
+                  
+                  // 使用静态方法，向issrecord表新增信息。
+                  $issRecordSet=IssrecordModel::create([
+                    'num'=>$numId,
+                    'act'=>'审核',
+                    'actdetail'=>'专利事务"'.$issSet->topic.'"审核未通过。<br>具体审核意见：<span class="text-info">'.$request->request('auditMsg').'</span><br>',
+                    'acttime'=>$today,
+                    'username'=>$request->param('username'),
+                    'rolename'=>$role,
+                    'issinfo_id'=>$issId,
+                  ]);
+                  //静态方法创建新对象后，返回对象id
+                  $issRecordId= $issRecordSet->id;
+                  
+                  $result='success';
+                  $msg.='专利事务<strong>"'.$issSet->topic.'"</strong>审核未通过。需留意后续审批结果。<br>';
+              break;
+              
+              case 'modify':
+                // 使用静态方法，向issinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
+                  IssinfoModel::update([
+                      'status' => '返回修改',
+                      'auditrejectdate'=> $today,
+                  ], ['id' => $request->request('issId')]);
+                  $result='success';
+                  $msg.='审核结果：<strong class="text-warning">返回修改</strong>。<br>具体审核意见：<span class="text-info">'.$request->request('auditMsg').'</span><br>';
+                  
+                  $issId=$request->request('issId');
+                  $issSet = IssinfoModel::get($issId);
+                  
+                  //
+                  $numId=$issSet->issnum;
+                  
+                  // 使用静态方法，向issrecord表新增信息。
+                  $issRecordSet=IssrecordModel::create([
+                    'num'=>$numId,
+                    'act'=>'审核',
+                    'actdetail'=>'专利事务"'.$issSet->topic.'"审核后返回撰写人【'.$issSet->writer.'】修改。<br>具体审核意见：<span class="text-info">'.$request->request('auditMsg').'</span><br>',
+                    'acttime'=>$today,
+                    'username'=>$request->param('username'),
+                    'rolename'=>$role,
+                    'issinfo_id'=>$issId,
+                  ]);
+                  //静态方法创建新对象后，返回对象id
+                  $issRecordId= $issRecordSet->id;
+                  
+                  $result='success';
+                  $msg.='专利事务<strong>"'.$issSet->topic.'"</strong>审核后返回撰写人【'.$issSet->writer.'】修改。<br>';
+                
+              break;
+              // pass
+              default:
+                // 使用静态方法，向issinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
+                  IssinfoModel::update([
+                      'status' => '审核通过',
+                      'auditrejectdate'=> $today,
+                  ], ['id' => $request->request('issId')]);
+                  $result='success';
+                  $msg.='审核结果：<strong class="text-success">审核通过</strong>。<br>';
+                  
+                  $issId=$request->request('issId');
+                  $issSet = IssinfoModel::get($issId);
+                  
+                  //
+                  $numId=$issSet->issnum;
+                  
+                  // 使用静态方法，向issrecord表新增信息。
+                  $issRecordSet=IssrecordModel::create([
+                    'num'=>$numId,
+                    'act'=>'审核',
+                    'actdetail'=>'专利事务"'.$issSet->topic.'"审核通过',
+                    'acttime'=>$today,
+                    'username'=>$request->param('username'),
+                    'rolename'=>$role,
+                    'issinfo_id'=>$issId,
+                  ]);
+                  //静态方法创建新对象后，返回对象id
+                  $issRecordId= $issRecordSet->id;
+                  
+                  $result='success';
+                  $msg.='专利事务<strong>"'.$issSet->topic.'"</strong>已审核通过。请留意后续审批结果。<br>';
+              break;
+              
+            }
+              // 存储上传的附件    
+              if($attUpload){
+                $issSet = IssinfoModel::get($request->request('issId'));
+                    
+                // 使用静态方法，向attinfo表新增附件文件
+                $attSet = AttinfoModel::create([
+                  'num_id'  => $numId,
+                  'name'  => $request->request('attName'),
+                  'atttype' => $request->request('attType'),
+                  'attmap_type' => $request->request('attObj'),
+                  'attmap_id' => $request->request('issId'),
+                  'uploaddate'=> $today,
+                  'uploader'=> $request->request('username'),
+                  'rolename'=> $role,
+                ]);
+                //完成附件上传
+                $uploadResult=$this->_uploadAtt($att,$attSet->num_id,$attSet->id);
+                        
+                if($uploadResult=='success'){
+                  $msg.='新附件上传成功。<br>';
+                }else{
+                  $msg.=$uploadResult;
+                }  
+              }else{
+                $result='success';
+                $msg.='无新附件上传。<br>';
+              }  
           
           break;
           
@@ -1008,8 +1103,8 @@ class DashboardController extends \think\Controller
           
         }
         // 向前端传送添加/修改成功后生成的patIssId
-        //$data=array('result'=>$result,'msg'=>$msg,'patIssId'=>$issId);
-        $data=array('result'=>$result,'msg'=>$msg);
+        $data=array('result'=>$result,'msg'=>$msg,'patIssId'=>$issId);
+        //$data=array('result'=>$result,'msg'=>$msg);
         return json($data); 
         
         //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div> ';
@@ -1239,7 +1334,10 @@ class DashboardController extends \think\Controller
     }
     
      //上传附件文件
-    private function _uploadAtt($fileSet,$num_id)
+     //参数1：$fileSet，类型：对象。值：不为空。说明：拟上传的文件对象
+     //参数2：$num_id，类型：字符。值：不为空。说明：上传文件拟放入的目录名称
+     //参数3：$attId，类型：字符。值：不为空。说明：拟记录上传文件路径的记录id
+    private function _uploadAtt($fileSet,$num_id,$attId)
     {
       
       if(!empty($fileSet)){
@@ -1261,7 +1359,7 @@ class DashboardController extends \think\Controller
             
             $path= '..'.DS.'uploads'. DS.$num_id.DS.$info->getSaveName();
             
-            $attSet = AttinfoModel::where('num_id',$num_id)->find(); 
+            $attSet = AttinfoModel::where('id',$attId)->find(); 
             $attSet->save([
               'attpath'=>$path,
             ]);

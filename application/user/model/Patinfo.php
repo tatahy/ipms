@@ -93,58 +93,58 @@ class Patinfo extends Model
       return $outPut;
     }
     
-    //获取器，获取数据表patinfo中status字段值，转换为中文输出
-    protected function getStatusAttr($value)
-    {
-      $outPut='……';
-      switch($value){
-        case '_PATS1':
-          $outPut='内审';
-        break;
-        
-        case '_PATS2':
-          $outPut='内审修改';
-        break;
-          
-        case '_PATS3':
-          $outPut='内审否决';
-        break;
-        
-        case '_PATS4':
-          $outPut='拟申报(内审批准)';
-        break;
-        
-        case '_PATS5':
-          $outPut='申报';
-        break;
-        
-        case '_PATS6':
-          $outPut='申报修订';
-        break;
-        
-        case '_PATS7':
-          $outPut='授权';
-        break;
-        
-        case '_PATS8':
-          $outPut='续费授权';
-        break;
-        
-        case '_PATS9':
-          $outPut='放弃';
-        break;
-        
-        case '_PATS10':
-          $outPut='驳回';
-        break;
-        
-        default:
-          $outPut='……';
-        break;
-        
-      }
-      return $outPut;
-    }
+    //获取器，获取数据表patinfo中status字段值，转换为中文输出，待考虑是否采用？？
+   // protected function getStatusAttr($value)
+//    {
+//      $outPut='……';
+//      switch($value){
+//        case '_PATS1':
+//          $outPut='内审';
+//        break;
+//        
+//        case '_PATS2':
+//          $outPut='内审修改';
+//        break;
+//          
+//        case '_PATS3':
+//          $outPut='内审否决';
+//        break;
+//        
+//        case '_PATS4':
+//          $outPut='拟申报(内审批准)';
+//        break;
+//        
+//        case '_PATS5':
+//          $outPut='申报';
+//        break;
+//        
+//        case '_PATS6':
+//          $outPut='申报修订';
+//        break;
+//        
+//        case '_PATS7':
+//          $outPut='授权';
+//        break;
+//        
+//        case '_PATS8':
+//          $outPut='续费授权';
+//        break;
+//        
+//        case '_PATS9':
+//          $outPut='放弃';
+//        break;
+//        
+//        case '_PATS10':
+//          $outPut='驳回';
+//        break;
+//        
+//        default:
+//          $outPut='……';
+//        break;
+//        
+//      }
+//      return $outPut;
+//    }
     
     /**
      * 获取内容所属的issue信息

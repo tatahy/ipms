@@ -23,6 +23,7 @@
 					<tr>
 						<th>专利名称</th>
 						<th>专利类型</th>
+						<th>专利状态</th>
 						<th>专利关键词</th>
 					</tr>
 				</thead>
@@ -30,6 +31,7 @@
 					<tr>
 						<td>{$pat.topic}</td>
 						<td>{$pat.pattype}</td>
+						<td>{$pat.status}</td>
 						<td>{$pat.keyword}</td>
 					</tr>	
 				</tbody>
@@ -125,9 +127,8 @@
 						<th>上传日期</th>
 						<th>上传人</th>
 						<th>系统角色</th>
-						{in name="$iss.status" value="待审核"}
-							<th>操作</th>
-						{/in}
+						<th>操作</th>
+						
 					</tr>
 				</thead>
 				<tbody><!-- 此处显示数据库查询后的数据集 -->
@@ -140,14 +141,9 @@
 						<td>{$vo.uploaddate}</td>
 						<td>{$vo.uploader}</td>
 						<td>{$vo.rolename}</td>
-						{in name="$iss.status" value="待审核"}
-							<td>
-								<a href="{$home}/attachment/index/download/id/{$vo.id}">下载</a>&nbsp;
-								{in name="$vo.rolename" value="reviewer"}
-									<a href="{$home}/attachment/index/delete/id/{$vo.id}">删除</a>&nbsp;
-								{/in}
-							</td>
-						{/in}
+						<td>
+							<a href="{$home}/attachment/index/download/id/{$vo.id}">下载</a>&nbsp;
+						</td>
 					</tr>	
 					{/volist}
 				</tbody>
@@ -172,6 +168,7 @@
 			
 			</div>
 		</div>
+		
 		
 		<div class="row">
 		<div class="form-group col-sm-12">			
@@ -315,7 +312,6 @@ $(document).ready(function(){
 				
 				$('#divAuditMsg').show();
 				$('#btnFail').show();
-				$('#auditMsg').text($(this).val());
 			break;
 			
 			case 'modify':
@@ -324,7 +320,6 @@ $(document).ready(function(){
 				
 				$('#divAuditMsg').show();
 				$('#btnModify').show();
-				$('#auditMsg').text($(this).val());
 			break;
 			// pass
 			default:

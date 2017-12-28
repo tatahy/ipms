@@ -138,9 +138,7 @@
 						<th>上传日期</th>
 						<th>上传人</th>
 						<th>系统角色</th>
-						{in name="$iss.status" value="填报"}
-							<th>操作</th>
-						{/in}
+						<th>操作</th>
 					</tr>
 				</thead>
 				<tbody><!-- 此处显示数据库查询后的数据集 -->
@@ -153,12 +151,14 @@
 						<td>{$vo.uploaddate}</td>
 						<td>{$vo.uploader}</td>
 						<td>{$vo.rolename}</td>
-						{in name="$iss.status" value="填报"}
-							<td>
-								<a href="{$home}/attachment/index/download/id/{$vo.id}">下载</a>&nbsp;
-								<a href="{$home}/attachment/index/delete/id/{$vo.id}">删除</a>&nbsp;
-							</td>
-						{/in}
+						
+						<td>
+							<a href="{$home}/attachment/index/download/id/{$vo.id}">下载</a>&nbsp;
+							{in name="$vo.deldisplay" value="1"}
+							<a href="{$home}/attachment/index/delete/id/{$vo.id}">删除</a>&nbsp;
+							{/in}
+						</td>
+						
 					</tr>	
 					{/volist}
 				</tbody>

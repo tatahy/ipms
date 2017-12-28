@@ -9,13 +9,13 @@
 				<tr>
 					<th>序号</th>
 					<th><a data-toggle="tooltip" href="#"  sortName="_TOPIC" sort="{$sort}">标题</a></th>
-					<th><a data-toggle="tooltip" href="#"  sortName="_ABSTRACT" sort="{$sort}">摘要</a></th>
+					<th><a data-toggle="tooltip" href="#"  sortName="_ABSTRACT" sort="{$sort}">简介</a></th>
 					<th><a data-toggle="tooltip" href="#"  sortName="_STATUS" sort="{$sort}">状态</a></th>
 					
 					<th><a data-toggle="tooltip" href="#"  sortName="_PATNAME" sort="{$sort}">专利名称</a></th>
 					<th><a data-toggle="tooltip" href="#"  sortName="_PATSTATUS" sort="{$sort}">专利类型</a></th>
 					
-					<th><a data-toggle="tooltip" href="#"  sortName="_SUBMITDATE" sort="{$sort}">提交日期</a></th>
+					<th><a data-toggle="tooltip" href="#"  sortName="_ADDNEWDATE" sort="{$sort}">填报日期</a></th>
 					
 					<th><a data-toggle="tooltip" href="#"  sortName="_WRITER" sort="{$sort}">撰写人</a></th>
 					<th><a data-toggle="tooltip" href="#"  sortName="_EXECUTER" sort="{$sort}">执行人</a></th>
@@ -40,7 +40,7 @@
 					{//同上得到$vo.issmap.pattype}
 					<td>{$vo.issmap.pattype}</td>
 					
-					<td>{$vo.submitdate}</td>
+					<td>{$vo.addnewdate}</td>
 					
 					<td>{$vo.writer}</td>
 					<td>{$vo.executer}</td>
