@@ -1,4 +1,4 @@
-<!-- // reviewer_audit.html -->
+<!-- // approver_approve.html -->
 <div class="container-fluid">
 	<!-- <div class="rows col-sm-12"> -->
 	<form id="fmIssPat" action="" role="form" enctype="multipart/form-data">
@@ -12,7 +12,7 @@
 			</div>
 		
 			<div class="form-group col-sm-4">
-				<h4>事务状态：<span class="text-warning"><strong>{$iss.status}</strong></span></h4>
+				<h4>事务状态：<span><strong><a href="{$home}/issue/index/issrecords/id/{$iss.id}" target="_blank" data-toggle="tooltip">{$iss.status}</a></strong></span></h4>
 			</div>
 		</div>
 		
@@ -95,8 +95,6 @@
 					
 					<label for="">附件类型</label>
 					<select class="form-control" id="attType" name="attType">
-						<option value="_ATTT1">申请</option>
-						<option value="_ATTT2">请示</option>
 						<option value="_ATTT3">报告</option>
 						<option value="_ATTT4">预算报告</option>
 						<option value="_ATTT5">说明</option>
@@ -154,17 +152,29 @@
 		
 		<div class="row">
 			<div class="form-group col-sm-4">
-				<label for="auditResult">审核结果</label>
-				<select class="form-control" id="auditResult" name="auditResult" >
-					<option value="pass">审核通过</option>
-					<option value="fail">审核不通过</option>
-					<option value="modify">返回修改</option>
+				<label for="approveResult">审批结果</label>
+				<select class="form-control" id="approveResult" name="approveResult" >
+					<option value="approve">批准申请</option>
+					<option value="veto">否决申请</option>
+					<option value="complete">修改完善</option>
 				</select>
 			</div>
+			
+			<div id="divOperator" class="form-group col-sm-8">
+				<label for="operator">选定执行人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<!-- <input class="form-control" id="operator" name="operator" value="" type="text" required="true"> -->
+				<select class="form-control" id="operator" name="operator">
+					<option value="0"></option>
+					<option value="">批准申请</option>
+					<option value="veto">否决申请</option>
+					<option value="complete">修改完善</option>
+				</select>
+			
+			</div>
 		
-			<div id="divAuditMsg" class="form-group col-sm-8" hidden="true">
-				<label class="control-label" for="auditMsg">审核意见<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<textarea class="form-control" id="auditMsg" name="auditMsg" value="" type="text" placeholder="请填入具体的审核意见"></textarea>
+			<div id="divApproveMsg" class="form-group col-sm-8" hidden="true">
+				<label class="control-label" for="approveMsg">审批意见<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<textarea class="form-control" id="approveMsg" name="approveMsg" value="" type="text" placeholder="请填入具体的审批意见"></textarea>
 			
 			</div>
 		</div>
@@ -173,11 +183,11 @@
 		<div class="row">
 		<div class="form-group col-sm-12">			
 			
-			<button type="submit" id="btnPass" class="btn btn-success btn-sm" data-oprt="pass"><span class="glyphicon glyphicon-check"></span>通过</button>
+			<button type="submit" id="btnApprove" class="btn btn-success btn-sm" data-oprt="approve"><span class="glyphicon glyphicon-ok"></span>批准申请</button>
 			
-			<button type="submit" id="btnFail" class="btn btn-danger btn-sm" data-oprt="fail" hidden="true"><span class="glyphicon glyphicon-ban-circle"></span>未通过</button>
+			<button type="submit" id="btnVeto" class="btn btn-danger btn-sm" data-oprt="veto" hidden="true"><span class="glyphicon glyphicon-remove"></span>否决申请</button>
 			
-			<button type="submit" id="btnModify" class="btn btn-primary btn-sm" data-oprt="modify" hidden="true"><span class="glyphicon glyphicon-erase"></span>修改</button>
+			<button type="submit" id="btnComplete" class="btn btn-primary btn-sm" data-oprt="complete" hidden="true"><span class="glyphicon glyphicon-erase"></span>修改完善</button>
 			
  			<div  class="pull-right">
 				<input type="reset" class="btn btn-primary btn-sm" value="重置">
@@ -193,8 +203,14 @@
 <script>
 $(document).ready(function(){
 
-	$('#btnFail').hide();
-	$('#btnModify').hide();
+	$('#btnVeto').hide();
+	$('#btnComplete').hide();
+	
+	// 准备好operator名单
+	showOperator($("#operator"),[],'{$iss.writer}');
+	
+	// 添加bootstrap的tooltip属性
+	$('h4 a').tooltip({title: '事务过程记录', placement: 'bottom'});
 				
 	// 监听文件上传进度，用回调函数实现？？
     var xhrOnProgress = function(fun) {
@@ -225,22 +241,23 @@ $(document).ready(function(){
 		
 		var oprt=$('#oprt').val();
 		var str='确定';
+		var operator=$('#operator').val();
 		var title=oprt;
 		switch(oprt){
-			case 'pass':
-				str='确定【<span class="glyphicon glyphicon-check text-success"></span>通过】操作？';
-				title='【<span class="glyphicon glyphicon-check text-success"></span>通过】操作'
+			case 'approve':
+				str='已选定执行人：<strong class="text-info">'+operator+'</strong><br>确定【<span class="glyphicon glyphicon-ok text-success"></span>批准申请】操作？';
+				title='【<span class="glyphicon glyphicon-ok text-success"></span>批准申请】操作'
 			break;
 			
-			case 'fail':
-				str='确定【<span class="glyphicon glyphicon-ban-circle text-danger"></span>未通过】操作？';
-				title='【<span class="glyphicon glyphicon-ban-circle text-danger"></span>未通过】操作';
+			case 'veto':
+				str='确定【<span class="glyphicon glyphicon-remove text-danger"></span>否决申请】操作？';
+				title='【<span class="glyphicon glyphicon-remove text-danger"></span>否决申请】操作';
 			break;
 			
-			// oprt=='modify'
+			// oprt=='complete'
 			default:
-				str='确定【<span class="glyphicon glyphicon-erase"></span>修改】操作？';
-				title='【<span class="glyphicon glyphicon-erase"></span>修改】操作';
+				str='确定【<span class="glyphicon glyphicon-erase"></span>修改完善】操作？';
+				title='【<span class="glyphicon glyphicon-erase"></span>修改完善】操作';
 			break;
 		
 		}
@@ -258,17 +275,17 @@ $(document).ready(function(){
 	
 	
 	// 点击通过按钮，与form的submit()配合确定传给后端的oprt='pass'
-	$('#btnPass').click(function(){
+	$('#btnApprove').click(function(){
 		$('#oprt').val($(this).attr('data-oprt'));
 	});
 	
 	// 点击未通过按钮，与form的submit()配合确定传给后端的oprt='fail'
-	$('#btnFail').click(function(){
+	$('#btnVeto').click(function(){
 		$('#oprt').val($(this).attr('data-oprt'));
 	});
 	
 	// 点击修改按钮，与form的submit()配合确定传给后端的oprt='modify'
-	$('#btnModify').click(function(){
+	$('#btnComplete').click(function(){
 		$('#oprt').val($(this).attr('data-oprt'));
 	});
 	
@@ -301,31 +318,45 @@ $(document).ready(function(){
 		}
 	});
 	
-	// 单选框auditResult选中变化满足条件时，出现auditMsg输入框。
-	$('#auditResult').change(function(){
+	// 单选框approveResult选中变化满足条件时，出现approveMsg输入框。
+	$('#approveResult').change(function(){
 		$(':submit').hide();
 	
 		switch($(this).val()){
-			case 'fail':
-				//为'#auditMsg'添加'required'属性，其值为true，保证在表单提交时必填
-				$('#auditMsg').attr('required',true);
+			case 'veto':
+				//为'#approveMsg'添加'required'属性，其值为true，保证在表单提交时必填
+				$('#approveMsg').attr('required',true);
 				
-				$('#divAuditMsg').show();
-				$('#btnFail').show();
+				$('#divApproveMsg').show();
+				$('#btnVeto').show();
+				
+				//选择执行人#divOperator隐藏
+				$('#divOperator').hide();
+				//为'#operator'添加'required'属性，其值为false
+				$('#operator').attr('required',false);
 			break;
 			
-			case 'modify':
-				//为'#auditMsg'添加'required'属性，其值为true，保证在表单提交时必填
-				$('#auditMsg').attr('required',true);
+			case 'complete':
+				//为'#approveMsg'添加'required'属性，其值为true，保证在表单提交时必填
+				$('#approveMsg').attr('required',true);
 				
-				$('#divAuditMsg').show();
-				$('#btnModify').show();
+				$('#divApproveMsg').show();
+				$('#btnComplete').show();
+				
+				//选择执行人#divOperator隐藏
+				$('#divOperator').hide();
+				//为'#operator'添加'required'属性，其值为false
+				$('#operator').attr('required',false);
 			break;
-			// pass
+			// approve
 			default:
-				$('#divAuditMsg').hide();
-				$('#btnPass').show();
+				$('#divApproveMsg').hide();
+				$('#btnApprove').show();
 				
+				//选择执行人#divOperator显示
+				$('#divOperator').show();
+				//为'#operator'添加'required'属性，其值为true，保证在表单提交时必填
+				$('#operator').attr('required',true);
 			break;
 		}
 		
@@ -333,18 +364,23 @@ $(document).ready(function(){
 	
 	// 重置按钮点击时附加
 	$('input:reset').click(function(){
-		//为'#attName'、'#auditMsg'添加'required'属性，其值为false，保证在表单提交时忽略
+		//为'#attName'、'#approveMsg'添加'required'属性，其值为false，保证在表单提交时忽略
 		$('#attName').attr('required',false);
-		$('#auditMsg').attr('required',false);
+		$('#approveMsg').attr('required',false);
 		
 		$(':submit').hide();
-		$('#btnPass').show();
-		<!-- $('#btnFail').hide(); -->
-		<!-- $('#btnModify').hide(); -->
+		$('#btnApprove').show();
+		<!-- $('#btnVeto').hide(); -->
+		<!-- $('#btnComplete').hide(); -->
 		
 		// 上传的输入框们和审查意见框退场
 		$('#divAtt').hide();
-		$('#divAuditMsg').hide();
+		$('#divApproveMsg').hide();
+		
+		//选择执行人#divOperator显示
+		$('#divOperator').show();
+		//为'#operator'添加'required'属性，其值为true，保证在表单提交时必填
+		$('#operator').attr('required',true);
 	});
 
    
@@ -413,7 +449,61 @@ $(document).ready(function(){
         });
 	}
 	
-	
+	//**函数名：showOperator
+ 	//*作用：向单选框填充"执行人"的内容选项
+	//* 参数1：Obj，必须。类型：对象，值：单选框的对象名称
+	//*参数2：attach，可为空。类型：json数组，值：需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
+	//*参数3：selected，可为空。类型：字符，值：单选框拟选定option项的value值。
+ 	//**/
+	function showOperator(Obj,attach,selected){
+		<!-- // 应用Ajax向服务器请求“部门”单选框内容所需数据，并组装好HTML语句 -->
+		$.ajax({
+			type : "post",
+			async : true,  //异步请求
+			url : "{$home}/user/dashboard/selectOperator",
+			// 发送到服务器的数据，可无
+			<!-- data : data, -->
+			timeout:1000,
+			<!-- // 服务器端response的数据类型为json-->
+			dataType:"json",
+			success:function(backData){
+				var data=backData;
+
+				var str="";
+				if(attach){
+					for(i=0;i<attach.length;i++){
+						str+="<option value='"+attach[i].val+"'>"+attach[i].text+"</option>";
+					}
+					
+				}
+				<!-- // 遍历data数组组装HTML语句 -->
+				<!-- // data的结构是数组类的：[{id:1,username:"xx", dept:"yy"},{}],所以要进行嵌套取出id，username和dept的值组装HTML语句-->
+				$.each(data,function(n1,v1){
+					$.each(v1,function(n2,v2){
+						if(n2=="username"){
+							str+="<option value='"+v2+"'>"+v2+" （部门：";
+						}
+						if(n2=="dept"){
+							str+=v2+"）</option>";
+						}
+					});
+				});
+				
+				<!--// 清空单选框Obj的所有选项-->
+				Obj.empty();
+				<!--// 添加单选框Obj的新选项-->
+				Obj.append(str);
+				
+				<!-- // value=selected 的项为选定项-->
+				if (selected){
+					Obj.val(selected).attr('selected','selected');
+				}
+			},
+			error: function() {
+               alert("失败operator，请稍后再试！");
+            }
+		});
+	}
 
 
 <!-- function -->

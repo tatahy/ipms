@@ -1,74 +1,62 @@
-<!-- // writer_edit.html -->
+<!-- // approver_approve.html -->
 <div class="container-fluid">
 	<!-- <div class="rows col-sm-12"> -->
 	<form id="fmIssPat" action="" role="form" enctype="multipart/form-data">
 		<div class="row">
-		<div class="form-group col-sm-3">
-			<h4>撰写人：{$iss.writer}</h4>
+			<div class="form-group col-sm-3">
+				<h4>撰写人：{$iss.writer}</h4>
+			</div>
+		
+			<div class="form-group col-sm-5">
+				<h4>所属部门：{$iss.dept}</h4>
+			</div>
+		
+			<div class="form-group col-sm-4">
+				<h4>事务状态：<span><strong><a href="{$home}/issue/index/issrecords/id/{$iss.id}" target="_blank" data-toggle="tooltip">{$iss.status}</a></strong></span></h4>
+			</div>
 		</div>
 		
-		<div class="form-group col-sm-5">
-			<h4>所属部门：{$iss.dept}</h4>
-		</div>
-		
-		<div class="form-group col-sm-4">
-			<h4>事务状态：<span class="text-warning"><strong>{$iss.status}</strong></span></h4>
-		</div>
-		</div>
-		
-		<h4><span class="label label-warning"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利信息</span></h4>
-		<div class="row">
-		<div class="form-group col-sm-8">
-			<label class="control-label" for="patTopic">专利名称<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-			<input class="form-control" id="patTopic" name="patTopic" value="{$pat.topic}" type="text" placeholder="一种ZZZ的____专利" required>
-			
-		</div>
-		
-		<div class="form-group col-sm-4">
-			<label for="patType">专利类型</label>
-			<select class="form-control" id="patType" name="patType">
-				<!-- {present name="pat.pattype"} -->
-					<!-- <option value="{$pat.pattype}" selected>{$pat.pattype}</option> -->
-				<!-- {/present} -->
-				
-				<option value="0">……</option>
-				<option value="_PATT1">发明专利</option>
-				<option value="_PATT2">实用新型专利</option>
-                <option value="_PATT3">外观设计专利</option>
-                <option value="_PATT4">软件版权</option>
-                <option value="_PATT5">著作权</option>
-                <option value="_PATT6">集成电路图</option>
-                
-			</select>
-		</div>
+		<h4><span class="label label-warning"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利摘要</span></h4>
+		<div class="table-responsive ">
+			<table class="table table-bordered table-striped table-hover">
+				<thead>
+					<tr>
+						<th>专利名称</th>
+						<th>专利类型</th>
+						<th>专利状态</th>
+						<th>专利关键词</th>
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					<tr>
+						<td>{$pat.topic}</td>
+						<td>{$pat.pattype}</td>
+						<td>{$pat.status}</td>
+						<td>{$pat.keyword}</td>
+					</tr>	
+				</tbody>
+			</table>
 		</div>
 	
-		<h4><span class="label label-warning">事务信息</span></h4>
-		<div class="row">
-		<div class="form-group col-sm-8">
-			<label class="control-label" for="topic">事务标题<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-			<input class="form-control" id="topic" name="topic" value="{$iss.topic}" type="text" placeholder="关于XX专利的YY申请" required>
-			
-		</div>
-		
-		<div class="form-group col-sm-4">
-			<label for="issType">事务类型</label>
-			<select class="form-control" id="issType" name="issType" >
-				<option value="_ISST_PAT1">专利授权申报</option>
-				<option value="_ISST_PAT2">专利授权到期续费</option>
-               
-			</select>
-		</div>
-		</div>
-		
-		<div class="row">
-		<div class="form-group col-sm-12">
-			<label class="control-label" for="abstract">事务简介<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-			<textarea class="form-control" rows="5" id="abstract" name="abstract" placeholder="填写事务的主要内容，字数不超过100字。" required>{$iss.abstract}</textarea>
-			
-		</div>
-		</div>
-		
+		<h4><span class="label label-warning">事务摘要</span></h4>
+		<div class="table-responsive ">
+			<table class="table table-bordered table-striped table-hover">
+				<thead>
+					<tr>
+						<th>事务标题</th>
+						<th>事务类型</th>
+						<th>事务简介</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>{$iss.topic}</td>
+						<td>{$iss.issmap_type}</td>
+						<td>{$iss.abstract}</td>
+					</tr>	
+				</tbody>
+			</table>
+		</div>	
 				
 		<h4><span class="label label-warning">事务附件上传</span>
 			<label class="radio-inline ">
@@ -107,10 +95,9 @@
 					
 					<label for="">附件类型</label>
 					<select class="form-control" id="attType" name="attType">
-						<option value="_ATTT1">申请</option>
-						<option value="_ATTT2">请示</option>
 						<option value="_ATTT3">报告</option>
 						<option value="_ATTT4">预算报告</option>
+						<option value="_ATTT5">说明</option>
 					</select>
 					
 				</div>
@@ -139,6 +126,7 @@
 						<th>上传人</th>
 						<th>系统角色</th>
 						<th>操作</th>
+						
 					</tr>
 				</thead>
 				<tbody><!-- 此处显示数据库查询后的数据集 -->
@@ -151,14 +139,9 @@
 						<td>{$vo.uploaddate}</td>
 						<td>{$vo.uploader}</td>
 						<td>{$vo.rolename}</td>
-						
 						<td>
 							<a href="{$home}/attachment/index/download/id/{$vo.id}">下载</a>&nbsp;
-							{in name="$vo.deldisplay" value="1"}
-							<a href="{$home}/attachment/index/delete/id/{$vo.id}">删除</a>&nbsp;
-							{/in}
 						</td>
-						
 					</tr>	
 					{/volist}
 				</tbody>
@@ -168,18 +151,48 @@
 		</div>
 		
 		<div class="row">
-		<div class="form-group col-sm-12">
-			<input type="submit" id="btnSave" class="btn btn-primary btn-sm" data-oprt="update" value="更新"> 
+			<div class="form-group col-sm-4">
+				<label for="approveResult">审批结果</label>
+				<select class="form-control" id="approveResult" name="approveResult" >
+					<option value="approve">批准申请</option>
+					<option value="veto">否决申请</option>
+					<option value="complete">修改完善</option>
+				</select>
+			</div>
 			
+			<div id="divOperator" class="form-group col-sm-8">
+				<label for="operator">选定执行人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<!-- <input class="form-control" id="operator" name="operator" value="" type="text" required="true"> -->
+				<select class="form-control" id="operator" name="operator">
+					<option value="0"></option>
+					<option value="">批准申请</option>
+					<option value="veto">否决申请</option>
+					<option value="complete">修改完善</option>
+				</select>
 			
+			</div>
+		
+			<div id="divApproveMsg" class="form-group col-sm-8" hidden="true">
+				<label class="control-label" for="approveMsg">审批意见<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<textarea class="form-control" id="approveMsg" name="approveMsg" value="" type="text" placeholder="请填入具体的审批意见"></textarea>
 			
-			<button type="submit" id="btnSubmit" class="btn btn-primary btn-sm" data-oprt="submit"><span class="glyphicon glyphicon-ok"></span>提交</button>
- 			
-			<div  class="pull-right">
+			</div>
+		</div>
+		
+		
+		<div class="row">
+		<div class="form-group col-sm-12">			
+			
+			<button type="submit" id="btnApprove" class="btn btn-success btn-sm" data-oprt="approve"><span class="glyphicon glyphicon-ok"></span>批准申请</button>
+			
+			<button type="submit" id="btnVeto" class="btn btn-danger btn-sm" data-oprt="veto" hidden="true"><span class="glyphicon glyphicon-remove"></span>否决申请</button>
+			
+			<button type="submit" id="btnComplete" class="btn btn-primary btn-sm" data-oprt="complete" hidden="true"><span class="glyphicon glyphicon-erase"></span>修改完善</button>
+			
+ 			<div  class="pull-right">
 				<input type="reset" class="btn btn-primary btn-sm" value="重置">
 				<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
 			</div>
-			
 		</div>
 		</div>
 	</form>
@@ -190,6 +203,15 @@
 <script>
 $(document).ready(function(){
 
+	$('#btnVeto').hide();
+	$('#btnComplete').hide();
+	
+	// 准备好operator名单
+	showOperator($("#operator"),[],'{$iss.writer}');
+	
+	// 添加bootstrap的tooltip属性
+	$('h4 a').tooltip({title: '事务过程记录', placement: 'bottom'});
+				
 	// 监听文件上传进度，用回调函数实现？？
     var xhrOnProgress = function(fun) {
         xhrOnProgress.onprogress = fun; //绑定监听
@@ -219,22 +241,23 @@ $(document).ready(function(){
 		
 		var oprt=$('#oprt').val();
 		var str='确定';
+		var operator=$('#operator').val();
 		var title=oprt;
 		switch(oprt){
-			case 'delete':
-				str='确定【<span class="glyphicon glyphicon-remove text-danger"></span>删除】操作？<hr>该操作将会同时删除已上传附件。';
-				title='【<span class="glyphicon glyphicon-remove text-danger"></span>删除】操作'
+			case 'approve':
+				str='已选定执行人：<strong class="text-info">'+operator+'</strong><br>确定【<span class="glyphicon glyphicon-ok text-success"></span>批准申请】操作？';
+				title='【<span class="glyphicon glyphicon-ok text-success"></span>批准申请】操作'
 			break;
 			
-			case 'submit':
-				str='确定【<span class="glyphicon glyphicon-ok text-success"></span>提交】操作？';
-				title='【<span class="glyphicon glyphicon-ok text-success"></span>提交】操作';
+			case 'veto':
+				str='确定【<span class="glyphicon glyphicon-remove text-danger"></span>否决申请】操作？';
+				title='【<span class="glyphicon glyphicon-remove text-danger"></span>否决申请】操作';
 			break;
 			
-			// oprt=='update'
+			// oprt=='complete'
 			default:
-				str='确定【更新】？';
-				title='【更新】操作';
+				str='确定【<span class="glyphicon glyphicon-erase"></span>修改完善】操作？';
+				title='【<span class="glyphicon glyphicon-erase"></span>修改完善】操作';
 			break;
 		
 		}
@@ -250,30 +273,19 @@ $(document).ready(function(){
 		}).cancel('否(N)').ok('是(Y)');
 	});
 	
-	// 只有专利事务状态为‘填报’才能有‘删除’按钮。
-	if('填报'=='{$iss.status}'){		
-		$('#btnSubmit').after('&nbsp;<button type="submit" id="btnDelete" class="btn btn-danger btn-sm" data-oprt="delete"><span class="glyphicon glyphicon-remove"></span>删除</button>');
-	}
 	
-	// select显示为后端传来的内容,后端patinfo模型中对pattpye字段有定义获取器，所以$pat.pattype的值不是数据库中的值，$pat->getData('pattype')才是。同理$iss->getData('issmap_type')
-	$('#patType').val('{$pat->getData('pattype')}').attr('selected');
-	$('#issType').val('{$iss->getData('issmap_type')}').attr('selected');
-	
-	//$('#patType').text('{$pat.pattype}').attr('selected');
-	//$('#issType').text('{$iss.issmap_type}').attr('selected');
-	
-	// 点击删除按钮，与form的submit()配合确定传给后端的oprt='delete'
-	$('#btnDelete').click(function(){
+	// 点击通过按钮，与form的submit()配合确定传给后端的oprt='pass'
+	$('#btnApprove').click(function(){
 		$('#oprt').val($(this).attr('data-oprt'));
 	});
 	
-	// 点击提交按钮，与form的submit()配合确定传给后端的oprt='submit'
-	$('#btnSubmit').click(function(){
+	// 点击未通过按钮，与form的submit()配合确定传给后端的oprt='fail'
+	$('#btnVeto').click(function(){
 		$('#oprt').val($(this).attr('data-oprt'));
 	});
 	
-	// 点击保存按钮，与form的submit()配合确定传给后端的oprt='update'
-	$('#btnSave').click(function(){
+	// 点击修改按钮，与form的submit()配合确定传给后端的oprt='modify'
+	$('#btnComplete').click(function(){
 		$('#oprt').val($(this).attr('data-oprt'));
 	});
 	
@@ -306,13 +318,69 @@ $(document).ready(function(){
 		}
 	});
 	
+	// 单选框approveResult选中变化满足条件时，出现approveMsg输入框。
+	$('#approveResult').change(function(){
+		$(':submit').hide();
+	
+		switch($(this).val()){
+			case 'veto':
+				//为'#approveMsg'添加'required'属性，其值为true，保证在表单提交时必填
+				$('#approveMsg').attr('required',true);
+				
+				$('#divApproveMsg').show();
+				$('#btnVeto').show();
+				
+				//选择执行人#divOperator隐藏
+				$('#divOperator').hide();
+				//为'#operator'添加'required'属性，其值为false
+				$('#operator').attr('required',false);
+			break;
+			
+			case 'complete':
+				//为'#approveMsg'添加'required'属性，其值为true，保证在表单提交时必填
+				$('#approveMsg').attr('required',true);
+				
+				$('#divApproveMsg').show();
+				$('#btnComplete').show();
+				
+				//选择执行人#divOperator隐藏
+				$('#divOperator').hide();
+				//为'#operator'添加'required'属性，其值为false
+				$('#operator').attr('required',false);
+			break;
+			// approve
+			default:
+				$('#divApproveMsg').hide();
+				$('#btnApprove').show();
+				
+				//选择执行人#divOperator显示
+				$('#divOperator').show();
+				//为'#operator'添加'required'属性，其值为true，保证在表单提交时必填
+				$('#operator').attr('required',true);
+			break;
+		}
+		
+	});
+	
 	// 重置按钮点击时附加
 	$('input:reset').click(function(){
-		//为'#attName'添加'required'属性，其值为false，保证在表单提交时忽略
+		//为'#attName'、'#approveMsg'添加'required'属性，其值为false，保证在表单提交时忽略
 		$('#attName').attr('required',false);
+		$('#approveMsg').attr('required',false);
 		
-		// 上传的输入框们退场
+		$(':submit').hide();
+		$('#btnApprove').show();
+		<!-- $('#btnVeto').hide(); -->
+		<!-- $('#btnComplete').hide(); -->
+		
+		// 上传的输入框们和审查意见框退场
 		$('#divAtt').hide();
+		$('#divApproveMsg').hide();
+		
+		//选择执行人#divOperator显示
+		$('#divOperator').show();
+		//为'#operator'添加'required'属性，其值为true，保证在表单提交时必填
+		$('#operator').attr('required',true);
 	});
 
    
@@ -334,8 +402,8 @@ $(document).ready(function(){
 		<!-- var formData = new FormData($('#fmIssPat')[0]); -->
 		// 添加表单内没有的内容
         formData.append('returnType', 0);
-		formData.append('role','writer');
-		formData.append('username','{$writer}');
+		formData.append('role','reviewer');
+		formData.append('username','{$reviewer}');
 		formData.append('dept','{$dept}');
 		formData.append('patId','{$pat.id}');
 		formData.append('issId','{$iss.id}');
@@ -363,13 +431,13 @@ $(document).ready(function(){
 						$('#modalPatIssTpl').modal('show');
 						// 重新载入文件
 						$("#modalPatIssTpl").on('shown.bs.modal',function(){
-							$('#patIss').load('{$home}/user/dashboard/patIss',{'role':'writer','returnType':0,'issType':'_PATENT','issStatus':'_TODO','patIssId':'{$iss.id}'});
+							$('#patIss').load('{$home}/user/dashboard/patIss',{'role':'reviewer','returnType':0,'issType':'_PATENT','issStatus':'_TODO','patIssId':'{$iss.id}'});
 						});
 					
 						$("#modalPatIssTpl").modal("hide");
 					}else{
 						// 重新载入文件
-						$('#patIss').load('{$home}/user/dashboard/patIss',{'role':'writer','returnType':0,'issType':'_PATENT','issStatus':'_TODO','patIssId':'{$iss.id}'});
+						$('#patIss').load('{$home}/user/dashboard/patIss',{'role':'reviewer','returnType':0,'issType':'_PATENT','issStatus':'_TODO','patIssId':'{$iss.id}'});
 					}
 					// 操作成功，提示框显示信息
 					$.alert(title+'成功<span class="glyphicon glyphicon-ok text-success"></span><hr>'+data.msg);
@@ -381,7 +449,61 @@ $(document).ready(function(){
         });
 	}
 	
-	
+	//**函数名：showOperator
+ 	//*作用：向单选框填充"执行人"的内容选项
+	//* 参数1：Obj，必须。类型：对象，值：单选框的对象名称
+	//*参数2：attach，可为空。类型：json数组，值：需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
+	//*参数3：selected，可为空。类型：字符，值：单选框拟选定option项的value值。
+ 	//**/
+	function showOperator(Obj,attach,selected){
+		<!-- // 应用Ajax向服务器请求“部门”单选框内容所需数据，并组装好HTML语句 -->
+		$.ajax({
+			type : "post",
+			async : true,  //异步请求
+			url : "{$home}/user/dashboard/selectOperator",
+			// 发送到服务器的数据，可无
+			<!-- data : data, -->
+			timeout:1000,
+			<!-- // 服务器端response的数据类型为json-->
+			dataType:"json",
+			success:function(backData){
+				var data=backData;
+
+				var str="";
+				if(attach){
+					for(i=0;i<attach.length;i++){
+						str+="<option value='"+attach[i].val+"'>"+attach[i].text+"</option>";
+					}
+					
+				}
+				<!-- // 遍历data数组组装HTML语句 -->
+				<!-- // data的结构是数组类的：[{id:1,username:"xx", dept:"yy"},{}],所以要进行嵌套取出id，username和dept的值组装HTML语句-->
+				$.each(data,function(n1,v1){
+					$.each(v1,function(n2,v2){
+						if(n2=="username"){
+							str+="<option value='"+v2+"'>"+v2+" （部门：";
+						}
+						if(n2=="dept"){
+							str+=v2+"）</option>";
+						}
+					});
+				});
+				
+				<!--// 清空单选框Obj的所有选项-->
+				Obj.empty();
+				<!--// 添加单选框Obj的新选项-->
+				Obj.append(str);
+				
+				<!-- // value=selected 的项为选定项-->
+				if (selected){
+					Obj.val(selected).attr('selected','selected');
+				}
+			},
+			error: function() {
+               alert("失败operator，请稍后再试！");
+            }
+		});
+	}
 
 
 <!-- function -->

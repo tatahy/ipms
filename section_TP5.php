@@ -159,4 +159,14 @@ User::where('id','>',10)->delete();
 
 <!--/  HY 2017/12/25 -->
 				
-				
+<!--  HY 2017/12/29 -->
+//问题,ipms系统中user模块的DashboardController.php， 操作‘role’(public function role())里
+//return $this->fetch()与return view()，有区别？？
+return $this->fetch('dashboard'.DS.'pat'.DS.$role);
+return view('dashboard'.DS.'pat'.DS.$role);
+//view()能正常显示模板文件内容，$this->fetch()显示的是转义字符填充后的模板文件内容。
+      
+
+
+
+<!--/  HY 2017/12/29 -->

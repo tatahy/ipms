@@ -91,19 +91,26 @@ switch(){
                     
                 }
 
-<{switch name="变量" }>
-    <{case value="值1" break="0或1"}>输出内容1<{/case}>
-    <{case value="值2"}>输出内容2<{/case}>
-    <{default /}>默认情况
-<{/switch}>
 
-简洁的用法
-<{switch $User.userId}>
-    <{case $adminId}> admin<{/case}>
-    <{case $memberId}> member<{/case}>
-<{/switch}>
-
-
-
+<!--  HY 2017/12/29 -->
+// jQuery的$.post()与.load()有细微的差别,在输出显示效果上load较POST多了双引号。post较load多出了回调函数，在回调函数里可以做更多的事情。
+	$('#btnPatIssNew').click(function(){
+		var str=$(this).html();
+		// 所有按钮所在行去掉附加的bg-warning
+		$('.btnTpl').parent().removeClass('bg-warning');
+		$.post('patIssTpl',
+			{
+				'role':role,
+				'tpl':'addNew',
+				'returnType':0
+			},
+			function(data){
+				$('#divPatIssTpl').html(data);
 				
+				$('.modal-header').find('h4').empty().html('<strong>【'+str+'】</strong><span class="glyphicon glyphicon-wrench">专利事务</span>');
+			}
+		);
+		<!-- $('#divPatIssTpl').load('patIssTpl',{'role':role,'tpl':tpl,'returnType':1}); -->
+	});
 				
+<!--/  HY 2017/12/29 -->				

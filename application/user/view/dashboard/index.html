@@ -52,7 +52,7 @@ $(document).ready(function(){
 	//加载锚点对应的页面文件
 	$("#role").load('role',{'role':window.location.hash});
 	
-	<!-- //点击.aTab中的各个按钮后，显示相应状态的pat内容-->
+	<!-- //点击.aTab中的各个按钮后，默认显示相应状态的pat内容-->
 	$('.aTab').click(function(){
         var sId = $(this).attr('href');  //a的attr属性值
 		window.location.hash = sId;  //设置锚点
