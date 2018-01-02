@@ -729,19 +729,24 @@ class DashboardController extends \think\Controller
                   $issSet=IssinfoModel::get($request->request('issId'));
                   $numId=$issSet->issnum;
                   
-                  // 删除step1，删除由$dirName指定的目录及其文件
-                  $dirName=ROOT_PATH.DS.'uploads'.DS.$numId;
-                  if(is_dir($dirName)){
-                    $result=$this->_deleteDirs($dirName);
-                    $msg='附件删除。<br>';
+                  // 删除step1，如果存在附件则删除由$dirName指定的目录及其文件，否则跳过这一步。
+                  if(count(AttinfoModel::where('num_id',$numId)->select())){
+                    $dirName=ROOT_PATH.DS.'uploads'.DS.$numId;
+                    if(is_dir($dirName)){
+                      $result=$this->_deleteDirs($dirName);
+                      $msg='附件删除。<br>';
+                    }else{
+                      $result="error";
+                      // "text-danger"为前端已定义好的css标签
+                      $msg='事务删除失败。<br><span class="text-danger">附件文件不存在。</span>';
+                      // 中断删除操作，向前端反馈信息。
+                      $data=array('result'=>$result,'msg'=>$msg,'patIssId'=>$request->request('issId'));
+                      return json($data);  
+                    }
                   }else{
-                    $result="error";
-                    // "text-danger"为前端已定义好的css标签
-                    $msg='事务删除失败。<br><span class="text-danger">附件文件不存在。</span>';
-                    // 中断删除操作，向前端反馈信息。
-                    $data=array('result'=>$result,'msg'=>$msg,'patIssId'=>$issId);
-                    return json($data);  
+                    $result="success";
                   }
+                  
                   
                   // 删除step2，指定条件删除数据，向attinfo表删除
                   AttinfoModel::destroy([
@@ -760,7 +765,6 @@ class DashboardController extends \think\Controller
                   }else{
                     $msg='专利事务删除出错。<br>';
                   }
-                  
                 break;
                 
                 // writer 更新专利事务
@@ -797,11 +801,15 @@ class DashboardController extends \think\Controller
                   $issSet=IssinfoModel::get($issId);
                   $numId=$issSet->issnum;
                   
-                  // $issSet->status=='填报'时，使用静态方法，向issrecord表更新acttime。
+                  // $issSet->status=='填报'时，使用静态方法，向issrecord/patrecord表更新acttime。
                   if($issSet->status=='填报'){
                     IssrecordModel::update([
                     'acttime'=>$today,
                     ],['num' => $numId]);
+                    
+                    PatrecordModel::update([
+                    'acttime'=>$today,
+                    ],['patinfo_id' => $request->request('patId')]);
                   }
                   // 设置att的deldisplay的字段值。用于前端页面判断是否显示“删除”按钮。0为不显示。
                   $deldisplay=1;
@@ -962,7 +970,7 @@ class DashboardController extends \think\Controller
                     
               }else{
               $result='success';
-              $msg.='无附件上传。<br>';
+              $msg.='无附件操作。<br>';
               }
               
           break;
@@ -1240,7 +1248,7 @@ class DashboardController extends \think\Controller
           
         }
         // 向前端传送添加/修改成功后生成的patIssId
-        $data=array('result'=>$result,'msg'=>$msg,'patIssId'=>$issId);
+        $data=array('result'=>$result,'msg'=>$msg,'patIssId'=>$request->request('issId'));
         //$data=array('result'=>$result,'msg'=>$msg);
         return json($data); 
         
