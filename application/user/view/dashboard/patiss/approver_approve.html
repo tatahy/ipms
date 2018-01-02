@@ -402,8 +402,8 @@ $(document).ready(function(){
 		<!-- var formData = new FormData($('#fmIssPat')[0]); -->
 		// 添加表单内没有的内容
         formData.append('returnType', 0);
-		formData.append('role','reviewer');
-		formData.append('username','{$reviewer}');
+		formData.append('role','approver');
+		formData.append('username','{$approver}');
 		formData.append('dept','{$dept}');
 		formData.append('patId','{$pat.id}');
 		formData.append('issId','{$iss.id}');
@@ -431,13 +431,13 @@ $(document).ready(function(){
 						$('#modalPatIssTpl').modal('show');
 						// 重新载入文件
 						$("#modalPatIssTpl").on('shown.bs.modal',function(){
-							$('#patIss').load('{$home}/user/dashboard/patIss',{'role':'reviewer','returnType':0,'issType':'_PATENT','issStatus':'_TODO','patIssId':'{$iss.id}'});
+							$('#patIss').load('{$home}/user/dashboard/patIss',{'role':'approver','returnType':0,'issType':'_PATENT','issStatus':'_TODO','patIssId':'{$iss.id}'});
 						});
 					
 						$("#modalPatIssTpl").modal("hide");
 					}else{
 						// 重新载入文件
-						$('#patIss').load('{$home}/user/dashboard/patIss',{'role':'reviewer','returnType':0,'issType':'_PATENT','issStatus':'_TODO','patIssId':'{$iss.id}'});
+						$('#patIss').load('{$home}/user/dashboard/patIss',{'role':'approver','returnType':0,'issType':'_PATENT','issStatus':'_TODO','patIssId':'{$iss.id}'});
 					}
 					// 操作成功，提示框显示信息
 					$.alert(title+'成功<span class="glyphicon glyphicon-ok text-success"></span><hr>'+data.msg);

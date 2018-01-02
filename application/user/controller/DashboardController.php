@@ -507,7 +507,7 @@ class DashboardController extends \think\Controller
         case'approver':
           switch($issStatus){
             case '_DONE':
-              $map['status'] =['in',['准予申报','否决','修改完善','准予续费','放弃']];
+              $map['status'] =['in',['准予申报','否决','修改完善','准予续费','放弃','批准']];
             break;
             
             case '_OPERATE':
@@ -1175,7 +1175,7 @@ class DashboardController extends \think\Controller
                   IssinfoModel::update([
                       'status' => '批准',
                       'auditrejectdate'=> $today,
-                      'operator'=>$request->request('operator')
+                      'executer'=>$request->request('operator')
                   ], ['id' => $request->request('issId')]);
                   $result='success';
                   $msg.='审批结果：<strong class="text-success">批准</strong>。<br>';
@@ -1392,7 +1392,7 @@ class DashboardController extends \think\Controller
                   $this->assign([
                     'home'=>$request->domain(),
                     // 
-                    'reviewer'=>$this->username,
+                    'approver'=>$this->username,
                     'dept'=>$this->dept,
                     //'issStatus'=>$iss->status,
                     
