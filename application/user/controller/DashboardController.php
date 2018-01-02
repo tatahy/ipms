@@ -489,7 +489,7 @@ class DashboardController extends \think\Controller
             break;
            
             case '_DONE':
-              $map['status'] =['in',['准予申报','否决','修改完善','返回修改']];
+              $map['status'] =['in',['准予申报','否决','修改完善','返回修改','批准']];
             break;
             
             case '_OPERATE':
@@ -534,7 +534,7 @@ class DashboardController extends \think\Controller
                 
             //默认'_OPERATE_TODO':
             default:
-              $map['status'] ='准予申报';
+              $map['status'] =['in',['准予申报','批准']];
             break;
           }  
         break;
@@ -569,7 +569,7 @@ class DashboardController extends \think\Controller
             break;
            
             case '_DONE':
-              $map['status'] =['in',['准予申报','否决']];
+              $map['status'] =['in',['准予申报','否决','批准']];
              
             break;
             
