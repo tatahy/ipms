@@ -84,9 +84,9 @@ class Patinfo extends Model
         case '_PATT6':
           $outPut='集成电路图';
         break;
-        
+        //$value值不做转换直接输出
         default:
-          $outPut='……';
+          $outPut=$value;
         break;
         
       }

@@ -250,14 +250,11 @@ $(document).ready(function(){
 			break;
 			
 			case 'operator':
-				if(patIssStatus=="准予申报" || patIssStatus=="准予变更"){
-					$(this).append('<button type="button" class="btn-link" data-tpl="accept" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class="glyphicon glyphicon-ok-circle"></span>认领</button><button type="button" class="btn-link" data-tpl="state" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class=" text-danger glyphicon glyphicon-record"></span>申述</button>');
-				}else if(patIssStatus=="否决变更"){
-					$(this).append('<button type="button" class="btn-link" data-tpl="accept" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class="glyphicon glyphicon-ok-circle"></span>认领</button>');
-				}else if(patIssStatus=="申报执行"){
-					$(this).append('<button type="button" class="btn-link" data-tpl="update" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class="glyphicon glyphicon-cloud-upload"></span>更新</button><button type="button" class="btn-link" data-tpl="submit" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class=" text-success glyphicon glyphicon-level-up"></span>提交</button>');
-				}else if(patIssStatus=="申报修改"){
-					$(this).append('<button type="button" class="btn-link" data-tpl="edit" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class="glyphicon glyphicon-edit"></span>编辑</button><button type="button" class="btn-link" data-tpl="submit" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class=" text-success glyphicon glyphicon-level-up"></span>提交</button>');
+				if(patIssStatus=="批准"){
+					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="todo" data-patIssId="'+id+'"><span class="glyphicon glyphicon-edit"></span>领受/申述</a>');
+				
+				}else if(patIssStatus=="申报修改" || patIssStatus=="申报执行"){
+					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="inprocess" data-patIssId="'+id+'"><span class="glyphicon glyphicon-edit"></span>报告/完成</a>');
 				}
 			break;
 			

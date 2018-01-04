@@ -1308,8 +1308,10 @@ class IndexController extends \think\Controller
             $this->error('未登录用户，请先登录系统');
             //$this->redirect($request->domain());
         }else{
-            $type=PatinfoModel::field('id,pattype')->group('pattype')->select();
+            $patSet=PatinfoModel::field('id,pattype')->group('pattype')->select();
+            //$type=PatinfoModel::group('pattype')->select();
             // 将数组转化为json
+            $type=$patSet;
             return json($type);
         }
     }
