@@ -154,20 +154,32 @@
 		
 		<div class="row">
 			<div class="form-group col-sm-4">
-				<label for="todoResult">领受任务/申请调换</label>
+				<label for="todoResult">领受任务/变更申请</label>
 				<select class="form-control" id="todoResult" name="todoResult" >
 					<option value="accept">领受任务</option>
-					<option value="refuse">申请调换</option>
+					<option value="refuse">变更申请</option>
 					
 				</select>
 			</div>
 			
 			<div id="divRefuseMsg" class="form-group col-sm-8" hidden="true">
-				<label class="control-label" for="refuseMsg">申请调换原因<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<textarea class="form-control" id="refuseMsg" name="refuseMsg" value="" type="text" placeholder="请填入申请调换的具体原因"></textarea>
+				<label class="control-label" for="refuseMsg">变更申请原因<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<textarea class="form-control" id="refuseMsg" name="refuseMsg" value="" type="text" placeholder="请填入变更申请的具体原因"></textarea>
 			
 			</div>
+		</div>	
 			
+		<div class="row">		
+			<div id="divChangeOperator" class="form-group col-sm-4" hidden="true">
+				<strong class="">变更执行人</strong>
+				<label class="radio-inline ">
+      			<input type="radio" name="changeOperator" value="0" checked><span class="label label-default">无</span>
+    			</label>
+				<label class="radio-inline">
+      			<input type="radio" name="changeOperator" value="1"><span class="label label-default">是</span>
+    			</label>
+			</div>
+  
 			<div id="divOperator" class="form-group col-sm-8" hidden="true">
 				<label for="operator">推荐执行人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 				<!-- <input class="form-control" id="operator" name="operator" value="" type="text" required="true"> -->
@@ -187,7 +199,7 @@
 			
 			<button type="submit" id="btnAccept" class="btn btn-primary btn-sm" data-oprt="accept"><span class="glyphicon glyphicon-ok-sign"></span>领受任务</button>
 			
-			<button type="submit" id="btnRefuse" class="btn btn-danger btn-sm" data-oprt="refuse" hidden="true"><span class="glyphicon glyphicon-question-sign"></span>申请调换</button>
+			<button type="submit" id="btnRefuse" class="btn btn-danger btn-sm" data-oprt="refuse" hidden="true"><span class="glyphicon glyphicon-question-sign"></span>变更申请</button>
 			
  			<div  class="pull-right">
 				<input type="reset" class="btn btn-primary btn-sm" value="重置">
@@ -206,7 +218,7 @@ $(document).ready(function(){
 	$('#btnRefuse').hide();
 	
 	// 准备好operator名单
-	showOperator($("#operator"),[],'{$iss.writer}');
+	showOperator($("#operator"),[],'{$iss.writer}','{$iss.executer}');
 	
 	// 添加bootstrap的tooltip属性
 	$('h4 a').tooltip({title: '事务过程记录', placement: 'bottom'});
@@ -250,8 +262,12 @@ $(document).ready(function(){
 			
 			// oprt=='refuse'
 			default:
-				str='已推荐执行人：<strong class="text-info">'+operator+'</strong><br>确定【<span class="glyphicon glyphicon-question-sign text-danger"></span>申请调换】操作？';
-				title='【<span class="glyphicon glyphicon glyphicon-question-sign text-danger"></span>申请调换】操作';
+				if(operator){
+					str='已推荐执行人：<strong class="text-danger">'+operator+'</strong><br>确定【<span class="glyphicon glyphicon-question-sign text-danger"></span>变更申请】操作？';
+				}else{
+					str='确定【<span class="glyphicon glyphicon-question-sign text-danger"></span>变更申请】操作？';
+				}
+				title='【<span class="glyphicon glyphicon glyphicon-question-sign text-danger"></span>变更申请】操作';
 			break;
 		
 		}
@@ -273,7 +289,7 @@ $(document).ready(function(){
 		$('#oprt').val($(this).attr('data-oprt'));
 	});
 	
-	// 点击申请调换按钮，与form的submit()配合确定传给后端的oprt='fail'
+	// 点击变更申请按钮，与form的submit()配合确定传给后端的oprt='fail'
 	$('#btnRefuse').click(function(){
 		$('#oprt').val($(this).attr('data-oprt'));
 	});
@@ -284,7 +300,7 @@ $(document).ready(function(){
 		// 选中的单选按钮的value值，值为“1”是选中的“上传”项
 		var v=$(this).attr('value');
 		if(v==1){
-			$(this).next().addClass('label-warning');
+			$(this).next().addClass('label-primary');
 			
 			// 为'#attName'和'#att'添加'required'属性，其值为true，保证在表单提交时必填
 			$('#att').attr('required',true);
@@ -298,7 +314,7 @@ $(document).ready(function(){
 			// 上传的输入框们现身
 			$('#divAtt').show();
 		}else{
-			$('input:radio[name="attUpload"][value="1"]').next().removeClass('label-warning');
+			$('input:radio[name="attUpload"][value="1"]').next().removeClass('label-primary');
 			//为'#attName'和'#att'添加'required'属性，其值为false，保证在表单提交时忽略
 			$('#attName').attr('required',false);
 			$('#att').attr('required',false);
@@ -306,6 +322,28 @@ $(document).ready(function(){
 			$('#divAtt').hide();
 			
 		}
+	});
+	
+	// 单选按钮选中“是”项后，出现推荐执行人单选框。
+	$('input:radio[name="changeOperator"]').change(function(){
+		// 选中的单选按钮的value值，值为“1”是选中的“是”项
+		var v=$(this).attr('value');
+		if(v==1){
+			$(this).next().addClass('label-primary');
+			// operator选择框进场
+			$('#divOperator').show();
+			//为'#operator'添加'required'属性，其值为true，保证在表单提交时必须
+			$('#operator').attr('required',true);
+			
+		}else{
+			$('input:radio[name="changeOperator"][value="1"]').next().removeClass('label-primary');
+			
+			// operator选择框退场
+			$('#divOperator').hide();
+			//为'#operator'添加'required'属性，其值为false，保证在表单提交时忽略
+			$('#operator').attr('required',false);
+		}
+		
 	});
 	
 	// 单选框todoResult选中变化满足条件时，出现refuseMsg输入框。
@@ -321,9 +359,8 @@ $(document).ready(function(){
 				$('#btnRefuse').show();
 				
 				//选择执行人#divOperator显示
-				$('#divOperator').show();
-				//为'#operator'添加'required'属性，其值为true，保证在表单提交时必填
-				$('#operator').attr('required',true);
+				$('#divChangeOperator').show();
+				
 			break;
 	
 			// accept
@@ -331,10 +368,15 @@ $(document).ready(function(){
 				$('#divRefuseMsg').hide();
 				$('#btnAccept').show();
 				
-				//选择执行人#divOperator隐藏
+				//是否推荐执行人#divChangeOperator隐藏
+				$('#divChangeOperator').hide();
+				//为'#refuseMsg'添加'required'属性，其值为false，保证在表单提交时忽略
+				$('#refuseMsg').attr('required',false);
+				// operator选择框退场
 				$('#divOperator').hide();
-				//为'#operator'添加'required'属性，其值为false
+				//为'#operator'添加'required'属性，其值为false，保证在表单提交时忽略
 				$('#operator').attr('required',false);
+				
 			break;
 		}
 		
@@ -356,9 +398,18 @@ $(document).ready(function(){
 		$('#divRefuseMsg').hide();
 		
 		//选择执行人#divOperator退场
+		$('#divChangeOperator').hide();
+		
+		// 重新准备好operator名单
+		showOperator($("#operator"),[],'{$iss.writer}','{$iss.executer}');
+		// operator选择框退场
 		$('#divOperator').hide();
-		//为'#operator'添加'required'属性，其值为true，保证在表单提交时必填
-		$('#operator').attr('required',true);
+		//为'#operator'添加'required'属性，其值为false，保证在表单提交时忽略
+		$('#operator').attr('required',false);
+		
+		//清除按钮底色
+		$('input:radio[name="changeOperator"][value="1"]').next().removeClass('label-primary');
+		
 	});
 
    
@@ -432,8 +483,9 @@ $(document).ready(function(){
 	//* 参数1：Obj，必须。类型：对象，值：单选框的对象名称
 	//*参数2：attach，可为空。类型：json数组，值：需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
 	//*参数3：selected，可为空。类型：字符，值：单选框拟选定option项的value值。
+	//*参数4：name，可为空。类型：字符，值：不能显示的operator名字。
  	//**/
-	function showOperator(Obj,attach,selected){
+	function showOperator(Obj,attach,selected,name){
 		<!-- // 应用Ajax向服务器请求“部门”单选框内容所需数据，并组装好HTML语句 -->
 		$.ajax({
 			type : "post",
@@ -458,8 +510,11 @@ $(document).ready(function(){
 				<!-- // data的结构是数组类的：[{id:1,username:"xx", dept:"yy"},{}],所以要进行嵌套取出id，username和dept的值组装HTML语句-->
 				$.each(data,function(n1,v1){
 					$.each(v1,function(n2,v2){
-						if(n2=="username"){
-							str+="<option value='"+v2+"'>"+v2+" （部门：";
+						if(n2=="username" ){
+							//不能包括的值
+							if(v2!=name){
+								str+="<option value='"+v2+"'>"+v2+" （部门：";
+							}
 						}
 						if(n2=="dept"){
 							str+=v2+"）</option>";

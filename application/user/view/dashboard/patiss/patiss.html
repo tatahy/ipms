@@ -152,7 +152,7 @@ $(document).ready(function(){
 			$('#panelPatIss').find('.span_OPERATE_TODO').text({$numTotal}).css("background-color","red");
 			
 			//利用jQuery的$.post请求计算_OPERATE_INPROCESS的patIss数量并加入到标题总数中
-			$.post('{$home}/user/dashboard/patiss',
+			$.post('{$home}/user/dashboard/patIss',
 				{
 					'role':role,
 					'issStatus':'_OPERATE_INPROCESS',
