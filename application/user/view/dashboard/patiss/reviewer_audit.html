@@ -329,6 +329,10 @@ $(document).ready(function(){
 				$('#divAuditMsg').hide();
 				$('#btnPass').show();
 				
+				//为'#attName'、'#approveMsg'添加'required'属性，其值为false，保证在表单提交时忽略
+				$('#attName').attr('required',false);
+				$('#auditMsg').attr('required',false);
+				
 			break;
 		}
 		

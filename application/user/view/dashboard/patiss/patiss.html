@@ -110,7 +110,7 @@
 
 <script>
 $(document).ready(function(){
-	// 本页面的pat状态
+	// 本页面的iss所处流程
 	var issStatus='{$issStatus}';
 	
 	// 本页面的role值
@@ -148,9 +148,17 @@ $(document).ready(function(){
 		
 		case '_OPERATE_TODO': 
 			$('#divPatIss h4').text('待执行专利事务');
+			if(role=='maintainer'){
+			// role='maintainer',添加‘续费管理’按钮。
+				$('#divPatIss h4').append('&nbsp;<button id="btnPatRenew"  type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalPatIssTpl"><span class="glyphicon glyphicon-tag"></span>续费管理</button>');
+			}
 			
-			$('#panelPatIss').find('.span_OPERATE_TODO').text({$numTotal}).css("background-color","red");
-			
+			//{$numTotal}不为0加底色
+			if({$numTotal}){
+				$('#panelPatIss').find('.span_OPERATE_TODO').text({$numTotal}).css("background-color","red");
+			}else{
+				$('#panelPatIss').find('.span_OPERATE_TODO').text({$numTotal});
+			}
 			//利用jQuery的$.post请求计算_OPERATE_INPROCESS的patIss数量并加入到标题总数中
 			$.post('{$home}/user/dashboard/patIss',
 				{
@@ -160,7 +168,13 @@ $(document).ready(function(){
 				},
 				function(data){
         			$('#panelPatIss').find('.span0').text(data+{$numTotal}).addClass('badge');
-					$('#panelPatIss').find('.span_OPERATE_INPROCESS').text(data);
+					//data不为0加底色
+					if(data){
+						$('#panelPatIss').find('.span_OPERATE_INPROCESS').text(data).css("background-color","red");
+					}else{
+						$('#panelPatIss').find('.span_OPERATE_INPROCESS').text(data);
+					}
+					
 				}
     		);
 			
@@ -168,9 +182,12 @@ $(document).ready(function(){
 		
 		case '_OPERATE_INPROCESS': 
 			$('#divPatIss h4').text('执行中专利事务');
-			
-			$('#panelPatIss').find('.span_OPERATE_INPROCESS').text({$numTotal}).css("background-color","red");
-			
+			//{$numTotal}不为0加底色
+			if({$numTotal}){
+				$('#panelPatIss').find('.span_OPERATE_INPROCESS').text({$numTotal}).css("background-color","red");
+			}else{
+				$('#panelPatIss').find('.span_OPERATE_INPROCESS').text({$numTotal}).remove("background-color","red");
+			}
 		break;
 		
 		case '_OPERATE_DONE': 
@@ -184,8 +201,13 @@ $(document).ready(function(){
 		<!-- // issStatus='_TODO' -->
 　　	default: 
 			$('#divPatIss h4').text('待处理专利事务');
+			//{$numTotal}不为0加底色
+			if({$numTotal}){
+				$('#panelPatIss').find('.span_TODO').text({$numTotal}).css("background-color","red");
+			}else{
+				$('#panelPatIss').find('.span_TODO').text({$numTotal}).remove("background-color","red");
+			}
 			
-			$('#panelPatIss').find('.span_TODO').text({$numTotal}).css("background-color","red");
 			$('#panelPatIss').find('.span0').text({$numTotal}).addClass('badge');
 			
 			// role='writer',添加‘新增事务’按钮。
@@ -222,23 +244,22 @@ $(document).ready(function(){
 		var patIssStatus=$(this).siblings('.patIssStatus').text();
 		var id=$(this).children().attr('data-patIssId');
 		$(this).children().remove();
+		
+		// 按钮的data-patIssId值与后端传来的{$patIssId}值相等，则所在行上色bg-warning。作用：在本文件重新加载时，之前已上色的行保持上色。
+		if(id=='{$patIssId}'){
+			$(this).parent().addClass('bg-warning');
+		}
+		
 		switch(role){
 			case 'writer':
 				if(patIssStatus=="填报" || patIssStatus=="返回修改"|| patIssStatus=="修改完善"){
 					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="edit" data-patIssId="'+id+'"><span class="glyphicon glyphicon-edit">编辑</span></a>');
-					
-				}
-				
-				// 按钮的data-patIssId值与后端传来的{$patIssId}值相等，则所在行上色bg-warning。作用：在本文件重新加载时，之前已上色的行保持上色。
-				if(id=='{$patIssId}'){
-					$(this).parent().addClass('bg-warning');
 				}
 			break;
 			
 			case 'reviewer':
 				if(patIssStatus=="待审核"){
-					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="audit" data-patIssId="'+id+'"><span class="glyphicon glyphicon-check text-warning"></span>审核</a>');
-					
+					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="audit" data-patIssId="'+id+'"><span class="glyphicon glyphicon-check text-warning"></span>审核</a>');	
 				}
 			break;
 				
@@ -259,10 +280,8 @@ $(document).ready(function(){
 			break;
 			
 			case 'maintainer':
-				if(patIssStatus=="申报复核"){
-					$(this).append('<button type="button" class=" btn-link" data-tpl="modify" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class="glyphicon glyphicon-edit"></span>申报修改</button><button type="button" class="btn-link" data-tpl="apply" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class=" text-danger glyphicon glyphicon-open"></span>提交申报</button>');
-				}else if(patIssStatus=="申报提交"){
-					$(this).append('<button type="button" class=" btn-link" data-tpl="modify" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class="glyphicon glyphicon-edit"></span>申报修改</button><button type="button" class="btn-link" data-tpl="authorize" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class=" text-success glyphicon glyphicon-registration-mark"></span>授权</button><button type="button" class="btn-link" data-tpl="reject " data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class="text-warning glyphicon glyphicon-alert"></span>驳回</button>');
+				if(patIssStatus=="申报复核" || patIssStatus=="申报提交"){
+					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="apply" data-patIssId="'+id+'"><span class="glyphicon glyphicon-open"></span>申报</a>');
 				}else if(patIssStatus=="授权" || patIssStatus=="续费授权"){
 					$(this).append('<button type="button" class="btn-link" data-tpl="renew" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class="glyphicon glyphicon-edit"></span>拟续费</button>');
 				}else if(patIssStatus=="续费提交"){

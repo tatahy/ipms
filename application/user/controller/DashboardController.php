@@ -637,7 +637,7 @@ class DashboardController extends \think\Controller
               'sort'=>$sort,
               //'patIssTableRows'=>$patIssTableRows,
               
-              // 所return的页面显示的iss状态值$issStatus
+              // 所return的页面显示的iss流程$issStatus
               'issStatus'=>$issStatus,
               
               // 所return的页面，某个button的data-patIssId的值为patIssId
@@ -1108,19 +1108,27 @@ class DashboardController extends \think\Controller
             $patId=$request->request('patId');
             switch($oprt){
               case 'veto':
+                
+                if($issStatus=='变更申请'){
+                  $status='批准';
+                  $msg.='专利事务"'.$issSet->topic.'"的变更申请被否决。<br><span class="text-info">审批意见：'.$request->request('approveMsg').'</span><br>事务执行人为【'.$issSet->executer.'】<br>';
+                }else{
+                  $status='否决';
+                  $msg.='专利事务"'.$issSet->topic.'"被否决。<br><span class="text-info">审批意见：'.$request->request('approveMsg').'</span><br>';
+                }
+              
                 // 使用静态方法，向issinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
                   IssinfoModel::update([
-                      'status' => '否决',
+                      'status' => $status,
                       'auditrejectdate'=> $today,
+                      'executerchangeto'=>0
                   ], ['id' => $issId]);
-                  $result='success';
-                  $msg.='审批结果：<strong class="text-danger">否决</strong>。<br><span class="text-info">审批意见：'.$request->request('approveMsg').'</span><br>';
                   
                   // 使用静态方法，向issrecord表新增信息。
                   $issRecordSet=IssrecordModel::create([
                     'num'=>$numId,
                     'act'=>'审批',
-                    'actdetail'=>'专利事务"'.$issSet->topic.'"被否决。<br><span class="text-info">审批意见：'.$request->request('approveMsg').'</span><br>',
+                    'actdetail'=>$msg,
                     'acttime'=>$today,
                     'username'=>$request->param('username'),
                     'rolename'=>$role,
@@ -1139,7 +1147,7 @@ class DashboardController extends \think\Controller
                   }
                   
                   $result='success';
-                  $msg.='专利事务<strong>"'.$issSet->topic.'"</strong>被否决。<br>';
+        
               break;
               
               case 'modify':
@@ -1149,13 +1157,13 @@ class DashboardController extends \think\Controller
                       'auditrejectdate'=> $today,
                   ], ['id' => $request->request('issId')]);
                   $result='success';
-                  $msg.='审批结果：<strong class="text-warning">修改完善</strong>。<br><span class="text-info">审批意见：'.$request->request('approveMsg').'</span><br>';
+                  $msg.='专利事务"'.$issSet->topic.'"<br>审批结果：<strong class="text-warning">修改完善</strong>。<br><span class="text-info">审批意见：'.$request->request('approveMsg').'</span><br>审批后返回撰写人【'.$issSet->writer.'】修改。<br>';
                   
                   // 使用静态方法，向issrecord表新增信息。
                   $issRecordSet=IssrecordModel::create([
                     'num'=>$numId,
                     'act'=>'审批',
-                    'actdetail'=>'专利事务"'.$issSet->topic.'"审批后返回撰写人【'.$issSet->writer.'】修改。<br><span class="text-info">审核意见：'.$request->request('approveMsg').'</span><br>',
+                    'actdetail'=>$msg,
                     'acttime'=>$today,
                     'username'=>$request->param('username'),
                     'rolename'=>$role,
@@ -1173,26 +1181,32 @@ class DashboardController extends \think\Controller
                     ],['id' => $patId]);
                   }
                   
-                  $result='success';
-                  $msg.='专利事务<strong>"'.$issSet->topic.'"</strong>审批后返回撰写人【'.$issSet->writer.'】修改。<br>';
-                
+                  $result='success';                
               break;
               // approve
               default:
+                
+                 if($issStatus=='变更申请'){
+                  $operator=$issSet->executerchangeto;
+                  $msg.='专利事务"'.$issSet->topic.'"的变更申请被批准。<br><span class="text-info">审批意见：'.$request->request('approveMsg').'</span><br>事务执行人为【'.$operator.'】<br>';
+                }else{
+                  $operator=$request->request('operator');
+                  $msg.='专利事务"'.$issSet->topic.'"已批准。<br>指定【<strong class="text-info">'.$operator.'</strong>】为执行人。<br>';
+                }
+                
                 // 使用静态方法，向issinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
                   IssinfoModel::update([
                       'status' => '批准',
                       'resultdate'=> $today,
-                      'executer'=>$request->request('operator')
+                      'executer'=>$operator,
+                      'executerchangeto'=>0
                   ], ['id' => $issId]);
-                  $result='success';
-                  $msg.='审批结果：<strong class="text-success">批准</strong>。<br>';
                   
                   // 使用静态方法，向issrecord表新增信息。
                   $issRecordSet=IssrecordModel::create([
                     'num'=>$numId,
                     'act'=>'审批',
-                    'actdetail'=>'专利事务"'.$issSet->topic.'"批准',
+                    'actdetail'=>$msg,
                     'acttime'=>$today,
                     'username'=>$request->param('username'),
                     'rolename'=>$role,
@@ -1206,12 +1220,11 @@ class DashboardController extends \think\Controller
                   if($issStatus=='审核通过' || $issStatus=='审核未通过' || $issStatus=='变更申请'){
                     PatinfoModel::update([
                         'status' => '拟申报',
-                        'resultdate'=>$today,
+                        'authrejectdate'=>$today,
                     ],['id' => $patId]);
                   }
                   
                   $result='success';
-                  $msg.='专利事务<strong>"'.$issSet->topic.'"</strong>已批准。<br>选定的执行人为【'.$request->request('operator').'】。<br>';
               break;
               
             }
@@ -1253,9 +1266,9 @@ class DashboardController extends \think\Controller
               case 'refuse':
                 $msg.='专利事务"'.$issSet->topic.'"变更申请。<br><span class="text-info">具体原因：'.$request->request('refuseMsg').'</span><br>';
                 // 是否有推荐执行人    
-                if($request->param('changeOperator')){
-                  $operator=$request->param('operator');
-                  $msg.='原执行人【'.$issSet->executer.'】推荐执行人：<span class="bg-danger">'.$request->request('operator').'</span><br>';
+                if($request->request('changeOperator')){
+                  $operator=$request->request('operator');
+                  $msg.='原执行人【'.$issSet->executer.'】推荐执行人：【<strong class="text-danger">'.$request->request('operator').'</strong>】<br>';
                 }else{
                   $operator=$issSet->executer;
                 }
@@ -1264,10 +1277,10 @@ class DashboardController extends \think\Controller
                   IssinfoModel::update([
                       'status' => '变更申请',
                       'auditrejectdate'=> $today,
-                      'executer'=>$operator
+                      'executerchangeto'=>$operator
                   ], ['id' => $issId]);
                   $result='success';
-                  $msg.=$actdetail;
+                  $msg.=$msg;
                   
                   // 使用静态方法，向issrecord表新增信息。
                   $issRecordSet=IssrecordModel::create([
@@ -1292,14 +1305,13 @@ class DashboardController extends \think\Controller
                       'status' => '申报执行',
                       'auditrejectdate'=> $today,
                   ], ['id' => $issId]);
-                  $result='success';
-                  $msg.='专利事务"'.$issSet->topic.'"执行情况报告。<br>内容概要：<span class="text-info">'.$request->request('reportMsg').'</span><br>';
+                  $msg.='专利事务"'.$issSet->topic.'"执行情况报告。<br>报告说明：<span class="text-info">'.$request->request('inprocessMsg').'</span><br>';
                   
                   // 使用静态方法，向issrecord表新增信息。
                   $issRecordSet=IssrecordModel::create([
                     'num'=>$numId,
-                    'act'=>'汇报',
-                    'actdetail'=>'专利事务"'.$issSet->topic.'"执行情况报告。<br>内容概要：<span class="text-info">'.$request->request('reportMsg').'</span><br>',
+                    'act'=>'报告',
+                    'actdetail'=>$msg,
                     'acttime'=>$today,
                     'username'=>$request->param('username'),
                     'rolename'=>$role,
@@ -1309,7 +1321,6 @@ class DashboardController extends \think\Controller
                   $issRecordId= $issRecordSet->id;
                   
                   $result='success';
-                  $msg.='专利事务<strong>"'.$issSet->topic.'"</strong>执行情况报告完成。<br>';
                 
               break;
               
@@ -1319,14 +1330,13 @@ class DashboardController extends \think\Controller
                       'status' => '申报复核',
                       'auditrejectdate'=> $today,
                   ], ['id' => $issId]);
-                  $result='success';
-                  $msg.='专利事务"'.$issSet->topic.'"完成情况报告。<br>内容概要：<span class="text-info">'.$request->request('reportMsg').'</span><br>';
+                  $msg.='专利事务"'.$issSet->topic.'"完成情况报告。<br>报告说明：<span class="text-info">'.$request->request('inprocessMsg').'</span><br>';
               
                   // 使用静态方法，向issrecord表新增信息。
                   $issRecordSet=IssrecordModel::create([
                     'num'=>$numId,
                     'act'=>'完成',
-                    'actdetail'=>'专利事务"'.$issSet->topic.'"完成情况报告。<br>内容概要：<span class="text-info">'.$request->request('reportMsg').'</span><br>',
+                    'actdetail'=>$msg,
                     'acttime'=>$today,
                     'username'=>$request->param('username'),
                     'rolename'=>$role,
@@ -1336,7 +1346,6 @@ class DashboardController extends \think\Controller
                   $issRecordId= $issRecordSet->id;
                   
                   $result='success';
-                  $msg.='专利事务<strong>"'.$issSet->topic.'"</strong>完成情况报告完成。<br>';
                 
               break;
               // accept
@@ -1345,16 +1354,16 @@ class DashboardController extends \think\Controller
                   IssinfoModel::update([
                       'status' => '申报执行',
                       'auditrejectdate'=> $today,
-                      'executer'=>$request->request('operator')
+                   //   'executer'=>$request->request('operator')
                   ], ['id' => $issId]);
-                  $result='success';
-                  $msg.='专利事务"'.$issSet->topic.'"已被领受。<br>';
+                  
+                  $msg.='专利事务<strong>"'.$issSet->topic.'"</strong>已被领受。<br>';
                   
                   // 使用静态方法，向issrecord表新增信息。
                   $issRecordSet=IssrecordModel::create([
                     'num'=>$numId,
                     'act'=>'领受任务',
-                    'actdetail'=>'专利事务"'.$issSet->topic.'"已被领受。',
+                    'actdetail'=>$msg,
                     'acttime'=>$today,
                     'username'=>$request->param('username'),
                     'rolename'=>$role,
@@ -1364,7 +1373,6 @@ class DashboardController extends \think\Controller
                   $issRecordId= $issRecordSet->id;
                   
                   $result='success';
-                  $msg.='专利事务<strong>"'.$issSet->topic.'"</strong>已被领受。<br>';
               break;
               
             }
@@ -1481,7 +1489,7 @@ class DashboardController extends \think\Controller
                   $pat= PatinfoModel::get($iss->issmap_id);
                   
                   // 查出issue所对应的attachment
-                  $att= AttinfoModel::where('attmap_type','_ATTO1')->where('attmap_id',$patIssId)->select();
+                  $att= AttinfoModel::where('attmap_type','_ATTO1')->where('attmap_id',$patIssId)->order('uploaddate','desc')->select();
                   
                   $this->assign([
                     'home'=>$request->domain(),
@@ -1513,7 +1521,7 @@ class DashboardController extends \think\Controller
                   $pat= PatinfoModel::get($iss->issmap_id);
                   
                   // 查出issue所对应的attachment
-                  $att= AttinfoModel::where('attmap_type','_ATTO1')->where('attmap_id',$patIssId)->select();
+                  $att= AttinfoModel::where('attmap_type','_ATTO1')->where('attmap_id',$patIssId)->order('uploaddate','desc')->select();
                   
                   $this->assign([
                     'home'=>$request->domain(),
@@ -1545,7 +1553,7 @@ class DashboardController extends \think\Controller
                   $pat= PatinfoModel::get($iss->issmap_id);
                   
                   // 查出issue所对应的attachment
-                  $att= AttinfoModel::where('attmap_type','_ATTO1')->where('attmap_id',$patIssId)->select();
+                  $att= AttinfoModel::where('attmap_type','_ATTO1')->where('attmap_id',$patIssId)->order('uploaddate','desc')->select();
                   
                   $this->assign([
                     'home'=>$request->domain(),
@@ -1577,7 +1585,7 @@ class DashboardController extends \think\Controller
                   $pat= PatinfoModel::get($iss->issmap_id);
                   
                   // 查出issue所对应的attachment
-                  $att= AttinfoModel::where('attmap_type','_ATTO1')->where('attmap_id',$patIssId)->select();
+                  $att= AttinfoModel::where('attmap_type','_ATTO1')->where('attmap_id',$patIssId)->order('uploaddate','desc')->select();
                   
                   $this->assign([
                     'home'=>$request->domain(),
@@ -1597,14 +1605,23 @@ class DashboardController extends \think\Controller
                 break;
                 
                 case "inprocess":
-                  // 查出所审核的issue的数据：
+                  // 查出所执行的issue的数据：
                   $iss= IssinfoModel::get($patIssId);
                   
                   // 查出issue所对应的patent
                   $pat= PatinfoModel::get($iss->issmap_id);
                   
                   // 查出issue所对应的attachment
-                  $att= AttinfoModel::where('attmap_type','_ATTO1')->where('attmap_id',$patIssId)->select();
+                  $att= AttinfoModel::where('attmap_type','_ATTO1')->where('attmap_id',$patIssId)->order('uploaddate','desc')->select();
+                  
+                  // 查出issue所对应的issrecord
+                  $issRecordSet= IssrecordModel::where('issinfo_id',$iss->id)
+                                                ->where('rolename','operator')
+                                                ->whereOr('rolename','maintainer')
+                                                ->where('username',$iss->executer)
+                                                ->limit(5)
+                                                ->order('acttime','desc')
+                                                ->select();
                   
                   $this->assign([
                     'home'=>$request->domain(),
@@ -1619,6 +1636,7 @@ class DashboardController extends \think\Controller
                     'iss'=>$iss,
                     'pat'=>$pat,
                     'att'=>$att,
+                    'issRecordSet'=>$issRecordSet,
               
                   ]);
                 break;
@@ -1638,8 +1656,8 @@ class DashboardController extends \think\Controller
         
         //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div> ';
         //输出对应的模板文件$role.'_'.$tpl.html
-        //return $this->fetch('dashboard'.DS.'pat'.DS.$role.'_'.$tpl);
-        return view('dashboard'.DS.'patiss'.DS.$role.'_'.$tpl);
+        return $this->fetch('dashboard'.DS.'patiss'.DS.$role.'_'.$tpl);
+        //return view('dashboard'.DS.'patiss'.DS.$role.'_'.$tpl);
       }
         
     } 

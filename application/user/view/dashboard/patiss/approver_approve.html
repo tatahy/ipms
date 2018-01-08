@@ -47,9 +47,9 @@
 						<th>事务类型</th>
 						<th>事务简介</th>
 						{notin name="$iss.status" value="变更申请"}
-						<th>事务执行人</th>
+							<th>事务执行人</th>
 						{else/}
-						<th class="bg-danger text-danger">事务执行人变更为</th>
+							<th class="bg-danger text-danger">事务执行人变更</th>
 						{/notin}
 						
 					</tr>
@@ -59,7 +59,12 @@
 						<td>{$iss.topic}</td>
 						<td>{$iss.issmap_type}</td>
 						<td>{$iss.abstract}</td>
-						<td>{$iss.executer}</td>
+						{notin name="$iss.status" value="变更申请"}
+							<td>{$iss.executer}</td>
+						{else/}
+							<td>{$iss.executer}申请变更执行人为【<strong class="text-danger">{$iss.executerchangeto}</strong>】</td>
+						{/notin}
+						
 					</tr>	
 				</tbody>
 			</table>
@@ -367,6 +372,10 @@ $(document).ready(function(){
 				$('#divOperator').show();
 				//为'#operator'添加'required'属性，其值为true，保证在表单提交时必填
 				$('#operator').attr('required',true);
+				
+				//为'#attName'、'#approveMsg'添加'required'属性，其值为false，保证在表单提交时忽略
+				$('#attName').attr('required',false);
+				$('#approveMsg').attr('required',false);
 			break;
 		}
 		

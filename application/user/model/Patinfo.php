@@ -86,7 +86,7 @@ class Patinfo extends Model
         break;
         
         default:
-          $outPut='……';
+          $outPut=$value;
         break;
         
       }

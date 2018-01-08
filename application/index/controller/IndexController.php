@@ -82,7 +82,7 @@ class IndexController extends \think\Controller
         $pats = new PatinfoModel;  
         
         //利用模型对象得到状态status"="新增"）的patent总数
-        $numpatadd=$pats->where('status','新增')->count();
+        $numpatadd=$pats->where('status','拟申报')->count();
         
         //利用模型对象得到状态status"="申报"，'返回修改'）的patent总数
         $numpatapp=$pats->where('status',['=','申报'],['=','返回修改'],'or')->count();
