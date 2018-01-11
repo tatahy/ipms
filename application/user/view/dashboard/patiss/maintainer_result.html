@@ -19,7 +19,7 @@
 			</div>
 		</div>
 		
-		<h4><span class="label label-warning">执行过程概要</span></h4>
+		<h4>执行过程概要</h4>
 		<div class="table-responsive ">
 			<table class="table table-bordered table-striped table-hover">
 				<thead>
@@ -46,6 +46,7 @@
 				</tbody>
 			</table>
 		</div>
+		<hr>
 		
 		<!-- //应用bootstrap的.collaps，会触发form的submit？？ HY2018/1/10 -->
 		<!-- <button type="button" class="btn btn-xs btn-warning" data-toggle="collapse" data-target="#divAbstractField"><strong>摘要信息&nbsp;<span class="caret"></span></strong> -->
@@ -53,9 +54,10 @@
 		<!-- <div id="divAbstractField" class="collapse"> -->
 		
 		<button id="btnAbstractField" class="btn btn-xs btn-warning" type="button"><strong style="font-size:14px;">摘要显示&nbsp;<span class="caret"></span></strong>
-		</button> 
+		</button>
+				
 		<div id="divAbstractField" hidden="true">
-		
+		<p class="small">&nbsp;</p>
 		<strong><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利摘要</strong>
 		<div class="table-responsive ">
 			
@@ -210,14 +212,14 @@
 		</div>
 		
 		<div class="row">&nbsp;</div>
-		
+		<hr>
 		<div class="row">
 			<div class="form-group col-sm-3">
 				<label for="patApplyResult"><span class="label label-warning" style="font-size:14px;"><strong>专利申报结果</strong></span></label>
-				<select class="form-control" id="patApplyResult" name="patApplyResult" >
-					<option value="improve">申报修改</option>
-					<option value="authorize">授权</option>
-					<option value="reject">驳回</option>
+				<select class="form-control" id="patApplyResult" name="patApplyResult" style="background-color:#337ab7;color:#FFF;">
+					<option value="improve" style="background-color:#337ab7;">申报修改</option>
+					<option value="authorize" style="background-color:#5cb85c;">授权</option>
+					<option value="reject" style="background-color:#d9534f;">驳回</option>
 				</select>
 				
 			</div>
@@ -269,7 +271,7 @@
 			{// TP5单行注释。在“申报修改”时隐藏}
 			<div id="divPatAuthNum" class="form-group col-sm-4" hidden="true">
 				<label for="patAuthNum">专利授权编号<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<input class="form-control" id="patAuthNum" name="patAuthNum" value="{$pat.patauthnum}" type="text">
+				<input class="form-control" id="patAuthNum" name="patAuthNum" value="{$pat.patauthnum}" type="text" style="background-color:#5cb85c;color:#FFF;">
 			</div>
 		</div>
 		
@@ -395,8 +397,8 @@ $(document).ready(function(){
 	
 	//结合#divAbstractField的hidden属性，实现显示/隐藏;
 	$('#btnAbstractField').click(function(){
-		var showStr='<strong>摘要显示&nbsp;<span class="caret"></span></strong>';
-		var hideStr='<strong>摘要隐藏&nbsp;&times;</strong>';
+		var showStr='<strong style="font-size:14px;">摘要显示&nbsp;<span class="caret"></span></strong>';
+		var hideStr='<strong style="font-size:14px;">摘要隐藏&nbsp;&times;</strong>';
 		var v=$('#divAbstractField').attr('hidden');
 		if(v){
 			$('#divAbstractField').show();
@@ -411,8 +413,8 @@ $(document).ready(function(){
 	
 	//结合#divAttField的hidden属性，实现显示/隐藏
 	$('#btnAttField').click(function(){
-		var showStr='<strong>附件/上传显示&nbsp;<span class="caret"></span></strong>';
-		var hideStr='<strong>附件/上传隐藏&nbsp;&times;</strong>';
+		var showStr='<strong style="font-size:14px;">附件/上传显示&nbsp;<span class="caret"></span></strong>';
+		var hideStr='<strong style="font-size:14px;">附件/上传隐藏&nbsp;&times;</strong>';
 		var v=$('#divAttField').attr('hidden');
 		if(v){
 			$('#divAttField').show();
@@ -471,8 +473,8 @@ $(document).ready(function(){
 		$('#divAttField').attr('hidden',true);
 		
 		//按钮恢复原值
-		$('#btnAbstractField').html('<strong>摘要显示&nbsp;<span class="caret"></span></strong>');
-		$('#btnAttField').html('<strong>附件/上传显示&nbsp;<span class="caret"></span></strong>');
+		$('#btnAbstractField').html('<strong style="font-size:14px;">摘要显示&nbsp;<span class="caret"></span></strong>');
+		$('#btnAttField').html('<strong style="font-size:14px;">附件/上传显示&nbsp;<span class="caret"></span></strong>');
 		
 		//恢复初始状态
 		$('#divPatAuthNum').hide();
@@ -481,17 +483,22 @@ $(document).ready(function(){
 		$('#patAuthNum').attr('required',false);
 		$('#btnImprove').show();
 		
+		//恢复单选框#patApplyResult底色和字体颜色
+		$('#patApplyResult').css({"background-color":"#337ab7","color":"#fff"});
+		
 	});
 	
 	//select显示为后端传来的内容,
 	$('#applyPlace').val('{$pat.applyplace}').attr('selected');
 	
-	// 单选框approveResult选中变化满足条件时，出现approveMsg输入框。
+	// 单选框#patApplyResult选中变化满足条件时，出现approveMsg输入框。
 	$('#patApplyResult').change(function(){
 		$(':submit').hide();
 	
 		switch($(this).val()){
 			case 'authorize':
+				//设置单选框#patApplyResult底色和字体颜色与按钮一致
+				$(this).css({"background-color":"#5cb85c","color":"#FFF"});
 				$('#divPatAuthNum').show();
 				//为'#patAuthNum'添加'required'属性，其值为true，保证在表单提交时必填
 				$('#patAuthNum').attr('required',true);
@@ -499,6 +506,9 @@ $(document).ready(function(){
 			break;
 			
 			case 'reject':
+				//设置单选框#patApplyResult底色和字体颜色与按钮一致
+				$(this).css({"background-color":"#d9534f","color":"#FFF"});
+				
 				$('#divPatAuthNum').hide();
 				//为'#patAuthNum'添加'required'属性，其值为false，保证在表单提交时忽略
 				$('#patAuthNum').attr('required',false);
@@ -506,6 +516,8 @@ $(document).ready(function(){
 			break;
 			// improve
 			default:
+				//设置单选框#patApplyResult底色和字体颜色与按钮一致
+				$(this).css({"background-color":"#337ab7","color":"#FFF"});
 				$('#divPatAuthNum').hide();
 				//为'#patAuthNum'添加'required'属性，其值为false，保证在表单提交时忽略
 				$('#patAuthNum').attr('required',false);
