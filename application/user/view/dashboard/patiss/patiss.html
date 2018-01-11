@@ -219,14 +219,14 @@ $(document).ready(function(){
 	
 	}
 	
-	// jQuery的$.post()与.load()有细微的差别,在输出显示效果上load较POST多了双引号。post在回调函数里可以做更多的事情。
+	// writer,load新PatIss页面。jQuery的$.post()与.load()有细微的差别,在输出显示效果上load较POST多了双引号。post在回调函数里可以做更多的事情。
 	$('#btnPatIssNew').click(function(){
 		var str=$(this).html();
 		// 所有按钮所在行去掉附加的bg-warning
 		$('.btnTpl').parent().removeClass('bg-warning');
 		$.post('patIssTpl',
 			{
-				'role':role,
+				'role':'writer',
 				'tpl':'addNew',
 				'returnType':0
 			},
@@ -239,6 +239,25 @@ $(document).ready(function(){
 		<!-- $('#divPatIssTpl').load('patIssTpl',{'role':role,'tpl':tpl,'returnType':1}); -->
 	});
 	
+	//maintainer，load续费管理页面
+	$('#btnPatRenew').click(function(){
+		var str=$(this).html();
+		// 所有按钮所在行去掉附加的bg-warning
+		$('.btnTpl').parent().removeClass('bg-warning');
+		$.post('patIssTpl',
+			{
+				'role':'maintainer',
+				'tpl':'renew',
+				'returnType':0
+			},
+			function(data){
+				$('#divPatIssTpl').html(data);
+				
+				$('.modal-header').find('h4').empty().html('<strong>【'+str+'】</strong><span class="glyphicon glyphicon-wrench">专利事务</span>');
+			}
+		);
+		<!-- $('#divPatIssTpl').load('patIssTpl',{'role':role,'tpl':tpl,'returnType':1}); -->
+	});
 	<!-- // patIss表格中<td>里的<a>按role、patIssStatus的不同进行配置 -->
 	$('.btnTpl').each(function(){
 		var patIssStatus=$(this).siblings('.patIssStatus').text();
@@ -272,7 +291,7 @@ $(document).ready(function(){
 			
 			case 'operator':
 				if(patIssStatus=="批准"){
-					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="todo" data-patIssId="'+id+'"><span class="glyphicon glyphicon-edit"></span>领受/申述</a>');
+					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="todo" data-patIssId="'+id+'"><span class="glyphicon glyphicon-edit"></span>领受/变更</a>');
 				
 				}else if(patIssStatus=="申报修改" || patIssStatus=="申报执行"){
 					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="inprocess" data-patIssId="'+id+'"><span class="glyphicon glyphicon-edit"></span>报告/完成</a>');
@@ -280,12 +299,13 @@ $(document).ready(function(){
 			break;
 			
 			case 'maintainer':
-				if(patIssStatus=="申报复核" || patIssStatus=="申报提交"){
-					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="apply" data-patIssId="'+id+'"><span class="glyphicon glyphicon-open"></span>申报</a>');
+				if(patIssStatus=="申报复核" || patIssStatus=="申报修改"){
+					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="apply" data-patIssId="'+id+'"><span class="glyphicon glyphicon-open"></span>申报提交</a>');
 				}else if(patIssStatus=="授权" || patIssStatus=="续费授权"){
-					$(this).append('<button type="button" class="btn-link" data-tpl="renew" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class="glyphicon glyphicon-edit"></span>拟续费</button>');
-				}else if(patIssStatus=="续费提交"){
-					$(this).append('<button type="button" class="btn-link" data-tpl="authorize" data-patIssId="'+id+'" data-toggle="modal" data-target="#modalPatIssTpl"><span class=" text-success glyphicon glyphicon-registration-mark"></span>续费授权</button>');
+					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="renew" data-patIssId="'+id+'"><span class="glyphicon glyphicon-edit"></span>申报结果</a>');
+					
+				}else if(patIssStatus=="申报提交" || patIssStatus=="续费提交"){
+					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="result" data-patIssId="'+id+'"><span class="glyphicon glyphicon-info-sign text-info"></span>申报结果</a>');
 				}
 				
 			break;
@@ -293,6 +313,7 @@ $(document).ready(function(){
 			default:
 				
 			break;
+			
 			
 		}
 		
@@ -466,7 +487,7 @@ $(document).ready(function(){
 		
 		<!-- // jquery load()方法，本文件重新加载到writer.html/operator.html……的指定区域<div id="patIss"></div> -->
 		$('#patIss').load('patIss',sendData);
-	
+		
 	}
 
 <!-- function -->

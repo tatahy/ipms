@@ -75,7 +75,7 @@ class Issinfo extends Model
         break;
         
         default:
-          $outPut='……';
+          $outPut=$value;
         break;
         
       }

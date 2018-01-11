@@ -165,9 +165,9 @@ class IndexController extends \think\Controller
         $pagenew = $patsnew->render(); 
         
         //利用模型对象得到状态status"="申报"）的patent总数
-        $numapp = $pats->where('status',['=','申报'],['=','返回修改'],'or')->count();
+        $numapp = $pats->where('status',['=','申报'],['=','申报修改'],'or')->count();
         //分页,每页$listrows条记录
-        $patsapp = $pats->where('status',['=','申报'],['=','返回修改'],'or')
+        $patsapp = $pats->where('status',['=','申报'],['=','申报修改'],'or')
                             ->order('applydate', 'desc')
                             ->paginate($listrows,false,['type'=>'bootstrap','var_page'=>'pageapp',]);
         // 获取分页显示
@@ -185,7 +185,7 @@ class IndexController extends \think\Controller
         //利用模型对象得到状态status"="放弃"）的patent总数
         $numaba = $pats->where('status','放弃')->count();
         //分页,每页$listrows条记录
-		$patsaba = $pats->where('status','放弃')
+		    $patsaba = $pats->where('status','放弃')
                             ->order('nextrenewdate', 'desc')
                             ->paginate($listrows,false,['type'=>'bootstrap','var_page'=>'pagetoaba',]);
         // 获取分页显示
@@ -1200,7 +1200,7 @@ class IndexController extends \think\Controller
         break;
         // ''    
         case '#apply':
-          $map['status'] =['in',['返回修改','申报']];
+          $map['status'] =['in',['申报修改','申报']];
         break;
         // ''    
         case '#authorize':

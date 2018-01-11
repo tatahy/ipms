@@ -44,7 +44,7 @@ class Issrecord extends Model
         break;
         
         default:
-          $outPut='……';
+          $outPut=$value;
         break;
         
       }
