@@ -420,10 +420,21 @@ $(document).ready(function(){
 			$('#divAttField').show();
 			$('#divAttField').attr('hidden',false);
 			$(this).html(hideStr);
+			
+			if($('input:radio[name="attUpload"]:checked').val()){
+				//为'#attName'和'#att'添加'required'属性，其值为false，保证在表单提交时忽略
+				$('#attName').attr('required',true);
+				$('#att').attr('required',true);
+			}
+			
 		}else{
 			$('#divAttField').hide();
 			$('#divAttField').attr('hidden',true);
 			$(this).html(showStr);
+			//为'#attName'和'#att'添加'required'属性，其值为false，保证在表单提交时忽略
+			$('#attName').attr('required',false);
+			$('#att').attr('required',false);
+			
 		}
 		
 	});

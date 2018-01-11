@@ -1,3 +1,4 @@
+<script>
 $("#actdetail").focus();
 		<!-- #actdetail失去焦点时判断是否填入了内容，否则拉回焦点填入内容  -->
 		$("#actdetail").focusout(function(){
@@ -20,10 +21,11 @@ $("#report").focusout(function(){
 					}).ok('同意').cancel('取消');
 				}
 });
+</script>
 
 
-
-<!-- ?? HY 2017/5/27 -->
+<!--??  HY 2017/5/27 -->
+<script>
 	<!-- 接受任务 -->
 	$("#btnAccept").click(function(){
 		<!-- 弹出自定义提示页面，确定后跳转并传参  -->
@@ -87,10 +89,13 @@ switch(){
                     
                     
                 }
-
+</script>
 
 <!--  HY 2017/12/29 -->
-// jQuery的$.post()与.load()有细微的差别,在输出显示效果上load较POST多了双引号。post较load多出了回调函数，在回调函数里可以做更多的事情。
+
+<script>
+
+//jQuery的$.post()与.load()有细微的差别,在输出显示效果上load较POST多了双引号。post较load多出了回调函数，在回调函数里可以做更多的事情。
 	$('#btnPatIssNew').click(function(){
 		var str=$(this).html();
 		// 所有按钮所在行去掉附加的bg-warning
@@ -109,5 +114,30 @@ switch(){
 		);
 		<!-- $('#divPatIssTpl').load('patIssTpl',{'role':role,'tpl':tpl,'returnType':1}); -->
 	});
+</script>
 				
-<!--/  HY 2017/12/29 -->				
+<!--/  HY 2017/12/29 -->			
+
+<!--/  HY 2018/1/11 -->	
+
+<h4><span >事务附件上传</span>
+			<label class="radio-inline ">
+      			<input type="radio" name="attUpload" value="0" checked><span class="label label-default">无</span>
+    		</label>
+			<label class="radio-inline">
+      			<input type="radio" name="attUpload" value="1"><span class="label label-default">上传</span>
+    		</label>
+    		
+		</h4>
+
+<script>
+//通过取得radio的选中项value值，判断是哪一项被选中
+var v=$('input:radio[name="attUpload"]:checked').val();
+
+//设置单选按钮value=1的项为当前选中项？？
+$('input:radio[name="attUpload"]').attr('checked','1');
+$('input:radio[name="attUpload"][value="1"]').attr('checked',true);
+$('input:radio[name="attUpload"][value="1"]').prop('checked',true);
+
+</script>		
+<!--/  HY 2018/1/11 -->	
