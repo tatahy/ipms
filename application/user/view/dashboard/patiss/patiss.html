@@ -299,7 +299,7 @@ $(document).ready(function(){
 			break;
 			
 			case 'maintainer':
-				if(patIssStatus=="申报复核" || patIssStatus=="申报修改"){
+				if(patIssStatus=="申报复核"){
 					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="apply" data-patIssId="'+id+'"><span class="glyphicon glyphicon-open"></span>申报提交</a>');
 				}else if(patIssStatus=="授权" || patIssStatus=="续费授权"){
 					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="renew" data-patIssId="'+id+'"><span class="glyphicon glyphicon-edit"></span>申报结果</a>');

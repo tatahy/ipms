@@ -507,11 +507,11 @@ class DashboardController extends \think\Controller
         case'approver':
           switch($issStatus){
             case '_DONE':
-              $map['status'] =['in',['准予申报','否决','修改完善','准予续费','放弃','批准']];
+              $map['status'] =['in',['准予申报','否决','修改完善','准予续费','专利放弃','批准']];
             break;
             
             case '_OPERATE':
-              $map['status'] =['in',['申报执行','申报复核','申报修改','申报提交','授权','驳回','续费提交','续费授权']];
+              $map['status'] =['in',['申报执行','申报复核','申报修改','申报提交','专利授权','专利驳回','续费提交','续费授权']];
             break;
                 
             //默认'_TODO':
@@ -547,7 +547,7 @@ class DashboardController extends \think\Controller
             break;
            
             case '_OPERATE_DONE':
-              $map['status'] =['in',['授权','驳回','续费授权','放弃']];
+              $map['status'] =['in',['专利授权','专利驳回','续费授权','专利放弃']];
             break;
                 
             //默认'_TODO'，对到期时间在半年内的“授权”或“续费授权”的专利，系统自动放入_TODO里！！考虑代码实现？？
@@ -1263,6 +1263,9 @@ class DashboardController extends \think\Controller
             $issSet = IssinfoModel::get($issId);
             $numId=$issSet->issnum;
             
+            $patId=$request->request('patId');
+            $patSet = PatinfoModel::get($patId);
+            $patNumId=$patSet->patnum;
             switch($oprt){
               case 'refuse':
                 $msg.='专利事务"'.$issSet->topic.'"变更申请。<br><span class="text-info">具体原因：'.$request->request('refuseMsg').'</span><br>';
@@ -1311,7 +1314,7 @@ class DashboardController extends \think\Controller
                   // 使用静态方法，向issrecord表新增信息。
                   $issRecordSet=IssrecordModel::create([
                     'num'=>$numId,
-                    'act'=>'报告',
+                    'act'=>'"'.$issSet->status.'"报告',
                     'actdetail'=>$msg,
                     'acttime'=>$today,
                     'username'=>$request->param('username'),
@@ -1321,6 +1324,15 @@ class DashboardController extends \think\Controller
                   //静态方法创建新对象后，返回对象id
                   $issRecordId= $issRecordSet->id;
                   
+                   // 使用静态方法，向patinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
+                  PatinfoModel::update([
+                    'patowner'=>$request->param('patOwner'),
+                    'inventor'=>$request->param('inventor'),
+                    'otherinventor'=>$request->param('otherInventor'),
+                    'applyplace'=>$request->param('applyPlace'),
+                    'note'=>$today.":".$msg
+                  ], ['id' => $patId]);
+                                    
                   $result='success';
                 
               break;
@@ -1336,7 +1348,7 @@ class DashboardController extends \think\Controller
                   // 使用静态方法，向issrecord表新增信息。
                   $issRecordSet=IssrecordModel::create([
                     'num'=>$numId,
-                    'act'=>'完成',
+                    'act'=>'"'.$issSet->status.'"完成',
                     'actdetail'=>$msg,
                     'acttime'=>$today,
                     'username'=>$request->param('username'),
@@ -1344,7 +1356,16 @@ class DashboardController extends \think\Controller
                     'issinfo_id'=>$issId,
                   ]);
                   //静态方法创建新对象后，返回对象id
-                  $issRecordId= $issRecordSet->id;
+                  $issRecordId= $issRecordSet->id;       
+                  
+                   // 使用静态方法，向patinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
+                  PatinfoModel::update([
+                    'patowner'=>$request->param('patOwner'),
+                    'inventor'=>$request->param('inventor'),
+                    'otherinventor'=>$request->param('otherInventor'),
+                    'applyplace'=>$request->param('applyPlace'),
+                    'note'=>$today.":".$msg
+                  ], ['id' => $patId]);
                   
                   $result='success';
                 
@@ -1415,8 +1436,23 @@ class DashboardController extends \think\Controller
             $patSet = PatinfoModel::get($patId);
             $patNumId=$patSet->patnum;
             switch($oprt){
+              //续费计划
+              case 'renew_plan':
+              
+              break;
+              
+              //续费申报
+              case 'renew_apply':
+              
+              break;
+              
+              //续费放弃
+              case 'renew_reject':
+              
+              break;                            
+              
               case 'improve':
-                $msg.='专利事务"'.$issSet->topic.'"反馈申报修改意见。<br><span class="text-info">具体内容：'.$request->request('applyMsg').'</span><br>';
+                $msg.='专利事务"'.$issSet->topic.'"反馈申报修改意见。<br><span class="text-info">意见内容：'.$request->request('resultMsg').'</span><br>';
                 // 使用静态方法，向issinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
                   IssinfoModel::update([
                       'status' => '申报修改',
@@ -1446,11 +1482,12 @@ class DashboardController extends \think\Controller
                   $patRecordSet=PatrecordModel::create([
                     'num'=>$patNumId,
                     'act'=>'申报修改',
-                    'actdetail'=>'提交专利申报资料后，需根据返回的修改意见修改申报资料。',
+                    'actdetail'=>'提交专利申报资料后，需根据返回的修改意见修改申报资料。<br><span class="text-info">意见内容：'.$request->request('resultMsg').'</span><br>',
                     'acttime'=>$today,
                     'username'=>$request->param('username'),
                     'rolename'=>$role,
                     'patinfo_id'=>$patId,
+                    'note'=>'<span class="text-info">'.$request->request('resultMsg').'</span><br>'
                   ]);
                   //静态方法创建新对象后，返回对象id
                   $patRecordId= $patRecordSet->id;
@@ -1458,12 +1495,108 @@ class DashboardController extends \think\Controller
                   $result='success';
               break;
               
-              case '':
-                
+              case 'authorize':
+                 $msg.='专利事务"'.$issSet->topic.'"'.$issSet->status.'反馈意见。<br><span class="text-info">意见内容：'.$request->request('resultMsg').'</span><br>';
+                // 使用静态方法，向issinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
+                  IssinfoModel::update([
+                      'status' => '专利授权',
+                      'resultdate'=> $today
+                  ], ['id' => $issId]);
+                  
+                  // 使用静态方法，向issrecord表新增信息。
+                  $issRecordSet=IssrecordModel::create([
+                    'num'=>$numId,
+                    'act'=>'专利授权',
+                    'actdetail'=>$msg,
+                    'acttime'=>$today,
+                    'username'=>$request->param('username'),
+                    'rolename'=>$role,
+                    'issinfo_id'=>$issId,
+                  ]);
+                  //静态方法创建新对象后，返回对象id
+                  $issRecordId= $issRecordSet->id;
+                  
+                   // 使用静态方法，向patinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
+                  PatinfoModel::update([
+                    'status' => '授权',
+                    'authrejectdate'=> $today,
+                    'patowner'=>$request->param('patOwner'),
+                    'inventor'=>$request->param('inventor'),
+                    'otherinventor'=>$request->param('otherInventor'),
+                    'patapplynum'=>$request->param('patApplyNum'),
+                    'patagency'=>$request->param('patAgency'),
+                    'patadmin'=>$request->param('patAdmin'),
+                    'applyplace'=>$request->param('applyPlace'),
+                    'note'=>$today.":".$msg
+                  ], ['id' => $patId]);                
+                  
+                  // 使用静态方法，向patrecord表新增信息。
+                  $patRecordSet=PatrecordModel::create([
+                    'num'=>$patNumId,
+                    'act'=>'授权',
+                    'actdetail'=>'“'.$patSet->topic.'”已获得<span class="label label-success">授权</span>。<br><span class="text-info">'.$request->request('resultMsg').'</span><br>',
+                    'acttime'=>$today,
+                    'username'=>$request->param('username'),
+                    'rolename'=>$role,
+                    'patinfo_id'=>$patId,
+                    'note'=>'<span class="text-info">'.$request->request('resultMsg').'</span><br>'
+                  ]);
+                  //静态方法创建新对象后，返回对象id
+                  $patRecordId= $patRecordSet->id;
+                  
+                  $result='success';
               break;
               
-              case '':
-                
+              case 'reject':
+                 $msg.='专利事务"'.$issSet->topic.'"'.$issSet->status.'反馈意见。<br><span class="text-info">意见内容：'.$request->request('resultMsg').'</span><br>';
+                // 使用静态方法，向issinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
+                  IssinfoModel::update([
+                      'status' => '专利驳回',
+                      'resultdate'=> $today
+                  ], ['id' => $issId]);
+                  
+                  // 使用静态方法，向issrecord表新增信息。
+                  $issRecordSet=IssrecordModel::create([
+                    'num'=>$numId,
+                    'act'=>'专利驳回',
+                    'actdetail'=>$msg,
+                    'acttime'=>$today,
+                    'username'=>$request->param('username'),
+                    'rolename'=>$role,
+                    'issinfo_id'=>$issId,
+                  ]);
+                  //静态方法创建新对象后，返回对象id
+                  $issRecordId= $issRecordSet->id;
+                  
+                   // 使用静态方法，向patinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
+                  PatinfoModel::update([
+                    'status' => '驳回',
+                    'authrejectdate'=> $today,
+                    'patowner'=>$request->param('patOwner'),
+                    'inventor'=>$request->param('inventor'),
+                    'otherinventor'=>$request->param('otherInventor'),
+                    'patapplynum'=>$request->param('patApplyNum'),
+                    'patagency'=>$request->param('patAgency'),
+                    'patadmin'=>$request->param('patAdmin'),
+                    'applyplace'=>$request->param('applyPlace'),
+                    'note'=>$today.":".$msg
+                  ], ['id' => $patId]);
+                  
+                  // 使用静态方法，向patrecord表新增信息。
+                  $patRecordSet=PatrecordModel::create([
+                    'num'=>$patNumId,
+                    'act'=>'驳回',
+                    'actdetail'=>'“'.$patSet->topic.'”授权申报被<span class="label label-danger">驳回</span>。<br><span class="text-info">'.$request->request('resultMsg').'</span><br>',
+                    'acttime'=>$today,
+                    'username'=>$request->param('username'),
+                    'rolename'=>$role,
+                    'patinfo_id'=>$patId,
+                    'note'=>'<span class="text-info">'.$request->request('resultMsg').'</span><br>'
+                  ]);
+                  //静态方法创建新对象后，返回对象id
+                  $patRecordId= $patRecordSet->id;
+                  
+                  $result='success';
                 
               break;
               // apply
@@ -1506,7 +1639,7 @@ class DashboardController extends \think\Controller
                   $patRecordSet=PatrecordModel::create([
                     'num'=>$patNumId,
                     'act'=>'申报',
-                    'actdetail'=>'提交专利申报资料。',
+                    'actdetail'=>'“'.$patSet->topic.'”提交申报资料。',
                     'acttime'=>$today,
                     'username'=>$request->param('username'),
                     'rolename'=>$role,

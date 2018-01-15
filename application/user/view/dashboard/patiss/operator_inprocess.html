@@ -1,7 +1,6 @@
 <!-- // operator_inprocess.html -->
 <div class="container-fluid">
 	<!-- <div class="rows col-sm-12"> -->
-	<form id="fmIssPat" action="" role="form" enctype="multipart/form-data">
 		<div class="row">
 			<div class="form-group col-sm-8">
 				<h4>事务标题：{$iss.topic}</h4>
@@ -21,7 +20,7 @@
 			
 		</div>
 		
-		<h4><span class="label label-warning">执行过程概要</span></h4>
+		<h4>执行过程概要</h4>
 		<div class="table-responsive ">
 			<table class="table table-bordered table-striped table-hover">
 				<thead>
@@ -49,7 +48,12 @@
 			</table>
 		</div>
 		
-		<h4><span class="label label-warning"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利摘要</span></h4>
+		<button id="btnAbstractField" class="btn btn-xs btn-warning" type="button"><strong style="font-size:14px;">摘要显示&nbsp;<span class="caret"></span></strong>
+		</button>
+		
+		<div id="divAbstractField" hidden="true">
+		<p class="small">&nbsp;</p>
+		<strong><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利摘要</strong>
 		<div class="table-responsive ">
 			<table class="table table-bordered table-striped table-hover">
 				<thead>
@@ -71,7 +75,7 @@
 			</table>
 		</div>
 	
-		<h4><span class="label label-warning">事务摘要</span></h4>
+		<strong>事务摘要</strong>
 		<div class="table-responsive ">
 			<table class="table table-bordered table-striped table-hover">
 				<thead>
@@ -91,9 +95,18 @@
 					</tr>	
 				</tbody>
 			</table>
-		</div>	
-				
-		<h4><span class="label label-warning">事务附件上传</span>
+		</div>
+		</div>
+		
+		<!-- //空白行 -->
+		<div class="row">&nbsp;</div>		
+
+	<form id="fmIssPat" action="" role="form" enctype="multipart/form-data">		
+		<button id="btnAttField" class="btn btn-xs btn-warning" type="button"><strong style="font-size:14px;">附件/上传显示&nbsp;<span class="caret"></span></strong>
+		</button> 
+		
+		<div id="divAttField" hidden="true">		
+		<h4><span >事务附件上传</span>
 			<label class="radio-inline ">
       			<input type="radio" name="attUpload" value="0" checked><span class="label label-default">无</span>
     		</label>
@@ -147,7 +160,7 @@
 				
 		</div>
 		
-		<h4><span class="label label-warning">事务附件列表</span></h4>
+		<strong>事务附件列表</strong>
 		<div class="row col-sm-12">
 			<div class="table-responsive ">
 			<table class="table table-bordered table-striped table-hover">
@@ -182,10 +195,42 @@
 				</tbody>
 			</table>
 			</div>
-			<hr>
+
+		</div>
 		</div>
 		
-		<div class="row">		
+		<div class="row">&nbsp;</div>
+		<hr>		
+		
+		<div class="row">
+			<div class="form-group col-sm-3">
+				<label for="patOwner">专利所有人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<input class="form-control" id="patOwner" name="patOwner" value="{$pat.patowner}" type="text" required>
+			</div>
+			
+			<div class="form-group col-sm-3">
+				<label for="inventor">专利发明人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<input class="form-control" id="inventor" name="inventor" value="{$pat.inventor}" type="text" required>
+			</div>
+			
+			<div class="form-group col-sm-3">
+				<label for="otherInventor">其他专利发明人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<input class="form-control" id="otherInventor" name="otherInventor" value="{$pat.otherinventor}" type="text" required>
+			</div>
+			
+			<div class="form-group col-sm-3">
+				<label for="applyPlace">专利申报地点<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<select class="form-control" id="applyPlace" name="applyPlace" required>
+					<option value="中国大陆">中国大陆</option>
+					<option value="港澳台">港澳台</option>
+					<option value="美国">美国</option>
+					<option value="欧洲">欧洲</option>
+					<option value="其他">其他</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="row">	
 			<div id="divInprocessMsg" class="form-group col-sm-8" >
 				<label class="control-label" for="inprocessMsg">报告/完成说明<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 				<textarea class="form-control" id="inprocessMsg" name="inprocessMsg" value="" type="text" placeholder="请填入具体的说明内容" required></textarea>
@@ -284,6 +329,50 @@ $(document).ready(function(){
 		$('#oprt').val($(this).attr('data-oprt'));
 	});
 	
+	//结合#divAbstractField的hidden属性，实现显示/隐藏;
+	$('#btnAbstractField').click(function(){
+		var showStr='<strong style="font-size:14px;">摘要显示&nbsp;<span class="caret"></span></strong>';
+		var hideStr='<strong style="font-size:14px;">摘要隐藏&nbsp;&times;</strong>';
+		var v=$('#divAbstractField').attr('hidden');
+		if(v){
+			$('#divAbstractField').show();
+			$('#divAbstractField').attr('hidden',false);
+			$(this).html(hideStr);
+		}else{
+			$('#divAbstractField').hide();
+			$('#divAbstractField').attr('hidden',true);
+			$(this).html(showStr);
+		}
+	});
+	
+	//结合#divAttField的hidden属性，实现显示/隐藏
+	$('#btnAttField').click(function(){
+		var showStr='<strong style="font-size:14px;">附件/上传显示&nbsp;<span class="caret"></span></strong>';
+		var hideStr='<strong style="font-size:14px;">附件/上传隐藏&nbsp;&times;</strong>';
+		var v=$('#divAttField').attr('hidden');
+		if(v){
+			$('#divAttField').show();
+			$('#divAttField').attr('hidden',false);
+			$(this).html(hideStr);
+			
+			if($('input:radio[name="attUpload"]:checked').val()){
+				//为'#attName'和'#att'添加'required'属性，其值为false，保证在表单提交时忽略
+				$('#attName').attr('required',true);
+				$('#att').attr('required',true);
+			}
+			
+		}else{
+			$('#divAttField').hide();
+			$('#divAttField').attr('hidden',true);
+			$(this).html(showStr);
+			//为'#attName'和'#att'添加'required'属性，其值为false，保证在表单提交时忽略
+			$('#attName').attr('required',false);
+			$('#att').attr('required',false);
+			
+		}
+		
+	});
+	
 	// 单选按钮选中“上传”项后，出现附件上传的输入框们。
 	$('input:radio[name="attUpload"]').change(function(){
 		// 选中的单选按钮的value值，值为“1”是选中的“上传”项
@@ -318,6 +407,9 @@ $(document).ready(function(){
 		//为'#attName'和'#att'添加'required'属性，其值为false，保证在表单提交时忽略
 		$('#attName').attr('required',false);
 		$('#att').attr('required',false);
+		
+		//为'#patAuthNum'添加'required'属性，其值为false，保证在表单提交时忽略
+		$('#patAuthNum').attr('required',false);
 		
 		// 上传的输入框们退场
 		$('#divAtt').hide();

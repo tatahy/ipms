@@ -122,7 +122,7 @@ class Patinfo extends Model
      */
     public function patrecords()
     {   
-        return $this->hasMany('Patrecord');
+        return $this->hasMany('Patrecord')->order('acttime desc');
     }     
 
     
