@@ -1343,7 +1343,7 @@ class DashboardController extends \think\Controller
                       'status' => '申报复核',
                       'auditrejectdate'=> $today,
                   ], ['id' => $issId]);
-                  $msg.='专利事务"'.$issSet->topic.'"完成情况报告。<br>报告说明：<span class="text-info">'.$request->request('inprocessMsg').'</span><br>';
+                  $msg.='专利事务"'.$issSet->topic.'"完成情况报告。<br>完成说明：<span class="text-info">'.$request->request('inprocessMsg').'</span><br>';
               
                   // 使用静态方法，向issrecord表新增信息。
                   $issRecordSet=IssrecordModel::create([
@@ -1500,7 +1500,7 @@ class DashboardController extends \think\Controller
                 // 使用静态方法，向issinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
                   IssinfoModel::update([
                       'status' => '专利授权',
-                      'resultdate'=> $today
+                      'resultdate'=> $request->param('patResultDate')
                   ], ['id' => $issId]);
                   
                   // 使用静态方法，向issrecord表新增信息。
@@ -1519,11 +1519,13 @@ class DashboardController extends \think\Controller
                    // 使用静态方法，向patinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
                   PatinfoModel::update([
                     'status' => '授权',
-                    'authrejectdate'=> $today,
+                    'authrejectdate'=>$request->param('patResultDate'),
+                    'renewdeadlinedate'=>$request->param('patRenewDeadlinDate'),
                     'patowner'=>$request->param('patOwner'),
                     'inventor'=>$request->param('inventor'),
                     'otherinventor'=>$request->param('otherInventor'),
                     'patapplynum'=>$request->param('patApplyNum'),
+                    'patauthnum'=>$request->param('patAuthNum'),
                     'patagency'=>$request->param('patAgency'),
                     'patadmin'=>$request->param('patAdmin'),
                     'applyplace'=>$request->param('applyPlace'),
@@ -1534,12 +1536,12 @@ class DashboardController extends \think\Controller
                   $patRecordSet=PatrecordModel::create([
                     'num'=>$patNumId,
                     'act'=>'授权',
-                    'actdetail'=>'“'.$patSet->topic.'”已获得<span class="label label-success">授权</span>。<br><span class="text-info">'.$request->request('resultMsg').'</span><br>',
+                    'actdetail'=>'“'.$patSet->topic.'”已获得<span class="label label-success">授权</span>。<br>',
                     'acttime'=>$today,
                     'username'=>$request->param('username'),
                     'rolename'=>$role,
                     'patinfo_id'=>$patId,
-                    'note'=>'<span class="text-info">'.$request->request('resultMsg').'</span><br>'
+                    'note'=>'授权时间：<span class="text-info">'.$request->param('patResultDate').'</span><br>授权到期时间：<span class="text-info">'.$request->param('patRenewDeadlinDate').'</span><br>'
                   ]);
                   //静态方法创建新对象后，返回对象id
                   $patRecordId= $patRecordSet->id;
@@ -1571,7 +1573,7 @@ class DashboardController extends \think\Controller
                    // 使用静态方法，向patinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
                   PatinfoModel::update([
                     'status' => '驳回',
-                    'authrejectdate'=> $today,
+                    'authrejectdate'=> $request->param('patResultDate'),
                     'patowner'=>$request->param('patOwner'),
                     'inventor'=>$request->param('inventor'),
                     'otherinventor'=>$request->param('otherInventor'),
@@ -1586,12 +1588,12 @@ class DashboardController extends \think\Controller
                   $patRecordSet=PatrecordModel::create([
                     'num'=>$patNumId,
                     'act'=>'驳回',
-                    'actdetail'=>'“'.$patSet->topic.'”授权申报被<span class="label label-danger">驳回</span>。<br><span class="text-info">'.$request->request('resultMsg').'</span><br>',
+                    'actdetail'=>'“'.$patSet->topic.'”授权申报被<span class="label label-danger">驳回</span>。<br>',
                     'acttime'=>$today,
                     'username'=>$request->param('username'),
                     'rolename'=>$role,
                     'patinfo_id'=>$patId,
-                    'note'=>'<span class="text-info">'.$request->request('resultMsg').'</span><br>'
+                    'note'=>'驳回时间：<span class="text-info">'.$request->param('patResultDate').'</span><br>'
                   ]);
                   //静态方法创建新对象后，返回对象id
                   $patRecordId= $patRecordSet->id;
@@ -1918,29 +1920,20 @@ class DashboardController extends \think\Controller
           case "maintainer":
             switch($tpl){                
                 case "renew":
-                  // 查出所审核的issue的数据：
-                  $iss= IssinfoModel::get($patIssId);
+                  $today=date('Y-m-d');
+                  $deadline=date('Y-m-d',strtotime("+3 month"));
+                  $map['status'] =['in',['授权','续费授权']];
                   
-                  // 查出issue所对应的patent
-                  $pat= PatinfoModel::get($iss->issmap_id);
-                  
-                  // 查出issue所对应的attachment
-                  $att= AttinfoModel::where('attmap_type','_ATTO1')->where('attmap_id',$patIssId)->order('uploaddate','desc')->select();
-                  
+                  // 查出满足条件的patent
+                  $pat= PatinfoModel::where($map)->where('renewdeadlinedate','between time',[$today,$deadline])->order('renewdeadlinedate asc')->select();
+
                   $this->assign([
                     'home'=>$request->domain(),
                     // 
                     'maintainer'=>$this->username,
                     'dept'=>$this->dept,
-                    //'issStatus'=>$iss->status,
-                    
-                    //
-                    'patIssId'=>$patIssId,
-                    
-                    'iss'=>$iss,
                     'pat'=>$pat,
-                    'att'=>$att,
-              
+                    'patTotal'=>count($pat),
                   ]);
                 break;
                 
@@ -2024,9 +2017,7 @@ class DashboardController extends \think\Controller
           break;
           
         }
-        
-        //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div> ';
-        //输出对应的模板文件$role.'_'.$tpl.html
+        //输出对应的模板文件$role.'_'.$tpl.html,$view类的fetch方法与直接使用助手函数view效果一样。
         return $this->fetch('dashboard'.DS.'patiss'.DS.$role.'_'.$tpl);
         //return view('dashboard'.DS.'patiss'.DS.$role.'_'.$tpl);
       }

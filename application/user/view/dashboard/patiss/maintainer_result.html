@@ -267,10 +267,16 @@
 				<input class="form-control" id="patApplyNum" name="patApplyNum" value="{$pat.patapplynum}" type="text" required>
 			</div>
 			
-			{// TP5单行注释。在“申报修改”时隐藏}
+			{// TP5单行注释。在“申报修改”和“申报驳回”时隐藏}
 			<div id="divPatAuthNum" class="form-group col-sm-4" hidden="true">
 				<label for="patAuthNum">专利授权编号<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 				<input class="form-control" id="patAuthNum" name="patAuthNum" value="{$pat.patauthnum}" type="text" style="background-color:#5cb85c;color:#FFF;">
+			</div>
+			
+			{// TP5单行注释。在“申报修改”、“申报驳回”时隐藏}
+			<div id="divPatRenewDeadlineDate" class="form-group col-sm-4" hidden="true">
+				<label for="patRenewDeadlineDate">专利授权到期日<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<input class="form-control" id="patRenewDeadlineDate" name="patRenewDeadlineDate" value="{$today}" type="text" style="background-color:#5cb85c;color:#FFF;">
 			</div>
 		</div>
 		
@@ -488,9 +494,12 @@ $(document).ready(function(){
 		
 		//恢复初始状态
 		$('#divPatAuthNum').hide();
+		$('#divPatRenewDeadlineDate').hide();
 		$(':submit').hide();
 		//为'#patAuthNum'添加'required'属性，其值为false，保证在表单提交时忽略
 		$('#patAuthNum').attr('required',false);
+		//为'#patRenewDeadlineDate'添加'required'属性，其值为false，保证在表单提交时忽略
+		$('#patRenewDeadlineDate').attr('required',false);
 		$('#btnImprove').show();
 		
 		//恢复单选框#patApplyResult底色和字体颜色
@@ -510,8 +519,12 @@ $(document).ready(function(){
 				//设置单选框#patApplyResult底色和字体颜色与按钮一致
 				$(this).css({"background-color":"#5cb85c","color":"#FFF"});
 				$('#divPatAuthNum').show();
+				$('#divPatRenewDeadlineDate').show();
 				//为'#patAuthNum'添加'required'属性，其值为true，保证在表单提交时必填
 				$('#patAuthNum').attr('required',true);
+				//为'#patRenewDeadlineDate'添加'required'属性，其值为true，保证在表单提交时必填
+				$('#patRenewDeadlineDate').attr('required',true);
+				
 				$('#btnAuthorize').show();
 			break;
 			
@@ -520,6 +533,7 @@ $(document).ready(function(){
 				$(this).css({"background-color":"#d9534f","color":"#FFF"});
 				
 				$('#divPatAuthNum').hide();
+				$('#divPatRenewDeadlineDate').hide();
 				//为'#patAuthNum'添加'required'属性，其值为false，保证在表单提交时忽略
 				$('#patAuthNum').attr('required',false);
 				$('#btnReject').show();
@@ -529,8 +543,12 @@ $(document).ready(function(){
 				//设置单选框#patApplyResult底色和字体颜色与按钮一致
 				$(this).css({"background-color":"#337ab7","color":"#FFF"});
 				$('#divPatAuthNum').hide();
+				$('#divPatRenewDeadlineDate').hide();
 				//为'#patAuthNum'添加'required'属性，其值为false，保证在表单提交时忽略
 				$('#patAuthNum').attr('required',false);
+				//为'#patRenewDeadlineDate'添加'required'属性，其值为true，保证在表单提交时必填
+				$('#patRenewDeadlineDate').attr('required',true);
+				
 				$('#btnImprove').show();
 			break;
 		}
