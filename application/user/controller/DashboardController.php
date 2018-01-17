@@ -543,16 +543,16 @@ class DashboardController extends \think\Controller
         case'maintainer':
           switch($issStatus){
             case '_OPERATE_INPROCESS':
-              $map['status'] =['in',['申报提交','续费提交','拟续费']];
+              $map['status'] =['in',['申报提交','续费提交','放弃续费']];
             break;
            
             case '_OPERATE_DONE':
-              $map['status'] =['in',['专利授权','专利驳回','续费授权','专利放弃']];
+              $map['status'] =['in',['专利授权','专利驳回','续费授权','完结']];
             break;
                 
-            //默认'_TODO'，对到期时间在半年内的“授权”或“续费授权”的专利，系统自动放入_TODO里！！考虑代码实现？？
+            //默认'_TODO'，对到期时间在半年内的“授权”或“续费授权”的专利，在maintainer_renew.html模板文件以及oprt=“renew”中进行处理
             default:
-              $map['status'] =['in',['申报修改','申报执行','申报复核','准予续费']];
+              $map['status'] =['in',['申报修改','申报执行','申报复核','准予续费','拟续费']];
             break;
           }     
         break;
@@ -1430,25 +1430,35 @@ class DashboardController extends \think\Controller
             //待完善，hy??2018/1/9
             $issId=$request->request('issId');
             $issSet = IssinfoModel::get($issId);
-            $numId=$issSet->issnum;
-            
+            if(!empty($issSet)){
+              $numId=$issSet->issnum;
+            }
+
             $patId=$request->request('patId');
             $patSet = PatinfoModel::get($patId);
             $patNumId=$patSet->patnum;
             switch($oprt){
-              //续费计划
-              case 'renew_plan':
+              //续费
+              case 'renew':
+                return json($patSet);
+              break;
               
+              //续费报告
+              case 'renewal_report':
+                $msg.='renewal_report';
+                $result='success';
               break;
               
               //续费申报
-              case 'renew_apply':
-              
+              case 'renewal_apply':
+                $msg.='renewal_apply';
+                $result='success';
               break;
               
               //续费放弃
-              case 'renew_reject':
-              
+              case 'renewal_abandon':
+                $msg.='renewal_abandon';
+                $result='success';
               break;                            
               
               case 'improve':
@@ -1676,6 +1686,8 @@ class DashboardController extends \think\Controller
                 }else{
                   $msg.=$uploadResult;
                 }  
+              }else if($oprt=="renewal_report" || $oprt=="renewal_apply" || $oprt=="renewal_abandon"){
+                $result='success';  //maintainer的“renewal*”操作无需附件信息。
               }else{
                 $result='success';
                 $msg.='无新附件上传。<br>';

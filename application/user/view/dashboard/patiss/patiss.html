@@ -147,7 +147,11 @@ $(document).ready(function(){
 		
 		
 		case '_OPERATE_TODO': 
-			$('#divPatIss h4').text('待执行专利事务');
+			if(role=='maintainer'){
+				$('#divPatIss h4').text('关注/待处理专利事务');
+			}else{
+				$('#divPatIss h4').text('待执行专利事务');
+			}
 			if(role=='maintainer'){
 			// role='maintainer',添加‘续费管理’按钮。
 				<!-- $('#divPatIss h4').append('&nbsp;<button id="btnPatRenew"  type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalPatIssTpl"><span class="glyphicon glyphicon-tag"></span>续费管理</button>'); -->
@@ -186,7 +190,11 @@ $(document).ready(function(){
 		break;
 		
 		case '_OPERATE_INPROCESS': 
-			$('#divPatIss h4').text('执行中专利事务');
+			if(role=='maintainer'){
+				$('#divPatIss h4').text('处理中专利事务');
+			}else{
+				$('#divPatIss h4').text('执行中专利事务');
+			}
 			//{$numTotal}不为0加底色
 			if({$numTotal}){
 				$('#panelPatIss').find('.span_OPERATE_INPROCESS').text({$numTotal}).css("background-color","red");
@@ -196,7 +204,12 @@ $(document).ready(function(){
 		break;
 		
 		case '_OPERATE_DONE': 
-			$('#divPatIss h4').text('执行完毕专利事务');
+			
+			if(role=='maintainer'){
+				$('#divPatIss h4').text('处理完专利事务');
+			}else{
+				$('#divPatIss h4').text('执行完毕专利事务');
+			}
 			$('#panelPatIss').find('.span_OPERATE_DONE').text({$numTotal});
 			$('.tpl').remove();
 			$('.btnTpl').remove();
@@ -247,21 +260,18 @@ $(document).ready(function(){
 	
 	//maintainer，load续费管理页面
 	$('#btnPatRenew').click(function(){
-		var str=$(this).html();
-		// 所有按钮所在行去掉附加的bg-warning
-		$('.btnTpl').parent().removeClass('bg-warning');
 		$.post('patIssTpl',
 			{
 				'role':'maintainer',
 				'tpl':'renew',
 				'returnType':0
 			},
-			
 			function(data){
 				$('#divPatIss').html(data);
 			}
 		);
 	});
+	
 	<!-- // patIss表格中<td>里的<a>按role、patIssStatus的不同进行配置 -->
 	$('.btnTpl').each(function(){
 		var patIssStatus=$(this).siblings('.patIssStatus').text();
@@ -303,10 +313,12 @@ $(document).ready(function(){
 			break;
 			
 			case 'maintainer':
-				if(patIssStatus=="申报复核"){
+				if(patIssStatus=="申报复核" || patIssStatus=='准予续费'){
 					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="apply" data-patIssId="'+id+'"><span class="glyphicon glyphicon-open"></span>申报提交</a>');
 				}else if(patIssStatus=="申报提交" || patIssStatus=="续费提交"){
 					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="result" data-patIssId="'+id+'"><span class="glyphicon glyphicon-info-sign text-info"></span>申报结果</a>');
+				}else if(patIssStatus=="放弃续费"){
+					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="result" data-patIssId="'+id+'"><span class="glyphicon glyphicon-ban-circle text-warning"></span>放弃</a>');
 				}
 				
 			break;

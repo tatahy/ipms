@@ -17,17 +17,17 @@
 				</thead>
 				<tbody><!-- 此处显示数据库查询后的数据集 -->
 					{volist name="pat" id="vo" empty="暂无专利授权到期"}
-					<tr>
+					<tr id="tr{$vo.id}">
 						<td>{$i}</td>
 						<td>{$vo.topic}</td>
 						<td>{$vo.pattype}</td>
 						<td>{$vo.status}</td>
 						<td>{$vo.authrejectdate}</td>
 						<td>{$vo.renewdeadlinedate}</td>
-						<td class="btnOprt">					
-							<a href="#modalPatRenew" data-toggle="modal" data-oprt="renew_plan" data-patId="'+{$vo.id}+'">内部申请</a>
-							<a href="#modalPatRenew" data-toggle="modal" data-oprt="renew_apply" data-patId="'+{$vo.id}+'">外部提交</a>
-							<a href="#modalPatRenew" data-toggle="modal" data-oprt="renew_abandon" data-patId="'+{$vo.id}+'">放弃</a>
+						<td class="btnOprt">
+							
+							
+							<a href="#modalPatRenew" data-toggle="modal" data-oprt="renew" data-patId="{$vo.id}"><span class="glyphicon glyphicon-repeat text-info"></span>续费</a>
 						
 						</td>
 					</tr>
@@ -51,14 +51,94 @@
         </div>
 		
         <div class="modal-body">
-			<!-- // 对patIss的增删改查页面显示位置-->
+			<!-- // 对patIssRenew的增删改查页面显示位置-->
 			<div id="divPatRenew">
 			<form id="fmIssPatRenew" action="" method="" role="form" enctype="multipart/form-data">
+				<!-- // 与本页的formDataAjax函数配合，传递本页所进行的oprt值到后端 -->
+				<input id="oprt" type="text" hidden="true">
+				<input id="patId" name="patId" type="text" hidden="true">
+				
+				<div class="row">
+					<div class="form-group col-sm-4">
+						<label for="topic">专利名称</label>
+						<p id="topic"></p>
+						<!-- <input class="form-control" id="topic" name="topic" readonly> -->
+					</div>
+				
+					<div class="form-group col-sm-4">
+						<label for="patowner">专利所有人</label>
+						<p id="patowner"></p>
+						<!-- <input class="form-control"  id="patowner" name="patowner" readonly> -->
+					</div>
 			
+					<div class="form-group col-sm-4">
+						<label for="dept">专利申报部门</label>
+						<p id="dept"></p>
+						<!-- <input class="form-control" id="" name="" readonly> -->
+					</div>
+				</div>
+				
+				<div class="row">
+					<div class="form-group col-sm-4">
+						<label for="patagency">专利代理机构</label>
+						<p id="patagency"></p>
+						<!-- <input class="form-control" id="patagency" name="patagency" readonly> -->
+					</div>
+				
+					<div class="form-group col-sm-4">
+						<label for="pattype">专利类型</label>
+						<p id="pattype"></p>
+						<!-- <input class="form-control" id="pattype" name="pattype" readonly> -->
+					</div>
+				
+					<div class="form-group col-sm-4">
+						<label for="status">专利状态</label>
+						<p id="status"></p>
+						<!-- <input class="form-control" id="status" name="status" readonly> -->
+					</div>
+				</div>
+				
+				<div class="row">
+					<div class="form-group col-sm-4">
+						<label for="patauthnum">专利授权编号</label>
+						<p id="patauthnum"></p>
+						<!-- <input class="form-control" id="patauthnum" name="patauthnum" readonly> -->
+					</div>
+				
+					<div class="form-group col-sm-4">
+						<label for="authrejectdate">专利授权日</label>
+						<p id="authrejectdate"></p>
+						<!-- <input class="form-control" id="authrejectdate" name="authrejectdate" readonly> -->
+					</div>
+				
+					<div class="form-group col-sm-4">
+						<label for="renewdeadlinedate">专利到期日</label>
+						<p id="renewdeadlinedate"></p>
+						<!-- <input class="form-control" id="renewdeadlinedate" name="renewdeadlinedate" readonly> -->
+					</div>
+				</div>
+				
+				<div class="row">
+				<hr>
+				<div class="form-group col-sm-12">			
 			
+					<button type="submit" id="btnRenewalReport" class="btn btn-primary btn-sm" data-oprt="renewal_report"><span class="glyphicon glyphicon-edit"></span>&nbsp;报告</button>
 			
+					<button type="submit" id="btnRenewalApply" class="btn btn-success btn-sm" data-oprt="renewal_apply"><span class="glyphicon glyphicon-open"></span>&nbsp;提交</button>
+			
+					<!-- <button type="submit" id="btnRenewalAbandon" class="btn btn-danger btn-sm" data-oprt="renewal_abandon"><span class="glyphicon glyphicon-ban-circle"></span>&nbsp;放弃</button> -->
+			
+ 					<div  class="pull-right">
+						<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
+					</div>
+				</div>
+				</div>
+				
 			</form>
 			</div>
+			
+			
+			
 		</div>
 		
 		<!-- <div class="modal-footer"> -->
@@ -96,13 +176,136 @@ $(document).ready(function(){
 				'returnType':0,
 			},
 			function(data){
-				$('#divPatRenew').html(data);
-				<!-- $('.modal-header').find('h4').empty().html('<strong>【'+str+'】</strong><span class="glyphicon glyphicon-wrench">专利事务</span>'); -->
-				$("#modalPatRenew").modal();
+			// 后端返回的data为json格式
+				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务</span>：<strong>【'+str+'】</strong>');
+				
+				$('#patId').val(data.id);
+				$('#topic').html(data.topic);
+				$('#pattype').html(data.pattype);
+				$('#dept').html(data.dept);
+				$('#status').html(data.status);
+				$('#patowner').html(data.patowner);
+				$('#patagency').html(data.patagency);
+				$('#patauthnum').html(data.patauthnum);
+				$('#authrejectdate').html(data.authrejectdate);
+				$('#renewdeadlinedate').html(data.renewdeadlinedate);
 			}
 		);
 	
+	});
+	
+	<!-- // 应用jQuery的$.ajax提交表单，提交前进行一些验证准备。结合输入框的“required”属性避免输入框无内容 -->
+	$('#fmIssPatRenew').submit(function(event){					
+		//jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作
+        event.preventDefault();
+	
+		var oprt=$('#oprt').val();
+		var str='确定';
+		var title=oprt;
+		switch(oprt){
+			case 'renewal_apply':
+				str='确定续费【<span class="glyphicon glyphicon-open text-success"></span>&nbsp;提交】操作？';
+				title='续费【<span class="glyphicon glyphicon-open text-success"></span>&nbsp;提交】操作';
+			break;
+			
+			case 'renewal_abandon':
+				str='确定续费【<span class="glyphicon glyphicon-remove text-danger"></span>&nbsp;放弃】操作？';
+				title='续费【<span class="glyphicon glyphicon-remove text-danger"></span>&nbsp;放弃】操作';
+			break;
+			//默认为'renewal_report'
+			default:
+				str='确定续费【<span class="glyphicon glyphicon-edit text-primary"></span>&nbsp;报告】操作？';
+				title='续费【<span class="glyphicon glyphicon-edit text-primary"></span>&nbsp;报告】操作';
+			break;
+			
+		}
+		
+		$('#modalPatRenew').modal('hide');
+		$.confirm(str,function(e){
+			con=e;
+			if(true==con){
+				formDataAjax(oprt,$('#fmIssPatRenew'),title);
+				
+			}else{
+				$('#modalPatRenew').modal('show');
+			}
+		}).cancel('否(N)').ok('是(Y)');
+	});
+	
+	// 点击报告修改按钮，与form的submit()配合确定传给后端的oprt='renewal_report'
+	$('#btnRenewalReport').click(function(){
+		$('#oprt').val($(this).attr('data-oprt'));
+	});
+	
+	// 点击申报按钮，与form的submit()配合确定传给后端的oprt='renewal_apply'
+	$('#btnRenewalApply').click(function(){
+		$('#oprt').val($(this).attr('data-oprt'));
+	});
+	
+	// 点击放弃按钮，与form的submit()配合确定传给后端的oprt='renewal_abandon'
+	$('#btnRenewalAbandon').click(function(){
+		$('#oprt').val($(this).attr('data-oprt'));
+	});
+	
+<!-- function -->
+	//**函数名：formDataAjax
+ 	//* 作用：应用jQuery的$.ajax向后端提交formData数据
+	//* 参数1：oprt，类型：字符。值：不为空。说明：表示触发本函数的‘操作’
+	//* 参数2：fmObj，类型：对象。值：可为空，默认为空。说明：表示需要一起提交的表单。
+	//* 参数3：title，类型：字符。值：不为空。说明：本函数显示的提示框$.alert的标题内容。
+	function formDataAjax(oprt,fmObj,title){
+	// formdata形式上传表单数据,自动搜索表单信息(表单内没有name属性的input不会被搜索到)，IE<=9不支持FormData
+		if(fmObj){
+			var formData = new FormData(fmObj[0]);
+		}else{
+			var formData = new FormData();
+		}
+		
+		<!-- var formData = new FormData($('#fmIssPatRenew')[0]); -->
+		// 添加表单内没有的内容
+        formData.append('returnType', 0);
+		formData.append('role','maintainer');
+		formData.append('username','{$maintainer}');
+		formData.append('oprt',oprt);
+			
+        $.ajax({
+            type: 'post',
+            url: 'patIssOprt',
+            data: formData,
+            contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
+            processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)
+			<!-- // 进度条显示上传进度 -->
+			<!-- xhr: xhrOnProgress(function(e){ -->
+                <!-- var percent=(e.loaded / e.total)*100;//计算百分比 -->
+                <!-- $('#divUpLoadProcess').css("width",percent + "%").text(percent + "%"); -->
+            <!-- }), -->
+            success: function(data) {
+                if(data.result=='success'){
+					
+					// 操作成功，提示框显示信息
+					$.alert(title+'成功<span class="glyphicon glyphicon-ok text-success"></span><hr>'+data.msg);
+					
+					//maintainer，load续费管理页面
+					$.post('patIssTpl',
+						{
+							'role':'maintainer',
+							'tpl':'renew',
+							'returnType':0
+						},
+						function(data){
+							$('#divPatIss').html(data);
+						}
+					);
+					
+				}else{
+					$('#modalPatRenew').modal();
+					<!-- $.alert(data.msg); -->
+				}
+            }
+        });
 	}
+
+<!-- function -->
 	
 });
 
