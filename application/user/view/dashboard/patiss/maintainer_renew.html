@@ -24,11 +24,12 @@
 						<td>{$vo.status}</td>
 						<td>{$vo.authrejectdate}</td>
 						<td>{$vo.renewdeadlinedate}</td>
-						<td class="btnOprt">
-							
-							
-							<a href="#modalPatRenew" data-toggle="modal" data-oprt="renew" data-patId="{$vo.id}"><span class="glyphicon glyphicon-repeat text-info"></span>续费</a>
-						
+						<td class="btnOprt">			
+							{in name="$vo.status" value="授权，续费授权"}
+								<a href="#modalPatRenew" data-toggle="modal" data-oprt="renew" data-patId="{$vo.id}"><span class="glyphicon glyphicon-repeat text-info"></span>续费</a>
+							{else/}
+								<a href="#modalPatRenew" data-toggle="modal" data-oprt="invalidate" data-patId="{$vo.id}"><span class="glyphicon glyphicon-repeat text-info"></span>无效</a>
+							{/in}
 						</td>
 					</tr>
 					{/volist}					

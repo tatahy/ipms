@@ -516,7 +516,7 @@ class DashboardController extends \think\Controller
                 
             //默认'_TODO':
             default:
-              $map['status'] =['in',['审核通过','审核未通过','拟续费','变更申请']];
+              $map['status'] =['in',['审核通过','审核未通过','变更申请','拟续费']];
             break;
           }  
         break;
@@ -543,7 +543,7 @@ class DashboardController extends \think\Controller
         case'maintainer':
           switch($issStatus){
             case '_OPERATE_INPROCESS':
-              $map['status'] =['in',['申报提交','续费提交','放弃续费']];
+              $map['status'] =['in',['申报提交','续费提交']];
             break;
            
             case '_OPERATE_DONE':
@@ -551,8 +551,9 @@ class DashboardController extends \think\Controller
             break;
                 
             //默认'_TODO'，对到期时间在半年内的“授权”或“续费授权”的专利，在maintainer_renew.html模板文件以及oprt=“renew”中进行处理
+            //对“放弃续费”的专利，在maintainer_renew.html模板文件以及oprt=“invalidate”中进行处理
             default:
-              $map['status'] =['in',['申报修改','申报执行','申报复核','准予续费','拟续费']];
+              $map['status'] =['in',['申报修改','申报执行','申报复核','准予续费','拟续费','放弃续费']];
             break;
           }     
         break;
@@ -1459,7 +1460,12 @@ class DashboardController extends \think\Controller
               case 'renewal_abandon':
                 $msg.='renewal_abandon';
                 $result='success';
-              break;                            
+              break;    
+              
+              //“放弃续费”专利改为“超期无效”
+              case 'invalidate':
+               
+              break;                                            
               
               case 'improve':
                 $msg.='专利事务"'.$issSet->topic.'"反馈申报修改意见。<br><span class="text-info">意见内容：'.$request->request('resultMsg').'</span><br>';

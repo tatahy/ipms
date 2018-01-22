@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+	
   <title>IPMS</title>
   <meta charset="utf-8">
   <!-- // 开启bootstrap响应式布局 -->
@@ -12,11 +14,12 @@
   <script src="http://maxcdn.bootstrapcdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.min.js"></script> -->
    */}
   
- {// TP5中的模板注释格式，单行。<!-- TP5的资源文件加载写法 -->内容不会出现在发送给浏览器的HTML文件中 }  
+ {// TP5中的模板注释格式，单行。<!-- TP5的资源文件加载写法 -->内容不会出现在发送给浏览器的HTML文件中 }
+  {css href="/home/res/css/bootstrap3.3.7.min.css" }
+  {css href="/home/res/css/bs-callout.css" } 
   {js href="/home/res/js/jquery1.12.4.min.js" }
   {js href="/home/res/js/bootstrap3.3.7.min.js" }
-  {css href="/home/res/css/bootstrap3.3.7.min.css" }
-  {css href="/home/res/css/bs-callout.css" }
+  
 
 {/*<!-- 实现nav固定在页面顶端效果的补充代码块,
 同时还需设置nav的data-offset-top="-3"防止鼠标单击页面时出现跳动-->
@@ -39,12 +42,14 @@ The following code will enable all tooltips in the document:-->
 <script>
 $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip();   
+	
+	
 });
 </script>
 
 </head>
-<body>
 
+<body>
 <!-- pageheader  -->
 <nav class="navbar navbar-default navbar-fixed-top" data-spy="affix" data-offset-top="-3">
   <div class="container-fluid">
