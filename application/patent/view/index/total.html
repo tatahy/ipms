@@ -160,6 +160,10 @@ $(document).ready(function(){
 			$("h4").html('<span class="label label-info" style="padding:6px;">被驳回专利数&nbsp;<span class="badge">{$numTotal}</span></span>');
 		break;
 		
+		case "#invalid": 
+			$("h4").html('<span class="label label-info" style="padding:6px;">无效专利数&nbsp;<span class="badge">{$numTotal}</span></span>');
+		break;
+		
 		<!-- // 带入“显示搜索”和“重置”按钮 -->
 　　	default: 
 			$("h4").html('<span class="label label-default" style="padding:6px;">专利总数&nbsp;<span class="badge">{$numTotal}</span></span>&nbsp;<button id="btnSearchInfo" type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divCollapse">显示搜索&nbsp;<span class="caret"></span></button>&nbsp;<button id="btnSearchReset" type="button" class="btn btn-primary btn-sm">重置&nbsp;<span class="glyphicon glyphicon-refresh"></span></button>');

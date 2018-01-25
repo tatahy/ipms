@@ -84,14 +84,12 @@ class IndexController extends \think\Controller
         //利用模型对象得到状态status"="新增"）的patent总数
         $numpatadd=$pats->where('status','拟申报')->count();
         
-        //利用模型对象得到状态status"="申报"，'返回修改'）的patent总数
-        $numpatapp=$pats->where('status',['=','申报'],['=','返回修改'],'or')->count();
+        //利用模型对象得到申报的patent总数
+        $numpatapp=$pats->where('status',['=','申报'],['=','申报修改'],'or')->count();
         
-        //利用模型对象得到状态status='授权'）的patent总数
-        $numpataut=$pats->where('status','授权')->count();
-        
-        //利用模型对象得到状态status"='续费授权'，'续费中'）的patent总数
-        $numpatren=$pats->where('status',['=','续费授权'],['=','续费中'],'or')->count();
+        //利用模型对象得到有效的patent总数
+        //$numpataut=$pats->where('status',['=','授权'],['=','续费授权'],['=','续费中'],['=','放弃续费'],'or')->count();
+        $numpataut=$pats->where('id','>',0)->where('status','in',['授权','续费授权','续费中','放弃续费'])->count();
         
         $this->assign([
             //在index.html页面通过'destr'输出自定义的信息
@@ -107,9 +105,9 @@ class IndexController extends \think\Controller
             'numpatadd'=>$numpatadd,
             'numpatapp'=>$numpatapp,
             'numpataut'=>$numpataut,
-            'numpatren'=>$numpatren,
             ]);
-            return view();
+            //return view();
+            return $this->fetch();
             
         }
         

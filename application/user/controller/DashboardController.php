@@ -1439,15 +1439,77 @@ class DashboardController extends \think\Controller
             $patSet = PatinfoModel::get($patId);
             $patNumId=$patSet->patnum;
             switch($oprt){
-              //续费
+              //续费，向前端返回JSON数据
               case 'renew':
-                return json($patSet);
+                $str1=array("today"=>$today,"username"=>$this->username,"deptMaintainer"=>$this->dept);
+                $str2=array_merge($patSet->toArray(),$str1);
+                return json($str2);
               break;
               
-              //续费报告
+              //续费报告,生成新的ISSPat
               case 'renewal_report':
-                $msg.='renewal_report';
-                $result='success';
+              
+              // 使用静态方法，向issinfo表写入新iss信息
+                 // $issRenewSet = IssinfoModel::create([
+//                    'topic'  => $request->request('topic'),
+//                    'status' => $request->request('status'),
+//                    'issmap_type'=>$request->request('issMapType'),
+//                    'issmap_id'=>$request->request('issMapId'),
+//                    // 兼容之前的代码
+//                    'num_id'=>$request->request('numId'),
+//                    'abstract'=>$request->request('abstract'),
+//                    'addnewdate'=>$request->request('addNewDate'),
+//                    'writer' => $request->request('writer'),
+//                    'dept' => $request->request('dept'),
+//                  ]);
+//                  //静态方法创建新对象后，返回对象id
+//                  $issRenewId= $issRenewSet->id;
+                  
+                  //引用Issinfo模型中定义的myCreate方法向issinfo表新增信息
+                  $issM=new IssinfoModel;
+                  $issRenewId = $issM->myCreate($request->request());
+                  if ($issRenewId) {
+                      $msg.='新增“拟续费”专利事务成功';
+                  } else {
+                      $msg.='新增“拟续费”专利事务失败';
+                  }
+              
+                  $issRenewSet = IssinfoModel::get($issRenewId);
+               // 使用静态方法，向issrecord表新增信息。
+                  $issRecordSet=IssrecordModel::create([
+                    'num'=>$issRenewSet->issnum,
+                    'act'=>'续费报告',
+                    'actdetail'=>'专利事务--'.$request->request('topic').'"--填报',
+                    'acttime'=>$today,
+                    'username'=>$request->param('username'),
+                    'rolename'=>$role,
+                    'issinfo_id'=>$issRenewId,
+                  ]);
+                  //静态方法创建新对象后，返回对象id
+                  $issRecordId= $issRecordSet->id;
+                  
+                  // 使用静态方法，向patinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
+                  PatinfoModel::update([
+                    'status' => '续费中',
+                    'modifydate'=> $today
+                  ], ['id' => $patId]);
+                  
+                  // 使用静态方法，向patrecord表新增信息。
+                  $patRecordSet=PatrecordModel::create([
+                    'num'=>$patNumId,
+                    'act'=>'续费中',
+                    'actdetail'=>'向【批准人】提交续费申请<br>',
+                    'acttime'=>$today,
+                    'username'=>$request->param('username'),
+                    'rolename'=>$role,
+                    'patinfo_id'=>$patId,
+                    'note'=>'<span class="text-info">'.$request->request('abstract').'</span><br>'
+                  ]);
+                  //静态方法创建新对象后，返回对象id
+                  $patRecordId= $patRecordSet->id;
+                  
+                
+                  $result='success';
               break;
               
               //续费申报

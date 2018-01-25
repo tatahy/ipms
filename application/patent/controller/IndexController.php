@@ -173,10 +173,10 @@ class IndexController extends \think\Controller
         // 获取分页显示
         $pageapp = $patsapp->render(); 
         
-        //利用模型对象得到状态status"="授权"）的patent总数
-        $numaut = $pats->where('status','授权')->count();
+        //利用模型对象得到有效状态的patent总数
+        $numaut = $pats->where('status',['=','授权'],['=','续费授权'],['=','续费中'],['=','放弃续费'],'or')->count();
         //分页,每页$listrows条记录
-        $patsaut = $pats->where('status','授权')
+        $patsaut = $pats->where('status',['=','授权'],['=','续费授权'],['=','续费中'],['=','放弃续费'],'or')
                             ->order('authrejectdate', 'desc')
                            ->paginate($listrows,false,['type'=>'bootstrap','var_page' => 'pageaut',]);
         // 获取分页显示
@@ -1204,12 +1204,12 @@ class IndexController extends \think\Controller
         break;
         // ''    
         case '#authorize':
-          $map['status'] ='授权';
+          $map['status'] =['in',['授权','续费授权','续费中','放弃续费']];
         break;
         // ''    
-        case '#render':
-          $map['status'] =['in',['续费授权','续费']];
-        break;
+       // case '#render':
+//          $map['status'] =['in',['续费授权','续费']];
+//        break;
         // ''    
         case '#abandon':
           $map['status'] ='放弃';
@@ -1217,6 +1217,10 @@ class IndexController extends \think\Controller
         // ''
         case '#reject':
           $map['status'] ='驳回';
+        break;
+        
+        case '#invalid':
+          $map['status'] =['in',['超期无效','驳回']];
         break;
             
         //默认所有状态专利'#total':

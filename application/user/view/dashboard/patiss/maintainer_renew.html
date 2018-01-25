@@ -1,7 +1,7 @@
 <!-- // maintainer_renew.html -->
 <div class="container-fluid">
 		<h4>续费管理</h4>
-		<p>近3个月内授权到期专利数：<span class="badge">{$patTotal}</span></p>
+		<p>近3个月内授权到期专利数：<span class="badge">{$patTotal}</span>&nbsp;<button id="btnBack"  type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-tag"></span>返回“关注/待处理”</button></p>
 		<div class="table-responsive ">
 			<table class="table table-bordered table-hover">
 				<thead>
@@ -25,11 +25,11 @@
 						<td>{$vo.authrejectdate}</td>
 						<td>{$vo.renewdeadlinedate}</td>
 						<td class="btnOprt">			
-							{in name="$vo.status" value="授权，续费授权"}
+							{in name="vo.status" value="授权,续费授权"}
 								<a href="#modalPatRenew" data-toggle="modal" data-oprt="renew" data-patId="{$vo.id}"><span class="glyphicon glyphicon-repeat text-info"></span>续费</a>
 							{else/}
 								<a href="#modalPatRenew" data-toggle="modal" data-oprt="invalidate" data-patId="{$vo.id}"><span class="glyphicon glyphicon-repeat text-info"></span>无效</a>
-							{/in}
+							{/in}  
 						</td>
 					</tr>
 					{/volist}					
@@ -56,13 +56,70 @@
 			<div id="divPatRenew">
 			<form id="fmIssPatRenew" action="" method="" role="form" enctype="multipart/form-data">
 				<!-- // 与本页的formDataAjax函数配合，传递本页所进行的oprt值到后端 -->
+				<h4><span class="label label-warning"><span class="glyphicon glyphicon-wrench"></span>&nbsp;拟新增专利事务信息</span></h4>
 				<input id="oprt" type="text" hidden="true">
 				<input id="patId" name="patId" type="text" hidden="true">
+				<div class="row">
+					<div class="form-group col-sm-4">
+						<label class="control-label" for="topic">事务标题topic<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+						<!-- <input class="form-control" id="topic" name="topic" value="" type="text" placeholder="关于XX专利的YY申请" required> -->
+						<textarea class="form-control" rows="2" id="topic" name="topic" placeholder="填写事务的主要内容，字数不超过100字。" required></textarea>
+					</div>
+					
+					<div class="form-group col-sm-2">
+						<label class="control-label" for="status">事务状态status</label>
+						<input class="form-control" id="status" name="status" value="拟续费" type="text" readonly="true">
+					</div>
+					
+					<div class="form-group col-sm-3">
+						<label for="issMapType">事务类型issMapType</label>
+						<select class="form-control" id="issMapType" name="issmap_type" readonly="true">
+							<option value="_ISST_PAT2">专利授权到期续费</option>
+						</select>
+					</div>
+					
+					<div class="form-group col-sm-3" >
+						<label for="issMapId">issMapId</label>
+						<input class="form-control" id="issMapId" name="issmap_id" value="" type="text" readonly="true">
+					</div>
+				</div>
 				
+				<div class="row">
+					<div class="form-group col-sm-3" >
+						<label for="numId">numId</label>
+						<input class="form-control" id="numId" name="num_id" value="" type="text" readonly="true">
+					</div>
+					
+					<div class="form-group col-sm-6">
+						<label class="control-label" for="abstract">事务简介abstract<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+						<textarea class="form-control" rows="5" id="abstract" name="abstract" placeholder="填写事务的主要内容，字数不超过100字。" required></textarea>
+					</div>
+					
+				</div>
+				
+				<div class="row">
+					<div class="form-group col-sm-3" >
+						<label for="addNewDate">addNewDate</label>
+						<input class="form-control" id="addNewDate" name="addNewDate" value="" type="text" readonly="true">
+					</div>
+					
+					<div class="form-group col-sm-3" >
+						<label for="writer">writer</label>
+						<input class="form-control" id="writer" name="writer" value="" type="text" readonly="true">
+					</div>
+					
+					<div class="form-group col-sm-3" >
+						<label for="dept">dept</label>
+						<input class="form-control" id="dept" name="dept" value="" type="text" readonly="true">
+					</div>
+				</div>
+				
+				
+				<h4><span class="label label-warning"><span class="glyphicon glyphicon-wrench"></span>&nbsp;拟续费专利信息</span></h4>
 				<div class="row">
 					<div class="form-group col-sm-4">
 						<label for="topic">专利名称</label>
-						<p id="topic"></p>
+						<p id="topic1"></p>
 						<!-- <input class="form-control" id="topic" name="topic" readonly> -->
 					</div>
 				
@@ -73,8 +130,8 @@
 					</div>
 			
 					<div class="form-group col-sm-4">
-						<label for="dept">专利申报部门</label>
-						<p id="dept"></p>
+						<label for="dept1">专利申报部门</label>
+						<p id="dept1"></p>
 						<!-- <input class="form-control" id="" name="" readonly> -->
 					</div>
 				</div>
@@ -93,8 +150,8 @@
 					</div>
 				
 					<div class="form-group col-sm-4">
-						<label for="status">专利状态</label>
-						<p id="status"></p>
+						<label for="status1">专利状态</label>
+						<p id="status1"></p>
 						<!-- <input class="form-control" id="status" name="status" readonly> -->
 					</div>
 				</div>
@@ -154,6 +211,13 @@
 <script>
 $(document).ready(function(){
 
+	// 点击btnBack，返回“关注/待处理”页面（即load“maintainer”的默认页面）
+	$("#btnBack").click(function(){
+		var sendData={"role":'maintainer',"issType":'_PATENT',"issStatus":'_OPERATE_TODO'};	
+		$("#patIss").load('patIss',sendData);
+		
+	});
+	
 	// 表格中<td>里<a>标签的click事件,给标签所在行上色
 	$("td a").click(function(){
 		
@@ -180,11 +244,18 @@ $(document).ready(function(){
 			// 后端返回的data为json格式
 				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务</span>：<strong>【'+str+'】</strong>');
 				
+				$('#topic').html('关于专利“'+data.topic+'”的续费申请');
+				$('#issMapId').val(data.id);
+				$('#numId').val(data.id);
+				$('#addNewDate').val(data.today);
+				$('#writer').val(data.username);
+				$('#dept').val(data.deptMaintainer);
+				
 				$('#patId').val(data.id);
-				$('#topic').html(data.topic);
+				$('#topic1').html(data.topic);
 				$('#pattype').html(data.pattype);
-				$('#dept').html(data.dept);
-				$('#status').html(data.status);
+				$('#dept1').html(data.dept);
+				$('#status1').html(data.status);
 				$('#patowner').html(data.patowner);
 				$('#patagency').html(data.patagency);
 				$('#patauthnum').html(data.patauthnum);
@@ -226,6 +297,7 @@ $(document).ready(function(){
 			con=e;
 			if(true==con){
 				formDataAjax(oprt,$('#fmIssPatRenew'),title);
+				<!-- formDataAjax(oprt,title); -->
 				
 			}else{
 				$('#modalPatRenew').modal('show');
@@ -275,11 +347,6 @@ $(document).ready(function(){
             data: formData,
             contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
             processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)
-			<!-- // 进度条显示上传进度 -->
-			<!-- xhr: xhrOnProgress(function(e){ -->
-                <!-- var percent=(e.loaded / e.total)*100;//计算百分比 -->
-                <!-- $('#divUpLoadProcess').css("width",percent + "%").text(percent + "%"); -->
-            <!-- }), -->
             success: function(data) {
                 if(data.result=='success'){
 					
