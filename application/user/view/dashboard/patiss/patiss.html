@@ -22,7 +22,11 @@
 					
 					<th><a data-toggle="tooltip" href="#"  sortName="_DEPT" sort="{$sort}">所属部门</a></th>
 					
-					<th class="tpl">操作视图</th>
+					{in name="role" value="maintainer,approver"}
+						<th class="tpl"><a data-toggle="tooltip" href="#"  sortName="_OPERATION" sort="{$sort}">操作视图</a></th>
+					{else/}
+						<th class="tpl">操作视图</th>
+					{/in}	
 					
 				</tr>
 			</thead>
@@ -297,14 +301,16 @@ $(document).ready(function(){
 			break;
 				
 			case 'approver':
-				if(patIssStatus=="审核通过" || patIssStatus=="审核未通过"|| patIssStatus=="拟续费"|| patIssStatus=="变更申请"){
-					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="approve" data-patIssId="'+id+'"><span class="glyphicon glyphicon-check text-danger"></span>审批</a>');
+				if(patIssStatus=="审核通过" || patIssStatus=="审核未通过"|| patIssStatus=="变更申请"){
+					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="approve" data-patIssId="'+id+'"><span class="glyphicon glyphicon-check text-danger"></span>申报审批</a>');
 					
+				}else if(patIssStatus=="拟续费"){
+					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="renewal" data-patIssId="'+id+'"><span class="glyphicon glyphicon-repeat text-danger"></span>续费审批</a>');
 				}
 			break;
 			
 			case 'operator':
-				if(patIssStatus=="批准"){
+				if(patIssStatus=="批准申报" || patIssStatus=="准予变更" || patIssStatus=="否决变更"){
 					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="todo" data-patIssId="'+id+'"><span class="glyphicon glyphicon-edit"></span>领受/变更</a>');
 				
 				}else if(patIssStatus=="申报修改" || patIssStatus=="申报执行"){
@@ -313,12 +319,16 @@ $(document).ready(function(){
 			break;
 			
 			case 'maintainer':
-				if(patIssStatus=="申报复核" || patIssStatus=='准予续费'){
-					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="apply" data-patIssId="'+id+'"><span class="glyphicon glyphicon-open"></span>申报提交</a>');
+				if(patIssStatus=="申报复核"){
+					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="apply" data-patIssId="'+id+'"><span class="glyphicon glyphicon-open"></span>授权申报</a>');
+				}else if(patIssStatus=='准予续费'){
+					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="apply" data-patIssId="'+id+'"><span class="glyphicon glyphicon-open"></span>续费申报</a>');
 				}else if(patIssStatus=="申报提交" || patIssStatus=="续费提交"){
-					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="result" data-patIssId="'+id+'"><span class="glyphicon glyphicon-info-sign text-info"></span>申报结果</a>');
-				}else if(patIssStatus=="放弃续费"){
-					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="result" data-patIssId="'+id+'"><span class="glyphicon glyphicon-ban-circle text-warning"></span>续费放弃</a>');
+					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="result" data-patIssId="'+id+'"><span class="glyphicon glyphicon-info-sign text-danger"></span>申报结果</a>');
+				}else if(patIssStatus=="放弃续费" || patIssStatus=="否决申报" || patIssStatus=="专利驳回" || patIssStatus=="专利授权" || patIssStatus=="续费授权"){
+					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="close" data-patIssId="'+id+'"><span class="glyphicon glyphicon-folder-close text-primary"></span>关闭事务</a>');
+				}else{
+					$(this).append('关注');
 				}
 				
 			break;
@@ -377,6 +387,16 @@ $(document).ready(function(){
 	$('.patInfo a').tooltip({title: '专利信息', placement: 'bottom'});
 	$('.issInfo a').tooltip({title: '事务信息', placement: 'bottom'});
 	$('.patIssStatus a').tooltip({title: '事务过程记录', placement: 'bottom'});
+	
+	//单元格里a的内容上色
+	$('.patIssStatus a').each(function(){
+		var v1=$(this).text();
+		if (v1=='专利授权' || v1=='续费授权'){
+			$(this).addClass('text-success');
+		}else if(v1=='放弃续费' || v1=='专利驳回' || v1=='否决申报'){
+			$(this).addClass('text-danger');
+		}
+	});
 
 	// 根据后端控制器给出的排序字段{$sortName},排序方式{$sort}，修改th中a的显示形式
 	$('#divPatIss thead a').each(function(){

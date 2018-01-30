@@ -95,6 +95,22 @@ class Attinfo extends Model
       }
       return $outPut;
     }
+    
+    /**
+     * 新增一个att。
+     * @param  array $data 新增att的各项信息
+     * @return integer|bool  新增成功返回主键，新增失败返回false
+     * 要求：传入的数组下标名与模型属性名（数据表字段名）一模一样。
+     */
+    public function myCreate($data = [])
+    {
+        $result = $this->allowField(true)->save($data);
+        if ($result) {
+            return $this->getData('id');
+        } else {
+            return false;
+        }
+    }
 
 }
 

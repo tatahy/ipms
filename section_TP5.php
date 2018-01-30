@@ -47,50 +47,57 @@ switch(){
                     
                     
                 }
+?>
 
-<{switch name="变量" }>
-    <{case value="值1" break="0或1"}>输出内容1<{/case}>
-    <{case value="值2"}>输出内容2<{/case}>
-    <{default /}>默认情况
-<{/switch}>
+<html>
+{switch name="变量" }
+    {case value="值1" break="0或1"}输出内容1{/case}
+    {case value="值2"}输出内容2{/case}
+    {default /}默认情况
+{/switch}
+
+{switch name="User.level"}
+    {case value="1"}value1{/case}
+    {case value="2"}value2{/case}
+    {default /}default
+{/switch}
+
+{switch name="Think.get.type"}
+    {case value="gif|png|jpg"}图像格式{/case}
+    {default /}其他格式
+{/switch}
 
 简洁的用法
-<{switch $User.userId}>
-    <{case $adminId}> admin<{/case}>
-    <{case $memberId}> member<{/case}>
-<{/switch}>
+{switch $User.userId}
+    {case $adminId} admin{/case}
+    {case $memberId} member{/case}
+{/switch}
+</html>
 
-
+<?php
 default:
                     
-                    $pros= null;
-                    $prosnum=0;
+    $pros= null;
+    $prosnum=0;
                     
-                    $thes= null;
-                    $thesnum=0;
+    $thes= null;
+    $thesnum=0;
                     
-                    $pats = PatinfoModel::where(function ($query) use ($topic, $enddate) {$query->where('topic', 'like', '%'.$topic.'%')->where('submitdate', '<= time', $enddate);
-                                                })
-                                                ->where(function ($query) use ($writer, $dept) {
-                                                    $query->where('author', 'like', '%'.$writer.'%')->where('dept', 'like', '%'.$dept.'%');
-                                                })
-                                                ->order('submitdate desc')
-                                                ->select();
+    $pats = PatinfoModel::where(function ($query) use ($topic, $enddate) {$query->where('topic', 'like', '%'.$topic.'%')->where('submitdate', '<= time', $enddate);})
+            ->where(function ($query) use ($writer, $dept) {$query->where('author', 'like', '%'.$writer.'%')->where('dept', 'like', '%'.$dept.'%');})
+            ->order('submitdate desc')
+            ->select();
                                         
-                    $patsnum=count($pats);
+    $patsnum=count($pats);
                         
-                    //issue的查询语句
-                    $isses= IssinfoModel::where(function ($query) use ($topic, $enddate) {
-                                                    $query->where('topic', 'like', '%'.$topic.'%')->where('submitdate', '<= time', $enddate);
-                                                })
-                                                ->where(function ($query) use ($writer, $dept) {
-                                                    $query->where('writer', 'like', '%'.$writer.'%')->where('dept', 'like', '%'.$dept.'%');
-                                                })
-                                                ->order('submitdate desc')
-                                                ->select();
-                    $issesnum=count($isses);                    
+    //issue的查询语句
+    $isses= IssinfoModel::where(function ($query) use ($topic, $enddate) {$query->where('topic', 'like', '%'.$topic.'%')->where('submitdate', '<= time', $enddate);})
+            ->where(function ($query) use ($writer, $dept) {$query->where('writer', 'like', '%'.$writer.'%')->where('dept', 'like', '%'.$dept.'%');})
+            ->order('submitdate desc')
+            ->select();
+    $issesnum=count($isses);                    
                 
-                break;
+break;
 ?>
 
 
@@ -593,6 +600,10 @@ class Index extends Controller
     ^register和login方法获取用户主键的方法区别；
     ^可以设置模型的错误信息，并且用getError方法获取；
 
+	
+应用TP5中模型的多态1对多关联得到专利事务对应的专利名称$vo.issmap.topic，关键是要在issinfo模型中定义morphTo的方法名"issmap"，就可"." 出$vo.issmap.topic}
+
+<td class="patInfo"><a href="{$home}/patent/index/patinfo/id/{$vo.issmap_id}" target="_blank" data-toggle="tooltip">{$vo.issmap.topic}</a></td>
 
 <!--/  HY 2018/1/21 -->
 

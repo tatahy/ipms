@@ -46,11 +46,7 @@
 						<th>事务标题</th>
 						<th>事务类型</th>
 						<th>事务简介</th>
-						{notin name="$iss.status" value="变更申请"}
-							<th>事务执行人</th>
-						{else/}
-							<th class="bg-danger text-danger">事务执行人变更</th>
-						{/notin}
+						<th>事务执行人</th>
 						
 					</tr>
 				</thead>
@@ -59,11 +55,7 @@
 						<td>{$iss.topic}</td>
 						<td>{$iss.issmap_type}</td>
 						<td>{$iss.abstract}</td>
-						{notin name="$iss.status" value="变更申请"}
-							<td>{$iss.executer}</td>
-						{else/}
-							<td>{$iss.executer}申请变更执行人为【<strong class="text-danger">{$iss.executerchangeto}</strong>】</td>
-						{/notin}
+						<td>{$iss.executer}</td>
 						
 					</tr>	
 				</tbody>
@@ -166,25 +158,12 @@
 			<div class="form-group col-sm-4">
 				<label for="approveResult">审批结果</label>
 				<select class="form-control" id="approveResult" name="approveResult" >
-					<option value="approve">批准申请</option>
-					<option value="veto">否决申请</option>
-					{notin name="$iss.status" value="变更申请"}
-					<option value="complete">修改完善</option>
-					{/notin}
-				</select>
-			</div>
-			
-			<div id="divOperator" class="form-group col-sm-8">
-				<label for="operator">选定执行人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<!-- <input class="form-control" id="operator" name="operator" value="" type="text" required="true"> -->
-				<select class="form-control" id="operator" name="operator">
-					<option value="0">0</option>
-					<option value="1">1</option>
+					<option value="renewal_approve">续费批准</option>
+					<option value="renewal_abandon">续费放弃</option>
 					
 				</select>
-			
 			</div>
-		
+			
 			<div id="divApproveMsg" class="form-group col-sm-8" hidden="true">
 				<label class="control-label" for="approveMsg">审批意见<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 				<textarea class="form-control" id="approveMsg" name="approveMsg" value="" type="text" placeholder="请填入具体的审批意见"></textarea>
@@ -196,13 +175,10 @@
 		<div class="row">
 		<div class="form-group col-sm-12">			
 			
-			<button type="submit" id="btnApprove" class="btn btn-success btn-sm" data-oprt="approve"><span class="glyphicon glyphicon-ok"></span>批准申请</button>
+			<button type="submit" id="btnRenewalApprove" class="btn btn-success btn-sm" data-oprt="renewal_approve"><span class="glyphicon glyphicon-ok"></span>续费批准</button>
 			
-			<button type="submit" id="btnVeto" class="btn btn-danger btn-sm" data-oprt="veto" hidden="true"><span class="glyphicon glyphicon-remove"></span>否决申请</button>
+			<button type="submit" id="btnRenewalAbandon" class="btn btn-danger btn-sm" data-oprt="renewal_abandon" hidden="true"><span class="glyphicon glyphicon-remove"></span>续费放弃</button>
 			
-			{notin name="$iss.status" value="变更申请"}
-			<button type="submit" id="btnComplete" class="btn btn-primary btn-sm" data-oprt="complete" hidden="true"><span class="glyphicon glyphicon-erase"></span>修改完善</button>
-			{/notin}
 			
  			<div  class="pull-right">
 				<input type="reset" class="btn btn-primary btn-sm" value="重置">
@@ -218,8 +194,7 @@
 <script>
 $(document).ready(function(){
 
-	$('#btnVeto').hide();
-	$('#btnComplete').hide();
+	$('#btnRenewalAbandon').hide();
 	
 	// 准备好operator名单
 	showOperator($("#operator"),[],'{$iss.writer}');
@@ -259,20 +234,15 @@ $(document).ready(function(){
 		var operator=$('#operator').val();
 		var title=oprt;
 		switch(oprt){
-			case 'approve':
-				str='已选定执行人：<strong class="text-info">'+operator+'</strong><br>确定【<span class="glyphicon glyphicon-ok text-success"></span>批准申请】操作？';
-				title='【<span class="glyphicon glyphicon-ok text-success"></span>批准申请】操作'
+			case 'renewal_approve':
+				str='确定【<span class="glyphicon glyphicon-ok text-success"></span>续费批准】操作？';
+				title='【<span class="glyphicon glyphicon-ok text-success"></span>续费批准】操作'
 			break;
 			
-			case 'veto':
-				str='确定【<span class="glyphicon glyphicon-remove text-danger"></span>否决申请】操作？';
-				title='【<span class="glyphicon glyphicon-remove text-danger"></span>否决申请】操作';
-			break;
-			
-			// oprt=='complete'
+			// oprt=='renewal_abandon'
 			default:
-				str='确定【<span class="glyphicon glyphicon-erase"></span>修改完善】操作？';
-				title='【<span class="glyphicon glyphicon-erase"></span>修改完善】操作';
+				str='确定【<span class="glyphicon glyphicon-remove text-danger"></span>续费放弃】操作？';
+				title='【<span class="glyphicon glyphicon-remove text-danger"></span>续费放弃】操作';
 			break;
 		
 		}
@@ -289,18 +259,13 @@ $(document).ready(function(){
 	});
 	
 	
-	// 点击通过按钮，与form的submit()配合确定传给后端的oprt='pass'
-	$('#btnApprove').click(function(){
+	// 点击通过按钮，与form的submit()配合确定传给后端的oprt='renewal_approve'
+	$('#btnRenewalApprove').click(function(){
 		$('#oprt').val($(this).attr('data-oprt'));
 	});
 	
-	// 点击未通过按钮，与form的submit()配合确定传给后端的oprt='fail'
-	$('#btnVeto').click(function(){
-		$('#oprt').val($(this).attr('data-oprt'));
-	});
-	
-	// 点击修改按钮，与form的submit()配合确定传给后端的oprt='modify'
-	$('#btnComplete').click(function(){
+	// 点击未通过按钮，与form的submit()配合确定传给后端的oprt='renewal_abandon'
+	$('#btnRenewalAbandon').click(function(){
 		$('#oprt').val($(this).attr('data-oprt'));
 	});
 	
@@ -338,12 +303,12 @@ $(document).ready(function(){
 		$(':submit').hide();
 	
 		switch($(this).val()){
-			case 'veto':
+			case 'renewal_abandon':
 				//为'#approveMsg'添加'required'属性，其值为true，保证在表单提交时必填
 				$('#approveMsg').attr('required',true);
 				
 				$('#divApproveMsg').show();
-				$('#btnVeto').show();
+				$('#btnRenewalAbandon').show();
 				
 				//选择执行人#divOperator隐藏
 				$('#divOperator').hide();
@@ -351,22 +316,10 @@ $(document).ready(function(){
 				$('#operator').attr('required',false);
 			break;
 			
-			case 'complete':
-				//为'#approveMsg'添加'required'属性，其值为true，保证在表单提交时必填
-				$('#approveMsg').attr('required',true);
-				
-				$('#divApproveMsg').show();
-				$('#btnComplete').show();
-				
-				//选择执行人#divOperator隐藏
-				$('#divOperator').hide();
-				//为'#operator'添加'required'属性，其值为false
-				$('#operator').attr('required',false);
-			break;
 			// approve
 			default:
 				$('#divApproveMsg').hide();
-				$('#btnApprove').show();
+				$('#btnRenewalApprove').show();
 				
 				//选择执行人#divOperator显示
 				$('#divOperator').show();
@@ -388,8 +341,8 @@ $(document).ready(function(){
 		$('#approveMsg').attr('required',false);
 		
 		$(':submit').hide();
-		$('#btnApprove').show();
-		<!-- $('#btnVeto').hide(); -->
+		$('#btnRenewalApprove').show();
+		<!-- $('#btnRenewalAbandon').hide(); -->
 		<!-- $('#btnComplete').hide(); -->
 		
 		// 上传的输入框们和审查意见框退场

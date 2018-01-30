@@ -134,7 +134,7 @@ class Issinfo extends Model
     
     /**
      * 新增一个issue。
-     * @param  array $data 新增issue信息
+     * @param  array $data 新增issue的各项信息
      * @return integer|bool  新增成功返回主键，新增失败返回false
      * 要求：传入的数组下标名与模型属性名（数据表字段名）一模一样。
      */

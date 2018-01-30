@@ -28,7 +28,7 @@
 							{in name="vo.status" value="授权,续费授权"}
 								<a href="#modalPatRenew" data-toggle="modal" data-oprt="renew" data-patId="{$vo.id}"><span class="glyphicon glyphicon-repeat text-info"></span>续费</a>
 							{else/}
-								<a href="#modalPatRenew" data-toggle="modal" data-oprt="invalidate" data-patId="{$vo.id}"><span class="glyphicon glyphicon-repeat text-info"></span>无效</a>
+								<a href="#modalPatRenew" data-toggle="modal" data-oprt="close" data-patId="{$vo.id}"><span class="glyphicon glyphicon-repeat text-info"></span>无效</a>
 							{/in}  
 						</td>
 					</tr>
@@ -56,7 +56,7 @@
 			<div id="divPatRenew">
 			<form id="fmIssPatRenew" action="" method="" role="form" enctype="multipart/form-data">
 				<!-- // 与本页的formDataAjax函数配合，传递本页所进行的oprt值到后端 -->
-				<h4><span class="label label-warning"><span class="glyphicon glyphicon-wrench"></span>&nbsp;拟新增专利事务信息</span></h4>
+				<h4><span class="label label-warning">专利续费事务</span></h4>
 				<input id="oprt" type="text" hidden="true">
 				<input id="patId" name="patId" type="text" hidden="true">
 				<div class="row">
@@ -112,77 +112,41 @@
 						<label for="dept">dept</label>
 						<input class="form-control" id="dept" name="dept" value="" type="text" readonly="true">
 					</div>
-				</div>
-				
-				
-				<h4><span class="label label-warning"><span class="glyphicon glyphicon-wrench"></span>&nbsp;拟续费专利信息</span></h4>
-				<div class="row">
-					<div class="form-group col-sm-4">
-						<label for="topic">专利名称</label>
-						<p id="topic1"></p>
-						<!-- <input class="form-control" id="topic" name="topic" readonly> -->
-					</div>
-				
-					<div class="form-group col-sm-4">
-						<label for="patowner">专利所有人</label>
-						<p id="patowner"></p>
-						<!-- <input class="form-control"  id="patowner" name="patowner" readonly> -->
-					</div>
-			
-					<div class="form-group col-sm-4">
-						<label for="dept1">专利申报部门</label>
-						<p id="dept1"></p>
-						<!-- <input class="form-control" id="" name="" readonly> -->
+					
+					<div class="form-group col-sm-3" >
+						<label for="executer">执行人</label>
+						<input class="form-control" id="executer" name="executer" value="" type="text" readonly="true">
 					</div>
 				</div>
 				
-				<div class="row">
-					<div class="form-group col-sm-4">
-						<label for="patagency">专利代理机构</label>
-						<p id="patagency"></p>
-						<!-- <input class="form-control" id="patagency" name="patagency" readonly> -->
-					</div>
-				
-					<div class="form-group col-sm-4">
-						<label for="pattype">专利类型</label>
-						<p id="pattype"></p>
-						<!-- <input class="form-control" id="pattype" name="pattype" readonly> -->
-					</div>
-				
-					<div class="form-group col-sm-4">
-						<label for="status1">专利状态</label>
-						<p id="status1"></p>
-						<!-- <input class="form-control" id="status" name="status" readonly> -->
-					</div>
+				<h4><span class="label label-warning">续费专利概要</span></h4>
+				<div class="bs-callout bs-callout-warning">
+					<h4 id="h4Topic">名称：</h4>
+
+					<p id="pPatInfo">//</p>
+					
+					<footer>
+						<div class="row">
+							<div class="col-sm-4">
+								<a id="aDetail" href="#" target="_blank" data-toggle="tooltip" title="专利信息">查看详情</a>;&nbsp;状态：
+								<a id="aProcess" href="#" target="_blank" data-toggle="tooltip" title="过程记录"></a>
+							</div>
+									
+							<div id="divPatAuthNum" class="col-sm-4">授权编号：</div>
+							
+							<div id="divSubmitDate" class="col-sm-4">提交时间：</div>
+									
+						</div>
+					</footer>
+						
 				</div>
 				
 				<div class="row">
-					<div class="form-group col-sm-4">
-						<label for="patauthnum">专利授权编号</label>
-						<p id="patauthnum"></p>
-						<!-- <input class="form-control" id="patauthnum" name="patauthnum" readonly> -->
-					</div>
-				
-					<div class="form-group col-sm-4">
-						<label for="authrejectdate">专利授权日</label>
-						<p id="authrejectdate"></p>
-						<!-- <input class="form-control" id="authrejectdate" name="authrejectdate" readonly> -->
-					</div>
-				
-					<div class="form-group col-sm-4">
-						<label for="renewdeadlinedate">专利到期日</label>
-						<p id="renewdeadlinedate"></p>
-						<!-- <input class="form-control" id="renewdeadlinedate" name="renewdeadlinedate" readonly> -->
-					</div>
-				</div>
-				
-				<div class="row">
-				<hr>
 				<div class="form-group col-sm-12">			
 			
-					<button type="submit" id="btnRenewalReport" class="btn btn-primary btn-sm" data-oprt="renewal_report"><span class="glyphicon glyphicon-edit"></span>&nbsp;报告</button>
+					<button type="submit" id="btnRenewalReport" class="btn btn-primary btn-sm" data-oprt="renewal_report"><span class="glyphicon glyphicon-edit"></span>&nbsp;续费报告</button>
 			
-					<button type="submit" id="btnRenewalApply" class="btn btn-success btn-sm" data-oprt="renewal_apply"><span class="glyphicon glyphicon-open"></span>&nbsp;提交</button>
+					<!-- <button type="submit" id="btnRenewalApply" class="btn btn-success btn-sm" data-oprt="renewal_apply"><span class="glyphicon glyphicon-open"></span>&nbsp;提交</button> -->
 			
 					<!-- <button type="submit" id="btnRenewalAbandon" class="btn btn-danger btn-sm" data-oprt="renewal_abandon"><span class="glyphicon glyphicon-ban-circle"></span>&nbsp;放弃</button> -->
 			
@@ -218,6 +182,9 @@ $(document).ready(function(){
 		
 	});
 	
+	// 添加bootstrap的tooltip属性
+	$('a').tooltip({placement: 'bottom'});
+	
 	// 表格中<td>里<a>标签的click事件,给标签所在行上色
 	$("td a").click(function(){
 		
@@ -250,17 +217,17 @@ $(document).ready(function(){
 				$('#addNewDate').val(data.today);
 				$('#writer').val(data.username);
 				$('#dept').val(data.deptMaintainer);
+				$('#executer').val('维护人');
 				
-				$('#patId').val(data.id);
-				$('#topic1').html(data.topic);
-				$('#pattype').html(data.pattype);
-				$('#dept1').html(data.dept);
-				$('#status1').html(data.status);
-				$('#patowner').html(data.patowner);
-				$('#patagency').html(data.patagency);
-				$('#patauthnum').html(data.patauthnum);
-				$('#authrejectdate').html(data.authrejectdate);
-				$('#renewdeadlinedate').html(data.renewdeadlinedate);
+				//bs-callout内容赋值
+				$('#h4Topic').html('专利名称：<strong>'+data.topic+'</strong>');
+				$('#pPatInfo').html('撰写人：'+data.author+'；发明人：'+data.inventor+'；所属部门：'+data.dept+'；<br>专利类型：'+data.pattype+'<br>授权时间：'+data.authrejectdate+'；<br>到期时间：'+data.renewdeadlinedate+'；<br>简介：'+data.summary);
+				$('#aDetail').attr('href','{$home}/patent/index/patinfo/id/'+data.id);
+				$('#aProcess').html(data.status).attr('href','{$home}/patent/index/patrecords/id/'+data.id);
+				$('#divPatAuthNum').html('授权编号：'+data.patauthnum);
+				$('#divSubmitDate').html('提交时间：'+data.submitdate);
+				
+				
 			}
 		);
 	
@@ -353,7 +320,7 @@ $(document).ready(function(){
 					// 操作成功，提示框显示信息
 					$.alert(title+'成功<span class="glyphicon glyphicon-ok text-success"></span><hr>'+data.msg);
 					
-					//maintainer，load续费管理页面
+					//maintainer，载入续费管理页面
 					$.post('patIssTpl',
 						{
 							'role':'maintainer',

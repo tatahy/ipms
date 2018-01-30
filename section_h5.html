@@ -161,7 +161,71 @@ $('input:radio[name="attUpload"][value="1"]').prop('checked',true);
 // 得到页面锚点值
 	var fragment = window.location.hash;	
 </script>
+<!--/  HY 2018/1/25 -->	
+
 <!--  HY 2018/1/25 -->	
+
+<script>
+//向后端提交数据的方式：
+//1. 表单get/post。TP5中后端用$request->param()来接收。
+//2. FormData。TP5中后端用$request->request()来接收。formdata形式上传表单数据,自动搜索表单信息(表单内没有name属性的input不会被搜索到)，IE<=9不支持FormData。
+
+//**函数名：formDataAjax
+ 	//* 作用：应用jQuery的$.ajax向后端提交formData数据
+	//* 参数1：oprt，类型：字符。值：不为空。说明：表示触发本函数的‘操作’
+	//* 参数2：fmObj，类型：对象。值：可为空，默认为空。说明：表示需要一起提交的表单。
+	//* 参数3：title，类型：字符。值：不为空。说明：本函数显示的提示框$.alert的标题内容。
+	function formDataAjax(oprt,fmObj,title){
+	// formdata形式上传表单数据,自动搜索表单信息(表单内没有name属性的input不会被搜索到)，IE<=9不支持FormData
+		if(fmObj){
+			var formData = new FormData(fmObj[0]);
+		}else{
+			var formData = new FormData();
+		}
+		
+		<!-- var formData = new FormData($('#fmIssPatRenew')[0]); -->
+		// 添加表单内没有的内容
+        formData.append('returnType', 0);
+		formData.append('role','maintainer');
+		formData.append('username','{$maintainer}');
+		formData.append('oprt',oprt);
+			
+        $.ajax({
+            type: 'post',
+            url: 'patIssOprt',
+            data: formData,
+            contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
+            processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)
+            success: function(data) {
+                if(data.result=='success'){
+					
+					// 操作成功，提示框显示信息
+					$.alert(title+'成功<span class="glyphicon glyphicon-ok text-success"></span><hr>'+data.msg);
+					
+					//maintainer，载入续费管理页面
+					$.post('patIssTpl',
+						{
+							'role':'maintainer',
+							'tpl':'renew',
+							'returnType':0
+						},
+						function(data){
+							$('#divPatIss').html(data);
+						}
+					);
+					
+				}else{
+					$('#modalPatRenew').modal();
+					<!-- $.alert(data.msg); -->
+				}
+            }
+        });
+	}
+
+</script>
+<!--/  HY 2018/1/25 -->	
+
+
 
 <!-- ......................问题................................ -->
 
