@@ -406,6 +406,42 @@ $user = User::get(request()->session('user_id'));
 // 更新用户数据
 $user->data($data, true)->save();
 ?>
+模型类提供了allowField方法用于在数据写入操作的时候设置字段过滤，从而避免数据库因为字段不存在而报错，上面的写法可以简化为。
+<?php 
+// 获取当前用户对象
+$user = User::get(request()->session('user_id'));
+// 只允许更新用户的nickname和address数据
+$user->allowField(['nickname', 'address'])
+    ->data(requst()->param(), true)
+    ->save();
+
+如果仅仅是希望去除数据表之外的字段，可以使用
+
+// 只允许更新数据表字段数据
+$user->allowField(true)
+	->data(requst()->param(), true)
+    ->save();
+	
+//data方法属于链式操作方法，用于设置数据
+?>
+
+
+为了不必每次都调用allowField方法，我们可以直接在模型类里面设置field属性，例如：
+
+<?php
+
+namespace app\index\model;
+
+use think\Model;
+
+class User extends Model
+{
+	protected $field = ['name', 'nickname', 'email', 'address'];
+}
+?>
+
+当调用allowField方法的时候，当前模型实例中的该配置的值会被覆盖。
+
 这一方式实现是默认表单提交数据的name与模型属性名称（数据表字段名称）一模一样
 
 模型类提供了allowField方法用于在数据写入操作的时候设置字段过滤，从而避免数据库因为字段不存在而报错，上面的写法可以简化为。

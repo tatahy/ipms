@@ -256,7 +256,7 @@ $(document).ready(function(){
 			function(data){
 				$('#divPatIssTpl').html(data);
 				
-				$('.modal-header').find('h4').empty().html('<strong>【'+str+'】</strong><span class="glyphicon glyphicon-wrench">专利事务</span>');
+				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务：</span><strong>【'+str+'】</strong>');
 			}
 		);
 		<!-- $('#divPatIssTpl').load('patIssTpl',{'role':role,'tpl':tpl,'returnType':1}); -->
@@ -322,9 +322,11 @@ $(document).ready(function(){
 				if(patIssStatus=="申报复核"){
 					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="apply" data-patIssId="'+id+'"><span class="glyphicon glyphicon-open"></span>授权申报</a>');
 				}else if(patIssStatus=='准予续费'){
-					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="apply" data-patIssId="'+id+'"><span class="glyphicon glyphicon-open"></span>续费申报</a>');
-				}else if(patIssStatus=="申报提交" || patIssStatus=="续费提交"){
-					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="result" data-patIssId="'+id+'"><span class="glyphicon glyphicon-info-sign text-danger"></span>申报结果</a>');
+					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="apply" data-patIssId="'+id+'"><span class="glyphicon glyphicon-repeat"></span>续费申报</a>');
+				}else if(patIssStatus=="申报提交"){
+					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="result" data-patIssId="'+id+'"><span class="glyphicon glyphicon-info-sign text-warning"></span>申报结果</a>');
+				}else if(patIssStatus=="续费提交"){
+					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="result" data-patIssId="'+id+'"><span class="glyphicon glyphicon-repeat text-warning"></span>续费结果</a>');
 				}else if(patIssStatus=="放弃续费" || patIssStatus=="否决申报" || patIssStatus=="专利驳回" || patIssStatus=="专利授权" || patIssStatus=="续费授权"){
 					$(this).append('<a href="#modalPatIssTpl" data-toggle="modal" data-tpl="close" data-patIssId="'+id+'"><span class="glyphicon glyphicon-folder-close text-primary"></span>关闭事务</a>');
 				}else{
@@ -374,7 +376,7 @@ $(document).ready(function(){
 			},
 			function(data){
 				$('#divPatIssTpl').html(data);
-				$('.modal-header').find('h4').empty().html('<strong>【'+str+'】</strong><span class="glyphicon glyphicon-wrench">专利事务</span>');
+				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务：</span><strong>【'+str+'】</strong>');
 				$("#modalPatIssTpl").modal();
 			}
 		);

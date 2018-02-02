@@ -541,7 +541,7 @@ class DashboardController extends \think\Controller
                 
             //默认'_OPERATE_TODO':
             default:
-              $map['status'] =['in',['准予申报','批准']];
+              $map['status'] =['in',['批准申报','准予变更','否决变更']];
             break;
           }  
         break;
@@ -655,8 +655,6 @@ class DashboardController extends \think\Controller
               'role'=>$role,
               
         ]);
-      
-        
         
         //return $this->display('dashboard'.DS.'pat'.DS.'patIss.html');
         //return $this->fetch();
@@ -664,7 +662,6 @@ class DashboardController extends \think\Controller
         //return $this->fetch('dashboard'.DS.'patiss'.DS.'patIss');
         return view('dashboard'.DS.'patiss'.DS.'patIss');
       }
-    
     }
     
     // 各个role的patIss的增删改查操作
@@ -1541,31 +1538,12 @@ class DashboardController extends \think\Controller
             $patNumId=$patSet->patnum;
             switch($oprt){
               //续费，向前端返回JSON数据
-              case 'renew':
-                $str1=array("today"=>$today,"username"=>$this->username,"deptMaintainer"=>$this->dept);
-                $str2=array_merge($patSet->toArray(),$str1);
-                return json($str2);
+              case 'renew':                
+                return json(array_merge($patSet->toArray(),array("today"=>$today,"username"=>$this->username,"deptMaintainer"=>$this->dept)));
               break;
               
               //续费报告,生成新的ISSPat
               case 'renewal_report':
-              
-              // 使用静态方法，向issinfo表写入新iss信息
-                 // $issRenewSet = IssinfoModel::create([
-//                    'topic'  => $request->request('topic'),
-//                    'status' => $request->request('status'),
-//                    'issmap_type'=>$request->request('issMapType'),
-//                    'issmap_id'=>$request->request('issMapId'),
-//                    // 兼容之前的代码
-//                    'num_id'=>$request->request('numId'),
-//                    'abstract'=>$request->request('abstract'),
-//                    'addnewdate'=>$request->request('addNewDate'),
-//                    'writer' => $request->request('writer'),
-//                    'dept' => $request->request('dept'),
-//                  ]);
-//                  //静态方法创建新对象后，返回对象id
-//                  $issRenewId= $issRenewSet->id;
-                  
                   //引用Issinfo模型中定义的myCreate方法向issinfo表新增信息
                   $issM=new IssinfoModel;
                   $issRenewId = $issM->myCreate($request->request());
@@ -1573,6 +1551,7 @@ class DashboardController extends \think\Controller
                       $msg.='新增“拟续费”专利事务成功';
                   } else {
                       $msg.='新增“拟续费”专利事务失败';
+                      break;
                   }
               
                   $issRenewSet = IssinfoModel::get($issRenewId);
@@ -1580,7 +1559,7 @@ class DashboardController extends \think\Controller
                   $issRecordSet=IssrecordModel::create([
                     'num'=>$issRenewSet->issnum,
                     'act'=>'续费申请',
-                    'actdetail'=>'专利事务--'.$request->request('topic').'"--填报',
+                    'actdetail'=>$request->request('topic').'填报',
                     'acttime'=>$today,
                     'username'=>$request->param('username'),
                     'rolename'=>$role,
@@ -1612,98 +1591,92 @@ class DashboardController extends \think\Controller
                   $result='success';
               break;
               
-              //续费申报
-              case 'renewal_apply':
-                $msg.='renewal_apply';
-                $result='success';
-              break;
-              
-              //续费放弃
-              case 'renewal_abandon':
-                $msg.='renewal_abandon';
-                $result='success';
-              break;    
-              
               //关闭事务
               case 'close':
-                  $patData=array('status'=>$patSet->status);
-                  //根据5类issStatus情况向patinfo,patrecord表写入不同的数据
+                  $msg.=$issSet->topic.$request->request('title').'<br>
+                    结果说明：<span class="text-info">'.$request->request('closeMsg').'</span><br>';
+                 
+                 //根据5类issStatus情况向patinfo,patrecord表写入不同的数据
                   switch($issSet->status){
                     case '否决申报':
                       //patinfo表要写入的数据                      
                       $patData=array('status'=>'内审否决','authrejectdate'=>$request->request('closeDate'));
                       
-                      //patrecord表要写入的数据
+                      //issrecord表、patrecord表要写入的数据
                       $act='确认“否决申报”';
-                      $note='<span class="text-info">'.$request->request('closeMsg').'</span><br>';
+                      $actdetail=$msg;
                     break;
                     
                     case '放弃续费':
                       //patinfo表要写入的数据
                       $patData=array('status'=>'超期无效','renewabandondate'=>$request->request('closeDate'));
                                             
-                      //patrecord表需要写的数据
+                      //issrecord表、patrecord表需要写的数据
                       $act='超期无效';
-                      $note='<span class="text-info">'.$request->request('closeMsg').'</span><br>';
+                      $actdetail=$msg;
                     break;
                     
                     case '专利驳回':
                       //patinfo表要写入的数据
-                      $patData=array('status'=>'驳回','authrejectdate'=>$request->request('closeDate'));
-                      
-                      //patrecord表要写入的数据
+                      if($patSet->status!="驳回"){
+                        $patData=array('status'=>'驳回','authrejectdate'=>$request->request('closeDate'));
+                      }else{
+                        $patData=array('status'=>$patSet->status);
+                      }
+                      //issrecord表、patrecord表要写入的数据
                       $act='驳回';
-                      $note='<span class="text-info">'.$request->request('closeMsg').'</span><br>';
+                      $actdetail=$msg;
                     break;
                     
                     case '专利授权':
                       //patinfo表要写入的数据
-                      $patData=array('status'=>'授权','authrejectdate'=>$request->request('closeDate'),'renewdeadlinedate'=>$request->request('renewDeadlineDate'));
-                  
-                      //patrecord表要写入的数据
+                      if($patSet->status!="授权"){
+                        $patData=array('status'=>'授权','authrejectdate'=>$request->request('closeDate'),'renewdeadlinedate'=>$request->request('renewDeadlineDate'));
+                      }else{
+                        $patData=array('status'=>$patSet->status);
+                      }
+                      //issrecord表、patrecord表要写入的数据
                       $act='专利授权';
-                      $note='<span class="text-info">'.$request->request('closeMsg').'</span><br>';
+                      $actdetail=$msg;
                     break;
                     
                     case '续费授权':
                       //patinfo表要写入的数据
-                      $patData=array('status'=>'续费授权','renewabandondate'=>$request->request('closeDate'),'renewdeadlinedate'=>$request->request('renewDeadlineDate'));
-                     
-                      //patrecord表要写入的数据
+                      if($patSet->status!="续费授权"){
+                        $patData=array('status'=>'续费授权','renewabandondate'=>$request->request('closeDate'),'renewdeadlinedate'=>$request->request('renewDeadlineDate'));
+                      }else{
+                        $patData=array('status'=>$patSet->status);
+                      }
+                      //issrecord表、patrecord表要写入的数据
                       $act='续费授权';
-                      $note='<span class="text-info">'.$request->request('closeMsg').'</span><br>';
-                      
+                      $actdetail=$msg;
                     break;
                     
                   }
-                  
-                  // 使用静态方法，向issinfo表更新信息。
-                  IssinfoModel::update([
-                      'status' => '完结',
-                      'finishdate'=> $today
-                  ], ['id' => $issId]);
-                  
-                  // 使用静态方法，向issrecord表新增信息。
-                  $issRecordSet=IssrecordModel::create([
-                    'num'=>$numId,
-                    'act'=>'完结',
-                    'actdetail'=>$note,
-                    'acttime'=>$today,
-                    'username'=>$request->param('username'),
-                    'rolename'=>$role,
-                    'issinfo_id'=>$issId,
-                  ]);
-                  //静态方法创建新对象后，返回对象id
-                  $issRecordId= $issRecordSet->id;
+                 //issinfo表要写入的数据  
+                  $issData=array('status'=>'完结','finishdate'=>$today);
+                 
+                 // 使用对象方法，向issinfo表更新数据表字段信息,有更新就返回受影响的行数。
+                  $issUpdated=$issSet->allowField(true)->data($issData,true)->save();
+              
+                  //$issUpdated不为0表示对issinfo表进行了更新，才在issrecord表新建一条记录。
+                  if($issUpdated){
+                    // 使用静态方法，向issrecord表新增信息。
+                    $issRecordSet=IssrecordModel::create([
+                      'num'=>$numId,
+                      'act'=>'完结',
+                      'actdetail'=>$actdetail,
+                      'acttime'=>$today,
+                      'username'=>$request->request('username'),
+                      'rolename'=>$role,
+                      'issinfo_id'=>$issId,
+                    ]);
+                    //静态方法创建新对象后，返回对象id
+                    $issRecordId= $issRecordSet->id;
+                  }
                   
                   // 使用对象方法，向patinfo表更新信息,有更新就返回受影响的行数。
-                  $patUpdated=$patSet->data($patData, true)->save();
-                  
-                  // 使用静态方法，向patinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
-                 // $patUpdated=PatinfoModel::update([
-//                    'status' => '申报修改',
-//                    'modifydate'=> $today
-//                  ], ['id' => $patId]);
+                  $patUpdated=$patSet->allowField(true)->data($patData,true)->save();
                   
                   //$patUpdated不为0表示对patinfo表进行了更新，才在patrecord表新建一条记录。
                   if($patUpdated){
@@ -1711,207 +1684,34 @@ class DashboardController extends \think\Controller
                     $patRecordSet=PatrecordModel::create([
                       'num'=>$patNumId,
                       'act'=>$act,
-                      'actdetail'=>$note,
+                      'actdetail'=>$actdetail,
                       'acttime'=>$today,
                       'username'=>$request->param('username'),
                       'rolename'=>$role,
                       'patinfo_id'=>$patId,
-                      'note'=>$note
+                      'note'=>$today.":".$actdetail
                     ]);
                     //静态方法创建新对象后，返回对象id
                     $patRecordId= $patRecordSet->id;
                   }
-                  
-                  //返回前端的信息
-                  $msg.='专利事务——“'.$issSet->topic.'”关闭成功';
                   $result='success';
               break;                                            
               
               case 'improve':
-                $msg.='专利事务"'.$issSet->topic.'"反馈申报修改意见。<br><span class="text-info">意见内容：'.$request->request('resultMsg').'</span><br>';
-                // 使用静态方法，向issinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
-                  IssinfoModel::update([
-                      'status' => '申报修改',
-                      'resultdate'=> $today
-                  ], ['id' => $issId]);
-                  
-                  // 使用静态方法，向issrecord表新增信息。
-                  $issRecordSet=IssrecordModel::create([
-                    'num'=>$numId,
-                    'act'=>'申报修改',
-                    'actdetail'=>$msg,
-                    'acttime'=>$today,
-                    'username'=>$request->param('username'),
-                    'rolename'=>$role,
-                    'issinfo_id'=>$issId,
-                  ]);
-                  //静态方法创建新对象后，返回对象id
-                  $issRecordId= $issRecordSet->id;
-                  
-                  // 使用静态方法，向patinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
-                  PatinfoModel::update([
-                    'status' => '申报修改',
-                    'modifydate'=> $today
-                  ], ['id' => $patId]);
-                  
-                  // 使用静态方法，向patrecord表新增信息。
-                  $patRecordSet=PatrecordModel::create([
-                    'num'=>$patNumId,
-                    'act'=>'申报修改',
-                    'actdetail'=>'提交专利申报资料后，需根据返回的修改意见修改申报资料。<br><span class="text-info">意见内容：'.$request->request('resultMsg').'</span><br>',
-                    'acttime'=>$today,
-                    'username'=>$request->param('username'),
-                    'rolename'=>$role,
-                    'patinfo_id'=>$patId,
-                    'note'=>'<span class="text-info">'.$request->request('resultMsg').'</span><br>'
-                  ]);
-                  //静态方法创建新对象后，返回对象id
-                  $patRecordId= $patRecordSet->id;
-                  
-                  $result='success';
-              break;
-              
-              case 'authorize':
-                 $msg.='专利事务"'.$issSet->topic.'"'.$issSet->status.'反馈意见。<br><span class="text-info">意见内容：'.$request->request('resultMsg').'</span><br>';
-                // 使用静态方法，向issinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
-                  IssinfoModel::update([
-                      'status' => '专利授权',
-                      'resultdate'=> $request->param('patResultDate')
-                  ], ['id' => $issId]);
-                  
-                  // 使用静态方法，向issrecord表新增信息。
-                  $issRecordSet=IssrecordModel::create([
-                    'num'=>$numId,
-                    'act'=>'专利授权',
-                    'actdetail'=>$msg,
-                    'acttime'=>$today,
-                    'username'=>$request->request('username'),
-                    'rolename'=>$role,
-                    'issinfo_id'=>$issId,
-                  ]);
-                  //静态方法创建新对象后，返回对象id
-                  $issRecordId= $issRecordSet->id;
-                  
-                   // 使用静态方法，向patinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
-                  PatinfoModel::update([
-                    'status' => '授权',
-                    'authrejectdate'=>$request->request('patResultDate'),
-                    'renewdeadlinedate'=>$request->request('patRenewDeadlinDate'),
-                    'patowner'=>$request->request('patOwner'),
-                    'inventor'=>$request->request('inventor'),
-                    'otherinventor'=>$request->request('otherInventor'),
-                    'patapplynum'=>$request->request('patApplyNum'),
-                    'patauthnum'=>$request->request('patAuthNum'),
-                    'patagency'=>$request->request('patAgency'),
-                    'patadmin'=>$request->request('patAdmin'),
-                    'applyplace'=>$request->request('applyPlace'),
-                    'note'=>$today.":".$msg
-                  ], ['id' => $patId]);                
-                  
-                  // 使用静态方法，向patrecord表新增信息。
-                  $patRecordSet=PatrecordModel::create([
-                    'num'=>$patNumId,
-                    'act'=>'授权',
-                    'actdetail'=>'“'.$patSet->topic.'”已获得<span class="label label-success">授权</span>。<br>',
-                    'acttime'=>$today,
-                    'username'=>$request->param('username'),
-                    'rolename'=>$role,
-                    'patinfo_id'=>$patId,
-                    'note'=>'授权时间：<span class="text-info">'.$request->param('patResultDate').'</span><br>授权到期时间：<span class="text-info">'.$request->param('patRenewDeadlinDate').'</span><br>'
-                  ]);
-                  //静态方法创建新对象后，返回对象id
-                  $patRecordId= $patRecordSet->id;
-                  
-                  $result='success';
-              break;
-              
-              case 'reject':
-                 $msg.='专利事务"'.$issSet->topic.'"'.$issSet->status.'反馈意见。<br><span class="text-info">意见内容：'.$request->request('resultMsg').'</span><br>';
-                // 使用静态方法，向issinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
-                  IssinfoModel::update([
-                      'status' => '专利驳回',
-                      'resultdate'=> $today
-                  ], ['id' => $issId]);
-                  
-                  // 使用静态方法，向issrecord表新增信息。
-                  $issRecordSet=IssrecordModel::create([
-                    'num'=>$numId,
-                    'act'=>'专利驳回',
-                    'actdetail'=>$msg,
-                    'acttime'=>$today,
-                    'username'=>$request->param('username'),
-                    'rolename'=>$role,
-                    'issinfo_id'=>$issId,
-                  ]);
-                  //静态方法创建新对象后，返回对象id
-                  $issRecordId= $issRecordSet->id;
-                  
-                   // 使用静态方法，向patinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
-                  PatinfoModel::update([
-                    'status' => '驳回',
-                    'authrejectdate'=> $request->param('patResultDate'),
-                    'patowner'=>$request->param('patOwner'),
-                    'inventor'=>$request->param('inventor'),
-                    'otherinventor'=>$request->param('otherInventor'),
-                    'patapplynum'=>$request->param('patApplyNum'),
-                    'patagency'=>$request->param('patAgency'),
-                    'patadmin'=>$request->param('patAdmin'),
-                    'applyplace'=>$request->param('applyPlace'),
-                    'note'=>$today.":".$msg
-                  ], ['id' => $patId]);
-                  
-                  // 使用静态方法，向patrecord表新增信息。
-                  $patRecordSet=PatrecordModel::create([
-                    'num'=>$patNumId,
-                    'act'=>'驳回',
-                    'actdetail'=>'“'.$patSet->topic.'”授权申报被<span class="label label-danger">驳回</span>。<br>',
-                    'acttime'=>$today,
-                    'username'=>$request->param('username'),
-                    'rolename'=>$role,
-                    'patinfo_id'=>$patId,
-                    'note'=>'驳回时间：<span class="text-info">'.$request->param('patResultDate').'</span><br>'
-                  ]);
-                  //静态方法创建新对象后，返回对象id
-                  $patRecordId= $patRecordSet->id;
-                  
-                  $result='success';
-                
-              break;
-              // apply
-              default:
-                  $patData=array('status'=>$patSet->status);
-                  $issData=array('status'=>$issSet->status);
-                  $msg.='"'.$issSet->topic.'"提交。<br><span class="text-info">提交说明：'.$request->request('applyMsg').'</span><br>';
-              
-                  //根据2类issStatus情况向patinfo,patrecord表写入不同的数据
-                  switch($issSet->status){
-                    case '准予续费':
-                      //issinfo表要写入的数据  
-                      $issData=array('status'=>'续费提交','applydate'=>$today);
+                $msg.=$issSet->topic.'提交结果：'.$request->request('title').'<br>
+                    结果说明：<span class="text-info">'.$request->request('resultMsg').'</span><br>';
+                  //issinfo表要写入的数据  
+                  $issData=array('status'=>'申报修改','resultdate'=>$today);
                       
-                      //patinfo表要写入的数据                      
-                      $patData=array('status'=>'续费中','renewapplydate'=>$today,'note'=>$today.":".$msg);
-                      
-                      //issrecord表、patrecord表要写入的数据
-                      $act='续费提交';
-                      $actdetail=$msg;
-                    break;
+                  //patinfo表要写入的数据，$request->request()为前端的formdata对象发送来的表单数据（键/值对）                      
+                  $patData= array_merge($request->request(),array('status'=>'申报修改','note'=>$today.":".$msg));
+
+                  //issrecord表、patrecord表要写入的数据
+                  $act='申报修改';
+                  $actdetail=$msg;
                     
-                    case '申报复核':
-                      //issinfo表要写入的数据  
-                      $issData=array('status'=>'申报提交','applydate'=>$today);
-                      
-                      //patinfo表要写入的数据
-                      $patData=array('status'=>'申报','applydate'=>$request->request('closeDate'),'note'=>$today.":".$msg);
-                                            
-                      //issrecord表、patrecord表要写入的数据
-                      $act='申报提交';
-                      $actdetail=$msg;
-                    break;
-                    
-                  }
-                  // 使用对象方法，向issinfo表更新信息,有更新就返回受影响的行数。
-                  $issUpdated=$patSet->data($issData, true)->save();
+                  // 使用对象方法，向issinfo表更新数据表字段信息,有更新就返回受影响的行数。
+                  $issUpdated=$issSet->allowField(true)->data($issData,true)->save();
               
                   //$issUpdated不为0表示对issinfo表进行了更新，才在issrecord表新建一条记录。
                   if($issUpdated){
@@ -1930,7 +1730,7 @@ class DashboardController extends \think\Controller
                   }
                   
                   // 使用对象方法，向patinfo表更新信息,有更新就返回受影响的行数。
-                  $patUpdated=$patSet->data($patData, true)->save();
+                  $patUpdated=$patSet->allowField(true)->data($patData,true)->save();
                   
                   //$patUpdated不为0表示对patinfo表进行了更新，才在patrecord表新建一条记录。
                   if($patUpdated){
@@ -1951,57 +1751,229 @@ class DashboardController extends \think\Controller
                   
                   //返回前端的信息
                   $result='success';
+              break;
+              
+              case 'authorize':
+                 $msg.=$issSet->topic.'提交结果：'.$request->request('title').'<br>
+                 结果说明：<span class="text-info">'.$request->request('resultMsg').'</span><br>';
+              
+                  //根据2类issStatus情况向patinfo,patrecord表写入不同的数据
+                  switch($issSet->status){
+                    case '申报提交':
+                      //issinfo表要写入的数据  
+                      $issData=array('status'=>'专利授权','resultdate'=>$today);
+                      
+                      //patinfo表要写入的数据，$request->request()为前端的formdata对象发送来的表单数据（键/值对）                      
+                      $patData= array_merge($request->request(),array('status'=>'授权','note'=>$today.":".$msg));
+
+                      //issrecord表、patrecord表要写入的数据
+                      $act='专利授权';
+                      $actdetail=$msg;
+                    break;
+                    
+                    case '续费提交':
+                      //issinfo表要写入的数据  
+                      $issData=array('status'=>'续费授权','resultdate'=>$today);
+                      
+                      //patinfo表要写入的数据，$request->request()为前端的formdata对象发送来的表单数据（键/值对）
+                      $patData=array_merge($request->request(),array('status'=>'续费授权','note'=>($today.":".$msg)));
+                      
+                      //issrecord表、patrecord表要写入的数据
+                      $act='续费授权';
+                      $actdetail=$msg;
+                    break;
+                    
+                  }
+                  // 使用对象方法，向issinfo表更新数据表字段信息,有更新就返回受影响的行数。
+                  $issUpdated=$issSet->allowField(true)->data($issData,true)->save();
+              
+                  //$issUpdated不为0表示对issinfo表进行了更新，才在issrecord表新建一条记录。
+                  if($issUpdated){
+                    // 使用静态方法，向issrecord表新增信息。
+                    $issRecordSet=IssrecordModel::create([
+                      'num'=>$numId,
+                      'act'=>$act,
+                      'actdetail'=>$actdetail,
+                      'acttime'=>$today,
+                      'username'=>$request->request('username'),
+                      'rolename'=>$role,
+                      'issinfo_id'=>$issId,
+                    ]);
+                    //静态方法创建新对象后，返回对象id
+                    $issRecordId= $issRecordSet->id;
+                  }
                   
-                //……………………………………………………………………  
+                  // 使用对象方法，向patinfo表更新信息,有更新就返回受影响的行数。
+                  $patUpdated=$patSet->allowField(true)->data($patData,true)->save();
                   
-                  $msg.='专利事务"'.$issSet->topic.'"申报提交。<br><span class="text-info">提交说明：'.$request->request('applyMsg').'</span><br>';
-                // 使用静态方法，向issinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
-                  IssinfoModel::update([
-                      'status' => '申报提交',
-                      'resultdate'=> $today
-                  ], ['id' => $issId]);
+                  //$patUpdated不为0表示对patinfo表进行了更新，才在patrecord表新建一条记录。
+                  if($patUpdated){
+                    // 使用静态方法，向patrecord表新增信息。
+                    $patRecordSet=PatrecordModel::create([
+                      'num'=>$patNumId,
+                      'act'=>$act,
+                      'actdetail'=>$actdetail,
+                      'acttime'=>$today,
+                      'username'=>$request->param('username'),
+                      'rolename'=>$role,
+                      'patinfo_id'=>$patId,
+                      'note'=>$today.":".$actdetail
+                    ]);
+                    //静态方法创建新对象后，返回对象id
+                    $patRecordId= $patRecordSet->id;
+                  }
                   
-                  // 使用静态方法，向issrecord表新增信息。
-                  $issRecordSet=IssrecordModel::create([
-                    'num'=>$numId,
-                    'act'=>'申报提交',
-                    'actdetail'=>$msg,
-                    'acttime'=>$today,
-                    'username'=>$request->param('username'),
-                    'rolename'=>$role,
-                    'issinfo_id'=>$issId,
-                  ]);
-                  //静态方法创建新对象后，返回对象id
-                  $issRecordId= $issRecordSet->id;
-                  
-                  // 使用静态方法，向patinfo表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
-                  PatinfoModel::update([
-                    'status' => '申报',
-                    'applydate'=> $today,
-                    'patowner'=>$request->param('patOwner'),
-                    'inventor'=>$request->param('inventor'),
-                    'otherinventor'=>$request->param('otherInventor'),
-                    'patapplynum'=>$request->param('patApplyNum'),
-                    'patagency'=>$request->param('patAgency'),
-                    'patadmin'=>$request->param('patAdmin'),
-                    'applyplace'=>$request->param('applyPlace'),
-                    'note'=>$today.":".$msg
-                  ], ['id' => $patId]);
-                  
-                  // 使用静态方法，向patrecord表新增信息。
-                  $patRecordSet=PatrecordModel::create([
-                    'num'=>$patNumId,
-                    'act'=>'申报',
-                    'actdetail'=>'“'.$patSet->topic.'”提交申报资料。',
-                    'acttime'=>$today,
-                    'username'=>$request->param('username'),
-                    'rolename'=>$role,
-                    'patinfo_id'=>$patId,
-                  ]);
-                  //静态方法创建新对象后，返回对象id
-                  $patRecordId= $patRecordSet->id;
-                  
+                  //返回前端的信息
                   $result='success';
+              break;
+              
+              case 'reject':
+                 $msg.=$issSet->topic.'提交结果：'.$request->request('title').'<br>
+                 结果说明：<span class="text-info">'.$request->request('resultMsg').'</span><br>';
+              
+                  //根据2类issStatus情况向issinfo,issrecord,patinfo,patrecord表写入不同的数据
+                  switch($issSet->status){
+                    case '申报提交':
+                      //issinfo表要写入的数据  
+                      $issData=array('status'=>'专利驳回','resultdate'=>$today);
+                      
+                      //patinfo表要写入的数据，$request->request()为前端的formdata对象发送来的表单数据（键/值对）                      
+                      $patData= array_merge($request->request(),array('status'=>'驳回','note'=>$today.":".$msg));
+
+                      //issrecord表、patrecord表要写入的数据
+                      $act='专利驳回';
+                      $actdetail=$msg;
+                    break;
+                    
+                    case '续费提交':
+                      //issinfo表要写入的数据  
+                      $issData=array('status'=>'完结','finishdate'=>$today);
+                      
+                      //patinfo表要写入的数据，$request->request()为前端的formdata对象发送来的表单数据（键/值对）
+                      $patData=array_merge($request->request(),array('status'=>'驳回续费','note'=>($today.":".$msg)));
+                      
+                      //issrecord表、patrecord表要写入的数据
+                      $act='完结';
+                      $actdetail=$msg;
+                    break;
+                    
+                  }
+                  // 使用对象方法，向issinfo表更新数据表字段信息,有更新就返回受影响的行数。
+                  $issUpdated=$issSet->allowField(true)->data($issData,true)->save();
+              
+                  //$issUpdated不为0表示对issinfo表进行了更新，才在issrecord表新建一条记录。
+                  if($issUpdated){
+                    // 使用静态方法，向issrecord表新增信息。
+                    $issRecordSet=IssrecordModel::create([
+                      'num'=>$numId,
+                      'act'=>$act,
+                      'actdetail'=>$actdetail,
+                      'acttime'=>$today,
+                      'username'=>$request->request('username'),
+                      'rolename'=>$role,
+                      'issinfo_id'=>$issId,
+                    ]);
+                    //静态方法创建新对象后，返回对象id
+                    $issRecordId= $issRecordSet->id;
+                  }
+                  
+                  // 使用对象方法，向patinfo表更新信息,有更新就返回受影响的行数。
+                  $patUpdated=$patSet->allowField(true)->data($patData,true)->save();
+                  
+                  //$patUpdated不为0表示对patinfo表进行了更新，才在patrecord表新建一条记录。
+                  if($patUpdated){
+                    // 使用静态方法，向patrecord表新增信息。
+                    $patRecordSet=PatrecordModel::create([
+                      'num'=>$patNumId,
+                      'act'=>$act,
+                      'actdetail'=>$actdetail,
+                      'acttime'=>$today,
+                      'username'=>$request->param('username'),
+                      'rolename'=>$role,
+                      'patinfo_id'=>$patId,
+                      'note'=>$today.":".$actdetail
+                    ]);
+                    //静态方法创建新对象后，返回对象id
+                    $patRecordId= $patRecordSet->id;
+                  }
+                  
+                  //返回前端的信息
+                  $result='success';
+                
+              break;
+              // apply
+              default:
+                  $msg.=$issSet->topic.'提交。<br><span class="text-info">提交说明：'.$request->request('applyMsg').'</span><br>';
+              
+                  //根据2类issStatus情况向issinfo,issrecord,patinfo,patrecord表写入不同的数据
+                  switch($issSet->status){
+                    case '准予续费':
+                      //issinfo表要写入的数据  
+                      $issData=array('status'=>'续费提交','applydate'=>$today);
+                      
+                      //patinfo表要写入的数据，$request->request()为前端的formdata对象发送来的表单数据（键/值对）                      
+                      $patData= array_merge($request->request(),array('status'=>'续费中','note'=>$today.":".$msg));
+
+                      //issrecord表、patrecord表要写入的数据
+                      $act='续费提交';
+                      $actdetail=$msg;
+                    break;
+                    
+                    case '申报复核':
+                      //issinfo表要写入的数据  
+                      $issData=array('status'=>'申报提交','applydate'=>$today);
+                      
+                      //patinfo表要写入的数据，$request->request()为前端的formdata对象发送来的表单数据（键/值对）
+                      $patData=array_merge($request->request(),array('status'=>'申报','note'=>($today.":".$msg)));
+                      
+                      //issrecord表、patrecord表要写入的数据
+                      $act='申报提交';
+                      $actdetail=$msg;
+                    break;
+                    
+                  }
+                  // 使用对象方法，向issinfo表更新数据表字段信息,有更新就返回受影响的行数。
+                  $issUpdated=$issSet->allowField(true)->data($issData,true)->save();
+              
+                  //$issUpdated不为0表示对issinfo表进行了更新，才在issrecord表新建一条记录。
+                  if($issUpdated){
+                    // 使用静态方法，向issrecord表新增信息。
+                    $issRecordSet=IssrecordModel::create([
+                      'num'=>$numId,
+                      'act'=>$act,
+                      'actdetail'=>$actdetail,
+                      'acttime'=>$today,
+                      'username'=>$request->request('username'),
+                      'rolename'=>$role,
+                      'issinfo_id'=>$issId,
+                    ]);
+                    //静态方法创建新对象后，返回对象id
+                    $issRecordId= $issRecordSet->id;
+                  }
+                  
+                  // 使用对象方法，向patinfo表更新信息,有更新就返回受影响的行数。
+                  $patUpdated=$patSet->allowField(true)->data($patData,true)->save();
+                  
+                  //$patUpdated不为0表示对patinfo表进行了更新，才在patrecord表新建一条记录。
+                  if($patUpdated){
+                    // 使用静态方法，向patrecord表新增信息。
+                    $patRecordSet=PatrecordModel::create([
+                      'num'=>$patNumId,
+                      'act'=>$act,
+                      'actdetail'=>$actdetail,
+                      'acttime'=>$today,
+                      'username'=>$request->param('username'),
+                      'rolename'=>$role,
+                      'patinfo_id'=>$patId,
+                      'note'=>$today.":".$actdetail
+                    ]);
+                    //静态方法创建新对象后，返回对象id
+                    $patRecordId= $patRecordSet->id;
+                  }
+                  
+                  //返回前端的信息
+                  $result='success';
+              
               break;
               
             }

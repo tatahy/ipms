@@ -1,25 +1,66 @@
 <!-- // maintainer_result.html -->
 <div class="container-fluid">
 	<!-- <div class="rows col-sm-12"> -->	
-		<div class="row">
-			<div class="form-group col-sm-8">
-				<h4>事务标题：{$iss.topic}</h4>
-			</div>
-			
-			<div class="form-group col-sm-4">
-				<h4>事务状态：<span><strong><a href="{$home}/issue/index/issrecords/id/{$iss.id}" target="_blank" data-toggle="tooltip">{$iss.status}</a></strong></span></h4>
-			</div>
-			
-			<div class="form-group col-sm-3">
-				<h4>执行人：{$iss.executer}</h4>
-			</div>
-		
-			<div class="form-group col-sm-5">
-				<h4>所属部门：{$iss.dept}</h4>
-			</div>
+		<h4><span class="label label-warning">事务概要</span></h4>
+		<div class="bs-callout bs-callout-warning">
+			<h4>标题：<strong>{$iss.topic}</strong></h4>
+			<ul>
+				<li>撰写人：{$iss.writer}；执行人：{$iss.executer}；</li>
+				<li>事务类型：{$iss.issmap_type}；</li>
+				<li>简介：{$iss.abstract}</li>
+				<li>状态：<a href="{$home}/issue/index/issrecords/id/{$iss.id}" target="_blank" data-toggle="tooltip" title="过程记录"><span class="label label-primary">{$iss.status}</span></a>
+				</li>
+				
+				
+			</ul>
+					
+			<footer>
+				<div class="row">
+					<div class="col-sm-4">
+						<a href="{$home}/issue/index/issinfo/id/{$iss.id}" target="_blank" data-toggle="tooltip" title="事务详情">查看详情</a>
+						
+					</div>
+							
+					<div id="divAddNewDate" class="col-sm-4">填报时间：{$iss.addnewdate}</div>
+									
+				</div>
+			</footer>
+						
 		</div>
 		
-		<h4>执行过程概要</h4>
+		<!-- //应用bootstrap的.collaps，会触发form的submit？？ HY2018/1/10 -->
+		<!-- <button type="button" class="btn btn-xs btn-warning" data-toggle="collapse" data-target="#divAbstractField"><strong>摘要信息&nbsp;<span class="caret"></span></strong> -->
+		<!-- </button>  -->
+		<!-- <div id="divAbstractField" class="collapse"> -->
+		
+		<button id="btnAbstractField" class="btn btn-xs btn-warning" type="button"><strong style="font-size:14px;">摘要显示&nbsp;<span class="caret"></span></strong>
+		</button>
+				
+		<div id="divAbstractField" hidden="true">
+		<strong><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利摘要</strong>
+		<div class="table-responsive ">
+			
+			<table class="table table-bordered table-striped table-hover">
+				<thead>
+					<tr>
+						<th>专利名称</th>
+						<th>专利类型</th>
+						<th>专利状态</th>
+						<th>专利关键词</th>
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					<tr>
+						<td>{$pat.topic}</td>
+						<td>{$pat.pattype}</td>
+						<td>{$pat.status}</td>
+						<td>{$pat.keyword}</td>
+					</tr>	
+				</tbody>
+			</table>
+		</div>
+		
+		<strong>执行过程摘要</strong>
 		<div class="table-responsive ">
 			<table class="table table-bordered table-striped table-hover">
 				<thead>
@@ -46,63 +87,6 @@
 				</tbody>
 			</table>
 		</div>
-		<hr>
-		
-		<!-- //应用bootstrap的.collaps，会触发form的submit？？ HY2018/1/10 -->
-		<!-- <button type="button" class="btn btn-xs btn-warning" data-toggle="collapse" data-target="#divAbstractField"><strong>摘要信息&nbsp;<span class="caret"></span></strong> -->
-		<!-- </button>  -->
-		<!-- <div id="divAbstractField" class="collapse"> -->
-		
-		<button id="btnAbstractField" class="btn btn-xs btn-warning" type="button"><strong style="font-size:14px;">摘要显示&nbsp;<span class="caret"></span></strong>
-		</button>
-				
-		<div id="divAbstractField" hidden="true">
-		<p class="small">&nbsp;</p>
-		<strong><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利摘要</strong>
-		<div class="table-responsive ">
-			
-			<table class="table table-bordered table-striped table-hover">
-				<thead>
-					<tr>
-						<th>专利名称</th>
-						<th>专利类型</th>
-						<th>专利状态</th>
-						<th>专利关键词</th>
-					</tr>
-				</thead>
-				<tbody><!-- 此处显示数据库查询后的数据集 -->
-					<tr>
-						<td>{$pat.topic}</td>
-						<td>{$pat.pattype}</td>
-						<td>{$pat.status}</td>
-						<td>{$pat.keyword}</td>
-					</tr>	
-				</tbody>
-			</table>
-		</div>
-		
-		<strong>事务摘要</strong>
-		<div class="table-responsive ">
-			
-			<table class="table table-bordered table-striped table-hover">
-				<thead>
-					<tr>
-						<th>事务标题</th>
-						<th>事务类型</th>
-						<th>事务简介</th>
-						<th>事务执行人</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>{$iss.topic}</td>
-						<td>{$iss.issmap_type}</td>
-						<td>{$iss.abstract}</td>
-						<td>{$iss.executer}</td>
-					</tr>	
-				</tbody>
-			</table>
-		</div>
 		
 		</div>	
 		
@@ -118,7 +102,7 @@
 		<button id="btnAttField" class="btn btn-xs btn-warning" type="button"><strong style="font-size:14px;">附件/上传显示&nbsp;<span class="caret"></span></strong>
 		</button> 
 		<div id="divAttField" hidden="true">		
-		<h4><span >事务附件上传</span>
+		<h4><span class="label label-info">事务附件上传</span>&nbsp;
 			<label class="radio-inline ">
       			<input type="radio" name="attUpload" value="0" checked><span class="label label-default">无</span>
     		</label>
@@ -162,11 +146,6 @@
 				</div>
 		
 				<input id="attObj" name="attObj" value="_ATTO1" type="text" hidden="true">
-				
-				<input id="oprt" value="" type="text" hidden="true">
-				<!-- // 与本页的formDataAjax函数配合，传递本页所编辑的信息对应的patIssId值到后端 -->
-				<input id="trId" value="{$patIssId}" type="text" hidden="true">
-		
 			</div>
 				
 		</div>
@@ -207,25 +186,32 @@
 			</table>
 			</div>
 			
-		</div>
-		</div>
+		</div>	
 		
-		<div class="row">&nbsp;</div>
+		</div>
+		<!-- //空白行 -->		
+		<div class="row"></div>
 		<hr>
+	
+		
+
+{switch name="$iss.status"}
+    {case value="申报提交"}
 		<div class="row">
+		
 			<div class="form-group col-sm-3">
-				<label for="patApplyResult"><span class="label label-warning" style="font-size:14px;"><strong>专利申报结果</strong></span></label>
-				<select class="form-control" id="patApplyResult" name="patApplyResult" style="background-color:#337ab7;color:#FFF;">
-					<option value="improve" style="background-color:#337ab7;">申报修改</option>
-					<option value="authorize" style="background-color:#5cb85c;">授权</option>
-					<option value="reject" style="background-color:#d9534f;">驳回</option>
+				<label for="oprt"><span class="label label-warning" style="font-size:14px;"><strong>授权申报结果</strong></span></label>
+				<select class="form-control" id="oprt" name="oprt">
+					<option value="0">……</option>
+					<option value="authorize" class="btn-success">专利授权</option>
+					<option value="reject" class="btn-danger">专利驳回</option>
+					<option value="improve" class="btn-primary">申报修改</option>
 				</select>
-				
 			</div>
 			
 			<div class="form-group col-sm-3">
-				<label for="patOwner">专利所有人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<input class="form-control" id="patOwner" name="patOwner" value="{$pat.patowner}" type="text" required>
+				<label for="patowner">专利所有人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<input class="form-control" id="patowner" name="patowner" value="{$pat.patowner}" type="text" required>
 			</div>
 			
 			<div class="form-group col-sm-3">
@@ -234,16 +220,15 @@
 			</div>
 			
 			<div class="form-group col-sm-3">
-				<label for="otherInventor">其他专利发明人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<input class="form-control" id="otherInventor" name="otherInventor" value="{$pat.otherinventor}" type="text" required>
+				<label for="otherinventor">其他专利发明人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<input class="form-control" id="otherinventor" name="otherinventor" value="{$pat.otherinventor}" type="text" required>
 			</div>
-			
 		</div>
 		
 		<div class="row">
 			<div class="form-group col-sm-4">
-				<label for="applyPlace">专利申报地点<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<select class="form-control" id="applyPlace" name="applyPlace" required>
+				<label for="applyplace">专利申报地点<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<select class="form-control" id="applyplace" name="applyplace" required>
 					<option value="中国大陆">中国大陆</option>
 					<option value="港澳台">港澳台</option>
 					<option value="美国">美国</option>
@@ -253,64 +238,127 @@
 			</div>
 			
 			<div class="form-group col-sm-4">
-				<label for="patAgency">专利申报代理<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<input class="form-control" id="patAgency" name="patAgency" value="{$pat.patagency}" type="text" required>
+				<label for="patagency">专利申报代理<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<input class="form-control" id="patagency" name="patagency" value="{$pat.patagency}" type="text" required>
 			</div>
 			
 			<div class="form-group col-sm-4">
-				<label for="patAdmin">专利管理机构<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<input class="form-control" id="patAdmin" name="patAdmin" value="{$pat.patadmin}" type="text" required>
-			</div>
-			
-			<div class="form-group col-sm-4">
-				<label for="patApplyNum">专利申报编号<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<input class="form-control" id="patApplyNum" name="patApplyNum" value="{$pat.patapplynum}" type="text" required>
-			</div>
-			
-			{// TP5单行注释。在“申报修改”和“申报驳回”时隐藏}
-			<div id="divPatAuthNum" class="form-group col-sm-4" hidden="true">
-				<label for="patAuthNum">专利授权编号<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<input class="form-control" id="patAuthNum" name="patAuthNum" value="{$pat.patauthnum}" type="text" style="background-color:#5cb85c;color:#FFF;">
-			</div>
-			
-			{// TP5单行注释。在“申报修改”、“申报驳回”时隐藏}
-			<div id="divPatRenewDeadlineDate" class="form-group col-sm-4" hidden="true">
-				<label for="patRenewDeadlineDate">专利授权到期日<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<input class="form-control" id="patRenewDeadlineDate" name="patRenewDeadlineDate" value="{$today}" type="text" style="background-color:#5cb85c;color:#FFF;">
+				<label for="patadmin">专利管理机构<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<input class="form-control" id="patadmin" name="patadmin" value="{$pat.patadmin}" type="text" required>
 			</div>
 		</div>
 		
 		<div class="row">
-			<div class="form-group col-sm-4">
-				<label for="patResultDate">申报结果日期<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<input class="form-control" id="patResultDate" name="patResultDate" value="{$today}" type="text"  placeholder="{$today}" required>
+			<div class="form-group col-sm-3">
+				<label for="patapplynum">专利申报编号<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<input class="form-control" id="patapplynum" name="patapplynum" value="{$pat.patapplynum}" type="text" required>
 			</div>
 			
-			<div class="form-group col-sm-8">
-				<label class="control-label" for="resultMsg">申报结果说明<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<div class="form-group col-sm-3">
+				<label for="authrejctdate">专利授权日期<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<input class="form-control" id="authrejctdate" name="authrejctdate" value="{$today}" type="text"  placeholder="{$today}" required>
+			</div>
+			
+			<div class="form-group col-sm-6">
+				<label class="control-label" for="resultMsg">专利授权说明<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 				<textarea class="form-control" id="resultMsg" name="resultMsg" value="" type="text" placeholder="请填入申报结果的简要说明，附件请上传" required></textarea>
-			
+			</div>
+		</div>
+		
+		<div class="row divRejectHide" hidden="true">
+			<div id="divPatAuthNum" class="form-group col-sm-3">
+				<label for="patauthnum">专利授权编号<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<input class="form-control btn-success" id="patauthnum" name="patauthnum" value="" type="text" required>
+			</div>
+			<div class="form-group col-sm-3">
+				<label for="renewdeadlinedate">专利授权到期日期<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<input class="form-control btn-success" id="renewdeadlinedate" name="renewdeadlinedate" value="" type="text"  placeholder="{$today}" required>
 			</div>
 			
-		</div>	
-		
+		</div>
 		
 		<div class="row">
 		<hr>
 		<div class="form-group col-sm-12">			
-			
-			<button type="submit" id="btnImprove" class="btn btn-primary btn-sm" data-oprt="improve"><span class="glyphicon glyphicon-plus-sign"></span>&nbsp;申报修改</button>
-			
-			<button type="submit" id="btnAuthorize" class="btn btn-success btn-sm" data-oprt="authorize"><span class="glyphicon glyphicon-ok-sign"></span>&nbsp;授权</button>
-			
-			<button type="submit" id="btnReject" class="btn btn-danger btn-sm" data-oprt="reject"><span class="glyphicon glyphicon-remove-sign"></span>&nbsp;驳回</button>
-			
- 			<div  class="pull-right">
+			<div hidden="true" class="pull-left">
+				<button type="submit" id="btnConfirm" class="btn btn-sm" >确认</button>
+			</div>
+		
+			<div class="pull-right">
 				<input type="reset" class="btn btn-primary btn-sm" value="重置">
 				<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
 			</div>
 		</div>
 		</div>
+	{/case}
+    
+	{case value="续费提交"}
+		<div class="row">
+			<div class="form-group col-sm-3">
+				<label for="oprt"><span class="label label-warning" style="font-size:14px;"><strong>续费申报结果</strong></span></label>
+				<select class="form-control" id="oprt" name="oprt">
+					<option value="0">……</option>
+					<option value="authorize" class="btn-success">续费授权</option>
+					<option value="reject" class="btn-danger">续费驳回</option>
+				</select>
+			</div>
+			
+			<div class="form-group col-sm-6">
+				<label for="patrenewagency">续费申报代理<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<input class="form-control" id="patrenewagency" name="patrenewagency" value="{$pat.patrenewagency}" type="text" required>
+			</div>
+			
+			
+		</div>
+		
+		<div class="row">
+			<div class="form-group col-sm-3">
+				<label for="patrenewapplynum">续费申报编号<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<input class="form-control" id="patrenewapplynum" name="patrenewapplynum" value="{$pat.patrenewapplynum}" type="text" required>
+			</div>
+			
+			<div class="form-group col-sm-3">
+				<label for="renewrejctdate">续费结果日期<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<input class="form-control" id="renewrejctdate" name="renewrejctdate" value="{$today}" type="text"  placeholder="{$today}" required>
+			</div>
+			
+			<div class="form-group col-sm-6">
+				<label class="control-label" for="resultMsg">续费结果说明<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<textarea class="form-control" id="resultMsg" name="resultMsg" value="" type="text" placeholder="请填入申报结果的简要说明，附件请上传" required></textarea>
+			</div>
+		</div>
+		
+		<div class="row divRejectHide" hidden="true">
+			<div class="form-group col-sm-3">
+				<label for="patrenewauthnum">续费授权编号<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<input class="form-control btn-success" id="patrenewauthnum" name="patrenewauthnum" value="" type="text">
+			</div>
+			<div class="form-group col-sm-3">
+				<label for="renewdeadlinedate1">续费到期日期<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<input class="form-control btn-success" id="renewdeadlinedate" name="renewdeadlinedate" value="" type="text"  placeholder="{$today}" required>
+			</div>
+			
+		</div>
+
+		<div class="row">
+		<hr>
+		<div class="form-group col-sm-12">			
+			<div hidden="true" class="pull-left">
+				<button type="submit" id="btnConfirm" class="btn btn-sm" >确认</button>
+			</div>
+		
+			<div class="pull-right">
+				<input type="reset" class="btn btn-primary btn-sm" value="重置">
+				<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
+			</div>
+		</div>
+		</div>
+		
+	{/case}
+	{default /}
+{/switch}		
+	
+	
 	</form>
 	<!-- </div> -->
 
@@ -319,8 +367,8 @@
 <script>
 $(document).ready(function(){
 	
-	$('#btnAuthorize').hide();
-	$('#btnReject').hide();
+	$('#btn').hide();
+	$('#btn').hide();
 	
 	// 添加bootstrap的tooltip属性
 	$('h4 a').tooltip({title: '事务过程记录', placement: 'bottom'});
@@ -347,28 +395,25 @@ $(document).ready(function(){
 		//jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作
         event.preventDefault();
 		
-		// 检查是否存在附件？？
-		
-		
-		// 检查附件后缀名是否符合要求？？
-		
 		var oprt=$('#oprt').val();
+		var btnHtml=$('#btnConfirm').html();
 		var str='确定';
-		var title=oprt;
+		var title='';
 		switch(oprt){
 			case 'authorize':
-				str='确定【<span class="glyphicon glyphicon-ok-sign text-success"></span>&nbsp;授权】操作？';
-				title='【<span class="glyphicon glyphicon-ok-sign text-success"></span>&nbsp;授权】操作';
+				str='确定【<span class="label label-success">'+btnHtml+'</span>】操作？'; 
+				title='【<span class="label label-success">'+btnHtml+'</span>】';
 			break;
 			
 			case 'reject':
-				str='确定【<span class="glyphicon glyphicon-remove-sign text-danger"></span>&nbsp;驳回】操作？';
-				title='【<span class="glyphicon glyphicon-remove-sign" text-danger></span>&nbsp;驳回';
+				str='确定【<span class="label label-danger">'+btnHtml+'</span>】操作？'; 
+				title='【<span class="label label-danger">'+btnHtml+'</span>】';
 			break;
 			//默认为'improve'
 			default:
-				str='确定【<span class="glyphicon glyphicon-plus-sign text-primary"></span>&nbsp;申报修改】操作？';
-				title='【<span class="glyphicon glyphicon-plus-sign text-primary"></span>&nbsp;申报修改】操作';
+				str='确定【<span class="label label-primary">'+btnHtml+'</span>】操作？'; 
+				title='【<span class="label label-primary">'+btnHtml+'</span>】';
+				
 			break;
 			
 		}
@@ -382,22 +427,6 @@ $(document).ready(function(){
 				$('#modalPatIssTpl').modal('show');
 			}
 		}).cancel('否(N)').ok('是(Y)');
-	});
-	
-	
-	// 点击申报修改按钮，与form的submit()配合确定传给后端的oprt='improve'
-	$('#btnImprove').click(function(){
-		$('#oprt').val($(this).attr('data-oprt'));
-	});
-	
-	// 点击授权按钮，与form的submit()配合确定传给后端的oprt='authorize'
-	$('#btnAuthorize').click(function(){
-		$('#oprt').val($(this).attr('data-oprt'));
-	});
-	
-	// 点击驳回按钮，与form的submit()配合确定传给后端的oprt='reject'
-	$('#btnReject').click(function(){
-		$('#oprt').val($(this).attr('data-oprt'));
 	});
 	
 	//结合#divAbstractField的hidden属性，实现显示/隐藏;
@@ -478,6 +507,7 @@ $(document).ready(function(){
 		//为'#attName'和'#att'添加'required'属性，其值为false，保证在表单提交时忽略
 		$('#attName').attr('required',false);
 		$('#att').attr('required',false);
+		$('#renewdeadlinedate').attr('required',false);
 		
 		// 上传的输入框们退场
 		$('#divAtt').hide();
@@ -492,68 +522,112 @@ $(document).ready(function(){
 		$('#btnAbstractField').html('<strong style="font-size:14px;">摘要显示&nbsp;<span class="caret"></span></strong>');
 		$('#btnAttField').html('<strong style="font-size:14px;">附件/上传显示&nbsp;<span class="caret"></span></strong>');
 		
-		//恢复初始状态
-		$('#divPatAuthNum').hide();
-		$('#divPatRenewDeadlineDate').hide();
-		$(':submit').hide();
-		//为'#patAuthNum'添加'required'属性，其值为false，保证在表单提交时忽略
-		$('#patAuthNum').attr('required',false);
-		//为'#patRenewDeadlineDate'添加'required'属性，其值为false，保证在表单提交时忽略
-		$('#patRenewDeadlineDate').attr('required',false);
-		$('#btnImprove').show();
+		//恢复单选框底色和字体颜色
+		$('#oprt').removeClass('btn-success btn-danger btn-primary');
+		$('#oprt').val('0').attr('selected');
 		
-		//恢复单选框#patApplyResult底色和字体颜色
-		$('#patApplyResult').css({"background-color":"#337ab7","color":"#fff"});
+		//隐藏btnConfirm按钮
+		$('#btnConfirm').parent().hide();
+		
+		//隐藏
+		$('.divRejectHide').hide();
 		
 	});
 	
 	//select显示为后端传来的内容,
-	$('#applyPlace').val('{$pat.applyplace}').attr('selected');
+	$('#applyplace').val('{$pat.applyplace}').attr('selected');
 	
-	// 单选框#patApplyResult选中变化满足条件时，出现approveMsg输入框。
-	$('#patApplyResult').change(function(){
-		$(':submit').hide();
-	
-		switch($(this).val()){
-			case 'authorize':
-				//设置单选框#patApplyResult底色和字体颜色与按钮一致
-				$(this).css({"background-color":"#5cb85c","color":"#FFF"});
-				$('#divPatAuthNum').show();
-				$('#divPatRenewDeadlineDate').show();
-				//为'#patAuthNum'添加'required'属性，其值为true，保证在表单提交时必填
-				$('#patAuthNum').attr('required',true);
-				//为'#patRenewDeadlineDate'添加'required'属性，其值为true，保证在表单提交时必填
-				$('#patRenewDeadlineDate').attr('required',true);
+	switch ('{$iss.status}'){
+		case '申报提交':
+			// 单选框#oprt选中变化满足条件时
+			$('#oprt').change(function(){
+				$(this).removeClass('btn-success btn-danger btn-primary');
+				$('#btnConfirm').removeClass('btn-success btn-danger btn-primary');
 				
-				$('#btnAuthorize').show();
-			break;
-			
-			case 'reject':
-				//设置单选框#patApplyResult底色和字体颜色与按钮一致
-				$(this).css({"background-color":"#d9534f","color":"#FFF"});
-				
-				$('#divPatAuthNum').hide();
-				$('#divPatRenewDeadlineDate').hide();
-				//为'#patAuthNum'添加'required'属性，其值为false，保证在表单提交时忽略
-				$('#patAuthNum').attr('required',false);
-				$('#btnReject').show();
-			break;
-			// improve
-			default:
-				//设置单选框#patApplyResult底色和字体颜色与按钮一致
-				$(this).css({"background-color":"#337ab7","color":"#FFF"});
-				$('#divPatAuthNum').hide();
-				$('#divPatRenewDeadlineDate').hide();
-				//为'#patAuthNum'添加'required'属性，其值为false，保证在表单提交时忽略
-				$('#patAuthNum').attr('required',false);
-				//为'#patRenewDeadlineDate'添加'required'属性，其值为true，保证在表单提交时必填
-				$('#patRenewDeadlineDate').attr('required',true);
-				
-				$('#btnImprove').show();
-			break;
-		}
+				switch($(this).val()){
+					case 'authorize':
+						//设置单选框#oprt底色和字体颜色
+						$(this).addClass('btn-success');
+						//改变按钮btnConfirm底色和字体颜色,内容
+						$('#btnConfirm').addClass('btn-success').html('<span class="glyphicon glyphicon-ok-sign"></span>&nbsp;专利授权');
+						$('#btnConfirm').parent().show();
+						//显示
+						$('.divRejectHide').show().find('input').attr('required',true);
+					break;
+					
+					case 'reject':
+						//改变单选框#oprt底色和字体颜色
+						$(this).addClass('btn-danger');
+						//改变按钮btnConfirm底色和字体颜色,内容
+						$('#btnConfirm').addClass('btn-danger').html('<span class="glyphicon glyphicon-remove-sign"></span>&nbsp;专利驳回');
+						$('#btnConfirm').parent().show();
+						//隐藏
+						$('.divRejectHide').hide().find('input').attr('required',false);
+					break;
+					
+					case 'improve':
+						//改变单选框#oprt底色和字体颜色
+						$(this).addClass('btn-primary');
+						//改变按钮btnConfirm底色和字体颜色,内容
+						$('#btnConfirm').addClass('btn-primary').html('<span class="glyphicon glyphicon-plus-sign"></span>&nbsp;申报修改');
+						$('#btnConfirm').parent().show();
+						//隐藏
+						$('.divRejectHide').hide().find('input').attr('required',false);
+					break;
+					
+					default:
+						$('#btnConfirm').html('确认');
+						$('#btnConfirm').parent().hide();
+						//隐藏
+						$('.divRejectHide').hide().find('input').attr('required',false);
+						<!-- $('#renewdeadlinedate').attr('required',false); -->
+
+					break;
+				}
+			});
+		break;
 		
-	});
+		case '续费提交':
+			// 单选框#oprt选中变化时
+			$('#oprt').change(function(){
+				$(this).removeClass('btn-success btn-danger');
+				$('#btnConfirm').removeClass('btn-success btn-danger');
+				switch($(this).val()){
+					case 'authorize':
+						//设置单选框#oprt底色和字体颜色
+						$(this).addClass('btn-success');
+						//改变按钮btnConfirm底色和字体颜色,内容
+						$('#btnConfirm').addClass('btn-success').html('<span class="glyphicon glyphicon-repeat"></span>&nbsp;续费授权');
+						$('#btnConfirm').parent().show();
+						//显示
+						$('.divRejectHide').show().find('input').attr('required',true);
+				
+					break;
+					
+					case 'reject':
+						//改变单选框#oprt底色和字体颜色
+						$(this).addClass('btn-danger');
+						//改变按钮btnConfirm底色和字体颜色,内容
+						$('#btnConfirm').addClass('btn-danger').html('<span class="glyphicon glyphicon-ban-circle"></span>&nbsp;续费驳回');
+						$('#btnConfirm').parent().show();
+						//隐藏
+						$('.divRejectHide').hide().find('input').attr('required',false);
+						
+					break;
+					
+					default:
+						$('#btnConfirm').html('确认');
+						$('#btnConfirm').parent().hide();
+						//隐藏
+						$('.divRejectHide').hide().find('input').attr('required',false);
+
+					break;
+				}
+			});
+		break;
+	}
+	
+	
 
 <!-- function -->
 	//**函数名：formDataAjax
@@ -578,6 +652,7 @@ $(document).ready(function(){
 		formData.append('patId','{$pat.id}');
 		formData.append('issId','{$iss.id}');
 		formData.append('oprt',oprt);
+		formData.append('title',title);
 			
         $.ajax({
             type: 'post',

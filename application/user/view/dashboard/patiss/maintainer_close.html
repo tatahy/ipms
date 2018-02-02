@@ -9,18 +9,19 @@
 				<li>事务类型：{$iss.issmap_type}；</li>
 				<li>简介：{$iss.abstract}</li>
 				<li>状态：
+					<a href="{$home}/issue/index/issrecords/id/{$iss.id}" target="_blank" data-toggle="tooltip" title="过程记录">
 					{switch name="$iss.status"}
     					{case value="专利授权|续费授权"} 
-							<a href="{$home}/issue/index/issrecords/id/{$iss.id}" target="_blank" data-toggle="tooltip" title="过程记录"><span class="label label-success">{$iss.status}</span></a>
+							<span class="label label-success">{$iss.status}</span>
 						{/case}
     					{case value="专利驳回|放弃续费"}
-							<a class="text-danger" href="{$home}/issue/index/issrecords/id/{$iss.id}" target="_blank" data-toggle="tooltip" title="过程记录"><span class="label label-danger">{$iss.status}</span></a>
+							<span class="label label-danger">{$iss.status}</span>
 						{/case}
 						{default /}
-							<a href="{$home}/issue/index/issrecords/id/{$iss.id}" target="_blank" data-toggle="tooltip" title="过程记录"><span class="label label-primary">{$iss.status}</span></a>
+							<span class="label label-primary">{$iss.status}</span>
 					{/switch}
-				
-				
+					</a>
+					
 				</li>
 				
 				
@@ -270,16 +271,13 @@ $(document).ready(function(){
 		//jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作
         event.preventDefault();
 		
-		// 检查是否存在附件？？
-		
-		
-		// 检查附件后缀名是否符合要求？？
-		
 		var oprt=$('#oprt').val();
+		var btnHtml=$('#btnClose').html();
 		var str='确定';
 		var title=oprt;
-		str='确定【<span class="glyphicon glyphicon-folder-close text-primary"></span>&nbsp;关闭事务】操作？';
-		title='【<span class="glyphicon glyphicon-folder-close text-primary"></span>&nbsp;关闭事务】操作';
+		
+		str='确定【<span class="label label-primary">'+btnHtml+'</span>】操作？'; 
+		title='【<span class="label label-primary">'+btnHtml+'</span>】';
 		
 		$('#modalPatIssTpl').modal('hide');
 		$.confirm(str,function(e){
@@ -396,7 +394,7 @@ $(document).ready(function(){
 		formData.append('patId','{$pat.id}');
 		formData.append('issId','{$iss.id}');
 		formData.append('oprt',oprt);
-		
+		formData.append('title',title);
 			
         $.ajax({
             type: 'post',
@@ -431,19 +429,19 @@ $(document).ready(function(){
 					// 操作成功，提示框显示信息
 					$.alert(title+'成功<span class="glyphicon glyphicon-ok text-success"></span><hr>'+data.msg);
 					
-					//maintainer，载入默认页面
-					$.post('patIss',
-						{
-							'role':'maintainer',
-							'tpl':'close',
-							'returnType':0,
-							'issType':'_PATENT',
-							'issStatus':'_OPERATE_TODO',
-						},
-						function(data){
-							$('#patIss').html(data);
-						}
-					);
+					<!-- //maintainer，载入默认页面 -->
+					<!-- $.post('patIss', -->
+						<!-- { -->
+							<!-- 'role':'maintainer', -->
+							<!-- 'tpl':'close', -->
+							<!-- 'returnType':0, -->
+							<!-- 'issType':'_PATENT', -->
+							<!-- 'issStatus':'_OPERATE_TODO', -->
+						<!-- }, -->
+						<!-- function(data){ -->
+							<!-- $('#patIss').html(data); -->
+						<!-- } -->
+					<!-- ); -->
 					
 				}else{
 					$('#modalPatIssTpl').modal();
