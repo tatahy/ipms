@@ -266,7 +266,12 @@ class IndexController extends \think\Controller
                             //->where('dept',$searchDept)
                             ->group('username')
                             ->select();
-        $usersNum=count($users1);       
+        //$usersNum=count($users1);     
+        $usersNum=count(UserModel::where('id','>',0)
+                            ->where($map)
+                            //->where('dept',$searchDept)
+                            ->group('username')
+                            ->select());    
  
         foreach($users as $v){
             $user1 = UserModel::get($v['id']);
