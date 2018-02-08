@@ -226,6 +226,24 @@ $('input:radio[name="attUpload"][value="1"]').prop('checked',true);
 <!--/  HY 2018/1/25 -->	
 
 
+<!--HY 2018/2/8 -->	
+<script>
+<!-- // 遍历data数组组装HTML语句 -->
+	<!-- // data的结构是数组类的：[{id:1,username:"xx", dept:"yy"},{}],所以要进行嵌套取出id，username和dept的值组装HTML语句-->
+	var str="";
+	$.each(data,function(n1,v1){
+		$.each(v1,function(n2,v2){
+			if(n2=="username"){
+				str+="<option value='"+v2+"'>"+v2+" （部门：";
+			}
+			if(n2=="dept"){
+				str+=v2+"）</option>";
+			}
+		});
+	});
+
+</script>
+<!--/  HY 2018/2/8 -->	
 
 <!-- ......................问题................................ -->
 

@@ -54,7 +54,7 @@ $(document).ready(function(){
 			</button>
 			<!-- <a class="navbar-brand" href="#">撰写人：username&nbsp;<span class="glyphicon glyphicon-user"></span>&nbsp;个人中心</a> -->
 			<span class="navbar-brand">
-				<a href="{$home}/user/index/index" data-toggle="tooltip" data-placement="bottom" title="个人事务中心">
+				<a href="{$home}/user/dashboard/index" data-toggle="tooltip" data-placement="bottom" title="个人事务中心">
 					<strong>IPMS【{$username}】</strong>个人事务&nbsp;<span class="small glyphicon glyphicon-pushpin"></span>
 				</a>
 			</span>
@@ -73,7 +73,9 @@ $(document).ready(function(){
 					
 				</form>
 				</li>
-				<li><a href="{$home}/index/index/index"><span class="glyphicon glyphicon-home"></span>&nbsp;首页</a></li>	
+				<li><a href="{$home}/index/index/index"><span class="glyphicon glyphicon-home"></span>&nbsp;首页</a></li>
+				<li><a href="{$home}/user/index/index"><span class="glyphicon glyphicon-pushpin"></span>个人事务中心（旧版）</a></li>
+				
 				<li id="liQuit"><a href="{$home}/index/index/logout"><span class="glyphicon glyphicon-log-out"></span>&nbsp;退出</a></li>
 			</ul>
 		</div>

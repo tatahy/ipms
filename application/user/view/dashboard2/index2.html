@@ -1,0 +1,236 @@
+{include file="../application/common/headeruser.html" title="个人事务中心" }
+
+<!-- pagewrap  -->
+<div class="container-fluid" style="padding-top: 55px;">
+		
+	<!-- <h4>  -->
+		<!-- <ul class="list-inline"> -->
+			<!-- <li><strong>【{$username}】的系统角色：</strong></li> -->
+			<!-- <li> -->
+				<!-- <select class="form-control" id="roleselect"> -->
+
+					<!-- {foreach name="roles" item="vo"} -->
+						<!-- <option>{$vo}</option> -->
+					
+					<!-- {/foreach} -->
+					
+				<!-- </select> -->
+			<!-- </li> -->
+			<!-- <li><button class="btn btn-primary">更新个人信息(开发中)</button></li> -->
+			
+		<!-- </ul> -->
+	<!-- </h4> -->
+	<!-- <hr> -->
+	<!-- <a href="{$home}/user/index/index">旧版</a> -->
+	<ul class="nav nav-pills" style="border-bottom:solid 0.1px #ddd;">
+		
+		<li><a href="{$home}/user/dashboard/index">roles版</a> </li>
+	</ul>
+
+	<div class="panel-group" id="accordion">
+		<div id="panelProIss" class="panel panel-default">
+			<div class="panel-heading">
+			<h4 class="panel-title">
+        		<a data-toggle="collapse" data-parent="#accordion" href="#collapsePro"><span class="glyphicon glyphicon-inbox"></span>&nbsp;<strong>
+        		项目事务</strong>&nbsp;<span class="span0">0</span></a>
+      		</h4>
+			
+			</div>
+			
+			<div id="collapsePro" class="panel-collapse collapse">
+			<div class="panel-body " >	
+			
+			</div>
+			</div>
+			
+		</div>
+		
+		<div id="panelIssPat" class="panel panel-warning">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+        			<a data-toggle="collapse" data-parent="#accordion" href="#collapsePat"><span class="glyphicon glyphicon-wrench"></span>&nbsp;<strong>
+        			专利事务</strong>&nbsp;<span class="span0">{$numTotal}</span></a>
+      			</h4>
+			
+			</div>
+			
+			<div id="collapsePat" class="panel-collapse collapse in">
+			<div class="panel-body " >
+				<!-- <ul class="nav nav-tabs nav-justified"> -->
+					<!-- <li class="active"><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-process="_TODO"><span class="glyphicon glyphicon-pencil"></span>&nbsp;待处理&nbsp;<span class="badge span_TODO">0</span></a></li> -->
+					<!-- <li><a class="aTab" href="#"  data-issue-type="_PATENT" data-issue-process="_INPROCESS"><span class="glyphicon glyphicon-road"></span>&nbsp;内部审批结果&nbsp;<span class="label label-warning span_INPROCESS">&nbsp;</span></a></li> -->
+					<!-- <li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-process="_RESULT"><span class="glyphicon glyphicon-bell"></span>&nbsp;外部申报结果&nbsp;<span class="label label-info span_RESULT">&nbsp;</span></a></li> -->
+					<!-- <li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-process="_DONE"><span class="glyphicon glyphicon-tasks"></span>&nbsp;完结&nbsp;<span class="label label-default span_DONE">&nbsp;</span></a></li> -->
+		
+				<!-- </ul> -->
+				
+				<ul class="nav nav-tabs nav-justified">
+					{eq name="$auth.isspat.edit" value="1"}
+					<li class="active"><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_EDIT"><span class="glyphicon glyphicon-pencil"></span>&nbsp;待编辑&nbsp;<span class="label label-info issPat span_EDIT" style="font-size:14px;">{$numIssPatEdit}/{$numTotal}</span></a></li>
+					
+					<!-- <li class="active"><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_EDIT"><span class="label label-info issPat span_EDIT" style="font-size:14px;"><span class="glyphicon glyphicon-pencil"></span>&nbsp;待编辑&nbsp;{$numIssPatEdit}/{$numTotal}</span></a></li> -->
+					{/eq}
+					
+					{eq name="$auth.isspat.audit" value="1"}
+					<li><a class="aTab" href="#"  data-issue-type="_PATENT" data-issue-authority="_AUDIT"><span class="glyphicon glyphicon-road"></span>&nbsp;待审查&nbsp;<span class="label label-warning issPat span_AUDIT">{$numIssPatAudit}/{$numTotal}</span></a></li>
+					{/eq}
+					
+					{eq name="$auth.isspat.approve" value="1"}
+					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_APPROVE"><span class="glyphicon glyphicon-bell"></span>&nbsp;待审批&nbsp;<span class="label label-danger issPat span_APPROVE">{$numIssPatApprove}/{$numTotal}</span></a></li>
+					{/eq}
+					
+					{eq name="$auth.isspat.execute" value="1"}
+					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_EXECUTE"><span class="glyphicon glyphicon-bell"></span>&nbsp;待执行&nbsp;<span class="label label-info issPat span_EXECUTE">{$numIssPatExecute}/{$numTotal}</span></a></li>
+					{/eq}
+					
+					{eq name="$auth.isspat.maintain" value="1"}
+					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_MAINTAIN"><span class="glyphicon glyphicon-bell"></span>&nbsp;待维护&nbsp;<span class="label label-info issPat span_MAINTAIN">{$numIssPatMaintain}/{$numTotal}</span></a></li>
+					{/eq}					
+					
+					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_DONE"><span class="glyphicon glyphicon-tasks"></span>&nbsp;完结&nbsp;<span class="label label-default issPat span_DONE">{$numIssPatDone}/{$numTotal}</span></a></li>
+		
+				</ul>
+			
+				<div class="tab-content">
+					<div>
+					<!-- <P>前端模板变量$userlg={ $userlg}<br> -->
+					<!-- $userlg.0={ $userlg.0},&nbsp;$userlg.id={ $userlg.id}<br> -->
+					<!-- 后端赋值语句'userlg'=>$userlg -->
+					<!-- </P> -->
+					
+					</div>
+					
+					<div id="issPat"></div>
+				</div>
+			</div>
+			</div>
+			
+		</div>
+		
+		<div id="panelTheIss" class="panel panel-info">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+        			<a data-toggle="collapse" data-parent="#accordion" href="#collapseThe"><span class="glyphicon glyphicon-list"></span>&nbsp;<strong>
+        			论文事务</strong>&nbsp;<span class="span0">0</span></a>
+      			</h4>
+			
+			</div>
+		
+			<div id="collapseThe" class="panel-collapse collapse">
+			<div class="panel-body " >
+		
+		
+		
+			</div>
+			</div>
+	
+	
+	
+		</div>
+		
+</div>
+
+
+
+
+<!-- /pagewrap  -->
+
+<style>
+.red{
+	background-color:red;
+}
+</style>
+
+<script>
+$(document).ready(function(){
+	
+	// 本页面载入时默认load的文件为issPatEdit.html
+	<!-- //TP5中 'issPat'='{$home}/user/dashboard2/isspat' -->
+	$('#issPat').load('issPatEdit');
+	$('.span_EDIT').removeClass('label label-default label-info label-warning').addClass('badge red');
+	
+	<!-- //点击.issPatATab中的各个按钮后，默认显示相应状态的issPat内容-->
+	$('.aTab').click(function(){
+        var issType=$(this).attr('data-issue-type');
+		var authority=$(this).attr('data-issue-authority');
+		var oprt='';
+		<!-- $('.aTab').find('.issPat').css("background-color","#777") .removeClass('badge'); -->
+		
+		$('.span_EDIT').removeClass('badge red').addClass('label label-info');
+		$('.span_AUDIT').removeClass('badge red').addClass('label label-warning');
+		$('.span_APPROVE').removeClass('badge red').addClass('label label-danger');
+		$('.span_EXECUTE').removeClass('badge red').addClass('label label-info');
+		$('.span_MAINTAIN').removeClass('badge red').addClass('label label-info');
+		$('.span_DONE').removeClass('badge red').addClass('label label-default');
+		
+		$(this).find('.issPat').removeClass('label label-default label-info label-warning').addClass('badge red');
+		<!-- .css("background-color","red") -->
+		switch(issType){
+			case '_PATENT':
+				$(this).tab('show');
+				$(this).parent().addClass('active');
+				switch(authority){
+					case'_EDIT':
+						oprt='issPatEdit';
+					break;
+					case'_AUDIT':
+						oprt='issPatAudit';
+					break;
+					case'_APPROVE':
+						oprt='issPatApprove';
+					break;
+					case'_EXECUTE':
+						oprt='issPatExecute';
+					break;
+					case'_MAINTAIN':
+						oprt='issPatMaintain';
+					break;
+					//_DONE
+					default:
+						oprt='issPatDone';
+					break;
+				}
+				$('#issPat').load(oprt);
+			break;
+			
+			case '_PROJECT':
+				$(this).tab('show');
+				$(this).parent().addClass('active');
+				$('#issPro').load('issPro',sendData);
+			break;
+			
+			case '_THESIS':
+				$(this).tab('show');
+				$(this).parent().addClass('active');
+				$('#issThe').load('issThe',sendData);
+			break;
+		}
+
+    });	
+	
+	<!-- // 在collapsePat出现前应用jQuery的load方法加载对应文件。 -->
+	<!-- $("#collapsePat").on("show.bs.collapse", function(){ -->
+    	
+		<!-- $("#issPat").load('issPatEdit'); -->
+  	<!-- }); -->
+	
+	<!-- // 在collapsePro出现前应用jQuery的load方法加载对应文件。 -->
+	<!-- $("#collapsePro").on("show.bs.collapse", function(){ -->
+    	
+  	<!-- }); -->
+	
+	<!-- // 在collapseThe出现前应用jQuery的load方法加载对应文件。 -->
+	<!-- $("#collapseThe").on("show.bs.collapse", function(){ -->
+    	
+  	<!-- }); -->
+	
+<!-- function  -->
+	
+
+
+<!--/ function -->
+
+});
+</script>
+
+{include file="../application/common/footer.html"}

@@ -391,7 +391,7 @@ class DashboardController extends \think\Controller
           $sort='_ASC';
         }
         
-         // 查询词1，'searchPatName'
+        // 查询词1，'searchPatName'
         if(!empty($request->param('searchPatName'))){
           $searchPatName=$request->param('searchPatName');
         }else{

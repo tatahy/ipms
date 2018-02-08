@@ -643,3 +643,298 @@ class Index extends Controller
 
 <!--/  HY 2018/1/21 -->
 
+
+<!--HY 2018/2/6 -->
+
+<?php
+// 查询JSON类型字段 （info字段为json类型）（mysql V5.0.1）
+Db::table('think_user')->where('info$.email','thinkphp@qq.com')->find();
+?>
+
+
+// json与array
+
+// 模型model（user.php）：设定“authority”字段为
+<?php
+namespace app\user\model;
+
+use think\Model;
+
+class User extends Model
+{   
+	protected $type = [
+    	'authority'  =>  'json',
+	];  
+}
+?>
+
+// 控制器controller(controller.php)：
+<?php
+	use app\user\model\User as UserModel;
+	
+	$user=new UserModel;           
+	$userlg=$user->where('username',$username)->where('pwd',$pwd)->find();
+	
+	$this->assign([
+		//模型对象转换成数组赋值给前端模板变量，会出现"Array to string conversion"错误
+        //'userlg'=>$userlg->toArray(),
+		//模型对象赋值给前端模板变量
+		'userlg'=>$userlg,
+		//模型对象转换成json字符串赋值给前端模板变量，
+		'userJson'=>$userlg->toJson(),
+        
+		// json引用("authority"字段已在模型中定义为"json"),此时对象方式引用$userlg->authority->att->delete不适用，会出现“Trying to get property of non-object”错误
+        'delete'=>$userlg['authority']['att']['delete'],
+		//数组方式引用后赋值给前端模板变量,此时对象方式引用$userlg->authority也适用
+        'authArray'=>$userlg['authority'],
+		// php的json_encode()函数将数组转换成json字符串
+        'authJson'=>json_encode($userlg['authority']),        
+		//json引用("authority"字段已在模型中定义为"json")后赋值给前端模板变量,此时对象方式引用$userlg->authority->att不适用，会出现“Trying to get property of non-object”错误
+        'authAttArray'=>$userlg['authority']['att'],
+		// php的json_encode()函数将数组转换成json字符串
+        'authAttJson'=>json_encode($userlg['authority']['att']),
+    ]);
+	
+?>
+//前端页面
+<html>
+	<div>
+	<P>前端模板变量$userlg={$userlg}<br>后端赋值语句'userlg'=>$userlg</P>
+					
+	<P>前端模板变量$userJson={$userJson}<br>后端赋值语句'userJson'=>$userlg->toJson()</P>
+					
+	<P>前端模板变量$userlg.authority.att.delete={$userlg.authority.att.delete}<br>后端赋值语句'userlg'=>$userlg</P>
+					
+	<P>前端模板变量$delete={$delete}<br>后端赋值语句'delete'=>$userlg['authority']['att']['delete']</P>
+					
+	<P>前端模板变量$authJson={$authJson}<br>后端赋值语句'authJson'=>json_encode($userlg['authority'])</P>
+					
+	<P>前端模板变量$authArray.att.delete={$authArray.att.delete}<br>后端赋值语句'authArray'=>$userlg['authority']</P>
+					
+	<P>前端模板变量$authAttJson={$authAttJson}<br>		后端赋值语句'authAttJson'=>json_encode($userlg['authority']['att'])</P>
+					
+	<P>前端模板变量$authAttArray.delete={$authAttArray.delete}<br>后端赋值语句'authAttArray'=>$userlg['authority']['att']</P>
+					
+	</div>
+</html>
+//前端页面运行后显示效果：
+前端模板变量$userJson={"id":23,"usernum":"","username":"test","pwd":"c4ca4238a0b923820dcc509a6f75849b","dept":"dept2","enable":1,"rolety_id":2,"authority":{"att":{"delete":1,"upload":1,"download":1},"isspat":{"edit":1,"audit":1,"create":1,"approve":1,"execute":1,"maintain":1},"isspro":{"edit":0,"audit":0,"create":0,"approve":0,"execute":0,"maintain":0},"issthe":{"edit":0,"audit":0,"create":0,"approve":0,"execute":0,"maintain":0}}}
+后端赋值语句'userJson'=>$userlg->toJson()
+
+前端模板变量$userlg.authority.att.delete=1
+后端赋值语句'userlg'=>$userlg
+
+前端模板变量$delete=1
+后端赋值语句'delete'=>$userlg['authority']['att']['delete']
+
+前端模板变量$authJson={"att":{"delete":1,"upload":1,"download":1},"isspat":{"edit":1,"audit":1,"create":1,"approve":1,"execute":1,"maintain":1},"isspro":{"edit":0,"audit":0,"create":0,"approve":0,"execute":0,"maintain":0},"issthe":{"edit":0,"audit":0,"create":0,"approve":0,"execute":0,"maintain":0}}
+后端赋值语句'authJson'=>json_encode($userlg['authority'])
+
+前端模板变量$authArray.att.delete=1
+后端赋值语句'authArray'=>$userlg['authority']
+
+前端模板变量$authAttJson={"delete":1,"upload":1,"download":1}
+后端赋值语句'authAttJson'=>json_encode($userlg['authority']['att'])
+
+前端模板变量$authAttArray.delete=1
+后端赋值语句'authAttArray'=>$userlg['authority']['att']
+
+<!--/  HY 2018/2/6 -->
+
+
+<!--  HY 2018/2/7 -->
+// 模板
+<?php
+//在控制器中我们给模板变量（字符串型）赋值：
+$view = new View();
+$view->name = 'thinkphp';
+//对数组变量赋值
+$data['name'] = 'ThinkPHP';
+$data['email'] = 'thinkphp@qq.com';
+$view->assign('data',$data);
+//输出变量到模板
+return $view->fetch('模板名');
+
+//或是直接用助手函数输出变量到模板：
+return view('模板名',['name'=>'thinkphp','data'=>$data]);
+
+?>
+
+<html>
+//变量输出。模板标签的变量输出根据变量类型有所区别
+//数组变量输出方式1
+<p>Name：{$data.name}</p>
+<p>Email：{$data.email}</p>
+//数组变量输出方式2
+<p>Name：{$data['name']}</p>
+<p>Email：{$data['email']}</p>
+//输出多维数组的时候，往往要采用输出方式2。
+
+//data变量是一个对象（并且包含有name和email两个属性）
+//输出方式1
+<p>Name：{$data:name}</p>
+<p>Email：{$data:email}</p>
+
+//输出方式2
+<p>Name：{$data->name}</p>
+<p>Email：{$data->email}</p>
+
+</html>
+
+<html>
+//系统变量输出
+//可以直接在模板中输出，系统变量的输出通常以{$Think** 打头，例如：
+<p>{$Think.server.script_name}</p> // 输出$_SERVER['SCRIPT_NAME']变量
+<p>{$Think.session.user_id}</p> // 输出$_SESSION['user_id']变量
+<p>{$Think.get.pageNumber}</p> // 输出$_GET['pageNumber']变量
+<p>{$Think.cookie.name}</p>  // 输出$_COOKIE['name']变量
+
+//支持输出 $_SERVER、$_ENV、 $_POST、 $_GET、 $_REQUEST、$_SESSION和 $_COOKIE变量。
+</html>
+
+<html>
+//请求参数输出
+//模板支持直接输出Request请求对象的方法参数，用法如下：$Request.方法名.参数,例如：
+
+<p>{$Request.get.id}</p>
+<p>{$Request.param.name}</p>
+
+//支持Request类的大部分方法，但只支持方法的第一个参数。例如：
+// 调用Request对象的get方法 传入参数为id
+<p>{$Request.get.id}</p>
+// 调用Request对象的param方法 传入参数为name
+<p>{$Request.param.name}</p>
+// 调用Request对象的param方法 传入参数为user.nickname
+<p>{$Request.param.user.nickname}</p>
+// 调用Request对象的root方法
+<p>{$Request.root}</p>
+// 调用Request对象的root方法，并且传入参数true
+<p>{$Request.root.true}</p>
+// 调用Request对象的path方法
+<p>{$Request.path}</p>
+// 调用Request对象的module方法
+<p>{$Request.module}</p>
+// 调用Request对象的controller方法
+<p>{$Request.controller}</p>
+// 调用Request对象的action方法
+<p>{$Request.action}</p>
+// 调用Request对象的ext方法
+<p>{$Request.ext}</p>
+// 调用Request对象的host方法
+<p>{$Request.host}</p>
+// 调用Request对象的ip方法
+<p>{$Request.ip}</p>
+// 调用Request对象的header方法
+<p>{$Request.header.accept-encoding}</p>
+
+</html>
+
+<html>
+//使用函数
+//对模板输出变量使用函数，可以使用：
+<p>{$data.name|md5}</p>
+
+//如果函数有多个参数需要调用，则使用：
+<p>{$create_time|date="y-m-d",###}</p>
+//表示date函数传入两个参数，每个参数用逗号分割，这里第一个参数是y-m-d，第二个参数是前面要输出的create_time变量，因为该变量是第二个参数，因此需要用###标识变量位置
+
+//如果前面输出的变量在后面定义的函数的第一个参数，
+<p>{$data.name|substr=###,0,3}</p>
+//则可以直接简化为：
+<p>{$data.name|substr=0,3}</p>
+
+//还可以支持多个函数过滤，多个函数之间用“|”分割即可，函数会按照从左到右的顺序依次调用。例如：
+<p>{$name|md5|strtoupper|substr=0,3}</p>
+
+</html>
+
+<html>
+//使用默认值
+//给变量输出提供默认值，例如：
+<p>{$user.nickname|default="这家伙很懒，什么也没留下"}</p>
+
+//对系统变量依然可以支持默认值输出，例如：
+<p>{$Think.get.name|default="名称为空"}</p>
+
+//默认值和函数可以同时使用，例如：
+<p>{$Think.get.name|getName|default="名称为空"}</p>
+
+
+</html>
+
+<html>
+//运算符
+// “+”“-” “*” “/”和“%” “++” “--”的支持
+<p>{$a+$b}、{$a-$b}、{$a*$b}、{$a/$b}、{$a%$b}、{$a++}、{++$a}、{$a--}、{--$a}、{$a+$b*10+$c}</p>
+
+//在使用运算符的时候，不再支持常规函数用法，
+<p>{$user['score']|myFun*10}</p> //错误的
+<p>{$user['score']+myFun($user['level'])}</p>//正确的
+
+//支持三元运算符，例如：
+<p>{$status? '正常' : '错误'}</p>
+<p>{$info['status']? $info['msg'] : $info['error']}</p>
+<p>{$info.status? $info.msg : $info.error }</p>
+
+//前面的表达式为真输出yes,否则输出no， 条件可以是“==”、“===”、“!=”、“!==”、“>=”、“<=”
+<p>{$a==$b ? 'yes' : 'no'}</p>
+
+</html>
+
+<html>
+//原样输出
+//所有可能和内置模板引擎的解析规则冲突的地方都可以使用literal标签处理。
+{literal}
+    Hello,{$name}！
+{/literal}
+
+//上面的{$name}标签被literal标签包含，因此并不会被模板引擎解析，而是保持原样输出。
+</html>
+
+<?php
+//查询语言
+//查询条件相关的用法我们称之为查询语言，查询语言可以用于数据库的URD操作，要掌握查询语言的核心，谨记：2个方法，3个用法，8个要诀。
+
+//2个方法
+//where和whereOr方法可以在一次查询操作中多次调用
+
+//3个用法
+//表达式、数组和闭包用法，并且可以混合使用
+//表达式用法:
+//where('字段名','表达式','查询条件');
+//whereOr('字段名','表达式','查询条件');
+//数组用法,数组用法其实是多字段的表达式用法，在一个方法完成所有的查询条件:    
+where([
+'字段名1'=>['表达式','查询条件'],
+'字段名2'=>['表达式','查询条件'],
+'字段名2'=> '条件（等于）',
+...
+])
+//数组用法不够灵活，有时候需要和其它用法配合使用，出于安全考虑也并不推荐。
+
+//闭包用法,指的是直接在where或者whereOr方法中传入闭包，和前面两种用法配合可以完成复杂的查询条件，闭包方法只有一个查询对象参数，如果需要在闭包中使用外部的变量，可以使用闭包的use语法
+$id     = 1;
+$name   = 'think';
+$result = Db::table('data')
+    ->where(function ($query) use ($id) {
+        $query->where('id', $id);
+    })
+    ->whereOr(function ($query) use ($id, $name) {
+        $query->where('name', 'like', '%' . $name . '%')->where('id', '<>', $id);
+    })
+    ->select();
+
+//8个要诀
+    //1查询条件的调用次序就是生成SQL的条件顺序；
+    //2查询字段用&分割表示对多个字段使用AND查询；
+    //3查询字段用|分割表示对多个字段使用OR查询；
+    //4对同一个查询字段多次调用非等查询条件会合并查询；
+    //5闭包查询和EXP查询会在生成的查询语句两边加上括号；
+    //6用闭包查询替代3.2版本的组合查询；
+    //7除了EXP查询外，其它查询都会自动使用参数绑定；
+	//8如果查询条件来自用户输入，尽量使用表达式和闭包查询，数组条件查询务必使用官方推荐的方法获取变量；
+?>
+
+
+<!--/  HY 2018/2/7 -->
+

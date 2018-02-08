@@ -78,5 +78,56 @@
                   //返回前端的信息
                   $result='success';
              //break;
+        UserModel::update([
+            'authority'=>('{"isspat":{"create":0,"edit":0,"audit":1,"approve":1,"execute":1,"maintain":1},
+            "isspro":{"create":0,"edit":0,"audit":0,"approve":0,"execute":0,"maintain":0},
+            "issthe":{"create":0,"edit":0,"audit":0,"approve":0,"execute":0,"maintain":0},
+            "att":{"upload":1,"download":1,"delete":1}}'),
+         ], ['id' => $userlg->id]);
+         
+         $authority=array('isspat'=>array('create'=>0,'edit'=>0,'audit'=>1,'approve'=>1,'execute'=>1,'maintain'=>1),
+                          'isspro'=>array('create'=>0,'edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0),
+                          'issthe'=>array('create'=>0,'edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0),
+                          'att'=>array('upload'=>1,'download'=>1,'delete'=>1),
+                          );
+                          
 
+          switch($oprt){
+            case 'edit':
+              $map['status'] =['in',['填报','返回修改','修改完善']];
+              $map['dept'] =$this->dept;
+            break;
+            
+            case 'audit':
+              $map['status'] ='待审核';
+              $map['dept'] =$this->dept;
+            break;
+            
+            case 'approve':
+              $map['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
+            break;
+            
+            case 'execute':
+              $map['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
+              $map['dept'] =$this->dept;
+            break;
+            
+            case 'maintain':
+              $map['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
+                                      '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
+            break;
+          }
+         
+         $mapAudit['status'] ='待审核';
+         $mapAudit['dept'] =$this->dept;
+         
+         $mapApprove['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
+         
+         $mapExecute['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
+         $mapExecute['dept'] =$this->dept;
+         
+         $mapMaintain['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
+                                      '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
+         
+         $map['status'] ='完结';
 ?>

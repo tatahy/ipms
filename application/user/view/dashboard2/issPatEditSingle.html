@@ -1,0 +1,57 @@
+<!-- // issPatEditSingle.html： -->
+
+<div id="divIssPatEditSingle">
+	<h4><span class="label label-warning">事务概要</span></h4>
+	<div class="bs-callout bs-callout-warning">
+		<h4>标题：<strong>{$iss.topic}</strong></h4>
+		<ul>
+			<li>撰写人：{$iss.writer}；执行人：{$iss.executer}；</li>
+			<li>事务类型：{$iss.issmap_type}；</li>
+			<li>简介：{$iss.abstract}</li>
+			<li>状态：<a href="{$home}/issue/index/issrecords/id/{$iss.id}" target="_blank" data-toggle="tooltip" title="过程记录"><span class="label label-primary">{$iss.status}</span></a>
+			</li>
+				
+				
+		</ul>
+					
+		<footer>
+			<div class="row">
+				<div class="col-sm-4">
+					<a href="{$home}/issue/index/issinfo/id/{$iss.id}" target="_blank" data-toggle="tooltip" title="事务详情">查看详情</a>
+						
+				</div>
+							
+				<div id="divAddNewDate" class="col-sm-4">填报时间：{$iss.addnewdate}</div>
+									
+			</div>
+		</footer>
+						
+	</div>
+	
+	<form id="fmIssPat" action="" role="form" enctype="multipart/form-data">
+	<!-- // 事务信息编辑-->
+	
+	
+	<!-- // 附件上传-->
+	
+	
+	<!-- // 按钮-->
+		<div class="row">
+		<div class="form-group col-sm-12">
+			<input type="submit" id="btnSave" class="btn btn-primary btn-sm" data-oprt="update" value="更新"> 
+			
+			<button type="submit" id="btnSubmit" class="btn btn-primary btn-sm" data-oprt="submit"><span class="glyphicon glyphicon-ok"></span>提交</button>
+ 			
+			<div  class="pull-right">
+				<input type="reset" class="btn btn-primary btn-sm" value="重置">
+				<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
+			</div>
+			
+		</div>
+		</div>
+	</form>		
+</div>
+
+<script>
+
+</script>
