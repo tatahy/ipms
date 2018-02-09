@@ -1,11 +1,14 @@
-<!-- // issPatEdit.html： -->
+<!-- // issPatMaintain.html： -->
 
-<div id="divIssPatEdit">	
-	<!-- <p>$mapEdit={$mapEdit}</p> -->
-	
-	<p></p>
-	
-	<h4 id="h4Title">待编辑专利事务<span class="badge red">{$numTotal}</span></h4>
+<div id="divIssPatMaintain">	
+	<h4 id="h4Title">专利事务<span class="label label-info">维护&nbsp;
+	{eq name="$numTotal" value="0"}
+		<span class="badge">{$numTotal}</span>
+	{else/}
+		<span class="badge red">{$numTotal}</span>
+	{/eq}
+	</span>
+	</h4>
 	
 	<div class="table-responsive">
 		<table class="table table-bordered table-hover">
@@ -54,7 +57,7 @@
 					<td>{$vo.dept}</td>
 					
 					<td class="btnTpl">
-						<a class="edit" href="#modalIssPatEditSingle" data-issId="{$vo.id}" data-toggle="modal" ><span class="glyphicon glyphicon-edit text-primary"></span>编辑</a>
+						<a class="audit" href="#modalIssPatAuditSingle" data-issId="{$vo.id}" data-toggle="modal" ><span class="glyphicon glyphicon-calendar text-info"></span>&nbsp;维护</a>
 				
 					</td>
 				
@@ -84,8 +87,8 @@
 	
 </div>
 
-<!-- Modal "modalIssPatEditSingle" -->
-<div class="modal fade" id="modalIssPatEditSingle" role="dialog">
+<!-- Modal "modalIssPatAuditSingle" -->
+<div class="modal fade" id="modalIssPatAuditSingle" role="dialog">
 	<div class="modal-dialog modal-lg">
     
       <!-- Modal content-->
@@ -98,7 +101,7 @@
 		
         <div class="modal-body">
 			<!-- // 对patIss的增删改查页面显示位置-->
-			<div id="issPatEditSingle"></div>
+			<div id="issPatAuditSingle"></div>
 		</div>
 		
 		<!-- <div class="modal-footer"> -->
@@ -109,7 +112,7 @@
 	</div>
 
 </div>
-<!--/ Modal "modalIssPatEditSingle" -->
+<!--/ Modal "modalIssPatAuditSingle" -->
 
 
 <script>
@@ -118,7 +121,7 @@
 	$('#issPatTableRows').val('{$issPatTableRows}');
 	
 	// 根据后端控制器给出的排序字段{$sortName},排序方式{$sort}，修改th中a的显示形式
-	$('#divIssPatEdit thead a').each(function(){
+	$('#divIssPatMaintain thead a').each(function(){
 	
 		var glyAsc='<span class="small glyphicon glyphicon-sort-by-attributes text-muted"></span>';
 		var glyDesc='<span class="small glyphicon glyphicon-sort-by-attributes-alt text-warning"></span>';
@@ -151,14 +154,14 @@
 	});	
 	
 	// 添加bootstrap的tooltip属性
-	$('#divIssPatEdit thead th a').tooltip({title: '点击排序', placement: 'bottom'});
+	$('#divIssPatMaintain thead th a').tooltip({title: '点击排序', placement: 'bottom'});
 	
 	$('.patInfo a').tooltip({title: '专利信息', placement: 'bottom'});
 	$('.issInfo a').tooltip({title: '事务信息', placement: 'bottom'});
 	$('.issPatStatus a').tooltip({title: '事务过程记录', placement: 'bottom'});
 	
 	// 点击th中的a，表格中的内容根据a中的属性值进行排序
-	$('#divIssPatEdit thead a').click(function(){
+	$('#divIssPatMaintain thead a').click(function(){
 		
 		var sort=$(this).attr("sort");
 		var sortName=$(this).attr("sortName");
@@ -224,25 +227,25 @@
 		var issId=$(this).attr('data-issId');
 		var str=$(this).html();
 				
-		$.post('issPatEditSingle',
+		$.post('issPatAuditSingle',
 			{
 				'issId':issId,
 				'returnType':0,
 			},
 			function(data){
-				$('#issPatEditSingle').html(data);
+				$('#issPatAuditSingle').html(data);
 				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务：</span><strong>【'+str+'】</strong>');
-				$("#modalIssPatEditSingle").modal();
+				$("#modalIssPatAuditSingle").modal();
 			}
 		);
 		
 	});
 	
 	// 在modalIssPatEditSingle出现前应用jQuery的load方法加载对应文件。
-	<!-- $('#modalIssPatEditSingle').on('bs.show', function(){ -->
+	<!-- $('#modalIssPatAuditSingle').on('bs.show', function(){ -->
     	<!-- var sendData={"issId":}; -->
 		
-		<!-- $("#issPatEditSingle").load('issPatEditSingle',sendData); -->
+		<!-- $("#issPatAuditSingle").load('issPatAuditSingle',sendData); -->
   	<!-- }); -->
 
 <!-- function -->
@@ -274,7 +277,7 @@
 		var sendData = {'sortName':sortName,'sort':sort,'issPatTableRows':rows,'pageTotalNum':pageTotalNum,'searchDept':searchDept,'searchPatName':searchPatName,'searchPatStatus':searchPatStatus,'searchPatType':searchPatType,'searchWriter':searchWriter};
 		
 		<!-- // jquery load()方法，本文件重新加载到index2.html的指定区域<div id="issPat"></div> -->
-		$('#issPat').load('issPatEdit',sendData);
+		$('#issPat').load('issPatMaintain',sendData);
 		
 	}
 

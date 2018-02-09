@@ -107,7 +107,7 @@ class Dashboard2Controller extends \think\Controller
         $numIssPatExecute=$issSet->where($mapExecute)->count(); 
         $numIssPatMaintain=$issSet->where($mapMaintain)->count(); 
         $numIssPatDone=$issSet->where($map)->count(); 
-        $numTotal=$numIssPatEdit+$numIssPatAudit+$numIssPatApprove+$numIssPatExecute+$numIssPatMaintain+$numIssPatDone;
+        $numTotal=$numIssPatEdit+$numIssPatAudit+$numIssPatApprove+$numIssPatExecute+$numIssPatMaintain;
         
         //取出user的authority字段值
       //  $user=new UserModel;           
@@ -288,28 +288,27 @@ class Dashboard2Controller extends \think\Controller
       
     }
     
-    // 根据前端传来的authority输出对应模板文件，显示issue中与pat相关的数据集。
-     public function issPatEdit(Request $request)
+    
+    
+    //根据前端传来的权限，选择返回前端的模板文件及内容
+    public function issPatAuth(Request $request)
     {
       $this->_loginUser();
       
-       // $returnType接收前端页面传来的returnType值，‘0’为模板文件，‘1’为数据
+      // $role接收前端页面传来的auth值
+      if(!empty($request->param('auth'))){
+        $auth=$request->param('auth');
+      }else{
+        $auth='_DONE';
+      }
+      
+      // $returnType接收前端页面传来的returnType值，‘0’为模板文件，‘1’为数据
       if(!empty($request->param('returnType'))){
         $returnType=$request->param('returnType');
       }else{
         $returnType=0;
       }
-      
-      // $authority接收前端页面传来的authority值
-     // if(!empty($request->param('authority'))){
-//        $authority=$request->param('authority');
-//      }else{
-//        $authority='_EDIT';
-//      }
-//      
-//      // 忽略前端页面传来的issType值，直接赋值为'_PATENT'
-//      $issType='_PATENT';
-      
+
       //$totalTableRows接收前端页面传来的分页时每页显示的记录数，默认为10
       if(!empty($request->param('issPatTableRows'))){
           $issPatTableRows=$request->param('issPatTableRows');
@@ -428,220 +427,69 @@ class Dashboard2Controller extends \think\Controller
           $strOrder=$strOrder.' desc';
           
       }
+      //选择模板文件名,组合查询条件
+      switch($auth){
+          //_EDIT
+          case '_EDIT':
+            $map['status'] =['in',['填报','返回修改','修改完善']];
+            $map['dept'] =$this->dept;
+            $map['writer']=$this->username;
+            //$tplFile='issPatEdit';
+            $tplFile='edit';
+          break;
+          //_AUDIT
+          case '_AUDIT':
+            $map['status'] ='待审核';
+            $map['dept'] =$this->dept;
+            //$tplFile='issPatAudit';
+            $tplFile='audit';
+          break;
+          //_APPROVE
+          case '_APPROVE':
+            $map['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
+            //$tplFile='issPatApprove';
+            $tplFile='approve';
+          break;
+          //_EXECUTE
+          case '_EXECUTE':
+            $map['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
+            $map['dept'] =$this->dept;
+            $map['executer'] =$this->username;
+            //$tplFile='issPatExecute';
+            $tplFile='execute';
+          break;
+          //_MAINTAIN
+          case '_MAINTAIN':
+            $map['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
+                                      '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
+            //$tplFile='issPatMaintain';
+            $tplFile='maintain';
+          break;
+          //_DONE
+          default:
+            $map['status'] ='完结';
+            //$tplFile='issPatDone';
+            $tplFile='done';
+          break;
+          
+      }
       
-     //使用模型Issinfo
+      //得到模板文件中需显示的内容
+      //使用模型Issinfo
      $issSet = new IssinfoModel; 
-     $mapEdit['status'] =['in',['填报','返回修改','修改完善']];
-     $mapEdit['dept'] =$this->dept;
-     $mapEdit['writer']=$this->username;
-     
+          
      // 记录总数
-     $numTotal = $issSet->where($mapEdit)->count();
+     $numTotal = $issSet->where($map)->count();
           
      // 查出所有的用户并分页，根据“strOrder”排序，前端页面显示的锚点（hash值）为$fragment，设定分页页数变量：“pageTotalNum”
      // 带上每页显示记录行数$totalTableRows，实现查询结果分页显示。
-     $issPatTotal = $issSet->where($mapEdit)
+     $issPatTotal = $issSet->where($map)
                             ->order($strOrder)
                             ->paginate($issPatTableRows,false,['type'=>'bootstrap','var_page' => 'pageTotalNum',
                             'query'=>['issPatTableRows'=>$issPatTableRows]]);
      // 获取分页显示
      $pageTotal = $issPatTotal->render();
-     //
-//     switch($authority){            
-//        case'_TODO':
-//          if($this->auth['isspat']['edit']){
-//            $mapEdit['status'] =['in',['填报','返回修改','修改完善']];
-//            $mapEdit['dept'] =$this->dept;
-//            $mapEdit['writer']=$this->username;
-//            //$mapEdit['executer']=['notin',0];
-//          }else{$mapEdit=$map;}
-//          
-//          if($this->auth['isspat']['audit']){
-//            $mapAudit['status'] ='待审核';
-//            $mapAudit['dept'] =$this->dept;
-//            //$mapAudit['writer']=['notin',0];
-////            $mapAudit['executer']=['notin',0];
-//          }else{$mapEdit=$map;}
-//          
-//          if($this->auth['isspat']['approve']){
-//            $mapApprove['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
-//            //$mapApprove['dept'] =['notin',0];
-////            $mapApprove['writer']=['notin',0];
-////            $mapApprove['executer']=['notin',0];
-//          }else{$mapEdit=$map;}
-//          
-//          if($this->auth['isspat']['execute']){
-//            $mapExecute['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
-//            $mapExecute['dept'] =$this->dept;
-//           // $mapExecute['writer']=['notin',0];
-//            $mapExecute['executer']=$this->username;
-//          }else{$mapEdit=$map;}
-//          
-//          if($this->auth['isspat']['maintain']){
-//            $mapMaintain['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
-//                                      '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
-////            $mapMaintain['dept'] =['notin',0];
-////            $mapMaintain['writer']=['notin',0];
-////            $mapMaintain['executer']=['notin',0];
-//          }else{$mapMaintain=$map;}
-//          
-//          // 记录总数
-//          $numTotal = $issSet
-//                            ->where($mapEdit)
-//                            ->whereOr(function ($query) use ($mapExecute){
-//                              $query->where($mapExecute);
-//                              })
-//                            ->whereOr(function ($query) use ($mapAudit){
-//                              $query->where($mapAudit);
-//                              })
-//                            ->whereOr($mapApprove)
-//                            ->whereOr($mapMaintain)
-//                            ->count();
-//          
-//          // 查出所有的用户并分页，根据“strOrder”排序，前端页面显示的锚点（hash值）为$fragment，设定分页页数变量：“pageTotalNum”
-//          // 带上每页显示记录行数$totalTableRows，实现查询结果分页显示。
-//          $issPatTotal = $issSet
-//                            ->where($mapEdit)
-//                            ->whereOr(function ($query) use ($mapExecute){
-//                              $query->where($mapExecute);
-//                              })
-//                            ->whereOr(function ($query) use ($mapAudit){
-//                              $query->where($mapAudit);
-//                              })
-//                            ->whereOr($mapApprove)
-//                            ->whereOr($mapMaintain)
-//                            ->order($strOrder)
-//                            ->paginate($issPatTableRows,false,['type'=>'bootstrap','var_page' => 'pageTotalNum',
-//                            'query'=>['issPatTableRows'=>$issPatTableRows]]);
-//        break;
-//        
-//        case'_RESULT':
-//          if($this->auth['isspat']['edit']){
-//            $mapEdit['status'] =['notin',['填报','返回修改','修改完善','完结']];
-//            $mapEdit['dept'] =$this->dept;
-//            $mapEdit['writer']=$this->username;
-//          }else{$mapEdit=$map;}
-//          
-//          if($this->auth['isspat']['audit']){
-//            $mapAudit['status'] =['notin',['待审核','完结']];
-//            $mapAudit['dept'] =$this->dept;
-//          }else{$mapAudit=$map;}
-//          
-//          if($this->auth['isspat']['approve']){
-//            $mapApprove['status'] =['notin',['审核未通过','审核通过','变更申请','拟续费','完结']];
-//          }else{$mapApprove=$map;}
-//          
-//          if($this->auth['isspat']['execute']){
-//            $mapExecute['status'] =['notin',['批准申报','申报执行','申报修改','准予变更','否决变更','完结']];
-//            $mapExecute['dept'] =$this->dept;
-//            $mapExecute['executer']=$this->username;
-//          }else{$mapExecute=$map;}
-//          
-//          if($this->auth['isspat']['maintain']){
-//            $mapMaintain['status'] =['notin',['申报复核','申报提交','续费提交','准予续费',
-//                                      '否决申报','专利授权','专利驳回','放弃续费','续费授权','完结']];
-//          }else{$mapMaintain=$map;}
-//        break;
-//         
-//                 
-//        case'_DONE':
-//          $map['status'] ='完结';
-//          
-//              //根据权限对查询字段进行赋值
-//          if($this->auth['isspat']['edit']){
-//            $mapEdit['status']=1;
-//            $mapEdit['dept'] =$this->dept;
-//            $mapEdit['writer']=$this->username;
-//            $mapEdit['executer']=1;
-//          }else{
-//            $mapEdit['status']=0;
-//            $mapEdit['dept'] =0;
-//            $mapEdit['writer']=0;
-//            $mapEdit['executer']=0;
-//          } 
-//              
-//          if($this->auth['isspat']['audit']){
-//            $mapAudit['status']=1;
-//            $mapAudit['dept'] =$this->dept;
-//            $mapAudit['writer']=1;
-//            $mapAudit['executer']=1;
-//          }else{
-//            $mapAudit['status']=0;
-//            $mapAudit['dept'] =0;
-//            $mapAudit['writer']=0;
-//            $mapAudit['executer']=0;
-//          } 
-//                        
-//          if($this->auth['isspat']['execute']){
-//            $mapExecute['status']=1;
-//            $mapExecute['dept'] =$this->dept;
-//            $mapExecute['writer']=1;
-//            $mapExecute['executer']=$this->username;
-//          }else{
-//            $mapExecute['status']=0;
-//            $mapExecute['dept'] =0;
-//            $mapExecute['writer']=0;
-//            $mapExecute['executer']=0;
-//          } 
-//              
-//          if($this->auth['isspat']['approve']){
-//            $mapApprove['status']=1;
-//            $mapApprove['dept'] =1;
-//            $mapApprove['writer']=1;
-//            $mapApprove['executer']=1;
-//          }else{
-//            $mapApprove['status']=0;
-//            $mapApprove['dept'] =0;
-//            $mapApprove['writer']=0;
-//            $mapApprove['executer']=0;
-//          } 
-//                    
-//          if($this->auth['isspat']['maintain']){
-//            $mapMaintain['status']=1;
-//            $mapMaintain['dept'] =1;
-//            $mapMaintain['writer']=1;
-//            $mapMaintain['executer']=1;
-//          }else{
-//            $mapMaintain['status']=0;
-//            $mapMaintain['dept'] =0;
-//            $mapMaintain['writer']=0;
-//            $mapMaintain['executer']=0;
-//          }
-//                    
-//          //根据权限情况，组合查询条件
-//          if(($mapMaintain['dept'].$mapApprove['dept'])=='00' ){
-//            $map['dept'] =$this->dept;
-//          }else{
-//            $map['dept'] =['notin',0];
-//          }
-//          
-//          if(($mapMaintain['writer'].$mapApprove['writer'].$mapAudit['writer'].$mapExecute['writer'])=='0000'){
-//            $map['writer'] =$this->username;
-//          }else{
-//            $map['writer'] =['notin',0];
-//          }
-//          
-//          if(($mapMaintain['executer'].$mapApprove['executer'].$mapAudit['executer'].$mapEdit['executer'])=='0000'){
-//            $map['executer'] =$this->username;
-//          }else{
-//            $map['executer'] =['notin',0];
-//          }
-//          
-//           // 记录总数
-//          $numTotal = $issSet->where($map)->count();
-//          
-//          // 查出所有的用户并分页，根据“strOrder”排序，前端页面显示的锚点（hash值）为$fragment，设定分页页数变量：“pageTotalNum”
-//          // 带上每页显示记录行数$totalTableRows，实现查询结果分页显示。
-//          $issPatTotal = $issSet->where($map)
-//                            ->order($strOrder)
-//                            ->paginate($issPatTableRows,false,['type'=>'bootstrap','var_page' => 'pageTotalNum',
-//                            'query'=>['issPatTableRows'=>$issPatTableRows]]);
-//          
-//        break;
-//     }      
-      
-      
-     //返回数据还是模板文件,‘0’为模板文件，‘1’为数据
+      //返回数据还是模板文件,‘0’为模板文件，‘1’为数据
       if($returnType){
         //响应前端的请求，返回前端要求条件的issPat数量
         return ($numTotal);
@@ -666,49 +514,58 @@ class Dashboard2Controller extends \think\Controller
         
               // 表格排序信息
               'sortName'=>$sortName,
-              'sort'=>$sort,
-              //'patIssTableRows'=>$patIssTableRows,
-              
-              // 所return的页面显示的iss流程$issStatus
-              //'authority'=>$authority,
-              
-              //
-              'mapEdit'=>json_encode($mapEdit),
-              //'mapAudit'=>json_encode($mapAudit),
-//              'mapApprove'=>json_encode($mapApprove),
-//              'mapExecute'=>json_encode($mapExecute),
-//              'mapMaintain'=>json_encode($mapMaintain),
-              // 所return的页面，某个button的data-patIssId的值为patIssId
-              //'patIssId'=>$patIssId,
-              
-              // 返回前端role值
-              //'role'=>$role,
+              'sort'=>$sort,             
               
         ]);
-        // $this->assign(['a'=>'a','b'=>'b']);
-//      return $this->fetch();
-      //return $this->fetch('issPat', ['a'=>'a','b'=>'b']);
-      //return $this->display();
-      //return view('issPat', ['a'=>$request->param('issType'),'b'=>$request->param('authority')]);
         
-        return view();
+       // return view($tplFile);
+        return view('dashboard2'.DS.'issPatAuth'.DS.$tplFile);
       }
-     
-      
     }
     
-    
-    public function issPatEditSingle(Request $request)
+    //根据前端传来的权限，选择返回前端的模板文件及内容
+    public function issPatAuthSingle(Request $request)
     {
       $this->_loginUser();
       
+      //选择模板文件名
+      switch($request->param('auth')){
+        //_EDIT
+        case '_EDIT':
+          $tplFile='editSingle';
+        break;
+        //_AUDIT
+        case '_AUDIT':
+          $tplFile='auditSingle';
+        break;
+        //_APPROVE
+        case '_APPROVE':
+          $tplFile='approveSingle';
+        break;
+        //_EXECUTE
+        case '_EXECUTE':
+          $tplFile='executeSingle';
+        break;
+        //_MAINTAIN
+        case '_MAINTAIN':
+          $tplFile='maintainSingle';
+        break;
+        //_DONE
+        default:
+          $tplFile='doneSingle';
+        break;
+        
+      }
+      
+      //得到模板文件中需显示的内容
       $iss=IssinfoModel::get($request->param('issId'));
       $this->assign([
         'home'=>$request->domain(),
         'iss'=>$iss
       ]);
-      return $this->fetch();
-      //return view();
-
+      //return $this->fetch($tplFile);
+      return view('dashboard2'.DS.'issPatAuthSingle'.DS.$tplFile);
     }
+    
+    
 }

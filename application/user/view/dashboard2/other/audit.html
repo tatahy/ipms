@@ -1,0 +1,289 @@
+<!-- // audit.html： -->
+
+<div id="divIssPatAuth">	
+	<h4 id="h4Title">专利事务<span class="label label-warning">待审核&nbsp;
+	{eq name="$numTotal" value="0"}
+		<span class="badge">{$numTotal}</span>
+	{else/}
+		<span class="badge red">{$numTotal}</span>
+	{/eq}
+	</span>
+	</h4>
+	
+	<div class="table-responsive">
+		<table class="table table-bordered table-hover">
+			<thead>
+				<tr>
+					<th>序号</th>
+					<th><a data-toggle="tooltip" href="#"  sortName="_TOPIC" sort="{$sort}">标题</a></th>
+					<th><a data-toggle="tooltip" href="#"  sortName="_ABSTRACT" sort="{$sort}">简介</a></th>
+					<th><a data-toggle="tooltip" href="#"  sortName="_STATUS" sort="{$sort}">状态</a></th>
+					
+					<th><a data-toggle="tooltip" href="#"  sortName="_PATNAME" sort="{$sort}">专利名称</a></th>
+					<th><a data-toggle="tooltip" href="#"  sortName="_PATSTATUS" sort="{$sort}">专利类型</a></th>
+					
+					<th><a data-toggle="tooltip" href="#"  sortName="_ADDNEWDATE" sort="{$sort}">填报日期</a></th>
+					
+					<th><a data-toggle="tooltip" href="#"  sortName="_WRITER" sort="{$sort}">撰写人</a></th>
+					<th><a data-toggle="tooltip" href="#"  sortName="_EXECUTER" sort="{$sort}">执行人</a></th>
+					
+					<th><a data-toggle="tooltip" href="#"  sortName="_DEPT" sort="{$sort}">所属部门</a></th>
+					
+					<th class="tpl"><a data-toggle="tooltip" href="#"  sortName="_OPERATION" sort="{$sort}">操作视图</a></th>
+								
+					
+										
+				</tr>
+			</thead>
+			<tbody><!-- 此处显示数据库查询后的数据集 -->
+				{volist name="issPatTotal" id="vo" empty="暂时没有数据"}
+				<tr>
+					<td>{$i+($pageTotalNum-1)*$issPatTableRows}</a></td>
+					<td class="issInfo"><a href="{$home}/issue/index/issinfo/id/{$vo.id}" target="_blank" data-toggle="tooltip">{$vo.topic}</a></td>
+					<td>{$vo.abstract}</td>
+					<td class="issPatStatus"><a href="{$home}/issue/index/issrecords/id/{$vo.id}" target="_blank" data-toggle="tooltip">{$vo.status}</a></td>
+					
+					{//应用TP5中模型的多态1对多关联得到专利事务对应的专利名称$vo.issmap.topic，关键是要在issinfo模型中定义morphTo的方法名"issmap"，就可"." 出$vo.issmap.topic}
+					<td class="patInfo"><a href="{$home}/patent/index/patinfo/id/{$vo.issmap_id}" target="_blank" data-toggle="tooltip">{$vo.issmap.topic}</a></td>
+					
+					{//同上得到$vo.issmap.pattype}
+					<td>{$vo.issmap.pattype}</td>
+					
+					<td>{$vo.addnewdate}</td>
+					
+					<td>{$vo.writer}</td>
+					<td>{$vo.executer}</td>
+					
+					<td>{$vo.dept}</td>
+					
+					<td class="btnTpl">
+						<a class="audit" href="#modalIssPatAuthSingle" data-issId="{$vo.id}" data-issue-authority="_AUDIT"data-toggle="modal" ><span class="glyphicon glyphicon-check text-warning"></span>&nbsp;审核</a>
+				
+					</td>
+				
+					
+					
+				</tr>
+				{/volist}
+			</tbody>
+		</table>
+	</div>
+	
+	<div id="divIssPatTableRows" class="col-sm-12 text-right search">
+		<!-- // 分页变量 -->
+		<div class="col-sm-10 text-right">{$pageTotal}</div>
+						
+		<div class="form-group form-group-sm col-sm-2">
+			<span class="">每页记录行数：</span>
+				<select class="form-control" id="issPatTableRows">
+					<option value="5">5</option>
+					<option value="10">10</option>
+					<option value="20">20</option>
+					<option value="50">50</option>
+				</select>
+						
+		</div>
+	</div>
+	
+</div>
+
+<!-- Modal "modalIssPatAuthSingle" -->
+<div class="modal fade" id="modalIssPatAuthSingle" role="dialog">
+	<div class="modal-dialog modal-lg">
+    
+      <!-- Modal content-->
+      	<div class="modal-content">
+        <div class="modal-header bg-warning" style="border-radius:5px;">
+          	<button type="button" class="close" data-dismiss="modal">&times;</button>
+		  
+          	<h4><span class="glyphicon glyphicon-wrench">专利事务</span></h4>
+        </div>
+		
+        <div class="modal-body">
+			<!-- // 对patIss的增删改查页面显示位置-->
+			<div id="divIssPatSingle_load"></div>
+		</div>
+		
+		<!-- <div class="modal-footer"> -->
+          
+          
+        <!-- </div> -->
+		</div>
+	</div>
+
+</div>
+<!--/ Modal "modalIssPatAuthSingle" -->
+
+
+<script>
+	
+	<!-- //表格每页显示记录行数 -->
+	$('#issPatTableRows').val('{$issPatTableRows}');
+	
+	// 根据后端控制器给出的排序字段{$sortName},排序方式{$sort}，修改th中a的显示形式
+	$('#divIssPatAuth thead a').each(function(){
+	
+		var glyAsc='<span class="small glyphicon glyphicon-sort-by-attributes text-muted"></span>';
+		var glyDesc='<span class="small glyphicon glyphicon-sort-by-attributes-alt text-warning"></span>';
+		
+		//排序字段{$sortName}已赋值在a的“sortName”属性中
+		var sortName=$(this).attr('sortName');
+		// 排序方式{$sort}已赋值在a的“sort”属性中
+		var sort=$(this).attr('sort');
+		
+		<!-- // 后端控制器给出的排序字段{$sortName}, -->
+		if (sortName=='{$sortName}'){
+			if(sort=='_ASC'){
+				$(this).append(glyAsc);
+				$(this).attr('sort','_DESC');
+				$(this).attr('data-original-title','点击后降序');
+				// bootstap3中修改tooltip的options属性值
+				<!-- $(this).data("bs.tooltip").options.title="点击后降序"; -->
+				<!-- $(this).data("bs.tooltip").options.placement="top"; -->
+				$(this).tooltip({placement: 'top'});
+			}else{
+				$(this).append(glyDesc);
+				$(this).attr('sort','_ASC');
+				$(this).attr('data-original-title','点击后升序');
+				// bootstap3中修改tooltip的options属性值
+				<!-- $(this).data("bs.tooltip").options.title="点击后降序"; -->
+				<!-- $(this).data("bs.tooltip").options.placement="top"; -->
+				$(this).tooltip({placement: 'top'});
+			}
+		}
+	});	
+	
+	// 添加bootstrap的tooltip属性
+	$('#divIssPatAuth thead th a').tooltip({title: '点击排序', placement: 'bottom'});
+	
+	$('.patInfo a').tooltip({title: '专利信息', placement: 'bottom'});
+	$('.issInfo a').tooltip({title: '事务信息', placement: 'bottom'});
+	$('.issPatStatus a').tooltip({title: '事务过程记录', placement: 'bottom'});
+	
+	// 点击th中的a，表格中的内容根据a中的属性值进行排序
+	$('#divIssPatAuth thead a').click(function(){
+		
+		var sort=$(this).attr("sort");
+		var sortName=$(this).attr("sortName");
+		
+		// 得到页面锚点值
+		<!-- var fragment = window.location.hash;	 -->
+		
+		<!-- //根据每页显示记录行数，pat状态，排序字段，排序方式加载页面 -->
+		loadMe($('#patIssTableRows').val(),sortName,sort);
+		
+	});
+	
+	// <td>里<a>标签的click事件,给标签所在行上色
+	$('td a').click(function(){
+		// 所有行去掉附加的bg-warning
+		$('tr').removeClass('bg-warning');
+		// 本<a>标签所在行上色bg-warning
+		$(this).parent().parent().addClass('bg-warning');
+	});
+	
+	<!-- //根据每页显示记录行数和issStatus加载页面 -->
+	$('#issPatTableRows').change(function(){
+		loadMe($(this).val());
+	
+	});	
+	
+	<!-- // 点击后端提供分页内容后分页索引中的a，根据a中的属性值进行显示 -->
+	$('#divIssPatTableRows a').click(function(event){
+		// a所在分页页数
+		var pageStr=$(this).text();
+		var pageNum;
+		//(li.active)所代表的页数
+		var pageNumActive=$('#divIssPatTableRows li.active').children('span').text();
+		
+		// jQuery的preventDefault()方法阻止元素发生默认的行为。阻止访问a的URL
+        event.preventDefault();
+		<!-- alert("pageStr:"+pageStr+" active:"+pageNumActive); -->
+		
+		switch(pageStr){
+			case'»':
+				//用"*"确保得到的是加法运算结果，而不是字符串
+				pageNum=(pageNumActive*1+1);
+			break;
+			
+			case'«':
+				pageNum=(pageNumActive*1-1);
+			break;
+			
+			default:
+				pageNum=pageStr;
+			break;
+		
+		}
+		<!-- alert("pageNum:"+pageNum); -->
+		
+		<!-- //根据每页显示记录行数，排序字段，排序方式，分页页数加载页面 -->
+		loadMe($('#issPatTableRows').val(),'{$sortName}','{$sort}',pageNum)
+	
+	});
+	
+	// patIss表格中<td>里<a>标签的click事件,Ajax处理数据引入内容
+	$(".btnTpl a").click(function(){
+		var issId=$(this).attr('data-issId');
+		var auth=$(this).attr('data-issue-authority');
+		var str=$(this).html();
+				
+		$.post('issPatAuthSingle',
+			{
+				'issId':issId,
+				'auth':auth,
+				'returnType':0,
+			},
+			function(data){
+				$('#divIssPatSingle_load').html(data);
+				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务：</span><strong>【'+str+'】</strong>');
+				$("#modalIssPatAuthSingle").modal();
+			}
+		);
+		
+	});
+	
+	// 在modalIssPatEditSingle出现前应用jQuery的load方法加载对应文件。
+	<!-- $('#modalIssPatAuthSingle').on('bs.show', function(){ -->
+    	<!-- var sendData={"issId":}; -->
+		
+		<!-- $("#divIssPatSingle_load").load('divIssPatSingle_load',sendData); -->
+  	<!-- }); -->
+
+<!-- function -->
+	
+	//**函数名：loadMe
+ 	//* 作用：加载本页面内容到load本页面的上一级页面（writer/reviewer/operator.html…）中<div id="patIss"></div>
+	//* 参数1：rows，类型：数值。值：可为空，每页显示的记录行数。默认为10。
+	//* 参数2：sortName，类型：字符。值：可为空，排序字段名称。默认为‘_TOPIC’。
+	//* 参数3：sort，类型：字符。值：可为空，排序方式。默认为'_ASC'。
+	//* 参数4：pageTotalNum，类型：数值。值：可为空，分页页数。默认为1。
+	
+	function loadMe(rows,sortName,sort,pageTotalNum){
+		
+		// 本页的5个查询词
+		var searchDept=$('#searchDept').val();
+		var searchPatName=$('#searchPatName').val();
+		var searchPatStatus=$('#searchPatStatus').val();
+		var searchPatType=$('#searchPatType').val();
+		var searchWriter=$('#searchWriter').val();
+		
+		if(rows){}else{rows=10;}
+		<!-- if(issProcess){}else{issProcess='_TODO';} -->
+		if(sortName){}else{sortName='_TOPIC';}
+		// 升序or降序
+		if(sort){}else{sort='_ASC';}
+		if(pageTotalNum){}else{pageTotalNum=1;}
+		
+		// 组装通过“post”提交的数据，名称与后端所用一致
+		var sendData = {'sortName':sortName,'sort':sort,'issPatTableRows':rows,'pageTotalNum':pageTotalNum,'searchDept':searchDept,'searchPatName':searchPatName,'searchPatStatus':searchPatStatus,'searchPatType':searchPatType,'searchWriter':searchWriter};
+		
+		<!-- // jquery load()方法，本文件重新加载到index2.html的指定区域<div id="divIssPatAuth_load"></div> -->
+		$('#divIssPatAuth_load').load('issPatAudit',sendData);
+		
+	}
+
+<!-- function -->
+
+
+</script>

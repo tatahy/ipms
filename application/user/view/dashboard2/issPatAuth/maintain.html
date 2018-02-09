@@ -1,0 +1,30 @@
+<!-- // 绝对文件路径加载父模板-->
+{extend name="../application/user/view/dashboard2/issPatAuth/base.html" /}
+{block name="title"}
+	<h4 id="h4Title">专利事务<span class="label label-info">维护&nbsp;
+	{eq name="$numTotal" value="0"}
+		<span class="badge">{$numTotal}</span>
+	{else/}
+		<span class="badge red">{$numTotal}</span>
+	{/eq}
+	</span>
+	
+	&nbsp;<button id="btnAddRenew"  type="button" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-repeat"></span>续费管理</button>
+	</h4>
+{/block}
+
+{block name="btnTpl"}
+	<td class="btnTpl">
+		<a class="audit" href="#modalIssPatAuthSingle" data-issId="{$vo.id}" data-toggle="modal" ><span class="glyphicon glyphicon-calendar text-info"></span>_维护</a>
+	</td>
+{/block}
+
+<script>
+$(document).ready(function(){
+
+
+
+});
+</script>
+
+
