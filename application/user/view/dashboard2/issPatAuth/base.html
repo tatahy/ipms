@@ -1,16 +1,30 @@
-<!-- // base.html： -->
+<!-- // base.html -->
+{/*  总共有4处block用于子模板修改，
+	name="titleSpan"，
+	name="addLabel"，
+	name="btnTpl"，
+	name="script" */}
 
 <div id="divIssPatAuth">		
-	{block name="title"}
-	<h4 id="h4Title">专利事务<span class="label label-primary">待编辑&nbsp;
+
+	<h4 id="h4Title">专利事务
+{block name="titleSpan"}	
+	<span class="label label-primary">待编辑&nbsp;	
+{/block}
 	{eq name="$numTotal" value="0"}
 		<span class="badge">{$numTotal}</span>
 	{else/}
-		<span class="badge red">{$numTotal}</span>
+		{notin name="$auth" value="_DONE"}
+			<span class="badge badge-redfont-thisfile">{$numTotal}</span>
+		{else/}
+			<span class="badge badge-whitebg-thisfile">{$numTotal}</span>
+		{/notin}
 	{/eq}
 	</span>
+{block name="addLabel"}{/block}
+	
 	</h4>
-	{/block}
+	
 	
 	<div class="table-responsive">
 		<table class="table table-bordered table-hover">
@@ -31,10 +45,10 @@
 					
 					<th><a data-toggle="tooltip" href="#"  sortName="_DEPT" sort="{$sort}">所属部门</a></th>
 					
-					<th class="tpl"><a data-toggle="tooltip" href="#"  sortName="_OPERATION" sort="{$sort}">操作视图</a></th>
-								
-					
-										
+					{notin name="$auth" value="_DONE"}
+					<th class="tpl"><a data-toggle="tooltip" href="#"  sortName="_OPERATION" sort="{$sort}">操作</a></th>
+					{/notin}
+
 				</tr>
 			</thead>
 			<tbody><!-- 此处显示数据库查询后的数据集 -->
@@ -57,12 +71,15 @@
 					<td>{$vo.executer}</td>
 					
 					<td>{$vo.dept}</td>
-					{block name="btnTpl"}
+{block name="btnTpl"}
+					{notin name="$auth" value="_DONE"}
 					<td class="btnTpl">
 						<a class="" href="#modalIssPatAuthSingle" data-issId="{$vo.id}" data-issue-authority="_EDIT" data-toggle="modal" ><span class="glyphicon glyphicon-pencil text-primary"></span>_编辑</a>
 				
 					</td>
-					{/block}
+					{/notin}
+					
+{/block}
 					
 					
 				</tr>
@@ -116,7 +133,23 @@
 </div>
 <!--/ Modal "modalIssPatAuthSingle" -->
 
+<style>
+.badge-redbg-thisfile{
+	background-color:red;
+}
 
+.badge-whitebg-thisfile{
+	color: #777;
+	background-color:#fff;
+}
+
+.badge-redfont-thisfile{
+	color: red;
+    background-color: #fff;
+}
+</style>
+
+{block name="script"}
 <script>
 $(document).ready(function(){	
 	<!-- //表格每页显示记录行数 -->
@@ -241,7 +274,6 @@ $(document).ready(function(){
 				//在本文件#divIssPatSingle_load处渲染显示data
 				$('#divIssPatSingle_load').html(data);
 				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务：</span><strong>【'+str+'】</strong>');
-				$("#modalIssPatAuthSingle").modal();
 			}
 		);
 		
@@ -280,7 +312,7 @@ $(document).ready(function(){
 		if(pageTotalNum){}else{pageTotalNum=1;}
 		
 		// 组装通过“post”提交的数据，名称与后端所用一致
-		var sendData = {'sortName':sortName,'sort':sort,'issPatTableRows':rows,'pageTotalNum':pageTotalNum,'searchDept':searchDept,'searchPatName':searchPatName,'searchPatStatus':searchPatStatus,'searchPatType':searchPatType,'searchWriter':searchWriter};
+		var sendData = {'sortName':sortName,'sort':sort,'issPatTableRows':rows,'pageTotalNum':pageTotalNum,'searchDept':searchDept,'searchPatName':searchPatName,'searchPatStatus':searchPatStatus,'searchPatType':searchPatType,'searchWriter':searchWriter,'auth':$('.btnTpl a').attr('data-issue-authority')};
 		
 		<!-- // jquery load()方法，本文件加载到index2.html的指定区域<div id="divIssPatAuth_load"></div> -->
 		$('#divIssPatAuth_load').load('issPatAuth',sendData);
@@ -290,3 +322,4 @@ $(document).ready(function(){
 });
 
 </script>
+{/block}

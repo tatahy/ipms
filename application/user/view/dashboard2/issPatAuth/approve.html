@@ -1,19 +1,12 @@
 <!-- // 绝对文件路径加载父模板-->
 {extend name="../application/user/view/dashboard2/issPatAuth/base.html" /}
-{block name="title"}
-	<h4 id="h4Title">专利事务<span class="label label-danger">待审批&nbsp;
-	{eq name="$numTotal" value="0"}
-		<span class="badge">{$numTotal}</span>
-	{else/}
-		<span class="badge red">{$numTotal}</span>
-	{/eq}
-	</span>
-	</h4>
+{block name="titleSpan"}
+	<span class="label label-danger">待审批&nbsp;
 {/block}
 
 {block name="btnTpl"}
 	<td class="btnTpl">
-		<a class="audit" href="#modalIssPatAuthSingle" data-issId="{$vo.id}" data-toggle="modal" ><span class="glyphicon glyphicon-ok text-danger"></span>_审批</a>
+		<a class="audit" href="#modalIssPatAuthSingle" data-issId="{$vo.id}" data-issue-authority="_APPROVE" data-toggle="modal" ><span class="glyphicon glyphicon-ok text-danger"></span>_审批</a>
 	</td>
 {/block}
 

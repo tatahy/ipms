@@ -109,6 +109,15 @@ class Dashboard2Controller extends \think\Controller
         $numIssPatDone=$issSet->where($map)->count(); 
         $numTotal=$numIssPatEdit+$numIssPatAudit+$numIssPatApprove+$numIssPatExecute+$numIssPatMaintain;
         
+        //得到满足续费条件的专利数
+        $today=date('Y-m-d');
+        $deadline=date('Y-m-d',strtotime("+3 month"));
+        $mapRenew['status'] =['in',['授权','续费授权']];
+                  
+        // 查出满足条件的patent
+        $numPatRenewTotal= PatinfoModel::where($mapRenew)->where('renewdeadlinedate','between time',[$today,$deadline])->count();
+        
+        
         //取出user的authority字段值
       //  $user=new UserModel;           
 //        $userlg=$user->where('username',$username)->where('pwd',$pwd)->find();
@@ -154,6 +163,7 @@ class Dashboard2Controller extends \think\Controller
           'numIssPatMaintain'=>$numIssPatMaintain,
           'numIssPatDone'=>$numIssPatDone,
           'numTotal'=>$numTotal,
+          'numPatRenewTotal'=>$numPatRenewTotal,
       	
         ]);
         //return view();
@@ -286,9 +296,7 @@ class Dashboard2Controller extends \think\Controller
       // 将数组转化为json
       return json($operator);
       
-    }
-    
-    
+    } 
     
     //根据前端传来的权限，选择返回前端的模板文件及内容
     public function issPatAuth(Request $request)
@@ -465,6 +473,12 @@ class Dashboard2Controller extends \think\Controller
             //$tplFile='issPatMaintain';
             $tplFile='maintain';
           break;
+          //_MAINTAIN_RENEW
+          case '_MAINTAIN_RENEW':
+            $mapPat['status'] =['in',['授权','续费授权']];
+            //$tplFile='issPatMaintain';
+            $tplFile='patRenew';
+          break;
           //_DONE
           default:
             $map['status'] ='完结';
@@ -514,7 +528,8 @@ class Dashboard2Controller extends \think\Controller
         
               // 表格排序信息
               'sortName'=>$sortName,
-              'sort'=>$sort,             
+              'sort'=>$sort,
+              'auth'=>$auth          
               
         ]);
         
@@ -527,6 +542,13 @@ class Dashboard2Controller extends \think\Controller
     public function issPatAuthSingle(Request $request)
     {
       $this->_loginUser();
+      
+      // $oprt接收前端页面传来的oprt值
+      if(!empty($request->param('oprt'))){
+        $oprt=$request->param('oprt');
+      }else{
+        $oprt='_NONE';
+      }
       
       //选择模板文件名
       switch($request->param('auth')){
@@ -561,11 +583,136 @@ class Dashboard2Controller extends \think\Controller
       $iss=IssinfoModel::get($request->param('issId'));
       $this->assign([
         'home'=>$request->domain(),
-        'iss'=>$iss
+        'iss'=>$iss,
+        'oprt'=>$oprt,
+        'username'=>$this->username,
+        'dept'=>$this->dept
       ]);
       //return $this->fetch($tplFile);
       return view('dashboard2'.DS.'issPatAuthSingle'.DS.$tplFile);
     }
     
+    //根据前端传来的操作类型，对数据库进行操作
+    public function issPatOprt(Request $request)
+    {
+      $this->_loginUser();
+      
+      // $oprt接收前端页面传来的oprt值
+      if(!empty($request->param('oprt'))){
+        $oprt=$request->param('oprt');
+      }else{
+        $oprt='_NONE';
+      }
+            
+      switch($oprt){
+        //“_EDIT”权限
+        case'_ADDNEW':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        
+        case'_SUBMIT':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        
+        case'_DELETE':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        
+        case'_UPDATE':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        //“_AUDIT”权限
+        case'_PASS':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        
+        case'_FAIL':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        
+        case'_MODIFY':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        //“_APPROVE”权限
+        case'_PERMIT':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        
+        case'_VETO':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        
+        case'_COMPLETE':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        //“_EXECUTE”权限
+        case'_ACCEPT':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        
+        case'_REFUSE':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        
+        case'_REPORT':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        
+        case'_FINISH':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        //“_MAINTAIN”权限
+        case'_APPLY':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        
+        case'_IMPROVE':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        
+        case'_AUTHORIZE':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        
+        case'_REJECT':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        
+        case'_CLOSE':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        
+        case'_ADDRENEW':
+          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        break;
+        
+      }
+      
+    }
+    
+    //
+     public function patRenew(Request $request)
+    {
+      $this->_loginUser();
+      
+      $today=date('Y-m-d');
+      $deadline=date('Y-m-d',strtotime("+3 month"));
+      $map['status'] =['in',['授权','续费授权']];
+                  
+      // 查出满足条件的patent
+      $pat= PatinfoModel::where($map)->where('renewdeadlinedate','between time',[$today,$deadline])->order('renewdeadlinedate asc')->select();
+        
+      $this->assign([
+          'home'=>$request->domain(),
+          // 
+          'maintainer'=>$this->username,
+          'dept'=>$this->dept,
+          'pat'=>$pat,
+          'patRenewTotal'=>count($pat),
+      ]);
+       
+       //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>_RENEW 模块开发中……<br/></p></div>';
+       return view('dashboard2'.DS.'issPatAuth'.DS.'patRenew');
+    }
     
 }

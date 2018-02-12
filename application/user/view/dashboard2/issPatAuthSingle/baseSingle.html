@@ -1,6 +1,13 @@
 <!-- // issPatAuditSingle.html： -->
+{/*  总共有X处block用于子模板修改用，
+	name="abstract"
+	name="input"，
+	name="attInput"，
+	name="btn"，
+	name="script"  */}
 
-<div id="divIssPaAuditSingle">
+<div id="divIssPatAuthSingle">
+{block name="abstract"}
 	<h4><span class="label label-warning">事务概要</span></h4>
 	<div class="bs-callout bs-callout-warning">
 		<h4>标题：<strong>{$iss.topic}</strong></h4>
@@ -27,33 +34,79 @@
 		</footer>
 						
 	</div>
-	
+{/block}	
 	<form id="fmIssPat" action="" role="form" enctype="multipart/form-data">
 	<!-- // 事务信息编辑-->
-	{block name="input"}{/block}
+{block name="input"}
+	
+	<input id="issPatOprt" name="oprt" value="" type="text" hidden="true">
+	
+{/block}
+
 	
 	<!-- // 附件上传-->
-	{block name="attInput"}{/block}
+{block name="attInput"}
+
+
+
+{/block}
 	
-	<!-- // 按钮-->
-	{block name="btn"}
+
 		<div class="row">
+		<hr>
 		<div class="form-group col-sm-12">
-			<input type="submit" id="btnSave" class="btn btn-primary btn-sm" data-oprt="update" value="更新"> 
-			
-			<button type="submit" id="btnSubmit" class="btn btn-primary btn-sm" data-oprt="submit"><span class="glyphicon glyphicon-ok"></span>提交</button>
- 			
-			<div  class="pull-right">
+		
+		<!-- // 按钮-->
+{block name="btn"}{/block}
+
+		<div  class="pull-right">
 				<input type="reset" class="btn btn-primary btn-sm" value="重置">
 				<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
 			</div>
 			
 		</div>
 		</div>
-	{/block}
+
 	</form>		
 </div>
 
+{block name="script"}
 <script>
-
+$(document).ready(function(){	
+	//按钮按下时，将按钮的data-oprt属性值传到表单中的id=issPatOprt输入框
+	$('button').click(function(){
+		$('#issPatOprt').val($(this).attr('data-oprt'));
+	
+	});
+	
+	<!-- // 应用jQuery的$.ajax提交表单，提交前进行一些验证准备。利用输入框的“required”属性避免输入框无内容 -->
+	$('#fmIssPat').submit(function(event){					
+		//jQuery的preventDefault()方法阻止元素发生默认的行为——表单提交
+        event.preventDefault();
+		
+		// formdata形式上传表单数据,自动搜索表单信息(表单内没有name属性的input不会被搜索到)，IE<=9不支持FormData
+		var formData = new FormData($('#fmIssPat')[0]);
+		var oprt=$('#issPatOprt').val();
+		// 添加表单内没有的内容
+        formData.append('returnType',0);
+		formData.append('username','{$username}');
+		formData.append('dept','{$dept}');
+		formData.append('oprt',oprt);
+			
+        $.ajax({
+            type: 'post',
+            url: 'issPatOprt',
+            data: formData,
+            contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
+            processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)
+			
+            success: function(data) {
+                $('#divIssPatSingle_load').html(data);
+            }
+        });
+			
+	});	
+	
+});
 </script>
+{/block}

@@ -145,6 +145,15 @@ class Patinfo extends Model
 //      }
 //      return $outPut;
 //    }
+
+    /**
+     * 获取即将到期需授权续费的patent信息
+     */
+    public function patRenew()
+    {
+        
+        //return $this->belongsTo('app\issue\model\Issinfo');
+    }
     
     /**
      * 获取内容所属的issue信息

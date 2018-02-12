@@ -56,8 +56,8 @@
 			
 			<div id="collapsePat" class="panel-collapse collapse in">
 			<div class="panel-body " >
-				
-				<ul class="nav nav-tabs nav-justified">
+				<ul class="nav nav-pills nav-justified" >
+				<!-- <ul class="nav nav-tabs nav-justified"> -->
 					{eq name="$auth.isspat.edit" value="1"}
 					<li class=""><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_EDIT"><span class="glyphicon glyphicon-pencil"></span>&nbsp;编辑&nbsp;
 						{eq name="$numIssPatEdit" value="0"}
@@ -106,9 +106,19 @@
 							<span class="label label-info issPat span_MAINTAIN">{$numIssPatMaintain}/{$numTotal}</span>
 						{/eq}
 					</a></li>
+					{/eq}
+
+					{eq name="$auth.isspat.maintain" value="1"}
+					<li><a id="aPatRenew" class="aTab" href="#" data-issue-type="_PATENT" data-oprt="_RENEW"><span class="glyphicon glyphicon-repeat"></span>&nbsp;续费&nbsp;
+						{eq name="$numPatRenewTotal" value="0"}
+							<span class="badge">{$numPatRenewTotal}</span>
+						{else/}
+							<span class="label label-warning issPat span_RENEW">{$numPatRenewTotal}</span>
+						{/eq}
+					</a></li>
 					{/eq}					
 					
-					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_DONE"><span class="glyphicon glyphicon-folder-close"></span>&nbsp;完结&nbsp;
+					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_DONE"><span class="glyphicon glyphicon-off"></span>&nbsp;完结&nbsp;
 						{eq name="$numIssPatDone" value="0"}
 							<span class="badge">{$numIssPatDone}</span>
 						{else/}
@@ -162,93 +172,80 @@
 
 <!-- /pagewrap  -->
 
-<style>
-.red{
-	background-color:red;
-}
-</style>
 
 <script>
 $(document).ready(function(){
-	
-	// 根据后端传来的$auth决定本页面载入时默认load的文件
-	<!-- //TP5中 'issPatAuth'='{$home}/user/dashboard2/issPatAuth' -->
+	// 根据后端传来的$auth决定本页面载入时默认load的文件	
 	var auth='_DONE';
 	if({$auth.isspat.edit}){
 		auth='_EDIT';
 		//设置显示格式
-		$('.span_EDIT').removeClass('label').addClass('badge red');
+		$('.span_EDIT').removeClass('label').addClass('badge');
 		//设置span所在li为“active”
 		$('.span_EDIT').parent().parent().addClass('active');
 	}else if({$auth.isspat.audit}){
 		auth='_AUDIT';
-		$('.span_AUDIT').removeClass('label').addClass('badge red');
+		$('.span_AUDIT').removeClass('label').addClass('badge');
 		//设置span所在li为“active”
 		$('.span_AUDIT').parent().parent().addClass('active');
 	}else if({$auth.isspat.approve}){
 		auth='_APPROVE';
-		$('.span_APPROVE').removeClass('label').addClass('badge red');
+		$('.span_APPROVE').removeClass('label').addClass('badge');
 		//设置span所在li为“active”
 		$('.span_APPROVE').parent().parent().addClass('active');
 	}else if({$auth.isspat.execute}){
 		auth='_EXECUTE';
-		$('.span_EXECUTE').removeClass('label').addClass('badge red');
+		$('.span_EXECUTE').removeClass('label').addClass('badge');
 		//设置span所在li为“active”
 		$('.span_EXECUTE').parent().parent().addClass('active');
 	}else if({$auth.isspat.maintain}){
 		auth='_MAINTAIN';
-		$('.span_MAINTAIN').removeClass('label').addClass('badge red');
+		$('.span_MAINTAIN').removeClass('label').addClass('badge');
 		//设置span所在li为“active”
 		$('.span_MAINTAIN').parent().parent().addClass('active');
 	}else{
-		$('.span_DONE').removeClass('label').addClass('badge red');
+		$('.span_DONE').removeClass('label').addClass('badge');
 		//设置span所在li为“active”
 		$('.span_DONE').parent().parent().addClass('active');
 	}
+	<!-- //TP5中 'issPatAuth'='{$home}/user/dashboard2/issPatAuth' -->
 	$('#divIssPatAuth_load').load('issPatAuth',{'auth':auth});
 	
-	<!-- //点击.issPatATab中的各个按钮后，默认显示相应状态的issPat内容-->
+	$('.aTab').each(function(){
+		// 显示边框
+		$(this).css("border","solid 1px #ddd");
+		//添加横线
+		$(this).parent().parent().css("border-bottom","solid 0.1px #ddd");
+		
+	});
+	
+	<!-- //点击.aTab中的各个按钮后，默认显示相应状态的issPat内容-->
 	$('.aTab').click(function(){
         var issType=$(this).attr('data-issue-type');
 		var authority=$(this).attr('data-issue-authority');
 		var oprt='';
 		<!-- $('.aTab').find('.issPat').css("background-color","#777") .removeClass('badge'); -->
 		
-		$('.span_EDIT').removeClass('badge red').addClass('label label-primary');
-		$('.span_AUDIT').removeClass('badge red').addClass('label label-warning');
-		$('.span_APPROVE').removeClass('badge red').addClass('label label-danger');
-		$('.span_EXECUTE').removeClass('badge red').addClass('label label-info');
-		$('.span_MAINTAIN').removeClass('badge red').addClass('label label-info');
-		$('.span_DONE').removeClass('badge red').addClass('label label-default');
+		$('.span_EDIT').removeClass('badge').addClass('label label-primary');
+		$('.span_AUDIT').removeClass('badge').addClass('label label-warning');
+		$('.span_APPROVE').removeClass('badge').addClass('label label-danger');
+		$('.span_EXECUTE').removeClass('badge').addClass('label label-info');
+		$('.span_MAINTAIN').removeClass('badge').addClass('label label-info');
+		$('.span_DONE').removeClass('badge').addClass('label label-default');
+		$('.span_RENEW').removeClass('badge').addClass('label label-warning');
 		
-		$(this).find('.issPat').removeClass('label').addClass('badge red');
+		$(this).find('.issPat').removeClass('label').addClass('badge');
 		<!-- .css("background-color","red") -->
 		switch(issType){
 			case '_PATENT':
 				$(this).tab('show');
 				$(this).parent().addClass('active');
-				<!-- switch(authority){ -->
-					<!-- case'_EDIT': -->
-						<!-- oprt='issPatEdit'; -->
-					<!-- break; -->
-					<!-- case'_AUDIT': -->
-						<!-- oprt='issPatAudit'; -->
-					<!-- break; -->
-					<!-- case'_APPROVE': -->
-						<!-- oprt='issPatApprove'; -->
-					<!-- break; -->
-					<!-- case'_EXECUTE': -->
-						<!-- oprt='issPatExecute'; -->
-					<!-- break; -->
-					<!-- case'_MAINTAIN': -->
-						<!-- oprt='issPatMaintain'; -->
-					<!-- break; -->
-					<!-- //_DONE -->
-					<!-- default: -->
-						<!-- oprt='issPatDone'; -->
-					<!-- break; -->
-				<!-- } -->
-				$('#divIssPatAuth_load').load('issPatAuth',{'auth':authority});
+				if($(this).attr('data-oprt')=='_RENEW'){
+					$('#divIssPatAuth_load').load('patRenew');
+				}else{
+					$('#divIssPatAuth_load').load('issPatAuth',{'auth':authority});
+				}
+				
 			break;
 			
 			case '_PROJECT':
