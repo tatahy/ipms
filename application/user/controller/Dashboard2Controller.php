@@ -107,7 +107,6 @@ class Dashboard2Controller extends \think\Controller
         $numIssPatExecute=$issSet->where($mapExecute)->count(); 
         $numIssPatMaintain=$issSet->where($mapMaintain)->count(); 
         $numIssPatDone=$issSet->where($map)->count(); 
-        $numTotal=$numIssPatEdit+$numIssPatAudit+$numIssPatApprove+$numIssPatExecute+$numIssPatMaintain;
         
         //得到满足续费条件的专利数
         $today=date('Y-m-d');
@@ -117,6 +116,7 @@ class Dashboard2Controller extends \think\Controller
         // 查出满足条件的patent
         $numPatRenewTotal= PatinfoModel::where($mapRenew)->where('renewdeadlinedate','between time',[$today,$deadline])->count();
         
+        $numTotal=$numIssPatEdit+$numIssPatAudit+$numIssPatApprove+$numIssPatExecute+$numIssPatMaintain+$numPatRenewTotal;
         
         //取出user的authority字段值
       //  $user=new UserModel;           
