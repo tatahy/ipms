@@ -151,8 +151,10 @@ class Patinfo extends Model
      */
     public function patRenew()
     {
-        
-        //return $this->belongsTo('app\issue\model\Issinfo');
+        $today=date('Y-m-d');
+        $deadline=date('Y-m-d',strtotime("+3 month"));
+        $map['status'] =['in',['授权','续费授权']];
+        return $this->where($map)->where('renewdeadlinedate','between time',[$today,$deadline])->order('renewdeadlinedate asc')->select();
     }
     
     /**

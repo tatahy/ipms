@@ -938,7 +938,7 @@ $result = Db::table('data')
 
 <!--/  HY 2018/2/7 -->
 
-<!--/  HY 2018/2/11 -->
+<!--HY 2018/2/11 -->
 模板注释，在生成编译缓存文件后会自动删除，这一点和Html的注释不同。
 <html>
 //单行注释,注意{和注释标记之间不能有空格。
@@ -949,3 +949,71 @@ $result = Db::table('data')
 注释内容*/ }
 
 </html>
+
+<!--/  HY 2018/2/11 -->
+
+<!--HY 2018/2/13 -->
+后端如何响应前端的request。后端与前端的数据交换可以通过request动态进行。
+request里前端可以明确：
+1.前端需要后端返回什么？
+	例：前端需要JSON数组
+	"$request->param('returnType')=='_JSON'"
+2.前端提供了什么？
+	例：patId
+	"$request->param('patId')==58"
+
+后端响应request
+1.从数据库查到所需数据(已定义模型对象$patObj):
+	"$patObj->where('id',$request->param('patId'))->find()"
+2.组合返回前端的数组：
+	"array_merge($patObj->where('id',$request->param('patId'))->find()->toArray(),array("today"=>date('Y-m-d'),"username"=>$this->username,"deptMaintainer"=>$this->dept))"
+3.返回前端JSON数组：
+	"return json(array_merge($patObj->where('id',$request->param('patId'))->find()->toArray(),array("today"=>date('Y-m-d'),"username"=>$this->username,"deptMaintainer"=>$this->dept)));"
+
+//前端提交request的方式（我在jQuery常用）：
+<html>
+
+<script>
+	//1."load()":Loads data from a server and puts the returned data into the selected elementhtml中的某一个元素
+	$(selector).load(URL,[data],[function(responseTxt, statusTxt, xhr){}]); 
+	/* The optional 3rd parameter specifies a callback function to run when the load() method is completed. The callback function can have different parameters: */
+    /* responseTxt - contains the resulting content if the call succeeds */
+    /* statusTxt - contains the status of the call */
+    /* xhr - contains the XMLHttpRequest object */
+
+	
+	//2."$.post()":Loads data from a server using an AJAX HTTP POST request.
+	$.post('url',sendData,function(data){});
+	$(selector).post(URL,[data],[function(data,status,xhr){}],[dataType])
+
+	//3."({name:value, name:value, ... })":Performs an async AJAX request.The parameters specifies one or more name/value pairs for the AJAX request.
+	$.ajax({
+		//type可选：'post','get'
+		type: 'post',
+        url: 'issPatOprt',
+        data: formData,
+		// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
+        contentType: false,
+		// 是否序列化data属性，默认true(注意：false时type必须是post)
+        processData: false,
+		success(result,status,xhr): function(data) {
+        	
+        },
+		error(xhr,status,error)	: function(data) {
+        	
+        }	
+	});
+
+</script>
+
+</html>
+	
+//后端代码：
+<?php 
+	if($request->param('returnType')=='_JSON'){   
+    	return json(array_merge($patObj->where('id',$request->param('patId'))->find()->toArray(),array("today"=>date('Y-m-d'),"username"=>$this->username,"deptMaintainer"=>$this->dept)));
+    }
+?>
+
+<!--/  HY 2018/2/13 -->
+

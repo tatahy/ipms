@@ -593,7 +593,9 @@ class Dashboard2Controller extends \think\Controller
     }
     
     //根据前端传来的操作类型，对数据库进行操作
-    public function issPatOprt(Request $request)
+    public function issPatOprt(Request $request,IssinfoModel $issObj,IssrecordModel $issRdObj,
+                                PatinfoModel $patObj,PatrecordModel $patRdObj,
+                                AttinfoModel $attObj)
     {
       $this->_loginUser();
       
@@ -683,25 +685,28 @@ class Dashboard2Controller extends \think\Controller
         break;
         
         case'_ADDRENEW':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          if($request->param('returnType')=='_JSON'){
+            return json(array_merge($patObj->where('id',$request->param('patId'))->find()->toArray(),
+                              array("today"=>date('Y-m-d'),"username"=>$this->username,"deptMaintainer"=>$this->dept)));
+          }else{
+            return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          }
+          
         break;
         
       }
       
     }
     
-    //
-     public function patRenew(Request $request)
+    //为前端显示PatRenew模板准备，1.数据库数据；2.向模板变量赋值；3.选择模板文件PatRenew.html返回前端
+     public function patRenew(Request $request,PatinfoModel $patObj)
     {
       $this->_loginUser();
       
-      $today=date('Y-m-d');
-      $deadline=date('Y-m-d',strtotime("+3 month"));
-      $map['status'] =['in',['授权','续费授权']];
-                  
-      // 查出满足条件的patent
-      $pat= PatinfoModel::where($map)->where('renewdeadlinedate','between time',[$today,$deadline])->order('renewdeadlinedate asc')->select();
-        
+      //调用模型文件Patinfo.php中定义的patRenew方法找出合适的pat。
+      $pat= $patObj->patRenew();
+       
       $this->assign([
           'home'=>$request->domain(),
           // 

@@ -31,11 +31,7 @@
 						<td>{$vo.authrejectdate}</td>
 						<td>{$vo.renewdeadlinedate}</td>
 						<td class="btnOprt">			
-							{in name="vo.status" value="授权,续费授权"}
-								<a href="#modalPatRenew" data-toggle="modal" data-oprt="renew" data-patId="{$vo.id}"><span class="glyphicon glyphicon-repeat text-info"></span>_续费</a>
-							{else/}
-								<a href="#modalPatRenew" data-toggle="modal" data-oprt="close" data-patId="{$vo.id}"><span class="glyphicon glyphicon-repeat text-info"></span>无效</a>
-							{/in}  
+								<a href="#modalPatRenew" data-toggle="modal" data-oprt="_ADDRENEW" data-patId="{$vo.id}"><span class="glyphicon glyphicon-edit text-info"></span>_续费报告</a>
 						</td>
 					</tr>
 					{/volist}					
@@ -150,13 +146,10 @@
 				<div class="row">
 				<div class="form-group col-sm-12">			
 			
-					<button type="submit" id="btnRenewalReport" class="btn btn-primary btn-sm" data-oprt="renewal_report"><span class="glyphicon glyphicon-edit"></span>&nbsp;续费报告</button>
-			
-					<!-- <button type="submit" id="btnRenewalApply" class="btn btn-success btn-sm" data-oprt="renewal_apply"><span class="glyphicon glyphicon-open"></span>&nbsp;提交</button> -->
-			
-					<!-- <button type="submit" id="btnRenewalAbandon" class="btn btn-danger btn-sm" data-oprt="renewal_abandon"><span class="glyphicon glyphicon-ban-circle"></span>&nbsp;放弃</button> -->
+					<button type="submit" id="btnAddRenew" class="btn btn-primary btn-sm" data-oprt="_ADDRENEW"><span class="glyphicon glyphicon-edit"></span>续费报告</button>
 			
  					<div  class="pull-right">
+						<input type="reset" class="btn btn-primary btn-sm" value="重置">
 						<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
 					</div>
 				</div>
@@ -202,10 +195,9 @@ $(document).ready(function(){
 		
 		$.post('issPatOprt',
 			{
-				'role':'maintainer',
 				'oprt':'_ADDRENEW',
 				'patId':patId,
-				'returnType':0,
+				'returnType':'_JSON',
 			},
 			function(data){
 			// 后端返回的data为json格式
@@ -239,26 +231,9 @@ $(document).ready(function(){
         event.preventDefault();
 	
 		var oprt='_ADDRENEW';
-		var str='确定';
-		var title=oprt;
-		switch(oprt){
-			case 'renewal_apply':
-				str='确定续费【<span class="glyphicon glyphicon-open text-success"></span>&nbsp;提交】操作？';
-				title='续费【<span class="glyphicon glyphicon-open text-success"></span>&nbsp;提交】操作';
-			break;
+		var str='确定【'+$('#btnAddRenew').html()+'】操作？';
+		var title='【'+$('#btnAddRenew').html()+'】操作？';
 			
-			case 'renewal_abandon':
-				str='确定续费【<span class="glyphicon glyphicon-remove text-danger"></span>&nbsp;放弃】操作？';
-				title='续费【<span class="glyphicon glyphicon-remove text-danger"></span>&nbsp;放弃】操作';
-			break;
-			//默认为'renewal_report'
-			default:
-				str='确定续费【<span class="glyphicon glyphicon-edit text-primary"></span>&nbsp;报告】操作？';
-				title='续费【<span class="glyphicon glyphicon-edit text-primary"></span>&nbsp;报告】操作';
-			break;
-			
-		}
-		
 		$('#modalPatRenew').modal('hide');
 		$.confirm(str,function(e){
 			con=e;
@@ -272,18 +247,8 @@ $(document).ready(function(){
 		}).cancel('否(N)').ok('是(Y)');
 	});
 	
-	// 点击报告修改按钮，与form的submit()配合确定传给后端的oprt='renewal_report'
-	$('#btnRenewalReport').click(function(){
-		$('#oprt').val($(this).attr('data-oprt'));
-	});
-	
-	// 点击申报按钮，与form的submit()配合确定传给后端的oprt='renewal_apply'
-	$('#btnRenewalApply').click(function(){
-		$('#oprt').val($(this).attr('data-oprt'));
-	});
-	
-	// 点击放弃按钮，与form的submit()配合确定传给后端的oprt='renewal_abandon'
-	$('#btnRenewalAbandon').click(function(){
+	// 点击btnAddRenew按钮，与form的submit()配合确定传给后端的oprt='_ADDRENEW'
+	$('#btnAddRenew').click(function(){
 		$('#oprt').val($(this).attr('data-oprt'));
 	});
 	
@@ -314,29 +279,34 @@ $(document).ready(function(){
             data: formData,
             contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
             processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)
-            success: function(data) {
-                if(data.result=='success'){
-					
-					// 操作成功，提示框显示信息
-					$.alert(title+'成功<span class="glyphicon glyphicon-ok text-success"></span><hr>'+data.msg);
-					
-					//maintainer，载入续费管理页面
-					$.post('patIssTpl',
-						{
-							'role':'maintainer',
-							'tpl':'renew',
-							'returnType':0
-						},
-						function(data){
-							$('#divPatIss').html(data);
-						}
-					);
-					
-				}else{
-					$('#modalPatRenew').modal();
-					<!-- $.alert(data.msg); -->
-				}
+			success: function(data) {
+                $('#divPatRenew').html(data);
+				$('#modalPatRenew').modal('show');
+				
             }
+            <!-- success: function(data) { -->
+                <!-- if(data.result=='success'){ -->
+					
+					<!-- // 操作成功，提示框显示信息 -->
+					<!-- $.alert(title+'成功<span class="glyphicon glyphicon-ok text-success"></span><hr>'+data.msg); -->
+					
+					<!-- //maintainer，载入续费管理页面 -->
+					<!-- $.post('patIssTpl', -->
+						<!-- { -->
+							<!-- 'role':'maintainer', -->
+							<!-- 'tpl':'renew', -->
+							<!-- 'returnType':0 -->
+						<!-- }, -->
+						<!-- function(data){ -->
+							<!-- $('#divPatIss').html(data); -->
+						<!-- } -->
+					<!-- ); -->
+					
+				<!-- }else{ -->
+					<!-- $('#modalPatRenew').modal(); -->
+					<!-- <!-- $.alert(data.msg); --> -->
+				<!-- } -->
+            <!-- } -->
         });
 	}
 
