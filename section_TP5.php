@@ -464,7 +464,7 @@ User::create(request()->param(), true);
 User::update(request()->param(), ['id' => 1], true);
 
 ?>
-
+模型中添加业务逻辑
 添加业务逻辑，模型的优势不是用来做基础的CURD操作的，实际的应用中，一般都需要根据业务需求来增加额外的业务逻辑方法。
 以User模型为例，假设我们需要实现下列功能：
 
@@ -652,7 +652,7 @@ Db::table('think_user')->where('info$.email','thinkphp@qq.com')->find();
 ?>
 
 
-// json与array
+// json类型与array类型
 
 // 模型model（user.php）：设定“authority”字段为
 <?php
@@ -970,10 +970,11 @@ request里前端可以明确：
 3.返回前端JSON数组：
 	"return json(array_merge($patObj->where('id',$request->param('patId'))->find()->toArray(),array("today"=>date('Y-m-d'),"username"=>$this->username,"deptMaintainer"=>$this->dept)));"
 
-//前端提交request的方式（我在jQuery常用）：
+
 <html>
 
 <script>
+前端提交request的方式（我在jQuery常用）：
 	//1."load()":Loads data from a server and puts the returned data into the selected elementhtml中的某一个元素
 	$(selector).load(URL,[data],[function(responseTxt, statusTxt, xhr){}]); 
 	/* The optional 3rd parameter specifies a callback function to run when the load() method is completed. The callback function can have different parameters: */
@@ -1016,4 +1017,80 @@ request里前端可以明确：
 ?>
 
 <!--/  HY 2018/2/13 -->
+
+<!-- HY 2018/2/21 -->
+数组
+//遍历数组，输出键值对方式(PHP 4, PHP 5, PHP 7)
+<?php
+$arr = array("one", "two", "three");
+reset($arr);
+while (list($key, $value) = each($arr)) {
+    echo "Key: $key; Value: $value<br />\n";
+}
+
+foreach ($arr as $key => $value) {
+    echo "Key: $key; Value: $value<br />\n";
+}
+?>
+
+//遍历数组，输出值方式(PHP 4, PHP 5, PHP 7)
+<?php
+$arr = array("one", "two", "three");
+reset($arr);
+while (list(, $value) = each($arr)) {
+    echo "Value: $value<br>\n";
+}
+
+foreach ($arr as $value) {
+    echo "Value: $value<br />\n";
+}
+?>
+
+用 list() 给嵌套的数组解包(PHP 5 >= 5.5.0, PHP 7)
+<?php
+$array = [
+    [1, 2],
+    [3, 4],
+];
+
+foreach ($array as list($a, $b)) {
+    // $a contains the first element of the nested array,
+    // and $b contains the second element.
+    echo "A: $a; B: $b\n";
+}
+?>
+以上例程会输出：
+A: 1; B: 2
+A: 3; B: 4
+
+<!--/  HY 2018/2/21 -->
+
+
+<!-- HY 2018/2/22 -->
+数组和字符串互相转换实现方法
+
+$array=explode(separator,$string); 
+$string=implode(glue,$array);
+
+<?php
+$s1='Mon-Tue-Wed-Thu-Fri';
+$days_array=explode('-',$s1);
+//$days_array 变量现在是一个有5个元素的数组，其元素 Mon 的索引为0，Tue 的索引为1，等等。
+$s2=implode(',',$days_array);
+//$s2变量现在是一个用逗号分隔的一个星期中各天的列表：Mon,Tue,Wed,Thu,Fri
+
+
+?>
+
+字段排除
+注意的是，字段排除功能不支持跨表和join操作。
+<?php
+//要排除更多的字段
+Db::table('think_user')->field('user_id,content',true)->select();
+//或者用
+Db::table('think_user')->field(['user_id','content'],true)->select();
+
+?>
+
+<!--/  HY 2018/2/22 -->
 

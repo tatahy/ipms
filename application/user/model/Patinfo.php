@@ -152,9 +152,13 @@ class Patinfo extends Model
     public function patRenew()
     {
         $today=date('Y-m-d');
-        $deadline=date('Y-m-d',strtotime("+3 month"));
+        $deadline=date('Y-m-d',strtotime("+6 month"));
         $map['status'] =['in',['授权','续费授权']];
-        return $this->where($map)->where('renewdeadlinedate','between time',[$today,$deadline])->order('renewdeadlinedate asc')->select();
+        return $this->where($map)
+                    ->where('renewdeadlinedate','between time',[$today,$deadline])
+                    ->order('renewdeadlinedate asc')
+                    ->paginate();
+                   // ->select();
     }
     
     /**

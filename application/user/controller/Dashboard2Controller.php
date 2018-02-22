@@ -95,26 +95,51 @@ class Dashboard2Controller extends \think\Controller
         //execute
         $mapExecute['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
         $mapExecute['dept'] =$this->dept;
+        $mapExecute['executer'] =$this->username;
         //maintain
         $mapMaintain['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
                                       '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
         //done
         $map['status'] ='完结';
         
-        $numIssPatEdit=$issSet->where($mapEdit)->count(); 
-        $numIssPatAudit=$issSet->where($mapAudit)->count(); 
-        $numIssPatApprove=$issSet->where($mapApprove)->count(); 
-        $numIssPatExecute=$issSet->where($mapExecute)->count(); 
-        $numIssPatMaintain=$issSet->where($mapMaintain)->count(); 
-        $numIssPatDone=$issSet->where($map)->count(); 
+        if($this->auth['authiss']['edit']){
+          $numIssPatEdit=$issSet->where($mapEdit)->count(); 
+        }else{
+          $numIssPatEdit=0;
+        }
         
-        //得到满足续费条件的专利数
-        $today=date('Y-m-d');
-        $deadline=date('Y-m-d',strtotime("+3 month"));
-        $mapRenew['status'] =['in',['授权','续费授权']];
-                  
-        // 查出满足条件的patent
-        $numPatRenewTotal= PatinfoModel::where($mapRenew)->where('renewdeadlinedate','between time',[$today,$deadline])->count();
+        if($this->auth['authiss']['audit']){
+          $numIssPatAudit=$issSet->where($mapAudit)->count(); 
+        }else{
+          $numIssPatAudit=0;
+        }
+        
+        if($this->auth['authiss']['approve']){
+          $numIssPatApprove=$issSet->where($mapApprove)->count(); 
+        }else{
+          $numIssPatApprove=0;
+        }
+        
+        if($this->auth['authiss']['execute']){
+          $numIssPatExecute=$issSet->where($mapExecute)->count(); 
+        }else{
+          $numIssPatExecute=0;
+        }
+        
+        if($this->auth['authiss']['maintain']){
+          $numIssPatMaintain=$issSet->where($mapMaintain)->count(); 
+          //得到满足续费条件的专利数
+          $today=date('Y-m-d');
+          $deadline=date('Y-m-d',strtotime("+6 month"));
+          $mapRenew['status'] =['in',['授权','续费授权']];          
+          // 查出满足条件的patent
+          $numPatRenewTotal= PatinfoModel::where($mapRenew)->where('renewdeadlinedate','between time',[$today,$deadline])->count();
+        }else{
+          $numIssPatMaintain=0;
+          $numPatRenewTotal=0;
+        }
+        
+        $numIssPatDone=$issSet->where($map)->count(); 
         
         $numTotal=$numIssPatEdit+$numIssPatAudit+$numIssPatApprove+$numIssPatExecute+$numIssPatMaintain+$numPatRenewTotal;
         
@@ -460,9 +485,10 @@ class Dashboard2Controller extends \think\Controller
           break;
           //_EXECUTE
           case '_EXECUTE':
+            $map['executer'] =$this->username;
             $map['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
             $map['dept'] =$this->dept;
-            $map['executer'] =$this->username;
+            
             //$tplFile='issPatExecute';
             $tplFile='execute';
           break;
@@ -706,6 +732,16 @@ class Dashboard2Controller extends \think\Controller
       
       //调用模型文件Patinfo.php中定义的patRenew方法找出合适的pat。
       $pat= $patObj->patRenew();
+      
+            
+     // 查出所有的用户并分页，根据“strOrder”排序，前端页面显示的锚点（hash值）为$fragment，设定分页页数变量：“pageTotalNum”
+     // 带上每页显示记录行数$totalTableRows，实现查询结果分页显示。
+     //$issPatTotal = $issSet->where($map)
+//                            ->order($strOrder)
+//                            ->paginate($issPatTableRows,false,['type'=>'bootstrap','var_page' => 'pageTotalNum',
+//                            'query'=>['issPatTableRows'=>$issPatTableRows]]);
+     // 获取分页显示
+     $pageTotal = $pat->render();
        
       $this->assign([
           'home'=>$request->domain(),
@@ -714,6 +750,7 @@ class Dashboard2Controller extends \think\Controller
           'dept'=>$this->dept,
           'pat'=>$pat,
           'patRenewTotal'=>count($pat),
+          'pageTotal'=>$pageTotal,
       ]);
        
        //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>_RENEW 模块开发中……<br/></p></div>';

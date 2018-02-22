@@ -49,7 +49,13 @@
 			<div class="panel-heading">
 				<h4 class="panel-title">
         			<a data-toggle="collapse" data-parent="#accordion" href="#collapsePat"><span class="glyphicon glyphicon-wrench"></span>&nbsp;<strong>
-        			专利事务</strong>&nbsp;<span class="span0">{$numTotal}</span></a>
+        			专利事务</strong>&nbsp;
+					{eq name="$numTotal" value="0"}
+					<span class="span0">{$numTotal}</span>
+					{else/}
+					<span class="span0 badge">{$numTotal}</span>
+					{/eq}
+					</a>
       			</h4>
 			
 			</div>
@@ -58,7 +64,7 @@
 			<div class="panel-body " >
 				<ul class="nav nav-pills nav-justified" >
 				<!-- <ul class="nav nav-tabs nav-justified"> -->
-					{eq name="$auth.isspat.edit" value="1"}
+					{eq name="$auth.authiss.edit" value="1"}
 					<li class=""><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_EDIT"><span class="glyphicon glyphicon-pencil"></span>&nbsp;编辑&nbsp;
 						{eq name="$numIssPatEdit" value="0"}
 							<span class="badge">{$numIssPatEdit}</span>
@@ -68,7 +74,7 @@
 					</a></li>
 					{/eq}
 					
-					{eq name="$auth.isspat.audit" value="1"}
+					{eq name="$auth.authiss.audit" value="1"}
 					<li><a class="aTab" href="#"  data-issue-type="_PATENT" data-issue-authority="_AUDIT"><span class="glyphicon glyphicon-check"></span>&nbsp;审核&nbsp;
 						{eq name="$numIssPatAudit" value="0"}
 							<span class="badge">{$numIssPatAudit}</span>
@@ -78,7 +84,7 @@
 					</a></li>
 					{/eq}
 					
-					{eq name="$auth.isspat.approve" value="1"}
+					{eq name="$auth.authiss.approve" value="1"}
 					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_APPROVE"><span class="glyphicon glyphicon-ok"></span>&nbsp;审批&nbsp;
 						{eq name="$numIssPatApprove" value="0"}
 							<span class="badge">{$numIssPatApprove}</span>
@@ -88,7 +94,7 @@
 					</a></li>
 					{/eq}
 					
-					{eq name="$auth.isspat.execute" value="1"}
+					{eq name="$auth.authiss.execute" value="1"}
 					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_EXECUTE"><span class="glyphicon glyphicon-random"></span>&nbsp;执行&nbsp;
 						{eq name="$numIssPatExecute" value="0"}
 							<span class="badge">{$numIssPatExecute}</span>
@@ -98,7 +104,7 @@
 					</a></li>
 					{/eq}
 					
-					{eq name="$auth.isspat.maintain" value="1"}
+					{eq name="$auth.authiss.maintain" value="1"}
 					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_MAINTAIN"><span class="glyphicon glyphicon-calendar"></span>&nbsp;维护&nbsp;
 						{eq name="$numIssPatMaintain" value="0"}
 							<span class="badge">{$numIssPatMaintain}</span>
@@ -108,7 +114,7 @@
 					</a></li>
 					{/eq}
 
-					{eq name="$auth.isspat.maintain" value="1"}
+					{eq name="$auth.authiss.maintain" value="1"}
 					<li><a id="aPatRenew" class="aTab" href="#" data-issue-type="_PATENT" data-oprt="_RENEW"><span class="glyphicon glyphicon-repeat"></span>&nbsp;续费&nbsp;
 						{eq name="$numPatRenewTotal" value="0"}
 							<span class="badge">{$numPatRenewTotal}</span>
@@ -177,28 +183,28 @@
 $(document).ready(function(){
 	// 根据后端传来的$auth决定本页面载入时默认load的文件	
 	var auth='_DONE';
-	if({$auth.isspat.edit}){
+	if({$auth.authiss.edit}){
 		auth='_EDIT';
 		//设置显示格式
 		$('.span_EDIT').removeClass('label').addClass('badge');
 		//设置span所在li为“active”
 		$('.span_EDIT').parent().parent().addClass('active');
-	}else if({$auth.isspat.audit}){
+	}else if({$auth.authiss.audit}){
 		auth='_AUDIT';
 		$('.span_AUDIT').removeClass('label').addClass('badge');
 		//设置span所在li为“active”
 		$('.span_AUDIT').parent().parent().addClass('active');
-	}else if({$auth.isspat.approve}){
+	}else if({$auth.authiss.approve}){
 		auth='_APPROVE';
 		$('.span_APPROVE').removeClass('label').addClass('badge');
 		//设置span所在li为“active”
 		$('.span_APPROVE').parent().parent().addClass('active');
-	}else if({$auth.isspat.execute}){
+	}else if({$auth.authiss.execute}){
 		auth='_EXECUTE';
 		$('.span_EXECUTE').removeClass('label').addClass('badge');
 		//设置span所在li为“active”
 		$('.span_EXECUTE').parent().parent().addClass('active');
-	}else if({$auth.isspat.maintain}){
+	}else if({$auth.authiss.maintain}){
 		auth='_MAINTAIN';
 		$('.span_MAINTAIN').removeClass('label').addClass('badge');
 		//设置span所在li为“active”

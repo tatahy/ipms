@@ -261,10 +261,30 @@ var max=Math.max.apply(null, arr);//max=1
 
 <!--/  HY 2018/2/13 -->	
 
+
+<!--HY 2018/2/17 -->	
+jQuery，表单
+
+<script>
+$(document).ready(function(){
+	<!-- 重置表单，通过调用 DOM 中的reset方法来重置表单。 -->
+	$('#formId')[0].reset();
+	
+	<!-- 提交表单 -->
+	$('#formId').submit(function(event){});
+
+});
+
+</script>
+
+<!--/  HY 2018/2/17 -->	
+
 <!-- ......................问题................................ -->
 
 <!--/  HY 2018/1/21 -->
 1.jquery主要用于DOM操作，BOM操作则要通过JavaScript？
+DOM:Document Object Model
+BOM:Brower Object Model
 
 2.跨域访问?
 jsonp
