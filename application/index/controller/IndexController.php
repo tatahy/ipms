@@ -83,7 +83,7 @@ class IndexController extends \think\Controller
         $numpataut=$pats->where('id','>',0)->where('status','in',['授权','续费授权','续费中','放弃续费'])->count();
 
         $userA=new UserModel;
-        //调用模型层定义的userAuth()方法得到登录用户的各个模块权限
+        //调用User模型层定义的userAuth()方法，刷新登录用户的各个模块权限
         $authority=$userA->userAuth($username,$pwd);
           
           //--在index.html页面输出自定义信息的HTML代码块

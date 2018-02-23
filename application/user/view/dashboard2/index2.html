@@ -22,7 +22,7 @@
 	<!-- </h4> -->
 	<!-- <hr> -->
 	<!-- <a href="{$home}/user/index/index">旧版</a> -->
-	<ul class="nav nav-pills" style="border-bottom:solid 0.1px #ddd;">
+	<ul class="nav nav-pills" >
 		
 		<li><a href="{$home}/user/dashboard/index">roles版</a> </li>
 	</ul>
@@ -62,12 +62,12 @@
 			
 			<div id="collapsePat" class="panel-collapse collapse in">
 			<div class="panel-body " >
-				<ul class="nav nav-pills nav-justified" >
-				<!-- <ul class="nav nav-tabs nav-justified"> -->
+				<!-- <ul class="nav nav-pills nav-justified"> -->
+				<ul class="nav nav-pills" >
 					{eq name="$auth.authiss.edit" value="1"}
-					<li class=""><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_EDIT"><span class="glyphicon glyphicon-pencil"></span>&nbsp;编辑&nbsp;
+					<li class="" ><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_EDIT" ><span class="glyphicon glyphicon-pencil"></span>&nbsp;编辑&nbsp;
 						{eq name="$numIssPatEdit" value="0"}
-							<span class="badge">{$numIssPatEdit}</span>
+							<span class="badge span_EDIT">{$numIssPatEdit}</span>
 						{else/}
 							<span class="label label-primary issPat span_EDIT">{$numIssPatEdit}/{$numTotal}</span>
 						{/eq}
@@ -75,9 +75,9 @@
 					{/eq}
 					
 					{eq name="$auth.authiss.audit" value="1"}
-					<li><a class="aTab" href="#"  data-issue-type="_PATENT" data-issue-authority="_AUDIT"><span class="glyphicon glyphicon-check"></span>&nbsp;审核&nbsp;
+					<li style="marging-left:0px;"><a class="aTab" href="#"  data-issue-type="_PATENT" data-issue-authority="_AUDIT"><span class="glyphicon glyphicon-check"></span>&nbsp;审核&nbsp;
 						{eq name="$numIssPatAudit" value="0"}
-							<span class="badge">{$numIssPatAudit}</span>
+							<span class="badge span_AUDIT">{$numIssPatAudit}</span>
 						{else/}
 							<span class="label label-warning issPat span_AUDIT">{$numIssPatAudit}/{$numTotal}</span>
 						{/eq}
@@ -87,7 +87,7 @@
 					{eq name="$auth.authiss.approve" value="1"}
 					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_APPROVE"><span class="glyphicon glyphicon-ok"></span>&nbsp;审批&nbsp;
 						{eq name="$numIssPatApprove" value="0"}
-							<span class="badge">{$numIssPatApprove}</span>
+							<span class="badge span_APPROVE">{$numIssPatApprove}</span>
 						{else/}
 							<span class="label label-danger issPat span_APPROVE">{$numIssPatApprove}/{$numTotal}</span>
 						{/eq}
@@ -97,7 +97,7 @@
 					{eq name="$auth.authiss.execute" value="1"}
 					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_EXECUTE"><span class="glyphicon glyphicon-random"></span>&nbsp;执行&nbsp;
 						{eq name="$numIssPatExecute" value="0"}
-							<span class="badge">{$numIssPatExecute}</span>
+							<span class="badge span_EXECUTE">{$numIssPatExecute}</span>
 						{else/}
 							<span class="label label-info issPat span_EXECUTE">{$numIssPatExecute}/{$numTotal}</span>
 						{/eq}
@@ -107,7 +107,7 @@
 					{eq name="$auth.authiss.maintain" value="1"}
 					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_MAINTAIN"><span class="glyphicon glyphicon-calendar"></span>&nbsp;维护&nbsp;
 						{eq name="$numIssPatMaintain" value="0"}
-							<span class="badge">{$numIssPatMaintain}</span>
+							<span class="badge span_MAINTAIN">{$numIssPatMaintain}</span>
 						{else/}
 							<span class="label label-info issPat span_MAINTAIN">{$numIssPatMaintain}/{$numTotal}</span>
 						{/eq}
@@ -117,7 +117,7 @@
 					{eq name="$auth.authiss.maintain" value="1"}
 					<li><a id="aPatRenew" class="aTab" href="#" data-issue-type="_PATENT" data-oprt="_RENEW"><span class="glyphicon glyphicon-repeat"></span>&nbsp;续费&nbsp;
 						{eq name="$numPatRenewTotal" value="0"}
-							<span class="badge">{$numPatRenewTotal}</span>
+							<span class="badge span_RENEW">{$numPatRenewTotal}</span>
 						{else/}
 							<span class="label label-warning issPat span_RENEW">{$numPatRenewTotal}/{$numTotal}</span>
 						{/eq}
@@ -126,7 +126,7 @@
 					
 					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_DONE"><span class="glyphicon glyphicon-off"></span>&nbsp;完结&nbsp;
 						{eq name="$numIssPatDone" value="0"}
-							<span class="badge">{$numIssPatDone}</span>
+							<span class="badge span_DONE">{$numIssPatDone}</span>
 						{else/}
 							<span class="label label-default issPat span_DONE">{$numIssPatDone}</span>
 						{/eq}
@@ -217,13 +217,26 @@ $(document).ready(function(){
 	<!-- //TP5中 'issPatAuth'='{$home}/user/dashboard2/issPatAuth' -->
 	$('#divIssPatAuth_load').load('issPatAuth',{'auth':auth});
 	
+	//调整ul.nav-pills li,去掉间隙
+	$('ul.nav-pills li').css('margin','0px');
+	
+	//调整ul.nav-pills,添加下边框
+	$('ul.nav-pills').css({'padding':'0px','border-bottom':'solid 0.02px #ddd'});
+	
+	//调整.aTab
 	$('.aTab').each(function(){
-		// 显示边框
-		$(this).css("border","solid 1px #ddd");
-		//添加横线
-		$(this).parent().parent().css("border-bottom","solid 0.1px #ddd");
+		//缩小padding
+		$(this).css('padding','5px');
 		
+		//去掉边框圆角
+		$(this).css('border-radius','0px');
+		
+		//添加边框，使上、左边框重合
+		$(this).css({'margin-top':'-1px','margin-left':'-1px','border':'solid 1px #ddd'});
 	});
+	
+	//调整span.label
+	$('span.label').css({'padding-bottom':'1px','margin-bottom':'2px'});	
 	
 	<!-- //点击.aTab中的各个按钮后，默认显示相应状态的issPat内容-->
 	$('.aTab').click(function(){

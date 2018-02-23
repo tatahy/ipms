@@ -40,17 +40,15 @@ class User extends Model
 //    }
 
     /**
-     * 确认登录用户的各个模块（issue，project，patent，thesis，attachment）权限
+     * 刷新登录用户的各个模块（issue，project，patent，thesis，attachment）权限
      */
      public function userAuth($username,$pwd)
     {
-    	
-        $userGroup=new UserGroupModel ;
         $user=$this->where('username',$username)->where('pwd',$pwd)->select();
         $usergroup_id= explode(",", $user[0]['usergroup_id']);//$usergroup_id=array(1,2,4)
         $i=0;
         foreach($usergroup_id as $key=>$value) {
-           $ugSet=$userGroup->where('id',$value)->find();
+           $ugSet=UserGroupModel::get($value);
            //$authissSet=AuthissModel::where('usergroup_id',$value)->field(['id','usergroup_id','usergroup_name'],true)->find();
            if($ugSet->enable){
               //得到authiss

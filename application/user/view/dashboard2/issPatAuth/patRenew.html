@@ -1,6 +1,6 @@
 <!-- // patRenew.html -->
-<div class="container-fluid">
-		<h4>续费管理<span class="label label-warning">近6个月内授权到期专利
+<div class="">
+		<h4>专利续费<span class="label label-warning">近6个月内授权到期专利
 		{eq name="$patRenewTotal" value="0"}
 			<span class="badge">{$patRenewTotal}</span>
 		{else/}
@@ -193,6 +193,11 @@ $(document).ready(function(){
 	
 	// 添加bootstrap的tooltip属性
 	$('a').tooltip({placement: 'bottom'});
+	
+	//调整span里的.label
+	$('span.label').css({'padding-bottom':'2px','margin-bottom':'2px'});
+	//调整span里的.badge
+	$('span.badge').css({'margin-bottom':'1px'});
 	
 	// 表格中<td>里<a>标签的click事件,给标签所在行上色
 	$("td a").click(function(){

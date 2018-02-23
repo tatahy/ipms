@@ -155,6 +155,11 @@ $(document).ready(function(){
 	<!-- //表格每页显示记录行数 -->
 	$('#issPatTableRows').val('{$issPatTableRows}');
 	
+	//调整span里的.label
+	$('span.label').css({'padding-bottom':'2px','margin-bottom':'2px'});
+	//调整span里的.badge
+	$('span.badge').css({'margin-bottom':'1px'});
+	
 	// 根据后端控制器给出的排序字段{$sortName},排序方式{$sort}，修改th中a的显示形式
 	$('#divIssPatAuth thead a').each(function(){
 	
