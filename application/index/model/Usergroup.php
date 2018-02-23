@@ -45,7 +45,25 @@ class Usergroup extends Model
     {   
         //在定义关联的时候添加额外条件:查询数据集不包含'id','usergroup_id','usergroup_name'3个字段的值。
         return $this->hasOne('Authpat')->field(['id','usergroup_id','usergroup_name'],true)->where('id',$value)->find();
-    }         
+    } 
+    
+    /**
+     * 定义一对一关系，获取auththe
+     */
+    public function auththeHasOne($value)
+    {   
+        //在定义关联的时候添加额外条件:查询数据集不包含'id','usergroup_id','usergroup_name'3个字段的值。
+        return $this->hasOne('Auththe')->field(['id','usergroup_id','usergroup_name'],true)->where('id',$value)->find();
+    }
+    
+    /**
+     * 定义一对一关系，获取authpro
+     */
+    public function authproHasOne($value)
+    {   
+        //在定义关联的时候添加额外条件:查询数据集不包含'id','usergroup_id','usergroup_name'3个字段的值。
+        return $this->hasOne('Authpro')->field(['id','usergroup_id','usergroup_name'],true)->where('id',$value)->find();
+    }                 
             
    
    /**

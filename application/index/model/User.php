@@ -91,7 +91,7 @@ class User extends Model
               //得到authpro
               if($ugSet->authpro){
                 //$authpro[]=$ugSet->authproHasOne($value); 
-                foreach($ugSet->authprotHasOne($value)->toArray() as $k=>$v){
+                foreach($ugSet->authproHasOne($value)->toArray() as $k=>$v){
                   if($v){
                     $authpro[$k]=$v;
                   }

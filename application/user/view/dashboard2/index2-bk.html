@@ -1,4 +1,71 @@
-<!-- <ul class="nav nav-pills nav-justified"> -->
+{include file="../application/common/headeruser.html" title="个人事务中心" }
+
+<!-- pagewrap  -->
+<div class="container-fluid" style="padding-top: 55px;">
+		
+	<!-- <h4>  -->
+		<!-- <ul class="list-inline"> -->
+			<!-- <li><strong>【{$username}】的系统角色：</strong></li> -->
+			<!-- <li> -->
+				<!-- <select class="form-control" id="roleselect"> -->
+
+					<!-- {foreach name="roles" item="vo"} -->
+						<!-- <option>{$vo}</option> -->
+					
+					<!-- {/foreach} -->
+					
+				<!-- </select> -->
+			<!-- </li> -->
+			<!-- <li><button class="btn btn-primary">更新个人信息(开发中)</button></li> -->
+			
+		<!-- </ul> -->
+	<!-- </h4> -->
+	<!-- <hr> -->
+	<!-- <a href="{$home}/user/index/index">旧版</a> -->
+	<ul class="nav nav-pills" >
+		
+		<li><a href="{$home}/user/dashboard/index">roles版</a> </li>
+	</ul>
+
+	<div class="panel-group" id="accordion">
+		<div id="panelProIss" class="panel panel-default">
+			<div class="panel-heading">
+			<h4 class="panel-title">
+        		<a data-toggle="collapse" data-parent="#accordion" href="#collapsePro"><span class="glyphicon glyphicon-inbox"></span>&nbsp;<strong>
+        		项目事务</strong>&nbsp;<span class="span0">0</span></a>
+      		</h4>
+			
+			</div>
+			
+			<div id="collapsePro" class="panel-collapse collapse">
+			<div class="panel-body " >	
+			
+				<!-- //需load其他模板文件的div -->
+				<div id="divProNavPills_load"></div>
+			
+			</div>
+			</div>
+			
+		</div>
+		
+		<div id="panelIssPat" class="panel panel-warning">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+        			<a data-toggle="collapse" data-parent="#accordion" href="#collapsePat"><span class="glyphicon glyphicon-wrench"></span>&nbsp;<strong>
+        			专利事务</strong>&nbsp;
+					{eq name="$numTotal" value="0"}
+					<span class="span0">{$numTotal}</span>
+					{else/}
+					<span class="span0 badge">{$numTotal}</span>
+					{/eq}
+					</a>
+      			</h4>
+			
+			</div>
+			
+			<div id="collapsePat" class="panel-collapse collapse in">
+			<div class="panel-body " >
+				<!-- <ul class="nav nav-pills nav-justified"> -->
 				<ul class="nav nav-pills" >
 					{eq name="$auth.authiss.edit" value="1"}
 					<li class="" ><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_EDIT" ><span class="glyphicon glyphicon-pencil"></span>编辑
@@ -81,9 +148,42 @@
 					<!-- //需load其他模板文件的div -->
 					<div id="divIssPatAuth_load"></div>
 				</div>
+			</div>
+			</div>
+			
+		</div>
+		
+		<div id="panelTheIss" class="panel panel-info">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+        			<a data-toggle="collapse" data-parent="#accordion" href="#collapseThe"><span class="glyphicon glyphicon-list"></span>&nbsp;<strong>
+        			论文事务</strong>&nbsp;<span class="span0">0</span></a>
+      			</h4>
+			
+			</div>
+		
+			<div id="collapseThe" class="panel-collapse collapse">
+			<div class="panel-body " >
 				
-				
-		<script>
+				<!-- //需load其他模板文件的div -->
+				<div id="divTheNavPills_load"></div>
+		
+			</div>
+			</div>
+	
+	
+	
+		</div>
+		
+</div>
+
+
+
+
+<!-- /pagewrap  -->
+
+
+<script>
 $(document).ready(function(){
 	// 根据后端传来的$auth决定本页面载入时默认load的文件	
 	var auth='_DONE';
@@ -203,4 +303,6 @@ $(document).ready(function(){
 <!--/ function -->
 
 });
-</script>		
+</script>
+
+{include file="../application/common/footer.html"}

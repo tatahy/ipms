@@ -321,6 +321,121 @@ class Dashboard2Controller extends \think\Controller
       // 将数组转化为json
       return json($operator);
       
+    }
+    
+     public function issPat(Request $request)
+    {
+       $this->_loginUser();
+      
+      //从session中取出登录用户的关键信息
+        $username=Session::get('username');
+        $pwd=Session::get('pwd');
+        $log=Session::get('log');
+        $roles=Session::get('role');
+        $dept=Session::get('dept');
+        $role=$request->param('role');
+      
+      //使用模型Issinfo
+        $issSet = new IssinfoModel; 
+        //edit
+        $mapEdit['status'] =['in',['填报','返回修改','修改完善']];
+        $mapEdit['dept'] =$this->dept;
+        $mapEdit['writer']=$this->username;
+        
+        //audit
+        $mapAudit['status'] ='待审核';
+        $mapAudit['dept'] =$this->dept;
+        //approve
+        $mapApprove['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
+        //execute
+        $mapExecute['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
+        $mapExecute['dept'] =$this->dept;
+        $mapExecute['executer'] =$this->username;
+        //maintain
+        $mapMaintain['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
+                                      '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
+        //done
+        $map['status'] ='完结';
+        
+        if($this->auth['authiss']['edit']){
+          $numIssPatEdit=$issSet->where($mapEdit)->count(); 
+        }else{
+          $numIssPatEdit=0;
+        }
+        
+        if($this->auth['authiss']['audit']){
+          $numIssPatAudit=$issSet->where($mapAudit)->count(); 
+        }else{
+          $numIssPatAudit=0;
+        }
+        
+        if($this->auth['authiss']['approve']){
+          $numIssPatApprove=$issSet->where($mapApprove)->count(); 
+        }else{
+          $numIssPatApprove=0;
+        }
+        
+        if($this->auth['authiss']['execute']){
+          $numIssPatExecute=$issSet->where($mapExecute)->count(); 
+        }else{
+          $numIssPatExecute=0;
+        }
+        
+        if($this->auth['authiss']['maintain']){
+          $numIssPatMaintain=$issSet->where($mapMaintain)->count(); 
+          //得到满足续费条件的专利数
+          $today=date('Y-m-d');
+          $deadline=date('Y-m-d',strtotime("+6 month"));
+          $mapRenew['status'] =['in',['授权','续费授权']];          
+          // 查出满足条件的patent
+          $numPatRenewTotal= PatinfoModel::where($mapRenew)->where('renewdeadlinedate','between time',[$today,$deadline])->count();
+        }else{
+          $numIssPatMaintain=0;
+          $numPatRenewTotal=0;
+        }
+        
+        $numIssPatDone=$issSet->where($map)->count(); 
+        
+        $numTotal=$numIssPatEdit+$numIssPatAudit+$numIssPatApprove+$numIssPatExecute+$numIssPatMaintain+$numPatRenewTotal;
+        
+        $destr= "请求方法:".$request->method()."<br/>".
+                "username:". $username."<br/>".
+                "pwd:".$pwd."<br/>".
+                "roles:".$roles[0]."<br/>".
+                "log:".$log."<br/>".
+                "auth:".json_encode($this->auth); 
+        
+         // 模板变量赋值        
+        $this->assign([
+          //在usercenter.html页面输出自定义的信息
+          //在index.html页面通过destr输出自定义的信息
+          'destr'=>$destr."</br>",
+          //在index.html页面通过array输出自定义的数组内容
+          'array'=>$roles, 
+          
+          'home'=>$request->domain(),
+          'username'=>$username,
+          'roles'=>$roles,
+          //'roles'=>json($roles),
+          'role'=>$role,
+          'role1st'=>$roles[0],
+  
+          //向前端权限变量赋值
+          'authArray'=>$this->auth, 
+          
+          'numIssPatEdit'=>$numIssPatEdit,
+          'numIssPatAudit'=>$numIssPatAudit,
+          'numIssPatApprove'=>$numIssPatApprove,
+          'numIssPatExecute'=>$numIssPatExecute,
+          'numIssPatMaintain'=>$numIssPatMaintain,
+          'numIssPatDone'=>$numIssPatDone,
+          'numTotal'=>$numTotal,
+          'numPatRenewTotal'=>$numPatRenewTotal,
+      	
+        ]);
+      return view();
+      //return ':)<br> issthe 模块开发中……';
+     
     } 
     
     //根据前端传来的权限，选择返回前端的模板文件及内容
@@ -499,12 +614,12 @@ class Dashboard2Controller extends \think\Controller
             //$tplFile='issPatMaintain';
             $tplFile='maintain';
           break;
-          //_MAINTAIN_RENEW
-          case '_MAINTAIN_RENEW':
-            $mapPat['status'] =['in',['授权','续费授权']];
-            //$tplFile='issPatMaintain';
-            $tplFile='patRenew';
-          break;
+          ////_MAINTAIN_RENEW
+//          case '_MAINTAIN_RENEW':
+//            $mapPat['status'] =['in',['授权','续费授权']];
+//            //$tplFile='issPatMaintain';
+//            $tplFile='patRenew';
+//          break;
           //_DONE
           default:
             $map['status'] ='完结';
@@ -757,4 +872,125 @@ class Dashboard2Controller extends \think\Controller
        return view('dashboard2'.DS.'issPatAuth'.DS.'patRenew');
     }
     
+    public function issThe(Request $request)
+    {
+       $this->_loginUser();
+      
+      ////从session中取出登录用户的关键信息
+//        $username=Session::get('username');
+//        $pwd=Session::get('pwd');
+//        $log=Session::get('log');
+//        $roles=Session::get('role');
+//        $dept=Session::get('dept');
+//        $role=$request->param('role');
+//      
+//      //使用模型Issinfo
+//        $issSet = new IssinfoModel; 
+//        //edit
+//        $mapEdit['status'] =['in',['填报','返回修改','修改完善']];
+//        $mapEdit['dept'] =$this->dept;
+//        $mapEdit['writer']=$this->username;
+//        
+//        //audit
+//        $mapAudit['status'] ='待审核';
+//        $mapAudit['dept'] =$this->dept;
+//        //approve
+//        $mapApprove['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
+//        //execute
+//        $mapExecute['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
+//        $mapExecute['dept'] =$this->dept;
+//        $mapExecute['executer'] =$this->username;
+//        //maintain
+//        $mapMaintain['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
+//                                      '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
+//        //done
+//        $map['status'] ='完结';
+//        
+//        if($this->auth['authiss']['edit']){
+//          $numIssPatEdit=$issSet->where($mapEdit)->count(); 
+//        }else{
+//          $numIssPatEdit=0;
+//        }
+//        
+//        if($this->auth['authiss']['audit']){
+//          $numIssPatAudit=$issSet->where($mapAudit)->count(); 
+//        }else{
+//          $numIssPatAudit=0;
+//        }
+//        
+//        if($this->auth['authiss']['approve']){
+//          $numIssPatApprove=$issSet->where($mapApprove)->count(); 
+//        }else{
+//          $numIssPatApprove=0;
+//        }
+//        
+//        if($this->auth['authiss']['execute']){
+//          $numIssPatExecute=$issSet->where($mapExecute)->count(); 
+//        }else{
+//          $numIssPatExecute=0;
+//        }
+//        
+//        if($this->auth['authiss']['maintain']){
+//          $numIssPatMaintain=$issSet->where($mapMaintain)->count(); 
+//          //得到满足续费条件的专利数
+//          $today=date('Y-m-d');
+//          $deadline=date('Y-m-d',strtotime("+6 month"));
+//          $mapRenew['status'] =['in',['授权','续费授权']];          
+//          // 查出满足条件的patent
+//          $numPatRenewTotal= PatinfoModel::where($mapRenew)->where('renewdeadlinedate','between time',[$today,$deadline])->count();
+//        }else{
+//          $numIssPatMaintain=0;
+//          $numPatRenewTotal=0;
+//        }
+//        
+//        $numIssPatDone=$issSet->where($map)->count(); 
+//        
+//        $numTotal=$numIssPatEdit+$numIssPatAudit+$numIssPatApprove+$numIssPatExecute+$numIssPatMaintain+$numPatRenewTotal;
+//        
+//        $destr= "请求方法:".$request->method()."<br/>".
+//                "username:". $username."<br/>".
+//                "pwd:".$pwd."<br/>".
+//                "roles:".$roles[0]."<br/>".
+//                "log:".$log."<br/>".
+//                "auth:".json_encode($this->auth); 
+//        
+//         // 模板变量赋值        
+//        $this->assign([
+//          //在usercenter.html页面输出自定义的信息
+//          //在index.html页面通过destr输出自定义的信息
+//          'destr'=>$destr."</br>",
+//          //在index.html页面通过array输出自定义的数组内容
+//          'array'=>$roles, 
+//          
+//          'home'=>$request->domain(),
+//          'username'=>$username,
+//          'roles'=>$roles,
+//          //'roles'=>json($roles),
+//          'role'=>$role,
+//          'role1st'=>$roles[0],
+//  
+//          //向前端权限变量赋值
+//          'authArray'=>$this->auth, 
+//          
+//          'numIssPatEdit'=>$numIssPatEdit,
+//          'numIssPatAudit'=>$numIssPatAudit,
+//          'numIssPatApprove'=>$numIssPatApprove,
+//          'numIssPatExecute'=>$numIssPatExecute,
+//          'numIssPatMaintain'=>$numIssPatMaintain,
+//          'numIssPatDone'=>$numIssPatDone,
+//          'numTotal'=>$numTotal,
+//          'numPatRenewTotal'=>$numPatRenewTotal,
+//      	
+//        ]);
+//      return view('dashboard2'.DS.'issThe'.DS.'theNavPills');
+      return ':)<br> issthe 模块开发中……';
+     
+    }
+    
+    public function issPro(Request $request)
+    {
+       
+      return ':)<br> issPro 模块开发中……';
+     
+    }
 }

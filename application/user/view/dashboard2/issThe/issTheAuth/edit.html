@@ -1,0 +1,46 @@
+<!-- // 绝对文件路径加载父模板-->
+{extend name="../application/user/view/dashboard2/issPatAuth/base.html" /}
+{block name="titleSpan"}
+{__block__}
+
+{/block}
+
+{block name="addLabel"}
+	
+	&nbsp;<a id="btnAddNew" href="#modalIssPatAuthSingle" class="btn btn-xs" data-issue-authority="_EDIT" data-issue-oprt="_ADDNEW" data-toggle="modal" style="font-size:14px;"><span class="glyphicon glyphicon-tag text-primary"></span>_新增</a>
+{/block}	
+
+
+{block name="btnTpl"}
+	<td class="btnTpl">
+		<a class="" href="#modalIssPatAuthSingle" data-issId="{$vo.id}" data-issue-authority="_EDIT" data-toggle="modal" ><span class="glyphicon glyphicon-pencil text-primary"></span>_编辑</a>
+	</td>
+{/block}
+
+<!-- //在base.html的基础上新增 -->
+{block name="script"}
+{__block__}
+<script>
+$(document).ready(function(){	
+	$('#btnAddNew').click(function(){
+		var str=$(this).html();
+		$.post('issPatAuthSingle',
+			{
+				'auth':$(this).attr('data-issue-authority'),
+				'oprt':$(this).attr('data-issue-oprt'),
+				'returnType':0,
+			},
+			//得到后端返回的data(模板文件)
+			function(data){
+				//在本文件#divIssPatSingle_load处渲染显示data
+				$('#divIssPatSingle_load').html(data);
+				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务：</span><strong>【'+str+'】</strong>');
+			}
+		);
+	
+	});
+});
+</script>
+
+
+{/block}

@@ -1,0 +1,39 @@
+<!-- // issPatAuditSingle.html： -->
+
+{extend name="../application/user/view/dashboard2/issPatAuthSingle/baseSingle.html" /}
+
+
+
+{block name="abstract"}
+{__block__}
+
+{/block}
+
+{block name="input"}
+{__block__}
+
+{/block}
+
+{block name="attInput"}
+{__block__}
+
+{/block}
+
+
+{block name="btn"}
+	<button type="submit" id="btnPass" class="btn btn-success btn-sm" data-oprt="_PASS"><span class="glyphicon glyphicon-ok-sign"></span>审核通过</button>
+	<button type="submit" id="btnFail" class="btn btn-danger btn-sm" data-oprt="_FAIL"><span class="glyphicon glyphicon-remove-sign"></span>审核未通过</button>
+	
+	<button type="submit" id="btnModify" class="btn btn-primary btn-sm" data-oprt="_MODIFY"><span class="glyphicon glyphicon-info-sign"></span>返回修改</button>
+	
+{/block}
+
+{block name="script"}
+{__block__}
+	<script>
+	$(document).ready(function(){	
+	
+	
+	});
+	</script>
+{/block}
