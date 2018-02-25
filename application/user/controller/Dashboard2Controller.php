@@ -720,14 +720,34 @@ class Dashboard2Controller extends \think\Controller
         
       }
       
-      //得到模板文件中需显示的内容
-      $iss=IssinfoModel::get($request->param('issId'));
+      if($oprt=='_ADDNEW'){
+        $iss=0;
+        $att=0;
+        $pat=array('topic'=>'','patowner'=>'','otherinventor'=>'','inventor'=>'');
+        $patType=0;
+      }else{
+        //得到模板文件中需显示的内容
+        $iss=IssinfoModel::get($request->param('issId'));
+        // 利用模型issinfo.php中定义的一对多方法“attachments”得到iss对应的attachments信息
+        $att=$iss->attachments;
+        // 利用模型issinfo.php中定义的多态方法“issmap”得到iss对应的pat信息
+        $pat=$iss->issmap;
+        // 得到iss对应的pat的'pattype'数据库字段值
+        $patType=$iss->issmap->getData('pattype');
+      }
+      
+      //向前端模板中的变量赋值
       $this->assign([
         'home'=>$request->domain(),
-        'iss'=>$iss,
-        'oprt'=>$oprt,
         'username'=>$this->username,
-        'dept'=>$this->dept
+        'dept'=>$this->dept,
+        'auth'=>$request->param('auth'),
+        'oprt'=>$oprt,
+        'iss'=>$iss,
+        'att'=>$att,
+        'pat'=>$pat,
+        'patType'=>$patType,
+        
       ]);
       //return $this->fetch($tplFile);
       return view('dashboard2'.DS.'issPatAuthSingle'.DS.$tplFile);
@@ -746,83 +766,104 @@ class Dashboard2Controller extends \think\Controller
       }else{
         $oprt='_NONE';
       }
+      
+      $msg="";
             
       switch($oprt){
         //“_EDIT”权限
         case'_ADDNEW':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+        
+          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
         break;
         
         case'_SUBMIT':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
         break;
         
         case'_DELETE':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
         break;
         
         case'_UPDATE':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
         break;
         //“_AUDIT”权限
         case'_PASS':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
         break;
         
         case'_FAIL':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
         break;
         
         case'_MODIFY':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
         break;
         //“_APPROVE”权限
         case'_PERMIT':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
         break;
         
         case'_VETO':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
         break;
         
         case'_COMPLETE':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
         break;
         //“_EXECUTE”权限
         case'_ACCEPT':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
         break;
         
         case'_REFUSE':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
         break;
         
         case'_REPORT':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
         break;
         
         case'_FINISH':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
         break;
         //“_MAINTAIN”权限
         case'_APPLY':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
         break;
         
         case'_IMPROVE':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
         break;
         
         case'_AUTHORIZE':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
         break;
         
         case'_REJECT':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
         break;
         
         case'_CLOSE':
-          return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
         break;
         
         case'_ADDRENEW':
@@ -831,12 +872,14 @@ class Dashboard2Controller extends \think\Controller
             return json(array_merge($patObj->where('id',$request->param('patId'))->find()->toArray(),
                               array("today"=>date('Y-m-d'),"username"=>$this->username,"deptMaintainer"=>$this->dept)));
           }else{
-            return '<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+            $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
           }
           
         break;
         
       }
+      
+      return $msg;
       
     }
     

@@ -166,7 +166,8 @@ class Patinfo extends Model
      */
     public function issinfo()
     {
-        return $this->belongsTo('app\issue\model\Issinfo');
+        //return $this->belongsTo('app\issue\model\Issinfo');
+        return $this->belongsTo('Issinfo');
     }
     
     /**

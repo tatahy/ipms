@@ -124,10 +124,11 @@ $(document).ready(function(){
 	<!-- //TP5中 'issPatAuth'='{$home}/user/dashboard2/issPatAuth' -->
 	$('#divIssPatAuth_load').load('issPatAuth',{'auth':auth});
 	//将nav-pills改造成与nav-tabs一样的点击效果，保留nav-pills点击后li.active项有颜色
-	//1.调整ul.nav-pills,添加下边框,下边框颜色与li.active一样
-	$('ul.nav-pills').css('border-bottom','solid 1px #337ab7');
+	//1.调整ul.nav-pills,添加下边框,[考虑下边框颜色与li.active一样#337ab7]
+	$('ul.nav-pills').css('border-bottom','solid 1px #ddd');
 	//2.调整.aTab
 	$('.aTab').each(function(){
+	
 		//缩小padding
 		$(this).css({'padding-top':'5px','padding-bottom':'5px'});
 		
@@ -154,31 +155,40 @@ $(document).ready(function(){
 		$('.span_RENEW').removeClass('badge').addClass('label label-warning');
 		
 		$(this).find('.issPat').removeClass('label').addClass('badge');
-		<!-- .css("background-color","red") -->
-		switch(issType){
-			case '_PATENT':
-				$(this).tab('show');
-				$(this).parent().addClass('active');
-				if($(this).attr('data-oprt')=='_RENEW'){
-					$('#divIssPatAuth_load').load('patRenew');
-				}else{
-					$('#divIssPatAuth_load').load('issPatAuth',{'auth':authority});
-				}
-				
-			break;
-			
-			case '_PROJECT':
-				$(this).tab('show');
-				$(this).parent().addClass('active');
-				$('#issPro').load('issPro',sendData);
-			break;
-			
-			case '_THESIS':
-				$(this).tab('show');
-				$(this).parent().addClass('active');
-				$('#issThe').load('issThe',sendData);
-			break;
+		
+		$(this).tab('show');
+		$(this).parent().addClass('active');
+		if($(this).attr('data-oprt')=='_RENEW'){
+			$('#divIssPatAuth_load').load('patRenew');
+		}else{
+			$('#divIssPatAuth_load').load('issPatAuth',{'auth':authority});
 		}
+				
+		<!-- .css("background-color","red") -->
+		<!-- switch(issType){ -->
+			<!-- case '_PATENT': -->
+				<!-- $(this).tab('show'); -->
+				<!-- $(this).parent().addClass('active'); -->
+				<!-- if($(this).attr('data-oprt')=='_RENEW'){ -->
+					<!-- $('#divIssPatAuth_load').load('patRenew'); -->
+				<!-- }else{ -->
+					<!-- $('#divIssPatAuth_load').load('issPatAuth',{'auth':authority}); -->
+				<!-- } -->
+				
+			<!-- break; -->
+			
+			<!-- case '_PROJECT': -->
+				<!-- $(this).tab('show'); -->
+				<!-- $(this).parent().addClass('active'); -->
+				<!-- $('#issPro').load('issPro',sendData); -->
+			<!-- break; -->
+			
+			<!-- case '_THESIS': -->
+				<!-- $(this).tab('show'); -->
+				<!-- $(this).parent().addClass('active'); -->
+				<!-- $('#issThe').load('issThe',sendData); -->
+			<!-- break; -->
+		<!-- } -->
 
     });	
 	

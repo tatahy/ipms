@@ -264,14 +264,116 @@ var max=Math.max.apply(null, arr);//max=1
 
 <!--HY 2018/2/17 -->	
 jQuery，表单
+<html>
+<div id="divForm" class="row col-sm-12">
+	<hr>
+	<form action="" id="fm1" class="form-inline" role="form">
+	
+	<div class="form-group">
+      	<label class="control-label" for="a">a:</label>
+        <input class="form-control" id="a" type="text" name="a" value="1">
+        
+	</div>
+	
+	<div class="form-group ">
+      	<label class="control-label" for="a1">a1:</label>
+        <input class="form-control" id="a" type="text" name="a1" value="11">
+		
+	</div>
+	
+	</form>
+	
+	<br>
+	<form action="" id="fm2" class="form-inline" role="form">fm2
+	<div class="form-group ">
+      	<label class="control-label" for="a">a:</label>
+        <input class="form-control" type="text" name="a" value="2">
+    	
+	</div>
+	
+	<div class="form-group ">
+      	<label class="control-label" for="a2">a2:</label>
+        <input class="form-control" type="text" name="a2" value="22">
+    	
+	</div>
+		
+	</form>
+	<br>
+	
+	<form action="" id="fm3" class="form-inline" role="form">fm3
+		<div class="form-group">
+      		<label class="control-label" for="a">a:</label>
+        	<input class="form-control" id="a" type="text" name="a" value="3">
+			
+		</div>
+	
+		<div class="form-group ">
+      		<label class="control-label" for="a3">a3:</label>
+        	<input class="form-control" type="text" name="a3" value="33">
+    	
+		</div>
+		
+		<select class="form-control" id="patType" name="patType">
+				<option value="0">……</option>
+				<option value="_PATT1">发明专利</option>
+				<option value="_PATT2">实用新型专利</option>
+                <option value="_PATT3">外观设计专利</option>
+                <option value="_PATT4">软件版权</option>
+                <option value="_PATT5">著作权</option>
+                <option value="_PATT6">集成电路图</option>
+                
+		</select>
+		
+	</form>
+	<br>
+	
+	<input id="btnSave" type="submit" class="btn btn-primary btn-sm" data-oprt="save" value="保存" > 
+	<button type="submit" id="btnSubmit" class="btn btn-primary btn-sm" data-oprt="submit"  ><span class="glyphicon glyphicon-ok"></span>提交</button>
+	<button type="submit" id="btnSubmit" class="btn btn-danger btn-sm"  data-oprt="delete" ><span class="glyphicon glyphicon-remove"></span>删除</button>
+	
+	<button id="btnReset" class="btn btn-warning btn-sm"  data-oprt="reset" ><span class="glyphicon glyphicon-repeat"></span>重置</button>
+	
+	<br>
+	<p>点击的按钮是：<span id="clickedBtn">无</span></p>
+	<p>fm1内容：<span id="spanFm1Display">无</span></p>
+	<p>fm2内容：<span id="spanFm2Display">无</span></p>
+	<p>fm3内容：<span id="spanFm3Display">无</span></p>
+</div>
+
+
+</html>
 
 <script>
 $(document).ready(function(){
 	<!-- 重置表单，通过调用 DOM 中的reset方法来重置表单。 -->
-	$('#formId')[0].reset();
+	$('#btnReset').click(function(){	
+		$('#fm1')[0].reset();
+		$('#fm2')[0].reset();
+		$('#fm3')[0].reset();
+	
+	});
 	
 	<!-- 提交表单 -->
 	$('#formId').submit(function(event){});
+	
+	//检查divForm里的input是否为空，为空做出提示，不为空去掉提示
+	$('#divForm .form-control').each(function(){
+		$(this).focusout(function(){
+			if($(this).val()){
+				$(this).parent().removeClass('has-error');
+				$(this).tooltip('destroy');
+			}else{
+				$(this).parent().addClass('has-error');
+				$(this).tooltip({title: '请填写此字段', placement: 'bottom'}).tooltip('show');
+			}
+			
+		});
+		
+	});
+	
+	// select显示为后端传来的内容,tp5框架下后端patinfo模型中对pattpye字段有定义获取器，所以$pat.pattype的值不是数据库中的值，$pat->getData('pattype')才是。同理$iss->getData('issmap_type')
+	$('#patType').val('{$pat->getData('pattype')}').attr('selected');
+	$('#issType').val('{$iss->getData('issmap_type')}').attr('selected');
 
 });
 

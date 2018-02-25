@@ -1,7 +1,8 @@
-<!-- // issPatAuditSingle.html： -->
-{/*  总共有5处block用于子模板修改用，
+<!-- // baseSingle.html： -->
+{/*  总共有6处block用于子模板修改用，
 	name="abstract"
-	name="input"，
+	name="issPatInput"，
+	name="patInput"，
 	name="attInput"，
 	name="btn"，
 	name="script"  */}
@@ -34,18 +35,127 @@
 		</footer>
 						
 	</div>
-{/block}	
+{/block}
+	
 	<form id="fmIssPat" action="" role="form" enctype="multipart/form-data">
-	<!-- // 事务信息编辑-->
-{block name="input"}
+	
+	<!-- // 事务信息-->
+{block name="issPatInput"}
 	
 	<input id="issPatOprt" name="oprt" value="" type="text" hidden="true">
 	
 {/block}
 
+<!-- // 专利信息-->
+{block name="patInput"}{/block}
 	
-	<!-- // 附件上传-->
+	<!-- // 附件信息、上传、下载、删除-->
 {block name="attInput"}
+	<h4>
+		<span class="label label-warning">事务附件上传</span>
+		<label class="radio-inline ">
+      		<input type="radio" name="attUpload" value="0" checked><span class="label label-default">无</span>
+    	</label>
+		<label class="radio-inline">
+      		<input type="radio" name="attUpload" value="1"><span class="label label-default">上传</span>
+   		</label>
+    		
+	</h4>
+	
+	
+	<div id="divAtt" class="myBorder" hidden="true">
+			<div class="row">
+				<div class="form-group col-sm-6">
+					<label for="att">选择附件</label>
+					<input type="file" name="att" id="att" accept=".jpg,.jpeg,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.rar">	
+					<blockquote>
+						<footer>附件小于等于：<mark class="text-danger">10MB</mark></footer>
+						<footer>附件类型：<mark>jpg,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx,rar</mark></footer>
+					</blockquote>
+
+					<label for="">上传进度</label>
+					
+					<div class="progress progress-striped active">
+    					<div id="divUpLoadProcess" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><span class="text-info">0%</span></div>
+					</div>					
+			
+				</div>
+		
+				<div class="form-group col-sm-4">
+					<label for="attName">附件名称</label>
+					<input class="form-control" id="attName" name="attName" value="" type="text">
+				</div>
+				
+				<div class="form-group col-sm-2">
+					
+					<label for="">附件类型</label>
+					<select class="form-control" id="attType" name="attType">
+						<option value="_ATTT1">申请</option>
+						<option value="_ATTT2">请示</option>
+						<option value="_ATTT3">报告</option>
+						<option value="_ATTT4">预算报告</option>
+					</select>
+					
+				</div>
+		
+				<input id="attObj" name="attObj" value="_ATTO1" type="text" hidden="true">
+				
+				<input id="oprt" value="" type="text" hidden="true">
+				<!-- // 与本页的formDataAjax函数配合，传递本页所编辑的信息对应的pasIssId值到后端 -->
+				<input id="trId" value="{$patIssId}" type="text" hidden="true">
+		
+			</div>
+				
+	</div>
+	
+	
+	
+	{notempty name="att"}
+	<h4><span class="label label-warning">事务附件列表</span></h4>
+	<div class="row col-sm-12">
+		<div class="table-responsive ">
+			<table class="table table-bordered table-striped table-hover">
+				<thead>
+					<tr>
+						<!-- <th>选择</th> -->
+						<th>序号</th>
+						<th>附件类型</th>
+						<th>附件名称</th>
+						<th>上传日期</th>
+						<th>上传人</th>
+						<th>系统角色</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+						
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="att" id="vo" empty="暂无附件"}
+					<tr>
+						<!-- <td><input type="checkbox" check=""></td> -->
+						<td>{$i}</td>
+						<td>{$vo.atttype}</a></td>
+						<td>{$vo.name}</a></td>
+						<td>{$vo.uploaddate}</td>
+						<td>{$vo.uploader}</td>
+						<td>{$vo.rolename}</td>
+						
+						<td>
+							<a href="{$home}/attachment/index/download/id/{$vo.id}">下载</a>&nbsp;
+							{in name="$vo.deldisplay" value="1"}
+							<a href="{$home}/attachment/index/delete/id/{$vo.id}">删除</a>&nbsp;
+							{/in}
+						</td>
+						
+					</tr>
+								
+					{/volist}
+				</tbody>
+			</table>
+		</div>
+	<hr>
+	</div>
+	{/notempty}	
+
 
 
 
@@ -69,6 +179,16 @@
 
 	</form>		
 </div>
+
+<style>
+.myBorder{
+	border-style:solid;
+	border-width:1px;
+	border-color:#ddd;
+	border-radius:5px;
+}
+
+</style>
 
 {block name="script"}
 <script>
@@ -106,6 +226,9 @@ $(document).ready(function(){
         });
 			
 	});	
+	
+	//添加.myBorder
+	<!-- $('.myBorder').css({'border-style':'solid','border-width':'1px','border-color':'#ddd','border-radius':'5px'}); -->
 	
 });
 </script>

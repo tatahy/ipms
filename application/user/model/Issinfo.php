@@ -112,6 +112,7 @@ class Issinfo extends Model
      public function issmap()
     {
         $this->getData('issmap_type');
+        //本模型内已定义获取器getIssmapTypeAttr,本属性读取的是获取器输出的issmap_type字段值（中文），所以要以获取器的输出值来对应模型
         $data=['专利授权申报' => 'Patinfo','专利授权到期续费' => 'Patinfo','项目申报' => 'Proinfo','论文审查' => 'Theinfo'];
         return $this->morphTo(null, $data);
         
