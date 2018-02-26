@@ -7,6 +7,35 @@
 	name="btn"，
 	name="script"  */}
 
+<style>
+.myFieldset{
+	border-style:solid;
+	border-width:1px;
+	border-color:#ddd;
+	border-radius:5px;
+	padding-top:20px;
+	margin-bottom:30px;
+}
+
+.myRow{
+	margin:0px;
+}
+
+.myLegend{
+	margin:-30px 10px 10px 15px;
+	<!-- margin-top:20px -->
+	<!-- margin-left:10px; -->
+	<!-- margin-bottom:-10px; -->
+	<!-- margin-right:10px; -->
+}
+
+.myLegend span{
+	font-size:14px;
+}
+
+</style>	
+
+
 <div id="divIssPatAuthSingle">
 {block name="abstract"}
 	<h4><span class="label label-warning">事务概要</span></h4>
@@ -74,7 +103,6 @@
 					</blockquote>
 
 					<label for="">上传进度</label>
-					
 					<div class="progress progress-striped active">
     					<div id="divUpLoadProcess" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><span class="text-info">0%</span></div>
 					</div>					
@@ -98,11 +126,11 @@
 					
 				</div>
 		
-				<input id="attObj" name="attObj" value="_ATTO1" type="text" hidden="true">
+				<!-- <input id="attObj" name="attObj" value="_ATTO1" type="text" hidden="true"> -->
 				
-				<input id="oprt" value="" type="text" hidden="true">
+				<!-- <input id="oprt" value="" type="text" hidden="true"> -->
 				<!-- // 与本页的formDataAjax函数配合，传递本页所编辑的信息对应的pasIssId值到后端 -->
-				<input id="trId" value="{$patIssId}" type="text" hidden="true">
+				<!-- <input id="trId" value="{ $patIssId}" type="text" hidden="true"> -->
 		
 			</div>
 				
@@ -111,9 +139,10 @@
 	
 	
 	{notempty name="att"}
+	
 	<h4><span class="label label-warning">事务附件列表</span></h4>
 	<div class="row col-sm-12">
-		<div class="table-responsive ">
+		<div class="table-responsive">
 			<table class="table table-bordered table-striped table-hover">
 				<thead>
 					<tr>
@@ -152,20 +181,18 @@
 				</tbody>
 			</table>
 		</div>
-	<hr>
 	</div>
 	{/notempty}	
 
-
+<hr>
 
 
 {/block}
 	
 
 		<div class="row">
-		<hr>
 		<div class="form-group col-sm-12">
-		
+			
 		<!-- // 按钮-->
 {block name="btn"}{/block}
 
@@ -176,19 +203,11 @@
 			
 		</div>
 		</div>
-
+	
 	</form>		
 </div>
 
-<style>
-.myBorder{
-	border-style:solid;
-	border-width:1px;
-	border-color:#ddd;
-	border-radius:5px;
-}
 
-</style>
 
 {block name="script"}
 <script>
@@ -198,6 +217,23 @@ $(document).ready(function(){
 		$('#issPatOprt').val($(this).attr('data-oprt'));
 	
 	});
+	
+	// 监听文件上传进度，用回调/递归函数实现？？
+    var xhrOnProgress = function(fun) {
+        xhrOnProgress.onprogress = fun; //绑定监听
+        return function(){
+        	//通过$.ajaxSettings.xhr();获得XMLHttpRequest对象
+        	var xhr = $.ajaxSettings.xhr();
+        	//判断监听函数是否为函数
+        	if(typeof xhrOnProgress.onprogress !== 'function')
+            return xhr;
+            //如果有监听函数并且xhr对象支持绑定时就把监听函数绑定上去
+            if (xhrOnProgress.onprogress && xhr.upload) {
+                xhr.upload.onprogress = xhrOnProgress.onprogress;
+            }
+            return xhr;
+        }
+    };
 	
 	<!-- // 应用jQuery的$.ajax提交表单，提交前进行一些验证准备。利用输入框的“required”属性避免输入框无内容 -->
 	$('#fmIssPat').submit(function(event){					
@@ -226,9 +262,6 @@ $(document).ready(function(){
         });
 			
 	});	
-	
-	//添加.myBorder
-	<!-- $('.myBorder').css({'border-style':'solid','border-width':'1px','border-color':'#ddd','border-radius':'5px'}); -->
 	
 });
 </script>

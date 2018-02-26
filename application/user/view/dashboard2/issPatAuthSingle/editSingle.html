@@ -16,9 +16,12 @@
 {/block}
 
 {block name="issPatInput"}
-	<h4><span class="label label-warning">事务信息</span></h4>
-	<div class="myBorder">
-	<div class="row">
+
+	<div class="myFieldset">
+	
+	<div class="myLegend"><span class="label label-warning">专利事务信息</span></div>
+	
+	<div class="row myRow">
 		<div class="form-group col-sm-8">
 			<label class="control-label" for="topic">事务标题<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 			<input class="form-control" id="topic" name="topic" value="{$iss.topic}" type="text" placeholder="关于XX专利的授权申报" required>
@@ -30,7 +33,7 @@
 		</div>
 	</div>
 	
-	<div class="row">
+	<div class="row myRow">
 		<div class="form-group col-sm-12">
 			<label class="control-label" for="abstract">事务简介<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 			<textarea class="form-control" rows="5" id="abstract" name="abstract" placeholder="填写事务的主要内容，字数不超过100字。" required>{$iss.abstract}</textarea>
@@ -40,10 +43,14 @@
 {/block}
 
 {block name="patInput"}
-	<h4><span class="label label-warning"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利信息</span></h4>
-	<!-- <div style="border:solid 1px #ddd"> -->
-	<div class="myBorder">
-	<div class="row">
+	<!-- <h4><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利信息</h4> -->
+	
+	
+	<div class="myFieldset" >
+	
+	<div class="myLegend"><span class="label label-warning"><span class="glyphicon glyphicon-wrench"></span>专利信息</span></div>
+	
+	<div class="row myRow">
 		<div class="form-group col-sm-8">
 			<label class="control-label" for="patTopic">专利名称<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 			<input class="form-control" id="patTopic" name="patTopic" value="{$pat.topic}" type="text" placeholder="xx专利" required>
@@ -64,7 +71,7 @@
 		</div>
 	</div>
 	
-	<div class="row">
+	<div class="row myRow">
 		<div class="form-group col-sm-6">
 			<label class="control-label" for="patOwner">专利所有人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 			<input class="form-control" id="patOwner" name="patOwner" value="{$pat.patowner}" type="text" placeholder="广州市光机电技术研究院" required>
@@ -112,9 +119,6 @@
 $(document).ready(function(){	
 	// select显示为后端传来的内容,
 	$('#patType').val('{$patType}').attr('selected');
-	
-	//调整.row
-	$('.row').css('margin','0px');
 	
 });
 </script>

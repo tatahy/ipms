@@ -191,7 +191,7 @@ $(document).ready(function(){
 	// 添加bootstrap的tooltip属性
 	$('h4 a').tooltip({title: '事务过程记录', placement: 'bottom'});
 	
-	// 监听文件上传进度，用回调函数实现？？
+	// 监听文件上传进度，用回调/递归函数实现？？
     var xhrOnProgress = function(fun) {
         xhrOnProgress.onprogress = fun; //绑定监听
         return function(){
