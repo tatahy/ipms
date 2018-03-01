@@ -773,6 +773,22 @@ class Dashboard2Controller extends \think\Controller
         $oprt='_NONE';
       }
       
+      // $btnText接收前端页面传来的btnText值
+      if(!empty($request->param('btnText'))){
+        $btnText=$request->param('btnText');
+      }else{
+        $btnText='';
+      }
+      
+      // $btnLabel接收前端页面传来的btnLabel值
+      if(!empty($request->param('btnLabel'))){
+        $btnLabel=$request->param('btnLabel');
+      }else{
+        $btnLabel='';
+      }
+      
+      $btnHtml='<span class="label '.$btnLabel.'" style="font-size:18px;">'.$btnText.'</span>';
+      
       $msg="";
       $tplFile='dashboard2'.DS.'issPatAuthSingle'.DS;
             
@@ -800,7 +816,7 @@ class Dashboard2Controller extends \think\Controller
         break;
         
         case'_UPDATE':
-          
+         
           $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
           $tplFile.='editSingle';
           
@@ -898,11 +914,12 @@ class Dashboard2Controller extends \think\Controller
           
         break;
         
+        //
+        
       }
-      
       //return $msg;
-      return $this->issPatAuth($request);
-      
+      return json(array('msg'=>$msg,'btnHtml'=>$btnHtml,'topic'=>$request->param('issPatTopic')));
+      //return $this->issPatAuth($request);//参数不够，不会产生分页。
     }
     
     //为前端显示PatRenew模板准备，1.数据库数据；2.向模板变量赋值；3.选择模板文件PatRenew.html返回前端

@@ -22,28 +22,28 @@
 
 {block name="btn"}
 {eq name="$oprt" value="_ADDRENEW"}
-	<button type="submit" id="btnAddRenew" class="btn btn-primary btn-sm" data-oprt="_ADDRENEW"><span class="glyphicon glyphicon-tag"></span>续费申请</button>
+	<button type="submit" id="btnAddRenew" class="btn btn-primary btn-sm" data-oprt="_ADDRENEW" data-btnLabel="label-primary"><span class="glyphicon glyphicon-tag"></span>续费申请</button>
 
 {else/}
 {switch name="$iss.status"}
     {case value="否决申报|专利授权|专利驳回|放弃续费|续费授权"}
-		<button type="submit" id="btnClose" class="btn btn-primary  btn-sm" data-oprt="_CLOSE"><span class="glyphicon glyphicon-off"></span>完结</button>
+		<button type="submit" id="btnClose" class="btn btn-primary  btn-sm" data-oprt="_CLOSE" data-btnLabel="label-primary"><span class="glyphicon glyphicon-off"></span>完结</button>
 		
 	{/case}
 		
 	{case value="申报提交"}
-		<button type="submit" id="btnAuthorize" class="btn btn-success btn-sm" data-oprt="_AUTHORIZE"><span class="glyphicon glyphicon-registration-mark"></span>授权</button>
-		<button type="submit" id="btnReject" class="btn btn-danger btn-sm" data-oprt="_REJECT"><span class="glyphicon 		glyphicon-ban-circle"></span>驳回</button>
-		<button type="submit" id="btnImprove" class="btn btn-primary  btn-sm" data-oprt="_IMPROVE"><span class="glyphicon glyphicon-plus-sign"></span>修改</button>
+		<button type="submit" id="btnAuthorize" class="btn btn-success btn-sm" data-oprt="_AUTHORIZE" data-btnLabel="label-success"><span class="glyphicon glyphicon-registration-mark"></span>授权</button>
+		<button type="submit" id="btnReject" class="btn btn-danger btn-sm" data-oprt="_REJECT" data-btnLabel="label-danger"><span class="glyphicon 		glyphicon-ban-circle"></span>驳回</button>
+		<button type="submit" id="btnImprove" class="btn btn-primary  btn-sm" data-oprt="_IMPROVE" data-btnLabel="label-primary"><span class="glyphicon glyphicon-plus-sign"></span>修改</button>
 	{/case}
 	
 	{case value="续费提交"}
-		<button type="submit" id="btnAuthorize" class="btn btn-success btn-sm" data-oprt="_AUTHORIZE"><span class="glyphicon glyphicon-registration-mark"></span>授权</button>
-		<button type="submit" id="btnReject" class="btn btn-danger btn-sm" data-oprt="_REJECT"><span class="glyphicon 		glyphicon-ban-circle"></span>驳回</button>
+		<button type="submit" id="btnAuthorize" class="btn btn-success btn-sm" data-oprt="_AUTHORIZE" data-btnLabel="label-success"><span class="glyphicon glyphicon-registration-mark"></span>授权</button>
+		<button type="submit" id="btnReject" class="btn btn-danger btn-sm" data-oprt="_REJECT" data-btnLabel="label-danger"><span class="glyphicon 		glyphicon-ban-circle"></span>驳回</button>
 	{/case}
 	
 	{case value="申报复核|准予续费"}
-		<button type="submit" id="btnApply" class="btn btn-primary  btn-sm" data-oprt="-APPLAY"><span class="glyphicon glyphicon-send"></span>提交申报</button>
+		<button type="submit" id="btnApply" class="btn btn-primary  btn-sm" data-oprt="-APPLAY" data-btnLabel="label-primary"><span class="glyphicon glyphicon-send"></span>提交申报</button>
 	{/case}
     
 {/switch}

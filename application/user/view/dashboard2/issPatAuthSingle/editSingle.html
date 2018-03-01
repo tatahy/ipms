@@ -103,10 +103,10 @@
 
 {else/}
 	
-	<button type="submit" id="btnUpdate" class="btn btn-primary btn-sm" data-oprt="_UPDATE"><span class="glyphicon glyphicon-refresh"></span>更新</button>
-	<button type="submit" id="btnSubmit" class="btn btn-primary btn-sm" data-oprt="_SUBMIT"><span class="glyphicon glyphicon-ok"></span>提交</button>
+	<button type="submit" id="btnUpdate" class="btn btn-primary btn-sm" data-oprt="_UPDATE" data-btnLabel="label-primary"><span class="glyphicon glyphicon-refresh"></span>更新</button>
+	<button type="submit" id="btnSubmit" class="btn btn-primary btn-sm" data-oprt="_SUBMIT" data-btnLabel="label-primary"><span class="glyphicon glyphicon-ok"></span>提交</button>
 	{in name="$iss.status" value="填报"}
-		<button type="submit" id="btnDelete" class="btn btn-danger btn-sm" data-oprt="_DELETE"><span class="glyphicon glyphicon-remove"></span>删除</button>
+		<button type="submit" id="btnDelete" class="btn btn-danger btn-sm" data-oprt="_DELETE" data-btnLabel="label-danger"><span class="glyphicon glyphicon-remove"></span>删除</button>
 	{/in}
 	
 {/eq}

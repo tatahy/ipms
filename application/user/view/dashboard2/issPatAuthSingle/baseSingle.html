@@ -68,20 +68,24 @@
 	
 	<form id="fmIssPat" action="" role="form" enctype="multipart/form-data">
 	
-	<!-- // 事务信息-->
-{block name="issPatInput"}
 	<!-- // class="sr-only" 仅源代码文件中显示-->
 	<input id="issPatOprt" name="oprt" value="" type="text" class="sr-only">
 	<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
 	<input id="auth" name="auth" value="{$auth}" type="text" class="sr-only">
 	
+	<input id="btnText" name="btnText" value="" type="text" class="sr-only">
 	
-{/block}
+	<input id="btnLabel" name="btnLabel" value="" type="text" class="sr-only">
+	
+	<input name="issPatTopic" value="{$iss.topic}" type="text" class="sr-only">
+	
+<!-- // 事务信息-->
+{block name="issPatInput"}{/block}
 
 <!-- // 专利信息-->
 {block name="patInput"}{/block}
 	
-	<!-- // 附件信息、上传、下载、删除-->
+<!-- // 附件信息、上传、下载、删除-->
 {block name="attInput"}
 	<div class="myFieldset">
 	
@@ -223,6 +227,8 @@ $(document).ready(function(){
 	//按钮按下时，将按钮的data-oprt属性值传到表单中的id=issPatOprt输入框
 	$('button[type="submit"]').click(function(){
 		$('#issPatOprt').val($(this).attr('data-oprt'));
+		$('#btnText').val($(this).html());
+		$('#btnLabel').val($(this).attr('data-btnLabel'));
 	
 	});
 	
@@ -262,7 +268,6 @@ $(document).ready(function(){
 		
 		// formdata形式上传表单数据,自动搜索表单信息(表单内没有name属性的input不会被搜索到)，IE<=9不支持FormData
 		var formData = new FormData($('#fmIssPat')[0]);
-		var oprt=$('#issPatOprt').val();
 		// '上传'按钮的value值,v==true,'上传'按钮被选中表示有文件要上传
 		var v=$('input:radio[name="attUpload"][value="1"]').prop('checked');
 		
@@ -271,7 +276,6 @@ $(document).ready(function(){
         formData.append('returnType',0);
 		formData.append('username','{$username}');
 		formData.append('dept','{$dept}');
-		formData.append('oprt',oprt);
 		
         //$.ajax()返回的是一个jQXHR对象，该对象还有done()、fail()等事件。		
         $.ajax({
@@ -298,11 +302,7 @@ $(document).ready(function(){
 							var percent=Math.round(progress.loaded/progress.total*100);
 							//在浏览器控制台显示的内容
 							console.log(percent);
-							
-							<!-- $("#modalIssPatAuthSingle").modal("hide"); -->
-							
 							$('#divUpLoadProcess').css("width",percent + "%").text(percent + "%");
-							
 						}
 					};
 					xhr.upload.onloadstart=function(){
@@ -313,28 +313,35 @@ $(document).ready(function(){
 						<!-- $.alert('附件上传完成'); -->
 					};
 				}else{
-					$.alert('无附件上传');
+					<!-- $.alert('无附件上传'); -->
 				}
 				return xhr;
 				<!-- return percent; -->
 			},
             success: function(data) {
-
-				<!-- $('#divIssPat_load').html(data); -->
-				<!-- $.alert('【'+oprt+'】成功'); -->
+				var oldStr=$('.modal-header').find('strong').html();
+				
+				<!-- $('.modal-header').find('strong').html('《'+data.topic+'》<br>'+oldStr+'结果'); -->
+				$('.modal-header').find('strong').remove();
+				
+				$('.modal-header').find('.glyphicon').append('《'+data.topic+'》<br><br>'+oldStr+'结果');
 				
 				//更新modalIssPatAuthSingle里的内容
-				$('#divIssPatSingle_load').html('【'+oprt+'】成功');
-				<!-- $('#modalIssPatAuthSingle').modal('show'); -->
+				$('#divIssPatSingle_load').html('<h4 style="text-align:center;margin-bottom:50px;margin-top:50px;">'+data.btnHtml+'&nbsp;</h4>');
+				
+				//显示modalIssPatAuthSingle的footer
+				$('.modal-footer').show();
+				
+				//不能用'hide.bs.modal',否则modal不能完全hide
+				$('#modalIssPatAuthSingle').on('hidden.bs.modal',function(){
+					//更新列表里的内容
+					$('#divIssPatAuth_load').load('issPatAuth',{'auth':'{$auth}'});
+				});
             },
 			error: function(){
-				<!-- $.alert('【'+oprt+'】失败'); -->
+				$.alert('【'+btnStr+'】失败');
 			}
-        }).then(function(data){
-			//更新列表里的内容
-			$('#divIssPatAuth_load').load('issPatAuth',{'auth':'{$auth}'});
-			<!-- $('#divIssPat_load').html(data); -->
-		});
+        });
 			
 	});	
 	
