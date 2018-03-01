@@ -691,8 +691,14 @@ class Dashboard2Controller extends \think\Controller
         $oprt='_NONE';
       }
       
+      if(!empty($request->param('auth'))){
+        $auth=$request->param('auth');
+      }else{
+        $auth='';
+      }
+      
       //选择模板文件名
-      switch($request->param('auth')){
+      switch($auth){
         //_EDIT
         case '_EDIT':
           $tplFile='editSingle';
@@ -768,42 +774,57 @@ class Dashboard2Controller extends \think\Controller
       }
       
       $msg="";
+      $tplFile='dashboard2'.DS.'issPatAuthSingle'.DS;
             
       switch($oprt){
         //“_EDIT”权限
         case'_ADDNEW':
         
           $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $tplFile.='editSingle';
+          
         break;
         
         case'_SUBMIT':
           
           $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $tplFile.='editSingle';
+          
         break;
         
         case'_DELETE':
           
           $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $tplFile.='editSingle';
+          
         break;
         
         case'_UPDATE':
           
           $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $tplFile.='editSingle';
+          
         break;
         //“_AUDIT”权限
         case'_PASS':
           
           $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $tplFile.='auditSingle';
+          
         break;
         
         case'_FAIL':
           
           $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $tplFile.='auditSingle';
+         
         break;
         
         case'_MODIFY':
           
           $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $tplFile.='auditSingle';
+         
         break;
         //“_APPROVE”权限
         case'_PERMIT':
@@ -879,7 +900,8 @@ class Dashboard2Controller extends \think\Controller
         
       }
       
-      return $msg;
+      //return $msg;
+      return $this->issPatAuth($request);
       
     }
     

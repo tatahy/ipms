@@ -72,6 +72,9 @@
 {block name="issPatInput"}
 	<!-- // class="sr-only" 仅源代码文件中显示-->
 	<input id="issPatOprt" name="oprt" value="" type="text" class="sr-only">
+	<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
+	<input id="auth" name="auth" value="{$auth}" type="text" class="sr-only">
+	
 	
 {/block}
 
@@ -103,17 +106,15 @@
 					<blockquote>
 						<footer>附件小于等于：<mark class="text-danger">10MB</mark></footer>
 						<footer>附件类型：<mark>jpg,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx,rar</mark></footer>
-					<input type="file" name="att" id="att"  class="btn btn-sm" accept=".jpg,.jpeg,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.rar">	
+					<input type="file" name="att[]" id="att" class="btn btn-sm" accept=".jpg,.jpeg,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.rar">	
 					</blockquote>
-					
-					
 
-					<label for="">上传进度</label>
-					<div class="progress progress-striped active">
-    					<div id="divUpLoadProcess" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-							<span class="text-info">0%</span>
-						</div>
-					</div>					
+					<!-- <label for="">上传进度</label> -->
+					<!-- <div class="progress"> -->
+    					<!-- <div id="divUpLoadProcess" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"> -->
+							<!-- <span class="text-info">0%</span> -->
+						<!-- </div> -->
+					<!-- </div>					 -->
 			
 				</div>
 		
@@ -254,23 +255,6 @@ $(document).ready(function(){
 		}
 	});
 	
-	// 监听文件上传进度，用回调/递归函数实现？？
-    var xhrOnProgress = function(fun) {
-        xhrOnProgress.onprogress = fun; //绑定监听
-        return function(){
-        	//通过$.ajaxSettings.xhr();获得XMLHttpRequest对象
-        	var xhr = $.ajaxSettings.xhr();
-        	//判断监听函数是否为函数
-        	if(typeof xhrOnProgress.onprogress !== 'function')
-            return xhr;
-            //如果有监听函数并且xhr对象支持绑定时就把监听函数绑定上去
-            if (xhrOnProgress.onprogress && xhr.upload) {
-                xhr.upload.onprogress = xhrOnProgress.onprogress;
-            }
-            return xhr;
-        }
-    };
-	
 	<!-- // 应用jQuery的$.ajax提交表单，提交前进行一些验证准备。利用输入框的“required”属性避免输入框无内容 -->
 	$('#fmIssPat').submit(function(event){					
 		//jQuery的preventDefault()方法阻止元素发生默认的行为——表单提交
@@ -279,7 +263,7 @@ $(document).ready(function(){
 		// formdata形式上传表单数据,自动搜索表单信息(表单内没有name属性的input不会被搜索到)，IE<=9不支持FormData
 		var formData = new FormData($('#fmIssPat')[0]);
 		var oprt=$('#issPatOprt').val();
-		// 选中的单选按钮的value值,v==true,'上传'按钮被选中表示有文件要上传
+		// '上传'按钮的value值,v==true,'上传'按钮被选中表示有文件要上传
 		var v=$('input:radio[name="attUpload"][value="1"]').prop('checked');
 		
 		
@@ -296,44 +280,60 @@ $(document).ready(function(){
             data: formData,
             contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
             processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)
+			
+			//在xhr,对应的函数中加载附件上传的进度条，显示上传进度
 			xhr:function(){
 				//jQuery中得到XMLHttpRequest对象
 				var xhr= $.ajaxSettings.xhr();
 				//v==true,'上传'按钮被选中表示有文件要上传
 				if(v==true){
+					
+					//更新modalIssPatAuthSingle里的内容为进度条
+					$('#divIssPatSingle_load').html('<label for="">上传进度</label><div class="progress">		<div id="divUpLoadProcess" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><span class="text-info">0%</span></div></div>');
+					
+					//显示上传进度
 					xhr.upload.onprogress=function(progress){
 						if(progress.lengthComputable){
 							//计算百分比并取整
 							var percent=Math.round(progress.loaded/progress.total*100);
 							//在浏览器控制台显示的内容
 							console.log(percent);
+							
+							<!-- $("#modalIssPatAuthSingle").modal("hide"); -->
+							
 							$('#divUpLoadProcess').css("width",percent + "%").text(percent + "%");
+							
 						}
 					};
 					xhr.upload.onloadstart=function(){
 						console.log('started...');
 					};
 					xhr.upload.onloadend=function(){
-						console.log('finished xhr.upload='+xhr.upload+' v='+v);
-						$.alert('附件上传完成'+v);
+						console.log('finished!!  xhr.upload='+xhr.upload+' v='+v);
+						<!-- $.alert('附件上传完成'); -->
 					};
 				}else{
-					$.alert('无附件上传 xhr.upload='+xhr.upload+' v='+v);
+					$.alert('无附件上传');
 				}
 				return xhr;
+				<!-- return percent; -->
 			},
             success: function(data) {
-                <!-- $('#divIssPatSingle_load').html(data); -->
-				$("#modalIssPatAuthSingle").modal("hide");
-				$.alert('【'+oprt+'】成功');
+
+				<!-- $('#divIssPat_load').html(data); -->
+				<!-- $.alert('【'+oprt+'】成功'); -->
+				
+				//更新modalIssPatAuthSingle里的内容
+				$('#divIssPatSingle_load').html('【'+oprt+'】成功');
+				<!-- $('#modalIssPatAuthSingle').modal('show'); -->
             },
 			error: function(){
-			
+				<!-- $.alert('【'+oprt+'】失败'); -->
 			}
-        }).done(function(resp){
-			//利用$.ajax()返回的jQXHR对象的done()事件（resopnse结束），弹出提示框，显示本次操作成功。与在success: function(data){}弹出提示框的效果一样
-			<!-- $.alert('【'+oprt+'】成功'); -->
-			
+        }).then(function(data){
+			//更新列表里的内容
+			$('#divIssPatAuth_load').load('issPatAuth',{'auth':'{$auth}'});
+			<!-- $('#divIssPat_load').html(data); -->
 		});
 			
 	});	

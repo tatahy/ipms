@@ -381,6 +381,71 @@ $(document).ready(function(){
 
 <!--/  HY 2018/2/17 -->	
 
+
+
+<!--HY 2018/3/1 -->	
+AJAX，jQuery
+<script>
+$(document).ready(function(){	
+//$.ajax()返回的是一个jQXHR对象，该对象还有done()、fail()等方法。		
+        $.ajax({
+            type: 'post',
+            url: 'issPatOprt',
+            data: formData,
+            contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
+            processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)
+			xhr:function(){
+				//jQuery中得到XMLHttpRequest对象
+				var xhr= $.ajaxSettings.xhr();
+				//v==true,'上传'按钮被选中表示有文件要上传
+				if(v==true){
+					xhr.upload.onprogress=function(progress){
+						if(progress.lengthComputable){
+							//计算百分比并取整
+							var percent=Math.round(progress.loaded/progress.total*100);
+							//在浏览器控制台显示的内容
+							console.log(percent);
+							$('#divUpLoadProcess').css("width",percent + "%").text(percent + "%");
+						}
+					};
+					xhr.upload.onloadstart=function(){
+						console.log('started...');
+					};
+					xhr.upload.onloadend=function(){
+						console.log('finished xhr.upload='+xhr.upload+' v='+v);
+						$.alert('附件上传完成'+v);
+					};
+				}else{
+					$.alert('无附件上传 xhr.upload='+xhr.upload+' v='+v);
+				}
+				return xhr;
+			},
+            success: function(data) {
+                <!-- $('#divIssPatSingle_load').html(data); -->
+				$("#modalIssPatAuthSingle").modal("hide");
+				$.alert('【'+oprt+'】成功');
+            },
+			error: function(){
+			
+			}
+        }).done(function(resp){
+			//利用$.ajax()返回的jQXHR对象的done()事件（resopnse结束），弹出提示框，显示本次操作成功。与在success: function(data){}弹出提示框的效果一样
+			<!-- $.alert('【'+oprt+'】成功'); -->
+		});
+			
+	});
+});	
+</script>
+
+
+<!--/  HY 2018/3/1 -->	
+
+
+
+
+
+
+
 <!-- ......................问题................................ -->
 
 <!--/  HY 2018/1/21 -->
