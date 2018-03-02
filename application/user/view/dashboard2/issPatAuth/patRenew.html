@@ -1,4 +1,5 @@
 <!-- // patRenew.html -->
+
 <div class="">
 		<h4>专利续费<span class="label label-warning">近6个月内授权到期专利
 		{eq name="$patRenewTotal" value="0"}
@@ -198,6 +199,8 @@ $(document).ready(function(){
 	$('span.label').css({'padding-bottom':'2px','margin-bottom':'2px'});
 	//调整span里的.badge
 	$('span.badge').css({'margin-bottom':'1px'});
+	//
+	$('#aPatRenew').find('.numSingle').addClass('mycolorred-bgwhite');
 	
 	// 表格中<td>里<a>标签的click事件,给标签所在行上色
 	$("td a").click(function(){

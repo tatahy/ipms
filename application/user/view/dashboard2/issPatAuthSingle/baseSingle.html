@@ -6,21 +6,24 @@
 	name="attInput"，
 	name="btn"，
 	name="script"  */}
-
+	
 <style>
+<!-- //自定义fieldset样式 -->
 .myFieldset{
-	border-style:solid;
 	border-width:1px;
+	border-style:solid;
 	border-color:#ddd;
 	border-radius:5px;
 	padding-top:20px;
 	margin-bottom:30px;
 }
 
+<!-- //自定义可增加的row样式 -->
 .myRow{
 	margin:0px;
 }
 
+<!-- //自定义legend样式 -->
 .myLegend{
 	margin:-30px 10px 10px 15px;
 	<!-- margin-top:20px -->
@@ -29,13 +32,13 @@
 	<!-- margin-right:10px; -->
 }
 
+<!-- //自定义legend中span可增加的样式 -->
 .myLegend span{
 	font-size:14px;
 }
 
-</style>	
-
-
+</style>
+	
 <div id="divIssPatAuthSingle">
 {block name="abstract"}
 	<h4><span class="label label-warning">事务概要</span></h4>
@@ -106,11 +109,17 @@
 		<div class="row myRow" >
 			<div id="divAtt" hidden>
 				<div class="form-group col-sm-6">
-					<label for="att">选择附件</label>
+					<label for="att" class="sr-only">选择附件</label>
+					<input type="file" name="att[]" id="att" class="btn btn-sm" accept=".jpg,.jpeg,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.rar">
 					<blockquote>
-						<footer>附件小于等于：<mark class="text-danger">10MB</mark></footer>
-						<footer>附件类型：<mark>jpg,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx,rar</mark></footer>
-					<input type="file" name="att[]" id="att" class="btn btn-sm" accept=".jpg,.jpeg,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.rar">	
+							
+						<footer style="margin-bottom:5px;">附件大小：<span class="label label-danger">&le; 10MB</spam></footer>
+						<footer>允许附件类型：
+							<li style="margin-left:15px;margin-bottom:5px;">文档：<span class="label label-info">pdf、doc、docx、xls、xlsx、ppt、pptx</span></li>
+							<li style="margin-left:15px;margin-bottom:5px;">图片：<span class="label label-info">jpg、jpeg、png</span></li>
+							<li style="margin-left:15px;margin-bottom:5px;">压缩文件：<span class="label label-info">rar</span></li>
+						</footer>
+					
 					</blockquote>
 
 					<!-- <label for="">上传进度</label> -->
@@ -220,7 +229,6 @@
 	</form>		
 </div>
 
-
 {block name="script"}
 <script>
 $(document).ready(function(){	
@@ -322,11 +330,11 @@ $(document).ready(function(){
 				var oldStr=$('.modal-header').find('strong').html();
 				
 				<!-- $('.modal-header').find('strong').html('《'+data.topic+'》<br>'+oldStr+'结果'); -->
+				////更新modalIssPatAuthSingle的header内容
 				$('.modal-header').find('strong').remove();
-				
 				$('.modal-header').find('.glyphicon').append('《'+data.topic+'》<br><br>'+oldStr+'结果');
 				
-				//更新modalIssPatAuthSingle里的内容
+				//更新modalIssPatAuthSingle的body内容
 				$('#divIssPatSingle_load').html('<h4 style="text-align:center;margin-bottom:50px;margin-top:50px;">'+data.btnHtml+'&nbsp;</h4>');
 				
 				//显示modalIssPatAuthSingle的footer
@@ -336,6 +344,7 @@ $(document).ready(function(){
 				$('#modalIssPatAuthSingle').on('hidden.bs.modal',function(){
 					//更新列表里的内容
 					$('#divIssPatAuth_load').load('issPatAuth',{'auth':'{$auth}'});
+					$('.modal-footer').hide();
 				});
             },
 			error: function(){

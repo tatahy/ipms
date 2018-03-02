@@ -4,7 +4,7 @@
 	name="addLabel"，
 	name="btnTpl"，
 	name="script" */}
-
+	
 <div id="divIssPatAuth">		
 
 	<h4 id="h4Title">专利事务
@@ -15,9 +15,9 @@
 		<span class="badge">{$numTotal}</span>
 	{else/}
 		{notin name="$auth" value="_DONE"}
-			<span class="badge badge-redfont-thisfile">{$numTotal}</span>
+			<span class="badge mycolorred-bgwhite">{$numTotal}</span>
 		{else/}
-			<span class="badge badge-whitebg-thisfile">{$numTotal}</span>
+			<span class="badge mycolor777-bgwhite">{$numTotal}</span>
 		{/notin}
 	{/eq}
 	</span>
@@ -124,7 +124,7 @@
 		</div>
 		
 		<div class="modal-footer" hidden>
-        	<input type="button" class="btn btn-primary btn-sm" data-dismiss="modal" value="确定">  
+        	<input type="button" class="btn btn-primary btn-sm" data-dismiss="modal" value="返回">  
           
         </div>
 		</div>
@@ -132,22 +132,6 @@
 
 </div>
 <!--/ Modal "modalIssPatAuthSingle" -->
-
-<style>
-.badge-redbg-thisfile{
-	background-color:red;
-}
-
-.badge-whitebg-thisfile{
-	color: #777;
-	background-color:#fff;
-}
-
-.badge-redfont-thisfile{
-	color: red;
-    background-color: #fff;
-}
-</style>
 
 {block name="script"}
 <script>

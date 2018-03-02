@@ -243,7 +243,7 @@ class Dashboard2Controller extends \think\Controller
       
       if(!empty($fileSet)){
             // 移动到框架根目录的uploads/ 目录下,系统重新命名文件名
-            $info = $fileSet->validate(['size'=>10485760,'ext'=>'jpg,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx,rar'])
+            $info = $fileSet->validate(['size'=>10485760,'ext'=>'jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,rar'])
                         ->move(ROOT_PATH.DS.'uploads'.DS.$num_id);
         }else{
             $this->error('未选择文件，请选择需上传的文件。');
