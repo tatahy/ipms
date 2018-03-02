@@ -7,37 +7,6 @@
 	name="btn"，
 	name="script"  */}
 	
-<style>
-<!-- //自定义fieldset样式 -->
-.myFieldset{
-	border-width:1px;
-	border-style:solid;
-	border-color:#ddd;
-	border-radius:5px;
-	padding-top:20px;
-	margin-bottom:30px;
-}
-
-<!-- //自定义可增加的row样式 -->
-.myRow{
-	margin:0px;
-}
-
-<!-- //自定义legend样式 -->
-.myLegend{
-	margin:-30px 10px 10px 15px;
-	<!-- margin-top:20px -->
-	<!-- margin-left:10px; -->
-	<!-- margin-bottom:-10px; -->
-	<!-- margin-right:10px; -->
-}
-
-<!-- //自定义legend中span可增加的样式 -->
-.myLegend span{
-	font-size:14px;
-}
-
-</style>
 	
 <div id="divIssPatAuthSingle">
 {block name="abstract"}
@@ -112,13 +81,12 @@
 					<label for="att" class="sr-only">选择附件</label>
 					<input type="file" name="att[]" id="att" class="btn btn-sm" accept=".jpg,.jpeg,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.rar">
 					<blockquote>
-							
-						<footer style="margin-bottom:5px;">附件大小：<span class="label label-danger">&le; 10MB</spam></footer>
-						<footer>允许附件类型：
-							<li style="margin-left:15px;margin-bottom:5px;">文档：<span class="label label-info">pdf、doc、docx、xls、xlsx、ppt、pptx</span></li>
-							<li style="margin-left:15px;margin-bottom:5px;">图片：<span class="label label-info">jpg、jpeg、png</span></li>
-							<li style="margin-left:15px;margin-bottom:5px;">压缩文件：<span class="label label-info">rar</span></li>
-						</footer>
+						<h5>附件大小：<span class="label label-danger">&le;&nbsp;10MB </span></h5>
+						<h5 >允许附件类型：
+							<li style="margin-top:10px;">文档：<span class="label label-info">pdf、doc、docx、xls、xlsx、ppt、pptx</span></li>
+							<li style="margin-top:10px;">图片：<span class="label label-info">jpg、jpeg、png</span></li>
+							<li style="margin-top:10px;">压缩文件：<span class="label label-info">rar</span></li>
+						</h5>
 					
 					</blockquote>
 
