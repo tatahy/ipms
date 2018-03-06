@@ -1,206 +1,299 @@
-<!-- <ul class="nav nav-pills nav-justified"> -->
-				<ul class="nav nav-pills" >
-					{eq name="$auth.authiss.edit" value="1"}
-					<li class="" ><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_EDIT" ><span class="glyphicon glyphicon-pencil"></span>编辑
-						{eq name="$numIssPatEdit" value="0"}
-							<span class="badge issPat span_EDIT">{$numIssPatEdit}</span>
-						{else/}
-							<span class="label label-primary issPat span_EDIT">{$numIssPatEdit}/{$numTotal}</span>
-						{/eq}
-					</a></li>
-					{/eq}
-					
-					{eq name="$auth.authiss.audit" value="1"}
-					<li style="marging-left:0px;"><a class="aTab" href="#"  data-issue-type="_PATENT" data-issue-authority="_AUDIT"><span class="glyphicon glyphicon-check"></span>审核
-						{eq name="$numIssPatAudit" value="0"}
-							<span class="badge issPat span_AUDIT">{$numIssPatAudit}</span>
-						{else/}
-							<span class="label label-warning issPat span_AUDIT">{$numIssPatAudit}/{$numTotal}</span>
-						{/eq}
-					</a></li>
-					{/eq}
-					
-					{eq name="$auth.authiss.approve" value="1"}
-					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_APPROVE"><span class="glyphicon glyphicon-ok"></span>审批
-						{eq name="$numIssPatApprove" value="0"}
-							<span class="badge issPat span_APPROVE">{$numIssPatApprove}</span>
-						{else/}
-							<span class="label label-danger issPat span_APPROVE">{$numIssPatApprove}/{$numTotal}</span>
-						{/eq}
-					</a></li>
-					{/eq}
-					
-					{eq name="$auth.authiss.execute" value="1"}
-					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_EXECUTE"><span class="glyphicon glyphicon-random"></span>&nbsp;执行
-						{eq name="$numIssPatExecute" value="0"}
-							<span class="badge issPat span_EXECUTE">{$numIssPatExecute}</span>
-						{else/}
-							<span class="label label-info issPat span_EXECUTE">{$numIssPatExecute}/{$numTotal}</span>
-						{/eq}
-					</a></li>
-					{/eq}
-					
-					{eq name="$auth.authiss.maintain" value="1"}
-					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_MAINTAIN"><span class="glyphicon glyphicon-calendar"></span>维护
-						{eq name="$numIssPatMaintain" value="0"}
-							<span class="badge issPat span_MAINTAIN">{$numIssPatMaintain}</span>
-						{else/}
-							<span class="label label-info issPat span_MAINTAIN">{$numIssPatMaintain}/{$numTotal}</span>
-						{/eq}
-					</a></li>
-					{/eq}
 
-					{eq name="$auth.authiss.maintain" value="1"}
-					<li><a id="aPatRenew" class="aTab" href="#" data-issue-type="_PATENT" data-oprt="_RENEW"><span class="glyphicon glyphicon-repeat"></span>续费
-						{eq name="$numPatRenewTotal" value="0"}
-							<span class="badge issPat span_RENEW">{$numPatRenewTotal}</span>
-						{else/}
-							<span class="label label-warning issPat span_RENEW">{$numPatRenewTotal}/{$numTotal}</span>
-						{/eq}
-					</a></li>
-					{/eq}					
-					
-					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_DONE"><span class="glyphicon glyphicon-off"></span>完结
-						{eq name="$numIssPatDone" value="0"}
-							<span class="badge issPat span_DONE">{$numIssPatDone}</span>
-						{else/}
-							<span class="label label-default issPat span_DONE">{$numIssPatDone}</span>
-						{/eq}
-					</a></li>
-		
-				</ul>
+{block name="issPatInput"}
+	<div class="myFieldset">	
+		<div class="myLegend"><span class="label label-warning">事务信息</span></div>
+			<!-- // class="sr-only" 仅源代码文件中显示-->
+			<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
 			
-				<div class="tab-content">
-					<div>
-					<!-- <P>前端模板变量$userlg={ $userlg}<br> -->
-					<!-- $userlg.0={ $userlg.0},&nbsp;$userlg.id={ $userlg.id}<br> -->
-					<!-- 后端赋值语句'userlg'=>$userlg -->
-					<!-- </P> -->
+			<form action="" id="fmIssPat">
+			
+			
+			</form>
+	</div>
+{/block}
+			
+{block name="patInput"}
+	<div class="myFieldset">	
+	
+		<div class="myLegend"><span class="label label-warning">专利信息</span></div>
+			<!-- // class="sr-only" 仅源代码文件中显示-->
+			<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
+		
+			<form action="" id="fmpat">
+			
+			
+			</form>
+	</div>	
+{/block}			
+
+{block name="attInput"}	
+	<div class="myFieldset">	
+		<div class="myLegend"><span class="label label-warning">事务附件</span></div>
+		
+	{notempty name="att"}
+		<div class="row myRow" style="margin-left:15px;margin-right:15px;">
+			<h5>已上传附件</h5>
+			<div class="table-responsive" >	
+				<table>
+				
+				
+				</table>
 					
-					</div>
-					<!-- //需load其他模板文件的div -->
-					<div id="divIssPatAuth_load"></div>
+			</div>
+		
+		</div>
+	{/notempty}
+
+		<div class="row myRow">
+			<h5 class="myedge-left-waring">附件上传:
+			<label class="radio-inline ">
+      			<input type="radio" name="attUpload" value="0" checked><span class="label label-default">无</span>
+    		</label>
+			<label class="radio-inline">
+      			<input type="radio" name="attUpload" value="1"><span class="label label-default">上传</span>
+   			</label>
+    		</h5>	
+		</div>	
+		
+		<div class="row myRow" >
+			<form id="fmAttUpload" hidden>
+				<div class="form-group col-sm-6">
+					<label for="att" class="sr-only">选择附件</label>
+					<input type="file" name="att[]" id="att" class="btn btn-sm" accept=".jpg,.jpeg,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.rar">
+					<blockquote>
+						<h5>附件大小：<span class="label label-danger">&le;&nbsp;10MB </span></h5>
+						<h5 >允许附件类型：
+							<li style="margin-top:10px;">文档：<span class="label label-info">pdf、doc、docx、xls、xlsx、ppt、pptx</span></li>
+							<li style="margin-top:10px;">图片：<span class="label label-info">jpg、jpeg、png</span></li>
+							<li style="margin-top:10px;">压缩文件：<span class="label label-info">rar</span></li>
+						</h5>
+					
+					</blockquote>
+					
+				</div>
+		
+				<div class="form-group col-sm-4">
+					<label for="attName">附件名称</label>
+					<input class="form-control" id="attName" name="attName" value="" type="text">
 				</div>
 				
+				<div class="form-group col-sm-2">
+					
+					<label for="">附件类型</label>
+					<select class="form-control" id="attType" name="attType">
+						<option value="_ATTT1">申请</option>
+						<option value="_ATTT2">请示</option>
+						<option value="_ATTT3">报告</option>
+						<option value="_ATTT4">预算报告</option>
+					</select>
+					
+				</div>
 				
-		<script>
-$(document).ready(function(){
-	// 根据后端传来的$auth决定本页面载入时默认load的文件	
-	var auth='_DONE';
-	if({$auth.authiss.edit}){
-		auth='_EDIT';
-		//设置显示格式
-		$('.span_EDIT').removeClass('label').addClass('badge');
-		//设置span所在li为“active”
-		$('.span_EDIT').parent().parent().addClass('active');
-	}else if({$auth.authiss.audit}){
-		auth='_AUDIT';
-		$('.span_AUDIT').removeClass('label').addClass('badge');
-		//设置span所在li为“active”
-		$('.span_AUDIT').parent().parent().addClass('active');
-	}else if({$auth.authiss.approve}){
-		auth='_APPROVE';
-		$('.span_APPROVE').removeClass('label').addClass('badge');
-		//设置span所在li为“active”
-		$('.span_APPROVE').parent().parent().addClass('active');
-	}else if({$auth.authiss.execute}){
-		auth='_EXECUTE';
-		$('.span_EXECUTE').removeClass('label').addClass('badge');
-		//设置span所在li为“active”
-		$('.span_EXECUTE').parent().parent().addClass('active');
-	}else if({$auth.authiss.maintain}){
-		auth='_MAINTAIN';
-		$('.span_MAINTAIN').removeClass('label').addClass('badge');
-		//设置span所在li为“active”
-		$('.span_MAINTAIN').parent().parent().addClass('active');
-	}else{
-		$('.span_DONE').removeClass('label').addClass('badge');
-		//设置span所在li为“active”
-		$('.span_DONE').parent().parent().addClass('active');
-	}
-	<!-- //TP5中 'issPatAuth'='{$home}/user/dashboard2/issPatAuth' -->
-	$('#divIssPatAuth_load').load('issPatAuth',{'auth':auth});
-	
-	//将nav-pills改造成与nav-tabs一样的点击效果，保留nav-pills点击后li.active项有颜色
-	//1.调整ul.nav-pills,添加下边框,下边框颜色与li.active一样
-	$('ul.nav-pills').css('border-bottom','solid 1px #337ab7');
-	//2.调整.aTab
-	$('.aTab').each(function(){
-		//缩小padding
-		$(this).css('padding','5px');
+				<label for="" class="attuploadbar" hidden>上传进度</label>	
+				<div class="progress" class="attuploadbar" hidden>
+					<div id="divUpLoadProcess" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><span class="text-info">0%</span>
+					</div>
+				</div>
+				
+				<button id="btnAttUpload" class="btn btn-primary btn-sm" data-oprt="" data-btnLabel=""><span class="glyphicon glyphicon-upload"></span>附件上传</button>
 		
-		//去掉底部边框圆角
-		$(this).css({'border-bottom-right-radius':'0px','border-bottom-left-radius':'0px'});
+			</form>
+				
+		</div>
+		
+	</div>
+		
+	
+{/block}
+
+<div class="row">
+	<hr>
+	<div class="form-group col-sm-12">
+			
+		<!-- // 按钮-->
+
+		<div  class="pull-left">
+{block name="btn"}		
+		{eq name="$oprt" value="_ADDNEW"}
+			<button type="submit" id="btnAddNew" class="btn btn-primary btn-sm" data-oprt="_ADDNEW"><span class="glyphicon glyphicon-tag"></span>新增</button>
+
+		{else/}
+			<button type="submit" id="btnUpdate" class="btn btn-primary btn-sm" data-oprt="_UPDATE" data-btnLabel="label-primary"><span class="glyphicon glyphicon-refresh"></span>更新</button>
+			
+			<button type="submit" id="btnSubmit" class="btn btn-primary btn-sm" data-oprt="_SUBMIT" data-btnLabel="label-primary"><span class="glyphicon glyphicon-ok"></span>提交</button>
+			
+			{in name="$iss.status" value="填报"}
+			<button type="submit" id="btnDelete" class="btn btn-danger btn-sm" data-oprt="_DELETE" data-btnLabel="label-danger"><span class="glyphicon glyphicon-remove"></span>删除</button>
+			{/in}
+	
+		{/eq}
+{/block}
+		</div>
+
+		<div  class="pull-right">
+			<input type="reset" class="btn btn-primary btn-sm" value="重置">
+			<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
+		</div>
+		
+	</div>
+</div>
+
+{block name="script"}
+<script>
+$(document).ready(function(){	
+	
+	//各个type="submit"按钮的click事件：
+	$('button[type="submit"]').each(function(){
+		$(this).click(function(){
+			var oprt=$(this).attr('data-oprt');
+			var btnHtml='<span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:18px;">'+$(this).html()+'</span>';
+			var v=$('input:radio[name="attUpload"][value="1"]').prop('checked');
+			
+			//'_ADDNEW'没有patId、issId
+			if(oprt=='_ADDNEW'){
+			
+			
+			
+			}else{
+			//其他oprt都有patId、issId			
+			
+			
+			
+			}
+			
+			
+			//触发#fmIssPat的提交事件
+			$('#fmIssPat').submit(function(evt){
+				evt.preventDefault();
+			
+				//调用函数触发Ajax
+				formDataAjax('url???',$('#fmIssPat'),'trigerName','oprt???','title???');
+			});
+			
+			//触发#fmPat的提交事件
+			$('#fmPat').submit(function(evt){
+			
+				evt.preventDefault();
+			
+				//调用函数触发Ajax
+				formDataAjax('url???',$('#fmPat'),'trigerName','oprt???','title???');
+		
+			});
+			
+			
+			//有附件上传触发#fmAtt的提交事件？？？
+			if(v==true){
+			
+				//显示上传进度条
+				$('.attuploadbar').show();
+				//触发#fmAttUpload的提交事件
+				$('#fmAttUpload').submit(function(evt){
+					
+					evt.preventDefault();
+					$('#modal???').modal('hide');
+					$.confirm(str,function(evt){
+						con=evt;
+						if(true==con){
+							$('#modal???').modal('show');
+							//调用函数触发Ajax并显示进度条
+							attUploadAjax('url???',$('#fmAttUpload'),'trigerName','oprt???','title???');
+						}else{
+						$('#modal???').modal('show');
+						}
+					}).cancel('否(N)').ok('是(Y)');
+				});
+			}
+			//无附件上传？？
+			else{
+			
+			}
+			
+			
+			
+			
+			//更新modalIssPatAuthSingle的body内容
+			$('#divIssPatSingle_load').html('<h4 style="text-align:center;margin-bottom:50px;margin-top:50px;">'+btnHtml+'&nbsp;</h4>');
+			
+		});
 	});
 	
-	//调整span.label
-	$('span.label').css({'padding-bottom':'1px','margin-bottom':'2px'});	
 	
-	<!-- //点击.aTab中的各个按钮后，默认显示相应状态的issPat内容-->
-	$('.aTab').click(function(){
-        var issType=$(this).attr('data-issue-type');
-		var authority=$(this).attr('data-issue-authority');
-		var oprt='';
-		<!-- $('.aTab').find('.issPat').css("background-color","#777") .removeClass('badge'); -->
+	$('#btnAttUpload').click(function(){
+		//显示上传进度条
+		$('.attuploadbar').show();
 		
-		$('.span_EDIT').removeClass('badge').addClass('label label-primary');
-		$('.span_AUDIT').removeClass('badge').addClass('label label-warning');
-		$('.span_APPROVE').removeClass('badge').addClass('label label-danger');
-		$('.span_EXECUTE').removeClass('badge').addClass('label label-info');
-		$('.span_MAINTAIN').removeClass('badge').addClass('label label-info');
-		$('.span_DONE').removeClass('badge').addClass('label label-default');
-		$('.span_RENEW').removeClass('badge').addClass('label label-warning');
+		//触发#fmAttUpload的提交事件
+		$('#fmAttUpload').submit(function(evt){
 		
-		$(this).find('.issPat').removeClass('label').addClass('badge');
-		<!-- .css("background-color","red") -->
-		switch(issType){
-			case '_PATENT':
-				$(this).tab('show');
-				$(this).parent().addClass('active');
-				if($(this).attr('data-oprt')=='_RENEW'){
-					$('#divIssPatAuth_load').load('patRenew');
+			evt.preventDefault();
+			
+			$('#modal???').modal('hide');
+			$.confirm(str,function(evt){
+				con=evt;
+				if(true==con){
+					$('#modal???').modal('show');
+					//调用函数触发Ajax并显示进度条
+					attUploadAjax('url???',$('#fmAttUpload'),'trigerName','oprt???','title???');
 				}else{
-					$('#divIssPatAuth_load').load('issPatAuth',{'auth':authority});
+					$('#modal???').modal('show');
 				}
-				
-			break;
-			
-			case '_PROJECT':
-				$(this).tab('show');
-				$(this).parent().addClass('active');
-				$('#issPro').load('issPro',sendData);
-			break;
-			
-			case '_THESIS':
-				$(this).tab('show');
-				$(this).parent().addClass('active');
-				$('#issThe').load('issThe',sendData);
-			break;
+			}).cancel('否(N)').ok('是(Y)');
+		});
+	
+	});
+
+	
+<!-- function -->
+	//**函数名：attUploadAjax
+ 	//* 作用：应用jQuery的$.ajax向后端提交formData数据
+	//* 参数url，类型：字符串。值：不为空。说明：表单提交（action中）的url。
+	//* 参数fmObj，类型：对象。值：不为空。说明：表示需要一起提交的表单。
+	//* 参数triger，类型：字符串。值：不为空。说明：触发formDataAjax的用户名。
+	//* 参数oprt，类型：字符。值：可为空。说明：表示触发本函数的‘操作’
+	//* 参数title，类型：字符。值：可为空。说明：本函数显示的提示框$.alert的标题内容。
+	function attUploadAjax(url,fmObj,trigerName[,oprt][,title]){
+	// formdata形式上传表单数据,自动搜索表单信息(表单内没有name属性的input不会被搜索到)，IE<=9不支持FormData
+		if(fmObj){
+			var formData = new FormData(fmObj[0]);
+		}else{
+			var formData = new FormData();
 		}
-
-    });	
 	
-	<!-- // 在collapsePat出现前应用jQuery的load方法加载对应文件。 -->
-	<!-- $("#collapsePat").on("show.bs.collapse", function(){ -->
-    	
-		<!-- $("#divIssPatAuth_load").load('issPatEdit'); -->
-  	<!-- }); -->
+		// 添加表单内没有的内容
+        formData.append('returnType',0);
+		formData.append('trigerName',trigerName);
+		formData.append('dept','{$dept}');
+		formData.append('issId','???');
+		
+			$.ajax({
+				type: 'post',
+            	url: url,
+            	data: formData,
+            	contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
+            	processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)
+				
+				//显示上传进度
+				xhr:xhrUpload,
+				success: function(data){
+				
+				},
+				error: function(){
+					$.alert('【附件上传】失败');
+				}
+		
+			});	
+		<!-- ------------------ -->
+		
+	}	
+	//定义&.ajax中xhr项对应的处理函数。作用：#div???_load加载附件上传的进度条，显示上传进度
+	function xhrUpload(){
 	
-	// 在collapsePro出现前应用jQuery的load方法加载对应文件。
-	$("#collapsePro").on("show.bs.collapse", function(){
-    	$("#divProNavPills_load").load('issPro');
-  	});
 	
-	// 在collapseThe出现前应用jQuery的load方法加载对应文件。
-	$("#collapseThe").on("show.bs.collapse", function(){
-    	$("#divTheNavPills_load").load('issThe');
-  	});
+	}
+<!--// function -->
 	
-<!-- function  -->
-	
-
-
-<!--/ function -->
-
 });
-</script>		
+
+</script>
+{/block}
+

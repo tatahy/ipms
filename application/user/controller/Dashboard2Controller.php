@@ -727,9 +727,9 @@ class Dashboard2Controller extends \think\Controller
       }
       
       if($oprt=='_ADDNEW'){
-        $iss=0;
+        $iss=array('id'=>'','topic'=>'','abstract'=>'');
         $att=0;
-        $pat=array('topic'=>'','patowner'=>'','otherinventor'=>'','inventor'=>'');
+        $pat=array('id'=>'','topic'=>'','patowner'=>'','otherinventor'=>'','inventor'=>'');
         $patType=0;
       }else{
         //得到模板文件中需显示的内容
@@ -798,6 +798,8 @@ class Dashboard2Controller extends \think\Controller
         
           $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
           $tplFile.='editSingle';
+          
+          
           
         break;
         
@@ -917,8 +919,34 @@ class Dashboard2Controller extends \think\Controller
         //
         
       }
+      
+      //引用patinfo模型中定义的patCreate方法向patinfo表新增信息
+         // $patId = $patObj->issCreate($request->request());
+//          if ($issNewId) {
+//            $msg.='新增专利事务成功';
+//          } else {
+//            $msg.='新增专利事务失败';
+//          }
+//      
+//      //引用Issinfo模型中定义的issCreate方法向issinfo表新增信息
+//          $issId = $issObj->issCreate($request->request());
+//          if ($issNewId) {
+//            $msg.='新增专利事务成功';
+//          } else {
+//            $msg.='新增专利事务失败';
+//          }
+//          
+//      //引用attinfo模型中定义的attCreate方法向attinfo表新增信息
+//          $attId = $attObj->attCreate($request->request());
+//          if ($issNewId) {
+//            $msg.='新增专利事务成功';
+//          } else {
+//            $msg.='新增专利事务失败';
+//          }
+      
       //return $msg;
-      return json(array('msg'=>$msg,'btnHtml'=>$btnHtml,'topic'=>$request->param('issPatTopic')));
+      //return json(array('msg'=>$msg,'btnHtml'=>$btnHtml,'topic'=>$request->param('issPatTopic')));
+      return json(array('msg'=>$msg,'topic'=>$request->param('issPatTopic')));
       //return $this->issPatAuth($request);//参数不够，不会产生分页。
     }
     

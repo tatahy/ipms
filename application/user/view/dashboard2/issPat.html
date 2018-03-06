@@ -1,13 +1,13 @@
 <!-- // issPat.html： -->
 
-				<!-- <ul class="nav nav-pills" > -->
-				<ul class="nav nav-tabs" >
+				<ul class="nav nav-pills" style="border-bottom: 1px solid #faebcc;">
+				<!-- <ul class="nav nav-tabs" > -->
 					{eq name="$authArray.authiss.edit" value="1"}
 					<li class="" ><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_EDIT" ><span class="glyphicon glyphicon-pencil"></span>编辑
 						{eq name="$numIssPatEdit" value="0"}
 							<span class="badge issPat span_EDIT">{$numIssPatEdit}</span>
 						{else/}
-							<span class="label label-primary issPat span_EDIT"><span class="numSingle">{$numIssPatEdit}</span>/{$numTotal}</span>
+							<span class="label label-info issPat span_EDIT"><span class="numSingle">{$numIssPatEdit}</span>/{$numTotal}</span>
 						{/eq}
 					</a></li>
 					{/eq}
@@ -95,33 +95,35 @@ $(document).ready(function(){
 		auth='_EDIT';
 		//设置数字的显示格式
 		$('.span_EDIT').find('.numSingle').addClass('badge mycolorred-bgwhite');
-		//设置span所在li为“active”,并对其a标签添加顶部色条。
-		$('.span_EDIT').parent().parent().addClass('active').find('a').	addClass('mybrightline-top-primary');
+		//设置span所在li为“active”
+		$('.span_EDIT').parent().parent().addClass('active');
+		//设置span所在li为“active”,并对其a标签添加顶部色条,nav-tabs添加的显示效果。
+		<!-- .find('a').addClass('myedge-top-warning'); -->
 
 	}else if({$authArray.authiss.audit}){
 		auth='_AUDIT';
 		$('.span_AUDIT').find('.numSingle').addClass('badge mycolorred-bgwhite');
 		
-		$('.span_AUDIT').parent().parent().addClass('active').find('a').addClass('mybrightline-top-primary');
+		$('.span_AUDIT').parent().parent().addClass('active');
 	}else if({$authArray.authiss.approve}){
 		auth='_APPROVE';
 		$('.span_APPROVE').find('.numSingle').addClass('badge mycolorred-bgwhite');
 		
-		$('.span_APPROVE').parent().parent().addClass('active').find('a').addClass('mybrightline-top-primary');
+		$('.span_APPROVE').parent().parent().addClass('active');
 	}else if({$authArray.authiss.execute}){
 		auth='_EXECUTE';
 		$('.span_EXECUTE').find('.numSingle').addClass('badge mycolorred-bgwhite');
 		
-		$('.span_EXECUTE').parent().parent().addClass('active').find('a').addClass('mybrightline-top-primary');
+		$('.span_EXECUTE').parent().parent().addClass('active');
 	}else if({$authArray.authiss.maintain}){
 		auth='_MAINTAIN';
 		$('.span_MAINTAIN').find('.numSingle').addClass('badge mycolorred-bgwhite');
 		
-		$('.span_MAINTAIN').parent().parent().addClass('active').find('a').addClass('mybrightline-top-primary');
+		$('.span_MAINTAIN').parent().parent().addClass('active');
 	}else{
 		$('.span_DONE').removeClass('label').addClass('badge');
 		
-		$('.span_DONE').parent().parent().addClass('active').find('a').addClass('mybrightline-top-primary');
+		$('.span_DONE').parent().parent().addClass('active');
 	}
 	<!-- //TP5中 'issPatAuth'='{$home}/user/dashboard2/issPatAuth' -->
 	$('#divIssPatAuth_load').load('issPatAuth',{'auth':auth});
@@ -131,13 +133,10 @@ $(document).ready(function(){
 	$('.aTab').each(function(){
 		$(this).css('padding','5px 10px');
 		
+		//去掉底部边框圆角
+		<!-- $(this).css({'border-bottom-right-radius':'0px','border-bottom-left-radius':'0px'}); -->
+
 	});
-	<!-- //2.当前的a加顶部色条 -->
-	<!-- $('.aTab').click(function(){ -->
-		<!-- $('.aTab').css('border-top','0px transparent'); -->
-		<!-- $(this).addClass('mybrightline-top-primary'); -->
-		
-	<!-- }); -->
 	
 	//调整span.label
 	$('span.label').css({'padding-bottom':'1px','margin-bottom':'2px'});	
@@ -152,13 +151,13 @@ $(document).ready(function(){
 		$('.numSingle').removeClass('badge').removeClass('mycolorred-bgwhite').addClass('mycolorwhite-bgtransparent');
 		
 		//设置所有标签a的顶部色条为透明
-		$('.aTab').addClass('mybrightline-top-transparent');
+		<!-- $('.aTab').addClass('myedge-top-transparent'); -->
 		
 		//本次点击的数字显示格式
 		$(this).find('.numSingle').addClass('badge').addClass('mycolorred-bgwhite');
 
 		//本次点击的a加顶部色条
-		$(this).removeClass('mybrightline-top-transparent').addClass('mybrightline-top-primary');
+		<!-- $(this).removeClass('myedge-top-transparent').addClass('myedge-top-warning'); -->
 		
 		$(this).tab('show');
 		$(this).parent().addClass('active');
