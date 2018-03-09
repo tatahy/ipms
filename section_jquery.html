@@ -480,6 +480,112 @@ $(document).ready(function(){
 <!--/  HY 2018/3/6 -->	
 
 
+<!--/  HY 2018/3/8 -->	
+使用FormData上传单个文件，并显示上传进度条
+
+<html>
+	<form action="" id="fmObj">
+		<input type="file" name="" id="file">
+		
+		<div class="form-group col-sm-6">
+			<button id="btnFileUpload" class="btn btn-primary btn-sm" data-oprt="" data-btnLabel=""><span class="glyphicon glyphicon-upload"></span>附件上传</button>
+			<br>
+			
+			<label for="" class="uploadbar" hidden>上传进度</label>	
+			<!-- //上传进度条 -->
+			<div class="progress" class="uploadbar" hidden>
+				<div id="divUpLoadProcess" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><span class="text-info">0%</span>
+				</div>
+			</div>
+				
+		</div>
+		
+	</form>
+
+</html>
+
+<script>
+$(document).ready(function(){
+	$('#fmObj').submit(function(event){					
+		//jQuery的preventDefault()方法阻止元素发生默认的行为——表单提交
+        event.preventDefault();	
+		
+		//得到新的FormData对象
+		<!-- if(fmObj){ -->
+			<!-- var formData = new FormData(fmObj[0]); -->
+		<!-- }else{ -->
+			<!-- var formData = new FormData(); -->
+		<!-- } -->
+		//append需要上传的文件对象
+		<!-- formData.append('file',$('#file').get(0).files[0]); -->
+		<!-- formData.append('file',$('#file')[0].files[0]); -->
+		
+		var formData = new FormData($('#fmObj')[0]);
+		
+		// 添加表单内没有的内容
+        formData.append('returnType',0);
+		
+		//显示上传进度条
+		$('.attuploadbar').show();	
+		
+		$.ajax({
+            type: 'post',
+            url: 'issPatOprt',
+            data: formData,
+            contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
+            processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)
+			//在xhr,调用自定义的xhrFileUploadBar函数，更新附件上传的进度条，显示上传进度
+			xhr:xhrFileUploadBar($('#divUpLoadProcess')),
+	
+            success: function(data,textStatus,jqXHR){
+				
+            },
+			error: function(jqXHR,textStatus,errorThrown){
+				
+				<!-- $.alert(jqXHR.readyState+'【'+textStatus+errorThrown+'】失败'); -->
+			}
+        });
+	
+	});
+	
+	
+	//**函数名：xhrFileUploadBar
+ 	//* 作用：应用XMLHttpRequest对象的progress事件显示文件上传进程
+	//* 参数obj，类型：对象。值：不为空。说明：为progress所在元素的id。类似$('#obj')
+	function xhrFileUploadBar(obj){
+		//jQuery中得到XMLHttpRequest对象	
+		var xhr= $.ajaxSettings.xhr();
+		
+		//显示上传进度
+		xhr.upload.onprogress=function(progress){
+			if(progress.lengthComputable){
+				//计算百分比并取整
+				var percent=Math.round(progress.loaded/progress.total*100);
+				//在浏览器控制台显示的内容
+				console.log(percent);
+				//附件上传的进度条显示上传进度
+				obj.css("width",percent + "%").text(percent + "%");
+			}
+		};
+		xhr.upload.onloadstart=function(){
+			console.log('started...');
+		};		
+		xhr.upload.onloadend=function(){
+			console.log('finished!!  xhr.upload='+xhr.upload+' v='+v);
+			<!-- $.alert('附件上传完成'); -->
+		};
+			
+		return xhr;
+	
+	}
+	
+});
+</script>
+
+
+<!--/  HY 2018/3/8 -->	
+
+
 
 
 <!-- ......................问题................................ -->

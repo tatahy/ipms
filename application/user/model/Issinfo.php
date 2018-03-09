@@ -165,6 +165,38 @@ class Issinfo extends Model
         }
     }
     
+    /**
+     * 更新issue。
+     * @param  array $data 更新issue的各项信息
+     * @return integer|bool  更新成功返回主键，未更新返回false
+     * 要求：传入的数组下标名与模型属性名（数据表字段名）一模一样。
+     */
+    public function issUpdate($data = [],$issId)
+    {
+        $result = $this->where('id',$issId)->allowField(true)->save($data);
+        if ($result) {
+            return $this->getData('id');
+        } else {
+            return false;
+        }
+    }
+    
+     /**
+     * 删除issue。
+     * @param  integer $issId 删除issue的id
+     * @return integer|bool  删除成功返回主键，未成功返回false
+     *
+     */
+    public function issDelete($issId)
+    {
+        $result = $this->where('id',$issId)->delete();
+        if ($result) {
+            return $this->getData('id');
+        } else {
+            return false;
+        }
+    }
+    
 }
 
 ?>

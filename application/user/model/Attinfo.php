@@ -88,6 +88,26 @@ class Attinfo extends Model
           $outPut='维护人';
         break;
         
+        case '_EDIT':
+          $outPut='撰写人';
+        break;
+        
+        case '_AUDIT':
+          $outPut='审核人';
+        break;
+        
+        case '_APPROVE':
+          $outPut='批准人';
+        break;
+        
+        case '_EXECUTE':
+          $outPut='执行人';
+        break;
+        
+        case '_MAINTAIN':
+          $outPut='维护人';
+        break;
+        
         default:
           $outPut=$value;
         break;
@@ -113,7 +133,7 @@ class Attinfo extends Model
     }
     
     /**
-     * 新增一个att。
+     * 新增一个attachment。
      * @param  array $data 新增att的各项信息
      * @return integer|bool  新增成功返回主键，新增失败返回false
      * 要求：传入的数组下标名与模型属性名（数据表字段名）一模一样。
@@ -121,6 +141,39 @@ class Attinfo extends Model
     public function attCreate($data = [])
     {
         $result = $this->allowField(true)->save($data);
+        if ($result) {
+            return $this->getData('id');
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * 更新attachment。
+     * @param  array $data 更新attachment的各项信息
+     * @param  integer $attId 删除attachment的id
+     * @return integer|bool  更新成功返回主键，未更新返回false
+     * 要求：传入的数组下标名与模型属性名（数据表字段名）一模一样。
+     */
+    public function attUpdate($data = [],$attId)
+    {
+        $result = $this->where('id',$attId)->allowField(true)->save($data);
+        if ($result) {
+            return $this->getData('id');
+        } else {
+            return false;
+        }
+    }
+    
+     /**
+     * 删除attachment。
+     * @param  integer $attId 删除attachment的id
+     * @return integer|bool  删除成功返回主键，未成功返回false
+     *
+     */
+    public function attDelete($attId)
+    {
+        $result = $this->where('id',$attId)->delete();
         if ($result) {
             return $this->getData('id');
         } else {

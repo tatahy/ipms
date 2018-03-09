@@ -200,7 +200,55 @@ class Patinfo extends Model
     public function patrecords()
     {   
         return $this->hasMany('Patrecord');
-    }     
+    }   
+    
+    /**
+     * 新增一个patent。
+     * @param  array $data 新增patent的各项信息
+     * @return integer|bool  新增成功返回主键，新增失败返回false
+     * 要求：传入的数组下标名与模型属性名（数据表字段名）一模一样。
+     */
+    public function patCreate($data = [])
+    {
+        $result = $this->allowField(true)->save($data);
+        if ($result) {
+            return $this->getData('id');
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * 更新patent。
+     * @param  array $data 更新patent的各项信息
+     * @return integer|bool  更新成功返回主键，未更新返回false
+     * 要求：传入的数组下标名与模型属性名（数据表字段名）一模一样。
+     */
+    public function patUpdate($data = [],$patId)
+    {
+        $result = $this->where('id',$patId)->allowField(true)->save($data);
+        if ($result) {
+            return $this->getData('id');
+        } else {
+            return false;
+        }
+    }
+    
+     /**
+     * 删除patent。
+     * @param  integer $patId 删除patent的id
+     * @return integer|bool  删除成功返回主键，未成功返回false
+     *
+     */
+    public function patDelete($patId)
+    {
+        $result = $this->where('id',$patId)->delete();
+        if ($result) {
+            return $this->getData('id');
+        } else {
+            return false;
+        }
+    }  
 
     
 }

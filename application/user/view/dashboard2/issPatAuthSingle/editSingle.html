@@ -24,19 +24,19 @@
 	<div class="row myRow">
 		<div class="form-group col-sm-8">
 			<label class="control-label" for="topic">事务标题<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-			<input class="form-control" id="topic" name="topic" value="{$iss.topic}" type="text" placeholder="关于XX专利的授权申报" required>
+			<input class="form-control" id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" placeholder="关于XX专利的授权申报" required>
 		</div>
 		
 		<div class="form-group col-sm-4">
 			<label for="issType">事务类型</label>
-			<input class="form-control" id="topic" name="topic" value="专利授权申报" type="text" readonly>
+			<input class="form-control" id="issType" name="issType" value="专利授权申报" type="text" readonly>
 		</div>
 	</div>
 	
 	<div class="row myRow">
 		<div class="form-group col-sm-12">
-			<label class="control-label" for="abstract">事务简介<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-			<textarea class="form-control" rows="5" id="abstract" name="abstract" placeholder="填写事务的主要内容，字数不超过100字。" required>{$iss.abstract}</textarea>
+			<label class="control-label" for="issPatAbstract">事务简介<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<textarea class="form-control" rows="5" id="issPatAbstract" name="issPatAbstract" placeholder="填写事务的主要内容，字数不超过100字。" required>{$iss.abstract}</textarea>
 		</div>
 	</div>
 	</div>
@@ -81,7 +81,7 @@
 		</div>
 		<div class="form-group col-sm-2">
 			<label class="control-label" for="patInventor">专利发明人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-			<input class="form-control" id="patInventor" name="patInventor" value="" type="text" placeholder="{$username}" required>
+			<input class="form-control" id="patInventor" name="patInventor" value="{$pat.inventor}" type="text" placeholder="{$username}" required>
 		</div>
 		
 		<div class="form-group col-sm-4">

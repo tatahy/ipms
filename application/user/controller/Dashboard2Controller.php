@@ -4,6 +4,7 @@ namespace app\user\controller;
 use think\Request;
 use think\Session;
 use think\View;
+use think\File as FileObj; 
 
 use app\user\model\User as UserModel;
 use app\user\model\Rolety as RoletyModel;
@@ -27,6 +28,7 @@ class Dashboard2Controller extends \think\Controller
     private $dept = null;
     //用户权限
     private $auth=array();
+    
     
     // 初始化
     protected function _initialize()
@@ -234,17 +236,17 @@ class Dashboard2Controller extends \think\Controller
       return view($role);
     }
     
-     //上传附件文件
+    //上传附件文件到temp目录
      //参数1：$fileSet，类型：对象。值：不为空。说明：拟上传的文件对象
-     //参数2：$num_id，类型：字符。值：不为空。说明：上传文件拟放入的目录名称
+     //参数2：$dirName，类型：字符。值：不为空。说明：上传文件拟放入的目录名称
      //参数3：$attId，类型：字符。值：不为空。说明：拟记录上传文件路径的记录id
-    private function _uploadAtt($fileSet,$num_id,$attId)
+    private function _uploadAttTemp(Request $request)
     {
-      
+      $fileSet=$request->file('attFile');
       if(!empty($fileSet)){
             // 移动到框架根目录的uploads/ 目录下,系统重新命名文件名
             $info = $fileSet->validate(['size'=>10485760,'ext'=>'jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,rar'])
-                        ->move(ROOT_PATH.DS.'uploads'.DS.$num_id);
+                        ->move(ROOT_PATH.DS.'uploads'.DS.'temp');
         }else{
             $this->error('未选择文件，请选择需上传的文件。');
         }
@@ -258,7 +260,64 @@ class Dashboard2Controller extends \think\Controller
             // 完整的文件名
             $info->getFilename(); 
             
-            $path= '..'.DS.'uploads'. DS.$num_id.DS.$info->getSaveName();
+            $path= '..'.DS.'uploads'. DS.'temp'.DS.$info->getSaveName();
+            
+            $data=array('attpath'=>$path,
+                        'uploaddate'=>date('Y-m-d H:i:s'),
+                        'uploader'=>$this->username,
+                        'atttype' =>$request->param('attType'),
+                        'attmap_id' =>$request->param('attmap_id'),
+                        'attmap_type' =>$request->param('attmap_type'),
+                        'name' =>$request->param('attName'),
+                        'rolename' =>$request->param('rolename')
+                        );
+            
+            $attSet=new AttinfoModel;
+            
+            $attId=$attSet->attCreate($data);
+            
+            $att = AttinfoModel::get($attId); 
+             
+            // 静态调用更新
+            //$attSet=AttinfoModel::update([
+//              'name'  => 'topthink',
+//              'email' => 'topthink@qq.com',
+//            ], ['num_id'=>$num_id]);
+            return $att;
+            
+        }else{
+            // 上传失败获取错误信息
+            //echo $file->getError();
+            return $fileSet->getError();
+        }
+      
+    }
+    
+     //上传附件文件到指定目录
+     //参数1：$fileSet，类型：对象。值：不为空。说明：拟上传的文件对象
+     //参数2：$dirName，类型：字符。值：不为空。说明：上传文件拟放入的目录名称
+     //参数3：$attId，类型：字符。值：不为空。说明：拟记录上传文件路径的记录id
+    private function _uploadAtt($fileSet,$dirName,$attId)
+    {
+      
+      if(!empty($fileSet)){
+            // 移动到框架根目录的uploads/ 目录下,系统重新命名文件名
+            $info = $fileSet->validate(['size'=>10485760,'ext'=>'jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,rar'])
+                        ->move(ROOT_PATH.DS.'uploads'.DS.$dirName);
+        }else{
+            $this->error('未选择文件，请选择需上传的文件。');
+        }
+        
+        if($info){
+            // 成功上传后 获取上传信息
+            // 文件的后缀名
+            $info->getExtension()."<br/>";
+            // 文件存放的文件夹路径：类似20160820/42a79759f284b767dfcb2a0197904287.jpg
+            $info->getSaveName()."<br/>";
+            // 完整的文件名
+            $info->getFilename(); 
+            
+            $path= '..'.DS.'uploads'. DS.$dirName.DS.$info->getSaveName();
             
             $attSet = AttinfoModel::where('id',$attId)->find(); 
             $attSet->save([
@@ -277,6 +336,29 @@ class Dashboard2Controller extends \think\Controller
             //echo $file->getError();
             return $fileSet->getError();
         }
+      
+    }
+    
+    //移动已上传的附件文件到指定目录???
+    //参数：$fileName，类型：字符串。值：不为空。说明：含上传文件名的路径。
+    //参数：$targetDir，类型：字符。值：不为空。说明：上传文件拟放入的目录名称
+    //参数：$id，类型：字符。值：不为空。说明：拟记录上传文件路径的记录id
+    private function _moveAtt($fileName,$targetDir,$id)
+    {
+      //得到文件对象
+      $file = new FileObj($fileName); 
+      
+      //文件移动到$targetDir目录
+      $fileMove=$file->move($targetDir);
+    
+       //引用attinfo模型中定义的方法向attinfo表更新信息
+      $attId = $attMdl->attUpdate($data=array('path'=>$targetDir),$id);
+      
+      if($attId && $fileMove){
+        return true;
+      }else{
+        return false;
+      }
       
     }
     
@@ -760,9 +842,9 @@ class Dashboard2Controller extends \think\Controller
     }
     
     //根据前端传来的操作类型，对数据库进行操作
-    public function issPatOprt(Request $request,IssinfoModel $issObj,IssrecordModel $issRdObj,
-                                PatinfoModel $patObj,PatrecordModel $patRdObj,
-                                AttinfoModel $attObj)
+    public function issPatOprt(Request $request,IssinfoModel $issMdl,IssrecordModel $issRdMdl,
+                                PatinfoModel $patMdl,PatrecordModel $patRdMdl,
+                                AttinfoModel $attMdl)
     {
       $this->_loginUser();
       
@@ -773,21 +855,14 @@ class Dashboard2Controller extends \think\Controller
         $oprt='_NONE';
       }
       
-      // $btnText接收前端页面传来的btnText值
-      if(!empty($request->param('btnText'))){
-        $btnText=$request->param('btnText');
-      }else{
-        $btnText='';
-      }
-      
-      // $btnLabel接收前端页面传来的btnLabel值
-      if(!empty($request->param('btnLabel'))){
-        $btnLabel=$request->param('btnLabel');
-      }else{
-        $btnLabel='';
-      }
-      
-      $btnHtml='<span class="label '.$btnLabel.'" style="font-size:18px;">'.$btnText.'</span>';
+      //变量赋初值
+      $issData=array();
+      $issMdlOprt='';
+      $patData=array();
+      $patMdlOprt='';
+      $attData=array();
+      $attMdlOprt='';
+      $oprtCN='';
       
       $msg="";
       $tplFile='dashboard2'.DS.'issPatAuthSingle'.DS;
@@ -795,114 +870,470 @@ class Dashboard2Controller extends \think\Controller
       switch($oprt){
         //“_EDIT”权限
         case'_ADDNEW':
-        
-          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          
+          $issData=array(
+                'topic'=>$request->param('issPatTopic'),
+                'type'=>$request->param('issType'),
+                'abstract'=>$request->param('issPatAbstract')
+          );
+          $issMdlOprt='_CREAT';
+          
+          $patData=array(
+                'topic'=>$request->param('patTopic'),
+                'pattype'=>$request->param('patType'),
+                'status'=>'填报',
+                'patowner'=>$request->param('patOwner'),
+                'inventor'=>$request->param('patInventor'),
+                'otherinventor'=>$request->param('patOtherInventor'),
+                'author'=>$request->param('patAuthor'),
+                'dept'=>$request->param('dept'),
+                'keyword'=>$request->param(''),
+                'summary'=>$request->param(''),
+                'applyplace'=>$request->param(''),
+                'pronum'=>$request->param(''),
+                'note'=>$request->param(''),
+                'addnewdate'=>$request->param(''),
+          );
+          $patMdlOprt='_CREAT';
+          
+          $attData=array(
+                ''=>$request->param(''),
+                ''=>$request->param('')
+          );
+          $attMdlOprt='_CREAT';
+          
+         // ''=>$request->param(''),
+          
           $tplFile.='editSingle';
-          
-          
+          $oprtCN='新增';
           
         break;
         
         case'_SUBMIT':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
           
-          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
           $tplFile.='editSingle';
+          $oprtCN='提交';
           
         break;
         
         case'_DELETE':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_DELETE';
           
-          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_DELETE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_DELETE';
+        
           $tplFile.='editSingle';
-          
+          $oprtCN='删除';
         break;
         
         case'_UPDATE':
-         
-          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
-          $tplFile.='editSingle';
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
           
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='editSingle';
+          $oprtCN='更新';
         break;
         //“_AUDIT”权限
         case'_PASS':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
           
-          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
           $tplFile.='auditSingle';
-          
+          $oprtCN='审核通过';
         break;
         
         case'_FAIL':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
           
-          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
           $tplFile.='auditSingle';
+          $oprtCN='审核未通过';
          
         break;
         
         case'_MODIFY':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
           
-          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
           $tplFile.='auditSingle';
+          $oprtCN='返回修改';
          
         break;
         //“_APPROVE”权限
         case'_PERMIT':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
           
-          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='批准';
+          
         break;
         
         case'_VETO':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
           
-          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='否决';
+          
         break;
         
         case'_COMPLETE':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
           
-          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='修改完善';
         break;
         //“_EXECUTE”权限
         case'_ACCEPT':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
           
-          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='领受';
         break;
         
         case'_REFUSE':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
           
-          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='申述';
+          
         break;
         
         case'_REPORT':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
           
-          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='执行报告';
+          
         break;
         
         case'_FINISH':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
           
-          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='执行完成';
+          
         break;
         //“_MAINTAIN”权限
         case'_APPLY':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
           
-          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='申报';
+          
         break;
         
         case'_IMPROVE':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
           
-          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='申报修改';
+          
         break;
         
         case'_AUTHORIZE':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
           
-          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='授权';
+          
         break;
         
         case'_REJECT':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
           
-          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='驳回';
+          
         break;
         
         case'_CLOSE':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
           
-          $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='关闭';
+          
         break;
         
         case'_ADDRENEW':
@@ -912,6 +1343,26 @@ class Dashboard2Controller extends \think\Controller
                               array("today"=>date('Y-m-d'),"username"=>$this->username,"deptMaintainer"=>$this->dept)));
           }else{
             $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+            $issData=array(
+                ''=>$request->param(''),
+                
+            );
+            $issMdlOprt='_CREAT';
+            
+            $patData=array(
+                  ''=>$request->param(''),
+                  
+            );
+            $patMdlOprt='_UPDATE';
+            
+            $attData=array(
+                  ''=>$request->param(''),
+          
+            );
+            $attMdlOprt='_CREAT';
+          
+            $tplFile.='auditSingle';
+            $oprtCN='新增';
           }
           
         break;
@@ -920,29 +1371,98 @@ class Dashboard2Controller extends \think\Controller
         
       }
       
-      //引用patinfo模型中定义的patCreate方法向patinfo表新增信息
-         // $patId = $patObj->issCreate($request->request());
-//          if ($issNewId) {
-//            $msg.='新增专利事务成功';
-//          } else {
-//            $msg.='新增专利事务失败';
+      //引用patinfo模型中定义的方法向patinfo表更新信息
+      switch( $patMdlOprt){
+        case '_CREAT':
+          $patId = $patMdl->patCreate($patData);
+          if ($patId) {
+            $msg.='专利【新增】成功。<br>';
+          }else {
+            $msg.='专利【新增】失败。<br>';
+          }
+        break;
+        
+        case '_UPDATE':
+          $patId = $patMdl->patUpdate($patData);
+          if ($patId) {
+            $msg.='专利【更新】完成。<br>';
+          }else {
+            $msg.='专利信息无变化，无需【更新】。<br>';
+          }
+        break;
+        
+        case '_DELETE':
+          $patId = $patMdl->patDelete($patData);
+          if ($patId) {
+            $msg.='专利【删除】成功。<br>';
+          }else {
+            $msg.='专利【删除】失败。<br>';
+          }
+        break;
+        
+      }
+      
+      //引用Issinfo模型中定义的方法向issinfo表更新信息
+      switch($issMdlOprt){
+        case '_CREAT':
+          $issId = $issMdl->issCreate($issData);
+          if ($issId) {
+            $msg.='专利事务【'.$oprtCN.'】成功。<br>';
+          }else {
+            $msg.='专利事务【'.$oprtCN.'】失败。<br>';
+          }
+        break;
+        
+        case '_UPDATE':
+          $issId = $issMdl->issUpdate($issData);
+          if ($issId) {
+            $msg.='专利事务【'.$oprtCN.'】完成。<br>';
+          }else {
+            $msg.='专利事务【'.$oprtCN.'】无变化，无需更新。<br>';
+          }
+        break;
+        
+        case '_DELETE':
+          $issId = $issMdl->issDelete($issData);
+          if ($issId) {
+            $msg.='专利事务【'.$oprtCN.'】成功。<br>';
+          }else {
+            $msg.='专利事务【'.$oprtCN.'】失败。<br>';
+          }
+        break;
+        
+      }
+      
+      //引用attinfo模型中定义的方法向attinfo表新增信息
+      switch( $attMdlOprt){
+        case '_CREAT':
+          $attId = $attMdl->attCreate($attData);
+          if ($attId) {
+            $msg.='专利事务附件【上传】成功。<br>';
+          }else {
+            $msg.='专利事务附件【上传】失败。<br>';
+          }
+        break;
+        
+        //case '_UPDATE':
+//          $attId = $attMdl->attUpdate($attData);
+//          if ($attId) {
+//            $msg.='专利事务附件'.$oprtCN.'完成。<br>';
+//          }else {
+//            $msg.='专利事务附件'.$oprtCN.'无变化，无需更新。<br>';
 //          }
-//      
-//      //引用Issinfo模型中定义的issCreate方法向issinfo表新增信息
-//          $issId = $issObj->issCreate($request->request());
-//          if ($issNewId) {
-//            $msg.='新增专利事务成功';
-//          } else {
-//            $msg.='新增专利事务失败';
-//          }
-//          
-//      //引用attinfo模型中定义的attCreate方法向attinfo表新增信息
-//          $attId = $attObj->attCreate($request->request());
-//          if ($issNewId) {
-//            $msg.='新增专利事务成功';
-//          } else {
-//            $msg.='新增专利事务失败';
-//          }
+//        break;
+        
+        case '_DELETE':
+          $attId = $attMdl->attDelete($attData);
+          if ($attId) {
+            $msg.='专利事务附件【删除】成功。<br>';
+          }else {
+            $msg.='专利事务附件【删除】失败。<br>';
+          }
+        break;
+        
+      }
       
       //return $msg;
       //return json(array('msg'=>$msg,'btnHtml'=>$btnHtml,'topic'=>$request->param('issPatTopic')));
@@ -1093,7 +1613,7 @@ class Dashboard2Controller extends \think\Controller
 //      	
 //        ]);
 //      return view('dashboard2'.DS.'issThe'.DS.'theNavPills');
-      return ':)<br> issthe 模块开发中……';
+      return ':)<br> issThe 模块开发中……';
      
     }
     
@@ -1101,6 +1621,14 @@ class Dashboard2Controller extends \think\Controller
     {
        
       return ':)<br> issPro 模块开发中……';
+     
+    }
+    
+     public function test(Request $request)
+    {
+      //调用本模块定义的_uploadAttTemp方法上传附件到服务器指定文件夹
+      $att=$this->_uploadAttTemp($request);
+      return $att;
      
     }
 }

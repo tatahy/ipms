@@ -2476,7 +2476,7 @@ class DashboardController extends \think\Controller
             $info->getExtension()."<br/>";
             // 文件存放的文件夹路径：类似20160820/42a79759f284b767dfcb2a0197904287.jpg
             $info->getSaveName()."<br/>";
-            // 完整的文件名
+            // 完整的文件名，类似42a79759f284b767dfcb2a0197904287.jpg
             $info->getFilename(); 
             
             $path= '..'.DS.'uploads'. DS.$num_id.DS.$info->getSaveName();

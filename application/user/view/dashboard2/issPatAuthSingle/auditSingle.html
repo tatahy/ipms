@@ -9,21 +9,41 @@
 
 {/block}
 
-{block name="issPatIput"}
-{__block__}
+{block name="issPatInput"}
+<div class="myFieldset">
+	
+		<div class="myLegend"><span class="label label-warning">审核</span></div>
+		<form action="" id="fmIssPat">
+		
+		<div class="row myRow">
+		
+			<div class="form-group col-sm-4">
+				<label for="auditResult">结论<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<select id="auditResult" class="empty-check form-control" name="auditResult" style="font-size:100%;">
+					<option value="0" class="text-warning bg-warning" >……</option>
+					<option class="text-success bg-success" value="_PASS">审核通过</option>
+					<option class="text-danger bg-danger" value="_FAIL">审核未通过</option>
+					<option class="text-primary bg-info" value="_MODIFY">返回修改</option>
+				</select>
+			</div>
+		
+			<div id="divAuditMsg" class="form-group col-sm-8" hidden="true">
+				<label for="attName">具体意见<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<textarea class="empty-check form-control" rows="5" id="auditMsg" name="auditMsg" type="text" placeholder="请填入具体的审核意见" required></textarea>
+			</div>
+			
+		</div>
+		</form>
+</div>		
 
 {/block}
 
-{block name="PatIput"}
-{__block__}
-
-{/block}
+{block name="patInput"}{/block}
 
 {block name="attInput"}
 {__block__}
 
 {/block}
-
 
 {block name="btn"}
 
@@ -36,10 +56,68 @@
 
 {block name="script"}
 {__block__}
-	<script>
-	$(document).ready(function(){	
+<script>
+$(document).ready(function(){	
+	//
+	$('button[type="submit"]').hide();
 	
 	
+	// 单选框auditResult的change事件，出现auditMsg输入框等。
+	$('#auditResult').change(function(){	
+		//恢复到default状态
+		$('button[type="submit"]').hide();
+		$('#divAuditMsg').hide();
+		$(this).removeClass('label label-danger label-primary label-success');
+		//#auditMsg增加'empty-check'，列入非空检查
+		$('#auditMsg').addClass('empty-check');
+		<!-- $(this).removeClass('label label-danger').removeClass('label label-primary').removeClass('label label-success'); -->
+		
+		
+		switch($(this).val()){
+			case '_FAIL':
+				$('#divAuditMsg').show();
+				$('#btnFail').show();
+				$(this).addClass('label label-danger');
+				//#auditMsg增加'empty-check'，列入非空检查
+				$('#auditMsg').addClass('empty-check');
+			break;
+			
+			case '_MODIFY':
+				//为'#auditMsg'添加'required'属性，其值为true，保证在表单提交时必填
+				$('#auditMsg').attr('required',true);
+				$('#divAuditMsg').show();
+				$('#btnModify').show();
+				$(this).addClass('label label-primary');
+				//#auditMsg增加'empty-check'，列入非空检查
+				$('#auditMsg').addClass('empty-check');
+			break;
+			
+			case '_PASS':
+				$('#divAuditMsg').hide();
+				$('#btnPass').show();
+				$(this).addClass('label label-success');
+				//#auditMsg去掉'empty-check'，不列入非空检查
+				$('#auditMsg').removeClass('empty-check');
+			break;
+			//0
+			default:
+				$('button[type="submit"]').hide();
+				$('#divAuditMsg').hide();
+				$(this).removeClass('label label-danger label-primary label-success');
+				//#auditMsg增加'empty-check'，列入非空检查
+				$('#auditMsg').addClass('empty-check');
+			break;
+		}	
 	});
-	</script>
+	
+	// 单选框auditResult的click事件，恢复到单选框default状态
+	<!-- $('#auditResult').click(function(){	 -->
+		<!-- //恢复到单选框default状态 -->
+		<!-- $(this).children().removeClass('label'); -->
+		<!-- $(this).removeClass('label label-danger label-primary label-success'); -->
+	
+	<!-- }); -->
+	
+});
+</script>
 {/block}
