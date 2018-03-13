@@ -1,15 +1,19 @@
 <!-- // baseSingle.html： -->
 {/*  总共有6处block用于子模板修改用，
 	name="abstract"
-	name="issPatInput"，
 	name="patInput"，
 	name="attInput"，
+	name="issPatInput"，
 	name="btn"，
 	name="script"  
 	
 	所有需要用户输入，并通过button[type="submit"]的click事件传到后端的数据，都要在输入框加上class="empty-check"再分类放入3个form中（#fmIssPat、#fmPat、#fmAtt）。因为自定义的inputsNotEmpty函数通过".empty-check"来逐个检查该输入项是否为空。
 	
 */}
+
+{block name="script"}
+
+{/block}
 	
 <div id="divIssPatAuthSingle">
 
@@ -20,7 +24,7 @@
 		
 		
 		
-		<div id="divAbstract" class="row myRow-noformel collapse in">
+		<div id="divAbstract" class="row myRow-noform-group collapse in">
 			<div class="bs-callout bs-callout-warning">
 			<h4 class="text-warning">专利事务：<strong>{$iss.topic}</strong></h4>
 			<ul>
@@ -84,23 +88,24 @@
 	<div class="myFieldset">	
 	
 		<div class="myLegend"><span class="label label-warning">专利XX（表单）</span></div>
-			<!-- // class="sr-only" 仅源代码文件中显示-->
-			<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
+			
 		
 			<form action="" id="fmPat">
-
+			<!-- // class="sr-only" 仅源代码文件中显示-->
+			<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
 			
 			</form>
 	</div>	
 {/block}			
 
 {block name="attInput"}
+	<!-- //附件显示 -->
 	<div class="myFieldset">
 	
 		<div id="divAttCollapse" class="myLegend" data-toggle="collapse" data-target="#fmAtt"><span class="label label-warning">附件显示<span class="glyphicon glyphicon-menu-down"></span></span></div>			
 		
-		<form id="fmAtt" class="collapse">				
-			<div class="table-responsive myRow-noformel" >	
+		<form id="fmAtt" class="collapse row myRow-noform-group">				
+			<div class="table-responsive" >	
 				<table class="table table-bordered table-responsive table-hover">
 				<thead>
 					<tr>
@@ -145,11 +150,8 @@
 	
 	</div>
 	
+	<!-- //附件上传 -->
 	<div class="myFieldset">
-	
-		<!-- <div id="divAttFileUploadCollapse" class="myLegend" data-toggle="collapse" data-target="#fmAttFileUpload"><span class="label label-warning">附件上传<span class="glyphicon glyphicon-menu-down"></span></span> -->
-		<!-- </div> -->
-		
 		<div class="myLegend">		
 			<h5>
 				<span id="spAttFileUploadCollapse" class="label label-warning" data-toggle="collapse" data-target="#fmAttFileUpload">附件上传<span class="glyphicon glyphicon-menu-down"></span></span>
@@ -163,6 +165,12 @@
 		</div>	
 			
 			<form id="fmAttFileUpload" class="collapse">
+				<div class="row myRow sr-only">
+				<input name="attmap_id" value="{$iss.id}" type="text" class="sr-only">
+				<input name="attmap_type" value="_ATTO1" type="text" class="sr-only">
+				<input name="rolename" value="{$auth}" type="text" class="sr-only">
+				</div>
+				
 				<div class="row myRow" >			
 				<div class="form-group col-sm-6">
 					<label for="attFile">选择附件<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
@@ -208,13 +216,6 @@
 				</div>
 				</div>
 				
-				<div class="row myRow sr-only">
-				<input name="attmap_id" value="{$iss.id}" type="text" class="sr-only">
-				<input name="attmap_type" value="_ATTO1" type="text" class="sr-only">
-				<input name="rolename" value="{$auth}" type="text" class="sr-only">
-				</div>
-			
-			
 			</form>
 	</div>
 
@@ -223,13 +224,11 @@
 {block name="issPatInput"}
 	<div class="myFieldset">	
 		<div class="myLegend"><span class="label label-warning">事务XX（表单）</span></div>
-			<!-- // class="sr-only" 仅源代码文件中显示-->
+			
+		<form action="" id="fmIssPat">
+		<!-- // class="sr-only" 仅源代码文件中显示-->
 			<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
-			
-			<form action="" id="fmIssPat">
-		
-			
-			</form>
+		</form>
 
 	</div>
 {/block}
@@ -239,7 +238,7 @@
 	<div class="form-group col-sm-12">
 			
 		<!-- // 按钮-->
-		<div  class="pull-left">
+		<div class="pull-left">
 		
 {block name="btn"}{/block}
 		</div>
@@ -251,9 +250,11 @@
 </div>
 </div>
 
-{block name="script"}
+
 <script>
-$(document).ready(function(){	
+$(document).ready(function(){
+	$('.modal-footer').attr('hidden',true);
+	
 	//#divAbstractCollapse“概要显示”
 	$('#divAbstract').on('hide.bs.collapse', function(){
     	$('#divAbstractCollapse').html('<span class="label label-warning">概要显示<span class="glyphicon glyphicon-menu-down"></span></span>');
@@ -323,98 +324,117 @@ $(document).ready(function(){
 		}
 	
 	});
-	
-	
-	
-	
-	
-	//各个type="submit"按钮的click事件，向后端传数据
-	$('button[type="submit"]').click(function(){
 		
-		<!-- $(this).click(function(){ -->
+	//各个type="submit"按钮的click事件:向后端传数据
+	$('button[type="submit"]').click(function(){
+			
 			var oprt=$(this).attr('data-oprt');
-			var btnHtml='<span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:18px;">'+$(this).html()+'</span>';
-			<!-- var attFile=$('input:radio[name="attUpload"][value="0"]').prop('checked'); -->
-			var noAttFileChecked=$('input:radio[name="attUpload"][value="0"]').prop('checked');
+			var topic=$(this).attr('data-issTopic');
+			
+			if(oprt=='_ADDNEW'){
+				topic=$('#issPatTopic').val();
+			}
+			
+			var btnHtml='<span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:16px;">'+$(this).html()+'</span>《'+topic+'》';
 
-			//input变为“有”选中；
-		<!-- $('input:radio[name="attUpload"][value="1"]').prop('checked',true); -->
+			<!-- var url='issPatOprt'; -->
+			var url='test';
+			
+			
+			//预处理3个表单的数据,利用自定义的serializeJson()函数
+			var fmPatDataJson=serializeJson($('#fmPat'));
+			var fmIssPatDataJson=serializeJson($('#fmIssPat'));
+			var fmAttDataJson=serializeJson($('#fmAtt'));
+			
+			//声明对象变量
+			var param={};
+			var formData= new FormData;
 			//引用自定义函数inputCheck检查所有的input(class="form-control")是否都填入内容，返回一个结果（true/）。		
-			var v1=inputsNotEmpty();	
+			var v1=inputsNotEmpty();
+			//获得input“无”按钮的状态，“1”为选中，“0”为未选中
+			var noAttFileChecked=$('input:radio[name="attUpload"][value="0"]').prop('checked');			
 
 			//启动ajax传数据的条件；
 			//1.所有的input(class="form-control")都填入内容，v1==true
 			//2.input为“无”选中，noAttFileChecked==true
 			if(v1==true && noAttFileChecked==true){
-				//ajax传数据,确保#fmPat总是第一个进行，成功后再有#fmAtt、#fmIssPat
 				
-				//更新modalIssPatAuthSingle的body内容，结合后端传来的内容$msg
-				$('#divIssPatSingle_load').html('<div style="text-align:center;margin-bottom:50px;margin-top:50px;"><h4>'+btnHtml+'&nbsp;</h4></p>$msg</p></div>');
-			
+				$('#modalIssPatAuthSingle').modal('hide');
+				//是否开始ajax传3个form的数据
+				$.confirm(btnHtml,function(e){
+					con=e;
+					if(true==con){
+						if(oprt=='_ADDNEW'){
+							//通过ajax嵌套完成新增
+							//首先提交#fmPat数据
+							$.extend(param,fmPatDataJson,{'oprt':'_ADDNEW'});
+							
+							var jqxhr=$.post(url,param,function(data){
+							<!-- var jqxhr=$.post(url,$('#fmPat').serialize(),function(data){ -->
+								//返回的data.patId不为0，说明已经新增pat成功
+								if(data.patId){
+									//再提交#fmIssPat和#fmAtt的数据
+									$.extend(param,fmIssPatDataJson,fmAttDataJson,{"patId":data.patId});
+									
+									$.post(url,param,function(data){
+										<!-- //后端数据处理成功后的动作： -->
+										//1.结合后端传来的内容$msg，更新modalIssPatAuthSingle的body内容
+										$('#divIssPatSingle_load').html('<div style="text-align:center;margin-bottom:50px;margin-top:50px;"><h4>'+btnHtml+'&nbsp;</h4></p>'+data.msg+'</p></div>');
+										//2. 显示“返回”按钮
+										$('.modal-footer').attr('hidden',false);
+										$('#modalIssPatAuthSingle').modal('show');
+										//3.在#modalIssPatAuthSingle的hidden.bs.modal事件中刷新#divIssPatAuth_load的内容
+										$('#modalIssPatAuthSingle').on('hidden.bs.modal', function(){
+											$("#divIssPatAuth_load").load('issPatAuth',{'auth':'{$auth}'});
+										});				
+							
+									});
+									
+								}
+								//新增pat失败，
+								else{
+									$.alert('新增事务失败，请重试');
+								}
+							})
+							.fail(function(){
+								$.alert('与服务器交换数据失败，请重试');
+							});
+						
+						}else{
+							formData.append('fmPatDataJson',fmPatDataJson);
+							formData.append('fmIssPatDataJson',fmIssPatDataJson);
+							formData.append('fmAttDataJson',fmAttDataJson);
+														
+							$.extend(param,fmPatDataJson,fmIssPatDataJson,fmAttDataJson);
+							
+							$.post(url,param,function(data){
+								<!-- //后端数据处理成功后的动作： -->
+								//1.结合后端传来的内容$msg，更新modalIssPatAuthSingle的body内容
+								$('#divIssPatSingle_load').html('<div style="text-align:center;margin-bottom:50px;margin-top:50px;"><h4>'+btnHtml+'&nbsp;</h4></p>'+data.msg+'</p></div>');
+								//2. 显示“返回”按钮
+								$('.modal-footer').attr('hidden',false);
+								$('#modalIssPatAuthSingle').modal('show');
+								//3.在#modalIssPatAuthSingle的hidden.bs.modal事件中刷新#divIssPatAuth_load的内容
+								$('#modalIssPatAuthSingle').on('hidden.bs.modal', function(){
+									$("#divIssPatAuth_load").load('issPatAuth',{'auth':'{$auth}'});
+								});				
+							
+							});
+							
+							<!-- console.log('backData='); -->
+							<!-- console.dir(backData); -->
+							<!-- console.dir('backData.msg='+backData.msg); -->
+						}
+						
+					}else{
+						$('#modalIssPatAuthSingle').modal('show');
+					}
+				}).cancel('否(N)').ok('是(Y)');
+				
 			}else{
 				$('#btnAttFileUpload').focus().tooltip({title: '点击!，完成附件上传', placement: 'bottom'}).tooltip('show');
 			}
-						
-			<!-- //'_ADDNEW'没有patId、issId -->
-			<!-- if(oprt=='_ADDNEW'){ -->
 			
-			
-			
-			<!-- }else{ -->
-			<!-- //其他oprt都有patId、issId			 -->
-			
-			
-			
-			<!-- } -->
-			
-			
-			<!-- //触发#fmIssPat的提交事件 -->
-			<!-- $('#fmIssPat').submit(function(evt){ -->
-				<!-- evt.preventDefault(); -->
-			
-				<!-- //调用函数触发Ajax -->
-				<!-- formDataAjax('url???',$('#fmIssPat'),'trigerName','oprt???','title???'); -->
-			<!-- }); -->
-			
-			<!-- //触发#fmPat的提交事件 -->
-			<!-- $('#fmPat').submit(function(evt){ -->
-			
-				<!-- evt.preventDefault(); -->
-			
-				<!-- //调用函数触发Ajax -->
-				<!-- formDataAjax('url???',$('#fmPat'),'trigerName','oprt???','title???'); -->
-		
-			<!-- }); -->
-			
-			
-			<!-- //有附件上传触发#fmAtt的提交事件？？？ -->
-			<!-- if(v==true){ -->
-			
-				<!-- //显示上传进度条 -->
-				<!-- $('.attuploadbar').show(); -->
-				<!-- //触发#fmAttUpload的提交事件 -->
-				<!-- $('#fmAttFileUpload').submit(function(evt){ -->
-					
-					<!-- evt.preventDefault(); -->
-					<!-- $('#modal???').modal('hide'); -->
-					<!-- $.confirm(str,function(evt){ -->
-						<!-- con=evt; -->
-						<!-- if(true==con){ -->
-							<!-- $('#modal???').modal('show'); -->
-							<!-- //调用函数触发Ajax并显示进度条 -->
-							<!-- attUploadAjax('url???',$('#fmAttFileUpload'),'trigerName','oprt???','title???'); -->
-						<!-- }else{ -->
-						<!-- $('#modal???').modal('show'); -->
-						<!-- } -->
-					<!-- }).cancel('否(N)').ok('是(Y)'); -->
-				<!-- }); -->
-			<!-- } -->
-			<!-- //无附件上传？？ -->
-			<!-- else{ -->
-			
-			<!-- } -->
-			
-		<!-- }); -->
 	});
 	
 	//上传附件文件
@@ -432,7 +452,7 @@ $(document).ready(function(){
 			
 			$.ajax({
 				type: 'post',
-            	url: 'test',
+            	url: 'uploadAttTemp',
             	data: formData,
 				<!-- datatype: 'JSON', -->
             	contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
@@ -478,8 +498,7 @@ $(document).ready(function(){
 		});
 	
 	});
-
-	//检查form里的input是否为空，为空做出'has-error'和tooltip提示，不为空去掉'has-error'和tooltip提示
+	//检查form里的input（class="empty-check"）是否为空，为空做出'has-error'和tooltip提示，不为空去掉'has-error'和tooltip提示
 	$('.empty-check').each(function(){
 		$(this).focusout(function(){
 			if($(this).val()){
@@ -487,7 +506,7 @@ $(document).ready(function(){
 				$(this).tooltip('destroy');
 			}else{
 				$(this).parent().addClass('has-error');
-				$(this).tooltip({title: '请填写此字段', placement: 'bottom'}).tooltip('show');
+				$(this).tooltip({title: '请填写此项', placement: 'bottom'}).tooltip('show');
 			}
 			
 		});
@@ -510,49 +529,13 @@ $(document).ready(function(){
 		
 		//去掉'.form-control'的tooltip和'has-error'
 		$('.form-control').tooltip('destroy').parent().removeClass('has-error');
+		
+		//隐藏
+		$('.resetHide').hide();
 	
 	});
 
 <!-- function -->
-	//**函数名：formAjax
- 	//* 作用：应用jQuery的$.ajax向后端提交formData数据
-	//* 参数url，类型：字符串。值：不为空。说明：表单提交（action中）的url。
-	//* 参数fmObj，类型：对象。值：不为空。说明：表示需要一起提交的表单。
-	//* 参数triger，类型：字符串。值：不为空。说明：触发formDataAjax的用户名。
-	//* 参数oprt，类型：字符。值：可为空。说明：表示触发本函数的‘操作’
-	//* 参数title，类型：字符。值：可为空。说明：本函数显示的提示框$.alert的标题内容。
-	function formAjax(url,fmObj,trigerName,oprt,title){
-	// formdata形式上传表单数据,自动搜索表单信息(表单内没有name属性的input不会被搜索到)，IE<=9不支持FormData
-		if(fmObj){
-			var formData = new FormData(fmObj[0]);
-		}else{
-			var formData = new FormData();
-		}
-	
-		// 添加表单内没有的内容
-        formData.append('returnType',0);
-		formData.append('trigerName',trigerName);
-		formData.append('dept','{$dept}');
-		formData.append('issId','???');
-		
-		$.ajax({
-			type: 'post',
-            url: url,
-            data: formData,
-            <!-- contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置 -->
-            <!-- processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post) -->
-				
-			success: function(data){
-				
-			},
-			error: function(){
-				$.alert('【附件上传】失败');
-			}
-		
-		});	
-		<!-- ------------------ -->
-		
-	}	
 	
 	//**函数名：xhrFileUploadBar
  	//* 作用：应用XMLHttpRequest对象的progress事件显示文件上传进程
@@ -591,7 +574,6 @@ $(document).ready(function(){
 	
 	}
 	
-	
 	//**函数名：inputsNotEmpty
  	//* 作用：检查所有的input(class="form-control")是否都填入内容，作用：无内容的加'has-error'和tooltip，在第一个无内容的input显示tooltip提示返回一个结果（true/false）
 	//* 参数，类型：对象。值：不为空。说明：。
@@ -600,7 +582,7 @@ $(document).ready(function(){
 		var obj=$('.empty-check');
 		var arr=[];
 		var i=0;
-		//检查所有的input是否都填入内容，无内容的加'has-error'和tooltip
+		//检查所有的input(class="form-control")是否都填入内容，无内容的加'has-error'和tooltip
 		for (i;i<obj.length;i++){
 			if(obj.eq(i).val()){
 				<!-- obj.eq(i).removeClass('bg-danger'); -->
@@ -622,10 +604,33 @@ $(document).ready(function(){
 		}
 	
 	}	
+	
+	//**函数名：serializeJson
+ 	//* 作用：对表单内容进行JSON对象序列化
+	//* 参数fmObj，类型：对象。值：不为空。说明：表单对象。
+	//* 返回值：JSON对象
+	function serializeJson(fmObj){
+		var serializeObj={};
+		var arr=fmObj.serializeArray();
+		var str=fmObj.serialize();
+		$.each(arr,function(){
+			if(serializeObj[this.name]){
+				if($.isArray(serializeObj[this.name])){
+					serializeObj[this.name].push(this.value);
+				}else{
+					serializeObj[this.name]=[serializeObj[this.name],this.value];
+				}
+			
+			}else{
+				serializeObj[this.name]=this.value;
+			}
+		});
+		return serializeObj;
+	}
+		
 <!--// function -->
 	
 });
 
 </script>
-{/block}
 

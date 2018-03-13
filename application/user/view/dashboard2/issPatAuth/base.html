@@ -74,7 +74,7 @@
 {block name="btnTpl"}
 					{notin name="$auth" value="_DONE"}
 					<td class="btnTpl">
-						<a class="" href="#modalIssPatAuthSingle" data-issId="{$vo.id}" data-issue-authority="_EDIT" data-toggle="modal" ><span class="glyphicon glyphicon-pencil text-primary"></span>_编辑</a>
+						<a class="" href="#modalIssPatAuthSingle" data-issId="{$vo.id}" data-issTopic="{$vo.topic}" data-issue-authority="_EDIT" data-toggle="modal" ><span class="glyphicon glyphicon-pencil text-primary"></span>_编辑</a>
 				
 					</td>
 					{/notin}
@@ -120,10 +120,10 @@
 		
         <div class="modal-body">
 			<!-- // 单个issPat增删改查页面显示位置，需load其他模板文件的div-->
-			<div id="divIssPatSingle_load"><h3 style="margin:50px;">加载中……</h3></div>
+			<div id="divIssPatSingle_load"><h4 style="margin:50px;">加载中……</h4></div>
 		</div>
 		
-		<div class="modal-footer" hidden>
+		<div class="modal-footer" hidden="true">
         	<input type="button" class="btn btn-primary btn-sm" data-dismiss="modal" value="返回">  
           
         </div>
@@ -249,6 +249,7 @@ $(document).ready(function(){
 	// patIss表格中<td>里<a>标签的click事件,Ajax处理数据引入#modalIssPatAuthSingle所需内容
 	$(".btnTpl a").click(function(){
 		var issId=$(this).attr('data-issId');
+		var topic=$(this).attr('data-issTopic');
 		var auth=$(this).attr('data-issue-authority');
 		var str=$(this).html();
 		//向后端“issPatSingle”(TP5中 'issPatSingle'='{$home}/user/dashboard2/issPatSingle' )发送数据(后端用于选择返回的模板文件)		
@@ -262,7 +263,7 @@ $(document).ready(function(){
 			function(data){
 				//在本文件#divIssPatSingle_load处渲染显示data
 				$('#divIssPatSingle_load').html(data);
-				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务：</span><strong>【'+str+'】</strong>');
+				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务：</span><strong>【'+str+'】</strong>《'+topic+'》');
 			}
 		);
 		

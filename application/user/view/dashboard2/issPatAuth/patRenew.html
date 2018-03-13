@@ -215,6 +215,7 @@ $(document).ready(function(){
 	$(".btnOprt a").click(function(){
 		
 		var patId=$(this).attr('data-patId');
+		var topic=$(this).attr('data-patTopic');
 		var str=$(this).html();
 		
 		$.post('issPatOprt',
@@ -225,7 +226,7 @@ $(document).ready(function(){
 			},
 			function(data){
 			// 后端返回的data为json格式
-				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务</span>：<strong>【'+str+'】</strong>');
+				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务</span>：<strong>【'+str+'】</strong>《关于专利“'+data.topic+'”的续费申请》');
 				
 				$('#topic').html('关于专利“'+data.topic+'”的续费申请');
 				$('#issMapId').val(data.id);
@@ -246,6 +247,12 @@ $(document).ready(function(){
 				
 			}
 		);
+	
+	});
+	
+	
+	//参照baseSingel.html中的$('button[type="submit"]').click修改$('#fmIssPatRenew').submit，保持一致 HY??? 2018/3/12
+	$('button[type="submit"]').click(function(){
 	
 	});
 	

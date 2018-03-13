@@ -240,7 +240,7 @@ class Dashboard2Controller extends \think\Controller
      //参数1：$fileSet，类型：对象。值：不为空。说明：拟上传的文件对象
      //参数2：$dirName，类型：字符。值：不为空。说明：上传文件拟放入的目录名称
      //参数3：$attId，类型：字符。值：不为空。说明：拟记录上传文件路径的记录id
-    private function _uploadAttTemp(Request $request)
+    public function uploadAttTemp(Request $request)
     {
       $fileSet=$request->file('attFile');
       if(!empty($fileSet)){
@@ -855,6 +855,13 @@ class Dashboard2Controller extends \think\Controller
         $oprt='_NONE';
       }
       
+      // $patId接收前端页面传来的patId值
+      if(!empty($request->param('patId'))){
+        $patId=$request->param('patId');
+      }else{
+        $patId=0;
+      }
+      
       //变量赋初值
       $issData=array();
       $issMdlOprt='';
@@ -868,7 +875,7 @@ class Dashboard2Controller extends \think\Controller
       $tplFile='dashboard2'.DS.'issPatAuthSingle'.DS;
             
       switch($oprt){
-        //“_EDIT”权限
+        //“_EDIT”权限拥有的操作
         case'_ADDNEW':
           
           $issData=array(
@@ -978,7 +985,7 @@ class Dashboard2Controller extends \think\Controller
           $tplFile.='editSingle';
           $oprtCN='更新';
         break;
-        //“_AUDIT”权限
+        //“_AUDIT”权限拥有的操作
         case'_PASS':
           $issData=array(
                 ''=>$request->param(''),
@@ -1049,7 +1056,7 @@ class Dashboard2Controller extends \think\Controller
           $oprtCN='返回修改';
          
         break;
-        //“_APPROVE”权限
+        //“_APPROVE”权限拥有的操作
         case'_PERMIT':
           $issData=array(
                 ''=>$request->param(''),
@@ -1120,7 +1127,7 @@ class Dashboard2Controller extends \think\Controller
           $tplFile.='auditSingle';
           $oprtCN='修改完善';
         break;
-        //“_EXECUTE”权限
+        //“_EXECUTE”权限拥有的操作
         case'_ACCEPT':
           $issData=array(
                 ''=>$request->param(''),
@@ -1215,7 +1222,7 @@ class Dashboard2Controller extends \think\Controller
           $oprtCN='执行完成';
           
         break;
-        //“_MAINTAIN”权限
+        //“_MAINTAIN”权限拥有的操作
         case'_APPLY':
           $issData=array(
                 ''=>$request->param(''),
@@ -1339,7 +1346,7 @@ class Dashboard2Controller extends \think\Controller
         case'_ADDRENEW':
           
           if($request->param('returnType')=='_JSON'){
-            return json(array_merge($patObj->where('id',$request->param('patId'))->find()->toArray(),
+            return json(array_merge($patMdl->where('id',$request->param('patId'))->find()->toArray(),
                               array("today"=>date('Y-m-d'),"username"=>$this->username,"deptMaintainer"=>$this->dept)));
           }else{
             $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
@@ -1466,17 +1473,17 @@ class Dashboard2Controller extends \think\Controller
       
       //return $msg;
       //return json(array('msg'=>$msg,'btnHtml'=>$btnHtml,'topic'=>$request->param('issPatTopic')));
-      return json(array('msg'=>$msg,'topic'=>$request->param('issPatTopic')));
+      return json(array('msg'=>$msg,'topic'=>$request->param('issPatTopic'),'patId'=>$patId));
       //return $this->issPatAuth($request);//参数不够，不会产生分页。
     }
     
     //为前端显示PatRenew模板准备，1.数据库数据；2.向模板变量赋值；3.选择模板文件PatRenew.html返回前端
-     public function patRenew(Request $request,PatinfoModel $patObj)
+     public function patRenew(Request $request,PatinfoModel $patMdl)
     {
       $this->_loginUser();
       
       //调用模型文件Patinfo.php中定义的patRenew方法找出合适的pat。
-      $pat= $patObj->patRenew();
+      $pat= $patMdl->patRenew();
       
             
      // 查出所有的用户并分页，根据“strOrder”排序，前端页面显示的锚点（hash值）为$fragment，设定分页页数变量：“pageTotalNum”
@@ -1626,9 +1633,19 @@ class Dashboard2Controller extends \think\Controller
     
      public function test(Request $request)
     {
-      //调用本模块定义的_uploadAttTemp方法上传附件到服务器指定文件夹
-      $att=$this->_uploadAttTemp($request);
-      return $att;
-     
-    }
+      $msg=$request->param('auditResult').'成功';
+      if(!empty($request->param('patId'))){
+        $patId=$request->param('patId');
+      }else{
+        $patId=0;
+      }
+      
+      if($request->param('oprt')=='_ADDNEW'){
+        $patId=1;
+      }
+      
+      $data=array('msg'=>$msg,'topic'=>$request->param('issPatTopic'),'patId'=>$patId);
+      return json($data);
+      //return $data;
+    } 
 }
