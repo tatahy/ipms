@@ -169,6 +169,8 @@
 				<input name="attmap_id" value="{$iss.id}" type="text" class="sr-only">
 				<input name="attmap_type" value="_ATTO1" type="text" class="sr-only">
 				<input name="rolename" value="{$auth}" type="text" class="sr-only">
+				<input name="uploader" value="{$username}" type="text" class="sr-only">
+				<input name="deldisplay" value="1" type="text" class="sr-only">
 				</div>
 				
 				<div class="row myRow" >			
@@ -385,6 +387,7 @@ $(document).ready(function(){
 										$('#modalIssPatAuthSingle').modal('show');
 										//3.在#modalIssPatAuthSingle的hidden.bs.modal事件中刷新#divIssPatAuth_load的内容
 										$('#modalIssPatAuthSingle').on('hidden.bs.modal', function(){
+											<!-- $("#divIssPat_load").load('issPat'); -->
 											$("#divIssPatAuth_load").load('issPatAuth',{'auth':'{$auth}'});
 										});				
 							
@@ -416,6 +419,7 @@ $(document).ready(function(){
 								$('#modalIssPatAuthSingle').modal('show');
 								//3.在#modalIssPatAuthSingle的hidden.bs.modal事件中刷新#divIssPatAuth_load的内容
 								$('#modalIssPatAuthSingle').on('hidden.bs.modal', function(){
+									<!-- $("#divIssPat_load").load('issPat'); -->
 									$("#divIssPatAuth_load").load('issPatAuth',{'auth':'{$auth}'});
 								});				
 							

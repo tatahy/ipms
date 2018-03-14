@@ -237,9 +237,6 @@ class Dashboard2Controller extends \think\Controller
     }
     
     //上传附件文件到temp目录
-     //参数1：$fileSet，类型：对象。值：不为空。说明：拟上传的文件对象
-     //参数2：$dirName，类型：字符。值：不为空。说明：上传文件拟放入的目录名称
-     //参数3：$attId，类型：字符。值：不为空。说明：拟记录上传文件路径的记录id
     public function uploadAttTemp(Request $request)
     {
       $fileSet=$request->file('attFile');
@@ -264,12 +261,13 @@ class Dashboard2Controller extends \think\Controller
             
             $data=array('attpath'=>$path,
                         'uploaddate'=>date('Y-m-d H:i:s'),
-                        'uploader'=>$this->username,
+                        'uploader'=>$request->param('uploader'),
                         'atttype' =>$request->param('attType'),
                         'attmap_id' =>$request->param('attmap_id'),
                         'attmap_type' =>$request->param('attmap_type'),
                         'name' =>$request->param('attName'),
-                        'rolename' =>$request->param('rolename')
+                        'rolename' =>$request->param('rolename'),
+                        'deldisplay' =>$request->param('deldisplay')
                         );
             
             $attSet=new AttinfoModel;
@@ -810,7 +808,8 @@ class Dashboard2Controller extends \think\Controller
       
       if($oprt=='_ADDNEW'){
         $iss=array('id'=>'','topic'=>'','abstract'=>'');
-        $att=0;
+        //查询当前用户已上传的所有附件信息
+        $att= AttinfoModel::all(['attmap_id'=>0,'uploader'=>$this->username,'rolename'=>'_EDIT','deldisplay'=>1]);
         $pat=array('id'=>'','topic'=>'','patowner'=>'','otherinventor'=>'','inventor'=>'');
         $patType=0;
       }else{
@@ -907,7 +906,7 @@ class Dashboard2Controller extends \think\Controller
                 ''=>$request->param(''),
                 ''=>$request->param('')
           );
-          $attMdlOprt='_CREAT';
+          $attMdlOprt='_UPDATE';
           
          // ''=>$request->param(''),
           

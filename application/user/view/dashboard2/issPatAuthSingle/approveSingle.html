@@ -50,7 +50,7 @@
 		
 		<div id="divApproveMsg" class="resetHide form-group col-sm-8 ">
 			<label for="attName">具体意见<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-			<textarea class="empty-check form-control" rows="5" id="auditMsg" name="auditMsg" type="text" placeholder="请填入具体的审批意见" required></textarea>
+			<textarea class="empty-check form-control" rows="5" id="approveMsg" name="approveMsg" type="text" placeholder="请填入具体的审批意见" required></textarea>
 		</div>
 
 	</div>
@@ -83,7 +83,7 @@
 $(document).ready(function(){	
 	$('.resetHide').hide();
 		
-	// 单选框approveResult的change事件，出现auditMsg输入框等。
+	// 单选框approveResult的change事件，出现approveMsg输入框等。
 	$('#approveResult').change(function(){	
 		//恢复到default状态
 		$('.resetHide').hide();
