@@ -168,7 +168,7 @@
 				<div class="row myRow sr-only">
 				<input name="attmap_id" value="{$iss.id}" type="text" class="sr-only">
 				<input name="attmap_type" value="_ATTO1" type="text" class="sr-only">
-				<input name="rolename" value="{$auth}" type="text" class="sr-only">
+				<input name="attRoleName" value="{$auth}" type="text" class="sr-only">
 				<input name="uploader" value="{$username}" type="text" class="sr-only">
 				<input name="deldisplay" value="1" type="text" class="sr-only">
 				</div>
@@ -255,6 +255,7 @@
 
 <script>
 $(document).ready(function(){
+	
 	$('.modal-footer').attr('hidden',true);
 	
 	//#divAbstractCollapse“概要显示”
@@ -336,6 +337,7 @@ $(document).ready(function(){
 			if(oprt=='_ADDNEW'){
 				topic=$('#issPatTopic').val();
 			}
+			var auth='{$auth}';
 			
 			var btnHtml='<span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:16px;">'+$(this).html()+'</span>《'+topic+'》';
 
@@ -369,7 +371,7 @@ $(document).ready(function(){
 						if(oprt=='_ADDNEW'){
 							//通过ajax嵌套完成新增
 							//首先提交#fmPat数据
-							$.extend(param,fmPatDataJson,{'oprt':'_ADDNEW'});
+							$.extend(param,fmPatDataJson,{'oprt':'_ADDNEW','auth':auth});
 							
 							var jqxhr=$.post(url,param,function(data){
 							<!-- var jqxhr=$.post(url,$('#fmPat').serialize(),function(data){ -->

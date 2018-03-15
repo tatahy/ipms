@@ -5,1408 +5,751 @@
  * @copyright 2018
  */
 
-   //case 'authorize':
-                 $msg.=$issSet->topic.'提交结果：'.$request->request('title').'<br>
-                 结果说明：<span class="text-info">'.$request->request('resultMsg').'</span><br>';
+   //根据前端传来的操作类型，对数据库进行操作
+    function issPatOprt(Request $request,IssinfoModel $issMdl,IssrecordModel $issRdMdl,
+                                PatinfoModel $patMdl,PatrecordModel $patRdMdl,
+                                AttinfoModel $attMdl)
+    {
+      $this->_loginUser();
+      
+      // $oprt接收前端页面传来的oprt值
+      if(!empty($request->param('oprt'))){
+        $oprt=$request->param('oprt');
+      }else{
+        $oprt='_NONE';
+      }
+      
+      // $auth接收前端页面传来的auth值
+      if(!empty($request->param('auth'))){
+        $auth=$request->param('auth');
+      }else{
+        $auth='_NONE';
+      }
+      
+      // $patId接收前端页面传来的patId值
+      if(!empty($request->param('patId'))){
+        $patId=$request->param('patId');
+      }else{
+        $patId=0;
+      }
+      
+      // $issId接收前端页面传来的issId值
+      if(!empty($request->param('issId'))){
+        $issId=$request->param('issId');
+      }else{
+        $issId=0;
+      }
+      
+     //如果要获取的数据为数组，要加上 /a 修饰符才能正确获取。
+      if(!empty($request->param('attId/a'))){
+        $arrAttId=$request->param('attId/a');
+        $arrAttFileName=$request->param('attFileName/a');
+      }else{
+        $arrAttId=array(0);
+        $arrAttFileName=array(0);
+      }
+      
+      //变量赋初值
+      $issData=array();
+      $issRdData=array();
+      $patData=array();
+      $patRdData=array();
+      $attData=array();
+      
+      $issMdlOprt='';
+      $patMdlOprt='';
+      $attMdlOprt='';
+      
+      $oprtCHNStr='';
+      
+      $msg="";
+      $tplFile='dashboard2'.DS.'issPatAuthSingle'.DS;
+      
+      if($oprt=='_ADDNEW'){
+        //patId=0,issId=0
+        $patData=array(
+                'topic'=>$request->param('patTopic'),
+                'pattype'=>$request->param('patType'),
+                'patowner'=>$request->param('patOwner'),
+                'inventor'=>$request->param('patInventor'),
+                'otherinventor'=>$request->param('patOtherInventor'),
+                'author'=>$request->param('patAuthor'),
+                'dept'=>$request->param('dept'),
+                
+                'status'=>'填报',
+                'addnewdate'=>$this->now(),
+                
+//                'keyword'=>$request->param(''),
+//                'summary'=>$request->param(''),
+//                'applyplace'=>$request->param(''),
+//                'pronum'=>$request->param(''),
+//                'note'=>$request->param(''),
+//                
+          );
+          //1. 新增pat,返回新增的patId                   
+          $patId = $patMdl->patCreate($patData);
+          if ($patId) {
+            $msg.='专利【新增】成功。<br>';
+            $patSet=$patMdl->where('id',$patId)->find();
+            
+            $patRdData=array(
+                'patinfo_id'=>$patId,
+                'num'=>$patSet->patnum,
+                'act'=>'填报',
+                'actdetail'=>'专利《'.$patSet->topic.'》新增填报',
+                'acttime'=>$this->now,
+                'username'=>$this->username,
+                'rolename'=>$auth,
+                
+            );
+            //2.由patId新增patRd
+            $patRdId = $patRdMdl->patRdCreate($patRdData);
+            
+            $issData=array(
+                'issmap_type'=>$request->param('issType'),
+                'topic'=>$request->param('issPatTopic'),
+                'abstract'=>$request->param('issPatAbstract'),
+                
+                'issmap_id'=>$patId,
+                'addnewdate'=>$this->now(),
+                'status'=>'填报',
+                'writer'=>$this->username,
+                'dept'=>$this->dept,
+        
+            );
+            //2.由patId新增issPat,返回新增issId
+            $issId = $issMdl->issCreate($issData);  
+            
+            $issRdData=array(
+                
+                'topic'=>$request->param('patTopic'),
+                'pattype'=>$request->param('patType'),
+                'status'=>'填报',
+                
+            );
+            //3.由issId新增issRd
+            $issRdId = $issRdMdl->issRdCreate($issRdData);
+            
+            //4.循环更新attMdl,将文件从现有的‘temp’目录移动到指定目录
+            for($i=0;$i<count($arrAttId);$i++){
+              $issSet = $issMdl->where('id',$issId)->find();            
               
-                  //根据2类issStatus情况向patinfo,patrecord表写入不同的数据
-                  switch($issSet->status){
-                    case '申报提交':
-                      //issinfo表要写入的数据  
-                      $issData=array('status'=>'专利授权','resultdate'=>$today);
-                      
-                      //patinfo表要写入的数据，$request->request()为前端的formdata对象发送来的表单数据（键/值对）                      
-                      $patData= array_merge($request->request(),array('status'=>'授权','note'=>$today.":".$msg));
-
-                      //issrecord表、patrecord表要写入的数据
-                      $act='专利授权';
-                      $actdetail=$msg;
-                    break;
-                    
-                    case '续费提交':
-                      //issinfo表要写入的数据  
-                      $issData=array('status'=>'续费授权','resultdate'=>$today);
-                      
-                      //patinfo表要写入的数据，$request->request()为前端的formdata对象发送来的表单数据（键/值对）
-                      $patData=array_merge($request->request(),array('status'=>'续费授权','note'=>($today.":".$msg)));
-                      
-                      //issrecord表、patrecord表要写入的数据
-                      $act='续费授权';
-                      $actdetail=$msg;
-                    break;
-                    
-                  }
-                  // 使用对象方法，向issinfo表更新数据表字段信息,有更新就返回受影响的行数。
-                  $issUpdated=$issSet->allowField(true)->data($issData,true)->save();
-              
-                  //$issUpdated不为0表示对issinfo表进行了更新，才在issrecord表新建一条记录。
-                  if($issUpdated){
-                    // 使用静态方法，向issrecord表新增信息。
-                    $issRecordSet=IssrecordModel::create([
-                      'num'=>$numId,
-                      'act'=>$act,
-                      'actdetail'=>$actdetail,
-                      'acttime'=>$today,
-                      'username'=>$request->request('username'),
-                      'rolename'=>$role,
-                      'issinfo_id'=>$issId,
-                    ]);
-                    //静态方法创建新对象后，返回对象id
-                    $issRecordId= $issRecordSet->id;
-                  }
-                  
-                  // 使用对象方法，向patinfo表更新信息,有更新就返回受影响的行数。
-                  $patUpdated=$patSet->allowField(true)->data($patData,true)->save();
-                  
-                  //$patUpdated不为0表示对patinfo表进行了更新，才在patrecord表新建一条记录。
-                  if($patUpdated){
-                    // 使用静态方法，向patrecord表新增信息。
-                    $patRecordSet=PatrecordModel::create([
-                      'num'=>$patNumId,
-                      'act'=>$act,
-                      'actdetail'=>$actdetail,
-                      'acttime'=>$today,
-                      'username'=>$request->param('username'),
-                      'rolename'=>$role,
-                      'patinfo_id'=>$patId,
-                      'note'=>$today.":".$actdetail
-                    ]);
-                    //静态方法创建新对象后，返回对象id
-                    $patRecordId= $patRecordSet->id;
-                  }
-                  
-                  //返回前端的信息
-                  $result='success';
-             //break;
-        UserModel::update([
-            'authority'=>('{"isspat":{"create":0,"edit":0,"audit":1,"approve":1,"execute":1,"maintain":1},
-            "isspro":{"create":0,"edit":0,"audit":0,"approve":0,"execute":0,"maintain":0},
-            "issthe":{"create":0,"edit":0,"audit":0,"approve":0,"execute":0,"maintain":0},
-            "att":{"upload":1,"download":1,"delete":1}}'),
-         ], ['id' => $userlg->id]);
+              $fileName=$arrAttFileName[$i];
+              $targetDir=ROOT_PATH.DS.'uploads'.DS.$issSet->issnum;
+              //将文件从‘temp’目录移动到指定目录
+              $fileMoveResult=$this->_moveAtt($fileName,$targetDir,$arrAttId[$i]);
+              //移动是否成功：
+              if($fileMoveResult){
+                $attData=array(
+                  'num_id'=>$issSet->issnum,
+                  'attmap_id'=>$issSet->id,
+                  'path'=>$targetDir
+                );
+                //更新att
+                $attId = $attMdl->attUpdate($attData,$arrAttId[$i]);
+                
+              }else{
+                $msg.="附件".$arrAttFileName[$i]."移动失败<br>"; 
+              }
+            }
+          }else {
+            $msg.='专利【新增】失败。<br>';
+          }
+          
+      }else if($oprt=='_ADDRENEW'){
+        //issId=0
+        
+      }else{
+        
+        
+      }
+      
+            
+      switch($oprt){
+        //“_EDIT”权限拥有的操作
+        case'_ADDNEW':
+          //patId=0,issId=0
+          $issData=array(
+                'topic'=>$request->param('issPatTopic'),
+                'type'=>$request->param('issType'),
+                'abstract'=>$request->param('issPatAbstract')
+          );
+          $issMdlOprt='_CREAT';
+          
+          
+          
+          $attData=array(
+                ''=>$request->param(''),
+                ''=>$request->param('')
+          );
+          $attMdlOprt='_UPDATE';
+          
+         // ''=>$request->param(''),
+          
+          $tplFile.='editSingle';
+          $oprtCN='新增';
+          
+        break;
+        
+        case'_SUBMIT':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
+          
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='editSingle';
+          $oprtCN='提交';
+          
+        break;
+        
+        case'_DELETE':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_DELETE';
+          
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_DELETE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_DELETE';
+        
+          $tplFile.='editSingle';
+          $oprtCN='删除';
+        break;
+        
+        case'_UPDATE':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
+          
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='editSingle';
+          $oprtCN='更新';
+        break;
+        //“_AUDIT”权限拥有的操作
+        case'_PASS':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
+          
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='审核通过';
+        break;
+        
+        case'_FAIL':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
+          
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='审核未通过';
          
-         $authority=array('isspat'=>array('create'=>0,'edit'=>0,'audit'=>1,'approve'=>1,'execute'=>1,'maintain'=>1),
-                          'isspro'=>array('create'=>0,'edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0),
-                          'issthe'=>array('create'=>0,'edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0),
-                          'att'=>array('upload'=>1,'download'=>1,'delete'=>1),
-                          );
-                          
-
-// 输出模板文件，显示issue中与pat相关的数据集。
-     public function issPatEdit(Request $request)
-    {
-      $this->_loginUser();
-      
-       // $returnType接收前端页面传来的returnType值，‘0’为模板文件，‘1’为数据
-      if(!empty($request->param('returnType'))){
-        $returnType=$request->param('returnType');
-      }else{
-        $returnType=0;
-      }
-      
-      // $authority接收前端页面传来的authority值
-     // if(!empty($request->param('authority'))){
-//        $authority=$request->param('authority');
-//      }else{
-//        $authority='_EDIT';
-//      }
-//      
-//      // 忽略前端页面传来的issType值，直接赋值为'_PATENT'
-//      $issType='_PATENT';
-      
-      //$totalTableRows接收前端页面传来的分页时每页显示的记录数，默认为10
-      if(!empty($request->param('issPatTableRows'))){
-          $issPatTableRows=$request->param('issPatTableRows');
-      }else{
-          $issPatTableRows=10;
-      }
-      
-       // 接收前端分页页数变量：“pageTotalNum”
-      if(!empty($request->param('pageTotalNum'))){
-          $pageTotalNum=$request->param('pageTotalNum');
-      }else{
-          $pageTotalNum=1;
-      }
-      
-      // $sortName接收前端页面传来的排序字段名
-      if(!empty($request->param('sortName'))){
-          $sortName=$request->param('sortName');
-      }else{
-          $sortName='_TOPIC';
-      }
-        
-      // $sort接收前端页面传来的排序顺序
-      if(!empty($request->param('sort'))){
-          $sort=$request->param('sort');
-      }else{
-          $sort='_ASC';
-      }
-      
-      // 查询词1，'searchPatName'
-      if(!empty($request->param('searchPatName'))){
-          $searchPatName=$request->param('searchPatName');
-      }else{
-          $searchPatName='';
-      } 
-        
-      // 查询词2，'searchDept'
-      if(!empty($request->param('searchDept'))){
-          $searchDept=$request->param('searchDept');
-      }else{
-          $searchDept=0;
-      } 
-        
-      // 查询词3，'searchPatStatus'
-      if(!empty($request->param('searchPatStatus'))){
-          $searchPatStatus=$request->param('searchPatStatus');
-      }else{
-          $searchPatStatus=0;
-      }
-        
-      // 查询词4，'searchPatType'
-      if(!empty($request->param('searchPatType'))){
-          $searchPatType=$request->param('searchPatType');
-      }else{
-          $searchPatType=0;
-      } 
-        
-      // 查询词5，'searchWriter'
-      if(!empty($request->param('searchWriter'))){
-          $searchWriter=$request->param('searchWriter');
-      }else{
-          $searchWriter='';
-      }
-      
-      // 选择排序字段
-      switch($sortName){
-      
-        case '_PATNAME':
-          $strOrder='abstract';
         break;
         
-        case '_PATSTATUS':
-          $strOrder='abstract';
-        break;
-            
-        case '_ABSTRACT':
-          $strOrder='abstract';
-        break;
-        
-        case '_WRITER':
-          $strOrder='writer';
-        break;
-        
-        case '_EXECUTER':
-          $strOrder='executer';
-        break;
-            
-        case '_ADDNEWDATE':
-          $strOrder='addnewdate';
-        break;
-        
-        case '_STATUS':
-          $strOrder='status';
-        break;
-            
-        case '_DEPT':
-          $strOrder='dept';
-        break;
-            
-        case '_TOPIC':
-          $strOrder='topic';  
-          $sortName="_TOPIC";
-        break;
-        
-         //默认按字段“status”
-        default:
-          $strOrder='status';  
-          $sortName="_OPERATION";
-        break;
-        
-      } 
-      
-      //  组合升序or降序查询
-      if($sort=="_ASC"){
-          $strOrder=$strOrder.' asc';
-      }else{
-          $strOrder=$strOrder.' desc';
+        case'_MODIFY':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
           
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='返回修改';
+         
+        break;
+        //“_APPROVE”权限拥有的操作
+        case'_PERMIT':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
+          
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='批准';
+          
+        break;
+        
+        case'_VETO':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
+          
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='否决';
+          
+        break;
+        
+        case'_COMPLETE':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
+          
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='修改完善';
+        break;
+        //“_EXECUTE”权限拥有的操作
+        case'_ACCEPT':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
+          
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='领受';
+        break;
+        
+        case'_REFUSE':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
+          
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='申述';
+          
+        break;
+        
+        case'_REPORT':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
+          
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='执行报告';
+          
+        break;
+        
+        case'_FINISH':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
+          
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='执行完成';
+          
+        break;
+        //“_MAINTAIN”权限拥有的操作
+        case'_APPLY':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
+          
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='申报';
+          
+        break;
+        
+        case'_IMPROVE':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
+          
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='申报修改';
+          
+        break;
+        
+        case'_AUTHORIZE':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
+          
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='授权';
+          
+        break;
+        
+        case'_REJECT':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
+          
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='驳回';
+          
+        break;
+        
+        case'_CLOSE':
+          $issData=array(
+                ''=>$request->param(''),
+                
+          );
+          $issMdlOprt='_UPDATE';
+          
+          $patData=array(
+                ''=>$request->param(''),
+                
+          );
+          $patMdlOprt='_UPDATE';
+          
+          $attData=array(
+                ''=>$request->param(''),
+        
+          );
+          $attMdlOprt='_CREAT';
+        
+          $tplFile.='auditSingle';
+          $oprtCN='关闭';
+          
+        break;
+        
+        case'_ADDRENEW':
+          
+          if($request->param('returnType')=='_JSON'){
+            return json(array_merge($patMdl->where('id',$request->param('patId'))->find()->toArray(),
+                              array("today"=>date('Y-m-d'),"username"=>$this->username,"deptMaintainer"=>$this->dept)));
+          }else{
+            $msg='<div style="padding: 24px 48px;"><h1>:)</h1><p>'.$oprt.'模块开发中……<br/></p></div>';
+            $issData=array(
+                ''=>$request->param(''),
+                
+            );
+            $issMdlOprt='_CREAT';
+            
+            $patData=array(
+                  ''=>$request->param(''),
+                  
+            );
+            $patMdlOprt='_UPDATE';
+            
+            $attData=array(
+                  ''=>$request->param(''),
+          
+            );
+            $attMdlOprt='_CREAT';
+          
+            $tplFile.='auditSingle';
+            $oprtCN='新增';
+          }
+          
+        break;
+        
+        //
+        
       }
       
-     //使用模型Issinfo
-     $issSet = new IssinfoModel; 
-     $mapEdit['status'] =['in',['填报','返回修改','修改完善']];
-     $mapEdit['dept'] =$this->dept;
-     $mapEdit['writer']=$this->username;
-     
-     // 记录总数
-     $numTotal = $issSet->where($mapEdit)->count();
-          
-     // 查出所有的用户并分页，根据“strOrder”排序，前端页面显示的锚点（hash值）为$fragment，设定分页页数变量：“pageTotalNum”
-     // 带上每页显示记录行数$totalTableRows，实现查询结果分页显示。
-     $issPatTotal = $issSet->where($mapEdit)
-                            ->order($strOrder)
-                            ->paginate($issPatTableRows,false,['type'=>'bootstrap','var_page' => 'pageTotalNum',
-                            'query'=>['issPatTableRows'=>$issPatTableRows]]);
-     // 获取分页显示
-     $pageTotal = $issPatTotal->render();
-     //
-//     switch($authority){            
-//        case'_TODO':
-//          if($this->auth['isspat']['edit']){
-//            $mapEdit['status'] =['in',['填报','返回修改','修改完善']];
-//            $mapEdit['dept'] =$this->dept;
-//            $mapEdit['writer']=$this->username;
-//            //$mapEdit['executer']=['notin',0];
-//          }else{$mapEdit=$map;}
-//          
-//          if($this->auth['isspat']['audit']){
-//            $mapAudit['status'] ='待审核';
-//            $mapAudit['dept'] =$this->dept;
-//            //$mapAudit['writer']=['notin',0];
-////            $mapAudit['executer']=['notin',0];
-//          }else{$mapEdit=$map;}
-//          
-//          if($this->auth['isspat']['approve']){
-//            $mapApprove['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
-//            //$mapApprove['dept'] =['notin',0];
-////            $mapApprove['writer']=['notin',0];
-////            $mapApprove['executer']=['notin',0];
-//          }else{$mapEdit=$map;}
-//          
-//          if($this->auth['isspat']['execute']){
-//            $mapExecute['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
-//            $mapExecute['dept'] =$this->dept;
-//           // $mapExecute['writer']=['notin',0];
-//            $mapExecute['executer']=$this->username;
-//          }else{$mapEdit=$map;}
-//          
-//          if($this->auth['isspat']['maintain']){
-//            $mapMaintain['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
-//                                      '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
-////            $mapMaintain['dept'] =['notin',0];
-////            $mapMaintain['writer']=['notin',0];
-////            $mapMaintain['executer']=['notin',0];
-//          }else{$mapMaintain=$map;}
-//          
-//          // 记录总数
-//          $numTotal = $issSet
-//                            ->where($mapEdit)
-//                            ->whereOr(function ($query) use ($mapExecute){
-//                              $query->where($mapExecute);
-//                              })
-//                            ->whereOr(function ($query) use ($mapAudit){
-//                              $query->where($mapAudit);
-//                              })
-//                            ->whereOr($mapApprove)
-//                            ->whereOr($mapMaintain)
-//                            ->count();
-//          
-//          // 查出所有的用户并分页，根据“strOrder”排序，前端页面显示的锚点（hash值）为$fragment，设定分页页数变量：“pageTotalNum”
-//          // 带上每页显示记录行数$totalTableRows，实现查询结果分页显示。
-//          $issPatTotal = $issSet
-//                            ->where($mapEdit)
-//                            ->whereOr(function ($query) use ($mapExecute){
-//                              $query->where($mapExecute);
-//                              })
-//                            ->whereOr(function ($query) use ($mapAudit){
-//                              $query->where($mapAudit);
-//                              })
-//                            ->whereOr($mapApprove)
-//                            ->whereOr($mapMaintain)
-//                            ->order($strOrder)
-//                            ->paginate($issPatTableRows,false,['type'=>'bootstrap','var_page' => 'pageTotalNum',
-//                            'query'=>['issPatTableRows'=>$issPatTableRows]]);
+      //引用patinfo模型中定义的方法向patinfo表更新信息
+      switch( $patMdlOprt){
+        case '_CREAT':
+          $patId = $patMdl->patCreate($patData);
+          if ($patId) {
+            $msg.='专利【新增】成功。<br>';
+          }else {
+            $msg.='专利【新增】失败。<br>';
+          }
+        break;
+        
+        case '_UPDATE':
+          $patId = $patMdl->patUpdate($patData);
+          if ($patId) {
+            $msg.='专利【更新】完成。<br>';
+          }else {
+            $msg.='专利信息无变化，无需【更新】。<br>';
+          }
+        break;
+        
+        case '_DELETE':
+          $patId = $patMdl->patDelete($patData);
+          if ($patId) {
+            $msg.='专利【删除】成功。<br>';
+          }else {
+            $msg.='专利【删除】失败。<br>';
+          }
+        break;
+        
+      }
+      
+      //引用Issinfo模型中定义的方法向issinfo表更新信息
+      switch($issMdlOprt){
+        case '_CREAT':
+          $issId = $issMdl->issCreate($issData);
+          if ($issId) {
+            $msg.='专利事务【'.$oprtCN.'】成功。<br>';
+          }else {
+            $msg.='专利事务【'.$oprtCN.'】失败。<br>';
+          }
+        break;
+        
+        case '_UPDATE':
+          $issId = $issMdl->issUpdate($issData);
+          if ($issId) {
+            $msg.='专利事务【'.$oprtCN.'】完成。<br>';
+          }else {
+            $msg.='专利事务【'.$oprtCN.'】无变化，无需更新。<br>';
+          }
+        break;
+        
+        case '_DELETE':
+          $issId = $issMdl->issDelete($issData);
+          if ($issId) {
+            $msg.='专利事务【'.$oprtCN.'】成功。<br>';
+          }else {
+            $msg.='专利事务【'.$oprtCN.'】失败。<br>';
+          }
+        break;
+        
+      }
+      
+      //引用attinfo模型中定义的方法向attinfo表新增信息
+      switch( $attMdlOprt){
+        case '_CREAT':
+          $attId = $attMdl->attCreate($attData);
+          if ($attId) {
+            $msg.='专利事务附件【上传】成功。<br>';
+          }else {
+            $msg.='专利事务附件【上传】失败。<br>';
+          }
+        break;
+        
+        //case '_UPDATE':
+//          $attId = $attMdl->attUpdate($attData);
+//          if ($attId) {
+//            $msg.='专利事务附件'.$oprtCN.'完成。<br>';
+//          }else {
+//            $msg.='专利事务附件'.$oprtCN.'无变化，无需更新。<br>';
+//          }
 //        break;
-//        
-//        case'_RESULT':
-//          if($this->auth['isspat']['edit']){
-//            $mapEdit['status'] =['notin',['填报','返回修改','修改完善','完结']];
-//            $mapEdit['dept'] =$this->dept;
-//            $mapEdit['writer']=$this->username;
-//          }else{$mapEdit=$map;}
-//          
-//          if($this->auth['isspat']['audit']){
-//            $mapAudit['status'] =['notin',['待审核','完结']];
-//            $mapAudit['dept'] =$this->dept;
-//          }else{$mapAudit=$map;}
-//          
-//          if($this->auth['isspat']['approve']){
-//            $mapApprove['status'] =['notin',['审核未通过','审核通过','变更申请','拟续费','完结']];
-//          }else{$mapApprove=$map;}
-//          
-//          if($this->auth['isspat']['execute']){
-//            $mapExecute['status'] =['notin',['批准申报','申报执行','申报修改','准予变更','否决变更','完结']];
-//            $mapExecute['dept'] =$this->dept;
-//            $mapExecute['executer']=$this->username;
-//          }else{$mapExecute=$map;}
-//          
-//          if($this->auth['isspat']['maintain']){
-//            $mapMaintain['status'] =['notin',['申报复核','申报提交','续费提交','准予续费',
-//                                      '否决申报','专利授权','专利驳回','放弃续费','续费授权','完结']];
-//          }else{$mapMaintain=$map;}
-//        break;
-//         
-//                 
-//        case'_DONE':
-//          $map['status'] ='完结';
-//          
-//              //根据权限对查询字段进行赋值
-//          if($this->auth['isspat']['edit']){
-//            $mapEdit['status']=1;
-//            $mapEdit['dept'] =$this->dept;
-//            $mapEdit['writer']=$this->username;
-//            $mapEdit['executer']=1;
-//          }else{
-//            $mapEdit['status']=0;
-//            $mapEdit['dept'] =0;
-//            $mapEdit['writer']=0;
-//            $mapEdit['executer']=0;
-//          } 
-//              
-//          if($this->auth['isspat']['audit']){
-//            $mapAudit['status']=1;
-//            $mapAudit['dept'] =$this->dept;
-//            $mapAudit['writer']=1;
-//            $mapAudit['executer']=1;
-//          }else{
-//            $mapAudit['status']=0;
-//            $mapAudit['dept'] =0;
-//            $mapAudit['writer']=0;
-//            $mapAudit['executer']=0;
-//          } 
-//                        
-//          if($this->auth['isspat']['execute']){
-//            $mapExecute['status']=1;
-//            $mapExecute['dept'] =$this->dept;
-//            $mapExecute['writer']=1;
-//            $mapExecute['executer']=$this->username;
-//          }else{
-//            $mapExecute['status']=0;
-//            $mapExecute['dept'] =0;
-//            $mapExecute['writer']=0;
-//            $mapExecute['executer']=0;
-//          } 
-//              
-//          if($this->auth['isspat']['approve']){
-//            $mapApprove['status']=1;
-//            $mapApprove['dept'] =1;
-//            $mapApprove['writer']=1;
-//            $mapApprove['executer']=1;
-//          }else{
-//            $mapApprove['status']=0;
-//            $mapApprove['dept'] =0;
-//            $mapApprove['writer']=0;
-//            $mapApprove['executer']=0;
-//          } 
-//                    
-//          if($this->auth['isspat']['maintain']){
-//            $mapMaintain['status']=1;
-//            $mapMaintain['dept'] =1;
-//            $mapMaintain['writer']=1;
-//            $mapMaintain['executer']=1;
-//          }else{
-//            $mapMaintain['status']=0;
-//            $mapMaintain['dept'] =0;
-//            $mapMaintain['writer']=0;
-//            $mapMaintain['executer']=0;
-//          }
-//                    
-//          //根据权限情况，组合查询条件
-//          if(($mapMaintain['dept'].$mapApprove['dept'])=='00' ){
-//            $map['dept'] =$this->dept;
-//          }else{
-//            $map['dept'] =['notin',0];
-//          }
-//          
-//          if(($mapMaintain['writer'].$mapApprove['writer'].$mapAudit['writer'].$mapExecute['writer'])=='0000'){
-//            $map['writer'] =$this->username;
-//          }else{
-//            $map['writer'] =['notin',0];
-//          }
-//          
-//          if(($mapMaintain['executer'].$mapApprove['executer'].$mapAudit['executer'].$mapEdit['executer'])=='0000'){
-//            $map['executer'] =$this->username;
-//          }else{
-//            $map['executer'] =['notin',0];
-//          }
-//          
-//           // 记录总数
-//          $numTotal = $issSet->where($map)->count();
-//          
-//          // 查出所有的用户并分页，根据“strOrder”排序，前端页面显示的锚点（hash值）为$fragment，设定分页页数变量：“pageTotalNum”
-//          // 带上每页显示记录行数$totalTableRows，实现查询结果分页显示。
-//          $issPatTotal = $issSet->where($map)
-//                            ->order($strOrder)
-//                            ->paginate($issPatTableRows,false,['type'=>'bootstrap','var_page' => 'pageTotalNum',
-//                            'query'=>['issPatTableRows'=>$issPatTableRows]]);
-//          
-//        break;
-//     }      
-      
-      
-     //返回数据还是模板文件,‘0’为模板文件，‘1’为数据
-      if($returnType){
-        //响应前端的请求，返回前端要求条件的issPat数量
-        return ($numTotal);
-      }else{
-        $this->assign([
-              'home'=>$request->domain(),
-              //"destr".$this->auth['isspro']['edit'],
-              
-              // 分页显示所需参数
-              'issPatTotal'=>$issPatTotal,
-              'numTotal'=>$numTotal,
-              'pageTotal'=>$pageTotal,
-              'issPatTableRows'=>$issPatTableRows,
-              'pageTotalNum'=>$pageTotalNum,
-              
-              // 表格搜索字段
-              'searchPatName'=>$searchPatName,
-              'searchDept'=>$searchDept,
-              'searchPatStatus'=>$searchPatStatus,
-              'searchPatType'=>$searchPatType,
-              'searchWriter'=>$searchWriter,
         
-              // 表格排序信息
-              'sortName'=>$sortName,
-              'sort'=>$sort,
-              //'patIssTableRows'=>$patIssTableRows,
-              
-              // 所return的页面显示的iss流程$issStatus
-              //'authority'=>$authority,
-              
-              //
-              'mapEdit'=>json_encode($mapEdit),
-              //'mapAudit'=>json_encode($mapAudit),
-//              'mapApprove'=>json_encode($mapApprove),
-//              'mapExecute'=>json_encode($mapExecute),
-//              'mapMaintain'=>json_encode($mapMaintain),
-              // 所return的页面，某个button的data-patIssId的值为patIssId
-              //'patIssId'=>$patIssId,
-              
-              // 返回前端role值
-              //'role'=>$role,
-              
-        ]);
-        // $this->assign(['a'=>'a','b'=>'b']);
-//      return $this->fetch();
-      //return $this->fetch('issPat', ['a'=>'a','b'=>'b']);
-      //return $this->display();
-      //return view('issPat', ['a'=>$request->param('issType'),'b'=>$request->param('authority')]);
+        case '_DELETE':
+          $attId = $attMdl->attDelete($attData);
+          if ($attId) {
+            $msg.='专利事务附件【删除】成功。<br>';
+          }else {
+            $msg.='专利事务附件【删除】失败。<br>';
+          }
+        break;
         
-        return view();
-      }
-     
-      
-    }
-    
-    // 输出模板文件，显示issue中与pat相关的数据集。
-     public function issPatAudit(Request $request)
-    {
-      $this->_loginUser();
-      
-       // $returnType接收前端页面传来的returnType值，‘0’为模板文件，‘1’为数据
-      if(!empty($request->param('returnType'))){
-        $returnType=$request->param('returnType');
-      }else{
-        $returnType=0;
-      }
-
-      //$totalTableRows接收前端页面传来的分页时每页显示的记录数，默认为10
-      if(!empty($request->param('issPatTableRows'))){
-          $issPatTableRows=$request->param('issPatTableRows');
-      }else{
-          $issPatTableRows=10;
       }
       
-       // 接收前端分页页数变量：“pageTotalNum”
-      if(!empty($request->param('pageTotalNum'))){
-          $pageTotalNum=$request->param('pageTotalNum');
-      }else{
-          $pageTotalNum=1;
-      }
-      
-      // $sortName接收前端页面传来的排序字段名
-      if(!empty($request->param('sortName'))){
-          $sortName=$request->param('sortName');
-      }else{
-          $sortName='_TOPIC';
-      }
-        
-      // $sort接收前端页面传来的排序顺序
-      if(!empty($request->param('sort'))){
-          $sort=$request->param('sort');
-      }else{
-          $sort='_ASC';
-      }
-      
-      // 查询词1，'searchPatName'
-      if(!empty($request->param('searchPatName'))){
-          $searchPatName=$request->param('searchPatName');
-      }else{
-          $searchPatName='';
-      } 
-        
-      // 查询词2，'searchDept'
-      if(!empty($request->param('searchDept'))){
-          $searchDept=$request->param('searchDept');
-      }else{
-          $searchDept=0;
-      } 
-        
-      // 查询词3，'searchPatStatus'
-      if(!empty($request->param('searchPatStatus'))){
-          $searchPatStatus=$request->param('searchPatStatus');
-      }else{
-          $searchPatStatus=0;
-      }
-        
-      // 查询词4，'searchPatType'
-      if(!empty($request->param('searchPatType'))){
-          $searchPatType=$request->param('searchPatType');
-      }else{
-          $searchPatType=0;
-      } 
-        
-      // 查询词5，'searchWriter'
-      if(!empty($request->param('searchWriter'))){
-          $searchWriter=$request->param('searchWriter');
-      }else{
-          $searchWriter='';
-      }
-      
-      // 选择排序字段
-      switch($sortName){
-      
-        case '_PATNAME':
-          $strOrder='abstract';
-        break;
-        
-        case '_PATSTATUS':
-          $strOrder='abstract';
-        break;
-            
-        case '_ABSTRACT':
-          $strOrder='abstract';
-        break;
-        
-        case '_WRITER':
-          $strOrder='writer';
-        break;
-        
-        case '_EXECUTER':
-          $strOrder='executer';
-        break;
-            
-        case '_ADDNEWDATE':
-          $strOrder='addnewdate';
-        break;
-        
-        case '_STATUS':
-          $strOrder='status';
-        break;
-            
-        case '_DEPT':
-          $strOrder='dept';
-        break;
-            
-        case '_TOPIC':
-          $strOrder='topic';  
-          $sortName="_TOPIC";
-        break;
-        
-         //默认按字段“status”
-        default:
-          $strOrder='status';  
-          $sortName="_OPERATION";
-        break;
-        
-      } 
-      
-      //  组合升序or降序查询
-      if($sort=="_ASC"){
-          $strOrder=$strOrder.' asc';
-      }else{
-          $strOrder=$strOrder.' desc';
-          
-      }
-      
-     //使用模型Issinfo
-     $issSet = new IssinfoModel; 
-     $mapAudit['status'] ='待审核';
-     $mapAudit['dept'] =$this->dept;
-     
-     // 记录总数
-     $numTotal = $issSet->where($mapAudit)->count();
-          
-     // 查出所有的用户并分页，根据“strOrder”排序，前端页面显示的锚点（hash值）为$fragment，设定分页页数变量：“pageTotalNum”
-     // 带上每页显示记录行数$totalTableRows，实现查询结果分页显示。
-     $issPatTotal = $issSet->where($mapAudit)
-                            ->order($strOrder)
-                            ->paginate($issPatTableRows,false,['type'=>'bootstrap','var_page' => 'pageTotalNum',
-                            'query'=>['issPatTableRows'=>$issPatTableRows]]);
-     // 获取分页显示
-     $pageTotal = $issPatTotal->render();
-       
-     //返回数据还是模板文件,‘0’为模板文件，‘1’为数据
-      if($returnType){
-        //响应前端的请求，返回前端要求条件的issPat数量
-        return ($numTotal);
-      }else{
-        $this->assign([
-              'home'=>$request->domain(),
-              //"destr".$this->auth['isspro']['edit'],
-              
-              // 分页显示所需参数
-              'issPatTotal'=>$issPatTotal,
-              'numTotal'=>$numTotal,
-              'pageTotal'=>$pageTotal,
-              'issPatTableRows'=>$issPatTableRows,
-              'pageTotalNum'=>$pageTotalNum,
-              
-              // 表格搜索字段
-              'searchPatName'=>$searchPatName,
-              'searchDept'=>$searchDept,
-              'searchPatStatus'=>$searchPatStatus,
-              'searchPatType'=>$searchPatType,
-              'searchWriter'=>$searchWriter,
-        
-              // 表格排序信息
-              'sortName'=>$sortName,
-              'sort'=>$sort,             
-              
-        ]);
-        
-        return view();
-      }
-     
-      
-    }
-    
-    // 输出模板文件，显示issue中与pat相关的数据集。
-     public function issPatApprove(Request $request)
-    {
-      $this->_loginUser();
-      
-       // $returnType接收前端页面传来的returnType值，‘0’为模板文件，‘1’为数据
-      if(!empty($request->param('returnType'))){
-        $returnType=$request->param('returnType');
-      }else{
-        $returnType=0;
-      }
-
-      //$totalTableRows接收前端页面传来的分页时每页显示的记录数，默认为10
-      if(!empty($request->param('issPatTableRows'))){
-          $issPatTableRows=$request->param('issPatTableRows');
-      }else{
-          $issPatTableRows=10;
-      }
-      
-       // 接收前端分页页数变量：“pageTotalNum”
-      if(!empty($request->param('pageTotalNum'))){
-          $pageTotalNum=$request->param('pageTotalNum');
-      }else{
-          $pageTotalNum=1;
-      }
-      
-      // $sortName接收前端页面传来的排序字段名
-      if(!empty($request->param('sortName'))){
-          $sortName=$request->param('sortName');
-      }else{
-          $sortName='_TOPIC';
-      }
-        
-      // $sort接收前端页面传来的排序顺序
-      if(!empty($request->param('sort'))){
-          $sort=$request->param('sort');
-      }else{
-          $sort='_ASC';
-      }
-      
-      // 查询词1，'searchPatName'
-      if(!empty($request->param('searchPatName'))){
-          $searchPatName=$request->param('searchPatName');
-      }else{
-          $searchPatName='';
-      } 
-        
-      // 查询词2，'searchDept'
-      if(!empty($request->param('searchDept'))){
-          $searchDept=$request->param('searchDept');
-      }else{
-          $searchDept=0;
-      } 
-        
-      // 查询词3，'searchPatStatus'
-      if(!empty($request->param('searchPatStatus'))){
-          $searchPatStatus=$request->param('searchPatStatus');
-      }else{
-          $searchPatStatus=0;
-      }
-        
-      // 查询词4，'searchPatType'
-      if(!empty($request->param('searchPatType'))){
-          $searchPatType=$request->param('searchPatType');
-      }else{
-          $searchPatType=0;
-      } 
-        
-      // 查询词5，'searchWriter'
-      if(!empty($request->param('searchWriter'))){
-          $searchWriter=$request->param('searchWriter');
-      }else{
-          $searchWriter='';
-      }
-      
-      // 选择排序字段
-      switch($sortName){
-      
-        case '_PATNAME':
-          $strOrder='abstract';
-        break;
-        
-        case '_PATSTATUS':
-          $strOrder='abstract';
-        break;
-            
-        case '_ABSTRACT':
-          $strOrder='abstract';
-        break;
-        
-        case '_WRITER':
-          $strOrder='writer';
-        break;
-        
-        case '_EXECUTER':
-          $strOrder='executer';
-        break;
-            
-        case '_ADDNEWDATE':
-          $strOrder='addnewdate';
-        break;
-        
-        case '_STATUS':
-          $strOrder='status';
-        break;
-            
-        case '_DEPT':
-          $strOrder='dept';
-        break;
-            
-        case '_TOPIC':
-          $strOrder='topic';  
-          $sortName="_TOPIC";
-        break;
-        
-         //默认按字段“status”
-        default:
-          $strOrder='status';  
-          $sortName="_OPERATION";
-        break;
-        
-      } 
-      
-      //  组合升序or降序查询
-      if($sort=="_ASC"){
-          $strOrder=$strOrder.' asc';
-      }else{
-          $strOrder=$strOrder.' desc';
-          
-      }
-      
-     //使用模型Issinfo
-     $issSet = new IssinfoModel; 
-     $mapApprove['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
-     
-     // 记录总数
-     $numTotal = $issSet->where($mapApprove)->count();
-          
-     // 查出所有的用户并分页，根据“strOrder”排序，前端页面显示的锚点（hash值）为$fragment，设定分页页数变量：“pageTotalNum”
-     // 带上每页显示记录行数$totalTableRows，实现查询结果分页显示。
-     $issPatTotal = $issSet->where($mapApprove)
-                            ->order($strOrder)
-                            ->paginate($issPatTableRows,false,['type'=>'bootstrap','var_page' => 'pageTotalNum',
-                            'query'=>['issPatTableRows'=>$issPatTableRows]]);
-     // 获取分页显示
-     $pageTotal = $issPatTotal->render();
-       
-     //返回数据还是模板文件,‘0’为模板文件，‘1’为数据
-      if($returnType){
-        //响应前端的请求，返回前端要求条件的issPat数量
-        return ($numTotal);
-      }else{
-        $this->assign([
-              'home'=>$request->domain(),
-              //"destr".$this->auth['isspro']['edit'],
-              
-              // 分页显示所需参数
-              'issPatTotal'=>$issPatTotal,
-              'numTotal'=>$numTotal,
-              'pageTotal'=>$pageTotal,
-              'issPatTableRows'=>$issPatTableRows,
-              'pageTotalNum'=>$pageTotalNum,
-              
-              // 表格搜索字段
-              'searchPatName'=>$searchPatName,
-              'searchDept'=>$searchDept,
-              'searchPatStatus'=>$searchPatStatus,
-              'searchPatType'=>$searchPatType,
-              'searchWriter'=>$searchWriter,
-        
-              // 表格排序信息
-              'sortName'=>$sortName,
-              'sort'=>$sort,             
-              
-        ]);
-        
-        return view();
-      }
-     
-      
-    }
-    
-    // 输出模板文件，显示issue中与pat相关的数据集。
-     public function issPatExecute(Request $request)
-    {
-      $this->_loginUser();
-      
-       // $returnType接收前端页面传来的returnType值，‘0’为模板文件，‘1’为数据
-      if(!empty($request->param('returnType'))){
-        $returnType=$request->param('returnType');
-      }else{
-        $returnType=0;
-      }
-
-      //$totalTableRows接收前端页面传来的分页时每页显示的记录数，默认为10
-      if(!empty($request->param('issPatTableRows'))){
-          $issPatTableRows=$request->param('issPatTableRows');
-      }else{
-          $issPatTableRows=10;
-      }
-      
-       // 接收前端分页页数变量：“pageTotalNum”
-      if(!empty($request->param('pageTotalNum'))){
-          $pageTotalNum=$request->param('pageTotalNum');
-      }else{
-          $pageTotalNum=1;
-      }
-      
-      // $sortName接收前端页面传来的排序字段名
-      if(!empty($request->param('sortName'))){
-          $sortName=$request->param('sortName');
-      }else{
-          $sortName='_TOPIC';
-      }
-        
-      // $sort接收前端页面传来的排序顺序
-      if(!empty($request->param('sort'))){
-          $sort=$request->param('sort');
-      }else{
-          $sort='_ASC';
-      }
-      
-      // 查询词1，'searchPatName'
-      if(!empty($request->param('searchPatName'))){
-          $searchPatName=$request->param('searchPatName');
-      }else{
-          $searchPatName='';
-      } 
-        
-      // 查询词2，'searchDept'
-      if(!empty($request->param('searchDept'))){
-          $searchDept=$request->param('searchDept');
-      }else{
-          $searchDept=0;
-      } 
-        
-      // 查询词3，'searchPatStatus'
-      if(!empty($request->param('searchPatStatus'))){
-          $searchPatStatus=$request->param('searchPatStatus');
-      }else{
-          $searchPatStatus=0;
-      }
-        
-      // 查询词4，'searchPatType'
-      if(!empty($request->param('searchPatType'))){
-          $searchPatType=$request->param('searchPatType');
-      }else{
-          $searchPatType=0;
-      } 
-        
-      // 查询词5，'searchWriter'
-      if(!empty($request->param('searchWriter'))){
-          $searchWriter=$request->param('searchWriter');
-      }else{
-          $searchWriter='';
-      }
-      
-      // 选择排序字段
-      switch($sortName){
-      
-        case '_PATNAME':
-          $strOrder='abstract';
-        break;
-        
-        case '_PATSTATUS':
-          $strOrder='abstract';
-        break;
-            
-        case '_ABSTRACT':
-          $strOrder='abstract';
-        break;
-        
-        case '_WRITER':
-          $strOrder='writer';
-        break;
-        
-        case '_EXECUTER':
-          $strOrder='executer';
-        break;
-            
-        case '_ADDNEWDATE':
-          $strOrder='addnewdate';
-        break;
-        
-        case '_STATUS':
-          $strOrder='status';
-        break;
-            
-        case '_DEPT':
-          $strOrder='dept';
-        break;
-            
-        case '_TOPIC':
-          $strOrder='topic';  
-          $sortName="_TOPIC";
-        break;
-        
-         //默认按字段“status”
-        default:
-          $strOrder='status';  
-          $sortName="_OPERATION";
-        break;
-        
-      } 
-      
-      //  组合升序or降序查询
-      if($sort=="_ASC"){
-          $strOrder=$strOrder.' asc';
-      }else{
-          $strOrder=$strOrder.' desc';
-          
-      }
-      
-     //使用模型Issinfo
-     $issSet = new IssinfoModel; 
-     $mapExecute['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
-     $mapExecute['dept'] =$this->dept;
-     $mapExecute['executer'] =$this->username;
-     
-     // 记录总数
-     $numTotal = $issSet->where($mapExecute)->count();
-          
-     // 查出所有的用户并分页，根据“strOrder”排序，前端页面显示的锚点（hash值）为$fragment，设定分页页数变量：“pageTotalNum”
-     // 带上每页显示记录行数$totalTableRows，实现查询结果分页显示。
-     $issPatTotal = $issSet->where($mapExecute)
-                            ->order($strOrder)
-                            ->paginate($issPatTableRows,false,['type'=>'bootstrap','var_page' => 'pageTotalNum',
-                            'query'=>['issPatTableRows'=>$issPatTableRows]]);
-     // 获取分页显示
-     $pageTotal = $issPatTotal->render();
-       
-     //返回数据还是模板文件,‘0’为模板文件，‘1’为数据
-      if($returnType){
-        //响应前端的请求，返回前端要求条件的issPat数量
-        return ($numTotal);
-      }else{
-        $this->assign([
-              'home'=>$request->domain(),
-              //"destr".$this->auth['isspro']['edit'],
-              
-              // 分页显示所需参数
-              'issPatTotal'=>$issPatTotal,
-              'numTotal'=>$numTotal,
-              'pageTotal'=>$pageTotal,
-              'issPatTableRows'=>$issPatTableRows,
-              'pageTotalNum'=>$pageTotalNum,
-              
-              // 表格搜索字段
-              'searchPatName'=>$searchPatName,
-              'searchDept'=>$searchDept,
-              'searchPatStatus'=>$searchPatStatus,
-              'searchPatType'=>$searchPatType,
-              'searchWriter'=>$searchWriter,
-        
-              // 表格排序信息
-              'sortName'=>$sortName,
-              'sort'=>$sort,             
-              
-        ]);
-        
-        return view();
-      }
-    }
-    
-    // 输出模板文件，显示issue中与pat相关的数据集。
-     public function issPatMaintain(Request $request)
-    {
-      $this->_loginUser();
-      
-       // $returnType接收前端页面传来的returnType值，‘0’为模板文件，‘1’为数据
-      if(!empty($request->param('returnType'))){
-        $returnType=$request->param('returnType');
-      }else{
-        $returnType=0;
-      }
-
-      //$totalTableRows接收前端页面传来的分页时每页显示的记录数，默认为10
-      if(!empty($request->param('issPatTableRows'))){
-          $issPatTableRows=$request->param('issPatTableRows');
-      }else{
-          $issPatTableRows=10;
-      }
-      
-       // 接收前端分页页数变量：“pageTotalNum”
-      if(!empty($request->param('pageTotalNum'))){
-          $pageTotalNum=$request->param('pageTotalNum');
-      }else{
-          $pageTotalNum=1;
-      }
-      
-      // $sortName接收前端页面传来的排序字段名
-      if(!empty($request->param('sortName'))){
-          $sortName=$request->param('sortName');
-      }else{
-          $sortName='_TOPIC';
-      }
-        
-      // $sort接收前端页面传来的排序顺序
-      if(!empty($request->param('sort'))){
-          $sort=$request->param('sort');
-      }else{
-          $sort='_ASC';
-      }
-      
-      // 查询词1，'searchPatName'
-      if(!empty($request->param('searchPatName'))){
-          $searchPatName=$request->param('searchPatName');
-      }else{
-          $searchPatName='';
-      } 
-        
-      // 查询词2，'searchDept'
-      if(!empty($request->param('searchDept'))){
-          $searchDept=$request->param('searchDept');
-      }else{
-          $searchDept=0;
-      } 
-        
-      // 查询词3，'searchPatStatus'
-      if(!empty($request->param('searchPatStatus'))){
-          $searchPatStatus=$request->param('searchPatStatus');
-      }else{
-          $searchPatStatus=0;
-      }
-        
-      // 查询词4，'searchPatType'
-      if(!empty($request->param('searchPatType'))){
-          $searchPatType=$request->param('searchPatType');
-      }else{
-          $searchPatType=0;
-      } 
-        
-      // 查询词5，'searchWriter'
-      if(!empty($request->param('searchWriter'))){
-          $searchWriter=$request->param('searchWriter');
-      }else{
-          $searchWriter='';
-      }
-      
-      // 选择排序字段
-      switch($sortName){
-      
-        case '_PATNAME':
-          $strOrder='abstract';
-        break;
-        
-        case '_PATSTATUS':
-          $strOrder='abstract';
-        break;
-            
-        case '_ABSTRACT':
-          $strOrder='abstract';
-        break;
-        
-        case '_WRITER':
-          $strOrder='writer';
-        break;
-        
-        case '_EXECUTER':
-          $strOrder='executer';
-        break;
-            
-        case '_ADDNEWDATE':
-          $strOrder='addnewdate';
-        break;
-        
-        case '_STATUS':
-          $strOrder='status';
-        break;
-            
-        case '_DEPT':
-          $strOrder='dept';
-        break;
-            
-        case '_TOPIC':
-          $strOrder='topic';  
-          $sortName="_TOPIC";
-        break;
-        
-         //默认按字段“status”
-        default:
-          $strOrder='status';  
-          $sortName="_OPERATION";
-        break;
-        
-      } 
-      
-      //  组合升序or降序查询
-      if($sort=="_ASC"){
-          $strOrder=$strOrder.' asc';
-      }else{
-          $strOrder=$strOrder.' desc';
-          
-      }
-      
-     //使用模型Issinfo
-     $issSet = new IssinfoModel; 
-     $mapMaintain['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
-                                      '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
-     
-     // 记录总数
-     $numTotal = $issSet->where($mapMaintain)->count();
-          
-     // 查出所有的用户并分页，根据“strOrder”排序，前端页面显示的锚点（hash值）为$fragment，设定分页页数变量：“pageTotalNum”
-     // 带上每页显示记录行数$totalTableRows，实现查询结果分页显示。
-     $issPatTotal = $issSet->where($mapMaintain)
-                            ->order($strOrder)
-                            ->paginate($issPatTableRows,false,['type'=>'bootstrap','var_page' => 'pageTotalNum',
-                            'query'=>['issPatTableRows'=>$issPatTableRows]]);
-     // 获取分页显示
-     $pageTotal = $issPatTotal->render();
-       
-     //返回数据还是模板文件,‘0’为模板文件，‘1’为数据
-      if($returnType){
-        //响应前端的请求，返回前端要求条件的issPat数量
-        return ($numTotal);
-      }else{
-        $this->assign([
-              'home'=>$request->domain(),
-              //"destr".$this->auth['isspro']['edit'],
-              
-              // 分页显示所需参数
-              'issPatTotal'=>$issPatTotal,
-              'numTotal'=>$numTotal,
-              'pageTotal'=>$pageTotal,
-              'issPatTableRows'=>$issPatTableRows,
-              'pageTotalNum'=>$pageTotalNum,
-              
-              // 表格搜索字段
-              'searchPatName'=>$searchPatName,
-              'searchDept'=>$searchDept,
-              'searchPatStatus'=>$searchPatStatus,
-              'searchPatType'=>$searchPatType,
-              'searchWriter'=>$searchWriter,
-        
-              // 表格排序信息
-              'sortName'=>$sortName,
-              'sort'=>$sort,             
-              
-        ]);
-        
-        return view();
-      }
-    }
-    
-    // 输出模板文件，显示issue中与pat相关的数据集。
-     public function issPatDone(Request $request)
-    {
-      $this->_loginUser();
-      
-       // $returnType接收前端页面传来的returnType值，‘0’为模板文件，‘1’为数据
-      if(!empty($request->param('returnType'))){
-        $returnType=$request->param('returnType');
-      }else{
-        $returnType=0;
-      }
-
-      //$totalTableRows接收前端页面传来的分页时每页显示的记录数，默认为10
-      if(!empty($request->param('issPatTableRows'))){
-          $issPatTableRows=$request->param('issPatTableRows');
-      }else{
-          $issPatTableRows=10;
-      }
-      
-       // 接收前端分页页数变量：“pageTotalNum”
-      if(!empty($request->param('pageTotalNum'))){
-          $pageTotalNum=$request->param('pageTotalNum');
-      }else{
-          $pageTotalNum=1;
-      }
-      
-      // $sortName接收前端页面传来的排序字段名
-      if(!empty($request->param('sortName'))){
-          $sortName=$request->param('sortName');
-      }else{
-          $sortName='_TOPIC';
-      }
-        
-      // $sort接收前端页面传来的排序顺序
-      if(!empty($request->param('sort'))){
-          $sort=$request->param('sort');
-      }else{
-          $sort='_ASC';
-      }
-      
-      // 查询词1，'searchPatName'
-      if(!empty($request->param('searchPatName'))){
-          $searchPatName=$request->param('searchPatName');
-      }else{
-          $searchPatName='';
-      } 
-        
-      // 查询词2，'searchDept'
-      if(!empty($request->param('searchDept'))){
-          $searchDept=$request->param('searchDept');
-      }else{
-          $searchDept=0;
-      } 
-        
-      // 查询词3，'searchPatStatus'
-      if(!empty($request->param('searchPatStatus'))){
-          $searchPatStatus=$request->param('searchPatStatus');
-      }else{
-          $searchPatStatus=0;
-      }
-        
-      // 查询词4，'searchPatType'
-      if(!empty($request->param('searchPatType'))){
-          $searchPatType=$request->param('searchPatType');
-      }else{
-          $searchPatType=0;
-      } 
-        
-      // 查询词5，'searchWriter'
-      if(!empty($request->param('searchWriter'))){
-          $searchWriter=$request->param('searchWriter');
-      }else{
-          $searchWriter='';
-      }
-      
-      // 选择排序字段
-      switch($sortName){
-      
-        case '_PATNAME':
-          $strOrder='abstract';
-        break;
-        
-        case '_PATSTATUS':
-          $strOrder='abstract';
-        break;
-            
-        case '_ABSTRACT':
-          $strOrder='abstract';
-        break;
-        
-        case '_WRITER':
-          $strOrder='writer';
-        break;
-        
-        case '_EXECUTER':
-          $strOrder='executer';
-        break;
-            
-        case '_ADDNEWDATE':
-          $strOrder='addnewdate';
-        break;
-        
-        case '_STATUS':
-          $strOrder='status';
-        break;
-            
-        case '_DEPT':
-          $strOrder='dept';
-        break;
-            
-        case '_TOPIC':
-          $strOrder='topic';  
-          $sortName="_TOPIC";
-        break;
-        
-         //默认按字段“status”
-        default:
-          $strOrder='status';  
-          $sortName="_OPERATION";
-        break;
-        
-      } 
-      
-      //  组合升序or降序查询
-      if($sort=="_ASC"){
-          $strOrder=$strOrder.' asc';
-      }else{
-          $strOrder=$strOrder.' desc';
-          
-      }
-      
-     //使用模型Issinfo
-     $issSet = new IssinfoModel; 
-     $mapDone['status'] ='完结';
-     
-     // 记录总数
-     $numTotal = $issSet->where($mapDone)->count();
-          
-     // 查出所有的用户并分页，根据“strOrder”排序，前端页面显示的锚点（hash值）为$fragment，设定分页页数变量：“pageTotalNum”
-     // 带上每页显示记录行数$totalTableRows，实现查询结果分页显示。
-     $issPatTotal = $issSet->where($mapDone)
-                            ->order($strOrder)
-                            ->paginate($issPatTableRows,false,['type'=>'bootstrap','var_page' => 'pageTotalNum',
-                            'query'=>['issPatTableRows'=>$issPatTableRows]]);
-     // 获取分页显示
-     $pageTotal = $issPatTotal->render();
-       
-     //返回数据还是模板文件,‘0’为模板文件，‘1’为数据
-      if($returnType){
-        //响应前端的请求，返回前端要求条件的issPat数量
-        return ($numTotal);
-      }else{
-        $this->assign([
-              'home'=>$request->domain(),
-              //"destr".$this->auth['isspro']['edit'],
-              
-              // 分页显示所需参数
-              'issPatTotal'=>$issPatTotal,
-              'numTotal'=>$numTotal,
-              'pageTotal'=>$pageTotal,
-              'issPatTableRows'=>$issPatTableRows,
-              'pageTotalNum'=>$pageTotalNum,
-              
-              // 表格搜索字段
-              'searchPatName'=>$searchPatName,
-              'searchDept'=>$searchDept,
-              'searchPatStatus'=>$searchPatStatus,
-              'searchPatType'=>$searchPatType,
-              'searchWriter'=>$searchWriter,
-        
-              // 表格排序信息
-              'sortName'=>$sortName,
-              'sort'=>$sort,             
-              
-        ]);
-        
-        return view();
-      }
+      //return $msg;
+      //return json(array('msg'=>$msg,'btnHtml'=>$btnHtml,'topic'=>$request->param('issPatTopic')));
+      return json(array('msg'=>$msg,'topic'=>$request->param('issPatTopic'),'patId'=>$patId));
+      //return $this->issPatAuth($request);//参数不够，不会产生分页。
     }
 
 

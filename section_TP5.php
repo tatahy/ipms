@@ -294,9 +294,9 @@ $tomorrow = mktime(0,0,0,date("m"),date("d")+1,date("Y"));
 //得到明天此时此刻的Unix timestamp
 $tomorrowNow = mktime(dat("H"),dat("i"),dat("s"),date("m"),date("d")+1,date("Y"));
 //以yyyy-mm-dd形式显示明天的日期
-$date("Y-m-d",$tomorrow);
+date("Y-m-d",$tomorrow);
 //以yyyy-mm-dd hh:mm:ss形式显示此时此刻的日期、时间
-$date("Y-m-d H:i:s");		     
+date("Y-m-d H:i:s");		     
 ?>
 
 
@@ -793,7 +793,7 @@ return view('模板名',['name'=>'thinkphp','data'=>$data]);
 </html>
 
 <html>
-//请求参数输出
+//请求参数输出,
 //模板支持直接输出Request请求对象的方法参数，用法如下：$Request.方法名.参数,例如：
 
 <p>{$Request.get.id}</p>
@@ -1094,3 +1094,27 @@ Db::table('think_user')->field(['user_id','content'],true)->select();
 
 <!--/  HY 2018/2/22 -->
 
+<!--/  HY 2018/3/15 -->
+
+request数组
+如果你要获取的数据为数组，请一定注意要加上 /a 修饰符才能正确获取到。
+
+<html>
+<form id="fmAtt" action="x" method="post">
+	<input name="attId[]" value="1" type="text" >
+	<input name="attId[]" value="2" type="text" >
+	<input name="attId[]" value="3" type="text" >
+	
+	<input type="submit" >
+
+</form>
+
+</html>
+
+<?php
+	$arr=$request->param('attId/a');
+
+?>
+
+
+<!--/  HY 2018/3/15 -->

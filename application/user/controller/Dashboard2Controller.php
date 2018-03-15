@@ -29,7 +29,9 @@ class Dashboard2Controller extends \think\Controller
     //用户权限
     private $auth=array();
     
+    private $today=null;
     
+    private $now=null;
     // 初始化
     protected function _initialize()
     {
@@ -38,6 +40,8 @@ class Dashboard2Controller extends \think\Controller
         $this->log=Session::get('log');
         $this->roles=Session::get('role');
         $this->dept=Session::get('dept');
+        $this->today=date('Y-m-d');
+        $this->now=date("Y-m-d H:i:s");
     }
     
      // 判断是否为登录用户
@@ -266,7 +270,7 @@ class Dashboard2Controller extends \think\Controller
                         'attmap_id' =>$request->param('attmap_id'),
                         'attmap_type' =>$request->param('attmap_type'),
                         'name' =>$request->param('attName'),
-                        'rolename' =>$request->param('rolename'),
+                        'rolename' =>$request->param('attRoleName'),
                         'deldisplay' =>$request->param('deldisplay')
                         );
             
@@ -861,6 +865,13 @@ class Dashboard2Controller extends \think\Controller
         $patId=0;
       }
       
+      // $issId接收前端页面传来的issId值
+      if(!empty($request->param('issId'))){
+        $issId=$request->param('issId');
+      }else{
+        $issId=0;
+      }
+      
       //变量赋初值
       $issData=array();
       $issMdlOprt='';
@@ -868,7 +879,7 @@ class Dashboard2Controller extends \think\Controller
       $patMdlOprt='';
       $attData=array();
       $attMdlOprt='';
-      $oprtCN='';
+      $oprtCHNStr='';
       
       $msg="";
       $tplFile='dashboard2'.DS.'issPatAuthSingle'.DS;
@@ -876,7 +887,7 @@ class Dashboard2Controller extends \think\Controller
       switch($oprt){
         //“_EDIT”权限拥有的操作
         case'_ADDNEW':
-          
+          //patId=0
           $issData=array(
                 'topic'=>$request->param('issPatTopic'),
                 'type'=>$request->param('issType'),
@@ -1641,9 +1652,18 @@ class Dashboard2Controller extends \think\Controller
       
       if($request->param('oprt')=='_ADDNEW'){
         $patId=1;
+      }     
+      
+      //如果要获取的数据为数组，要加上 /a 修饰符才能正确获取。
+      if(!empty($request->param('attId/a'))){
+        $arrAttId=$request->param('attId/a');
+        $arrAttFileName=$request->param('attFileName/a');
+      }else{
+        $arrAttId=array(0);
+        $arrAttFileName=array(0);
       }
       
-      $data=array('msg'=>$msg,'topic'=>$request->param('issPatTopic'),'patId'=>$patId);
+      $data=array('msg'=>$msg,'topic'=>$request->param('issPatTopic'),'patId'=>$patId,'attId'=>$arrAttId);
       return json($data);
       //return $data;
     } 
