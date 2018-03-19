@@ -8,6 +8,7 @@
 namespace app\user\model;
 
 use think\Model;
+use think\Request;
 
 class Attinfo extends Model
 {   
@@ -173,12 +174,83 @@ class Attinfo extends Model
      */
     public function attDelete($attId)
     {
+        //delete()方法返回的是受影响记录数
         $result = $this->where('id',$attId)->delete();
         if ($result) {
-            return $this->getData('id');
+            return true;
         } else {
             return false;
         }
+    }
+    
+    
+    /**
+     * 上传附件文件到本服务器temp目录
+     * @param  $fileSet Object 文件对象
+     * @return Object|string  成功：返回新建的att记录，未成功：返回未成功信息
+     *
+     */
+    public function fileUploadTemp($data=[],$fileSet)
+    {
+
+      if(!empty($fileSet)){
+            // 移动到框架根目录的uploads/temp/ 目录下,系统重新命名文件名
+            $info = $fileSet->validate(['size'=>10485760,'ext'=>'jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,rar'])
+                        ->move(ROOT_PATH.DS.'uploads'.DS.'temp');
+        }else{
+            $this->error('未选择文件，请选择需上传的文件。');
+        }
+        
+        if($info){
+            // 成功上传后 获取上传信息
+            // 文件的后缀名
+            $info->getExtension()."<br/>";
+            // 文件存放的文件夹路径：类似20160820/42a79759f284b767dfcb2a0197904287.jpg
+            $info->getSaveName()."<br/>";
+            // 完整的文件名
+            $info->getFilename(); 
+            
+            $path= '..'.DS.'uploads'. DS.'temp'.DS.$info->getSaveName();
+            
+            array_push($data,array('attpath'=>$path));
+            
+            $attId=$this->attCreate($data);
+            
+            $att = $this->get($attId); 
+      
+            return $att;
+            
+        }else{
+            // 上传失败获取错误信息
+            //echo $file->getError();
+            return $fileSet->getError();
+        }
+      
+    }
+    
+    /**
+     * 上传附件文件到本服务器temp目录
+     * @param  $fileSet Object 文件对象
+     * @return Object|string  成功：返回新建的att记录，未成功：返回未成功信息
+     *
+     */
+     public function fileMove($fileName,$targetDir,$id)
+    {
+      //得到文件对象
+      $file = new FileObj($fileName); 
+      
+      //文件移动到$targetDir目录
+      $fileMove=$file->move($targetDir);
+    
+       //引用attinfo模型中定义的方法向attinfo表更新信息
+      $attId = $attMdl->attUpdate($data=array('path'=>$targetDir),$id);
+      
+      if($attId && $fileMove){
+        return true;
+      }else{
+        return false;
+      }
+      
     }
 
 }

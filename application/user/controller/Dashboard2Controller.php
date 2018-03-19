@@ -241,30 +241,9 @@ class Dashboard2Controller extends \think\Controller
     }
     
     //上传附件文件到temp目录
-    public function uploadAttTemp(Request $request)
+    public function uploadAttTemp(Request $request,AttinfoModel $attMdl)
     {
-      $fileSet=$request->file('attFile');
-      if(!empty($fileSet)){
-            // 移动到框架根目录的uploads/ 目录下,系统重新命名文件名
-            $info = $fileSet->validate(['size'=>10485760,'ext'=>'jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,rar'])
-                        ->move(ROOT_PATH.DS.'uploads'.DS.'temp');
-        }else{
-            $this->error('未选择文件，请选择需上传的文件。');
-        }
-        
-        if($info){
-            // 成功上传后 获取上传信息
-            // 文件的后缀名
-            $info->getExtension()."<br/>";
-            // 文件存放的文件夹路径：类似20160820/42a79759f284b767dfcb2a0197904287.jpg
-            $info->getSaveName()."<br/>";
-            // 完整的文件名
-            $info->getFilename(); 
-            
-            $path= '..'.DS.'uploads'. DS.'temp'.DS.$info->getSaveName();
-            
-            $data=array('attpath'=>$path,
-                        'uploaddate'=>date('Y-m-d H:i:s'),
+      $attData=array('uploaddate'=>$this->now,
                         'uploader'=>$request->param('uploader'),
                         'atttype' =>$request->param('attType'),
                         'attmap_id' =>$request->param('attmap_id'),
@@ -272,26 +251,12 @@ class Dashboard2Controller extends \think\Controller
                         'name' =>$request->param('attName'),
                         'rolename' =>$request->param('attRoleName'),
                         'deldisplay' =>$request->param('deldisplay')
-                        );
-            
-            $attSet=new AttinfoModel;
-            
-            $attId=$attSet->attCreate($data);
-            
-            $att = AttinfoModel::get($attId); 
-             
-            // 静态调用更新
-            //$attSet=AttinfoModel::update([
-//              'name'  => 'topthink',
-//              'email' => 'topthink@qq.com',
-//            ], ['num_id'=>$num_id]);
-            return $att;
-            
-        }else{
-            // 上传失败获取错误信息
-            //echo $file->getError();
-            return $fileSet->getError();
-        }
+      );
+      
+      //应用AttinfoModel中定义的fileUpdateTemp()方法上传附件文件到temp目录
+      $att_return=$attMdl->fileUploadTemp($attData,$request->file('attFile'));
+      
+      return $att_return;
       
     }
     

@@ -43,6 +43,26 @@ class Issrecord extends Model
           $outPut='维护人';
         break;
         
+         case '_EDIT':
+          $outPut='撰写人';
+        break;
+        
+        case '_AUDIT':
+          $outPut='审核人';
+        break;
+        
+        case '_APPROVE':
+          $outPut='批准人';
+        break;
+        
+        case '_EXECUTE':
+          $outPut='执行人';
+        break;
+        
+        case '_MAINTAIN':
+          $outPut='维护人';
+        break;
+                
         default:
           $outPut=$value;
         break;
@@ -99,9 +119,10 @@ class Issrecord extends Model
      */
     public function issRdDelete($issId)
     {
+        //delete()方法返回的是受影响记录数
         $result = $this->where('id',$issId)->delete();
         if ($result) {
-            return $this->getData('id');
+            return true;
         } else {
             return false;
         }

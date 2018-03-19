@@ -242,9 +242,10 @@ class Patinfo extends Model
      */
     public function patDelete($patId)
     {
+        //delete()方法返回的是受影响记录数
         $result = $this->where('id',$patId)->delete();
         if ($result) {
-            return $this->getData('id');
+            return true;
         } else {
             return false;
         }
