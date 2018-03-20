@@ -101,11 +101,13 @@ class Issrecord extends Model
      * @return integer|bool  更新成功返回主键，未更新返回false
      * 要求：传入的数组下标名与模型属性名（数据表字段名）一模一样。
      */
-    public function issRdUpdate($data = [],$issId)
+    public function issRdUpdate($data = [],$id)
     {
-        $result = $this->where('id',$issId)->allowField(true)->save($data);
+       $result = $this::get($id)->allowField(true)->save($data);
+       // $issRd=$this::get($id);
+//        $result = $issRd->allowField(true)->data($data, true)->save();
         if ($result) {
-            return $this->getData('id');
+            return $id;
         } else {
             return false;
         }

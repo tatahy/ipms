@@ -9,6 +9,7 @@ namespace app\user\model;
 
 use think\Model;
 use think\Request;
+use think\File as FileObj; 
 
 class Attinfo extends Model
 {   
@@ -156,11 +157,13 @@ class Attinfo extends Model
      * @return integer|bool  更新成功返回主键，未更新返回false
      * 要求：传入的数组下标名与模型属性名（数据表字段名）一模一样。
      */
-    public function attUpdate($data = [],$attId)
+    public function attUpdate($data = [],$id)
     {
-        $result = $this->where('id',$attId)->allowField(true)->save($data);
+        $result = $this::get($id)->allowField(true)->save($data);
+        //$att=$this::get($id);
+//        $result = $att->allowField(true)->data($data, true)->save();
         if ($result) {
-            return $this->getData('id');
+            return $id;
         } else {
             return false;
         }
@@ -243,7 +246,7 @@ class Attinfo extends Model
       $fileMove=$file->move($targetDir);
     
        //引用attinfo模型中定义的方法向attinfo表更新信息
-      $attId = $attMdl->attUpdate($data=array('path'=>$targetDir),$id);
+      $attId = $this->attUpdate($data=array('path'=>$targetDir),$id);
       
       if($attId && $fileMove){
         return true;

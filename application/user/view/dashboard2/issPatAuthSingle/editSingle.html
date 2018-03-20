@@ -129,7 +129,8 @@ $(document).ready(function(){
 		var param ={'patId':$('#patId').val(),'issId':$('#issId').val()}
 			
 		var btnHtml='<span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:16px;">'+$(this).html()+'</span>《'+$(this).attr('data-issTopic')+'》';
-		var url='test';
+		<!-- var url='test'; -->
+		var url='issPatOprt';
 		//去掉'.form-control'的tooltip和'has-error'
 		$('.form-control').tooltip('destroy').parent().removeClass('has-error');
 		

@@ -224,11 +224,13 @@ class Patinfo extends Model
      * @return integer|bool  更新成功返回主键，未更新返回false
      * 要求：传入的数组下标名与模型属性名（数据表字段名）一模一样。
      */
-    public function patUpdate($data = [],$patId)
+    public function patUpdate($data = [],$id)
     {
-        $result = $this->where('id',$patId)->allowField(true)->save($data);
+        $result = $this::get($id)->allowField(true)->save($data);
+        //$pat=$this::get($id);
+//        $result = $pat->allowField(true)->data($data, true)->save();
         if ($result) {
-            return $this->getData('id');
+            return $id;
         } else {
             return false;
         }

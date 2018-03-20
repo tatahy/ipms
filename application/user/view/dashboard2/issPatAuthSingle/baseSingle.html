@@ -341,8 +341,8 @@ $(document).ready(function(){
 			
 			var btnHtml='<span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:16px;">'+$(this).html()+'</span>《'+topic+'》';
 
-			<!-- var url='issPatOprt'; -->
-			var url='test';
+			var url='issPatOprt';
+			<!-- var url='test'; -->
 			
 			
 			//预处理3个表单的数据,利用自定义的serializeJson()函数
@@ -378,7 +378,8 @@ $(document).ready(function(){
 								//返回的data.patId不为0，说明已经新增pat成功
 								if(data.patId){
 									//再提交#fmIssPat和#fmAtt的数据
-									$.extend(param,fmIssPatDataJson,fmAttDataJson,{"patId":data.patId});
+									param={};
+									$.extend(param,fmIssPatDataJson,fmAttDataJson,{'oprt':'_ADDNEW','auth':auth,"patId":data.patId});
 									
 									$.post(url,param,function(data){
 										<!-- //后端数据处理成功后的动作： -->
