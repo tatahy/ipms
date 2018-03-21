@@ -417,6 +417,7 @@ $user->allowField(['nickname', 'address'])
 
 如果仅仅是希望去除数据表之外的字段，可以使用
 
+
 // 只允许更新数据表字段数据
 $user->allowField(true)
 	->data(requst()->param(), true)
@@ -1094,7 +1095,7 @@ Db::table('think_user')->field(['user_id','content'],true)->select();
 
 <!--/  HY 2018/2/22 -->
 
-<!--/  HY 2018/3/15 -->
+<!--  HY 2018/3/15 -->
 
 request数组
 如果你要获取的数据为数组，请一定注意要加上 /a 修饰符才能正确获取到。
@@ -1118,3 +1119,38 @@ request数组
 
 
 <!--/  HY 2018/3/15 -->
+
+<!--  HY 2018/3/21 -->
+移动文件，上传到服务器的文件要改变存放目录
+<?php
+//方法一： 应用php原生的raname()函数，应确保newDir存在，否则应先创建newDir
+	rename('oldDir\fileOldName','newDir\fileNewName');
+	
+	//注意：在应用rename()移动文件时，要确保该文件没有被打开或该文件对象已被释放，如下语句在tp5中会报错
+	$fileStr='oldDir\fileOldName';
+	$file = new FileObj($fileStr); 
+	rename('oldDir\fileOldName','newDir\fileNewName');
+	
+	//上述代码需修改为
+	$fileStr='oldDir\fileOldName';
+	$file = new FileObj($fileStr);
+	//释放文件对象
+	unset($file);	
+	rename('oldDir\fileOldName','newDir\fileNewName');
+	
+//方法二： 应用php原生的copy()函数+unlink()函数，应确保newDir存在，否则应先创建newDir。同上述方法一，应用时要确保该文件没有被打开或该文件对象已被释放，否则原文件删除时报错，无法删除
+	//复制新文件
+	copy('oldDir\fileOldName','newDir\fileNewName');
+	//删除原文件 
+	unlink($fileStr);
+	
+//说明：
+//1.对于文件，rename可以在不同盘符之间移动
+//2.对于空文件夹，rename也可在不同盘符之间移动，但目标文件夹的父目录必须存在。
+//3.对于非空文件夹，只能在同一盘符下移动。
+//4.对于几十M的文件，rename比copy+unlink快上百倍。
+?>
+
+<!--/  HY 2018/3/15 -->
+
+

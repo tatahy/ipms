@@ -825,9 +825,11 @@ class Dashboard2Controller extends \think\Controller
       if(!empty($request->param('attId/a'))){
         $arrAttId=$request->param('attId/a');
         $arrAttFileName=$request->param('attFileName/a');
+        $arrAttFileObjStr=$request->param('attFileObjStr/a');
       }else{
         $arrAttId=array(0);
         $arrAttFileName=array(0);
+        $arrAttFileObjStr=array(0);;
       }
       
       //变量赋初值
@@ -1359,7 +1361,7 @@ class Dashboard2Controller extends \think\Controller
           //patId!=0,issId=0
           if($request->param('returnType')=='_JSON'){
             return json(array_merge($patMdl->where('id',$request->param('patId'))->find()->toArray(),
-                              array("today"=>date('Y-m-d'),"username"=>$this->username,"deptMaintainer"=>$this->dept)));
+                              array("today"=>$this->today,"username"=>$this->username,"deptMaintainer"=>$this->dept)));
           }else{
             $oprtCHNStr='续费报告';
             
@@ -1594,30 +1596,62 @@ class Dashboard2Controller extends \think\Controller
       //5.attinfo表更新
       //循环更新attMdl,将文件从现有的‘temp’目录移动到指定目录
       for($i=0;$i<count($arrAttId);$i++){
-             
-        $fileName=$arrAttFileName[$i];
-        $targetDir=ROOT_PATH.DS.'uploads'.DS.$issSet->issnum;
+        
+        $fileStr=$arrAttFileObjStr[$i];
+        $name=$arrAttFileName[$i];
+        
+        //$file = new FileObj($fileStr); 
+//        //完整的文件名
+//        $name= $file->getFilename();
+//        unset($file);
+        
+        $newDir=ROOT_PATH.DS.'uploads'.DS.$issSet->issnum;
+        //有‘temp’字符串才移动到指定目录
+        if(substr_count($fileStr,'temp')){
+            if(is_dir($newDir)){
+              rename($fileStr,$newDir.DS.$name);
+            }else{
+              mkdir('..'.DS.'uploads'.DS.'xx',0777);
+              rename($fileStr,$newDir.DS.$name);
+            }
+            
+            //移动是否成功：
+            if(file_exists($newDir.DS.$name)){
+              
+              $attData=array(
+              'num_id'=>0,
+              'attmap_id'=>0,
+              'attpath'=>$newDir.DS.$name,
+              'deldisplay'=>0
+              );
+              
+              //添加到$attData的内容,更新att
+              $attId = $attMdl->attUpdate($attData,$arrAttId[0]);
+                          
+              $msg.="附件".$fileStr."移动成功</br>"; 
+              
+            }else{
+              $msg.="附件".$fileStr."移动失败</br>"; 
+            }
+        }
                 
         //有‘temp’字符串才移动到指定目录
-        while(substr_count($fileName,'temp')){
+        if(substr_count($fileObj,'temp')){
                   
           //引用attinfo模型中定义的fileMove()方法，将文件从‘temp’目录移动到指定目录
-          $fileMoveResult=$attMdl->fileMove($fileName,$targetDir,$arrAttId[$i]);
+          $fileMoveResult=$attMdl->fileMove($fileObj,$targetDir);
                     
           //移动是否成功：
           if($fileMoveResult){
             $attData=array(
             'num_id'=>$issSet->issnum,
             'attmap_id'=>$issSet->id,
-            'path'=>$targetDir,
+            'attpath'=>$targetDir.$fileMoveResult,
             //'deldisplay'=>0
             );
             
-            //添加到$attData的内容
-            array_push($attData,$attDataPatch);
-            
-            //更新att
-            $attId = $attMdl->attUpdate($attData,$arrAttId[$i]);
+            //添加到$attData的内容,更新att
+            $attId = $attMdl->attUpdate(array_push($attData,$attDataPatch),$arrAttId[$i]);
                         
             $msg.="附件".$arrAttFileName[$i]."移动成功<br>"; 
           }else{
@@ -1670,113 +1704,7 @@ class Dashboard2Controller extends \think\Controller
     {
        $this->_loginUser();
       
-      ////从session中取出登录用户的关键信息
-//        $username=Session::get('username');
-//        $pwd=Session::get('pwd');
-//        $log=Session::get('log');
-//        $roles=Session::get('role');
-//        $dept=Session::get('dept');
-//        $role=$request->param('role');
-//      
-//      //使用模型Issinfo
-//        $issSet = new IssinfoModel; 
-//        //edit
-//        $mapEdit['status'] =['in',['填报','返回修改','修改完善']];
-//        $mapEdit['dept'] =$this->dept;
-//        $mapEdit['writer']=$this->username;
-//        
-//        //audit
-//        $mapAudit['status'] ='待审核';
-//        $mapAudit['dept'] =$this->dept;
-//        //approve
-//        $mapApprove['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
-//        //execute
-//        $mapExecute['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
-//        $mapExecute['dept'] =$this->dept;
-//        $mapExecute['executer'] =$this->username;
-//        //maintain
-//        $mapMaintain['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
-//                                      '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
-//        //done
-//        $map['status'] ='完结';
-//        
-//        if($this->auth['authiss']['edit']){
-//          $numIssPatEdit=$issSet->where($mapEdit)->count(); 
-//        }else{
-//          $numIssPatEdit=0;
-//        }
-//        
-//        if($this->auth['authiss']['audit']){
-//          $numIssPatAudit=$issSet->where($mapAudit)->count(); 
-//        }else{
-//          $numIssPatAudit=0;
-//        }
-//        
-//        if($this->auth['authiss']['approve']){
-//          $numIssPatApprove=$issSet->where($mapApprove)->count(); 
-//        }else{
-//          $numIssPatApprove=0;
-//        }
-//        
-//        if($this->auth['authiss']['execute']){
-//          $numIssPatExecute=$issSet->where($mapExecute)->count(); 
-//        }else{
-//          $numIssPatExecute=0;
-//        }
-//        
-//        if($this->auth['authiss']['maintain']){
-//          $numIssPatMaintain=$issSet->where($mapMaintain)->count(); 
-//          //得到满足续费条件的专利数
-//          $today=date('Y-m-d');
-//          $deadline=date('Y-m-d',strtotime("+6 month"));
-//          $mapRenew['status'] =['in',['授权','续费授权']];          
-//          // 查出满足条件的patent
-//          $numPatRenewTotal= PatinfoModel::where($mapRenew)->where('renewdeadlinedate','between time',[$today,$deadline])->count();
-//        }else{
-//          $numIssPatMaintain=0;
-//          $numPatRenewTotal=0;
-//        }
-//        
-//        $numIssPatDone=$issSet->where($map)->count(); 
-//        
-//        $numTotal=$numIssPatEdit+$numIssPatAudit+$numIssPatApprove+$numIssPatExecute+$numIssPatMaintain+$numPatRenewTotal;
-//        
-//        $destr= "请求方法:".$request->method()."<br/>".
-//                "username:". $username."<br/>".
-//                "pwd:".$pwd."<br/>".
-//                "roles:".$roles[0]."<br/>".
-//                "log:".$log."<br/>".
-//                "auth:".json_encode($this->auth); 
-//        
-//         // 模板变量赋值        
-//        $this->assign([
-//          //在usercenter.html页面输出自定义的信息
-//          //在index.html页面通过destr输出自定义的信息
-//          'destr'=>$destr."</br>",
-//          //在index.html页面通过array输出自定义的数组内容
-//          'array'=>$roles, 
-//          
-//          'home'=>$request->domain(),
-//          'username'=>$username,
-//          'roles'=>$roles,
-//          //'roles'=>json($roles),
-//          'role'=>$role,
-//          'role1st'=>$roles[0],
-//  
-//          //向前端权限变量赋值
-//          'authArray'=>$this->auth, 
-//          
-//          'numIssPatEdit'=>$numIssPatEdit,
-//          'numIssPatAudit'=>$numIssPatAudit,
-//          'numIssPatApprove'=>$numIssPatApprove,
-//          'numIssPatExecute'=>$numIssPatExecute,
-//          'numIssPatMaintain'=>$numIssPatMaintain,
-//          'numIssPatDone'=>$numIssPatDone,
-//          'numTotal'=>$numTotal,
-//          'numPatRenewTotal'=>$numPatRenewTotal,
-//      	
-//        ]);
-//      return view('dashboard2'.DS.'issThe'.DS.'theNavPills');
+   
       return ':)<br> issThe 模块开发中……';
      
     }
@@ -1788,9 +1716,9 @@ class Dashboard2Controller extends \think\Controller
      
     }
     
-     public function test(Request $request)
+     public function test(Request $request,AttinfoModel $attMdl)
     {
-      $msg=$request->param('auditResult').'成功';
+      $msg='</br>';
       if(!empty($request->param('patId'))){
         $patId=$request->param('patId');
       }else{
@@ -1801,16 +1729,59 @@ class Dashboard2Controller extends \think\Controller
         $patId=1;
       }     
       
+      $targetDir=ROOT_PATH.'uploads'.DS.'xx'.DS;
+      $resourceDir=ROOT_PATH.'uploads'.DS.'temp'.DS.'20180321'.DS;
+      $fileStr='';
+      $newDir='..'.DS.'uploads'.DS.'xx';
+      
+      $fileMoveResult=0;
+      
       //如果要获取的数据为数组，要加上 /a 修饰符才能正确获取。
       if(!empty($request->param('attId/a'))){
         $arrAttId=$request->param('attId/a');
         $arrAttFileName=$request->param('attFileName/a');
+        $arrAttFileObjStr=$request->param('attFileObjStr/a');
+        
+        $fileStr=$arrAttFileObjStr[0];
+        $name=$arrAttFileName[0];
+        
       }else{
         $arrAttId=array(0);
         $arrAttFileName=array(0);
+        $name=0;
       }
       
-      $data=array('msg'=>$msg,'topic'=>$request->param('issPatTopic'),'patId'=>$patId,'attId'=>$arrAttId);
+      //有‘temp’字符串才移动到指定目录
+      if(substr_count($fileStr,'temp')){
+          if(is_dir($newDir)){
+            rename($fileStr,$newDir.DS.$name);
+          }else{
+            mkdir('..'.DS.'uploads'.DS.'xx',0777);
+            rename($fileStr,$newDir.DS.$name);
+          }
+          
+          //移动是否成功：
+          if(file_exists($newDir.DS.$name)){
+            
+            $attData=array(
+            'num_id'=>0,
+            'attmap_id'=>0,
+            'attpath'=>$newDir.DS.$name,
+            'attfilename'=>$name,
+            'deldisplay'=>0
+            );
+            
+            //添加到$attData的内容,更新att
+            $attId = $attMdl->attUpdate($attData,$arrAttId[0]);
+                        
+            $msg.="附件".$fileStr."移动成功</br>"; 
+            
+          }else{
+            $msg.="附件".$fileStr."移动失败</br>"; 
+          }
+        }
+      
+      $data=array('msg'=>$msg,'topic'=>$request->param('issPatTopic'),'patId'=>$patId,'attId'=>$arrAttId,'fileName'=>$name,'targetDir'=>$targetDir,'fileMoveResult'=>$fileMoveResult);
       return json($data);
       //return $data;
     } 

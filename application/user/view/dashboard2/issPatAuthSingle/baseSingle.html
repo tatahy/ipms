@@ -125,9 +125,13 @@
 					{volist name="att" id="vo" empty="暂无附件"}
 					<tr>
 						
-						<td>{$i}<input name="attId[]" value="{$vo.id}" type="text" class="sr-only"></td>
+						<td>{$i}
+							<input name="attId[]" value="{$vo.id}" type="text" class="sr-only">
+							<input name="attFileObjStr[]" value="{$vo.attpath}" type="text" class="sr-only">
+							<input name="attFileName[]" value="{$vo.attfilename}" type="text" class="sr-only">
+						</td>
 						<td>{$vo.atttype}</td>
-						<td>{$vo.name}<input name="attFileName[]" value="{$vo.attpath}" type="text" class="sr-only"></td>
+						<td>{$vo.name}</td>
 						<td>{$vo.uploaddate}</td>
 						<td>{$vo.uploader}</td>
 						<td>{$vo.rolename}</td>
@@ -341,8 +345,8 @@ $(document).ready(function(){
 			
 			var btnHtml='<span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:16px;">'+$(this).html()+'</span>《'+topic+'》';
 
-			var url='issPatOprt';
-			<!-- var url='test'; -->
+			<!-- var url='issPatOprt'; -->
+			var url='test';
 			
 			
 			//预处理3个表单的数据,利用自定义的serializeJson()函数
@@ -379,7 +383,7 @@ $(document).ready(function(){
 								if(data.patId){
 									//再提交#fmIssPat和#fmAtt的数据
 									param={};
-									$.extend(param,fmIssPatDataJson,fmAttDataJson,{'oprt':'_ADDNEW','auth':auth,"patId":data.patId});
+									$.extend(param,fmIssPatDataJson,fmAttDataJson,{'oprt':'_ADDNEW','auth':auth,'patId':data.patId});
 									
 									$.post(url,param,function(data){
 										<!-- //后端数据处理成功后的动作： -->
@@ -392,13 +396,16 @@ $(document).ready(function(){
 										$('#modalIssPatAuthSingle').on('hidden.bs.modal', function(){
 											<!-- $("#divIssPat_load").load('issPat'); -->
 											$("#divIssPatAuth_load").load('issPatAuth',{'auth':'{$auth}'});
-										});				
+										});
+										console.log('data.fileName='+data.fileName);
+										console.dir(data.fileName);
 							
 									});
 									
 								}
 								//新增pat失败，
 								else{
+		
 									$.alert('新增事务失败，请重试');
 								}
 							})
@@ -424,13 +431,14 @@ $(document).ready(function(){
 								$('#modalIssPatAuthSingle').on('hidden.bs.modal', function(){
 									<!-- $("#divIssPat_load").load('issPat'); -->
 									$("#divIssPatAuth_load").load('issPatAuth',{'auth':'{$auth}'});
-								});				
-							
+								});	
+								console.log('data.fileName='+data.fileName);
+								console.dir(data.fileName);								
 							});
 							
 							<!-- console.log('backData='); -->
 							<!-- console.dir(backData); -->
-							<!-- console.dir('backData.msg='+backData.msg); -->
+							<!-- console.dir('data.fileName='+data.fileName); -->
 						}
 						
 					}else{
