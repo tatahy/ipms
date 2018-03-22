@@ -833,20 +833,20 @@ class Dashboard2Controller extends \think\Controller
       }
       
       //变量赋初值
-      $issData=array(0);
-      $issDataPatch=array(0);
-      $issRdData=array(0);
-      $issRdDataPatch=array(0);
+      $issData=array('z'=>0);
+      $issDataPatch=array('z'=>0);
+      $issRdData=array('z'=>0);
+      $issRdDataPatch=array('z'=>0);
       $issId_return=0;
       
-      $patData=array(0);
-      $patDataPatch=array(0);
-      $patRdData=array(0);
-      $patRdDataPatch=array(0);
+      $patData=array('z'=>0);
+      $patDataPatch=array('z'=>0);
+      $patRdData=array('z'=>0);
+      $patRdDataPatch=array('z'=>0);
       $patId_return=0;
       
-      $attData=array(0);
-      $attDataPatch=array(0);
+      $attData=array('z'=>0);
+      $attDataPatch=array('z'=>0);
       $attId_return=0;
       
      // $issMdlOprt='';
@@ -863,12 +863,7 @@ class Dashboard2Controller extends \think\Controller
         case'_ADDNEW':
           //patId=0,issId=0
           $oprtCHNStr='新增';
-          
-          $patDataPatch=array('z'=>0);
-          $patRdDataPatch=array('z'=>0);
-          $issDataPatch=array('z'=>0);
-          $issRdDataPatch=array('z'=>0);
-          $attDataPatch=array('deldisplay'=>0);
+          $attDataPatch=array('deldisplay'=>1);
           
         break;
         
@@ -900,21 +895,15 @@ class Dashboard2Controller extends \think\Controller
         case'_UPDATE':
           //patId!=0,issId!=0
           $oprtCHNStr='更新';
-          
-          $patDataPatch=array('z'=>0);
-          $patRdDataPatch=array('z'=>0);
-          $issDataPatch=array('z'=>0);
-          $issRdDataPatch=array('z'=>0);
-          $attDataPatch=array('z'=>0);
+
+          $attDataPatch=array('deldisplay'=>1);
           
         break;
         //“_AUDIT”权限拥有的操作
         case'_PASS':
           //patId!=0,issId!=0
           $oprtCHNStr='审核';
-          
-          $patDataPatch=array('z'=>0);
-          $patRdDataPatch=array('z'=>0);
+
           $issDataPatch=array('status'=>'审核通过',
                               'auditrejectdate'=>$this->now,
                               );
@@ -930,8 +919,6 @@ class Dashboard2Controller extends \think\Controller
           //patId!=0,issId!=0
           $oprtCHNStr='审核';
           
-          $patDataPatch=array('z'=>0);
-          $patRdDataPatch=array('z'=>0);
           $issDataPatch=array('status'=>'审核未通过',
                               'auditrejectdate'=>$this->now,
                               );
@@ -987,8 +974,6 @@ class Dashboard2Controller extends \think\Controller
                                   );
             
           }else if($issSet->status=='变更申请'){
-            $patDataPatch=array('z'=>0);
-            $patRdDataPatch=array('z'=>0);
             $issDataPatch=array('status'=>'准予变更',
                                 'auditrejectdate'=>$this->now,
                                 );
@@ -998,8 +983,6 @@ class Dashboard2Controller extends \think\Controller
                                   );
           }else{
             //$issSet->status=='拟续费'
-            $patDataPatch=array('z'=>0);
-            $patRdDataPatch=array('z'=>0);
             $issDataPatch=array('status'=>'准予续费',
                                 'auditrejectdate'=>$this->now,
                                 );
@@ -1036,8 +1019,6 @@ class Dashboard2Controller extends \think\Controller
                                   );
             
           }else if($issSet->status=='变更申请'){
-            $patDataPatch=array('z'=>0);
-            $patRdDataPatch=array('z'=>0);
             $issDataPatch=array('status'=>'否决变更',
                                 'auditrejectdate'=>$this->now,
                                 );
@@ -1097,9 +1078,7 @@ class Dashboard2Controller extends \think\Controller
         case'_ACCEPT':
           //patId!=0,issId!=0
           $oprtCHNStr='领受';
-          
-          $patDataPatch=array('z'=>0);
-          $patRdDataPatch=array('z'=>0);
+        
           $issDataPatch=array('status'=>'申报执行',
                               'operatestartdate'=>$this->now,
                               );
@@ -1113,9 +1092,7 @@ class Dashboard2Controller extends \think\Controller
         case'_REFUSE':
           //patId!=0,issId!=0
           $oprtCHNStr='变更申述';
-          
-          $patDataPatch=array('z'=>0);
-          $patRdDataPatch=array('z'=>0);
+         
           $issDataPatch=array('status'=>'变更申请',
                               'executerchangeto'=>$this->username,
                               );
@@ -1131,9 +1108,6 @@ class Dashboard2Controller extends \think\Controller
           //patId!=0,issId!=0
           $oprtCHNStr='申报执行报告';
           
-          $patDataPatch=array('z'=>0);
-          $patRdDataPatch=array('z'=>0);
-          $issDataPatch=array('z'=>0);
           $issRdDataPatch=array('act'=>$oprtCHNStr,
                                 'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报执行报告</br>
                                 报告简述：<span class="label label-primary">'.$request->param('executeMsg').'</span></br>'
@@ -1146,8 +1120,6 @@ class Dashboard2Controller extends \think\Controller
           //patId!=0,issId!=0
           $oprtCHNStr='申报提交复核';
           
-          $patDataPatch=array('z'=>0);
-          $patRdDataPatch=array('z'=>0);
           $issDataPatch=array('status'=>'申报复核');
           $issRdDataPatch=array('act'=>$oprtCHNStr,
                                 'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报提交复核</br>
@@ -1210,8 +1182,6 @@ class Dashboard2Controller extends \think\Controller
           if($issSet->status=='申报复核'){
             $oprtCHNStr='申报修改';
             
-            $patDataPatch=array('z'=>0);
-            $patRdDataPatch=array('z'=>0);
             $issDataPatch=array('status'=>'申报修改');
             $issRdDataPatch=array('act'=>$oprtCHNStr,
                                   'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报复核结果：</br>
@@ -1396,10 +1366,8 @@ class Dashboard2Controller extends \think\Controller
                 'addnewdate'=>$this->now,
                 
           );
-          //添加到$patData的内容
-          array_push($patData,$patDataPatch);
           //新增                  
-          $patId_return = $patMdl->patCreate($patData);
+          $patId_return = $patMdl->patCreate(array_merge($patData,$patDataPatch));
           return json(array('patId'=>$patId_return));
         }else{
           //2.patrecord表新增
@@ -1416,10 +1384,8 @@ class Dashboard2Controller extends \think\Controller
                 'rolename'=>$auth,
                 
             );
-            //添加到$patRdData的内容
-            array_push($patRdData,$patRdDataPatch);
             //新增patRd
-            $patRdId = $patRdMdl->patRdCreate($patRdData);
+            $patRdId = $patRdMdl->patRdCreate(array_merge($patRdData,$patRdDataPatch));
         
         //3.issinfo表新增
             $issData=array(
@@ -1435,10 +1401,8 @@ class Dashboard2Controller extends \think\Controller
                     'dept'=>$this->dept,
             
             );
-            //添加到$issData的内容
-            array_push($issData,$issDataPatch);
             //新增issPat
-            $issId_return = $issMdl->issCreate($issData); 
+            $issId_return = $issMdl->issCreate(array_merge($issData,$issDataPatch)); 
         
         //4.issrecord表新增
             //取出新增的isspat内容
@@ -1454,10 +1418,8 @@ class Dashboard2Controller extends \think\Controller
                 'username'=>$this->username,
                 'rolename'=>$auth,               
             );
-            //添加到$issRdData的内容
-            array_push($issRdData,$issRdDataPatch);
             //新增issRd
-            $issRdId = $issRdMdl->issRdCreate($issRdData);
+            $issRdId = $issRdMdl->issRdCreate(array_merge($issRdData,$issRdDataPatch));
         }
       }else if($oprt=='_ADDRENEW'){
         //patId!=0,issId=0
@@ -1479,10 +1441,8 @@ class Dashboard2Controller extends \think\Controller
                 'dept'=>$this->dept,
         
         );
-        //添加到$issData的内容
-        array_push($issData,$issDataPatch);   
         //新增
-        $issId_return = $issMdl->issCreate($issData);  
+        $issId_return = $issMdl->issCreate(array_merge($issData,$issDataPatch));  
         
         //4.issrecord表新增
         //取出新增的isspat内容
@@ -1498,10 +1458,8 @@ class Dashboard2Controller extends \think\Controller
                 'username'=>$this->username,
                 'rolename'=>$auth,               
         );
-        //添加到$issRdData的内容
-        array_push($issRdData,$issRdDataPatch);   
         //新增
-        $issRdId = $issRdMdl->issRdCreate($issRdData);
+        $issRdId = $issRdMdl->issRdCreate(array_merge($issRdData,$issRdDataPatch));
         
       }else if($oprt=='_DELETE'){
         //$patId!=0,$issId!=0
@@ -1524,72 +1482,20 @@ class Dashboard2Controller extends \think\Controller
       
       }else{
         //$patId!=0,$issId!=0
-        //1.patinfo表更新
-        $patData=array(                
-                'status'=>'续费中',
-                'renew_createdate'=>$this->now,
-        );
-        //添加到$patData的内容
-        array_push($patData,$patDataPatch);          
-        //更新
-        $patId_return = $patMdl->patUpdate($patData,$patId);
+        $patSet=$issMdl->where('id',$patId)->find();
+        $issSet=$issMdl->where('id',$issId)->find();
         
-        //2.patrecord表新增
-        $patSet=$patMdl->where('id',$patId)->find();
-        $patRdData=array(
-                'patinfo_id'=>$patId_return,
-                'num'=>$patSet->patnum,
-                'act'=>'续费',
-                'actdetail'=>'专利《'.$patSet->topic.'》续费',
-                'acttime'=>$this->now,
-                'username'=>$this->username,
-                'rolename'=>$auth,
-                
-        );
-        //添加到$patRdData的内容
-        array_push($patRdData,$patRdDataPatch);  
-            
-        //新增
-        $patRdId = $patRdMdl->patRdCreate($patRdData);
+        //1.删除pat
+        $patId_return=$patMdl->patDelete($patId);
         
-        //3.issinfo表更新
-        $issData=array(
-                'issmap_type'=>$request->param('issType'),
-                'topic'=>$request->param('issPatTopic'),
-                'abstract'=>$request->param('issPatAbstract'),
-                
-                'issmap_id'=>$patId_return,
-                'addnewdate'=>$this->now,
-                'status'=>'拟续费',
-                'writer'=>$this->username,
-                'dept'=>$this->dept,
+        //2.删除patRd
+        $patRdId_return=$patRdMdl->where('patinfo_id',$patId)->delete();
         
-        );
-        //添加到$issData的内容
-        array_push($issData,$issDataPatch);
+        //3.删除iss
+        $issId_return=$issMdl->issDelete($issId);
         
-        //更新
-        $issId_return = $issMdl->issUpdate($issData,$issId); 
-        
-        //4.issrecord表新增
-        //取出新增的isspat内容
-        $issSet = $issMdl->where('id',$issId_return)->find();
-        $msg.='专利事务【新增续费】成功。<br>';  
-            
-        $issRdData=array(
-                'issinfo_id'=>$issId_return,
-                'num'=>$issSet->issnum,
-                'act'=>'拟续费',
-                'actdetail'=>'专利事务《'.$issSet->topic.'》新增填报',
-                'acttime'=>$this->now,
-                'username'=>$this->username,
-                'rolename'=>$auth,               
-        );
-        //添加到$issRdData的内容
-        array_push($issRdData,$ssRdDataPatch);
-        
-        //新增
-        $issRdId = $issRdMdl->issRdCreate($issRdData);
+        //4.删除issRd
+        $issRdId_return=$issRdMdl->where('issinfo_id',$issId)->delete();
         
       }
       
@@ -1600,66 +1506,28 @@ class Dashboard2Controller extends \think\Controller
         $fileStr=$arrAttFileObjStr[$i];
         $name=$arrAttFileName[$i];
         
-        //$file = new FileObj($fileStr); 
-//        //完整的文件名
-//        $name= $file->getFilename();
-//        unset($file);
-        
-        $newDir=ROOT_PATH.DS.'uploads'.DS.$issSet->issnum;
         //有‘temp’字符串才移动到指定目录
         if(substr_count($fileStr,'temp')){
-            if(is_dir($newDir)){
-              rename($fileStr,$newDir.DS.$name);
-            }else{
-              mkdir('..'.DS.'uploads'.DS.'xx',0777);
-              rename($fileStr,$newDir.DS.$name);
-            }
+          $newDir='..'.DS.'uploads'.DS.$issSet->issnum;
+          
+          //调用AttinfoModel中定义的fileMove()方法，返回true后才更新Attinfo表
+          if($attMdl->fileMove($fileStr,$name,$newDir)){
             
-            //移动是否成功：
-            if(file_exists($newDir.DS.$name)){
-              
-              $attData=array(
-              'num_id'=>0,
-              'attmap_id'=>0,
-              'attpath'=>$newDir.DS.$name,
-              'deldisplay'=>0
-              );
-              
-              //添加到$attData的内容,更新att
-              $attId = $attMdl->attUpdate($attData,$arrAttId[0]);
-                          
-              $msg.="附件".$fileStr."移动成功</br>"; 
-              
-            }else{
-              $msg.="附件".$fileStr."移动失败</br>"; 
-            }
-        }
+            $attData=array('num_id'=>$issSet->issnum,
+                            'attmap_id'=>$issSet->id,
+                            'attpath'=>$newDir.DS.$name,
+                          //  'deldisplay'=>0
+                            );
                 
-        //有‘temp’字符串才移动到指定目录
-        if(substr_count($fileObj,'temp')){
-                  
-          //引用attinfo模型中定义的fileMove()方法，将文件从‘temp’目录移动到指定目录
-          $fileMoveResult=$attMdl->fileMove($fileObj,$targetDir);
-                    
-          //移动是否成功：
-          if($fileMoveResult){
-            $attData=array(
-            'num_id'=>$issSet->issnum,
-            'attmap_id'=>$issSet->id,
-            'attpath'=>$targetDir.$fileMoveResult,
-            //'deldisplay'=>0
-            );
-            
-            //添加到$attData的内容,更新att
-            $attId = $attMdl->attUpdate(array_push($attData,$attDataPatch),$arrAttId[$i]);
-                        
-            $msg.="附件".$arrAttFileName[$i]."移动成功<br>"; 
+            //更新att
+            $attId = $attMdl->attUpdate(array_merge($attData,$attDataPatch),$arrAttId[0]);
+                          
+            $msg.="附件".$fileStr."移动成功</br>"; 
           }else{
-            $msg.="附件".$arrAttFileName[$i]."移动失败<br>"; 
+            $msg.="附件".$fileStr."移动失败</br>"; 
           }
-        } 
-      }
-      
+        }
+      } 
 //  <----------------------------------------------------------------------------------------->
        
       //return $msg;
@@ -1729,12 +1597,9 @@ class Dashboard2Controller extends \think\Controller
         $patId=1;
       }     
       
-      $targetDir=ROOT_PATH.'uploads'.DS.'xx'.DS;
-      $resourceDir=ROOT_PATH.'uploads'.DS.'temp'.DS.'20180321'.DS;
       $fileStr='';
-      $newDir='..'.DS.'uploads'.DS.'xx';
-      
-      $fileMoveResult=0;
+      $name='';
+      $newDir='..'.DS.'uploads'.DS.'xx';  
       
       //如果要获取的数据为数组，要加上 /a 修饰符才能正确获取。
       if(!empty($request->param('attId/a'))){
@@ -1744,7 +1609,7 @@ class Dashboard2Controller extends \think\Controller
         
         $fileStr=$arrAttFileObjStr[0];
         $name=$arrAttFileName[0];
-        
+
       }else{
         $arrAttId=array(0);
         $arrAttFileName=array(0);
@@ -1752,36 +1617,27 @@ class Dashboard2Controller extends \think\Controller
       }
       
       //有‘temp’字符串才移动到指定目录
-      if(substr_count($fileStr,'temp')){
-          if(is_dir($newDir)){
-            rename($fileStr,$newDir.DS.$name);
-          }else{
-            mkdir('..'.DS.'uploads'.DS.'xx',0777);
-            rename($fileStr,$newDir.DS.$name);
-          }
+        if(substr_count($fileStr,'temp')){
           
-          //移动是否成功：
-          if(file_exists($newDir.DS.$name)){
+          //调用AttinfoModel中定义的fileMove()方法，返回true后才更新Attinfo表
+          if($attMdl->fileMove($fileStr,$name,$newDir)){
             
-            $attData=array(
-            'num_id'=>0,
-            'attmap_id'=>0,
-            'attpath'=>$newDir.DS.$name,
-            'attfilename'=>$name,
-            'deldisplay'=>0
-            );
-            
-            //添加到$attData的内容,更新att
+            $attData=array('num_id'=>0,
+                            'attmap_id'=>0,
+                            'attpath'=>$newDir.DS.$name,
+                            'deldisplay'=>0
+                            );
+                
+            //更新att
             $attId = $attMdl->attUpdate($attData,$arrAttId[0]);
-                        
+                          
             $msg.="附件".$fileStr."移动成功</br>"; 
-            
           }else{
             $msg.="附件".$fileStr."移动失败</br>"; 
           }
         }
       
-      $data=array('msg'=>$msg,'topic'=>$request->param('issPatTopic'),'patId'=>$patId,'attId'=>$arrAttId,'fileName'=>$name,'targetDir'=>$targetDir,'fileMoveResult'=>$fileMoveResult);
+      $data=array('msg'=>$msg,'topic'=>$request->param('issPatTopic'),'patId'=>$patId,'attId'=>$arrAttId);
       return json($data);
       //return $data;
     } 

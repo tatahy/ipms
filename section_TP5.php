@@ -1123,10 +1123,13 @@ request数组
 <!--  HY 2018/3/21 -->
 移动文件，上传到服务器的文件要改变存放目录
 <?php
+//通过命名空间引入TP5内置的File对象重新命名为FileObj
+use think\File as FileObj; 
+
 //方法一： 应用php原生的raname()函数，应确保newDir存在，否则应先创建newDir
 	rename('oldDir\fileOldName','newDir\fileNewName');
 	
-	//注意：在应用rename()移动文件时，要确保该文件没有被打开或该文件对象已被释放，如下语句在tp5中会报错
+	//注意：在应用rename()移动文件时，要确保该文件没有被打开或该文件对象已被释放，如下语句在tp5中会报错[code 32]
 	$fileStr='oldDir\fileOldName';
 	$file = new FileObj($fileStr); 
 	rename('oldDir\fileOldName','newDir\fileNewName');
@@ -1144,13 +1147,117 @@ request数组
 	//删除原文件 
 	unlink($fileStr);
 	
+	$fileObj= new FileObj($fileStr);
+    //得到文件的md5散列值,32位16进制数
+	$fileMd5=$fileObj->hash('md5');
+	//得到文件的sha1散列值,40位16进制数
+    $fileSha1=$fileObj->hash('sha1');
+	
+	
 //说明：
 //1.对于文件，rename可以在不同盘符之间移动
 //2.对于空文件夹，rename也可在不同盘符之间移动，但目标文件夹的父目录必须存在。
 //3.对于非空文件夹，只能在同一盘符下移动。
 //4.对于几十M的文件，rename比copy+unlink快上百倍。
+
+//PHP原生dirname(),给出一个包含有指向一个文件的全路径的字符串，本函数返回去掉文件名后的目录名。 
+dirname($fileStr);
+
+//PHP原生basename(),给出一个包含有指向一个文件的全路径的字符串，本函数返回基本的文件名。 
+basename($fileStr);
+
+//PHP原生scandir(dir),返回一个 array，包含有 dir中的文件和目录。
+$dir    = '/tmp';
+$files1 = scandir($dir);
+$files2 = scandir($dir, 1);
+
+print_r($files1);
+print_r($files2);
+
+//$files1输出：按字母升序
+/* Array
+(
+   [0] => .
+   [1] => ..
+   [2] => bar.php
+   [3] => foo.txt
+   [4] => somedir
+) 
+
+//$files2输出：按字母降序
+Array
+(
+    [0] => somedir
+    [1] => foo.txt
+    [2] => bar.php
+    [3] => ..
+    [4] => .
+)
+
+
+*/
+
 ?>
 
-<!--/  HY 2018/3/15 -->
+<!--/  HY 2018/3/21 -->
 
+
+<!--  HY 2018/3/22 -->
+TP5内置的上传(\library\think\File.php)只是上传到本地服务器，上传到远程或者第三方平台的话需要自己扩展。
+
+上传成功后返回的仍然是一个File对象，除了File对象自身的方法外，并且可以使用PHP原生SplFileObject的属性和方法，便于进行后续的文件处理。
+
+上传文件的唯一性
+系统默认提供了几种上传命名规则，包括：
+规则	描述
+date	根据日期和微秒数生成
+md5	    对文件使用md5_file散列生成
+sha1	对文件使用sha1_file散列生成
+<?php
+// 获取表单上传文件 例如上传了001.jpg
+$fileSet = request()->file('image');
+
+// 移动到框架根目录的uploads/temp/ 目录下,系统默认使用date规则，在上传目录下面生成以当前日期为子目录，以微秒时间的md5编码为文件名的文件，例如，下面语句执行后生成的文件名可能是：“../uploads/temp/20160510/42a79759f284b767dfcb2a0197904287.jpg”
+
+$info = $fileSet->validate(['size'=>10485760,'ext'=>'jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,rar'])->move(ROOT_PATH.'uploads'.DS.'temp');
+
+//应用uniqid规则，生成的文件名类似于：“../uploads/temp/573d3b6d7abe2.jpg”，是应用的php原生uniqid()函数（以微秒计的当前时间，生成一个唯一的13位ID）得到的文件名
+$info = $fileSet->rule('uniqid')->validate(['size'=>10485760,'ext'=>'jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,rar'])->move(ROOT_PATH.'uploads'.DS.'temp');
+
+//应用md5规则，生成的文件名类似于：“../uploads/temp/72/ef580909368d824e899f77c7c98388.jpg”，md5和sha1规则会自动以散列值的前两个字符作为子目录，后面的散列值作为文件名。
+$info = $fileSet->rule('md5')->validate(['size'=>10485760,'ext'=>'jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,rar'])->move(ROOT_PATH.'uploads'.DS.'temp');
+
+// 移动到服务器的上传目录,并且使用原文件名
+$file->move('/home/www/upload/','');
+
+// 移动到服务器的上传目录,并且设置不覆盖
+$file->move('/home/www/upload/',true,false);
+
+//获取文件hash散列值
+
+// 移动到服务器的上传目录 并且使用原文件名
+$upload = $file->move('/home/www/upload/');
+// 获取上传文件的hash散列值
+echo $upload->hash('sha1');
+echo $upload->hash('md5');
+
+//PHP原生hash_file()/md5_file()函数获取文件的散列值，得到md5散列值(32位十六进制数字)
+hash_file('md5', 'example.txt');
+md5_file('example.txt');
+
+//PHP原生sha1_file()函数获取文件的散列值，得到sha1散列值(40位十六进制数字)。
+sha1_file('example.txt');
+
+?>
+
+
+
+<!--/  HY 2018/3/21 -->
+
+
+<input name="attId[]" value="{$vo.id}" type="text" class="sr-only">
+<input name="attFileObjStr[]" value="{$vo.attpath}" type="text" class="sr-only">
+<input name="attFileName[]" value="{$vo.attfilename}" type="text" class="sr-only">
+
+'<input name="attFileName[]" value="'+data.attpath+'" type="text" class="sr-only">
 

@@ -197,9 +197,12 @@ class Attinfo extends Model
     {
 
       if(!empty($fileSet)){
-            // 移动到框架根目录的uploads/temp/ 目录下,系统重新命名文件名
-            $info = $fileSet->validate(['size'=>10485760,'ext'=>'jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,rar'])
-                        ->move(ROOT_PATH.'uploads'.DS.'temp');
+            // 移动到框架根目录的uploads/temp/ 目录下,并且使用md5规则重新命名文件。
+            //新命名文件所在目录类似temp/72/ef580909368d824e899f77c7c98388.jpg 
+            $info = $fileSet->rule('md5')
+                            ->validate(['size'=>10485760,'ext'=>'jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,rar'])
+                            ->move(ROOT_PATH.'uploads'.DS.'temp');
+            
         }else{
             $this->error('未选择文件，请选择需上传的文件。');
         }
@@ -215,7 +218,7 @@ class Attinfo extends Model
             
             $path= '..'.DS.'uploads'. DS.'temp'.DS.$info->getSaveName();
             
-            $attId=$this->attCreate(array_merge($data,array('attpath'=>$path,'attfilename'=>$info->getSaveName())));
+            $attId=$this->attCreate(array_merge($data,array('attpath'=>$path,'attfilename'=>$info->getFileName())));
             
             $att = $this->get($attId); 
       
@@ -231,32 +234,37 @@ class Attinfo extends Model
     
     /**
      * 移动附件文件到目标目录
-     * @param  Object $fileObj  文件对象
-     * @param  string $targetDir 移动的目标目录
-     * @return Object|string  成功：返回完整的文件名，未成功：返回未成功信息
+     * @param  string $fileStr    指向一个文件的全路径的字符串
+     * @param  string $name       文件名
+     * @param  string $targetDir  目标文件夹
+     * @return Object|string      成功：返回true，未成功：返回false
      *
      */
-     public function fileMove($fileObj,$targetDir)
+     public function fileMove($fileStr,$name,$targetDir)
     {
-      //得到文件对象
-      $file = new FileObj($fileObj); 
-      // 完整的文件名
-      $name= $file->getFilename(); 
-      
-      //文件移动到$targetDir目录
-      $fileMove=$file->move($targetDir,$name);
-      
-      //引用attinfo模型中定义的方法向attinfo表更新信息
-     // $attId = $this->attUpdate(array('attpath'=>$targetDir.$name),$id);
-      
-      if($fileMove){
-        //返回文件名
-        return $name;
-      }else{
-        return false;
-      }
-      
+          $fileDir=dirname($fileStr);
+          //新目录是否存在
+          if(is_dir($targetDir)){
+            rename($fileStr,$targetDir.DS.$name);
+          }else{
+            mkdir($targetDir,0777);
+            rename($fileStr,$targetDir.DS.$name);
+          }
+          
+          //删除旧目录，若旧目录为空目录
+          if(count(scandir($fileDir)==2)){
+            rmdir($fileDir);
+          }
+          
+          //文件存在返回true
+          if(file_exists($targetDir.DS.$name)){
+            return true;
+          }else{
+            return false;
+          }
     }
+      
+    
 
 }
 

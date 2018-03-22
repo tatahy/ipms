@@ -345,8 +345,8 @@ $(document).ready(function(){
 			
 			var btnHtml='<span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:16px;">'+$(this).html()+'</span>《'+topic+'》';
 
-			<!-- var url='issPatOprt'; -->
-			var url='test';
+			var url='issPatOprt';
+			<!-- var url='test'; -->
 			
 			
 			//预处理3个表单的数据,利用自定义的serializeJson()函数
@@ -455,10 +455,11 @@ $(document).ready(function(){
 	//上传附件文件
 	$('#btnAttFileUpload').click(function(){
 		
-		<!-- //触发#fmAttFileUpload的提交事件 -->
+		//防止触发#fmAttFileUpload的提交事件
 		$('#fmAttFileUpload').submit(function(evt){
 		
 			evt.preventDefault();
+		});
 			
 			var formData = new FormData($('#fmAttFileUpload')[0]);
 			
@@ -478,7 +479,7 @@ $(document).ready(function(){
 				success: function(data){
 					<!-- $('#divUpLoadProcess1').text('【附件上传】成功') -->
 					//列表增加上传文件内容
-					$('tr:last').after('<tr class=""><td>'+($('#tbattFileList').children('tr').length+1)+'<input name="attId[]" value="'+data.id+'" type="text" class="sr-only"></td><td>'+data.atttype+'</td><td>'+data.name+'<input name="attFileName[]" value="'+data.attpath+'" type="text" class="sr-only"></td><td>'+data.uploaddate+'</td><td>'+data.uploader+'</td><td>'+data.rolename+'</td><td><a href="{$home}/attachment/index/download/id/'+data.id+'" target="_blank">下载</a>&nbsp;<a href="{$home}/attachment/index/delete/id/'+data.id+'" target="_blank">删除</a>&nbsp;</td></tr>');
+					$('tr:last').after('<tr class=""><td>'+($('#tbattFileList').children('tr').length+1)+'<input name="attId[]" value="'+data.id+'" type="text" class="sr-only"><input name="attFileObjStr[]" value="'+data.attpath+'" type="text" class="sr-only"><input name="attFileName[]" value="'+data.attfilename+'" type="text" class="sr-only"></td><td>'+data.atttype+'</td><td>'+data.name+'</td><td>'+data.uploaddate+'</td><td>'+data.uploader+'</td><td>'+data.rolename+'</td><td><a href="{$home}/attachment/index/download/id/'+data.id+'" target="_blank">下载</a>&nbsp;<a href="{$home}/attachment/index/delete/id/'+data.id+'" target="_blank">删除</a>&nbsp;</td></tr>');
 					
 					//所有的行去掉颜色
 					$('tr').removeClass('bg-warning');
@@ -504,13 +505,17 @@ $(document).ready(function(){
 					//input变为“无”选中；
 					$('input:radio[name="attUpload"][value="0"]').prop('checked',true);
 					
+					//#modalIssPatAuthSingle,show
+					$('#modalIssPatAuthSingle').modal('show');
+					
 				},
 				error: function(){
+					//#modalIssPatAuthSingle,hide
+					$('#modalIssPatAuthSingle').modal('hide');
 					$.alert('【附件上传】失败');
 				}
 		
 			});	
-		});
 	
 	});
 	//检查form里的input（class="empty-check"）是否为空，为空做出'has-error'和tooltip提示，不为空去掉'has-error'和tooltip提示
