@@ -170,18 +170,26 @@ class Attinfo extends Model
     }
     
      /**
-     * 删除attachment。
+     * 删除attachment记录及其对应的附件文件和目录
      * @param  integer $attId 删除attachment的id
-     * @return integer|bool  删除成功返回主键，未成功返回false
-     *
+     * @return integer|bool  删除成功返回true，未成功返回false
+     *  考虑应用TP5的软删除进行改进，？？？2018/3/23
      */
-    public function attDelete($attId)
+    public function attDelete($attMapId)
     {
-        //delete()方法返回的是受影响记录数
-        $result = $this->where('id',$attId)->delete();
-        if ($result) {
+        $att=$this->where('attmap_id',$attMapId)->select();
+        //默认查询出的所有记录对应的附件文件都在同一个目录下
+        $fileDir=dirname($att[0]->attpath);
+        //引用本模型中定义的fileDelete方法删除记录和附件文件
+        for($i=0;$i<count($att);$i++){
+          $this->fileDelete($att[i]->id);
+        }
+        
+        //删除目录，若旧目录为空目录
+        if(count(scandir($fileDir)==2)){
+            rmdir($fileDir);
             return true;
-        } else {
+        }else {
             return false;
         }
     }
@@ -254,6 +262,9 @@ class Attinfo extends Model
           //删除旧目录，若旧目录为空目录
           if(count(scandir($fileDir)==2)){
             rmdir($fileDir);
+          }else{
+            //旧目录不为空，返回true
+            return true;
           }
           
           //文件存在返回true
@@ -262,6 +273,23 @@ class Attinfo extends Model
           }else{
             return false;
           }
+    }
+    
+     //删除单一文件及其记录
+    public function fileDelete($attId)
+    {
+        $att= $this->where('id',$attId)->find();
+        $attpath=$att->attpath;
+        $name=$att->name;
+        //删除attachment表中的附件文件记录
+        $this->where('id',$attId)->delete();
+        //删除文件，成功后返回
+        if(file_exists($attpath)){
+          unlink($attpath);
+          $this->success("删除文件'".$name."'成功。");	
+        }else{
+          $this->error("未删除文件'".$name."'");	
+        }
     }
       
     

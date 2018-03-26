@@ -101,9 +101,11 @@ class Patrecord extends Model
      * @return integer|bool  更新成功返回主键，未更新返回false
      * 要求：传入的数组下标名与模型属性名（数据表字段名）一模一样。
      */
-    public function patRdUpdate($data = [],$id)
+    public function patRdUpdate($data = [],$patId)
     {
-        $result = $this::get($id)->allowField(true)->save($data);
+       $idmax=$this::all('patinfo_id',$patId)->max('id');
+       
+       $result = $this::get($idmax)->allowField(true)->save($data);
         //$patRd=$this::get($id);
 //        $result = $patRd->allowField(true)->data($data, true)->save();
         if ($result) {
@@ -117,12 +119,12 @@ class Patrecord extends Model
      * 删除patentRecord。
      * @param  integer $patId 删除patent的id
      * @return integer|bool  删除成功返回主键，未成功返回false
-     *
+     *  考虑应用TP5的软删除进行改进，？？？2018/3/23
      */
     public function patRdDelete($patId)
     {
         //delete()方法返回的是受影响记录数
-        $result = $this->where('id',$patId)->delete();
+        $result = $this->where('patinfo_id',$patId)->delete();
         if ($result) {
             return true;
         } else {

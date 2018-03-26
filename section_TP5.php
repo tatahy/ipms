@@ -28,7 +28,8 @@ $user->allowField(true)
 User::create(request()->param(), ['nickname', 'address']);
 User::update(request()->param(), ['id' => 1], ['nickname', 'address']);
 
-<!-- TP5 同样可以传入true表示过滤非数据表字段 -->
+// TP5 同样可以传入true表示过滤非数据表字段 
+
 User::create(request()->param(), true);
 User::update(request()->param(), ['id' => 1], true);
 

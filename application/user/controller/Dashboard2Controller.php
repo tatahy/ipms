@@ -338,14 +338,21 @@ class Dashboard2Controller extends \think\Controller
         return $result;
     }
     
-    // 向前端返回查询的operator信息
-     public function selectOperator()
+    // 向前端返回查询的Executer信息
+     public function selectExecuter()
     {
       $this->_loginUser();
-      
-      $operator=UserModel::where('rolety_id','7')->where('enable','1')->order('dept', 'asc')->select();
+      //查出所有未禁用的用户
+      $user=UserModel::where('enable','1')->order('dept', 'asc')->select();
+      $executer=array();
+      foreach($user as $v){
+        //用户在operator用户组(usergroupid=4)中：即是usergroup_id字段含有'4'
+        if(strstr($v->usergroup_id,'4')){
+            array_push($executer,$v);
+        }
+      }
       // 将数组转化为json
-      return json($operator);
+      return json($executer);
       
     }
     
@@ -383,26 +390,37 @@ class Dashboard2Controller extends \think\Controller
         //done
         $map['status'] ='完结';
         
+        // $auth接收前端页面传来的auth值,表示rolename（映射“用户组名”）
+        if(!empty($request->param('auth'))){
+          $auth=$request->param('auth');
+        }else{
+          $auth='_NONE';
+        }
+        
         if($this->auth['authiss']['edit']){
           $numIssPatEdit=$issSet->where($mapEdit)->count(); 
+          $auth='_EDIT';
         }else{
           $numIssPatEdit=0;
         }
         
         if($this->auth['authiss']['audit']){
-          $numIssPatAudit=$issSet->where($mapAudit)->count(); 
+          $numIssPatAudit=$issSet->where($mapAudit)->count();
+          $auth='_AUDIT'; 
         }else{
           $numIssPatAudit=0;
         }
         
         if($this->auth['authiss']['approve']){
-          $numIssPatApprove=$issSet->where($mapApprove)->count(); 
+          $numIssPatApprove=$issSet->where($mapApprove)->count();
+          $auth='_APPROVE'; 
         }else{
           $numIssPatApprove=0;
         }
         
         if($this->auth['authiss']['execute']){
-          $numIssPatExecute=$issSet->where($mapExecute)->count(); 
+          $numIssPatExecute=$issSet->where($mapExecute)->count();
+          $auth='_EXECUTE'; 
         }else{
           $numIssPatExecute=0;
         }
@@ -410,11 +428,11 @@ class Dashboard2Controller extends \think\Controller
         if($this->auth['authiss']['maintain']){
           $numIssPatMaintain=$issSet->where($mapMaintain)->count(); 
           //得到满足续费条件的专利数
-          $today=date('Y-m-d');
           $deadline=date('Y-m-d',strtotime("+6 month"));
           $mapRenew['status'] =['in',['授权','续费授权']];          
           // 查出满足条件的patent
-          $numPatRenewTotal= PatinfoModel::where($mapRenew)->where('renewdeadlinedate','between time',[$today,$deadline])->count();
+          $numPatRenewTotal= PatinfoModel::where($mapRenew)->where('renewdeadlinedate','between time',[$this->today,$deadline])->count();
+          $auth='_MAINTAIN';
         }else{
           $numIssPatMaintain=0;
           $numPatRenewTotal=0;
@@ -447,7 +465,10 @@ class Dashboard2Controller extends \think\Controller
           'role1st'=>$roles[0],
   
           //向前端权限变量赋值
-          'authArray'=>$this->auth, 
+          //所有权限
+          'authArray'=>$this->auth,
+          //当前权限
+          'auth'=>$auth,  
           
           'numIssPatEdit'=>$numIssPatEdit,
           'numIssPatAudit'=>$numIssPatAudit,
@@ -787,12 +808,13 @@ class Dashboard2Controller extends \think\Controller
     }
     
     //根据前端传来的操作类型，对数据库进行操作
+    //结构：1.变量赋初值  //结构2.20个oprt接收前端页面传来的数据，分别对变量赋值再进行数据库表的操作
     public function issPatOprt(Request $request,IssinfoModel $issMdl,IssrecordModel $issRdMdl,
-                                PatinfoModel $patMdl,PatrecordModel $patRdMdl,
-                                AttinfoModel $attMdl)
+                                PatinfoModel $patMdl,PatrecordModel $patRdMdl,AttinfoModel $attMdl)
     {
       $this->_loginUser();
       
+      //结构：1.变量赋初值 
       // $oprt接收前端页面传来的oprt值
       if(!empty($request->param('oprt'))){
         $oprt=$request->param('oprt');
@@ -800,7 +822,7 @@ class Dashboard2Controller extends \think\Controller
         $oprt='_NONE';
       }
       
-      // $auth接收前端页面传来的auth值
+      // $auth接收前端页面传来的auth值,表示rolename（映射“用户组名”）
       if(!empty($request->param('auth'))){
         $auth=$request->param('auth');
       }else{
@@ -821,6 +843,7 @@ class Dashboard2Controller extends \think\Controller
         $issId=0;
       }
       
+     //接收前端页面传来的附件文件信息
      //如果要通过$request->param()获取的数据为数组，要加上 /a 修饰符才能正确获取。
       if(!empty($request->param('attId/a'))){
         $arrAttId=$request->param('attId/a');
@@ -832,562 +855,97 @@ class Dashboard2Controller extends \think\Controller
         $arrAttFileObjStr=array(0);;
       }
       
-      //变量赋初值
+      //涉及数据库5个数据表的变量赋初值
       $issData=array('z'=>0);
-      $issDataPatch=array('z'=>0);
       $issRdData=array('z'=>0);
-      $issRdDataPatch=array('z'=>0);
+      if($issId){
+        //issrecord新增时需patch的数据
+        $issRdDataPatch=array('acttime'=>$this->now,
+                              'username'=>$this->username,
+                              'rolename'=>$auth,
+                              'issinfo_id'=>$issId,
+                              'num'=>$issMdl::get($issId)->issnum
+                              );
+        $issStatus=$issMdl::get($issId)->status;
+      }else{
+        $issRdDataPatch=array('z'=>0);
+        $issStatus=0;
+        
+      }
       $issId_return=0;
       
       $patData=array('z'=>0);
-      $patDataPatch=array('z'=>0);
       $patRdData=array('z'=>0);
-      $patRdDataPatch=array('z'=>0);
+      if($patId){
+        //patrecord新增时需patch的数据
+        $patRdDataPatch=array('acttime'=>$this->now,
+                              'username'=>$this->username,
+                              'rolename'=>$auth,
+                              'patinfo_id'=>$patId,
+                              'num'=>$patMdl::get($patId)->patnum
+                              );
+      }else{
+        $patRdDataPatch=array('z'=>0);
+      }
       $patId_return=0;
       
       $attData=array('z'=>0);
       $attDataPatch=array('z'=>0);
-      $attId_return=0;
-      
-     // $issMdlOprt='';
-//      $patMdlOprt='';
-//      $attMdlOprt='';
       
       $oprtCHNStr='';
       
       $msg="";
-      //$tplFile='dashboard2'.DS.'issPatAuthSingle'.DS;
       
+//<结构2.----------------------------------------------------------------------------------------->
+//20个oprt接收前端页面传来的数据，分别对变量赋值再进行数据库表的操作
       switch($oprt){
         //“_EDIT”权限拥有的操作
         case'_ADDNEW':
           //patId=0,issId=0
           $oprtCHNStr='新增';
-          $attDataPatch=array('deldisplay'=>1);
-          
-        break;
-        
-        case'_SUBMIT':
-          //patId!=0,issId!=0
-          $oprtCHNStr='提交';
-          
-          $patDataPatch=array('status'=>'内审',
-                              'submitdate'=>$this->now,
-                              );
-          $patRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利《'.$request->param('patTopic').'》提交。待内部审查<br>',
-                                );
-          $issDataPatch=array('status'=>'待审核',
-                              'submitdate'=>$this->now,
-                              );
-          $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》提交审核。',
-                                );
-          $attDataPatch=array('deldisplay'=>0);
-          
-        break;
-        
-        case'_DELETE':
-          //patId!=0,issId!=0
-          $oprtCHNStr='删除';
-        break;
-        
-        case'_UPDATE':
-          //patId!=0,issId!=0
-          $oprtCHNStr='更新';
-
-          $attDataPatch=array('deldisplay'=>1);
-          
-        break;
-        //“_AUDIT”权限拥有的操作
-        case'_PASS':
-          //patId!=0,issId!=0
-          $oprtCHNStr='审核';
-
-          $issDataPatch=array('status'=>'审核通过',
-                              'auditrejectdate'=>$this->now,
-                              );
-          $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审核结果：</br>
-                                              <span class="label label-success">审核通过</span></br>'
-                                );
-          $attDataPatch=array('deldisplay'=>0);
-          
-        break;
-        
-        case'_FAIL':
-          //patId!=0,issId!=0
-          $oprtCHNStr='审核';
-          
-          $issDataPatch=array('status'=>'审核未通过',
-                              'auditrejectdate'=>$this->now,
-                              );
-          $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审核结果：</br>
-                                              <span class="label label-warning">审核未通过</span></br>
-                                              审核意见：<span class="label label-primary">'.$request->param('auditMsg').'</span></br>',
-                                );
-          $attDataPatch=array('deldisplay'=>0);
-          
-        break;
-        
-        case'_MODIFY':
-          //patId!=0,issId!=0
-          $oprtCHNStr='审核';
-          
-          $patDataPatch=array('status'=>'内审修改');
-          $patRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利《'.$request->param('patTopic').'》审核结果：</br>
-                                              <span class="label label-primary">内审修改</span></br>
-                                              审核意见：<span class="label label-primary">'.$request->param('auditMsg').'</span></br>',
-                                );
-          $issDataPatch=array('status'=>'返回修改',
-                              'auditrejectdate'=>$this->now,
-                              );
-          $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审核结果：</br>
-                                              <span class="label label-primary">返回修改</span></br>
-                                              审核意见：<span class="label label-primary">'.$request->param('auditMsg').'</span></br>',
-                                );
-          $attDataPatch=array('deldisplay'=>0);
-         
-        break;
-        //“_APPROVE”权限拥有的操作
-        case'_PERMIT':
-          //patId!=0,issId!=0
-          $oprtCHNStr='审批';
-          //根据iss.status的值进行赋值
-          $issSet=$issMdl->where('id',$issId)->find();
-          
-          if($issSet->status=='审核通过' || $issSet->status=='审核未通过' ){
-            $patDataPatch=array('status'=>'拟申报(内审批准)',
-                                'auditrejectdate'=>$this->now,
-                                );
-            $patRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利《'.$request->param('patTopic').'》审批结果：</br>
-                                              <span class="label label-success">拟申报(内审批准)</span></br>'
-                                  );
-            $issDataPatch=array('status'=>'批准申报');
-            $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审批结果：</br>
-                                              <span class="label label-success">批准申报</span></br>'
-                                  );
-            
-          }else if($issSet->status=='变更申请'){
-            $issDataPatch=array('status'=>'准予变更',
-                                'auditrejectdate'=>$this->now,
-                                );
-            $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审批结果：</br>
-                                              <span class="label label-success">准予变更</span></br>'
-                                  );
-          }else{
-            //$issSet->status=='拟续费'
-            $issDataPatch=array('status'=>'准予续费',
-                                'auditrejectdate'=>$this->now,
-                                );
-            $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审批结果：</br>
-                                              <span class="label label-success">准予续费</span></br>'
-                                  );
-          }
-          $attDataPatch=array('deldisplay'=>0);
-          
-        break;
-        
-        case'_VETO':
-          //patId!=0,issId!=0
-          $oprtCHNStr='审批';
-          
-           //根据iss.status的值进行赋值
-          $issSet=$issMdl->where('id',$issId)->find();
-          
-          if($issSet->status=='审核通过' || $issSet->status=='审核未通过' ){
-            $patDataPatch=array('status'=>'内审否决');
-            $patRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利《'.$request->param('patTopic').'》审批结果：</br>
-                                              <span class="label label-danger">内审否决</span></br>
-                                              审批意见：<span class="label label-primary">'.$request->param('approveMsg').'</span></br>'
-                                  );
-            $issDataPatch=array('status'=>'否决申报',
-                                'auditrejectdate'=>$this->now,
-                                );
-            $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审批结果：</br>
-                                              <span class="label label-danger">否决申报</span></br>
-                                              审批意见：<span class="label label-primary">'.$request->param('approveMsg').'</span></br>'
-                                  );
-            
-          }else if($issSet->status=='变更申请'){
-            $issDataPatch=array('status'=>'否决变更',
-                                'auditrejectdate'=>$this->now,
-                                );
-            $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                  'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审批结果：</br>
-                                              <span class="label label-danger">否决变更</span></br>
-                                              审批意见：<span class="label label-primary">'.$request->param('approveMsg').'</span></br>'
-                                  );
-          }else{
-            //$issSet->status=='拟续费'
-            $patDataPatch=array('status'=>'放弃续费');
-            $patRdDataPatch=array('act'=>$oprtCHNStr,
-                                  'actdetail'=>'专利《'.$request->param('patTopic').'》续费审批结果：</br>
-                                              <span class="label label-default">放弃续费</span></br>
-                                              审批意见：<span class="label label-default">'.$request->param('approveMsg').'</span></br>'
-                                  );
-            $issDataPatch=array('status'=>'放弃续费',
-                                'auditrejectdate'=>$this->now,
-                                );
-            $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审批结果：</br>
-                                              <span class="label label-default">放弃续费</span></br>
-                                              审批意见：<span class="label label-default">'.$request->param('approveMsg').'</span></br>'
-                                  );
-          }
-          $attDataPatch=array('deldisplay'=>0);
-          
-        break;
-        
-        case'_COMPLETE':
-          //patId!=0,issId!=0
-         $oprtCHNStr='审批';
-          
-          //根据iss.status的值进行赋值
-          //$issSet=$issMdl->where('id',$issId)->find();
-          
-          //$issSet->status=='审核通过' || $issSet->status=='审核未通过' ){
-          $patDataPatch=array('status'=>'内审修改');
-          $patRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利《'.$request->param('patTopic').'》审批结果：</br>
-                                              <span class="label label-warning">内审修改</span></br>
-                                              审批意见：<span class="label label-primary">'.$request->param('approveMsg').'</span></br>'
-                                  );
-          $issDataPatch=array('status'=>'修改完善',
-                                'auditrejectdate'=>$this->now,
-                                );
-          $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审批结果：</br>
-                                              <span class="label label-warning">修改完善</span></br>
-                                              审批意见：<span class="label label-primary">'.$request->param('approveMsg').'</span></br>'
-                                  );
-            
-          $attDataPatch=array('deldisplay'=>0);
-          
-        break;
-        //“_EXECUTE”权限拥有的操作
-        case'_ACCEPT':
-          //patId!=0,issId!=0
-          $oprtCHNStr='领受';
-        
-          $issDataPatch=array('status'=>'申报执行',
-                              'operatestartdate'=>$this->now,
-                              );
-          $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报开始</br>'
-                                );
-          $attDataPatch=array('deldisplay'=>0);
-          
-        break;
-        
-        case'_REFUSE':
-          //patId!=0,issId!=0
-          $oprtCHNStr='变更申述';
-         
-          $issDataPatch=array('status'=>'变更申请',
-                              'executerchangeto'=>$this->username,
-                              );
-          $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报变更申请</br>
-                                变更申请意见：<span class="label label-warning">'.$request->param('executeMsg').'</span></br>'
-                                );
-          $attDataPatch=array('deldisplay'=>0);
-          
-        break;
-        
-        case'_REPORT':
-          //patId!=0,issId!=0
-          $oprtCHNStr='申报执行报告';
-          
-          $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报执行报告</br>
-                                报告简述：<span class="label label-primary">'.$request->param('executeMsg').'</span></br>'
-                                );
-          $attDataPatch=array('deldisplay'=>0);
-          
-        break;
-        
-        case'_FINISH':
-          //patId!=0,issId!=0
-          $oprtCHNStr='申报提交复核';
-          
-          $issDataPatch=array('status'=>'申报复核');
-          $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报提交复核</br>
-                                提交内容简述：<span class="label label-primary">'.$request->param('executeMsg').'</span></br>'
-                                );
-          $attDataPatch=array('deldisplay'=>0);
-          
-        break;
-        //“_MAINTAIN”权限拥有的操作
-        case'_APPLY':
-          //patId!=0,issId!=0
-          $oprtCHNStr='<span class="label label-primary">申报正式提交</span>';
-          
-           //根据iss.status的值进行赋值
-          $issSet=$issMdl->where('id',$issId)->find();
-          
-          if($issSet->status=='申报复核'){
-            $patDataPatch=array('status'=>'申报',
-                                'applydate'=>$this->now,
-                                );
-            $patRdDataPatch=array('act'=>$oprtCHNStr,
-                                  'actdetail'=>'专利《'.$request->param('patTopic').'》申报提交</br>
-                                                申报提交简述：<span class="label label-primary">'.$request->param('maintainMsg').'</span></br>'
-                                  );
-            $issDataPatch=array('status'=>'申报提交',
-                                'applydate'=>$this->now,
-                                );
-            $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                  'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报提交</br>
-                                                申报提交简述：<span class="label label-primary">'.$request->param('maintainMsg').'</span></br>'
-                                  );
-            
-          }else{
-            //$issSet->status=='准予续费'
-            $patDataPatch=array('status'=>'续费中',
-                                'renewapplydate'=>$this->now,
-                                );
-            $patRdDataPatch=array('act'=>$oprtCHNStr,
-                                  'actdetail'=>'专利《'.$request->param('patTopic').'》续费申报提交</br>
-                                              申报提交简述：<span class="label label-primary">'.$request->param('maintainMsg').'</span></br>'
-                                  );
-            $issDataPatch=array('status'=>'续费提交',
-                                'applydate'=>$this->now,
-                                );
-            $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》续费申报提交</br>
-                                              申报提交简述：<span class="label label-primary">'.$request->param('maintainMsg').'</span></br>'
-                                  );
-          }
-          $attDataPatch=array('deldisplay'=>0);
-          
-        break;
-        
-        case'_IMPROVE':
-          //patId!=0,issId!=0
-      
-           //根据iss.status的值进行赋值
-          $issSet=$issMdl->where('id',$issId)->find();
-          
-          if($issSet->status=='申报复核'){
-            $oprtCHNStr='申报修改';
-            
-            $issDataPatch=array('status'=>'申报修改');
-            $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                  'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报复核结果：</br>
-                                                申报修改</br>
-                                                申报修改原因：<span class="label label-primary">'.$request->param('maintainMsg').'</span></br>'
-                                  );
-            
-          }else{
-            //$issSet->status=='申报提交'
-            $oprtCHNStr='<span class="label label-warning">申报修改</span>';
-            
-            $patDataPatch=array('status'=>'申报修改',
-                                'modifydate'=>$this->now,
-                                );
-            $patRdDataPatch=array('act'=>$oprtCHNStr,
-                                  'actdetail'=>'专利《'.$request->param('patTopic').'》申报提交结果：</br>'.$oprtCHNStr.'</br> 
-                                              申报修改原因：<span class="label label-warning">'.$request->param('maintainMsg').'</span></br>'
-                                  );
-            $issDataPatch=array('status'=>'申报修改',
-                                'resultdate'=>$this->now,
-                                );
-            $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                  'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》</br>'.$oprtCHNStr.'</br> 
-                                              申报修改原因：<span class="label label-warning">'.$request->param('maintainMsg').'</span></br>'
-                                  );
-          }
-          $attDataPatch=array('deldisplay'=>0);
-          
-        break;
-        
-        case'_AUTHORIZE':
-          //patId!=0,issId!=0
-          $oprtCHNStr='<span class="label label-success">授权</span>';
-          //根据iss.status的值进行赋值
-          $issSet=$issMdl->where('id',$issId)->find();
-          
-          if($issSet->status=='申报提交'){            
-            $patDataPatch=array('status'=>'授权',
-                                'authrejectdate'=>$this->now,
-                                );
-            $patRdDataPatch=array('act'=>$oprtCHNStr,
-                                  'actdetail'=>'专利《'.$request->param('patTopic').'》申报提交结果：</br>'.$oprtCHNStr.'</br>'
-                                  );
-            $issDataPatch=array('status'=>'专利授权',
-                                'resultdate'=>$this->now,
-                                );
-            $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                  'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报提交结果：</br>'.$oprtCHNStr.'</br>'
-                                  );
-            
-          }else{
-            //$issSet->status=='续费提交'
-            $patDataPatch=array('status'=>'续费授权',
-                                //'authrejectdate'=>$request->param('xxDate'),
-                                //'nextrenewdate'=>$request->param('xxDate'),
-                                //'renewdeadlindate'=>$request->param('xxDate'),
-                                );
-            $patRdDataPatch=array('act'=>$oprtCHNStr,
-                                  'actdetail'=>'专利《'.$request->param('patTopic').'》续费申报提交结果：</br>'.$oprtCHNStr.'</br>'
-                                  );
-            $issDataPatch=array('status'=>'专利授权',
-                                'resultdate'=>$this->now,
-                                );
-            $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                  'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》续费申报提交结果：</br>'.$oprtCHNStr.'</br>'
-                                  );
-          }
-          $attDataPatch=array('deldisplay'=>0);
-          
-        break;
-        
-        case'_REJECT':
-          //patId!=0,issId!=0
-          $oprtCHNStr='<span class="label label-danger">驳回</span>';
-          //根据iss.status的值进行赋值
-          $issSet=$issMdl->where('id',$issId)->find();
-          
-          if($issSet->status=='申报提交'){            
-            $patDataPatch=array('status'=>'驳回',
-                                'authrejectdate'=>$this->now,
-                                );
-            $patRdDataPatch=array('act'=>$oprtCHNStr,
-                                  'actdetail'=>'专利《'.$request->param('patTopic').'》申报提交结果：</br>'.$oprtCHNStr.'</br>
-                                  驳回原因：<span class="label label-danger">'.$request->param('maintainMsg').'</span></br>'
-                                  );
-            $issDataPatch=array('status'=>'专利驳回',
-                                'resultdate'=>$this->now,
-                                );
-            $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                  'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报提交结果：</br>'.$oprtCHNStr.'</br>
-                                  驳回原因：<span class="label label-danger">'.$request->param('maintainMsg').'</span></br>'
-                                  );
-          }else{
-            //$issSet->status=='续费提交'
-            $patDataPatch=array('status'=>'驳回续费',
-                                'renewrejectdate'=>$request->param('xxDate'),
-                                //'nextrenewdate'=>$request->param('xxDate'),
-                                //'renewdeadlindate'=>$request->param('xxDate'),
-                                );
-            $patRdDataPatch=array('act'=>$oprtCHNStr,
-                                  'actdetail'=>'专利《'.$request->param('patTopic').'》续费申报提交结果：</br>'.$oprtCHNStr.'</br>
-                                  驳回原因：<span class="label label-danger">'.$request->param('maintainMsg').'</span></br>'
-                                  );
-            $issDataPatch=array('status'=>'专利驳回',
-                                'resultdate'=>$this->now,
-                                );
-            $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                  'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》续费申报提交结果：</br>'.$oprtCHNStr.'</br>
-                                  驳回原因：<span class="label label-danger">'.$request->param('maintainMsg').'</span></br>'
-                                  );
-          }
-          $attDataPatch=array('deldisplay'=>0);
-          
-        break;
-        
-        case'_CLOSE':
-          //patId!=0,issId!=0
-          $oprtCHNStr='<span class="label label-default">完结</span>';
-          //根据iss.status的值进行赋值
-          $issSet=$issMdl->where('id',$issId)->find();
                     
-          if($issSet->status=='放弃续费' ){            
-            $patDataPatch=array('status'=>'超期无效',
-                                'renewabandondate'=>$this->now,
-                                );
-            $patRdDataPatch=array('act'=>'<span class="label label-default">超期无效</span>',
-                                    'actdetail'=>'专利《'.$request->param('patTopic').'》</br><span class="label label-default">超期无效</span></br>'
-                                  );
+          if($patId==0){
+            //1.patinfo表新增   
+            //patData
+            $patData=array('topic'=>$request->param('patTopic'),
+                            'pattype'=>$request->param('patType'),
+                            'patowner'=>$request->param('patOwner'),
+                            'inventor'=>$request->param('patInventor'),
+                            'otherinventor'=>$request->param('patOtherInventor'),
+                            'author'=>$request->param('patAuthor'),
+                            'dept'=>$request->param('dept'),
+                            
+                            'status'=>'填报',
+                            'addnewdate'=>$this->now,
+                          );
+            //新增，自定义patCreate()方法    
+           // $patId_return = $patMdl->patCreate($patData);
+            //新增，模型create()方法
+            $patId_return = $patMdl::create($patData,true);
             
+            //配合前端的ajax请求，返回前端patId
+            return json(array('patId'=>$patId_return));
           }else{
-            //$issSet->status=='放弃续费' || $issSet->status=='续费授权' 
-            $patDataPatch=array('z'=>0);
-            $patRdDataPatch=array('z'=>0);
-           
-          }
-          $issDataPatch=array('status'=>'完结',
-                              'finishdate'=>$this->now,
-                              );
-          $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》'.$oprtCHNStr.'</br>'
-                                );
-          $attDataPatch=array('deldisplay'=>0);
-          
-        break;
-        
-        case'_ADDRENEW':
-          //patId!=0,issId=0
-          if($request->param('returnType')=='_JSON'){
-            return json(array_merge($patMdl->where('id',$request->param('patId'))->find()->toArray(),
-                              array("today"=>$this->today,"username"=>$this->username,"deptMaintainer"=>$this->dept)));
-          }else{
-            $oprtCHNStr='续费报告';
+            //2.patrecord表新增
+            //patRdData
+            $msg.='专利【新增】成功。<br>';
+            $patSet=$patMdl::get($patId);
+            $patRdData=array('patinfo_id'=>$patId,
+                              'num'=>$patSet->patnum,
+                              'actdetail'=>'专利《'.$patSet->topic.'》新增填报',
+                              
+                              'act'=>'填报',
+                              'acttime'=>$this->now,
+                              'username'=>$this->username,
+                              'rolename'=>$auth,
+                            );
+            //新增，自定义patRdCreate()方法  
+           // $patRdId = $patRdMdl->patRdCreate($patRdData);
+            //新增，模型create()方法
+            $patRdId = $patRdMdl::create($patData,true);
             
-            $patDataPatch=array('z'=>0);
-            $patRdDataPatch=array('z'=>0);
-            $issDataPatch=array('z'=>0);
-            $issRdDataPatch=array('z'=>0);
-            $attDataPatch=array('deldisplay'=>0);
-          }
-        break;
-        
-        //
-        
-      }
-      
-      //对5个数据表分4类情况进行操作
-      if($oprt=='_ADDNEW'){
-        //patId=0,issId=0
-        
-        if($patId==0){
-          //1.patinfo表新增
-          $patData=array(
-                'topic'=>$request->param('patTopic'),
-                'pattype'=>$request->param('patType'),
-                'patowner'=>$request->param('patOwner'),
-                'inventor'=>$request->param('patInventor'),
-                'otherinventor'=>$request->param('patOtherInventor'),
-                'author'=>$request->param('patAuthor'),
-                'dept'=>$request->param('dept'),
-                
-                'status'=>'填报',
-                'addnewdate'=>$this->now,
-                
-          );
-          //新增                  
-          $patId_return = $patMdl->patCreate(array_merge($patData,$patDataPatch));
-          return json(array('patId'=>$patId_return));
-        }else{
-          //2.patrecord表新增
-          $msg.='专利【新增】成功。<br>';
-            $patSet=$patMdl->where('id',$patId)->find();
-            
-            $patRdData=array(
-                'patinfo_id'=>$patId,
-                'num'=>$patSet->patnum,
-                'act'=>'填报',
-                'actdetail'=>'专利《'.$patSet->topic.'》新增填报',
-                'acttime'=>$this->now,
-                'username'=>$this->username,
-                'rolename'=>$auth,
-                
-            );
-            //新增patRd
-            $patRdId = $patRdMdl->patRdCreate(array_merge($patRdData,$patRdDataPatch));
-        
-        //3.issinfo表新增
+            //3.issinfo表新增
+            //issData
             $issData=array(
                     'issmap_type'=>$request->param('issType'),
                     'topic'=>$request->param('issPatTopic'),
@@ -1401,138 +959,932 @@ class Dashboard2Controller extends \think\Controller
                     'dept'=>$this->dept,
             
             );
-            //新增issPat
-            $issId_return = $issMdl->issCreate(array_merge($issData,$issDataPatch)); 
-        
-        //4.issrecord表新增
-            //取出新增的isspat内容
-            $issSet = $issMdl->where('id',$issId_return)->find();
+            //新增，自定义issCreate()方法 
+            //$issId_return = $issMdl->issCreate($issData); 
+            //新增，模型create()方法
+            $issId_return = $issMdl::create($issData,true);
+            
+            //4.issrecord表新增
+            //issRdData
             $msg.='专利事务【新增】成功。<br>';  
             
-            $issRdData=array(
-                'issinfo_id'=>$issId_return,
-                'num'=>$issSet->issnum,
-                'act'=>'填报',
-                'actdetail'=>'专利事务《'.$issSet->topic.'》新增填报',
-                'acttime'=>$this->now,
-                'username'=>$this->username,
-                'rolename'=>$auth,               
-            );
-            //新增issRd
-            $issRdId = $issRdMdl->issRdCreate(array_merge($issRdData,$issRdDataPatch));
+            $issRdData=array('act'=>'填报',
+                              'actdetail'=>'专利事务《'.$issMdl::get($issId_return)->topic.'》新增填报',
+                              'acttime'=>$this->now,
+                              'username'=>$this->username,
+                              'rolename'=>$auth,
+                              'issinfo_id'=>$issId_return,
+                              'num'=>$issMdl::get($issId_return)->issnum,
+                              
+                            );
+            //新增，自定义issRdCreate()方法 
+            //$issRdId = $issRdMdl->issRdCreate($issRdData);
+            //新增，模型create()方法
+            $issRdId = $issRdMdl::create($issRdData,true);
         }
-      }else if($oprt=='_ADDRENEW'){
-        //patId!=0,issId=0
+          //5.attinfo更新
+          //attData
+          $attData=array('deldisplay'=>1);
+          
+        break;
         
-        //1.patinfo表无需更新记录
-
-        //2.patrecord表无需新增记录
+        case'_SUBMIT':
+          //patId!=0,issId!=0
+          $oprtCHNStr='提交';
+          //1.patinfo更新
+          //patData
+          $patData=array('topic'=>$request->param('patTopic'),
+                          'pattype'=>$request->param('patType'),
+                          'patowner'=>$request->param('patOwner'),
+                          'inventor'=>$request->param('patInventor'),
+                          'otherinventor'=>$request->param('patOtherInventor'),
+                          'author'=>$request->param('patAuthor'),
+                          'dept'=>$request->param('dept'),
+                          
+                          'status'=>'内审',
+                          'submitdate'=>$this->now,
+                          );
+          //更新，自定义patUpdate()方法
+         // $patMdl->patUpdate($patData,$patId);
+         //更新，模型update()方法
+          $patMdl::update($patData,['id' => $patId],true);
+          
+          //2.patrecord新增
+          //patRdData
+          $patRdData=array('act'=>$oprtCHNStr,
+                            'actdetail'=>'专利《'.$request->param('patTopic').'》提交。待内部审查<br>',
+                            );
+          //新增，自定义patRdCreate()方法
+          //$patRdMdl->patRdCreate($patData);
+          //新增，模型create()方法
+          $patRdMdl::create(array_merge($patRdData,$patRdDataPatch),true);
+          
+          //3.issinfo更新
+          //issData
+          $issData=array('topic'=>$request->param('issPatTopic'),
+                          'abstract'=>$request->param('issPatAbstract'),
+                          );
+          //更新，自定义issUpdate()方法
+          //$issMdl->issUpdate($issData,$issId);
+          //更新，模型update()方法
+          $issMdl::update($issData,['id'=>$issId],true);
+                          
+          //4.issrecord新增
+          //issRdData
+          $issRdData=array('act'=>$oprtCHNStr,
+                            'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》提交审核。',
+                            );
+          //新增，自定义issRdCreate()方法
+          //$issRdMdl->issRdCreate($issRdData);
+          //新增，模型create()方法
+          $issRdMdl::create(array_merge($issRdData,$issRdDataPatch),true);
+          
+          //5.attinfo更新
+          //attData                      
+          $attData=array('deldisplay'=>0);
+          
+        break;
         
-        //3.issinfo表新增记录
-        $issData=array(
-                'issmap_type'=>$request->param('issType'),
-                'topic'=>$request->param('issPatTopic'),
-                'abstract'=>$request->param('issPatAbstract'),
-                
-                'issmap_id'=>$patId_return,
-                'addnewdate'=>$this->now,
-                'status'=>'拟续费',
-                'writer'=>$this->username,
-                'dept'=>$this->dept,
+        case'_DELETE':
+          //patId!=0,issId!=0
+          $oprtCHNStr='删除';
+           //借助各自模型定义的Delete()方法进行删除
+          //考虑应用TP5的软删除进行改进，？？？2018/3/23
+          //1.删除pat，自定义patDelete()方法
+         // $patId_return=$patMdl->patDelete($patId);
+          //1.删除pat，模型destroy()方法
+          $patMdl::destroy($patId);
+          
+          //2.删除patRd，自定义patRdDelete()方法
+         // $patRdId_return=$patRdMdl->patRdDelete($patId);
+          //2.删除patRd，模型destroy()方法
+          $patRdMdl::destroy(['patinfo_id'=>$patId]);
+          
+          //3.删除iss，自定义issDelete()方法
+          //$issId_return=$issMdl->issDelete($issId);
+          //3.删除iss，模型destroy()方法
+          $issMdl::destroy($issId);
+          
+          //4.删除issRd，自定义issRdDelete()方法
+          //$issRdId_return=$issRdMdl->issRdDelete($issId);
+          //4.删除issRd，模型destroy()方法
+          $issRdMdl::destroy(['issinfo_id'=>$issId]);
+          
+          //5.删除att，自定义attDelete()方法
+          //$attId_return=$attMdl->attDelete($issId);
+          //5.删除att，模型destroy()方法
+          $attMdl::destroy(['attmap_id'=>$issId]);
+          
+          $msg.='专利事务【删除】成功。<br>';  
+          return json(array('msg'=>$msg,'topic'=>$request->param('issPatTopic'),'patId'=>$patId));
+        break;
         
-        );
-        //新增
-        $issId_return = $issMdl->issCreate(array_merge($issData,$issDataPatch));  
+        case'_UPDATE':
+          //patId!=0,issId!=0
+          $oprtCHNStr='更新';
+          //issStatus=='新增','返回修改' ,'修改完善'
         
-        //4.issrecord表新增
-        //取出新增的isspat内容
-        $issSet = $issMdl->where('id',$issId_return)->find();
-        $msg.='专利事务【新增续费】成功。<br>';  
+          //1.patinfo更新
+          //patData
+          $patData=array('topic'=>$request->param('patTopic'),
+                          'pattype'=>$request->param('patType'),
+                          'patowner'=>$request->param('patOwner'),
+                          'inventor'=>$request->param('patInventor'),
+                          'otherinventor'=>$request->param('patOtherInventor'),
+                          'author'=>$request->param('patAuthor'),
+                          'dept'=>$request->param('dept'),
+                          
+                          'status'=>'内审',
+                          'submitdate'=>$this->now,
+                          );
+          //更新，自定义patUpdate()方法
+          //$patMdl->patUpdate($patData,$patId);
+          //更新，模型update()方法
+          $patMdl::update($patData,['id'=>$patId],true);
+          
+          //2.patrecord更新
+          //patRdData
+          $patRdData=array('actdetail'=>'专利《'.$patSet->topic.'》新增填报');
+          //更新，自定义patRdUpdate()方法
+          //$patRdMdl->patRdUpdate($patRdData,$patId);
+          //更新，模型update()方法
+          $patRdMdl::update($patRdData,['act'=>'填报','patinfo_id'=>$patId],true);
+          
+          //3.issinfo更新
+          //issData
+          $issData=array('topic'=>$request->param('issPatTopic'),
+                          'abstract'=>$request->param('issPatAbstract'),
+                          );
+          //更新，自定义issUpdate()方法
+          //$issMdl->issUpdate($issData,$issId);
+          //更新，模型模型update()方法
+          $issMdl::update($patData,['id'=>$patId],true);
+          
+          //4.issrecord更新
+          //issRdData
+          $issRdData=array('actdetail'=>'专利事务《'.$request->param('issPatTopic').'》新增填报。');
+          //更新，自定义issRdUpdate()方法
+          //$issRdMdl->issRdUpdate($issData,$issId);
+          //更新，模型模型update()方法
+          $issRdMdl::update($issRdData,['act'=>'填报','issinfo_id'=>$issId],true);
+          
+          //5.attinfo更新
+          //attData                      
+          $attData=array('deldisplay'=>1);
+          
+        break;
+        //“_AUDIT”权限拥有的操作
+        case'_PASS':
+          //patId!=0,issId!=0
+          $oprtCHNStr='审核';
+          //1.patData无
+          
+          //2.patRdData无
+          
+          //3.issinfo更新
+          //issData
+          $issData=array('status'=>'审核通过',
+                          'auditrejectdate'=>$this->now,
+                          );
+          //更新，模型update()方法
+          $issMdl::update($issData,['id'=>$issId],true);
+          
+                          
+          //4.issrecord新增
+          //issRdData
+          $issRdData=array('act'=>$oprtCHNStr,
+                            'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审核结果：<span class="label label-success">审核通过</span></br>',
+                            );
+          //新增，自定义issRdCreate()方法
+          //$issRdMdl->issRdCreate($issRdData);
+          //新增，模型create()方法
+          $issRdMdl::create(array_merge($issRdData,$issRdDataPatch),true);
+          
+          //5.attinfo更新
+          //attData
+          $attData=array('deldisplay'=>0);
+          
+        break;
+        
+        case'_FAIL':
+          //patId!=0,issId!=0
+          $oprtCHNStr='审核';
+          //1.patData无
+          
+          //2.patRdData无
+          
+          //3.issinfo更新
+          //issData
+          $issData=array('status'=>'审核未通过',
+                          'auditrejectdate'=>$this->now,
+                              );
+          //更新，自定义issCreate()方法
+          //issMdl->issUpdate($issData,$issId);
+          //更新，模型模型update()方法
+          $issMdl::update($issData,['id'=>$issId],true);
+          
+          //4.issrecord新增
+          //issRdData
+          $issRdData=array('act'=>$oprtCHNStr,
+                            'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审核结果：<span class="label label-warning">审核未通过</span></br>
+                                          审核意见：<span class="text-primary">'.$request->param('auditMsg').'</span></br>',
+                                );
+          //新增，自定义issRdCreate()方法
+         // $issRdMdl->issRdCreate($issRdData);
+         //新增，模型create()方法
+          $issRdMdl::create(array_merge($issRdData,$issRdDataPatch),true);
+          
+          //5.attinfo更新
+          //attData
+          $attData=array('deldisplay'=>0);
+          
+        break;
+        
+        case'_MODIFY':
+          //patId!=0,issId!=0
+          $oprtCHNStr='审核';
+          //1.patinfo更新
+          //patData
+          $patData=array('status'=>'内审修改');
+          //更新，自定义patUpdate()方法
+          //$patMdl->patUpdate($patData,$patId);
+          //更新，模型update()方法
+          $patMdl::update($patData,['id'=>$patId],true);
+          
+          //2.patrecord新增
+          //patRdData
+          $patRdData=array('act'=>$oprtCHNStr,
+                            'actdetail'=>'专利《'.$request->param('patTopic').'》审核结果：<span class="label label-primary">内审修改</span></br>
+                                          审核意见：<span class="text-primary">'.$request->param('auditMsg').'</span></br>',
+                                );
+          //新增，自定义patRdCreate()方法
+          //$patRdMdl->patRdCreate($patRdData);
+          //新增，模型create()方法
+          $patRdMdl::create(array_merge($patRdData,$patRdDataPatch),true);
+          
+          //3.issinfo更新
+          //issData
+          $issData=array('status'=>'返回修改',
+                          'auditrejectdate'=>$this->now,
+                          );
+                              //$issMdl->where('id',$issId)->find()->toArray['issnum']
+          //更新，自定义issUpdate()方法
+          //issMdl->issUpdate($issData,$issId);
+          //更新，模型模型update()方法
+          $issMdl::update($issData,['id'=>$issId],true);
+          
+          //4.issrecord新增
+          //issRdData
+          $issRdData=array('act'=>$oprtCHNStr,
+                            'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审核结果：<span class="label label-primary">返回修改</span></br>
+                                          审核意见：<span class="text-primary">'.$request->param('auditMsg').'</span></br>',
+                                );
+          //新增，自定义issRdCreate()方法
+          //$issRdMdl->issRdCreate($issRdData);
+          //新增，模型create()方法
+          $issRdMdl::create(array_merge($issRdData,$issRdDataPatch),true);
+          
+          //5.attinfo更新
+          //attData
+          $attData=array('deldisplay'=>0);
+         
+        break;
+        //“_APPROVE”权限拥有的操作
+        case'_PERMIT':
+          //patId!=0,issId!=0
+          $oprtCHNStr='审批';
+          //根据$issStatus的值进行赋值
+          if($issStatus=='审核通过' || $issStatus=='审核未通过' ){
+            $patData=array('status'=>'拟申报(内审批准)',
+                            'auditrejectdate'=>$this->now,
+                            );
+            $patRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利《'.$request->param('patTopic').'》审批结果：<span class="label label-success">拟申报(内审批准)</span></br>'
+                              );
+            $issData=array('status'=>'批准申报',
+                            'executer'=>$request->param('executer')
+                            );
+            $issRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审批结果：<span class="label label-success">批准申报</span></br>'
+                              );
             
-        $issRdData=array(
-                'issinfo_id'=>$issId_return,
-                'num'=>$issSet->issnum,
-                'act'=>'拟续费',
-                'actdetail'=>'专利事务《'.$issSet->topic.'》新增填报',
-                'acttime'=>$this->now,
-                'username'=>$this->username,
-                'rolename'=>$auth,               
-        );
-        //新增
-        $issRdId = $issRdMdl->issRdCreate(array_merge($issRdData,$issRdDataPatch));
+          }else if($issStatus=='变更申请'){
+            $issData=array('status'=>'准予变更',
+                            'auditrejectdate'=>$this->now,
+                            );
+            $issRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审批结果：<span class="label label-success">准予变更</span></br>'
+                              );
+          }else{
+            //$issStatus=='拟续费'
+            $issData=array('status'=>'准予续费',
+                            'auditrejectdate'=>$this->now,
+                            );
+            $issRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审批结果：<span class="label label-success">准予续费</span></br>'
+                              );
+          }
+          //1.patinfo更新
+          //更新，模型update()方法
+          $patMdl::update($patData,['id'=>$patId],true);
+          
+          //2.patrecord新增
+          //新增，模型create()方法
+          $patRdMdl::create(array_merge($patRdData,$patRdDataPatch),true);
+          
+          //3.issinfo更新
+          //更新，模型模型update()方法
+          $issMdl::update($issData,['id'=>$issId],true);
+          
+          //4.issrecord新增
+          //新增，模型create()方法
+          $issRdMdl::create(array_merge($issRdData,$issRdDataPatch),true);
+
+          //5.attinfo更新
+          //attData
+          $attData=array('deldisplay'=>0);
+          
+        break;
         
-      }else if($oprt=='_DELETE'){
-        //$patId!=0,$issId!=0
-        //1.删除pat
-        $patId_return=$patMdl->patDelete($patId);
+        case'_VETO':
+          //patId!=0,issId!=0
+          $oprtCHNStr='审批';
+          //根据$issStatus的值进行赋值
+          if($issStatus=='审核通过' || $issStatus=='审核未通过' ){
+            $patData=array('status'=>'内审否决');
+            $patRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利《'.$request->param('patTopic').'》审批结果：<span class="label label-danger">内审否决</span></br>
+                                            审批意见：<span class="text-primary">'.$request->param('approveMsg').'</span></br>'
+                              );
+            $issData=array('status'=>'否决申报',
+                            'auditrejectdate'=>$this->now,
+                            );
+            $issRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审批结果：<span class="label label-danger">否决申报</span></br>
+                                            审批意见：<span class="text-primary">'.$request->param('approveMsg').'</span></br>'
+                              );
+            
+          }else if($issStatus=='变更申请'){
+            $issData=array('status'=>'否决变更',
+                            'auditrejectdate'=>$this->now,
+                            );
+            $issRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审批结果：<span class="label label-danger">否决变更</span></br>
+                                            审批意见：<span class="text-primary">'.$request->param('approveMsg').'</span></br>'
+                              );
+          }else{
+            //$issStatus=='拟续费'
+            $patData=array('status'=>'放弃续费');
+            $patRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利《'.$request->param('patTopic').'》续费审批结果：<span class="label label-default">放弃续费</span></br>
+                                            审批意见：<span class="text-default">'.$request->param('approveMsg').'</span></br>'
+                              );
+            $issData=array('status'=>'放弃续费',
+                            'auditrejectdate'=>$this->now,
+                            );
+            $issRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审批结果：<span class="label label-default">放弃续费</span></br>
+                                            审批意见：<span class="text-default">'.$request->param('approveMsg').'</span></br>'
+                              );
+          }
+          //1.patinfo更新
+          //更新，模型update()方法
+          $patMdl::update($patData,['id'=>$patId],true);
+          
+          //2.patrecord新增
+          //新增，模型create()方法
+          $patRdMdl::create(array_merge($patRdData,$patRdDataPatch),true);
+          
+          //3.issinfo更新
+          //更新，模型模型update()方法
+          $issMdl::update($issData,['id'=>$issId],true);
+          
+          //4.issrecord新增
+          //新增，模型create()方法
+          $issRdMdl::create(array_merge($issRdData,$issRdDataPatch),true);
+
+          //5.attinfo更新
+          //attData
+          $attData=array('deldisplay'=>0);
+          
+          
+        break;
         
-        //2.删除patRd
-        $patRdId_return=$patRdMdl->where('patinfo_id',$patId)->delete();
+        case'_COMPLETE':
+          //patId!=0,issId!=0
+         $oprtCHNStr='审批';
+          
+          //根据iss.status的值进行赋值
+          //$issStatus=$issMdl::get($issId)->status;
+          
+          //$issStatus=='审核通过' || $issStatus=='审核未通过' ){
+          //1.patinfo更新
+          //patData
+          $patData=array('status'=>'内审修改');
+          //更新，模型update()方法
+          $patMdl::update($patData,['id'=>$patId],true);
+          
+          //2.patrecord新增
+          //patRdData
+          $patRdData=array('act'=>$oprtCHNStr,
+                            'actdetail'=>'专利《'.$request->param('patTopic').'》审批结果：<span class="label label-warning">内审修改</span></br>
+                                              审批意见：<span class="text-primary">'.$request->param('approveMsg').'</span></br>'
+                            );
+          //新增，模型create()方法
+          $patRdMdl::create(array_merge($patRdData,$patRdDataPatch),true);
+          
+          //3.issinfo更新
+          //issData
+          $issData=array('status'=>'修改完善',
+                          'auditrejectdate'=>$this->now,
+                          );
+          //更新，模型模型update()方法
+          $issMdl::update($issData,['id'=>$issId],true);
+          
+          //4.issrecord新增
+          //issRdData
+          $issRdData=array('act'=>$oprtCHNStr,
+                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审批结果：<span class="label label-warning">修改完善</span></br>
+                                              审批意见：<span class="text-primary">'.$request->param('approveMsg').'</span></br>'
+                                  );
+          //新增，模型create()方法
+          $issRdMdl::create(array_merge($issRdData,$issRdDataPatch),true);
+
+          //5.attinfo更新
+          //attData
+          $attData=array('deldisplay'=>0);
+          
+        break;
+        //“_EXECUTE”权限拥有的操作
+        case'_ACCEPT':
+          //patId!=0,issId!=0
+          $oprtCHNStr='领受';
+          //1.patinfo无
+          //2.patrecord无
+          
+          //3.issinfo更新
+          //issData
+          $issData=array('status'=>'申报执行',
+                          'operatestartdate'=>$this->now,
+                          );
+          //更新，模型模型update()方法
+          $issMdl::update($issData,['id'=>$issId],true); 
+          
+          //4.issrecord新增
+          //issRdData         
+          $issRdDataPatch=array('act'=>$oprtCHNStr,
+                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报开始</br>'
+                                );
+          //新增，模型create()方法
+          $issRdMdl::create(array_merge($issRdData,$issRdDataPatch),true);
+          
+          //5.attinfo更新
+          //attData
+          $attData=array('deldisplay'=>0);
+          
+        break;
         
-        //3.删除iss
-        $issId_return=$issMdl->issDelete($issId);
+        case'_REFUSE':
+          //patId!=0,issId!=0
+          $oprtCHNStr='变更申述';
+          //1.patinfo无
+          //2.patrecord无
+          
+          //3.issinfo更新
+          //issData
+          $issData=array('status'=>'变更申请',
+                          'executerchangeto'=>$this->username,
+                          );
+          //更新，模型模型update()方法
+          $issMdl::update($issData,['id'=>$issId],true);
+          
+          //4.issrecord新增
+          //issRdData
+          $issRdData=array('act'=>$oprtCHNStr,
+                            'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报变更申请</br>
+                                变更申请意见：<span class="text-warning">'.$request->param('executeMsg').'</span></br>'
+                            );
+          //新增，模型create()方法
+          $issRdMdl::create(array_merge($issRdData,$issRdDataPatch),true);
+          
+          //5.attinfo更新
+          //attData
+          $attData=array('deldisplay'=>0);
+          
+        break;
         
-        //4.删除issRd
-        $issRdId_return=$issRdMdl->where('issinfo_id',$issId)->delete();
+        case'_REPORT':
+          //patId!=0,issId!=0
+          $oprtCHNStr='申报执行报告';
+          //1.patinfo无
+          //2.patrecord无
+          //3.issinfo无
+          
+          //4.issrecord新增
+          //issRdData
+          $issRdData=array('act'=>$oprtCHNStr,
+                            'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报执行报告</br>
+                                报告简述：<span class="text-primary">'.$request->param('executeMsg').'</span></br>'
+                            );
+          //新增，模型create()方法
+          $issRdMdl::create(array_merge($issRdData,$issRdDataPatch),true);
+          
+          //5.attinfo更新
+          //attData
+          $attData=array('deldisplay'=>0);
+          
+        break;
         
-        //5.删除att
-        $attId_return=$attMdl->where('attmap_id',$issId)->delete();
+        case'_FINISH':
+          //patId!=0,issId!=0
+          $oprtCHNStr='申报提交复核';
+          //1.patinfo无
+          //2.patrecord无
+          
+          //3.issinfo更新
+          //issData
+          $issDataPatch=array('status'=>'申报复核');
+          //更新，模型模型update()方法
+          $issMdl::update($issData,['id'=>$issId],true);
+          
+          //4.issrecord新增
+          //issRdData
+          $issRdData=array('act'=>$oprtCHNStr,
+                            'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报提交复核</br>
+                                          提交内容简述：<span class="text-primary">'.$request->param('executeMsg').'</span></br>'
+                            );
+          //新增，模型create()方法
+          $issRdMdl::create(array_merge($issRdData,$issRdDataPatch),true);
+                            
+          //5.attinfo更新
+          //attData
+          $attData=array('deldisplay'=>0);
+          
+        break;
+        //“_MAINTAIN”权限拥有的操作
+        case'_APPLY':
+          //patId!=0,issId!=0
+          $oprtCHNStr='<span class="label label-primary">申报正式提交</span>';
+          //根据$issStatus的值进行赋值
+          if($issStatus=='申报复核'){
+            $patData=array('status'=>'申报',
+                            'applydate'=>$this->now,
+                            );
+            $patRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利《'.$request->param('patTopic').'》申报提交</br>
+                                            申报提交简述：<span class="text-primary">'.$request->param('maintainMsg').'</span></br>'
+                              );
+            $issData=array('status'=>'申报提交',
+                            'applydate'=>$this->now,
+                            );
+            $issRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报提交</br>
+                                            申报提交简述：<span class="text-primary">'.$request->param('maintainMsg').'</span></br>'
+                              );
+            
+          }else{
+            //$issStatus=='准予续费'
+            $patData=array('status'=>'续费中',
+                            'renewapplydate'=>$this->now,
+                            );
+            $patRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利《'.$request->param('patTopic').'》续费申报提交</br>
+                                            申报提交简述：<span class="text-primary">'.$request->param('maintainMsg').'</span></br>'
+                              );
+            $issData=array('status'=>'续费提交',
+                            'applydate'=>$this->now,
+                            );
+            $issRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》续费申报提交</br>
+                                            申报提交简述：<span class="text-primary">'.$request->param('maintainMsg').'</span></br>'
+                              );
+          }
+          //1.patinfo更新
+          //更新，模型update()方法
+          $patMdl::update($patData,['id'=>$patId],true);
+          
+          //2.patrecord新增
+          //新增，模型create()方法
+          $patRdMdl::create(array_merge($patRdData,$patRdDataPatch),true);
+          
+          //3.issinfo更新
+          //更新，模型模型update()方法
+          $issMdl::update($issData,['id'=>$issId],true);
+          
+          //4.issrecord新增
+          //新增，模型create()方法
+          $issRdMdl::create(array_merge($issRdData,$issRdDataPatch),true);
+          
+          //5.attinfo更新
+          //attData
+          $attData=array('deldisplay'=>0);
+          
+        break;
         
-        return json(array('msg'=>$msg,'topic'=>$request->param('issPatTopic'),'patId'=>$patId));
-      
-      }else{
-        //$patId!=0,$issId!=0
-        $patSet=$issMdl->where('id',$patId)->find();
-        $issSet=$issMdl->where('id',$issId)->find();
+        case'_IMPROVE':
+          //patId!=0,issId!=0
+          //根据$issStatus的值进行赋值
+           if($issStatus=='申报复核'){
+            $oprtCHNStr='申报修改';
+            
+            $issData=array('status'=>'申报修改');
+            $issRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报复核结果：申报修改</br>
+                                            申报修改原因：<span class="text-primary">'.$request->param('maintainMsg').'</span></br>'
+                              );
+            
+          }else{
+            //$issStatus=='申报提交'
+            $oprtCHNStr='<span class="label label-warning">申报修改</span>';
+            
+            $patData=array('status'=>'申报修改',
+                            'modifydate'=>$this->now,
+                            );
+            $patRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利《'.$request->param('patTopic').'》申报提交结果：'.$oprtCHNStr.'</br> 
+                                            申报修改原因：<span class="text-warning">'.$request->param('maintainMsg').'</span></br>'
+                              );
+            $issData=array('status'=>'申报修改',
+                            'resultdate'=>$this->now,
+                            );
+            $issRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》'.$oprtCHNStr.'</br> 
+                                            申报修改原因：<span class="text-warning">'.$request->param('maintainMsg').'</span></br>'
+                              );
+          }
+          //1.patinfo更新
+          //更新，模型update()方法
+          $patMdl::update($patData,['id'=>$patId],true);
+          
+          //2.patrecord新增
+          //新增，模型create()方法
+          $patRdMdl::create(array_merge($patRdData,$patRdDataPatch),true);
+          
+          //3.issinfo更新
+          //更新，模型模型update()方法
+          $issMdl::update($issData,['id'=>$issId],true);
+          
+          //4.issrecord新增
+          //新增，模型create()方法
+          $issRdMdl::create(array_merge($issRdData,$issRdDataPatch),true);
+          
+          //5.attinfo更新
+          //attData
+          $attData=array('deldisplay'=>0);
+          
+        break;
         
-        //1.删除pat
-        $patId_return=$patMdl->patDelete($patId);
+        case'_AUTHORIZE':
+          //patId!=0,issId!=0
+          $oprtCHNStr='<span class="label label-success">授权</span>';
+          //根据$issStatus的值进行赋值
+          if($issStatus=='申报提交'){            
+            $patData=array('status'=>'授权',
+                            'authrejectdate'=>$this->now,
+                            );
+            $patRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利《'.$request->param('patTopic').'》申报提交结果：'.$oprtCHNStr.'</br>'
+                              );
+            $issData=array('status'=>'专利授权',
+                            'resultdate'=>$this->now,
+                            );
+            $issRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报提交结果：'.$oprtCHNStr.'</br>'
+                              );
+            
+          }else{
+            //$issStatus=='续费提交'
+            $patData=array('status'=>'续费授权',
+                                //'authrejectdate'=>$request->param('xxDate'),
+                                //'nextrenewdate'=>$request->param('xxDate'),
+                                //'renewdeadlindate'=>$request->param('xxDate'),
+                            );
+            $patRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利《'.$request->param('patTopic').'》续费申报提交结果：'.$oprtCHNStr.'</br>'
+                              );
+            $issData=array('status'=>'专利授权',
+                            'resultdate'=>$this->now,
+                            );
+            $issRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》续费申报提交结果：'.$oprtCHNStr.'</br>'
+                              );
+          }
+          //1.patinfo更新
+          //更新，模型update()方法
+          $patMdl::update($patData,['id'=>$patId],true);
+          
+          //2.patrecord新增
+          //新增，模型create()方法
+          $patRdMdl::create(array_merge($patRdData,$patRdDataPatch),true);
+          
+          //3.issinfo更新
+          //更新，模型模型update()方法
+          $issMdl::update($issData,['id'=>$issId],true);
+          
+          //4.issrecord新增
+          //新增，模型create()方法
+          $issRdMdl::create(array_merge($issRdData,$issRdDataPatch),true);
+          
+          //5.attinfo更新
+          //attData
+          $attData=array('deldisplay'=>0);
+          
+        break;
         
-        //2.删除patRd
-        $patRdId_return=$patRdMdl->where('patinfo_id',$patId)->delete();
+        case'_REJECT':
+          //patId!=0,issId!=0
+          $oprtCHNStr='<span class="label label-danger">驳回</span>';
+          //根据$issStatus的值进行赋值
+          if($issStatus=='申报提交'){            
+            $patData=array('status'=>'驳回',
+                            'authrejectdate'=>$this->now,
+                            );
+            $patRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利《'.$request->param('patTopic').'》申报提交结果：'.$oprtCHNStr.'</br>
+                                            驳回原因：<span class="text-danger">'.$request->param('maintainMsg').'</span></br>'
+                              );
+            $issData=array('status'=>'专利驳回',
+                            'resultdate'=>$this->now,
+                            );
+            $issRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报提交结果：'.$oprtCHNStr.'</br>
+                                            驳回原因：<span class="text-danger">'.$request->param('maintainMsg').'</span></br>'
+                              );
+          }else{
+            //$issStatus=='续费提交'
+            $patData=array('status'=>'驳回续费',
+                            'renewrejectdate'=>$request->param('xxDate'),
+                                //'nextrenewdate'=>$request->param('xxDate'),
+                                //'renewdeadlindate'=>$request->param('xxDate'),
+                            );
+            $patRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利《'.$request->param('patTopic').'》续费申报提交结果：'.$oprtCHNStr.'</br>
+                                            驳回原因：<span class="text-danger">'.$request->param('maintainMsg').'</span></br>'
+                              );
+            $issData=array('status'=>'专利驳回',
+                            'resultdate'=>$this->now,
+                            );
+            $issRdData=array('act'=>$oprtCHNStr,
+                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》续费申报提交结果：'.$oprtCHNStr.'</br>
+                                              驳回原因：<span class="text-danger">'.$request->param('maintainMsg').'</span></br>'
+                              );
+          }
+          //1.patinfo更新
+          //更新，模型update()方法
+          $patMdl::update($patData,['id'=>$patId],true);
+          
+          //2.patrecord新增
+          //新增，模型create()方法
+          $patRdMdl::create(array_merge($patRdData,$patRdDataPatch),true);
+          
+          //3.issinfo更新
+          //更新，模型模型update()方法
+          $issMdl::update($issData,['id'=>$issId],true);
+          
+          //4.issrecord新增
+          //新增，模型create()方法
+          $issRdMdl::create(array_merge($issRdData,$issRdDataPatch),true);
+          
+          //5.attinfo更新
+          //attData
+          $attData=array('deldisplay'=>0);
+          
+        break;
         
-        //3.删除iss
-        $issId_return=$issMdl->issDelete($issId);
+        case'_CLOSE':
+          //patId!=0,issId!=0
+          $oprtCHNStr='<span class="label label-default">完结</span>';
+          //根据$issStatus的值进行赋值
+          if($issStatus=='放弃续费' ){            
+            $patData=array('status'=>'超期无效',
+                            'renewabandondate'=>$this->now,
+                            );
+            $patRdData=array('act'=>'<span class="label label-default">超期无效</span>',
+                              'actdetail'=>'专利《'.$request->param('patTopic').'》<span class="label label-default">超期无效</span></br>'
+                              );
+            
+          }else{
+            //$issStatuss=='放弃续费' || $issStatus=='续费授权' 
+           
+          }
+          $issData=array('status'=>'完结',
+                              'finishdate'=>$this->now,
+                              );
+          $issRdData=array('act'=>$oprtCHNStr,
+                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》'.$oprtCHNStr.'</br>'
+                                );
+          //1.patinfo更新
+          //更新，模型update()方法
+          $patMdl::update($patData,['id'=>$patId],true);
+          
+          //2.patrecord新增
+          //新增，模型create()方法
+          $patRdMdl::create(array_merge($patRdData,$patRdDataPatch),true);
+          
+          //3.issinfo更新
+          //更新，模型模型update()方法
+          $issMdl::update($issData,['id'=>$issId],true);
+          
+          //4.issrecord新增
+          //新增，模型create()方法
+          $issRdMdl::create(array_merge($issRdData,$issRdDataPatch),true);
+          
+          //5.attinfo更新
+          //attData
+          $attData=array('deldisplay'=>0);
+          
+        break;
         
-        //4.删除issRd
-        $issRdId_return=$issRdMdl->where('issinfo_id',$issId)->delete();
-        
+        case'_ADDRENEW':
+          //patId!=0,issId=0
+          if($request->param('returnType')=='_JSON'){
+            //配合前端请求，返回前端json数据
+            return json(array_merge($patMdl->where('id',$request->param('patId'))->find()->toArray(),
+                              array("today"=>$this->today,"username"=>$this->username,"deptMaintainer"=>$this->dept)));
+          }else{
+            $oprtCHNStr='续费报告';
+            //1.patinfo表无需更新记录
+
+            //2.patrecord表无需新增记录
+         
+            //3.issinfo新增
+            //issData
+            $issData=array('issmap_type'=>$request->param('issType'),
+                            'topic'=>$request->param('issPatTopic'),
+                            'abstract'=>$request->param('issPatAbstract'),
+                            
+                            'issmap_id'=>$patId_return,
+                            'addnewdate'=>$this->now,
+                            'status'=>'拟续费',
+                            'writer'=>$this->username,
+                            'dept'=>$this->dept,
+                            );
+            //新增，模型create()方法
+            $issId_return=$issMdl::create($issData);
+            
+            //4.issrecord新增
+            //取出新增的isspat内容
+            $issSet = $issMdl::get($issId_return);
+            //issRdData
+            $issRdData=array('issinfo_id'=>$issId_return,
+                              'num'=>$issSet->issnum,
+                              'act'=>'拟续费',
+                              'actdetail'=>'专利事务《'.$issSet->topic.'》新增填报',
+                              'acttime'=>$this->now,
+                              'username'=>$this->username,
+                              'rolename'=>$auth,
+                              );
+            //新增，模型create()方法
+            $issRdMdl::create($issRdData);
+             
+            //5.attinfo更新
+            //attData
+            $attData=array('deldisplay'=>0);
+            
+            $msg.='专利事务【新增续费】成功。<br>';  
+          }
+        break;
+
       }
       
-      //5.attinfo表更新
-      //循环更新attMdl,将文件从现有的‘temp’目录移动到指定目录
-      for($i=0;$i<count($arrAttId);$i++){
-        
-        $fileStr=$arrAttFileObjStr[$i];
-        $name=$arrAttFileName[$i];
-        
-        //有‘temp’字符串才移动到指定目录
-        if(substr_count($fileStr,'temp')){
-          $newDir='..'.DS.'uploads'.DS.$issSet->issnum;
+      //5.attinfo更新
+      if($issId){
+        $issSet=$issMdl::get($issId);
+        //循环更新attMdl,将文件从现有的‘temp’目录移动到指定目录
+        for($i=0;$i<count($arrAttId);$i++){
           
-          //调用AttinfoModel中定义的fileMove()方法，返回true后才更新Attinfo表
-          if($attMdl->fileMove($fileStr,$name,$newDir)){
+          $fileStr=$arrAttFileObjStr[$i];
+          $name=$arrAttFileName[$i];
+          
+          //有‘temp’字符串才移动到指定目录
+          if(substr_count($fileStr,'temp')){
+            $newDir='..'.DS.'uploads'.DS.$issSet->issnum;
             
-            $attData=array('num_id'=>$issSet->issnum,
-                            'attmap_id'=>$issSet->id,
-                            'attpath'=>$newDir.DS.$name,
-                          //  'deldisplay'=>0
-                            );
-                
-            //更新att
-            $attId = $attMdl->attUpdate(array_merge($attData,$attDataPatch),$arrAttId[0]);
-                          
-            $msg.="附件".$fileStr."移动成功</br>"; 
-          }else{
-            $msg.="附件".$fileStr."移动失败</br>"; 
+            //调用AttinfoModel中定义的fileMove()方法，返回true后才更新Attinfo表
+            if($attMdl->fileMove($fileStr,$name,$newDir)){
+              $attDataPatch=array('num_id'=>$issSet->issnum,
+                              'attmap_id'=>$issSet->id,
+                              'attpath'=>$newDir.DS.$name,
+                              );
+              //更新att
+              $attMdl::update(array_merge($attData,$attDataPatch),['id'=>$arrAttId[$i]],true);
+                            
+              $msg.="附件".$name."移动成功</br>"; 
+            }else{
+              $msg.="附件".$name."移动失败</br>"; 
+            }
           }
-        }
-      } 
-//  <----------------------------------------------------------------------------------------->
+        } 
+        
+      }else{
+        $msg.="无附件移动</br>"; 
+      }
+       
+//  </结构2.----------------------------------------------------------------------------------------->
        
       //return $msg;
       //return json(array('msg'=>$msg,'btnHtml'=>$btnHtml,'topic'=>$request->param('issPatTopic')));
-      return json(array('msg'=>$msg,'topic'=>$request->param('issPatTopic'),'patId'=>$patId));
+      return json(array('msg'=>$msg,'topic'=>$request->param('issPatTopic'),'patId'=>$patId,'issId'=>$issId));
       //return $this->issPatAuth($request);//参数不够，不会产生分页。
     }
     
@@ -1625,11 +1977,10 @@ class Dashboard2Controller extends \think\Controller
             $attData=array('num_id'=>0,
                             'attmap_id'=>0,
                             'attpath'=>$newDir.DS.$name,
-                            'deldisplay'=>0
                             );
                 
             //更新att
-            $attId = $attMdl->attUpdate($attData,$arrAttId[0]);
+            $attId = $attMdl->attUpdate(array_merge($attData,$attDataPatch),$arrAttId[i]);
                           
             $msg.="附件".$fileStr."移动成功</br>"; 
           }else{

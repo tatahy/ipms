@@ -101,9 +101,11 @@ class Issrecord extends Model
      * @return integer|bool  更新成功返回主键，未更新返回false
      * 要求：传入的数组下标名与模型属性名（数据表字段名）一模一样。
      */
-    public function issRdUpdate($data = [],$id)
+    public function issRdUpdate($data = [],$issId)
     {
-       $result = $this::get($id)->allowField(true)->save($data);
+       $idmax=$this::all('issinfo_id',$issId)->max('id');
+       
+       $result = $this::get($idmax)->allowField(true)->save($data);
        // $issRd=$this::get($id);
 //        $result = $issRd->allowField(true)->data($data, true)->save();
         if ($result) {
@@ -117,12 +119,12 @@ class Issrecord extends Model
      * 删除issureRecord。
      * @param  integer $issId 删除issure的id
      * @return integer|bool  删除成功返回主键，未成功返回false
-     *
+     * 考虑应用TP5的软删除进行改进，？？？2018/3/23
      */
     public function issRdDelete($issId)
     {
         //delete()方法返回的是受影响记录数
-        $result = $this->where('id',$issId)->delete();
+        $result = $this->where('issinfo_id',$issId)->delete();
         if ($result) {
             return true;
         } else {

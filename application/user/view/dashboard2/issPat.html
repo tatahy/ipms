@@ -89,44 +89,44 @@
 
 <script>
 $(document).ready(function(){
-	// 根据后端传来的$auth决定本页面载入时默认load的文件,以及设置数字的显示格式，设置li为“active”,并对其a标签添加顶部色条。	
-	var auth='_DONE';
-	if({$authArray.authiss.edit}){
-		auth='_EDIT';
-		//设置数字的显示格式
-		$('.span_EDIT').find('.numSingle').addClass('badge mycolorred-bgwhite');
-		//设置span所在li为“active”
-		$('.span_EDIT').parent().parent().addClass('active');
-		//设置span所在li为“active”,并对其a标签添加顶部色条,nav-tabs添加的显示效果。
-		<!-- .find('a').addClass('myedge-top-warning'); -->
-
-	}else if({$authArray.authiss.audit}){
-		auth='_AUDIT';
-		$('.span_AUDIT').find('.numSingle').addClass('badge mycolorred-bgwhite');
+	// 根据后端传来的$auth决定本页面载入时默认load的文件,以及设置数字的显示格式，设置li为“active”,并对其a标签添加顶部色条。
+	switch('{$auth}'){
+		case '_EDIT':
+			//设置数字的显示格式
+			$('.span_EDIT').find('.numSingle').addClass('badge mycolorred-bgwhite');
+			//设置span所在li为“active”
+			$('.span_EDIT').parent().parent().addClass('active');
+		break;
 		
-		$('.span_AUDIT').parent().parent().addClass('active');
-	}else if({$authArray.authiss.approve}){
-		auth='_APPROVE';
-		$('.span_APPROVE').find('.numSingle').addClass('badge mycolorred-bgwhite');
+		case '_AUDIT':
+			$('.span_AUDIT').find('.numSingle').addClass('badge mycolorred-bgwhite');
+			$('.span_AUDIT').parent().parent().addClass('active');
+		break;
+			
+		case '_APPROVE':
+			$('.span_APPROVE').find('.numSingle').addClass('badge mycolorred-bgwhite');
+			$('.span_APPROVE').parent().parent().addClass('active');
+		break;
 		
-		$('.span_APPROVE').parent().parent().addClass('active');
-	}else if({$authArray.authiss.execute}){
-		auth='_EXECUTE';
-		$('.span_EXECUTE').find('.numSingle').addClass('badge mycolorred-bgwhite');
+		case '_EXECUTE':
+			$('.span_EXECUTE').find('.numSingle').addClass('badge mycolorred-bgwhite');
+			$('.span_EXECUTE').parent().parent().addClass('active');
+		break;
 		
-		$('.span_EXECUTE').parent().parent().addClass('active');
-	}else if({$authArray.authiss.maintain}){
-		auth='_MAINTAIN';
-		$('.span_MAINTAIN').find('.numSingle').addClass('badge mycolorred-bgwhite');
+		case '_MAINTAIN':
+			$('.span_MAINTAIN').find('.numSingle').addClass('badge mycolorred-bgwhite');
+			$('.span_MAINTAIN').parent().parent().addClass('active');
+		break;
+		//'_DONE'
+		default:
+			$('.span_DONE').removeClass('label').addClass('badge');
+			$('.span_DONE').parent().parent().addClass('active');
+		break;
 		
-		$('.span_MAINTAIN').parent().parent().addClass('active');
-	}else{
-		$('.span_DONE').removeClass('label').addClass('badge');
-		
-		$('.span_DONE').parent().parent().addClass('active');
 	}
+	
 	<!-- //TP5中 'issPatAuth'='{$home}/user/dashboard2/issPatAuth' -->
-	$('#divIssPatAuth_load').load('issPatAuth',{'auth':auth});
+	$('#divIssPatAuth_load').load('issPatAuth',{'auth':'{$auth}'});
 	
 	//ul.nav-tabs调整.aTab
 	//1.缩小padding

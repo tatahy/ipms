@@ -1,4 +1,4 @@
-<!-- // issPatAuditSingle.html： -->
+<!-- // issPat:auditSingle.html： -->
 
 {extend name="../application/user/view/dashboard2/issPatAuthSingle/baseSingle.html" /}
 
@@ -13,7 +13,8 @@
 
 			<form action="" id="fmPat">
 <!-- // class="sr-only" 仅源代码文件中显示-->
-			<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
+				<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
+				<input id="patTopic" name="patTopic" value="{$pat.topic}" type="text" class="sr-only">
 			
 			</form>
 {/block}
@@ -28,6 +29,9 @@
 	
 	<div class="myLegend"><span class="label label-warning">审核</span></div>
 	<form action="" id="fmIssPat" >
+		<!-- // class="sr-only" 仅源代码文件中显示-->
+		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
+		<input id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" class="sr-only">
 		
 		<div class="row myRow">
 		

@@ -187,7 +187,7 @@ class Issinfo extends Model
      * 删除issue。
      * @param  integer $issId 删除issue的id
      * @return integer|bool  删除成功返回主键，未成功返回false
-     *
+     *  考虑应用TP5的软删除进行改进，？？？2018/3/23
      */
     public function issDelete($issId)
     {
