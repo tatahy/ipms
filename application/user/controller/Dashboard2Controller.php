@@ -382,7 +382,7 @@ class Dashboard2Controller extends \think\Controller
         $mapApprove['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
         //execute
         $mapExecute['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
-        $mapExecute['dept'] =$this->dept;
+        //$mapExecute['dept'] =$this->dept;
         $mapExecute['executer'] =$this->username;
         //maintain
         $mapMaintain['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
@@ -394,33 +394,33 @@ class Dashboard2Controller extends \think\Controller
         if(!empty($request->param('auth'))){
           $auth=$request->param('auth');
         }else{
-          $auth='_NONE';
+          $auth='_DONE';
         }
         
         if($this->auth['authiss']['edit']){
           $numIssPatEdit=$issSet->where($mapEdit)->count(); 
-          $auth='_EDIT';
+          //$auth='_EDIT';
         }else{
           $numIssPatEdit=0;
         }
         
         if($this->auth['authiss']['audit']){
           $numIssPatAudit=$issSet->where($mapAudit)->count();
-          $auth='_AUDIT'; 
+          //$auth='_AUDIT'; 
         }else{
           $numIssPatAudit=0;
         }
         
         if($this->auth['authiss']['approve']){
           $numIssPatApprove=$issSet->where($mapApprove)->count();
-          $auth='_APPROVE'; 
+          //$auth='_APPROVE'; 
         }else{
           $numIssPatApprove=0;
         }
         
         if($this->auth['authiss']['execute']){
           $numIssPatExecute=$issSet->where($mapExecute)->count();
-          $auth='_EXECUTE'; 
+          //$auth='_EXECUTE'; 
         }else{
           $numIssPatExecute=0;
         }
@@ -432,7 +432,7 @@ class Dashboard2Controller extends \think\Controller
           $mapRenew['status'] =['in',['授权','续费授权']];          
           // 查出满足条件的patent
           $numPatRenewTotal= PatinfoModel::where($mapRenew)->where('renewdeadlinedate','between time',[$this->today,$deadline])->count();
-          $auth='_MAINTAIN';
+        //$auth='_MAINTAIN';
         }else{
           $numIssPatMaintain=0;
           $numPatRenewTotal=0;
@@ -1023,6 +1023,7 @@ class Dashboard2Controller extends \think\Controller
           //issData
           $issData=array('topic'=>$request->param('issPatTopic'),
                           'abstract'=>$request->param('issPatAbstract'),
+                          'status'=>'待审核'
                           );
           //更新，自定义issUpdate()方法
           //$issMdl->issUpdate($issData,$issId);
@@ -1104,7 +1105,7 @@ class Dashboard2Controller extends \think\Controller
           
           //2.patrecord更新
           //patRdData
-          $patRdData=array('actdetail'=>'专利《'.$patSet->topic.'》新增填报');
+          $patRdData=array('actdetail'=>'专利《'.$patMdl::get($patId)->topic.'》新增填报');
           //更新，自定义patRdUpdate()方法
           //$patRdMdl->patRdUpdate($patRdData,$patId);
           //更新，模型update()方法
@@ -1118,7 +1119,7 @@ class Dashboard2Controller extends \think\Controller
           //更新，自定义issUpdate()方法
           //$issMdl->issUpdate($issData,$issId);
           //更新，模型模型update()方法
-          $issMdl::update($patData,['id'=>$patId],true);
+          $issMdl::update($issData,['id'=>$issId],true);
           
           //4.issrecord更新
           //issRdData
@@ -1255,25 +1256,29 @@ class Dashboard2Controller extends \think\Controller
           $oprtCHNStr='审批';
           //根据$issStatus的值进行赋值
           if($issStatus=='审核通过' || $issStatus=='审核未通过' ){
-            $patData=array('status'=>'拟申报(内审批准)',
+            $patData=array('status'=>'拟申报',
                             'auditrejectdate'=>$this->now,
                             );
             $patRdData=array('act'=>$oprtCHNStr,
-                              'actdetail'=>'专利《'.$request->param('patTopic').'》审批结果：<span class="label label-success">拟申报(内审批准)</span></br>'
+                              'actdetail'=>'专利《'.$request->param('patTopic').'》审批结果：<span class="label label-success">拟申报</span>(内审批准)</br>'
                               );
             $issData=array('status'=>'批准申报',
                             'executer'=>$request->param('executer')
                             );
             $issRdData=array('act'=>$oprtCHNStr,
-                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审批结果：<span class="label label-success">批准申报</span></br>'
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审批结果：<span class="label label-success">批准申报</span></br>
+                                            专利事务执行人：<span class="text-primary">【<strong>'.$request->param('executer').'</strong>】</span></br>'
                               );
             
           }else if($issStatus=='变更申请'){
+            
             $issData=array('status'=>'准予变更',
+                            'executer'=>$issMdl::get($issId)->executerchangeto,
                             'auditrejectdate'=>$this->now,
                             );
             $issRdData=array('act'=>$oprtCHNStr,
-                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审批结果：<span class="label label-success">准予变更</span></br>'
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》"变更申请"审批结果：<span class="label label-success">准予变更</span></br>
+                                            专利事务执行人：<span class="text-primary">【<strong>'.$issMdl::get($issId)->executer.'</strong>】</span></br>'
                               );
           }else{
             //$issStatus=='拟续费'
@@ -1329,8 +1334,9 @@ class Dashboard2Controller extends \think\Controller
                             'auditrejectdate'=>$this->now,
                             );
             $issRdData=array('act'=>$oprtCHNStr,
-                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审批结果：<span class="label label-danger">否决变更</span></br>
-                                            审批意见：<span class="text-primary">'.$request->param('approveMsg').'</span></br>'
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》"变更申请"审批结果：<span class="label label-danger">否决变更</span></br>
+                                            审批意见：<span class="text-primary">'.$request->param('approveMsg').'</span></br>
+                                            专利事务执行人：<span class="text-primary">【<strong>'.$issMdl::get($issId)->executer.'</strong>】</span></br>'
                               );
           }else{
             //$issStatus=='拟续费'
@@ -1344,7 +1350,8 @@ class Dashboard2Controller extends \think\Controller
                             );
             $issRdData=array('act'=>$oprtCHNStr,
                               'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》审批结果：<span class="label label-default">放弃续费</span></br>
-                                            审批意见：<span class="text-default">'.$request->param('approveMsg').'</span></br>'
+                                            审批意见：<span class="text-default">'.$request->param('approveMsg').'</span></br>
+                                            专利事务执行人：<span class="text-primary">【<strong>'.$issMdl::get($issId)->executer.'</strong>】</span></br>'
                               );
           }
           //1.patinfo更新
@@ -1452,17 +1459,29 @@ class Dashboard2Controller extends \think\Controller
           
           //3.issinfo更新
           //issData
-          $issData=array('status'=>'变更申请',
-                          'executerchangeto'=>$this->username,
-                          );
+          //执行人变更
+            if($request->param('changeExecuter')){
+              $issData=array('status'=>'变更申请',
+                              'executerchangeto'=>$request->param('executer'),
+                              'executerchangemsg'=>$request->param('executeMsg'),
+                              );
+              $strAppend='申请执行人由【<strong>'.$this->username.'</strong>】变更为【<strong>'.$request->param('executer').'</strong>】</br>';
+            }else{
+              //非执行人变更
+              $issData=array('status'=>'变更申请',
+                              'executerchangeto'=>$this->username,
+                              'executerchangemsg'=>$request->param('executeMsg'),
+                              );
+              $strAppend='';
+            }
           //更新，模型模型update()方法
           $issMdl::update($issData,['id'=>$issId],true);
           
           //4.issrecord新增
           //issRdData
           $issRdData=array('act'=>$oprtCHNStr,
-                            'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报变更申请</br>
-                                变更申请意见：<span class="text-warning">'.$request->param('executeMsg').'</span></br>'
+                            'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报变更申请</br>'.$strAppend.'
+                                变更申请原因：<span class="text-warning">'.$request->param('executeMsg').'</span></br>'
                             );
           //新增，模型create()方法
           $issRdMdl::create(array_merge($issRdData,$issRdDataPatch),true);
@@ -1476,12 +1495,27 @@ class Dashboard2Controller extends \think\Controller
         case'_REPORT':
           //patId!=0,issId!=0
           $oprtCHNStr='申报执行报告';
-          //1.patinfo无
+          //1.patinfo更新
+          $patData=array('topic'=>$request->param('patTopic'),
+                          'pattype'=>$request->param('patType'),
+                          'patowner'=>$request->param('patOwner'),
+                          'inventor'=>$request->param('patInventor'),
+                          'otherinventor'=>$request->param('patOtherInventor'),
+                          );
+          //更新，模型update()方法
+          $patMdl::update($patData,['id'=>$patId],true);
+          
           //2.patrecord无
-          //3.issinfo无
+          
+          //3.issinfo更新
+          $issData=array('topic'=>$request->param('issPatTopic'),
+                          'abstract'=>$request->param('issPatAbstract'),
+                          'status'=>'申报执行'
+                          );
+          //更新，模型模型update()方法
+          $issMdl::update($issData,['id'=>$issId],true);
           
           //4.issrecord新增
-          //issRdData
           $issRdData=array('act'=>$oprtCHNStr,
                             'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报执行报告</br>
                                 报告简述：<span class="text-primary">'.$request->param('executeMsg').'</span></br>'
@@ -1493,17 +1527,30 @@ class Dashboard2Controller extends \think\Controller
           //attData
           $attData=array('deldisplay'=>0);
           
+          $msg.='完成</br>';
+          
         break;
         
         case'_FINISH':
           //patId!=0,issId!=0
           $oprtCHNStr='申报提交复核';
-          //1.patinfo无
+          //1.patinfo更新
+          $patData=array('topic'=>$request->param('patTopic'),
+                          'pattype'=>$request->param('patType'),
+                          'patowner'=>$request->param('patOwner'),
+                          'inventor'=>$request->param('patInventor'),
+                          'otherinventor'=>$request->param('patOtherInventor'),
+                          );
+          //更新，模型update()方法
+          $patMdl::update($patData,['id'=>$patId],true);
+          
           //2.patrecord无
           
           //3.issinfo更新
-          //issData
-          $issDataPatch=array('status'=>'申报复核');
+          $issData=array('topic'=>$request->param('issPatTopic'),
+                          'abstract'=>$request->param('issPatAbstract'),
+                          'status'=>'申报复核'
+                          );
           //更新，模型模型update()方法
           $issMdl::update($issData,['id'=>$issId],true);
           
@@ -1519,6 +1566,8 @@ class Dashboard2Controller extends \think\Controller
           //5.attinfo更新
           //attData
           $attData=array('deldisplay'=>0);
+          
+          $msg.='完成</br>';
           
         break;
         //“_MAINTAIN”权限拥有的操作

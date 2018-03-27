@@ -1192,7 +1192,7 @@ class IndexController extends \think\Controller
         break;
         // '内审'   
         case '#audit':
-          $map['status'] =['in',['内审','内审否决']];
+          $map['status'] =['in',['内审','内审否决','内审修改']];
         break;
         // '拟申报'   
         case '#newAdd':

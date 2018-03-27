@@ -32,13 +32,29 @@
 		<!-- // class="sr-only" 仅源代码文件中显示-->
 		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
 		<input id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" class="sr-only">
+	
+	{eq name="$iss.status" value="变更申请"}
+	
+	<div class="row myRow ">
+	{if condition="$iss.executer != $iss.executerchangeto"}
+		<div id="divExecuterChange" class="form-group col-sm-6" >
+			<p class="myedge-left-info">执行人【<span class="text-primary"><strong>{$iss.executer}</strong></span>】申请变更"执行人"为【<span class="text-danger"><strong>{$iss.executerchangeto}</strong></span>】</p>
+			<p class="myedge-left-info">申请变更原因：</br><span class="text-primary">{$iss.executerchangemsg}</span></p>	
+		</div>
+	{else /}
+		<div id="divElseChange" class="form-group col-sm-6" >
+			<p class="myedge-left-info">执行人【<span class="text-primary">{$iss.executer}</span>】申请变更原因：</br><span class="text-primary">{$iss.executerchangemsg}</span></p>	
+		</div>
+	{/if}
+	</div>
+	{/eq}
 		
 	<div class="row myRow">
 		<div class="form-group col-sm-4">
-		<label for="approveResult">结论<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+		<label for="approveResult">结果<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 		<select id="approveResult" class="empty-check form-control" name="auditResult" style="font-size:100%;">
 			<option value="0" class="text-warning bg-warning" >……</option>
-		{eq name="$iss.status" value="拟续费"}
+		{in name="$iss.status" value="拟续费,变更申请"}
 			<option class="text-success bg-success" value="_PERMIT">批准</option>
 			<option class="text-danger bg-danger" value="_VETO">否决</option>
 			
@@ -49,7 +65,7 @@
 			<option class="text-danger bg-danger" value="_VETO">否决</option>
 			<option class="text-primary bg-info" value="_COMPLETE">修改完善</option>	
 				
-		{/eq}
+		{/in}
 		</select>
 		</div>
 		
@@ -70,8 +86,7 @@
 		</div>
 
 	</div>
-	
-	
+		
 	</form>
 </div>
 
@@ -79,7 +94,7 @@
 
 
 {block name="btn"}
-{eq name="$iss.status" value="拟续费"}
+{in name="$iss.status" value="拟续费,变更申请"}
 	<button type="submit" id="btnPermit" class="resetHide btn btn-success btn-sm" data-oprt="_PERMIT" data-issTopic="{$iss.topic}" data-btnLabel="label-success"><span class="glyphicon glyphicon-ok"></span>批准</button>
 	<button type="submit" id="btnVeto" class="resetHide btn btn-danger btn-sm" data-oprt="_VETO" data-issTopic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-remove"></span>否决</button>
 
@@ -89,7 +104,7 @@
 	
 	<button type="submit" id="btnComplete" class="resetHide btn btn-primary btn-sm" data-oprt="_COMPLETE" data-issTopic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-erase"></span>修改完善</button>
 
-{/eq}	
+{/in}	
 	
 {/block}
 
@@ -157,7 +172,7 @@ $(document).ready(function(){
 	});
 
 <!-- function -->	
-	//**函数名：showOperator
+	//**函数名：showExecuter
  	//*作用：向单选框填充"执行人"的内容选项
 	//* 参数1：Obj，必须。类型：对象，值：单选框的对象名称
 	//*参数2：attach，可为空。类型：json数组，值：需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
@@ -176,13 +191,11 @@ $(document).ready(function(){
 			dataType:"json",
 			success:function(backData){
 				var data=backData;
-
 				var str='<option value="">……</option>';
 				if(attach){
 					for(i=0;i<attach.length;i++){
 						str+="<option value='"+attach[i].val+"'>"+attach[i].text+"</option>";
 					}
-					
 				}
 				<!-- // 遍历data数组组装HTML语句 -->
 				<!-- // data的结构是数组类的：[{id:1,username:"xx", dept:"yy"},{}],所以要进行嵌套取出id，username和dept的值组装HTML语句-->
@@ -196,19 +209,17 @@ $(document).ready(function(){
 						}
 					});
 				});
-				
 				<!--// 清空单选框Obj的所有选项-->
 				Obj.empty();
 				<!--// 添加单选框Obj的新选项-->
 				Obj.append(str);
-				
 				<!-- // value=selected 的项为选定项-->
 				if (selected){
 					Obj.val(selected).attr('selected','selected');
 				}
 			},
 			error: function() {
-               alert("失败operator，请稍后再试！");
+               $.alert('获取执行人列表失败，请稍后再试！');
             }
 		});
 	}

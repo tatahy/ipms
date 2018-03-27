@@ -65,7 +65,7 @@
 			<footer>
 				<div class="row">
 					<div class="col-sm-3">
-						<a href="{$home}/patent/index/patinfo/id/{$pat.id}" target="_blank" data-toggle="tooltip" title="事务详情">查看详情</a>
+						<a href="{$home}/patent/index/patinfo/id/{$pat.id}" target="_blank" data-toggle="tooltip" title="专利详情">查看详情</a>
 						
 					</div>
 							
@@ -89,13 +89,12 @@
 	<div class="myFieldset">	
 	
 		<div class="myLegend"><span class="label label-warning">专利XX（表单）</span></div>
-			
 		
-			<form action="" id="fmPat">
-			<!-- // class="sr-only" 仅源代码文件中显示-->
+		<form action="" id="fmPat">
+		<!-- // class="sr-only" 仅源代码文件中显示-->
 			<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
 			
-			</form>
+		</form>
 	</div>	
 {/block}			
 
@@ -111,13 +110,13 @@
 				<thead>
 					<tr>
 						<!-- <th>选择</th> -->
-						<th>序号</th>
-						<th>附件类型</th>
-						<th>附件名称</th>
-						<th>上传日期</th>
-						<th>上传人</th>
-						<th>系统角色</th>
-						<th>操作</th>
+						<th class="text-center">序号</th>
+						<th class="text-center">附件类型</th>
+						<th class="text-center">附件名称</th>
+						<th class="text-center">上传日期</th>
+						<th class="text-center">上传人</th>
+						<th class="text-center">系统角色</th>
+						<th class="text-center">操作</th>
 					</tr>
 				</thead>
 						
@@ -260,7 +259,8 @@
 
 <script>
 $(document).ready(function(){
-	
+	//enable all tooltips in the document
+	$('[data-toggle="tooltip"]').tooltip(); 
 	$('.modal-footer').attr('hidden',true);
 	
 	//#divAbstractCollapse“概要显示”
@@ -344,10 +344,8 @@ $(document).ready(function(){
 			}
 			var auth='{$auth}';
 			
-			var btnHtml='<span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:14px;">'+$(this).html()+'</span>《'+topic+'》';
-			<!-- var btnHtml='<span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:16px;">'+$(this).html()+'</span>'; -->
-			
-			
+			<!-- var btnHtml='<span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:14px;">'+$(this).html()+'</span>《'+topic+'》'; -->
+			var btnHtml='《'+topic+'》<span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:14px;">'+$(this).html()+'</span>';
 
 			var url='issPatOprt';
 			<!-- var url='test'; -->
@@ -392,7 +390,7 @@ $(document).ready(function(){
 									$.post(url,param,function(data){
 										<!-- //后端数据处理成功后的动作： -->
 										//1.结合后端传来的内容$msg，更新modalIssPatAuthSingle的body内容
-										$('#divIssPatSingle_load').html('<div style="text-align:center;margin-bottom:50px;margin-top:50px;"><h4>'+btnHtml+'&nbsp;</h4></p>'+data.msg+'</p></div>');
+										$('#divIssPatSingle_load').html('<div style="text-align:center;margin-bottom:50px;margin-top:50px;"><h4>'+btnHtml+'&nbsp;'+data.msg+'</h4></div>');
 										//2. 显示“返回”按钮
 										$('.modal-footer').attr('hidden',false);
 										$('#modalIssPatAuthSingle').modal('show');
@@ -427,7 +425,7 @@ $(document).ready(function(){
 							$.post(url,param,function(data){
 								<!-- //后端数据处理成功后的动作： -->
 								//1.结合后端传来的内容$msg，更新modalIssPatAuthSingle的body内容
-								$('#divIssPatSingle_load').html('<div style="text-align:center;margin-bottom:50px;margin-top:50px;"><h4>'+btnHtml+'&nbsp;</h4></p>'+data.msg+'</p></div>');
+								$('#divIssPatSingle_load').html('<div style="text-align:center;margin-bottom:50px;margin-top:50px;"><h4>'+btnHtml+'&nbsp;'+data.msg+'</h4></div>');
 								//2. 显示“返回”按钮
 								$('.modal-footer').attr('hidden',false);
 								$('#modalIssPatAuthSingle').modal('show');
@@ -558,6 +556,9 @@ $(document).ready(function(){
 		
 		//隐藏
 		$('.resetHide').hide();
+		
+		// select显示为模板变量值
+		$('#patType').val('{$patType}').attr('selected');
 	
 	});
 

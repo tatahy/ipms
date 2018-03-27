@@ -10,12 +10,64 @@
 {/block}
 
 {block name="patInput"}
-
-			<form action="" id="fmPat">
-<!-- // class="sr-only" 仅源代码文件中显示-->
+	<div id="divPatApplyInfo" class="myFieldset resetHide">	
+	
+		<div class="myLegend"><span class="label label-warning">专利申报信息</span></div>		
+		<form action="" id="fmPat">
 			<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
+			<input id="patTopic" name="patTopic" value="{$pat.topic}" type="text" class="sr-only">
 			
-			</form>
+			<div class="row myRow" >			
+				<div class="form-group col-sm-4">
+					<label for="patApplyNum">专利申报号<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patApplyNum" name="patApplyNum" value="" type="text" required>
+				</div>
+				
+				<div class="form-group col-sm-4">
+					<label for="patAdmin">专利管理机构<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patAdmin" name="patAdmin" value="中华人民共和国国家知识产权局" type="text" placeholder="中华人民共和国国家知识产权局" required>
+				</div>
+				
+				<div class="form-group col-sm-4">
+					<label for="patAgency">专利申报代理<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patAgency" name="" value="" type="text" placeholder="xx专利商标事务有限公司" required>
+				</div>
+				
+			</div>
+			
+			<div class="row myRow" >			
+				<div class="form-group col-sm-4">
+					<label for="patOwner">专利所有人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patOwner" name="patOwner" value="广州市光机电技术研究院" type="text" placeholder="广州市光机电技术研究院" required>
+				</div>
+				
+				<div class="form-group col-sm-4">
+					<label for="patInventor">专利发明人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patInventor" name="patInventor" value="{$pat.inventor}" type="text" required>
+				</div>
+				
+				<div class="form-group col-sm-4">
+					<label for="patOtherInventor">专利其他发明人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patOtherInventor" name="patOtherInventor" value="{$pat.otherinventor}" type="text" required>
+				</div>
+				
+			</div>
+			
+			<div class="row myRow" >			
+				<div class="form-group col-sm-4">
+					<label for="patKeyword">专利关键词<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patKeyword" name="patKeyword" value="" type="text" placeholder="关键词" required>
+				</div>
+				
+				<div class="form-group col-sm-8">
+					<label for="patSummary">专利简介<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<textarea class="form-control" rows="5" id="patSummary" name="patSummary" type="text" placeholder="请填入专利的简介" required></textarea>
+				</div>
+				
+			</div>
+			
+		</form>
+	</div>	
 {/block}
 
 {block name="attInput"}
@@ -25,11 +77,6 @@
 
 {block name="issPatInput"}
 
-{in name="$oprt" value="_ADDNEW"}
-
-{else/}
-
-{/in}
 <div class="myFieldset">
 
 {switch name="$iss.status"}
@@ -103,10 +150,12 @@
 			</div>
 		
 			<div id="divMaintainMsg" class="resetHide form-group col-sm-8 ">
-				<label for="maintainMsg">具体原因/内容<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<label for="maintainMsg">申报复核说明<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 				<textarea class="empty-check form-control" rows="5" id="maintainMsg" name="maintainMsg" type="text" placeholder="请填入具体的原因/内容" required></textarea>
 			</div>
 		</div>
+		
+		
 	</form>
 
 	{/case}
@@ -146,7 +195,7 @@
 	{/case}
 	
 	{case value="申报复核"}
-		<button type="submit" id="btnApply" class="resetHide btn btn-primary  btn-sm" data-oprt="_APPLAY" data-issTopic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-send"></span>提交申报</button>
+		<button type="submit" id="btnApply" class="resetHide btn btn-danger btn-sm" data-oprt="_APPLAY" data-issTopic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-send"></span>&nbsp;提交申报</button>
 		<button type="submit" id="btnImprove" class="resetHide btn btn-primary  btn-sm" data-oprt="_IMPROVE" data-issTopic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-plus-sign"></span>修改</button>
 	{/case}
 	
@@ -169,8 +218,9 @@ $(document).ready(function(){
 		//恢复到default状态
 		$('.resetHide').hide();
 		$(this).removeClass('label label-danger label-primary label-success');
-		//#maintainMsg去掉'empty-check'，取消非空检查
-		$('#maintainMsg').removeClass('empty-check');	
+		//去掉'empty-check'，取消非空检查
+		$('#maintainMsg').removeClass('empty-check');
+		$('#divPatApplyInfo').children().find('.form-control').removeClass('empty-check');		
 		
 		switch($(this).val()){			
 			case '_IMPROVE':
@@ -183,10 +233,12 @@ $(document).ready(function(){
 			
 			case '_APPLY':
 				$('#divMaintainMsg').show();
+				$('#divPatApplyInfo').show();
 				$('#btnApply').show();
-				$(this).addClass('label label-primary');
-				//#maintainMsg增加'empty-check'，列入非空检查
+				$(this).addClass('label label-danger');
+				//增加'empty-check'，列入非空检查
 				$('#maintainMsg').addClass('empty-check');
+				$('#divPatApplyInfo').children().find('.form-control').addClass('empty-check');
 			break;
 			
 			case '_AUTHORIZE':

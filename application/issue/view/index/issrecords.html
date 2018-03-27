@@ -73,17 +73,17 @@ $(document).ready(function(){
 				<thead>
 					<tr>
 						<!-- <th>选择</th> -->
-						<th>序号</th>
-						<th>用户</th>
-						<th>系统角色</th>
-						<th>操作</th>
-						<th>操作说明</th>
-						<th>操作时间</th>
+						<th class="text-center">序号</th>
+						<th class="text-center">用户</th>
+						<th class="text-center">系统角色</th>
+						<th class="text-center">操作</th>
+						<th class="text-center">操作说明</th>
+						<th class="text-center">操作时间</th>
 					</tr>
 				</thead>
 				<tbody><!-- 此处显示数据库查询后的数据集 -->
 					{volist name="issrecords" id="vo" empty="暂无信息"}
-					<tr>
+					<tr >
 						<!-- <td><input type="checkbox" check=""></td> -->
 						<td>{$i}</td>
 						<td>{$vo.username}</a></td>
