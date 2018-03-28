@@ -1001,8 +1001,9 @@ class Dashboard2Controller extends \think\Controller
                           'author'=>$request->param('patAuthor'),
                           'dept'=>$request->param('dept'),
                           
-                          'status'=>'内审',
                           'submitdate'=>$this->now,
+                          'status'=>'内审',
+                          
                           );
           //更新，自定义patUpdate()方法
          // $patMdl->patUpdate($patData,$patId);
@@ -1023,6 +1024,7 @@ class Dashboard2Controller extends \think\Controller
           //issData
           $issData=array('topic'=>$request->param('issPatTopic'),
                           'abstract'=>$request->param('issPatAbstract'),
+                          'submitdate'=>$this->now,
                           'status'=>'待审核'
                           );
           //更新，自定义issUpdate()方法
@@ -1096,7 +1098,6 @@ class Dashboard2Controller extends \think\Controller
                           'dept'=>$request->param('dept'),
                           
                           'status'=>'内审',
-                          'submitdate'=>$this->now,
                           );
           //更新，自定义patUpdate()方法
           //$patMdl->patUpdate($patData,$patId);
@@ -1132,6 +1133,8 @@ class Dashboard2Controller extends \think\Controller
           //5.attinfo更新
           //attData                      
           $attData=array('deldisplay'=>1);
+          
+          $msg.='成功。<br>';  
           
         break;
         //“_AUDIT”权限拥有的操作
@@ -1439,16 +1442,16 @@ class Dashboard2Controller extends \think\Controller
           
           //4.issrecord新增
           //issRdData         
-          $issRdDataPatch=array('act'=>$oprtCHNStr,
-                                'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报开始</br>'
-                                );
+          $issRdData=array('act'=>$oprtCHNStr,
+                            'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报开始</br>'
+                            );
           //新增，模型create()方法
           $issRdMdl::create(array_merge($issRdData,$issRdDataPatch),true);
           
           //5.attinfo更新
           //attData
           $attData=array('deldisplay'=>0);
-          
+          $msg.='成功</br>';
         break;
         
         case'_REFUSE':
@@ -1518,7 +1521,7 @@ class Dashboard2Controller extends \think\Controller
           //4.issrecord新增
           $issRdData=array('act'=>$oprtCHNStr,
                             'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报执行报告</br>
-                                报告简述：<span class="text-primary">'.$request->param('executeMsg').'</span></br>'
+                                          报告简述：<span class="text-primary">'.$request->param('executeMsg').'</span></br>'
                             );
           //新增，模型create()方法
           $issRdMdl::create(array_merge($issRdData,$issRdDataPatch),true);
@@ -1578,6 +1581,15 @@ class Dashboard2Controller extends \think\Controller
           if($issStatus=='申报复核'){
             $patData=array('status'=>'申报',
                             'applydate'=>$this->now,
+                            
+                            'patapplynum'=>$request->param('patApplyNum'),
+                            'patadmin'=>$request->param('patAdmin'),
+                            'patagency'=>$request->param('patAgency'),
+                            'patowner'=>$request->param('patOwner'),
+                            'inventer'=>$request->param('patInventor'),
+                            'otherinventor'=>$request->param('patOtherInventor'),
+                            'keyword'=>$request->param('patKeyword'),
+                            'summary'=>$request->param('patSummary'),
                             );
             $patRdData=array('act'=>$oprtCHNStr,
                               'actdetail'=>'专利《'.$request->param('patTopic').'》申报提交</br>
@@ -1627,6 +1639,37 @@ class Dashboard2Controller extends \think\Controller
           //5.attinfo更新
           //attData
           $attData=array('deldisplay'=>0);
+          
+          $msg.='完成';
+        break;
+        
+        case'_REVIEW':
+          //patId!=0,issId!=0
+          $oprtCHNStr='复核修改';
+          //1.patinfo更新
+          $patData=array('patapplynum'=>$request->param('patApplyNum'),
+                          'patadmin'=>$request->param('patAdmin'),
+                          'patagency'=>$request->param('patAgency'),
+                          'patowner'=>$request->param('patOwner'),
+                          'inventer'=>$request->param('patInventor'),
+                          'otherinventor'=>$request->param('patOtherInventor'),
+                          'keyword'=>$request->param('patKeyword'),
+                          'summary'=>$request->param('patSummary'),
+                          );
+          //更新，模型update()方法
+          $pat=$patMdl::update($patData,['id'=>$patId],true);
+          
+          //2.patrecord无
+          
+          //3.issinfo无
+          
+          //4.issrecord无
+          
+          //5.attinfo更新
+          //attData
+          $attData=array('deldisplay'=>0);
+          
+          $msg.='完成';
           
         break;
         
@@ -1933,7 +1976,7 @@ class Dashboard2Controller extends \think\Controller
        
       //return $msg;
       //return json(array('msg'=>$msg,'btnHtml'=>$btnHtml,'topic'=>$request->param('issPatTopic')));
-      return json(array('msg'=>$msg,'topic'=>$request->param('issPatTopic'),'patId'=>$patId,'issId'=>$issId));
+      return json(array('msg'=>$msg,'topic'=>$issMdl::get($issId)->topic,'patId'=>$patId,'issId'=>$issId));
       //return $this->issPatAuth($request);//参数不够，不会产生分页。
     }
     
