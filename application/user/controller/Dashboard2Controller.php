@@ -826,7 +826,7 @@ class Dashboard2Controller extends \think\Controller
       if(!empty($request->param('auth'))){
         $auth=$request->param('auth');
       }else{
-        $auth='_NONE';
+        $auth='_DONE';
       }
       
       // $patId接收前端页面传来的patId值
@@ -894,10 +894,10 @@ class Dashboard2Controller extends \think\Controller
       
       $oprtCHNStr='';
       
-      $msg="";
+      $msg='完成';
       
 //<结构2.----------------------------------------------------------------------------------------->
-//20个oprt接收前端页面传来的数据，分别对变量赋值再进行数据库表的操作
+//21个oprt接收前端页面传来的数据，分别对变量赋值再进行数据库表的操作
       switch($oprt){
         //“_EDIT”权限拥有的操作
         case'_ADDNEW':
@@ -1576,9 +1576,10 @@ class Dashboard2Controller extends \think\Controller
         //“_MAINTAIN”权限拥有的操作
         case'_APPLY':
           //patId!=0,issId!=0
-          $oprtCHNStr='<span class="label label-primary">申报正式提交</span>';
+          
           //根据$issStatus的值进行赋值
           if($issStatus=='申报复核'){
+            $oprtCHNStr='<span class="label label-primary">授权申报正式提交</span>';
             $patData=array('status'=>'申报',
                             'applydate'=>$this->now,
                             
@@ -1592,32 +1593,32 @@ class Dashboard2Controller extends \think\Controller
                             'summary'=>$request->param('patSummary'),
                             );
             $patRdData=array('act'=>$oprtCHNStr,
-                              'actdetail'=>'专利《'.$request->param('patTopic').'》申报提交</br>
-                                            申报提交简述：<span class="text-primary">'.$request->param('maintainMsg').'</span></br>'
+                              'actdetail'=>'专利《'.$request->param('patTopic').'》申报提交</br>申报提交简述：<span class="text-primary">'.$request->param('maintainMsg').'</span></br>'
                               );
             $issData=array('status'=>'申报提交',
                             'applydate'=>$this->now,
                             );
             $issRdData=array('act'=>$oprtCHNStr,
-                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报提交</br>
-                                            申报提交简述：<span class="text-primary">'.$request->param('maintainMsg').'</span></br>'
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报提交</br>申报提交简述：<span class="text-primary">'.$request->param('maintainMsg').'</span></br>'
                               );
             
           }else{
             //$issStatus=='准予续费'
+            $oprtCHNStr='<span class="label label-primary">续费申报正式提交</span>';
             $patData=array('status'=>'续费中',
+                            'patrenewapplynum'=>$request->param('patRenewApplyNum'),
+                            'patadmin'=>$request->param('patAdmin'),
+                            'patrenewagency'=>$request->param('patRenewAgency'),
                             'renewapplydate'=>$this->now,
                             );
             $patRdData=array('act'=>$oprtCHNStr,
-                              'actdetail'=>'专利《'.$request->param('patTopic').'》续费申报提交</br>
-                                            申报提交简述：<span class="text-primary">'.$request->param('maintainMsg').'</span></br>'
+                              'actdetail'=>'专利《'.$request->param('patTopic').'》续费申报提交</br>申报提交简述：<span class="text-primary">'.$request->param('maintainMsg').'</span></br>'
                               );
             $issData=array('status'=>'续费提交',
                             'applydate'=>$this->now,
                             );
             $issRdData=array('act'=>$oprtCHNStr,
-                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》续费申报提交</br>
-                                            申报提交简述：<span class="text-primary">'.$request->param('maintainMsg').'</span></br>'
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》续费申报提交</br>申报提交简述：<span class="text-primary">'.$request->param('maintainMsg').'</span></br>'
                               );
           }
           //1.patinfo更新
@@ -1639,13 +1640,13 @@ class Dashboard2Controller extends \think\Controller
           //5.attinfo更新
           //attData
           $attData=array('deldisplay'=>0);
-          
-          $msg.='完成';
         break;
         
         case'_REVIEW':
           //patId!=0,issId!=0
           $oprtCHNStr='复核修改';
+          //根据$issStatus的值进行赋值
+          if($issStatus=='申报复核'){
           //1.patinfo更新
           $patData=array('patapplynum'=>$request->param('patApplyNum'),
                           'patadmin'=>$request->param('patAdmin'),
@@ -1656,6 +1657,16 @@ class Dashboard2Controller extends \think\Controller
                           'keyword'=>$request->param('patKeyword'),
                           'summary'=>$request->param('patSummary'),
                           );
+          
+          }else{
+            //$issStatus=='准予续费'
+            $patData=array('status'=>'续费中',
+                            'patrenewapplynum'=>$request->param('patRenewApplyNum'),
+                            'patadmin'=>$request->param('patAdmin'),
+                            'patrenewagency'=>$request->param('patRenewAgency'),
+                            'renewapplydate'=>$this->now,
+                            );
+          }
           //更新，模型update()方法
           $pat=$patMdl::update($patData,['id'=>$patId],true);
           
@@ -1668,9 +1679,6 @@ class Dashboard2Controller extends \think\Controller
           //5.attinfo更新
           //attData
           $attData=array('deldisplay'=>0);
-          
-          $msg.='完成';
-          
         break;
         
         case'_IMPROVE':
@@ -1679,10 +1687,11 @@ class Dashboard2Controller extends \think\Controller
            if($issStatus=='申报复核'){
             $oprtCHNStr='申报修改';
             
-            $issData=array('status'=>'申报修改');
+            $issData=array('status'=>'申报修改',
+                            'statussummary'=>$request->param('maintainMsg')
+                            );
             $issRdData=array('act'=>$oprtCHNStr,
-                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报复核结果：申报修改</br>
-                                            申报修改原因：<span class="text-primary">'.$request->param('maintainMsg').'</span></br>'
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报复核结果：申报修改</br>申报修改原因：<span class="text-primary">'.$request->param('maintainMsg').'</span></br>'
                               );
             
           }else{
@@ -1693,15 +1702,14 @@ class Dashboard2Controller extends \think\Controller
                             'modifydate'=>$this->now,
                             );
             $patRdData=array('act'=>$oprtCHNStr,
-                              'actdetail'=>'专利《'.$request->param('patTopic').'》申报提交结果：'.$oprtCHNStr.'</br> 
-                                            申报修改原因：<span class="text-warning">'.$request->param('maintainMsg').'</span></br>'
+                              'actdetail'=>'专利《'.$request->param('patTopic').'》申报提交结果：'.$oprtCHNStr.'</br>申报修改原因：<span class="text-warning">'.$request->param('maintainMsg').'</span></br>'
                               );
             $issData=array('status'=>'申报修改',
+                            'statussummary'=>$request->param('maintainMsg'),
                             'resultdate'=>$this->now,
                             );
             $issRdData=array('act'=>$oprtCHNStr,
-                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》'.$oprtCHNStr.'</br> 
-                                            申报修改原因：<span class="text-warning">'.$request->param('maintainMsg').'</span></br>'
+                              'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》'.$oprtCHNStr.'</br>申报修改原因：<span class="text-warning">'.$request->param('maintainMsg').'</span></br>'
                               );
           }
           //1.patinfo更新
@@ -1723,7 +1731,6 @@ class Dashboard2Controller extends \think\Controller
           //5.attinfo更新
           //attData
           $attData=array('deldisplay'=>0);
-          
         break;
         
         case'_AUTHORIZE':
@@ -1732,12 +1739,15 @@ class Dashboard2Controller extends \think\Controller
           //根据$issStatus的值进行赋值
           if($issStatus=='申报提交'){            
             $patData=array('status'=>'授权',
-                            'authrejectdate'=>$this->now,
+                            'patauthnum'=>$request->param('patAuthNum'),
+                            'authrejectdate'=>$request->param('authRejectDate'),
+                            'patadmin'=>$request->param('patAdmin'),
                             );
             $patRdData=array('act'=>$oprtCHNStr,
                               'actdetail'=>'专利《'.$request->param('patTopic').'》申报提交结果：'.$oprtCHNStr.'</br>'
                               );
             $issData=array('status'=>'专利授权',
+                            'statussummary'=>$oprtCHNStr,
                             'resultdate'=>$this->now,
                             );
             $issRdData=array('act'=>$oprtCHNStr,
@@ -1747,9 +1757,9 @@ class Dashboard2Controller extends \think\Controller
           }else{
             //$issStatus=='续费提交'
             $patData=array('status'=>'续费授权',
-                                //'authrejectdate'=>$request->param('xxDate'),
-                                //'nextrenewdate'=>$request->param('xxDate'),
-                                //'renewdeadlindate'=>$request->param('xxDate'),
+                            'patrenewauthnum'=>$request->param('patRenewAuthNum'),
+                            'renewauthrejectdate'=>$request->param('renewAuthRejectDate'),
+                            'patadmin'=>$request->param('patAdmin'),
                             );
             $patRdData=array('act'=>$oprtCHNStr,
                               'actdetail'=>'专利《'.$request->param('patTopic').'》续费申报提交结果：'.$oprtCHNStr.'</br>'
@@ -1789,14 +1799,16 @@ class Dashboard2Controller extends \think\Controller
           //根据$issStatus的值进行赋值
           if($issStatus=='申报提交'){            
             $patData=array('status'=>'驳回',
-                            'authrejectdate'=>$this->now,
+                            'authrejectdate'=>$request->param('authRejectDate'),
+                            'abandonrejectreason'=>$request->param('maintainMsg'),
                             );
             $patRdData=array('act'=>$oprtCHNStr,
                               'actdetail'=>'专利《'.$request->param('patTopic').'》申报提交结果：'.$oprtCHNStr.'</br>
                                             驳回原因：<span class="text-danger">'.$request->param('maintainMsg').'</span></br>'
                               );
             $issData=array('status'=>'专利驳回',
-                            'resultdate'=>$this->now,
+                            'statussummary'=>$request->param('maintainMsg'),
+                            'resultdate'=>$request->param('authRejectDate'),
                             );
             $issRdData=array('act'=>$oprtCHNStr,
                               'actdetail'=>'专利事务《'.$request->param('issPatTopic').'》申报提交结果：'.$oprtCHNStr.'</br>
@@ -1814,6 +1826,7 @@ class Dashboard2Controller extends \think\Controller
                                             驳回原因：<span class="text-danger">'.$request->param('maintainMsg').'</span></br>'
                               );
             $issData=array('status'=>'专利驳回',
+                            'statussummary'=>$request->param('maintainMsg'),
                             'resultdate'=>$this->now,
                             );
             $issRdData=array('act'=>$oprtCHNStr,
@@ -1961,15 +1974,15 @@ class Dashboard2Controller extends \think\Controller
               //更新att
               $attMdl::update(array_merge($attData,$attDataPatch),['id'=>$arrAttId[$i]],true);
                             
-              $msg.="附件".$name."移动成功</br>"; 
+              $msg.="附件".$name."已上传。</br>"; 
             }else{
-              $msg.="附件".$name."移动失败</br>"; 
+              $msg.="附件".$name."上传失败。</br>"; 
             }
           }
         } 
         
       }else{
-        $msg.="无附件移动</br>"; 
+        $msg.="无附件</br>"; 
       }
        
 //  </结构2.----------------------------------------------------------------------------------------->

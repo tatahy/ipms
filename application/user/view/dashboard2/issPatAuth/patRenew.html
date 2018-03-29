@@ -61,7 +61,6 @@
 <!-- Modal "modalPatRenew" -->
 <div class="modal fade" id="modalPatRenew" role="dialog">
     <div class="modal-dialog modal-lg">
-    
       <!-- Modal content-->
       	<div class="modal-content">
         <div class="modal-header bg-warning" style="border-radius:5px;">
@@ -71,118 +70,106 @@
         </div>
 		
         <div class="modal-body">
-			<!-- // 对patIssRenew的增删改查页面显示位置-->
-			<div id="divPatRenew">
-			<form id="fmIssPatRenew" action="" method="" role="form" enctype="multipart/form-data">
-				<!-- // 与本页的formDataAjax函数配合，传递本页所进行的oprt值到后端 -->
-				<h4><span class="label label-warning">专利续费事务</span></h4>
-				<input id="oprt" type="text" hidden="true">
-				<input id="patId" name="patId" type="text" hidden="true">
-				<div class="row">
-					<div class="form-group col-sm-4">
-						<label class="control-label" for="topic">事务标题topic<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-						<!-- <input class="form-control" id="topic" name="topic" value="" type="text" placeholder="关于XX专利的YY申请" required> -->
-						<textarea class="form-control" rows="2" id="topic" name="topic" placeholder="填写事务的主要内容，字数不超过100字。" required></textarea>
-					</div>
-					
-					<div class="form-group col-sm-2">
-						<label class="control-label" for="status">事务状态status</label>
-						<input class="form-control" id="status" name="status" value="拟续费" type="text" readonly="true">
-					</div>
-					
-					<div class="form-group col-sm-3">
-						<label for="issMapType">事务类型issMapType</label>
-						<select class="form-control" id="issMapType" name="issmap_type" readonly="true">
-							<option value="_ISST_PAT2">专利授权到期续费</option>
-						</select>
-					</div>
-					
-					<div class="form-group col-sm-3" >
-						<label for="issMapId">issMapId</label>
-						<input class="form-control" id="issMapId" name="issmap_id" value="" type="text" readonly="true">
-					</div>
-				</div>
-				
-				<div class="row">
-					<div class="form-group col-sm-3" >
-						<label for="numId">numId</label>
-						<input class="form-control" id="numId" name="num_id" value="" type="text" readonly="true">
-					</div>
-					
-					<div class="form-group col-sm-6">
-						<label class="control-label" for="abstract">事务简介abstract<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-						<textarea class="form-control" rows="5" id="abstract" name="abstract" placeholder="填写事务的主要内容，字数不超过100字。" required></textarea>
-					</div>
-					
-				</div>
-				
-				<div class="row">
-					<div class="form-group col-sm-3" >
-						<label for="addNewDate">addNewDate</label>
-						<input class="form-control" id="addNewDate" name="addNewDate" value="" type="text" readonly="true">
-					</div>
-					
-					<div class="form-group col-sm-3" >
-						<label for="writer">writer</label>
-						<input class="form-control" id="writer" name="writer" value="" type="text" readonly="true">
-					</div>
-					
-					<div class="form-group col-sm-3" >
-						<label for="dept">dept</label>
-						<input class="form-control" id="dept" name="dept" value="" type="text" readonly="true">
-					</div>
-					
-					<div class="form-group col-sm-3" >
-						<label for="executer">执行人</label>
-						<input class="form-control" id="executer" name="executer" value="" type="text" readonly="true">
-					</div>
-				</div>
-				
-				<h4><span class="label label-warning">续费专利概要</span></h4>
-				<div class="bs-callout bs-callout-warning">
-					<h4 id="h4Topic">名称：</h4>
-
-					<p id="pPatInfo">//</p>
-					
-					<footer>
-						<div class="row">
-							<div class="col-sm-4">
-								<a id="aDetail" href="#" target="_blank" data-toggle="tooltip" title="专利信息">查看详情</a>;&nbsp;状态：
-								<a id="aProcess" href="#" target="_blank" data-toggle="tooltip" title="过程记录"></a>
+			<div class="myFieldset">
+				<div class="myLegend" ><span class="label label-warning">续费专利概要</span></div>
+				<div class="row myRow-noform-group">
+					<div class="bs-callout bs-callout-default">
+						<h4 id="h4Topic">名称：</h4>
+						<p id="pPatInfo">//</p>
+						<footer>
+							<div class="row">
+								<div class="col-sm-4">
+									<a id="aDetail" href="#" target="_blank" data-toggle="tooltip" title="专利信息">查看详情</a>;&nbsp;状态：
+									<a id="aProcess" href="#" target="_blank" data-toggle="tooltip" title="过程记录"></a>
+								</div>
+								<div id="divPatAuthNum" class="col-sm-4">授权编号：</div>
+								<div id="divSubmitDate" class="col-sm-4">提交时间：</div>
 							</div>
-									
-							<div id="divPatAuthNum" class="col-sm-4">授权编号：</div>
-							
-							<div id="divSubmitDate" class="col-sm-4">提交时间：</div>
-									
-						</div>
-					</footer>
-						
-				</div>
-				
-				<div class="row">
-				<div class="form-group col-sm-12">			
-			
-					<button type="submit" id="btnAddRenew" class="btn btn-primary btn-sm" data-oprt="_ADDRENEW"><span class="glyphicon glyphicon-edit"></span>续费报告</button>
-			
- 					<div  class="pull-right">
-						<input type="reset" class="btn btn-primary btn-sm" value="重置">
-						<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
+						</footer>
 					</div>
 				</div>
-				</div>
+			</div>	
+			
+			<div class="myFieldset">
+				<div class="myLegend" ><span class="label label-warning">续费事务信息</span></div>
+					
+				<form id="fmIssPatRenew" action="" method="" role="form" enctype="multipart/form-data">
+					<input id="oprt" type="text" class="sr-only">
+					<input id="patId" name="patId" type="text" class="sr-only">
+					<div class="row myRow">
+						<div class="form-group col-sm-4">
+							<label class="control-label" for="topic">事务标题topic<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+						<!-- <input class="form-control" id="topic" name="topic" value="" type="text" placeholder="关于XX专利的YY申请" required> -->
+							<textarea class="form-control" rows="2" id="topic" name="topic" placeholder="填写事务的主要内容，字数不超过100字。" required></textarea>
+						</div>
+					
+						<div class="form-group col-sm-2">
+							<label class="control-label" for="status">事务状态status</label>
+							<input class="form-control" id="status" name="status" value="拟续费" type="text" readonly="true">
+						</div>
+					
+						<div class="form-group col-sm-3">
+							<label for="issMapType">事务类型issMapType</label>
+							<select class="form-control" id="issMapType" name="issmap_type" readonly="true">
+								<option value="_ISST_PAT2">专利授权到期续费</option>
+							</select>
+						</div>
+					
+						<div class="form-group col-sm-3" >
+							<label for="issMapId">issMapId</label>
+							<input class="form-control" id="issMapId" name="issmap_id" value="" type="text" readonly="true">
+						</div>
+					</div>
 				
-			</form>
+					<div class="row myRow">
+						<div class="form-group col-sm-3" >
+							<label for="numId">numId</label>
+							<input class="form-control" id="numId" name="num_id" value="" type="text" readonly="true">
+						</div>
+					
+						<div class="form-group col-sm-6">
+							<label class="control-label" for="abstract">事务简介abstract<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+							<textarea class="form-control" rows="5" id="abstract" name="abstract" placeholder="填写事务的主要内容，字数不超过100字。" required></textarea>
+						</div>
+					
+					</div>
+				
+					<div class="row myRow">
+						<div class="form-group col-sm-3" >
+							<label for="addNewDate">addNewDate</label>
+							<input class="form-control" id="addNewDate" name="addNewDate" value="" type="text" readonly="true">
+						</div>
+					
+						<div class="form-group col-sm-3" >
+							<label for="writer">writer</label>
+							<input class="form-control" id="writer" name="writer" value="" type="text" readonly="true">
+						</div>
+					
+						<div class="form-group col-sm-3" >
+							<label for="dept">dept</label>
+							<input class="form-control" id="dept" name="dept" value="" type="text" readonly="true">
+						</div>
+					
+						<div class="form-group col-sm-3" >
+							<label for="executer">执行人</label>
+							<input class="form-control" id="executer" name="executer" value="" type="text" readonly="true">
+						</div>
+					</div>
+				
+				
+				</form>
 			</div>
-			
-			
-			
 		</div>
-		
-		<!-- <div class="modal-footer"> -->
+		<div class="modal-footer">
+        	<div class="pull-left">
+				<button type="submit" id="btnAddRenew" class="btn btn-primary btn-sm" data-oprt="_ADDRENEW" data-issTopic="" data-btnLabel="label-primary"><span class="glyphicon glyphicon-info-sign"></span>新增续费事务</button>
+			</div>
+			<div  class="pull-right">
+				<input id="btnReset" type="button" class="btn btn-primary btn-sm" value="重置">
+				<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
+			</div>
           
-          
-        <!-- </div> -->
+        </div>
 		</div>
 	</div>
 </div>

@@ -251,7 +251,7 @@ $(document).ready(function(){
 		var issId=$(this).attr('data-issId');
 		var topic=$(this).attr('data-issTopic');
 		var auth=$(this).attr('data-issue-authority');
-		var str=$(this).html();
+		var aHtml=$(this).html();
 		//向后端“issPatSingle”(TP5中 'issPatSingle'='{$home}/user/dashboard2/issPatSingle' )发送数据(后端用于选择返回的模板文件)		
 		$.post('issPatAuthSingle',
 			{
@@ -263,7 +263,7 @@ $(document).ready(function(){
 			function(data){
 				//在本文件#divIssPatSingle_load处渲染显示data
 				$('#divIssPatSingle_load').html(data);
-				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务：</span><strong>【'+str+'】</strong>《'+topic+'》');
+				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务：</span>【<strong>'+aHtml+'</strong>】《'+topic+'》');
 			}
 		);
 		

@@ -11,36 +11,26 @@
 
 {block name="btnTpl"}
 	<td class="btnTpl">
-		<a class="audit" href="#modalIssPatAuthSingle" data-issId="{$vo.id}" data-issTopic="{$vo.topic}" data-issue-authority="_MAINTAIN" data-toggle="modal" ><span class="glyphicon glyphicon-calendar text-info"></span>_维护</a>
+		<a class="audit" href="#modalIssPatAuthSingle" data-issId="{$vo.id}" data-issTopic="{$vo.topic}" data-issue-authority="_MAINTAIN" data-toggle="modal" >
+	{switch name="$vo.status" }
+    	{case value="申报复核" }
+			<span class="glyphicon glyphicon-check text-info"></span>_复核
+		{/case}
+		{case value="申报提交" }
+			<span class="glyphicon glyphicon-registration-mark text-info"></span>_专利授权
+		{/case}
+    	{case value="续费提交|准予续费"}
+			<span class="glyphicon glyphicon-retweet text-info"></span>_专利续费
+		{/case}
+    	{default /}<span class="glyphicon glyphicon-off text-info"></span>_完结
+	{/switch}
+		</a>
 	</td>
 {/block}
 
 <!-- //在base.html的基础上新增 -->
 {block name="script"}
 {__block__}
-<script>
-$(document).ready(function(){	
-	$('#btnRenew').click(function(){
-		var str=$(this).html();
-		$.post('issPatAuth',
-			{
-				'auth':'_EDIT',
-				'issId':101,
-				'returnType':0,
-			},
-			//得到后端返回的data(模板文件)
-			function(data){
-				//在本文件#divIssPatAuth处渲染显示data
-				$('#divIssPatAuth').html(data);
-				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务：</span><strong>【'+str+'】</strong>');
-				<!-- $("#modalIssPatAuthSingle").modal(); -->
-			}
-		);
-	
-	});
-});
-</script>
-
 
 {/block}
 

@@ -176,10 +176,18 @@
 			</div>
 			
 			<div class="form-group col-sm-2">
-				<label class="control-label" for="issStatus">事务状态</label>
+				<label class="control-label" for="">事务状态</label>
 				<a href="{$home}/issue/index/issrecords/id/{$iss.id}" target="_blank" data-toggle="tooltip" title="过程记录"><span class="btn btn-sm btn-primary">{$iss.status}</span></a>
 			
 			</div>
+			
+			{notin name="$iss.statussummary" value="0"}
+			<div class="form-group col-sm-6">
+				<label class="control-label" for="">事务反馈意见</label>
+				<p class="myedge-left-info">{$iss.statussummary}</p>
+			
+			</div>
+			{/notin}
 		</div>
 
 		<div class="row myRow">
