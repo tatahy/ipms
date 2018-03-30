@@ -27,21 +27,34 @@
 				<li>撰写人：{$iss.writer}；执行人：{$iss.executer}；</li>
 				<li>事务类型：{$iss.issmap_type}；</li>
 				<li>简介：{$iss.abstract}</li>
-				<li>状态：<a href="{$home}/issue/index/issrecords/id/{$iss.id}" target="_blank" data-toggle="tooltip" title="过程记录"><span class="label label-primary">{$iss.status}</span></a>
-				</li>
-				
-			</ul>
+				<li>状态：
+					<a href="{$home}/issue/index/issrecords/id/{$iss.id}" target="_blank" data-toggle="tooltip" title="过程记录">
+				{switch name="$iss.status"}
+    				{case value="专利授权|续费授权"}
+					<span class="label label-success">{$iss.status}</span>
+					{/case}
+					{case value="专利驳回"}
+					<span class="label label-danger">{$iss.status}</span>
+					{/case}
+					{case value="放弃续费|申报修改|修改完善"}
+					<span class="label label-warning">{$iss.status}</span>
+					{/case}
+					{case value="完结"}
+					<span class="label label-default">{$iss.status}</span>
+					{/case}
 					
-			
+					{default /}
+					<span class="label label-primary">{$iss.status}</span>
+				{/switch}
+					</a>
+				</li>
+			</ul>
 			<footer>
 				<div class="row">
 					<div class="col-sm-3">
 						<a href="{$home}/issue/index/issinfo/id/{$iss.id}" target="_blank" data-toggle="tooltip" title="事务详情">查看详情</a>
-						
 					</div>
-							
 					<div id="divAddNewDate" class="col-sm-3">填报时间：{$iss.addnewdate}</div>
-									
 				</div>
 			</footer>
 			</div>
@@ -52,43 +65,51 @@
 				<li>发明人：{$pat.inventor}；&nbsp;&nbsp;其他发明人：{$pat.otherinventor}；</li>
 				<li>专利类型：{$pat.pattype}；</li>
 				<li>简介：{$pat.summary}</li>
-				<li>状态：<a href="{$home}/patent/index/patrecords/id/{$pat.id}" target="_blank" data-toggle="tooltip" title="过程记录"><span class="label label-primary">{$pat.status}</span></a>
-				</li>
-				
-			</ul>
+				<li>状态：
+					<a href="{$home}/patent/index/patrecords/id/{$pat.id}" target="_blank" data-toggle="tooltip" title="过程记录">
+				{switch name="$pat.status"}
+    				{case value="授权|续费授权|续费中"}
+					<span class="label label-success">{$pat.status}</span>
+					{/case}
+					{case value="驳回|驳回续费"}
+					<span class="label label-danger">{$pat.status}</span>
+					{/case}
+					{case value="放弃续费"}
+					<span class="label label-warning">{$pat.status}</span>
+					{/case}
+					{case value="超期无效"}
+					<span class="label label-default">{$pat.status}</span>
+					{/case}
 					
+					{default /}
+					<span class="label label-primary">{$pat.status}</span>
+				{/switch}
+						
+					</a>
+				</li>
+			</ul>
 			<footer>
 				<div class="row">
 					<div class="col-sm-3">
 						<a href="{$home}/patent/index/patinfo/id/{$pat.id}" target="_blank" data-toggle="tooltip" title="专利详情">查看详情</a>
-						
 					</div>
-							
 					<div id="" class="col-sm-3">填报时间：{$pat.addnewdate}</div>
-					
 					<div id="" class="col-sm-3">专利所有人：{$pat.patowner}</div>
-					
-					<div id="" class="col-sm-3">专利撰写人：{$pat.author}</div>
-									
+					<div id="" class="col-sm-3">专利撰写人：{$pat.author}</div>				
 				</div>
 			</footer>
-			</div>
-						
-		</div>
-		
+			</div>				
+		</div>	
 	</div>			
 
 {/block}
 		
 {block name="patInput"}
-	<div class="myFieldset">	
-	
+	<div class="myFieldset">
 		<div class="myLegend"><span class="label label-warning">专利XX（表单）</span></div>
-		
 		<form action="" id="fmPat">
 		<!-- // class="sr-only" 仅源代码文件中显示-->
 			<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
-			
 		</form>
 	</div>	
 {/block}			

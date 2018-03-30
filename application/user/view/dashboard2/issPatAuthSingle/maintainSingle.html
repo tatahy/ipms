@@ -50,39 +50,36 @@
 		<form action="" id="fmPat">
 			<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
 			<input id="patTopic" name="patTopic" value="{$pat.topic}" type="text" class="sr-only">
-			<!-- //专利授权 -->
-			<div id="divPatAuthInfo" class="resetHide">
+			
 			<div class="row myRow" >			
+			<!-- //专利授权 -->
+				<div id="divPatAuthInfo" class="resetHide">
 				<div class="form-group col-sm-3">
 					<label for="patAuthNum">专利授权证书号<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 					<input class="form-control" id="patAuthNum" name="patAuthNum" value="{$pat.patauthnum}" type="text" required>
 				</div>
 				<div class="form-group col-sm-3">
-					<label for="patAdmin">专利授权机构<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-					<input class="form-control" id="patAdmin" name="patAdmin" value="{$pat.patadmin}" type="text" placeholder="中华人民共和国国家知识产权局" required>
-				</div>
-				<div class="form-group col-sm-3">
-					<label for="authRejectDate">专利授权日期<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-					<input class="form-control authRejectDate" id="" name="authRejectDate" value="" placeholder="yyyy-mm-dd" type="text" required>
+					<label for="patAuthDate">专利授权日期<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patAuthDate" name="patAuthDate" value="" placeholder="yyyy-mm-dd" type="text" required>
 				</div>
 				<div class="form-group col-sm-3">
 					<label for="renewDeadlinDate">专利续费截止日期<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-					<input class="form-control" id="renewDeadlineDate" name="renewDeadlineDate" value="{$pat.renewdeadlinedate}" placeholder="yyyy-mm-dd"  type="text" required>
+					<input class="form-control" id="renewDeadlineDate" name="renewDeadlineDate" value="" placeholder="yyyy-mm-dd"  type="text" required>
 				</div>
-			</div>
-			</div>
+				</div>
+		
 			<!-- //专利驳回 -->
-			<div id="divPatRejectInfo" class="resetHide">
-			<div class="row myRow" >			
+				<div id="divPatRejectInfo" class="resetHide">	
 				<div class="form-group col-sm-4">
-					<label for="authRejectDate">专利被驳回日期<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-					<input class="form-control authRejectDate" id="" name="authRejectDate" value="" placeholder="yyyy-mm-dd" type="text" required>
+					<label for="patRejectDate">专利被驳回日期<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patRejectDate" name="patRejectDate" value="" placeholder="yyyy-mm-dd" type="text" required>
 				</div>
+				</div>
+			
 				<div class="form-group col-sm-4">
 					<label for="patAdmin">专利授权机构<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 					<input class="form-control" id="patAdmin" name="patAdmin" value="{$pat.patadmin}" type="text" placeholder="中华人民共和国国家知识产权局" required>
 				</div>
-			</div>
 			</div>
 		</form>
 		{/case}
@@ -94,22 +91,22 @@
 			<input id="patTopic" name="patTopic" value="{$pat.topic}" type="text" class="sr-only">			
 			<div class="row myRow" >			
 				<!-- //专利续费授权 -->
-				<div id="divPatAuthInfo" class="resetHide">
+				<div id="divPatRenewAuthInfo" class="resetHide">
 				<div class="form-group col-sm-4">
-					<label for="patAuthNum">专利续费授权证书号<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<label for="patRenewAuthNum">专利续费授权证书号<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 					<input class="form-control" id="patRenewAuthNum" name="patRenewAuthNum" value="{$pat.patrenewauthnum}" type="text" required>
 				</div>
 				<div class="form-group col-sm-4">
-					<label for="renewAuthRejectDate">专利续费授权日期<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-					<input class="form-control renewAuthRejectDate" id="" name="renewAuthRejectDate" value="" placeholder="yyyy-mm-dd" type="text" required>
+					<label for="patRenewAuthDate">专利续费授权日期<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patRenewAuthDate" name="patRenewAuthDate" value="" placeholder="yyyy-mm-dd" type="text" required>
 				</div>
 				</div>
 				
 				<!-- //专利续费驳回 -->
-				<div id="divPatRejectInfo" class="resetHide">		
+				<div id="divPatRenewRejectInfo" class="resetHide">		
 				<div class="form-group col-sm-4">
-					<label for="renewAuthRejectDate">专利续费驳回日期<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-					<input class="form-control renewAuthRejectDate" id="" name="renewAuthRejectDate" value="" placeholder="yyyy-mm-dd" type="text" required>
+					<label for="patRenewRejectDate">专利续费驳回日期<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patRenewRejectDate" name="patRenewRejectDate" value="" placeholder="yyyy-mm-dd" type="text" required>
 				</div>	
 				</div>
 				
@@ -380,13 +377,14 @@ $(document).ready(function(){
 				$('#btnAuthorize').show();
 				$(this).addClass('label label-success');
 				//出现，增加'empty-check'，列入非空检查
-				$('#maintainMsg').addClass('empty-check');
 				$('#divPatAuthInfo').show().children().find('.form-control').addClass('empty-check');
 				//隐藏并取消非空检查
+				$('#maintainMsg').removeClass('empty-check');
 				$('#divPatRejectInfo').hide().children().find('.form-control').removeClass('empty-check');
 				//以yyyy-mm-dd格式显示系统当前日期
-				$('.authRejectDate').val(dateValue());
-				$('.renewAuthRejectDate').val(dateValue());
+				$('#patAuthDate').val(dateValue());
+				$('#patRenewAuthDate').val(dateValue());
+				
 			break;
 			
 			case '_REJECT':
@@ -399,8 +397,8 @@ $(document).ready(function(){
 				//隐藏并取消非空检查
 				$('#divPatAuthInfo').hide().children().find('.form-control').removeClass('empty-check');
 				//以yyyy-mm-dd格式显示系统当前日期
-				$('.authRejectDate').val(dateValue());
-				$('.renewAuthRejectDate').val(dateValue());
+				$('#patRejectDate').val(dateValue());
+				$('#patRenewRejectDate').val(dateValue());
 				
 			break;
 	
