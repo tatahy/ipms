@@ -100,8 +100,8 @@
 
 <script>
 $(document).ready(function(){
-
-	$("#divIssPat_load").load('issPat');
+	//根据issPat的权限加载内容
+	$("#divIssPat_load").load('issPat',{'auth':'{$auth}'});
 	
 	$("#divIssPro_load").load('issPro');
 	
