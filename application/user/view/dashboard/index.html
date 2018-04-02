@@ -1,0 +1,108 @@
+{include file="../application/common/headeruser.html" title="个人事务中心" }
+
+<!-- pagewrap  -->
+<div class="container-fluid" style="padding-top: 55px;">
+		
+	<!-- <h4>  -->
+		<!-- <ul class="list-inline"> -->
+			<!-- <li><strong>【{$username}】的系统角色：</strong></li> -->
+			<!-- <li> -->
+				<!-- <select class="form-control" id="roleselect"> -->
+
+					<!-- {foreach name="roles" item="vo"} -->
+						<!-- <option>{$vo}</option> -->
+					
+					<!-- {/foreach} -->
+					
+				<!-- </select> -->
+			<!-- </li> -->
+			<!-- <li><button class="btn btn-primary">更新个人信息(开发中)</button></li> -->
+			
+		<!-- </ul> -->
+	<!-- </h4> -->
+	<!-- <hr> -->
+	<!-- <a href="{$home}/user/index/index">旧版</a> -->
+	<ul class="nav nav-pills" style="border-bottom:solid 0.1px #ddd;">
+		<li><a class="aTab" href="#writer"><span class="glyphicon glyphicon-folder-open"></span>&nbsp;撰写人</a></li>
+		<li><a class="aTab" href="#operator"><span class="glyphicon glyphicon-folder-close"></span>&nbsp;执行人</a></li>
+		<li><a class="aTab" href="#approver"><span class="glyphicon glyphicon-fire"></span>&nbsp;批准人</a></li>
+		
+		<li><a class="aTab" href="#reviewer"><span class="glyphicon glyphicon-eye-open"></span>&nbsp;审查人</a></li>
+		<li><a class="aTab" href="#formchecker"><span class="glyphicon glyphicon-exclamation-sign"></span>&nbsp;形式审查人</a></li> 
+		<li><a class="aTab" href="#financialchecker"><span class="glyphicon glyphicon-warning-sign"></span>&nbsp;财务审查人</a></li>
+		<li><a class="aTab" href="#maintainer" ><span class="glyphicon glyphicon-calendar" ></span>&nbsp;维护人</a></li>
+		<li><a href="{$home}/user/dashboard2/index2">json权限版</a> </li>
+	</ul>
+
+	<div class="tab-content" style="padding-top:5px;">
+    	
+		<div id="role"></div>	
+	</div>
+		
+</div>
+
+
+
+
+<!-- /pagewrap  -->
+
+<script>
+$(document).ready(function(){
+	
+	//加载锚点对应的页面文件
+	$("#role").load('role',{'role':window.location.hash});
+	
+	<!-- //点击.aTab中的各个按钮后，默认显示相应状态的pat内容-->
+	$('.aTab').click(function(){
+        var sId = $(this).attr('href');  //a的attr属性值
+		window.location.hash = sId;  //设置锚点
+		$(this).tab('show');
+		
+		//加载锚点对应的页面文件
+		$('#role').load('role',{'role':sId});
+    });	
+	
+	// 仅显示$roles数组对应的li标签
+	$('.aTab').hide();
+	$('.aTab').each(function(){
+		// 显示边框
+		$(this).css("border","solid 1px #ddd");
+		//	为锚点值对应的li添加.active
+		if($(this).attr('href')==window.location.hash){
+			$(this).parent().addClass('active');
+		}
+			
+		// TP5框架在前端模板应用“foreach”标签对后端传送的数组变量进行遍历操作
+		{foreach name="roles" item="vo"}	
+		var roleStr=$(this).attr('href'); 
+		if('{$vo}'==roleStr.substr(1)){
+			$(this).show();
+		}
+		{/foreach}
+			
+	});
+	
+	// 锚点为空，默认显示$roles数组第一个role对应的li标签及其内容	
+	if(window.location.hash==''){
+		var sId='#'+'{$roles[0]}';
+		$('.aTab').each(function(){
+			// 显示边框
+			$(this).css("border","solid 1px #ddd");
+			//	为锚点值对应的li添加.active
+			if($(this).attr('href')==sId){
+				$(this).parent().addClass('active');
+			}
+		
+		});
+	}
+	
+<!-- function  -->
+	
+
+
+<!--/ function -->
+
+});
+</script>
+
+{include file="../application/common/footer.html"}

@@ -21,8 +21,9 @@
   {js href="/home/res/js/alert.min.js" }
 
 
+ 
+  <style> 
   <!-- 实现nav固定在页面顶端效果的补充代码块，同时还需设置nav的data-offset-top="-3"防止鼠标单击页面时出现跳动-->
-  <style>
   .affix {
       top: 0;
       width: 100%;
@@ -31,6 +32,113 @@
   .affix + .container-fluid {
       padding-top: 70px;
   }
+  
+  .myRow{
+	margin:0px;
+}
+
+/* 自定义fieldset样式 */
+.myFieldset{
+	border-width:0px;
+	border-top-width:1px;
+	border-style:solid;
+	border-color:#eee;
+	//border-radius:5px;
+	padding-top:20px;
+	//margin-bottom:30px;
+}
+
+/* 自定义legend样式 */
+.myLegend{
+	//margin:-30px 10px 10px 15px;
+	margin:-15px 10px 10px 0px;
+}
+
+
+/* 自定义可增加的row样式 与myLegend搭配使用，用于child有form element且form element带有.col-*-*的.row */
+.myRow{
+	margin:0px;
+}
+
+
+/* 自定义可增加的row样式 与myLegend搭配使用，用于child无form element的.row  form-group*/
+.myRow-noform-group{
+	margin-left:15px;
+	margin-right:15px;
+	margin-bottom:15px;
+	
+}
+
+/* 自定义legend中span可增加的样式 */
+.myLegend span{
+	font-size:14px;
+}
+
+/* 自定义badge的字体颜色，白色背景，用于改变bootstrap3的badge的底色 */
+.mycolor777-bgwhite{
+	color: #777;
+	background-color:#fff;
+}
+/* 自定义白色字体，透明背景，用于改变bootstrap3的badge的字体颜色和底色 */
+.mycolorwhite-bgtransparent{
+	color: #fff;
+	background-color:transparent;
+}
+
+/* 自定义红色字体，白色背景，用于改变bootstrap3的badge的字体颜色和底色 */
+.mycolorred-bgwhite{
+	color: red;
+    background-color: #fff;
+}
+
+/* 自定义上部黄色色条，颜色取自bootstrap3的label-warning */
+.myedge-top-waring{
+	border-top: 3px solid #f0ad4e !important;
+	padding:5px !important;
+}
+
+/* 自定义底部黄色色条，颜色取自bootstrap3的label-warning */
+.myedge-bottom-waring{
+	border-bottom: 3px solid #f0ad4e !important;
+	//padding:5px !important;
+}
+
+/* 自定义左边黄色色条，颜色取自bootstrap3的label-warning */
+.myedge-left-waring{
+	border-left: 3px solid #f0ad4e !important;
+	padding:5px !important;
+}
+
+/* 自定义左边浅蓝色色条，颜色取自bootstrap3的label-info */
+.myedge-left-info{
+	border-left: 3px solid #5bc0de !important;
+	padding:5px !important;
+}
+
+
+
+/* 自定义顶部蓝色色条，颜色取自bootstrap3的btn-primary */
+.myedge-top-primary{
+	border-top: 3px solid #2e6da4 !important;
+	//border-bottom: 0px !important;
+	padding-top:2px !important;
+}
+
+/* 自定义顶部黄色色条，颜色取自bootstrap3的label-warning */
+.myedge-top-warning{
+	border-top: 3px solid #f0ad4e !important;
+	//border-bottom: 0px !important;
+	padding-top:2px !important;
+	
+}
+
+/* 自定义去除顶部色条 */
+.myedge-top-transparent{
+	border-top: 0px solid transparent !important;
+	padding: 5px 10px !important;
+	
+}
+  
   </style>
   
   <!-- Tooltips must be initialized with jQuery: select the specified element and call the tooltip() method.
@@ -54,8 +162,8 @@ $(document).ready(function(){
 			</button>
 			<!-- <a class="navbar-brand" href="#">撰写人：username&nbsp;<span class="glyphicon glyphicon-user"></span>&nbsp;个人中心</a> -->
 			<span class="navbar-brand">
-				<a href="{$home}/user/index/index" data-toggle="tooltip" data-placement="bottom" title="个人事务中心">
-					<strong>IPMS&nbsp;<span class="glyphicon glyphicon-pushpin"></span>&nbsp;个人事务中心</strong>
+				<a href="{$home}/user/dashboard/index" data-toggle="tooltip" data-placement="bottom" title="个人事务中心">
+					<strong>IPMS【{$username}】</strong>个人事务&nbsp;<span class="small glyphicon glyphicon-pushpin"></span>
 				</a>
 			</span>
 		</div>
@@ -73,7 +181,9 @@ $(document).ready(function(){
 					
 				</form>
 				</li>
-				<li><a href="{$home}/index/index/index"><span class="glyphicon glyphicon-home"></span>&nbsp;首页</a></li>	
+				<li><a href="{$home}/index/index/index"><span class="glyphicon glyphicon-home"></span>&nbsp;首页</a></li>
+				<li><a href="{$home}/user/index/index"><span class="glyphicon glyphicon-pushpin"></span>个人事务中心（旧版）</a></li>
+				
 				<li id="liQuit"><a href="{$home}/index/index/logout"><span class="glyphicon glyphicon-log-out"></span>&nbsp;退出</a></li>
 			</ul>
 		</div>

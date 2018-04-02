@@ -1,0 +1,61 @@
+{include file="../application/common/header.html" title="专利信息" }
+
+<!-- pagewrap  -->
+<div class="container-fluid" style="padding-top: 55px;">
+	<!-- <h3><span class="label label-warning"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利情况</span></h3> -->
+	<!-- <ul class="nav nav-tabs"> -->
+	
+	<ul class="nav nav-pills nav-justified" style="border-bottom:solid 0.1px #ddd;">
+		<li><a class="aTab" href="#total">项目概况&nbsp;|&nbsp;<span class="glyphicon glyphicon-search"></span></a></li>
+		<li><a class="aTab" href="#audit">内审</a></li>
+		<li><a class="aTab" href="#plan">拟申报&nbsp;<span class="label label-warning">...</span></a></li>
+		<li><a class="aTab" href="#apply">申报&nbsp;<span class="label label-warning">...</span></a></li>
+		<li><a class="aTab" href="#approve">立项&nbsp;<span class="label label-warning">...</a></span></li>
+		<li><a class="aTab" href="#process">在研&nbsp;<span class="label label-warning">...</a></span></li>
+		<li><a class="aTab" href="#inspect">验收</a></li>
+		<li><a class="aTab" href="#done">结题</a></li>
+		<li><a class="aTab" href="#terminate">终止(未完成)</a></li>
+		<li><a class="aTab" href="#reject">申报未立项</a></li>
+	</ul>
+		
+
+	<div class="tab-content">
+		<div id="prolist"></div>
+	</div>
+	
+</div>
+
+<!-- /pagewrap  -->
+
+<script>
+$(document).ready(function(){
+
+	<!-- 选中id为"nav_pat"的标签（header.html文件中的li标签）,添加.active -->
+	$("#nav_pro").addClass("active");
+
+	<!-- // 锚点值对应于pat的不同状态，jquery load()方法，加载total.html页面内容到本页面中<div id="patlist"></div>位置  -->
+    $("#prolist").load('total',{"proStatus":window.location.hash});
+	
+	<!-- //点击.aTab中的各个按钮后，显示相应状态的pat内容-->
+	$(".aTab").click(function(){
+        var sId = $(this).attr("href");  //a的attr属性值
+		window.location.hash = sId;  //设置锚点
+		$(this).tab('show');
+		
+		$("#prolist").load('total',{"proStatus":sId});
+		
+    });	
+	
+	$('.aTab').each(function(){
+		// 显示边框
+		$(this).css("border","solid 1px #ddd");
+		//	为sId对应的li添加.active
+		if($(this).attr('href')==window.location.hash){
+			$(this).parent().addClass('active');
+		}	
+	});
+	
+});
+</script>
+
+{include file="../application/common/footer.html"}

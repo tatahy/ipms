@@ -1,0 +1,392 @@
+<!-- // writer_edit.html -->
+<div class="container-fluid">
+	<!-- <div class="rows col-sm-12"> -->
+	<form id="fmIssPat" action="" role="form" enctype="multipart/form-data">
+		<div class="row">
+		<div class="form-group col-sm-3">
+			<h4>撰写人：{$iss.writer}</h4>
+		</div>
+		
+		<div class="form-group col-sm-5">
+			<h4>所属部门：{$iss.dept}</h4>
+		</div>
+		
+		<div class="form-group col-sm-4">
+			<h4>事务状态：<span><strong><a href="{$home}/issue/index/issrecords/id/{$iss.id}" target="_blank" data-toggle="tooltip">{$iss.status}</a></strong></span></h4>
+		</div>
+		</div>
+		
+		<h4><span class="label label-warning"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利信息</span></h4>
+		<div class="row">
+		<div class="form-group col-sm-8">
+			<label class="control-label" for="patTopic">专利名称<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<input class="form-control" id="patTopic" name="patTopic" value="{$pat.topic}" type="text" placeholder="一种ZZZ的____专利" required>
+			
+		</div>
+		
+		<div class="form-group col-sm-4">
+			<label for="patType">专利类型</label>
+			<select class="form-control" id="patType" name="patType">
+				<!-- {present name="pat.pattype"} -->
+					<!-- <option value="{$pat.pattype}" selected>{$pat.pattype}</option> -->
+				<!-- {/present} -->
+				
+				<option value="0">……</option>
+				<option value="_PATT1">发明专利</option>
+				<option value="_PATT2">实用新型专利</option>
+                <option value="_PATT3">外观设计专利</option>
+                <option value="_PATT4">软件版权</option>
+                <option value="_PATT5">著作权</option>
+                <option value="_PATT6">集成电路图</option>
+                
+			</select>
+		</div>
+		</div>
+	
+		<h4><span class="label label-warning">事务信息</span></h4>
+		<div class="row">
+		<div class="form-group col-sm-8">
+			<label class="control-label" for="topic">事务标题<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<input class="form-control" id="topic" name="topic" value="{$iss.topic}" type="text" placeholder="关于XX专利的YY申请" required>
+			
+		</div>
+		
+		<div class="form-group col-sm-4">
+			<label for="issType">事务类型</label>
+			<select class="form-control" id="issType" name="issType" >
+				<option value="_ISST_PAT1">专利授权申报</option>
+				<option value="_ISST_PAT2">专利授权到期续费</option>
+               
+			</select>
+		</div>
+		</div>
+		
+		<div class="row">
+		<div class="form-group col-sm-12">
+			<label class="control-label" for="abstract">事务简介<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<textarea class="form-control" rows="5" id="abstract" name="abstract" placeholder="填写事务的主要内容，字数不超过100字。" required>{$iss.abstract}</textarea>
+			
+		</div>
+		</div>
+		
+				
+		<h4><span class="label label-warning">事务附件上传</span>
+			<label class="radio-inline ">
+      			<input type="radio" name="attUpload" value="0" checked><span class="label label-default">无</span>
+    		</label>
+			<label class="radio-inline">
+      			<input type="radio" name="attUpload" value="1"><span class="label label-default">上传</span>
+    		</label>
+    		
+		</h4>
+
+		<div id="divAtt" hidden="true">
+			<div class="row">
+				<div class="form-group col-sm-6">
+					<label for="att">选择附件</label>
+					<input type="file" name="att" id="att" accept=".jpg,.jpeg,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.rar">	
+					<blockquote>
+						<footer>附件小于等于：<mark class="text-danger">10MB</mark></footer>
+						<footer>附件类型：<mark>jpg,jpeg,pdf,doc,docx,xls,xlsx,ppt,pptx,rar</mark></footer>
+					</blockquote>
+
+					<label for="">上传进度</label>
+					
+					<div class="progress progress-striped active">
+    					<div id="divUpLoadProcess" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><span class="text-info">0%</span></div>
+					</div>					
+			
+				</div>
+		
+				<div class="form-group col-sm-4">
+					<label for="attName">附件名称</label>
+					<input class="form-control" id="attName" name="attName" value="" type="text">
+				</div>
+				
+				<div class="form-group col-sm-2">
+					
+					<label for="">附件类型</label>
+					<select class="form-control" id="attType" name="attType">
+						<option value="_ATTT1">申请</option>
+						<option value="_ATTT2">请示</option>
+						<option value="_ATTT3">报告</option>
+						<option value="_ATTT4">预算报告</option>
+					</select>
+					
+				</div>
+		
+				<input id="attObj" name="attObj" value="_ATTO1" type="text" hidden="true">
+				
+				<input id="oprt" value="" type="text" hidden="true">
+				<!-- // 与本页的formDataAjax函数配合，传递本页所编辑的信息对应的pasIssId值到后端 -->
+				<input id="trId" value="{$patIssId}" type="text" hidden="true">
+		
+			</div>
+				
+		</div>
+		
+		<h4><span class="label label-warning">事务附件列表</span></h4>
+		<div class="row col-sm-12">
+			<div class="table-responsive ">
+			<table class="table table-bordered table-striped table-hover">
+				<thead>
+					<tr>
+						<!-- <th>选择</th> -->
+						<th>序号</th>
+						<th>附件类型</th>
+						<th>附件名称</th>
+						<th>上传日期</th>
+						<th>上传人</th>
+						<th>系统角色</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="att" id="vo" empty="暂无附件"}
+					<tr>
+						<!-- <td><input type="checkbox" check=""></td> -->
+						<td>{$i}</td>
+						<td>{$vo.atttype}</a></td>
+						<td>{$vo.name}</a></td>
+						<td>{$vo.uploaddate}</td>
+						<td>{$vo.uploader}</td>
+						<td>{$vo.rolename}</td>
+						
+						<td>
+							<a href="{$home}/attachment/index/download/id/{$vo.id}">下载</a>&nbsp;
+							{in name="$vo.deldisplay" value="1"}
+							<a href="{$home}/attachment/index/delete/id/{$vo.id}">删除</a>&nbsp;
+							{/in}
+						</td>
+						
+					</tr>	
+					{/volist}
+				</tbody>
+			</table>
+			</div>
+			<hr>
+		</div>
+		
+		<div class="row">
+		<div class="form-group col-sm-12">
+			<input type="submit" id="btnSave" class="btn btn-primary btn-sm" data-oprt="update" value="更新"> 
+			
+			<button type="submit" id="btnSubmit" class="btn btn-primary btn-sm" data-oprt="submit"><span class="glyphicon glyphicon-ok"></span>提交</button>
+ 			
+			<div  class="pull-right">
+				<input type="reset" class="btn btn-primary btn-sm" value="重置">
+				<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
+			</div>
+			
+		</div>
+		</div>
+	</form>
+	<!-- </div> -->
+
+</div>
+
+<script>
+$(document).ready(function(){
+
+	// 添加bootstrap的tooltip属性
+	$('h4 a').tooltip({title: '事务过程记录', placement: 'bottom'});
+	
+	<!-- // 应用jQuery的$.ajax提交表单，提交前进行一些验证准备。结合输入框的“required”属性避免输入框无内容 -->
+	$('#fmIssPat').submit(function(event){					
+		//jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作
+        event.preventDefault();
+		
+		// 检查是否存在附件？？
+		
+		
+		// 检查附件后缀名是否符合要求？？
+		
+		var oprt=$('#oprt').val();
+		var str='确定';
+		var title=oprt;
+		switch(oprt){
+			case 'delete':
+				str='确定【<span class="glyphicon glyphicon-remove text-danger"></span>删除】操作？<hr>该操作将会同时删除已上传附件。';
+				title='【<span class="glyphicon glyphicon-remove text-danger"></span>删除】操作'
+			break;
+			
+			case 'submit':
+				str='确定【<span class="glyphicon glyphicon-ok text-success"></span>提交】操作？';
+				title='【<span class="glyphicon glyphicon-ok text-success"></span>提交】操作';
+			break;
+			
+			// oprt=='update'
+			default:
+				str='确定【更新】？';
+				title='【更新】操作';
+			break;
+		
+		}
+		
+		$('#modalPatIssTpl').modal('hide');
+		$.confirm(str,function(e){
+			con=e;
+			if(true==con){
+				formDataAjax(oprt,$('#fmIssPat'),title);
+			}else{
+				$('#modalPatIssTpl').modal('show');
+			}
+		}).cancel('否(N)').ok('是(Y)');
+	});
+	
+	// 只有专利事务状态为‘填报’才能有‘删除’按钮。
+	if('填报'=='{$iss.status}'){		
+		$('#btnSubmit').after('&nbsp;<button type="submit" id="btnDelete" class="btn btn-danger btn-sm" data-oprt="delete"><span class="glyphicon glyphicon-remove"></span>删除</button>');
+	}
+	
+	// select显示为后端传来的内容,后端patinfo模型中对pattpye字段有定义获取器，所以$pat.pattype的值不是数据库中的值，$pat->getData('pattype')才是。同理$iss->getData('issmap_type')
+	$('#patType').val('{$pat->getData('pattype')}').attr('selected');
+	$('#issType').val('{$iss->getData('issmap_type')}').attr('selected');
+	
+	//$('#patType').text('{$pat.pattype}').attr('selected');
+	//$('#issType').text('{$iss.issmap_type}').attr('selected');
+	
+	// 点击删除按钮，与form的submit()配合确定传给后端的oprt='delete'
+	$('#btnDelete').click(function(){
+		$('#oprt').val($(this).attr('data-oprt'));
+	});
+	
+	// 点击提交按钮，与form的submit()配合确定传给后端的oprt='submit'
+	$('#btnSubmit').click(function(){
+		$('#oprt').val($(this).attr('data-oprt'));
+	});
+	
+	// 点击保存按钮，与form的submit()配合确定传给后端的oprt='update'
+	$('#btnSave').click(function(){
+		$('#oprt').val($(this).attr('data-oprt'));
+	});
+	
+	// 单选按钮选中“上传”项后，出现附件上传的输入框们。
+	$('input:radio[name="attUpload"]').change(function(){
+		// 选中的单选按钮的value值，值为“1”是选中的“上传”项
+		var v=$(this).attr('value');
+		if(v==1){
+			$(this).next().addClass('label-warning');
+			
+			// 为'#attName'和'#att'添加'required'属性，其值为true，保证在表单提交时必填
+			$('#att').attr('required',true);
+			$('#attName').attr('required',true);
+			// '#attName'和'#att'前的标签，去除内容里添加的span
+			$('#attName').prev('label').children('span').remove();
+			$('#att').prev('label').children('span').remove();
+			// '#attName'和'#att'前的标签，在标签内容后面添加glyphicon并设置颜色为text-danger
+			$('#attName').prev('label').append('<span class="glyphicon glyphicon-asterisk text-danger"></span>');
+			$('#att').prev('label').append('<span class="glyphicon glyphicon-asterisk text-danger"></span>');
+			// 上传的输入框们现身
+			$('#divAtt').show();
+		}else{
+			$('input:radio[name="attUpload"][value="1"]').next().removeClass('label-warning');
+			//为'#attName'和'#att'添加'required'属性，其值为false，保证在表单提交时忽略
+			$('#attName').attr('required',false);
+			$('#att').attr('required',false);
+			// 上传的输入框们退场
+			$('#divAtt').hide();
+			
+		}
+	});
+	
+	// 重置按钮点击时附加
+	$('input:reset').click(function(){
+		//为'#attName'添加'required'属性，其值为false，保证在表单提交时忽略
+		$('#attName').attr('required',false);
+		
+		// 上传的输入框们退场
+		$('#divAtt').hide();
+	});
+
+   // 定义监听文件上传过程函数'xhrOnProgress'，用回调/递归函数实现？？
+    var xhrOnProgress = function(fun) {
+        xhrOnProgress.onprogress = fun; //绑定监听
+        return function(){
+        	//通过$.ajaxSettings.xhr();获得XMLHttpRequest对象
+        	var xhr = $.ajaxSettings.xhr();
+        	//判断监听函数是否为函数
+        	if(typeof xhrOnProgress.onprogress !== 'function')
+            return xhr;
+            //如果有监听函数并且xhr对象支持绑定时就把监听函数绑定上去
+            if (xhrOnProgress.onprogress && xhr.upload) {
+                xhr.upload.onprogress = xhrOnProgress.onprogress;
+            }
+            return xhr;
+        }
+    };
+
+<!-- function -->
+	//**函数名：formDataAjax
+ 	//* 作用：应用jQuery的$.ajax向后端提交formData数据
+	//* 参数1：oprt，类型：字符。值：不为空。说明：表示触发本函数的‘操作’
+	//* 参数2：fmObj，类型：对象。值：可为空，默认为空。说明：表示需要一起提交的表单。
+	//* 参数3：title，类型：字符。值：不为空。说明：本函数显示的提示框$.alert的标题内容。
+	function formDataAjax(oprt,fmObj,title){
+	// formdata形式上传表单数据,自动搜索表单信息(表单内没有name属性的input不会被搜索到)，IE<=9不支持FormData
+		if(fmObj){
+			var formData = new FormData(fmObj[0]);
+		}else{
+			var formData = new FormData();
+		}
+		
+		<!-- var formData = new FormData($('#fmIssPat')[0]); -->
+		// 添加表单内没有的内容
+        formData.append('returnType', 0);
+		formData.append('role','writer');
+		formData.append('username','{$writer}');
+		formData.append('dept','{$dept}');
+		formData.append('patId','{$pat.id}');
+		formData.append('issId','{$iss.id}');
+		formData.append('oprt',oprt);
+			
+        $.ajax({
+            type: 'post',
+            url: 'patIssOprt',
+            data: formData,
+            contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
+            processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)
+			// 进度条显示上传进度
+			xhr: xhrOnProgress(function(e){
+                var percent=(e.loaded / e.total)*100;//计算百分比
+                $('#divUpLoadProcess').css("width",percent + "%").text(percent + "%");
+            }),
+            success: function(data) {
+                if(data.result=='success'){
+					
+					// 选中的单选按钮的value值
+					var v=$('input:radio[name="attUpload"][value="1"]').prop('checked');
+					// v==true,'上传'按钮
+					if(v){
+						// show出modal，以便看见文件上传进度条
+						$('#modalPatIssTpl').modal('show');
+						// 重新载入文件
+						$("#modalPatIssTpl").on('shown.bs.modal',function(){
+							$('#patIss').load('{$home}/user/dashboard/patIss',{'role':'writer','returnType':0,'issType':'_PATENT','issStatus':'_TODO','patIssId':'{$iss.id}'});
+						});
+					
+						$("#modalPatIssTpl").modal("hide");
+					}else{
+						// 重新载入文件
+						$('#patIss').load('{$home}/user/dashboard/patIss',{'role':'writer','returnType':0,'issType':'_PATENT','issStatus':'_TODO','patIssId':'{$iss.id}'});
+					}
+					// 操作成功，提示框显示信息
+					$.alert(title+'成功<span class="glyphicon glyphicon-ok text-success"></span><hr>'+data.msg);
+				}else{
+					$('#modalPatIssTpl').modal();
+					<!-- $.alert(data.msg); -->
+				}
+            }
+        });
+	}
+	
+	
+
+
+<!-- function -->
+	
+});
+
+
+</script>
+

@@ -61,9 +61,9 @@
 			<hr>
 			</div>
 			
-			<label class="label label-warning" style="padding:5px;">用户记录总数：<span class="badge">{$userRecords}</span></label>
+			<label class="label label-warning" style="padding:5px;">系统角色总数：<span class="badge">{$userRecords}</span></label>
 			
-			<label class="label label-info" style="padding:5px;">用户总数：<span class="badge">{$usersNum}</span></label>
+			<label class="label label-info" style="padding:5px;">系统用户总数：<span class="badge">{$usersNum}</span></label>
 				
 			</br>
 			</br>
@@ -435,9 +435,9 @@ $(function(){
 	
 	//**
  	//* 向单选框填充"用户组"的内容选项
-	//* 参数1：Obj，必须。类型：对象，值：单选框的对象名称
-	//* //参数2：attach，可为空。类型：json数组，值：需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
-	//*参数3：selected，可为空。类型：字符，值：字符。
+	//* 参数1：Obj，类型：对象。值：必须，单选框的对象名称
+	//* //参数2：attach，类型：json数组。值：可为空，需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
+	//*参数3：selected，类型：字符。值：字符，可为空。
  	//**/ 
 	function showUserGroup(Obj,attach,selected){
 		<!-- // 应用Ajax向服务器请求“用户组”单选框内容所需数据，并组装好HTML语句 -->

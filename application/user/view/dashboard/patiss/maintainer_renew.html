@@ -1,0 +1,349 @@
+<!-- // maintainer_renew.html -->
+<div class="container-fluid">
+		<h4>续费管理</h4>
+		<p>近3个月内授权到期专利数：<span class="badge">{$patTotal}</span>&nbsp;<button id="btnBack"  type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-tag"></span>返回“关注/待处理”</button></p>
+		<div class="table-responsive ">
+			<table class="table table-bordered table-hover">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>名称</th>
+						<th>类型</th>
+						<th>状态</th>
+						<th>授权时间</th>
+						<th>授权到期时间</th>
+						<th>续费操作</th>
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="pat" id="vo" empty="暂无专利授权到期"}
+					<tr id="tr{$vo.id}">
+						<td>{$i}</td>
+						<td>{$vo.topic}</td>
+						<td>{$vo.pattype}</td>
+						<td>{$vo.status}</td>
+						<td>{$vo.authrejectdate}</td>
+						<td>{$vo.renewdeadlinedate}</td>
+						<td class="btnOprt">			
+							{in name="vo.status" value="授权,续费授权"}
+								<a href="#modalPatRenew" data-toggle="modal" data-oprt="renew" data-patId="{$vo.id}"><span class="glyphicon glyphicon-repeat text-info"></span>续费</a>
+							{else/}
+								<a href="#modalPatRenew" data-toggle="modal" data-oprt="close" data-patId="{$vo.id}"><span class="glyphicon glyphicon-repeat text-info"></span>无效</a>
+							{/in}  
+						</td>
+					</tr>
+					{/volist}					
+				</tbody>
+			</table>
+		</div>
+
+</div>
+
+<!-- Modal "modalPatRenew" -->
+<div class="modal fade" id="modalPatRenew" role="dialog">
+    <div class="modal-dialog modal-lg">
+    
+      <!-- Modal content-->
+      	<div class="modal-content">
+        <div class="modal-header bg-warning" style="border-radius:5px;">
+          	<button type="button" class="close" data-dismiss="modal">&times;</button>
+		  
+          	<h4><span class="glyphicon glyphicon-wrench">专利续费事务</span></h4>
+        </div>
+		
+        <div class="modal-body">
+			<!-- // 对patIssRenew的增删改查页面显示位置-->
+			<div id="divPatRenew">
+			<form id="fmIssPatRenew" action="" method="" role="form" enctype="multipart/form-data">
+				<!-- // 与本页的formDataAjax函数配合，传递本页所进行的oprt值到后端 -->
+				<h4><span class="label label-warning">专利续费事务</span></h4>
+				<input id="oprt" type="text" hidden="true">
+				<input id="patId" name="patId" type="text" hidden="true">
+				<div class="row">
+					<div class="form-group col-sm-4">
+						<label class="control-label" for="topic">事务标题topic<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+						<!-- <input class="form-control" id="topic" name="topic" value="" type="text" placeholder="关于XX专利的YY申请" required> -->
+						<textarea class="form-control" rows="2" id="topic" name="topic" placeholder="填写事务的主要内容，字数不超过100字。" required></textarea>
+					</div>
+					
+					<div class="form-group col-sm-2">
+						<label class="control-label" for="status">事务状态status</label>
+						<input class="form-control" id="status" name="status" value="拟续费" type="text" readonly="true">
+					</div>
+					
+					<div class="form-group col-sm-3">
+						<label for="issMapType">事务类型issMapType</label>
+						<select class="form-control" id="issMapType" name="issmap_type" readonly="true">
+							<option value="_ISST_PAT2">专利授权到期续费</option>
+						</select>
+					</div>
+					
+					<div class="form-group col-sm-3" >
+						<label for="issMapId">issMapId</label>
+						<input class="form-control" id="issMapId" name="issmap_id" value="" type="text" readonly="true">
+					</div>
+				</div>
+				
+				<div class="row">
+					<div class="form-group col-sm-3" >
+						<label for="numId">numId</label>
+						<input class="form-control" id="numId" name="num_id" value="" type="text" readonly="true">
+					</div>
+					
+					<div class="form-group col-sm-6">
+						<label class="control-label" for="abstract">事务简介abstract<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+						<textarea class="form-control" rows="5" id="abstract" name="abstract" placeholder="填写事务的主要内容，字数不超过100字。" required></textarea>
+					</div>
+					
+				</div>
+				
+				<div class="row">
+					<div class="form-group col-sm-3" >
+						<label for="addNewDate">addNewDate</label>
+						<input class="form-control" id="addNewDate" name="addNewDate" value="" type="text" readonly="true">
+					</div>
+					
+					<div class="form-group col-sm-3" >
+						<label for="writer">writer</label>
+						<input class="form-control" id="writer" name="writer" value="" type="text" readonly="true">
+					</div>
+					
+					<div class="form-group col-sm-3" >
+						<label for="dept">dept</label>
+						<input class="form-control" id="dept" name="dept" value="" type="text" readonly="true">
+					</div>
+					
+					<div class="form-group col-sm-3" >
+						<label for="executer">执行人</label>
+						<input class="form-control" id="executer" name="executer" value="" type="text" readonly="true">
+					</div>
+				</div>
+				
+				<h4><span class="label label-warning">续费专利概要</span></h4>
+				<div class="bs-callout bs-callout-warning">
+					<h4 id="h4Topic">名称：</h4>
+
+					<p id="pPatInfo">//</p>
+					
+					<footer>
+						<div class="row">
+							<div class="col-sm-4">
+								<a id="aDetail" href="#" target="_blank" data-toggle="tooltip" title="专利信息">查看详情</a>;&nbsp;状态：
+								<a id="aProcess" href="#" target="_blank" data-toggle="tooltip" title="过程记录"></a>
+							</div>
+									
+							<div id="divPatAuthNum" class="col-sm-4">授权编号：</div>
+							
+							<div id="divSubmitDate" class="col-sm-4">提交时间：</div>
+									
+						</div>
+					</footer>
+						
+				</div>
+				
+				<div class="row">
+				<div class="form-group col-sm-12">			
+			
+					<button type="submit" id="btnRenewalReport" class="btn btn-primary btn-sm" data-oprt="renewal_report"><span class="glyphicon glyphicon-edit"></span>&nbsp;续费报告</button>
+			
+					<!-- <button type="submit" id="btnRenewalApply" class="btn btn-success btn-sm" data-oprt="renewal_apply"><span class="glyphicon glyphicon-open"></span>&nbsp;提交</button> -->
+			
+					<!-- <button type="submit" id="btnRenewalAbandon" class="btn btn-danger btn-sm" data-oprt="renewal_abandon"><span class="glyphicon glyphicon-ban-circle"></span>&nbsp;放弃</button> -->
+			
+ 					<div  class="pull-right">
+						<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
+					</div>
+				</div>
+				</div>
+				
+			</form>
+			</div>
+			
+			
+			
+		</div>
+		
+		<!-- <div class="modal-footer"> -->
+          
+          
+        <!-- </div> -->
+		</div>
+	</div>
+</div>
+<!--/ Modal "modalPatRenew" -->
+
+<script>
+$(document).ready(function(){
+
+	// 点击btnBack，返回“关注/待处理”页面（即load“maintainer”的默认页面）
+	$("#btnBack").click(function(){
+		var sendData={"role":'maintainer',"issType":'_PATENT',"issStatus":'_OPERATE_TODO'};	
+		$("#patIss").load('patIss',sendData);
+		
+	});
+	
+	// 添加bootstrap的tooltip属性
+	$('a').tooltip({placement: 'bottom'});
+	
+	// 表格中<td>里<a>标签的click事件,给标签所在行上色
+	$("td a").click(function(){
+		
+		// 所有行去掉附加的bg-warning
+		$('tr').removeClass('bg-warning');
+		// 本<a>标签所在行上色bg-warning
+		$(this).parent().parent().addClass('bg-warning');
+	});
+	
+	// 表格中<td class="btnOprt">里a标签的click事件,Ajax处理数据引入内容
+	$(".btnOprt a").click(function(){
+		var oprt=$(this).attr('data-oprt');
+		var patId=$(this).attr('data-patId');
+		var str=$(this).html();
+		
+		$.post('patIssOprt',
+			{
+				'role':'maintainer',
+				'oprt':oprt,
+				'patId':patId,
+				'returnType':0,
+			},
+			function(data){
+			// 后端返回的data为json格式
+				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务</span>：<strong>【'+str+'】</strong>');
+				
+				$('#topic').html('关于专利“'+data.topic+'”的续费申请');
+				$('#issMapId').val(data.id);
+				$('#numId').val(data.id);
+				$('#addNewDate').val(data.today);
+				$('#writer').val(data.username);
+				$('#dept').val(data.deptMaintainer);
+				$('#executer').val('维护人');
+				
+				//bs-callout内容赋值
+				$('#h4Topic').html('专利名称：<strong>'+data.topic+'</strong>');
+				$('#pPatInfo').html('撰写人：'+data.author+'；发明人：'+data.inventor+'；所属部门：'+data.dept+'；<br>专利类型：'+data.pattype+'<br>授权时间：'+data.authrejectdate+'；<br>到期时间：'+data.renewdeadlinedate+'；<br>简介：'+data.summary);
+				$('#aDetail').attr('href','{$home}/patent/index/patinfo/id/'+data.id);
+				$('#aProcess').html(data.status).attr('href','{$home}/patent/index/patrecords/id/'+data.id);
+				$('#divPatAuthNum').html('授权编号：'+data.patauthnum);
+				$('#divSubmitDate').html('提交时间：'+data.submitdate);
+				
+				
+			}
+		);
+	
+	});
+	
+	<!-- // 应用jQuery的$.ajax提交表单，提交前进行一些验证准备。结合输入框的“required”属性避免输入框无内容 -->
+	$('#fmIssPatRenew').submit(function(event){					
+		//jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作
+        event.preventDefault();
+	
+		var oprt=$('#oprt').val();
+		var str='确定';
+		var title=oprt;
+		switch(oprt){
+			case 'renewal_apply':
+				str='确定续费【<span class="glyphicon glyphicon-open text-success"></span>&nbsp;提交】操作？';
+				title='续费【<span class="glyphicon glyphicon-open text-success"></span>&nbsp;提交】操作';
+			break;
+			
+			case 'renewal_abandon':
+				str='确定续费【<span class="glyphicon glyphicon-remove text-danger"></span>&nbsp;放弃】操作？';
+				title='续费【<span class="glyphicon glyphicon-remove text-danger"></span>&nbsp;放弃】操作';
+			break;
+			//默认为'renewal_report'
+			default:
+				str='确定续费【<span class="glyphicon glyphicon-edit text-primary"></span>&nbsp;报告】操作？';
+				title='续费【<span class="glyphicon glyphicon-edit text-primary"></span>&nbsp;报告】操作';
+			break;
+			
+		}
+		
+		$('#modalPatRenew').modal('hide');
+		$.confirm(str,function(e){
+			con=e;
+			if(true==con){
+				formDataAjax(oprt,$('#fmIssPatRenew'),title);
+				<!-- formDataAjax(oprt,title); -->
+				
+			}else{
+				$('#modalPatRenew').modal('show');
+			}
+		}).cancel('否(N)').ok('是(Y)');
+	});
+	
+	// 点击报告修改按钮，与form的submit()配合确定传给后端的oprt='renewal_report'
+	$('#btnRenewalReport').click(function(){
+		$('#oprt').val($(this).attr('data-oprt'));
+	});
+	
+	// 点击申报按钮，与form的submit()配合确定传给后端的oprt='renewal_apply'
+	$('#btnRenewalApply').click(function(){
+		$('#oprt').val($(this).attr('data-oprt'));
+	});
+	
+	// 点击放弃按钮，与form的submit()配合确定传给后端的oprt='renewal_abandon'
+	$('#btnRenewalAbandon').click(function(){
+		$('#oprt').val($(this).attr('data-oprt'));
+	});
+	
+<!-- function -->
+	//**函数名：formDataAjax
+ 	//* 作用：应用jQuery的$.ajax向后端提交formData数据
+	//* 参数1：oprt，类型：字符。值：不为空。说明：表示触发本函数的‘操作’
+	//* 参数2：fmObj，类型：对象。值：可为空，默认为空。说明：表示需要一起提交的表单。
+	//* 参数3：title，类型：字符。值：不为空。说明：本函数显示的提示框$.alert的标题内容。
+	function formDataAjax(oprt,fmObj,title){
+	// formdata形式上传表单数据,自动搜索表单信息(表单内没有name属性的input不会被搜索到)，IE<=9不支持FormData
+		if(fmObj){
+			var formData = new FormData(fmObj[0]);
+		}else{
+			var formData = new FormData();
+		}
+		
+		<!-- var formData = new FormData($('#fmIssPatRenew')[0]); -->
+		// 添加表单内没有的内容
+        formData.append('returnType', 0);
+		formData.append('role','maintainer');
+		formData.append('username','{$maintainer}');
+		formData.append('oprt',oprt);
+			
+        $.ajax({
+            type: 'post',
+            url: 'patIssOprt',
+            data: formData,
+            contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
+            processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)
+            success: function(data) {
+                if(data.result=='success'){
+					
+					// 操作成功，提示框显示信息
+					$.alert(title+'成功<span class="glyphicon glyphicon-ok text-success"></span><hr>'+data.msg);
+					
+					//maintainer，载入续费管理页面
+					$.post('patIssTpl',
+						{
+							'role':'maintainer',
+							'tpl':'renew',
+							'returnType':0
+						},
+						function(data){
+							$('#divPatIss').html(data);
+						}
+					);
+					
+				}else{
+					$('#modalPatRenew').modal();
+					<!-- $.alert(data.msg); -->
+				}
+            }
+        });
+	}
+
+<!-- function -->
+	
+});
+
+
+</script>
+

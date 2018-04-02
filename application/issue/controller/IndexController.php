@@ -1003,6 +1003,7 @@ class IndexController extends \think\Controller
         
         $iss = IssinfoModel::get($id);
         $topic=$iss->topic;
+        //调用IssinfoModel中定义的一对多方法。
         $issrecords=$iss->issrecords;
          
         $this->assign([
@@ -1120,7 +1121,7 @@ class IndexController extends \think\Controller
             if($iss->writer==$this->username or $rolename=="审查人" or $rolename=="批准人" or $rolename=="执行人" or $rolename=="维护人"){
                 //查出$iss->issnum对应的attachment记录
                 $atts=AttinfoModel::where('num_id',$iss->issnum)
-                                    ->order('uploaddate asc')
+                                    ->order('uploaddate','desc')
                                     ->select();   
                 
                 $topic=$iss->topic;

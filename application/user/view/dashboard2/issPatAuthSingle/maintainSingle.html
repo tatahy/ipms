@@ -1,0 +1,442 @@
+<!-- // issPatApproveSingle.html： -->
+
+{extend name="../application/user/view/dashboard2/issPatAuthSingle/baseSingle.html" /}
+
+
+
+{block name="abstract"}
+{__block__}
+
+{/block}
+
+{block name="patInput"}
+	<div id="divPatInfo" class="resetHide myFieldset">	
+	
+	{switch name="$iss.status"}
+    	{case value="准予续费"}
+		<div class="myLegend"><span class="label label-warning">专利续费信息</span></div>		
+		<form action="" id="fmPat">
+			<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
+			<input id="patTopic" name="patTopic" value="{$pat.topic}" type="text" class="sr-only">
+			<div id="divPatAuthInfo" class="resetHide">
+			<div class="row myRow" >			
+				<div class="form-group col-sm-4">
+					<label for="patRenewApplyNum">专利续费申报号<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patRenewApplyNum" name="patRenewApplyNum" value="{$pat.patrenewapplynum}" type="text" required>
+				</div>
+				
+				<div class="form-group col-sm-4">
+					<label for="patAdmin">专利管理机构<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patAdmin" name="patAdmin" value="{$pat.patadmin}" type="text" placeholder="中华人民共和国国家知识产权局" required>
+				</div>
+				
+				<div class="form-group col-sm-4">
+					<label for="patRenewAgency">专利续费申报代理<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patRenewAgency" name="patRenewAgency" value="{$pat.patrenewagency}" type="text" placeholder="xx专利商标事务有限公司" required>
+				</div>
+				
+			</div>
+			</div>
+			
+			<!-- <div id="divPatRejectInfo" class="resetHide"> -->
+			
+			<!-- </div> -->
+			
+		</form>
+		{/case}
+		
+		{case value="申报提交"}
+		<div class="myLegend"><span class="label label-warning">专利授权申报</span></div>		
+		<form action="" id="fmPat">
+			<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
+			<input id="patTopic" name="patTopic" value="{$pat.topic}" type="text" class="sr-only">
+			
+			<div class="row myRow" >			
+			<!-- //专利授权 -->
+				<div id="divPatAuthInfo" class="resetHide">
+				<div class="form-group col-sm-3">
+					<label for="patAuthNum">专利授权证书号<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patAuthNum" name="patAuthNum" value="{$pat.patauthnum}" type="text" required>
+				</div>
+				<div class="form-group col-sm-3">
+					<label for="patAuthDate">专利授权日期<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patAuthDate" name="patAuthDate" value="" placeholder="yyyy-mm-dd" type="text" required>
+				</div>
+				<div class="form-group col-sm-3">
+					<label for="renewDeadlinDate">专利续费截止日期<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="renewDeadlineDate" name="renewDeadlineDate" value="" placeholder="yyyy-mm-dd"  type="text" required>
+				</div>
+				</div>
+		
+			<!-- //专利驳回 -->
+				<div id="divPatRejectInfo" class="resetHide">	
+				<div class="form-group col-sm-4">
+					<label for="patRejectDate">专利被驳回日期<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patRejectDate" name="patRejectDate" value="" placeholder="yyyy-mm-dd" type="text" required>
+				</div>
+				</div>
+			
+				<div class="form-group col-sm-4">
+					<label for="patAdmin">专利授权机构<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patAdmin" name="patAdmin" value="{$pat.patadmin}" type="text" placeholder="中华人民共和国国家知识产权局" required>
+				</div>
+			</div>
+		</form>
+		{/case}
+		
+		{case value="续费提交"}
+		<div class="myLegend"><span class="label label-warning">专利续费授权申报</span></div>		
+		<form action="" id="fmPat">
+			<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
+			<input id="patTopic" name="patTopic" value="{$pat.topic}" type="text" class="sr-only">			
+			<div class="row myRow" >			
+				<!-- //专利续费授权 -->
+				<div id="divPatRenewAuthInfo" class="resetHide">
+				<div class="form-group col-sm-4">
+					<label for="patRenewAuthNum">专利续费授权证书号<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patRenewAuthNum" name="patRenewAuthNum" value="{$pat.patrenewauthnum}" type="text" required>
+				</div>
+				<div class="form-group col-sm-4">
+					<label for="patRenewAuthDate">专利续费授权日期<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patRenewAuthDate" name="patRenewAuthDate" value="" placeholder="yyyy-mm-dd" type="text" required>
+				</div>
+				</div>
+				
+				<!-- //专利续费驳回 -->
+				<div id="divPatRenewRejectInfo" class="resetHide">		
+				<div class="form-group col-sm-4">
+					<label for="patRenewRejectDate">专利续费驳回日期<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patRenewRejectDate" name="patRenewRejectDate" value="" placeholder="yyyy-mm-dd" type="text" required>
+				</div>	
+				</div>
+				
+				<div class="form-group col-sm-4">
+					<label for="patAdmin">专利授权机构<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patAdmin" name="patAdmin" value="{$pat.patadmin}" type="text" placeholder="中华人民共和国国家知识产权局" required>
+				</div>
+			</div>	
+		</form>
+		{/case}
+		
+    	{default /}
+		<div class="myLegend"><span class="label label-warning">专利申报信息</span></div>		
+		<form action="" id="fmPat">
+			<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
+			<input id="patTopic" name="patTopic" value="{$pat.topic}" type="text" class="sr-only">
+			<div id="divPatAuthInfo" class="resetHide">
+			<div class="row myRow" >			
+				<div class="form-group col-sm-4">
+					<label for="patApplyNum">专利申报号<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patApplyNum" name="patApplyNum" value="{$pat.patapplynum}" type="text" required>
+				</div>
+				
+				<div class="form-group col-sm-4">
+					<label for="patAdmin">专利管理机构<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patAdmin" name="patAdmin" value="{$pat.patadmin}" type="text" placeholder="中华人民共和国国家知识产权局" required>
+				</div>
+				
+				<div class="form-group col-sm-4">
+					<label for="patAgency">专利申报代理<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patAgency" name="patAgency" value="{$pat.patagency}" type="text" placeholder="xx专利商标事务有限公司" required>
+				</div>
+				
+			</div>
+			
+			<div class="row myRow" >			
+				<div class="form-group col-sm-4">
+					<label for="patOwner">专利所有人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patOwner" name="patOwner" value="{$pat.patowner}" type="text" placeholder="广州市光机电技术研究院" required>
+				</div>
+				
+				<div class="form-group col-sm-4">
+					<label for="patInventor">专利发明人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patInventor" name="patInventor" value="{$pat.inventor}" type="text" required>
+				</div>
+				
+				<div class="form-group col-sm-4">
+					<label for="patOtherInventor">专利其他发明人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patOtherInventor" name="patOtherInventor" value="{$pat.otherinventor}" type="text" required>
+				</div>
+				
+			</div>
+			
+			<div class="row myRow" >			
+				<div class="form-group col-sm-4">
+					<label for="patKeyword">专利关键词<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="patKeyword" name="patKeyword" value="{$pat.keyword}" type="text" placeholder="关键词" required>
+				</div>
+				
+				<div class="form-group col-sm-8">
+					<label for="patSummary">专利简介<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<textarea class="form-control" rows="5" id="patSummary" name="patSummary" type="text" placeholder="请填入专利的简介" required>{$pat.summary}</textarea>
+				</div>
+				
+			</div>
+			</div>
+		</form>
+	{/switch}	
+	</div>	
+{/block}
+
+{block name="attInput"}
+{__block__}
+
+{/block}
+
+{block name="issPatInput"}
+
+<div class="myFieldset">
+
+{switch name="$iss.status"}
+    {case value="否决申报|专利授权|专利驳回|放弃续费|续费授权"}
+	<!-- //无 -->
+	<form action="" id="fmIssPat">
+		<!-- // class="sr-only" 仅源代码文件中显示-->
+		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
+		<input id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" class="sr-only">
+			
+	</form>
+	{/case}
+	
+	{case value="申报提交"}
+		<!-- //授权、驳回、修改 -->
+	
+	<div class="myLegend"><span class="label label-warning">申报维护</span></div>
+	<form action="" id="fmIssPat" >
+		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
+		<input id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" class="sr-only">		
+	
+		<div class="row myRow">
+			<div class="form-group col-sm-4">
+				<label for="maintainResult">申报结果<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<select id="maintainResult" class="empty-check form-control" name="maintainResult" style="font-size:100%;">
+					<option value="0" class="text-warning bg-warning" >……</option>
+					<option class="text-success bg-success" value="_AUTHORIZE">授权</option>
+					<option class="text-danger bg-danger" value="_REJECT">驳回</option>
+					<option class="text-primary bg-info" value="_IMPROVE">修改</option>
+				</select>
+			</div>
+		
+			<div id="divMaintainMsg" class="resetHide form-group col-sm-8 ">
+				<label for="maintainMsg">具体原因/内容<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<textarea class="empty-check form-control" rows="5" id="maintainMsg" name="maintainMsg" type="text" placeholder="请填入具体的原因/内容" required></textarea>
+			</div>
+		</div>		
+		
+	</form>
+	{/case}
+	
+	{case value="续费提交"}
+		<!-- //授权、驳回 -->
+	
+	<div class="myLegend"><span class="label label-warning">续费维护</span></div>
+	<form action="" id="fmIssPat" >	
+		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
+		<input id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" class="sr-only">		
+		<div class="row myRow">
+			<div class="form-group col-sm-4">
+				<label for="maintainResult">续费结果<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<select id="maintainResult" class="empty-check form-control" name="maintainResult" style="font-size:100%;">
+					<option value="0" class="text-warning bg-warning" >……</option>
+					<option class="text-success bg-success" value="_AUTHORIZE">授权</option>
+					<option class="text-danger bg-danger" value="_REJECT">驳回</option>
+				</select>
+			</div>
+		
+			<div id="divMaintainMsg" class="resetHide form-group col-sm-8 ">
+				<label for="maintainMsg">具体原因/内容<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<textarea class="empty-check form-control" rows="5" id="maintainMsg" name="maintainMsg" type="text" placeholder="请填入具体的原因/内容" required></textarea>
+			</div>
+		</div>
+	</form>
+	{/case}
+	
+	{case value="申报复核|准予续费"}
+	<div class="myLegend"><span class="label label-warning">申报维护</span></div>
+	<form action="" id="fmIssPat" >
+		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
+		<input id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" class="sr-only">		
+		<div class="row myRow">
+			<div class="form-group col-sm-4">
+				<label for="maintainResult">选择<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<select id="maintainResult" class="empty-check form-control" name="maintainResult" style="font-size:100%;">
+					<option value="0" class="text-warning bg-warning" >……</option>
+					<option class="text-danger bg-danger" value="_APPLY">提交申报</option>
+					<option class="text-primary bg-info" value="_REVIEW">复核修改</option>
+				</select>
+			</div>
+		
+			<div id="divMaintainMsg" class="resetHide form-group col-sm-8 ">
+				<label for="maintainMsg">简要说明<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<textarea class="empty-check form-control" rows="5" id="maintainMsg" name="maintainMsg" type="text" placeholder="请填入简要的原因/内容" required></textarea>
+			</div>
+		</div>
+		
+		
+	</form>
+
+	{/case}
+	
+	{case value="准予续费"}
+		<!-- //无 -->
+	<form action="" id="fmIssPat">
+		<!-- // class="sr-only" 仅源代码文件中显示-->
+		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
+		<input id="issTopic" name="issTopic" value="{$iss.topic}" type="text" class="sr-only">
+			
+	</form>
+	{/case}
+	
+    
+{/switch}
+	
+</div>
+{/block}
+
+{block name="btn"}
+
+{switch name="$iss.status"}
+    {case value="否决申报|专利授权|专利驳回|放弃续费|续费授权"}
+		<button type="submit" id="btnClose" class="btn btn-primary  btn-sm" data-oprt="_CLOSE" data-issTopic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-off"></span>完结</button>
+		
+	{/case}
+		
+	{case value="申报提交"}
+		<button type="submit" id="btnAuthorize" class="resetHide btn btn-success btn-sm" data-oprt="_AUTHORIZE" data-issTopic="{$iss.topic}" data-btnLabel="label-success"><span class="glyphicon glyphicon-registration-mark"></span>授权</button>
+		<button type="submit" id="btnReject" class="resetHide btn btn-danger btn-sm" data-oprt="_REJECT" data-issTopic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon 		glyphicon-ban-circle"></span>驳回</button>
+		<button type="submit" id="btnImprove" class="resetHide btn btn-primary  btn-sm" data-oprt="_IMPROVE" data-issTopic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-plus-sign"></span>修改</button>
+	{/case}
+	
+	{case value="续费提交"}
+		<button type="submit" id="btnAuthorize" class="resetHide btn btn-success btn-sm" data-oprt="_AUTHORIZE" data-issTopic="{$iss.topic}" data-btnLabel="label-success"><span class="glyphicon glyphicon-registration-mark"></span>授权</button>
+		<button type="submit" id="btnReject" class="resetHide btn btn-danger btn-sm" data-oprt="_REJECT" data-issTopic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-ban-circle"></span>驳回</button>
+	{/case}
+	
+	{case value="申报复核|准予续费"}
+		<button type="submit" id="btnApply" class="resetHide btn btn-danger btn-sm" data-oprt="_APPLY" data-issTopic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-send"></span>&nbsp;提交申报</button>
+		<button type="submit" id="btnReview" class="resetHide btn btn-primary  btn-sm" data-oprt="_REVIEW" data-issTopic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-check"></span>&nbsp;修改保存</button>
+	{/case}
+	
+	<!-- {case value="准予续费"} -->
+		<!-- <button type="submit" id="btnApply" class="btn btn-primary  btn-sm" data-oprt="_APPLY" data-issTopic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-send"></span>提交申报</button> -->
+		<!-- <button type="submit" id="btnReview" class="resetHide btn btn-primary  btn-sm" data-oprt="_REVIEW" data-issTopic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-check"></span>&nbsp;修改保存</button> -->
+	<!-- {/case} -->
+    
+{/switch}
+
+{/block}
+
+{block name="script"}
+{__block__}
+<script>
+$(document).ready(function(){	
+	$('.resetHide').hide();
+	
+	// 单选框maintainResult的change事件，出现maintainMsg输入框等。
+	$('#maintainResult').change(function(){	
+		//恢复到default状态
+		$('.resetHide').hide();
+		$(this).removeClass('label label-danger label-primary label-success');
+		//去掉'empty-check'，取消非空检查
+		$('#maintainMsg').removeClass('empty-check');
+		$('#divPatAuthInfo').children().find('.form-control').removeClass('empty-check');
+		$('#divPatInfo').show();		
+		
+		switch($(this).val()){			
+			case '_IMPROVE':
+				$('#divMaintainMsg').show();
+				$('#btnImprove').show();
+				$(this).addClass('label label-primary');
+				//#maintainMsg增加'empty-check'，列入非空检查
+				$('#maintainMsg').addClass('empty-check');
+				$('#divPatInfo').hide();
+			break;
+			
+			case '_REVIEW':
+				$('#divMaintainMsg').show();
+				$('#btnReview').show();
+				$(this).addClass('label label-primary');
+				//隐藏并取消非空检查
+				$('#maintainMsg').removeClass('empty-check').parent().hide();
+				//增加'empty-check'，列入非空检查
+				$('#divPatAuthInfo').show().children().find('.form-control').addClass('empty-check').prop('readonly',false);
+			break;
+			
+			case '_APPLY':
+				$('#divMaintainMsg').show();
+				$('#divPatAuthInfo').show();
+				$('#btnApply').show();
+				$(this).addClass('label label-danger');
+				//出现，增加'empty-check'，列入非空检查，只读
+				$('#maintainMsg').addClass('empty-check');
+				$('#divPatAuthInfo').show().children().find('.form-control').addClass('empty-check').prop('readonly',true);
+			break;
+			
+			case '_AUTHORIZE':
+				$('#divMaintainMsg').hide();
+				$('#btnAuthorize').show();
+				$(this).addClass('label label-success');
+				//出现，增加'empty-check'，列入非空检查
+				$('#divPatAuthInfo').show().children().find('.form-control').addClass('empty-check');
+				//隐藏并取消非空检查
+				$('#maintainMsg').removeClass('empty-check');
+				$('#divPatRejectInfo').hide().children().find('.form-control').removeClass('empty-check');
+				//以yyyy-mm-dd格式显示系统当前日期
+				$('#patAuthDate').val(dateValue());
+				$('#patRenewAuthDate').val(dateValue());
+				
+			break;
+			
+			case '_REJECT':
+				$('#divMaintainMsg').show();
+				$('#btnReject').show();
+				$(this).addClass('label label-danger');
+				//出现，增加'empty-check'，列入非空检查
+				$('#maintainMsg').addClass('empty-check');
+				$('#divPatRejectInfo').show().children().find('.form-control').addClass('empty-check');
+				//隐藏并取消非空检查
+				$('#divPatAuthInfo').hide().children().find('.form-control').removeClass('empty-check');
+				//以yyyy-mm-dd格式显示系统当前日期
+				$('#patRejectDate').val(dateValue());
+				$('#patRenewRejectDate').val(dateValue());
+				
+			break;
+	
+			case '_CLOSE':
+				$('.resetHide').hide();
+				$(this).removeClass('label label-danger label-primary label-success');
+				//#maintainMsg去掉'empty-check'，取消非空检查
+				$('#maintainMsg').removeClass('empty-check');
+			break;
+		}	
+	
+	});
+	
+	//附加#btnReset 的click事件
+	$('#btnReset').click(function(){	
+	
+		$('#maintainResult').removeClass('label label-danger label-primary label-success');
+		
+	});
+	
+	
+<!-- function -->
+	//**函数名：dateValue
+ 	//* 作用：得到yyyy-mm-dd格式的日期
+	//* 参数无
+	//* 返回值：系统当前日期
+	<!-- function todayDate(today,year,month,day){ -->
+	function dateValue(){
+		var mydate=new Date();
+		//mydate.getMonth()的取值为0~11，将月份统一为mm的格式
+		var str=(mydate.getMonth()+1)>9?(mydate.getMonth()+1).toString():'0'+(mydate.getMonth()+1);
+		var today=mydate.getFullYear()+'-'+str+'-'+mydate.getDate();
+		//系统当前时间字符串
+		<!-- var todayDate=mydate.toLocaleString(); -->
+		return today;
+	}
+	
+<!--// function -->	
+});
+</script>
+{/block}

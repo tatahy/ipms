@@ -5,7 +5,7 @@ use think\Request;
 use think\Session;
 
 use app\common\validate\Ipvalidate;
-use app\user\model\User as UserModel;
+use app\index\model\User as UserModel;
 use app\user\model\Rolety as RoletyModel;
 use app\patent\model\Patinfo as PatinfoModel;
 
@@ -27,16 +27,7 @@ class IndexController extends \think\Controller
         }
         
         $log=Session::get('log');       
-       
-        //--在index.html页面输出自定义信息的HTML代码块
-        $destr= "请求方法:".$request->method()."</br>".
-                "username:".$username."</br>".
-                //"pwd:".sizeof($pwd);
-                "pwd:".$pwd."</br>".
-                "log:".$log."</br>";
-                //"session:".dump($request->session());
-        //--!
-        
+
         $data=[
             'name'=>$username,
             'pwd'=>$pwd,
@@ -82,16 +73,28 @@ class IndexController extends \think\Controller
         $pats = new PatinfoModel;  
         
         //利用模型对象得到状态status"="新增"）的patent总数
-        $numpatadd=$pats->where('status','新增')->count();
+        $numpatadd=$pats->where('status','拟申报')->count();
         
-        //利用模型对象得到状态status"="申报"，'返回修改'）的patent总数
-        $numpatapp=$pats->where('status',['=','申报'],['=','返回修改'],'or')->count();
+        //利用模型对象得到申报的patent总数
+        $numpatapp=$pats->where('status',['=','申报'],['=','申报修改'],'or')->count();
         
-        //利用模型对象得到状态status='授权'）的patent总数
-        $numpataut=$pats->where('status','授权')->count();
-        
-        //利用模型对象得到状态status"='续费授权'，'续费中'）的patent总数
-        $numpatren=$pats->where('status',['=','续费授权'],['=','续费中'],'or')->count();
+        //利用模型对象得到有效的patent总数
+        //$numpataut=$pats->where('status',['=','授权'],['=','续费授权'],['=','续费中'],['=','放弃续费'],'or')->count();
+        $numpataut=$pats->where('id','>',0)->where('status','in',['授权','续费授权','续费中','放弃续费'])->count();
+
+        $userA=new UserModel;
+        //调用User模型层定义的userAuth()方法，刷新登录用户的各个模块权限
+        $authority=$userA->userAuth($username,$pwd);
+          
+          //--在index.html页面输出自定义信息的HTML代码块
+        $destr= "请求方法:".$request->method()."</br>".
+                "username:".$username."</br>".
+                //"pwd:".sizeof($pwd);
+                "pwd:".$pwd."</br>".
+                "log:".$log."</br>".
+                "<strong>authority Now [JSON string]:</strong>".json_encode($authority)."</br>";
+                //"session:".dump($request->session());
+        //--!
         
         $this->assign([
             //在index.html页面通过'destr'输出自定义的信息
@@ -107,15 +110,15 @@ class IndexController extends \think\Controller
             'numpatadd'=>$numpatadd,
             'numpatapp'=>$numpatapp,
             'numpataut'=>$numpataut,
-            'numpatren'=>$numpatren,
             ]);
-            return view();
+            //return view();
+            return $this->fetch();
             
         }
         
     }
     
-    //修改application/config.php的设置将“默认操作”由“index”改为“login”
+    //修改application/config.php的设置将“默认操作”由“index”改为“login”？？
      public function login(Request $request)
     {
                         
@@ -136,6 +139,7 @@ class IndexController extends \think\Controller
         $this->success('安全退出系统','index/login');
                                 
     }
+    
     
 
 }

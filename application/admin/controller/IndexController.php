@@ -4,6 +4,7 @@ namespace app\admin\controller;
 use think\Request;
 use think\Session;
 use think\Model;
+
 use app\user\model\User as UserModel;
 use app\user\model\Rolety as RoletyModel;
 use app\admin\model\Dept as DeptModel;
@@ -265,7 +266,12 @@ class IndexController extends \think\Controller
                             //->where('dept',$searchDept)
                             ->group('username')
                             ->select();
-        $usersNum=count($users1);       
+        //$usersNum=count($users1);     
+        $usersNum=count(UserModel::where('id','>',0)
+                            ->where($map)
+                            //->where('dept',$searchDept)
+                            ->group('username')
+                            ->select());    
  
         foreach($users as $v){
             $user1 = UserModel::get($v['id']);
@@ -361,7 +367,7 @@ class IndexController extends \think\Controller
     {
       $this->_loginUser();
       
-      $dept=DeptModel::all();
+      $dept=DeptModel::where('enable','1')->select();
       // 将数组转化为json
       return json($dept);
     }

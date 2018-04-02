@@ -38,11 +38,12 @@ class Issinfo extends Model
     }
     
     /**
-     * 获取patent的内容
+     * 获取对应patent的内容
      */    
     public function patinfo()
     {
         return $this->hasOne('app\patent\model\Patinfo');
+        //return $this->hasOne('Patinfo');
     }    
     
     /**
@@ -50,7 +51,8 @@ class Issinfo extends Model
      */
     public function issrecords()
     {   
-        return $this->hasMany('Issrecord');
+        //根据'acttime'降序排列
+        return $this->hasMany('Issrecord')->order('acttime','desc');
     }
     
     //获取issinfo的多态模型,涉及issinfo表中的num_id和num_type两个字段内容

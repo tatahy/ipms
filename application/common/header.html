@@ -33,6 +33,7 @@
   .affix + .container-fluid {
       padding-top: 70px;
   }
+  
   </style>
   
   <!-- Tooltips must be initialized with jQuery: select the specified element and call the tooltip() method.
@@ -61,10 +62,10 @@ $(document).ready(function(){
 		</div>
     <div id="myNavbar" class="collapse navbar-collapse" >
       <ul class="nav navbar-nav">
-        <li id="nav_index"><a href="{$home}/index/index/index">首页</a></li>
-		<li><a href="#">项目</a></li>
-        <li id="nav_pat"><a href="{$home}/patent/index/patlist">专利</a></li>
-		<li><a href="#">论文</a></li>
+        <li id="nav_index"><a href="{$home}/index/index/index"><span class="glyphicon glyphicon-home"></span>&nbsp;首页</a></li>
+        <li id="nav_pat"><a href="{$home}/patent/index/patlist#total"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利</a></li>
+		<li id="nav_the"><a href="{$home}/thesis/index/thelist#total"><span class="glyphicon glyphicon-list"></span>&nbsp;论文</a></li>
+		<li id="nav_pro"><a href="{$home}/project/index/prolist#total"><span class="glyphicon glyphicon-inbox"></span>&nbsp;项目</a></li>
         <!-- <li><a href="#">获奖</a></li> -->
 		<!-- <li><a href="#">成果转化</a></li> -->
 		
@@ -83,18 +84,18 @@ $(document).ready(function(){
       </ul>
       <ul class="nav navbar-nav navbar-right">
 		<li id="liSearch" class="">
-				<form target="_blank" class="navbar-form" method="post" role="form" action="{$home}/search/index/searchresult">
-					<div class="form-group">
-						<label class="sr-only" for="searchword">关键词:</label>
-						<input class="form-control" id="searchword" name="searchword" type="text" placeholder="关键词（题目/作者/部门) "size="30">
-						<input class="form-control hidden" id="htype" name="htype" type="text" value="all" >
-					</div>	
-						<button type="submit" class="btn btn-default form-control"><span class="glyphicon glyphicon-search"></span>&nbsp;搜索</button>
-						<a target="_blank" href="{$home}/search/index/index" data-toggle="tooltip" title="精细查找"  data-placement="bottom">更多...</a>
+				<!-- <form target="_blank" class="navbar-form" method="post" role="form" action="{$home}/search/index/searchresult"> -->
+					<!-- <div class="form-group"> -->
+						<!-- <label class="sr-only" for="searchword">关键词:</label> -->
+						<!-- <input class="form-control" id="searchword" name="searchword" type="text" placeholder="关键词（题目/作者/部门) "size="30"> -->
+						<!-- <input class="form-control hidden" id="htype" name="htype" type="text" value="all" > -->
+					<!-- </div>	 -->
+						<!-- <button type="submit" class="btn btn-default form-control"><span class="glyphicon glyphicon-search"></span>&nbsp;搜索</button> -->
+						<!-- <a target="_blank" href="{$home}/search/index/index" data-toggle="tooltip" title="精细查找"  data-placement="bottom">更多...</a> -->
 					
-				</form>
+				<!-- </form> -->
 		</li>
-        <li><a href="{$home}/user/index/index"><span class="glyphicon glyphicon-user"></span>&nbsp;【{$username}】个人事务</a></li>	
+        <li><a href="{$home}/user/dashboard/index"><span class="glyphicon glyphicon-user"></span>&nbsp;【{$username}】个人事务</a></li>	
         <li id="liQuit"><a href="{$home}/index/index/logout"><span class="glyphicon glyphicon-log-out"></span>&nbsp;退出</a></li>
       </ul>
     </div>
@@ -106,12 +107,10 @@ $(document).ready(function(){
 
 <!-- <div class="container-fluid" data-offset-top="200"> -->
 <!-- <p>{$destr}</p> -->
-<!-- {foreach name="array" item="vo"} -->
-<!-- {$vo},&nbsp; -->
-<!-- {/foreach} -->
+
 <!-- </div> -->
 
-<!-- /调试，输出结果显示代码-->
+<!-- {//调试，输出结果显示代码} -->
 
 
 <!-- /pageheader  -->

@@ -1,0 +1,608 @@
+<script>
+$("#actdetail").focus();
+		<!-- #actdetail失去焦点时判断是否填入了内容，否则拉回焦点填入内容  -->
+		$("#actdetail").focusout(function(){
+			if($("#actdetail").val()==''){
+				$.alert("请填入审批意见。");
+				$("#actdetail").val("退回修改").css('background','#00CCFF');
+				$("#actdetail").focus();
+			}
+		});	
+		
+<!-- //简单渲染页面，IPMS V3	 -->
+return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
+
+$("#report").focusout(function(){
+				if($("#report").text()!=''){
+					<!-- 弹出自定义提示页面，确定后跳转并传参  -->
+					$.confirm('确定提交&nbsp;‘任务报告’&nbsp;？',function(e){
+						con=e;
+						if(true==con)window.location.href="<{$home}>/issue/index/isssave"+"/issnum/"+"<{$issnum}>"+"/operate/"+$("#btnReport").val()+"/rolename/"+"<{$rolename}>"+"/actdetail/"+$("#report").text();
+					}).ok('同意').cancel('取消');
+				}
+});
+</script>
+
+
+<!--??  HY 2017/5/27 -->
+<script>
+	<!-- 接受任务 -->
+	$("#btnAccept").click(function(){
+		<!-- 弹出自定义提示页面，确定后跳转并传参  -->
+		$.confirm('确定&nbsp;‘领受任务’&nbsp;？',function(e){
+			con=e;
+			if(true==con)window.location.href="<{$home}>/issue/index/isssave"+"/issnum/"+"<{$issnum}>"+"/operate/"+$("#btnAccept").val()+"/rolename/"+"<{$rolename}>"+"/actdetail/"+$("#btnAccept").val();
+			
+		}).ok('同意').cancel('取消');		
+    });	
+
+			<!-- 用ajax实现上述代码块if(true==con)的功能 -->
+			if(true==con){
+				$.post("<{$home}>/issue/index/isssave",
+					{
+						issnum: "<{$issnum}>",
+						operate: $("#btnReject").val(),
+						rolename: "<{$rolename}>",
+						actdetail: $("#actdetail").val()
+				
+					},function(id){window.location.href="<{$home}>/issue/index/issinfo"+"/id/"+id});
+				
+			}
+<!-- /?? -->
+
+<!-- maintainer专利管理页面，根据专利状态不同需调整页面的输入框			 -->
+$("#divAddnewDate").show().html('<p><strong>填报日期：</strong><{$addnewdate}></p>');
+$(".statusShow td").children().hide();
+				
+				$("#divStatusChange").show();
+				<!-- $("#divApplyDate").hide(); 申请日期-->
+				<!-- $("#divModifyDate").hide(); 返回修改日期-->
+				<!-- $("#divAJDate").hide(); 授权/驳回日期：-->
+				<!-- $("#divdivRenewdlDate").hide(); 授权续费截止日期：-->
+				<!-- $("#divRADate").hide(); 续费/放弃日期：-->
+				<!-- $("#divNextrenewDate").hide(); 下次续费日期：-->
+				
+				
+				$("#divPatNum").show();
+				<!-- $("#divPatApplynum").hide(); 申请编号-->
+				<!-- $("#divPatAuthnum").hide(); 授权编号-->
+				<!-- $("#divPatAgency").hide(); 代理机构-->
+				<!-- $("#divPatAdmin").hide(); 授权机构-->
+				<!-- $("#divRAReason").hide(); 放弃/驳回原因-->
+				<!-- $("#divModSuggestion").hide(); 修改建议-->
+		
+
+<!-- /maintainer专利管理页面，根据专利状态不同需调整页面的输入框			 -->
+
+switch(){
+                    case '':
+                    
+                    break;
+                    
+                    case '':
+                    
+                    break;
+                    
+                    default:
+                    
+                    break;
+                    
+                    
+                }
+</script>
+
+<!--  HY 2017/12/29 -->
+
+<script>
+
+//jQuery的$.post()与.load()有细微的差别,在输出显示效果上load较POST多了双引号。post较load多出了回调函数，在回调函数里可以做更多的事情。
+	$('#btnPatIssNew').click(function(){
+		var str=$(this).html();
+		// 所有按钮所在行去掉附加的bg-warning
+		$('.btnTpl').parent().removeClass('bg-warning');
+		$.post('patIssTpl',
+			{
+				'role':role,
+				'tpl':'addNew',
+				'returnType':0
+			},
+			function(data){
+				$('#divPatIssTpl').html(data);
+				
+				$('.modal-header').find('h4').empty().html('<strong>【'+str+'】</strong><span class="glyphicon glyphicon-wrench">专利事务</span>');
+			}
+		);
+		<!-- $('#divPatIssTpl').load('patIssTpl',{'role':role,'tpl':tpl,'returnType':1}); -->
+	});
+</script>
+				
+<!--/  HY 2017/12/29 -->			
+
+<!--  HY 2018/1/11 -->	
+
+<h4><span >事务附件上传</span>
+			<label class="radio-inline ">
+      			<input type="radio" name="attUpload" value="0" checked><span class="label label-default">无</span>
+    		</label>
+			<label class="radio-inline">
+      			<input type="radio" name="attUpload" value="1"><span class="label label-default">上传</span>
+    		</label>
+    		
+		</h4>
+
+<script>
+//通过取得radio的选中项value值，判断是哪一项被选中
+var v=$('input:radio[name="attUpload"]:checked').val();
+
+//设置单选按钮value=1的项为当前选中项？？
+$('input:radio[name="attUpload"]').attr('checked','1');
+$('input:radio[name="attUpload"][value="1"]').attr('checked',true);
+$('input:radio[name="attUpload"][value="1"]').prop('checked',true);
+
+</script>		
+<!--/  HY 2018/1/11 -->	
+
+<!--  HY 2018/1/11 -->	
+<style>
+//Bootstrap 3定义页面宽度？？
+ @media only screen 
+        and (min-device-width : 375px) 
+        and (max-device-width : 667px) { 
+            .col-md-3,
+            .col-md-9 {
+                width: 100%;
+            }
+        }
+</style>	
+<!--/  HY 2018/1/11 -->		
+		
+<!--  HY 2018/1/25 -->	
+<script>
+// 得到页面锚点值
+	var fragment = window.location.hash;	
+</script>
+<!--/  HY 2018/1/25 -->	
+
+<!--  HY 2018/1/25 -->	
+
+<script>
+//向后端提交数据的方式：
+//1. 表单get/post。TP5中后端用$request->param()来接收。
+//2. FormData。TP5中后端用$request->request()来接收。formdata形式上传表单数据,自动搜索表单信息(表单内没有name属性的input不会被搜索到)，IE<=9不支持FormData。
+
+//**函数名：formDataAjax
+ 	//* 作用：应用jQuery的$.ajax向后端提交formData数据
+	//* 参数1：oprt，类型：字符。值：不为空。说明：表示触发本函数的‘操作’
+	//* 参数2：fmObj，类型：对象。值：可为空，默认为空。说明：表示需要一起提交的表单。
+	//* 参数3：title，类型：字符。值：不为空。说明：本函数显示的提示框$.alert的标题内容。
+	function formDataAjax(oprt,fmObj,title){
+	// formdata形式上传表单数据,自动搜索表单信息(表单内没有name属性的input不会被搜索到)，IE<=9不支持FormData
+		if(fmObj){
+			var formData = new FormData(fmObj[0]);
+		}else{
+			var formData = new FormData();
+		}
+		
+		<!-- var formData = new FormData($('#fmIssPatRenew')[0]); -->
+		// 添加表单内没有的内容
+        formData.append('returnType', 0);
+		formData.append('role','maintainer');
+		formData.append('username','{$maintainer}');
+		formData.append('oprt',oprt);
+			
+        $.ajax({
+            type: 'post',
+            url: 'patIssOprt',
+            data: formData,
+            contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
+            processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)
+            success: function(data) {
+                if(data.result=='success'){
+					
+					// 操作成功，提示框显示信息
+					$.alert(title+'成功<span class="glyphicon glyphicon-ok text-success"></span><hr>'+data.msg);
+					
+					//maintainer，载入续费管理页面
+					$.post('patIssTpl',
+						{
+							'role':'maintainer',
+							'tpl':'renew',
+							'returnType':0
+						},
+						function(data){
+							$('#divPatIss').html(data);
+						}
+					);
+					
+				}else{
+					$('#modalPatRenew').modal();
+					<!-- $.alert(data.msg); -->
+				}
+            }
+        });
+	}
+
+</script>
+<!--/  HY 2018/1/25 -->	
+
+
+<!--HY 2018/2/8 -->	
+<script>
+<!-- // 遍历data数组组装HTML语句 -->
+	<!-- // data的结构是数组类的：[{id:1,username:"xx", dept:"yy"},{}],所以要进行嵌套取出id，username和dept的值组装HTML语句-->
+	var str="";
+	$.each(data,function(n1,v1){
+		$.each(v1,function(n2,v2){
+			if(n2=="username"){
+				str+="<option value='"+v2+"'>"+v2+" （部门：";
+			}
+			if(n2=="dept"){
+				str+=v2+"）</option>";
+			}
+		});
+	});
+
+</script>
+<!--/  HY 2018/2/8 -->	
+
+<!--HY 2018/2/13 -->	
+Javascript,数组的最大值、数组的最小值
+<script>
+var arr=[];
+for (var i=0;i<2;i++){
+	arr.push(i);
+}
+
+var min=Math.min.apply(null, arr);//min=0
+var max=Math.max.apply(null, arr);//max=1
+
+</script>
+
+
+<!--/  HY 2018/2/13 -->	
+
+
+<!--HY 2018/2/17 -->	
+jQuery，表单
+<html>
+<div id="divForm" class="row col-sm-12">
+	<hr>
+	<form action="" id="fm1" class="form-inline" role="form">
+	
+	<div class="form-group">
+      	<label class="control-label" for="a">a:</label>
+        <input class="form-control" id="a" type="text" name="a" value="1">
+        
+	</div>
+	
+	<div class="form-group ">
+      	<label class="control-label" for="a1">a1:</label>
+        <input class="form-control" id="a" type="text" name="a1" value="11">
+		
+	</div>
+	
+	</form>
+	
+	<br>
+	<form action="" id="fm2" class="form-inline" role="form">fm2
+	<div class="form-group ">
+      	<label class="control-label" for="a">a:</label>
+        <input class="form-control" type="text" name="a" value="2">
+    	
+	</div>
+	
+	<div class="form-group ">
+      	<label class="control-label" for="a2">a2:</label>
+        <input class="form-control" type="text" name="a2" value="22">
+    	
+	</div>
+		
+	</form>
+	<br>
+	
+	<form action="" id="fm3" class="form-inline" role="form">fm3
+		<div class="form-group">
+      		<label class="control-label" for="a">a:</label>
+        	<input class="form-control" id="a" type="text" name="a" value="3">
+			
+		</div>
+	
+		<div class="form-group ">
+      		<label class="control-label" for="a3">a3:</label>
+        	<input class="form-control" type="text" name="a3" value="33">
+    	
+		</div>
+		
+		<select class="form-control" id="patType" name="patType">
+				<option value="0">……</option>
+				<option value="_PATT1">发明专利</option>
+				<option value="_PATT2">实用新型专利</option>
+                <option value="_PATT3">外观设计专利</option>
+                <option value="_PATT4">软件版权</option>
+                <option value="_PATT5">著作权</option>
+                <option value="_PATT6">集成电路图</option>
+                
+		</select>
+		
+	</form>
+	<br>
+	
+	<input id="btnSave" type="submit" class="btn btn-primary btn-sm" data-oprt="save" value="保存" > 
+	<button type="submit" id="btnSubmit" class="btn btn-primary btn-sm" data-oprt="submit"  ><span class="glyphicon glyphicon-ok"></span>提交</button>
+	<button type="submit" id="btnSubmit" class="btn btn-danger btn-sm"  data-oprt="delete" ><span class="glyphicon glyphicon-remove"></span>删除</button>
+	
+	<button id="btnReset" class="btn btn-warning btn-sm"  data-oprt="reset" ><span class="glyphicon glyphicon-repeat"></span>重置</button>
+	
+	<br>
+	<p>点击的按钮是：<span id="clickedBtn">无</span></p>
+	<p>fm1内容：<span id="spanFm1Display">无</span></p>
+	<p>fm2内容：<span id="spanFm2Display">无</span></p>
+	<p>fm3内容：<span id="spanFm3Display">无</span></p>
+</div>
+
+
+</html>
+
+<script>
+$(document).ready(function(){
+	<!-- 重置表单，通过调用 DOM 中的reset方法来重置表单。 -->
+	$('#btnReset').click(function(){	
+		$('#fm1')[0].reset();
+		$('#fm2')[0].reset();
+		$('#fm3')[0].reset();
+	
+	});
+	
+	<!-- 提交表单 -->
+	$('#formId').submit(function(event){});
+	
+	//检查divForm里的input是否为空，为空做出提示，不为空去掉提示
+	$('#divForm .form-control').each(function(){
+		$(this).focusout(function(){
+			if($(this).val()){
+				$(this).parent().removeClass('has-error');
+				$(this).tooltip('destroy');
+			}else{
+				$(this).parent().addClass('has-error');
+				$(this).tooltip({title: '请填写此字段', placement: 'bottom'}).tooltip('show');
+			}
+			
+		});
+		
+	});
+	
+	// select显示为后端传来的内容,tp5框架下后端patinfo模型中对pattpye字段有定义获取器，所以$pat.pattype的值不是数据库中的值，$pat->getData('pattype')才是。同理$iss->getData('issmap_type')
+	$('#patType').val('{$pat->getData('pattype')}').attr('selected');
+	$('#issType').val('{$iss->getData('issmap_type')}').attr('selected');
+
+});
+
+</script>
+
+<!--/  HY 2018/2/17 -->	
+
+
+
+<!--HY 2018/3/1 -->	
+AJAX，jQuery
+<script>
+$(document).ready(function(){	
+//$.ajax()返回的是一个jQXHR对象，该对象还有done()、fail()等方法。		
+        $.ajax({
+            type: 'post',
+            url: 'issPatOprt',
+            data: formData,
+            contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
+            processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)
+			xhr:function(){
+				//jQuery中得到XMLHttpRequest对象
+				var xhr= $.ajaxSettings.xhr();
+				//v==true,'上传'按钮被选中表示有文件要上传
+				if(v==true){
+					xhr.upload.onprogress=function(progress){
+						if(progress.lengthComputable){
+							//计算百分比并取整
+							var percent=Math.round(progress.loaded/progress.total*100);
+							//在浏览器控制台显示的内容
+							console.log(percent);
+							$('#divUpLoadProcess').css("width",percent + "%").text(percent + "%");
+						}
+					};
+					xhr.upload.onloadstart=function(){
+						console.log('started...');
+					};
+					xhr.upload.onloadend=function(){
+						console.log('finished xhr.upload='+xhr.upload+' v='+v);
+						$.alert('附件上传完成'+v);
+					};
+				}else{
+					$.alert('无附件上传 xhr.upload='+xhr.upload+' v='+v);
+				}
+				return xhr;
+			},
+            success: function(data) {
+                <!-- $('#divIssPatSingle_load').html(data); -->
+				$("#modalIssPatAuthSingle").modal("hide");
+				$.alert('【'+oprt+'】成功');
+            },
+			error: function(){
+			
+			}
+        }).done(function(resp){
+			//利用$.ajax()返回的jQXHR对象的done()事件（resopnse结束），弹出提示框，显示本次操作成功。与在success: function(data){}弹出提示框的效果一样
+			<!-- $.alert('【'+oprt+'】成功'); -->
+		});
+			
+	});
+});	
+</script>
+
+
+<!--/  HY 2018/3/1 -->	
+
+
+<!--  HY 2018/3/6 -->	
+// 函数定义与调用的方式：
+<script>
+$(document).ready(function(){	
+	//函数定义1：
+	var xhrUpload=function(){
+		return function(){
+		
+			//code
+		
+		}
+	};
+	//函数调用1
+	xhrUpload(function(){});
+	
+	//函数定义2：
+	var xhrUpload=function(){
+
+		//code
+		
+	};
+	//函数调用2
+	xhrUpload;
+	
+	//函数定义3：
+	function xhrUpload(){
+
+		//code
+		
+	};
+	//函数调用3
+	xhrUpload;
+	
+};
+</script>
+
+<!--/  HY 2018/3/6 -->	
+
+
+<!--/  HY 2018/3/8 -->	
+使用FormData上传单个文件，并显示上传进度条
+
+<html>
+	<form action="" id="fmObj">
+		<input type="file" name="" id="file">
+		
+		<div class="form-group col-sm-6">
+			<button id="btnFileUpload" class="btn btn-primary btn-sm" data-oprt="" data-btnLabel=""><span class="glyphicon glyphicon-upload"></span>附件上传</button>
+			<br>
+			
+			<label for="" class="uploadbar" hidden>上传进度</label>	
+			<!-- //上传进度条 -->
+			<div class="progress" class="uploadbar" hidden>
+				<div id="divUpLoadProcess" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><span class="text-info">0%</span>
+				</div>
+			</div>
+				
+		</div>
+		
+	</form>
+
+</html>
+
+<script>
+$(document).ready(function(){
+	$('#fmObj').submit(function(event){					
+		//jQuery的preventDefault()方法阻止元素发生默认的行为——表单提交
+        event.preventDefault();	
+		
+		//得到新的FormData对象
+		<!-- if(fmObj){ -->
+			<!-- var formData = new FormData(fmObj[0]); -->
+		<!-- }else{ -->
+			<!-- var formData = new FormData(); -->
+		<!-- } -->
+		//append需要上传的文件对象
+		<!-- formData.append('file',$('#file').get(0).files[0]); -->
+		<!-- formData.append('file',$('#file')[0].files[0]); -->
+		
+		var formData = new FormData($('#fmObj')[0]);
+		
+		// 添加表单内没有的内容
+        formData.append('returnType',0);
+		
+		//显示上传进度条
+		$('.attuploadbar').show();	
+		
+		$.ajax({
+            type: 'post',
+            url: 'issPatOprt',
+            data: formData,
+            contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
+            processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)
+			//在xhr,调用自定义的xhrFileUploadBar函数，更新附件上传的进度条，显示上传进度
+			xhr:xhrFileUploadBar($('#divUpLoadProcess')),
+	
+            success: function(data,textStatus,jqXHR){
+				
+            },
+			error: function(jqXHR,textStatus,errorThrown){
+				
+				<!-- $.alert(jqXHR.readyState+'【'+textStatus+errorThrown+'】失败'); -->
+			}
+        });
+	
+	});
+	
+	
+	//**函数名：xhrFileUploadBar
+ 	//* 作用：应用XMLHttpRequest对象的progress事件显示文件上传进程
+	//* 参数obj，类型：对象。值：不为空。说明：为progress所在元素的id。类似$('#obj')
+	function xhrFileUploadBar(obj){
+		//jQuery中得到XMLHttpRequest对象	
+		var xhr= $.ajaxSettings.xhr();
+		
+		//显示上传进度
+		xhr.upload.onprogress=function(progress){
+			if(progress.lengthComputable){
+				//计算百分比并取整
+				var percent=Math.round(progress.loaded/progress.total*100);
+				//在浏览器控制台显示的内容
+				console.log(percent);
+				//附件上传的进度条显示上传进度
+				obj.css("width",percent + "%").text(percent + "%");
+			}
+		};
+		xhr.upload.onloadstart=function(){
+			console.log('started...');
+		};		
+		xhr.upload.onloadend=function(){
+			console.log('finished!!  xhr.upload='+xhr.upload+' v='+v);
+			<!-- $.alert('附件上传完成'); -->
+		};
+			
+		return xhr;
+	
+	}
+	
+});
+</script>
+
+
+<!--/  HY 2018/3/8 -->	
+
+
+
+
+<!-- ......................问题................................ -->
+
+<!--/  HY 2018/1/21 -->
+1.jquery主要用于DOM操作，BOM操作则要通过JavaScript？
+DOM:Document Object Model
+BOM:Brower Object Model
+
+2.跨域访问?
+jsonp
+
+3.H5中增加的meta元组“viewport”的使用？
+<head>
+<!-- // 开启bootstrap响应式布局 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>	
+<!--/  HY 2018/1/21 -->			
+
+<!--// ......................问题................................ -->	
