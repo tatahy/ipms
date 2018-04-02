@@ -384,7 +384,8 @@ $(document).ready(function(){
 			//启动ajax传数据的条件；
 			//1.所有的input(class="form-control")都填入内容，v1==true
 			//2.input为“无”选中，noAttFileChecked==true
-			if(v1==true && noAttFileChecked==true){
+			//或者oprt=='_DELETE'
+			if(v1==true && noAttFileChecked==true || oprt=='_DELETE'){
 				
 				$('#modalIssPatAuthSingle').modal('hide');
 				//是否开始ajax传3个form的数据
