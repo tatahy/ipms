@@ -1947,7 +1947,8 @@ class Dashboard2Controller extends \think\Controller
                             'topic'=>$request->param('issPatTopic'),
                             'abstract'=>$request->param('issPatAbstract'),
                             
-                            'issmap_id'=>$request->param('patId'),
+                            'issmap_id'=>$patId,
+                            'num_id'=>$patId,
                             'status'=>'拟续费',
                             'addnewdate'=>$this->now,
                             'writer'=>$this->username,
