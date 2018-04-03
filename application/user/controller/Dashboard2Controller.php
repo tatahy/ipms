@@ -883,7 +883,7 @@ class Dashboard2Controller extends \think\Controller
         $issStatus=0;
         
       }
-      $issId_return=0;
+      $issReturn=0;
       
       $patData=array('z'=>0);
       $patRdData=array('z'=>0);
@@ -898,14 +898,14 @@ class Dashboard2Controller extends \think\Controller
       }else{
         $patRdDataPatch=array('z'=>0);
       }
-      $patId_return=0;
+      $patReturn=0;
       
       $attData=array('z'=>0);
       $attDataPatch=array('z'=>0);
       
       $oprtCHNStr='';
       
-      $msg='完成';
+      $msg='完成<br>';
       
 //<结构2.----------------------------------------------------------------------------------------->
 //21个oprt接收前端页面传来的数据，分别对变量赋值再进行数据库表的操作
@@ -916,30 +916,36 @@ class Dashboard2Controller extends \think\Controller
           $oprtCHNStr='新增';
                     
           if($patId==0){
-            //1.patinfo表新增   
-            //patData
-            $patData=array('topic'=>$request->param('patTopic'),
-                            'pattype'=>$request->param('patType'),
-                            'patowner'=>$request->param('patOwner'),
-                            'inventor'=>$request->param('patInventor'),
-                            'otherinventor'=>$request->param('patOtherInventor'),
-                            'author'=>$request->param('patAuthor'),
-                            'dept'=>$request->param('dept'),
-                            
-                            'status'=>'填报',
-                            'addnewdate'=>$this->now,
-                          );
-            //新增，自定义patCreate()方法    
-           // $patId_return = $patMdl->patCreate($patData);
-            //新增，模型create()方法
-            $patId_return = $patMdl::create($patData,true);
-            
+            //专利名称是否已存在
+            if($patMdl::where('topic','like',$request->param('patTopic'))->find()){
+              $msg='专利名称：《'.$request->param('patTopic').'》已存在，请重新填写';
+            }else{
+              //1.patinfo表新增   
+              //patData
+              $patData=array('topic'=>$request->param('patTopic'),
+                              'pattype'=>$request->param('patType'),
+                              'patowner'=>$request->param('patOwner'),
+                              'inventor'=>$request->param('patInventor'),
+                              'otherinventor'=>$request->param('patOtherInventor'),
+                              'author'=>$request->param('patAuthor'),
+                              'dept'=>$request->param('dept'),
+                              
+                              'status'=>'填报',
+                              'addnewdate'=>$this->now,
+                            );
+              //新增，自定义patCreate()方法    
+             // $patReturn = $patMdl->patCreate($patData);
+              //新增，模型create()方法，返回的是新建的对象
+              $patReturn = $patMdl::create($patData,true);
+              $patId=$patReturn->id;
+              $msg.='专利【新增】成功。<br>';
+            }
             //配合前端的ajax请求，返回前端patId
-            return json(array('patId'=>$patId_return));
+            return json(array('patId'=>$patId,'msg'=>$msg));
           }else{
             //2.patrecord表新增
             //patRdData
-            $msg.='专利【新增】成功。<br>';
+            
             $patSet=$patMdl::get($patId);
             $patRdData=array('patinfo_id'=>$patId,
                               'num'=>$patSet->patnum,
@@ -953,7 +959,7 @@ class Dashboard2Controller extends \think\Controller
             //新增，自定义patRdCreate()方法  
            // $patRdId = $patRdMdl->patRdCreate($patRdData);
             //新增，模型create()方法
-            $patRdId = $patRdMdl::create($patData,true);
+            $patRdId = $patRdMdl::create($patRdData,true);
             
             //3.issinfo表新增
             //issData
@@ -971,31 +977,34 @@ class Dashboard2Controller extends \think\Controller
             
             );
             //新增，自定义issCreate()方法 
-            //$issId_return = $issMdl->issCreate($issData); 
-            //新增，模型create()方法
-            $issId_return = $issMdl::create($issData,true);
+            //$issReturn = $issMdl->issCreate($issData); 
+            //新增，模型create()方法，返回的是新建的对象
+            $issReturn = $issMdl::create($issData,true);
+            $issId=$issReturn->id;
             
             //4.issrecord表新增
             //issRdData
             $msg.='专利事务【新增】成功。<br>';  
             
             $issRdData=array('act'=>'填报',
-                              'actdetail'=>'专利事务《'.$issMdl::get($issId_return)->topic.'》新增填报',
+                              'actdetail'=>'专利事务《'.$issReturn->topic.'》新增填报',
                               'acttime'=>$this->now,
                               'username'=>$this->username,
                               'rolename'=>$auth,
-                              'issinfo_id'=>$issId_return,
-                              'num'=>$issMdl::get($issId_return)->issnum,
+                              'issinfo_id'=>$issReturn->id,
+                              'num'=>$issReturn->issnum,
                               
                             );
             //新增，自定义issRdCreate()方法 
             //$issRdId = $issRdMdl->issRdCreate($issRdData);
             //新增，模型create()方法
             $issRdId = $issRdMdl::create($issRdData,true);
+            
         }
           //5.attinfo更新
           //attData
           $attData=array('deldisplay'=>1);
+          
           
         break;
         
@@ -1065,7 +1074,7 @@ class Dashboard2Controller extends \think\Controller
            //借助各自模型定义的Delete()方法进行删除
           //考虑应用TP5的软删除进行改进，？？？2018/3/23
           //1.删除pat，自定义patDelete()方法
-         // $patId_return=$patMdl->patDelete($patId);
+         // $patReturn=$patMdl->patDelete($patId);
           //1.删除pat，模型destroy()方法
           $patMdl::destroy($patId);
           
@@ -1075,7 +1084,7 @@ class Dashboard2Controller extends \think\Controller
           $patRdMdl::destroy(['patinfo_id'=>$patId]);
           
           //3.删除iss，自定义issDelete()方法
-          //$issId_return=$issMdl->issDelete($issId);
+          //$issReturn=$issMdl->issDelete($issId);
           //3.删除iss，模型destroy()方法
           $issMdl::destroy($issId);
           
@@ -1914,49 +1923,59 @@ class Dashboard2Controller extends \think\Controller
           //patId!=0,issId=0
           if($request->param('returnType')=='_JSON'){
             //配合前端请求，返回前端json数据
-            return json(array_merge($patMdl->where('id',$request->param('patId'))->find()->toArray(),
+            return json(array_merge($patMdl::where('id',$request->param('patId'))->find()->toArray(),
                               array("today"=>$this->today,"username"=>$this->username,"deptMaintainer"=>$this->dept)));
           }else{
             $oprtCHNStr='续费报告';
-            //1.patinfo表无需更新记录
+            //1.patinfo表更新记录
+            $patData=array('status'=>'续费中',
+                            'renew_createdate'=>$this->now
+                            );
+            //更新
+            $patMdl::update($patData,['id'=>$patId],true);
 
-            //2.patrecord表无需新增记录
+            //2.patrecord表新增记录
+            $patRdData=array('act'=>$oprtCHNStr,
+                              'actdetail'=>'专利《'.$patMdl::get($patId)->topic.'》'.$oprtCHNStr.'</br>'
+                              );
+            //新建
+            $patRdMdl::create(array_merge($patRdData,$patRdDataPatch),true);
          
             //3.issinfo新增
             //issData
-            $issData=array('issmap_type'=>$request->param('issType'),
+            $issData=array('issmap_type'=>$request->param('issMapType'),
                             'topic'=>$request->param('issPatTopic'),
                             'abstract'=>$request->param('issPatAbstract'),
                             
-                            'issmap_id'=>$patId_return,
-                            'addnewdate'=>$this->now,
+                            'issmap_id'=>$request->param('patId'),
                             'status'=>'拟续费',
+                            'addnewdate'=>$this->now,
                             'writer'=>$this->username,
+                            'executer'=>$this->username,
                             'dept'=>$this->dept,
                             );
-            //新增，模型create()方法
-            $issId_return=$issMdl::create($issData);
+            //新增，模型create()方法，返回的是新增的对象
+            $issReturn=$issMdl::create($issData,true);
+            $issId=$issReturn->id;
             
             //4.issrecord新增
-            //取出新增的isspat内容
-            $issSet = $issMdl::get($issId_return);
             //issRdData
-            $issRdData=array('issinfo_id'=>$issId_return,
-                              'num'=>$issSet->issnum,
-                              'act'=>'拟续费',
-                              'actdetail'=>'专利事务《'.$issSet->topic.'》新增填报',
+            $issRdData=array('issinfo_id'=>$issReturn->id,
+                              'num'=>$issReturn->issnum,
+                              'act'=>$oprtCHNStr,
+                              'actdetail'=>'专利事务《'.$issReturn->topic.'》新增填报',
                               'acttime'=>$this->now,
                               'username'=>$this->username,
                               'rolename'=>$auth,
                               );
             //新增，模型create()方法
-            $issRdMdl::create($issRdData);
+            $issRdMdl::create($issRdData,true);
              
             //5.attinfo更新
             //attData
             $attData=array('deldisplay'=>0);
             
-            $msg.='专利事务【新增续费】成功。<br>';  
+            $msg.='【新增续费】专利事务成功。<br>';  
           }
         break;
 
@@ -2029,6 +2048,7 @@ class Dashboard2Controller extends \think\Controller
           'pat'=>$pat,
           'patRenewTotal'=>count($pat),
           'pageTotal'=>$pageTotal,
+          'auth'=>'_MAINTAIN'
       ]);
        
        //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>_RENEW 模块开发中……<br/></p></div>';

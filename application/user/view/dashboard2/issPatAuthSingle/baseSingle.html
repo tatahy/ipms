@@ -405,11 +405,11 @@ $(document).ready(function(){
 									param={};
 									$.extend(param,fmIssPatDataJson,fmAttDataJson,{'oprt':'_ADDNEW','auth':auth,'patId':data.patId});
 									
-									$.post(url,param,function(data){
+									$.post(url,param,function(data1){
 										//后端数据处理成功后，刷新#divIssPat_load和#divIssPatAuth_load的内容
 										$("#divIssPat_load").load('issPat',{'auth':'{$auth}'},function(){
 											//弹窗显示信息
-											$.alert('《'+data.topic+'》'+btnHtml+data.msg);
+											$.alert('《'+data1.topic+'》'+btnHtml+data1.msg);
 										});	
 							
 									});
@@ -417,7 +417,7 @@ $(document).ready(function(){
 								}
 								//新增pat失败，
 								else{
-									$.alert('新增事务失败，请重试');
+									$.alert(data.msg);
 								}
 							})
 							.fail(function(){
@@ -612,7 +612,7 @@ $(document).ready(function(){
 	}
 	
 	//**函数名：inputsNotEmpty
- 	//* 作用：检查所有的input(class="form-control")是否都填入内容，作用：无内容的加'has-error'和tooltip，在第一个无内容的input显示tooltip提示返回一个结果（true/false）
+ 	//* 作用：检查所有的input(class="form-control empty-check")是否都填入内容，作用：无内容的加'has-error'和tooltip，在第一个无内容的input显示tooltip提示返回一个结果（true/false）
 	//* 参数，类型：对象。值：不为空。说明：。
 	function inputsNotEmpty(){
 		

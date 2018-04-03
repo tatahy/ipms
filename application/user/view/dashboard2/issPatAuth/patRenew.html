@@ -32,7 +32,7 @@
 						<td>{$vo.authrejectdate}</td>
 						<td>{$vo.renewdeadlinedate}</td>
 						<td class="btnOprt">			
-								<a href="#modalPatRenew" data-toggle="modal" data-oprt="_ADDRENEW" data-patId="{$vo.id}"><span class="glyphicon glyphicon-edit text-info"></span>_续费报告</a>
+								<a href="#modalPatRenew" data-toggle="modal" data-oprt="_ADDRENEW" data-patId="{$vo.id}" data-patTopic="{$vo.topic}"><span class="glyphicon glyphicon-edit text-info"></span>_续费报告</a>
 						</td>
 					</tr>
 					{/volist}					
@@ -94,75 +94,36 @@
 				<div class="myLegend" ><span class="label label-warning">续费事务信息</span></div>
 					
 				<form id="fmIssPatRenew" action="" method="" role="form" enctype="multipart/form-data">
-					<input id="oprt" type="text" class="sr-only">
-					<input id="patId" name="patId" type="text" class="sr-only">
+					<input id="patId" name="patId" value="" type="text" class="sr-only">
 					<div class="row myRow">
 						<div class="form-group col-sm-4">
-							<label class="control-label" for="topic">事务标题topic<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-						<!-- <input class="form-control" id="topic" name="topic" value="" type="text" placeholder="关于XX专利的YY申请" required> -->
-							<textarea class="form-control" rows="2" id="topic" name="topic" placeholder="填写事务的主要内容，字数不超过100字。" required></textarea>
-						</div>
-					
-						<div class="form-group col-sm-2">
-							<label class="control-label" for="status">事务状态status</label>
-							<input class="form-control" id="status" name="status" value="拟续费" type="text" readonly="true">
+							<label class="control-label" for="issPatTopic">事务标题<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+							<input class="form-control empty-check" id="issPatTopic" name="issPatTopic" value="" type="text" placeholder="关于XX专利的YY申请" required>
+							<!-- <textarea class="form-control" rows="2" id="issPatTopic" name="issPatTopic" placeholder="填写事务的主要内容，字数不超过100字。" required></textarea> -->
 						</div>
 					
 						<div class="form-group col-sm-3">
 							<label for="issMapType">事务类型issMapType</label>
-							<select class="form-control" id="issMapType" name="issmap_type" readonly="true">
+							<select class="form-control" id="issMapType" name="issMapType" readonly="true">
 								<option value="_ISST_PAT2">专利授权到期续费</option>
 							</select>
 						</div>
 					
-						<div class="form-group col-sm-3" >
-							<label for="issMapId">issMapId</label>
-							<input class="form-control" id="issMapId" name="issmap_id" value="" type="text" readonly="true">
-						</div>
 					</div>
 				
 					<div class="row myRow">
-						<div class="form-group col-sm-3" >
-							<label for="numId">numId</label>
-							<input class="form-control" id="numId" name="num_id" value="" type="text" readonly="true">
-						</div>
-					
-						<div class="form-group col-sm-6">
-							<label class="control-label" for="abstract">事务简介abstract<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-							<textarea class="form-control" rows="5" id="abstract" name="abstract" placeholder="填写事务的主要内容，字数不超过100字。" required></textarea>
+						<div class="form-group col-sm-8">
+							<label class="control-label" for="issPatAbstract">事务简介abstract<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+							<textarea class="form-control empty-check" rows="5" id="issPatAbstract" name="issPatAbstract" placeholder="填写事务的主要内容，字数不超过100字。" required></textarea>
 						</div>
 					
 					</div>
-				
-					<div class="row myRow">
-						<div class="form-group col-sm-3" >
-							<label for="addNewDate">addNewDate</label>
-							<input class="form-control" id="addNewDate" name="addNewDate" value="" type="text" readonly="true">
-						</div>
-					
-						<div class="form-group col-sm-3" >
-							<label for="writer">writer</label>
-							<input class="form-control" id="writer" name="writer" value="" type="text" readonly="true">
-						</div>
-					
-						<div class="form-group col-sm-3" >
-							<label for="dept">dept</label>
-							<input class="form-control" id="dept" name="dept" value="" type="text" readonly="true">
-						</div>
-					
-						<div class="form-group col-sm-3" >
-							<label for="executer">执行人</label>
-							<input class="form-control" id="executer" name="executer" value="" type="text" readonly="true">
-						</div>
-					</div>
-				
-				
 				</form>
 			</div>
 		</div>
 		<div class="modal-footer">
         	<div class="pull-left">
-				<button type="submit" id="btnAddRenew" class="btn btn-primary btn-sm" data-oprt="_ADDRENEW" data-issTopic="" data-btnLabel="label-primary"><span class="glyphicon glyphicon-info-sign"></span>新增续费事务</button>
+				<button id="btnAddRenew" class="btn btn-primary btn-sm" data-oprt="_ADDRENEW" data-btnLabel="label-primary"><span class="glyphicon glyphicon-info-sign"></span>新增续费事务</button>
 			</div>
 			<div  class="pull-right">
 				<input id="btnReset" type="button" class="btn btn-primary btn-sm" value="重置">
@@ -215,7 +176,8 @@ $(document).ready(function(){
 			// 后端返回的data为json格式
 				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务</span>：<strong>【'+str+'】</strong>《关于专利“'+data.topic+'”的续费申请》');
 				
-				$('#topic').html('关于专利“'+data.topic+'”的续费申请');
+				$('#patId').val(patId);
+				$('#issPatTopic').val('关于专利“'+data.topic+'”的续费申请');
 				$('#issMapId').val(data.id);
 				$('#numId').val(data.id);
 				$('#addNewDate').val(data.today);
@@ -239,94 +201,126 @@ $(document).ready(function(){
 	
 	
 	//参照baseSingel.html中的$('button[type="submit"]').click修改$('#fmIssPatRenew').submit，保持一致 HY??? 2018/3/12
-	$('button[type="submit"]').click(function(){
-	
-	});
-	
-	<!-- // 应用jQuery的$.ajax提交表单，提交前进行一些验证准备。结合输入框的“required”属性避免输入框无内容 -->
-	$('#fmIssPatRenew').submit(function(event){					
-		//jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作
-        event.preventDefault();
-	
-		var oprt='_ADDRENEW';
-		var str='确定【'+$('#btnAddRenew').html()+'】操作？';
-		var title='【'+$('#btnAddRenew').html()+'】操作？';
-			
-		$('#modalPatRenew').modal('hide');
-		$.confirm(str,function(e){
-			con=e;
-			if(true==con){
-				formDataAjax(oprt,$('#fmIssPatRenew'),title);
-				<!-- formDataAjax(oprt,title); -->
-				
-			}else{
-				$('#modalPatRenew').modal('show');
-			}
-		}).cancel('否(N)').ok('是(Y)');
-	});
-	
-	// 点击btnAddRenew按钮，与form的submit()配合确定传给后端的oprt='_ADDRENEW'
 	$('#btnAddRenew').click(function(){
-		$('#oprt').val($(this).attr('data-oprt'));
+		var oprt=$(this).attr('data-oprt');
+		var topic=$('#issPatTopic').val();
+		var auth='{$auth}';
+		
+		var btnHtml='<span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:14px;">'+$(this).html()+'</span>';
+		var aHtml=$('.modal-header').find('strong').html();
+		var url='issPatOprt';
+		
+		//预处理表单的数据,利用自定义的serializeJson()函数
+		var fmIssPatRenewJson=serializeJson($('#fmIssPatRenew'));
+		//声明对象变量
+		var param={};
+		var formData= new FormData;
+		
+		if(inputsNotEmpty()==true){
+			$('#modalPatRenew').modal('hide');
+			//是否开始ajax传form的数据
+			$.confirm('《'+topic+'》'+btnHtml,function(e){
+				con=e;
+				if(true==con){
+					formData.append('fmIssPatRenewJson',fmIssPatRenewJson);
+					$.extend(param,fmIssPatRenewJson,{'oprt':oprt,'auth':auth});
+					$.post(url,param,function(data){
+						//后端数据处理成功后，刷新#divIssPat_load和#divIssPatAuth_load的内容
+						$("#divIssPat_load").load('issPat',{'auth':'{$auth}'},function(){
+							//弹窗显示信息
+							$.alert('《'+data.topic+'》'+btnHtml+data.msg);
+						});
+					});
+				}else{
+					$('#modalPatRenew').modal('show');
+				}
+			}).cancel('否(N)').ok('是(Y)');
+			
+		}else{
+			//防止触发#fmIssPatRenew的提交事件
+			$('#fmIssPatRenew').submit(function(evt){
+				evt.preventDefault();
+			});
+			
+		}
+	});
+	
+	//检查form里的input（class="empty-check"）是否为空或0，为空或0做出'has-error'和tooltip提示，不为空去掉'has-error'和tooltip提示
+	$('.empty-check').each(function(){
+		$(this).focusout(function(){
+			if($(this).val()!=0){
+				$(this).parent().removeClass('has-error');
+				$(this).tooltip('destroy');
+			}else{
+				$(this).parent().addClass('has-error');
+				$(this).tooltip({title: '请填写此项', placement: 'bottom'}).tooltip('show');
+			}
+		});
+	});
+	
+	//本页内的所有form重置，同时去掉'.form-control'的tooltip和'has-error'
+	$('#btnReset').click(function(){	
+		//本页内的所有form重置
+		$('#fmIssPatRenew')[0].reset();
+			
+		//去掉'.form-control'的tooltip和'has-error'
+		$('.form-control').tooltip('destroy').parent().removeClass('has-error');
 	});
 	
 <!-- function -->
-	//**函数名：formDataAjax
- 	//* 作用：应用jQuery的$.ajax向后端提交formData数据
-	//* 参数1：oprt，类型：字符。值：不为空。说明：表示触发本函数的‘操作’
-	//* 参数2：fmObj，类型：对象。值：可为空，默认为空。说明：表示需要一起提交的表单。
-	//* 参数3：title，类型：字符。值：不为空。说明：本函数显示的提示框$.alert的标题内容。
-	function formDataAjax(oprt,fmObj,title){
-	// formdata形式上传表单数据,自动搜索表单信息(表单内没有name属性的input不会被搜索到)，IE<=9不支持FormData
-		if(fmObj){
-			var formData = new FormData(fmObj[0]);
-		}else{
-			var formData = new FormData();
-		}
-		
-		<!-- var formData = new FormData($('#fmIssPatRenew')[0]); -->
-		// 添加表单内没有的内容
-        formData.append('returnType', 0);
-		formData.append('role','maintainer');
-		formData.append('username','{$maintainer}');
-		formData.append('oprt',oprt);
+	//**函数名：serializeJson
+ 	//* 作用：对表单内容进行JSON对象序列化
+	//* 参数fmObj，类型：对象。值：不为空。说明：表单对象。
+	//* 返回值：JSON对象
+	function serializeJson(fmObj){
+		var serializeObj={};
+		var arr=fmObj.serializeArray();
+		var str=fmObj.serialize();
+		$.each(arr,function(){
+			if(serializeObj[this.name]){
+				if($.isArray(serializeObj[this.name])){
+					serializeObj[this.name].push(this.value);
+				}else{
+					serializeObj[this.name]=[serializeObj[this.name],this.value];
+				}
 			
-        $.ajax({
-            type: 'post',
-            url: 'issPatOprt',
-            data: formData,
-            contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
-            processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)
-			success: function(data) {
-                $('#divPatRenew').html(data);
-				$('#modalPatRenew').modal('show');
-				
-            }
-            <!-- success: function(data) { -->
-                <!-- if(data.result=='success'){ -->
-					
-					<!-- // 操作成功，提示框显示信息 -->
-					<!-- $.alert(title+'成功<span class="glyphicon glyphicon-ok text-success"></span><hr>'+data.msg); -->
-					
-					<!-- //maintainer，载入续费管理页面 -->
-					<!-- $.post('patIssTpl', -->
-						<!-- { -->
-							<!-- 'role':'maintainer', -->
-							<!-- 'tpl':'renew', -->
-							<!-- 'returnType':0 -->
-						<!-- }, -->
-						<!-- function(data){ -->
-							<!-- $('#divPatIss').html(data); -->
-						<!-- } -->
-					<!-- ); -->
-					
-				<!-- }else{ -->
-					<!-- $('#modalPatRenew').modal(); -->
-					<!-- <!-- $.alert(data.msg); --> -->
-				<!-- } -->
-            <!-- } -->
-        });
+			}else{
+				serializeObj[this.name]=this.value;
+			}
+		});
+		return serializeObj;
 	}
+	
+	//**函数名：inputsNotEmpty
+ 	//* 作用：检查所有的input(class="form-control empty-check")是否都填入内容，作用：无内容的加'has-error'和tooltip，在第一个无内容的input显示tooltip提示返回一个结果（true/false）
+	//* 参数，类型：对象。值：不为空。说明：。
+	function inputsNotEmpty(){
+		
+		var obj=$('.empty-check');
+		var arr=[];
+		var i=0;
+		//检查所有的input(class="form-control")是否都填入内容并不为0，无内容的加'has-error'和tooltip
+		for (i;i<obj.length;i++){
+			if(obj.eq(i).val()!=0){
+				<!-- obj.eq(i).removeClass('bg-danger'); -->
+				<!-- obj.eq(i).next().hide(); -->
+				obj.eq(i).parent().removeClass('has-error');
+			}else{
+				<!-- obj.eq(i).addClass('bg-danger'); -->
+				<!-- obj.eq(i).next().show(); -->
+				obj.eq(i).tooltip({title: '请填写此项', placement: 'bottom'}).parent().addClass('has-error');
+				arr.push(i);				
+			}	
+		}
+		//在第一个无内容的input显示tooltip提示。
+		if(arr.length){
+			<!-- obj.eq(Math.min(arr)).focus(); -->
+			return obj.eq(Math.min.apply(null, arr)).focus().tooltip('show');
+		}else{
+			return true;
+		}
+	
+	}	
 
 <!-- function -->
 	
