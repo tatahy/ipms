@@ -581,10 +581,62 @@ $(document).ready(function(){
 	
 });
 </script>
+<!--/  HY 2018/3/8 -->
+
+<!-- HY 2018/4/2 -->	
+//一个页面中多个表单内容异步传输
+
+<script>
+
+//按钮的click事件:向后端传数据
+	$('#btn').click(function(){
+		//预处理3个表单的数据,利用自定义的serializeJson()函数
+		var fmPatDataJson=serializeJson($('#fmPat'));
+		var fmIssPatDataJson=serializeJson($('#fmIssPat'));
+		var fmAttDataJson=serializeJson($('#fmAtt'));
+		
+		//声明对象变量
+		var param={};
+		//使用“FormData”API
+		var formData= new FormData;
+		
+		formData.append('fmPatDataJson',fmPatDataJson);
+		formData.append('fmIssPatDataJson',fmIssPatDataJson);
+		formData.append('fmAttDataJson',fmAttDataJson);
+		//合并3个表单内容及附加内容到param中
+		$.extend(param,fmPatDataJson,fmIssPatDataJson,fmAttDataJson,{'oprt':oprt,'auth':auth});
+		$.post(url,param,function(data){
+			//弹窗显示信息
+			$.alert('《'+data.topic+'》'+btnHtml+data.msg);
+		});
+	});
+//**函数名：serializeJson
+ 	//* 作用：对表单内容进行JSON对象序列化
+	//* 参数fmObj，类型：对象。值：不为空。说明：表单对象。
+	//* 返回值：JSON对象
+	function serializeJson(fmObj){
+		var serializeObj={};
+		var arr=fmObj.serializeArray();
+		var str=fmObj.serialize();
+		$.each(arr,function(){
+			if(serializeObj[this.name]){
+				if($.isArray(serializeObj[this.name])){
+					serializeObj[this.name].push(this.value);
+				}else{
+					serializeObj[this.name]=[serializeObj[this.name],this.value];
+				}
+			
+			}else{
+				serializeObj[this.name]=this.value;
+			}
+		});
+		return serializeObj;
+	}
+
+</script>
 
 
-<!--/  HY 2018/3/8 -->	
-
+<!--/  HY 2018/4/2 -->	
 
 
 
