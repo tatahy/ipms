@@ -884,7 +884,7 @@ class Dashboard2Controller extends \think\Controller
         
       }
       $issReturn=0;
-      
+     
       $patData=array('z'=>0);
       $patRdData=array('z'=>0);
       if($patId){
@@ -899,12 +899,12 @@ class Dashboard2Controller extends \think\Controller
         $patRdDataPatch=array('z'=>0);
       }
       $patReturn=0;
-      
+
       $attData=array('z'=>0);
       $attDataPatch=array('z'=>0);
       
       $oprtCHNStr='';
-      
+
       $msg='完成<br>';
       
 //<结构2.----------------------------------------------------------------------------------------->
@@ -945,7 +945,6 @@ class Dashboard2Controller extends \think\Controller
           }else{
             //2.patrecord表新增
             //patRdData
-            
             $patSet=$patMdl::get($patId);
             $patRdData=array('patinfo_id'=>$patId,
                               'num'=>$patSet->patnum,
@@ -976,7 +975,7 @@ class Dashboard2Controller extends \think\Controller
                     'dept'=>$this->dept,
             
             );
-            //新增，自定义issCreate()方法 
+            //新增，自定义issCreate()方法
             //$issReturn = $issMdl->issCreate($issData); 
             //新增，模型create()方法，返回的是新建的对象
             $issReturn = $issMdl::create($issData,true);
@@ -992,20 +991,16 @@ class Dashboard2Controller extends \think\Controller
                               'username'=>$this->username,
                               'rolename'=>$auth,
                               'issinfo_id'=>$issReturn->id,
-                              'num'=>$issReturn->issnum,
-                              
+                              'num'=>$issReturn->issnum,                              
                             );
             //新增，自定义issRdCreate()方法 
             //$issRdId = $issRdMdl->issRdCreate($issRdData);
             //新增，模型create()方法
             $issRdId = $issRdMdl::create($issRdData,true);
-            
         }
           //5.attinfo更新
           //attData
           $attData=array('deldisplay'=>1);
-          
-          
         break;
         
         case'_SUBMIT':
@@ -1971,11 +1966,10 @@ class Dashboard2Controller extends \think\Controller
                               );
             //新增，模型create()方法
             $issRdMdl::create($issRdData,true);
-             
+
             //5.attinfo更新
             //attData
             $attData=array('deldisplay'=>0);
-            
             $msg.='【新增续费】专利事务成功。<br>';  
           }
         break;

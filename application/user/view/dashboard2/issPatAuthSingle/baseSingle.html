@@ -386,7 +386,6 @@ $(document).ready(function(){
 			//2.input为“无”选中，noAttFileChecked==true
 			//或者oprt=='_DELETE'
 			if(v1==true && noAttFileChecked==true || oprt=='_DELETE'){
-				
 				$('#modalIssPatAuthSingle').modal('hide');
 				//是否开始ajax传3个form的数据
 				$.confirm('《'+topic+'》'+btnHtml,function(e){
@@ -404,7 +403,6 @@ $(document).ready(function(){
 									//2.提交#fmIssPat和#fmAtt的数据
 									param={};
 									$.extend(param,fmIssPatDataJson,fmAttDataJson,{'oprt':'_ADDNEW','auth':auth,'patId':data.patId});
-									
 									$.post(url,param,function(data1){
 										//后端数据处理成功后，刷新#divIssPat_load和#divIssPatAuth_load的内容
 										$("#divIssPat_load").load('issPat',{'auth':'{$auth}'},function(){

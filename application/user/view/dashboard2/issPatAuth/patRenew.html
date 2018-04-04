@@ -107,8 +107,7 @@
 							<select class="form-control" id="issMapType" name="issMapType" readonly="true">
 								<option value="_ISST_PAT2">专利授权到期续费</option>
 							</select>
-						</div>
-					
+            </div>
 					</div>
 				
 					<div class="row myRow">
@@ -116,7 +115,6 @@
 							<label class="control-label" for="issPatAbstract">事务简介abstract<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 							<textarea class="form-control empty-check" rows="5" id="issPatAbstract" name="issPatAbstract" placeholder="填写事务的主要内容，字数不超过100字。" required></textarea>
 						</div>
-					
 					</div>
 				</form>
 			</div>
@@ -175,7 +173,7 @@ $(document).ready(function(){
 			function(data){
 			// 后端返回的data为json格式
 				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务</span>：<strong>【'+str+'】</strong>《关于专利“'+data.topic+'”的续费申请》');
-				
+			
 				$('#patId').val(patId);
 				$('#issPatTopic').val('关于专利“'+data.topic+'”的续费申请');
 				$('#issMapId').val(data.id);
@@ -319,7 +317,6 @@ $(document).ready(function(){
 		}else{
 			return true;
 		}
-	
 	}	
 
 <!-- function -->
