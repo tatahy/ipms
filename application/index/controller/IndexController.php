@@ -6,6 +6,7 @@ use think\Session;
 
 use app\common\validate\Ipvalidate;
 use app\index\model\User as UserModel;
+use app\index\model\Usergroup as UsergroupModel;
 use app\user\model\Rolety as RoletyModel;
 use app\patent\model\Patinfo as PatinfoModel;
 
@@ -48,9 +49,9 @@ class IndexController extends \think\Controller
         
         //通过浏览器端验证后再在数据库中查询是否有相应的用户存在,
         //连接数据库,利用模型对象查询有效的$username，$pwd在数据库中是否存在并得到其在系统中的所有role
-        $user = UserModel::where('username',$username)
-                            ->where('pwd',$pwd)
-                            ->select();
+        $user = UserModel::where('username',$username)->where('pwd',$pwd)->where('enable',1)->select();
+        
+        $usergroup_id= explode(",", $user[0]['usergroup_id']);
                                    
         //不存在，同验证失败的处理
         if(empty($user)){
@@ -85,7 +86,11 @@ class IndexController extends \think\Controller
         $userA=new UserModel;
         //调用User模型层定义的userAuth()方法，刷新登录用户的各个模块权限
         $authority=$userA->userAuth($username,$pwd);
-          
+        
+        //调用User模型层定义的refreshUserAuth()方法，刷新登录用户的各个模块权限
+        //$authority=$userA->refreshUserAuth($username,$pwd);
+        
+       // $iss=array_merge($iss,array_filter(UsergroupModel::get($usergroup_id[0])['authority']['iss']));
           //--在index.html页面输出自定义信息的HTML代码块
         $destr= "请求方法:".$request->method()."</br>".
                 "username:".$username."</br>".

@@ -19,6 +19,10 @@ class Usergroup extends Model
     //只读字段，这个字段的值一旦写入，就无法更改。
     //protected $readonly = ['rolety_id'];
     
+    protected $type = [
+        'authority'  =>  'json',
+    ];  
+    
      
     /**
      * 定义一对一关系，获取authiss

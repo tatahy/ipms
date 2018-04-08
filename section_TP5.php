@@ -656,7 +656,7 @@ Db::table('think_user')->where('info$.email','thinkphp@qq.com')->find();
 
 // json类型与array类型
 
-// 模型model（user.php）：设定“authority”字段为
+// 模型model（user.php）：设定“authority”字段为json
 <?php
 namespace app\user\model;
 
