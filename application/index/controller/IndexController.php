@@ -85,10 +85,10 @@ class IndexController extends \think\Controller
 
         $userA=new UserModel;
         //调用User模型层定义的userAuth()方法，刷新登录用户的各个模块权限
-        $authority=$userA->userAuth($username,$pwd);
+        //$authority=$userA->userAuth($username,$pwd);
         
         //调用User模型层定义的refreshUserAuth()方法，刷新登录用户的各个模块权限
-        //$authority=$userA->refreshUserAuth($username,$pwd);
+        $authority=$userA->refreshUserAuth($username,$pwd);
         
        // $iss=array_merge($iss,array_filter(UsergroupModel::get($usergroup_id[0])['authority']['iss']));
           //--在index.html页面输出自定义信息的HTML代码块
