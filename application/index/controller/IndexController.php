@@ -48,7 +48,7 @@ class IndexController extends \think\Controller
         }
         
         //通过浏览器端验证后再在数据库中查询是否有相应的用户存在,
-        //连接数据库,利用模型对象查询有效的$username，$pwd在数据库中是否存在并得到其在系统中的所有role
+        //连接数据库,利用模型对象查询有效的$username，$pwd在数据库中是否存在并得到其在系统中的所有可用role
         $user = UserModel::where('username',$username)->where('pwd',$pwd)->where('enable',1)->select();
         
         $usergroup_id= explode(",", $user[0]['usergroup_id']);

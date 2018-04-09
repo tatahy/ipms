@@ -638,6 +638,15 @@ $(document).ready(function(){
 
 <!--/  HY 2018/4/2 -->	
 
+<!--  HY 2018/4/9 -->	
+<script>
+//当给extend方法传递一个以上的参数时，它会将所有参数对象合并到第一个里；同时，如果对象中有同名属性是，合并的时候后面的会覆盖前面的。
+var param=$.extend({},fmIssPatDataJson,fmAttDataJson,{'oprt':'_ADDNEW','auth':auth,'patId':data.patId});
+//上述代码的含义：param的值是4个参数对象的合集。
+</script>
+
+<!--/  HY 2018/4/2 -->	
+
 
 
 <!-- ......................问题................................ -->

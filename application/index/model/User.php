@@ -179,7 +179,6 @@ class User extends Model
         ], ['username' => $username,'pwd'=>$pwd]);
       return $authority;
     }
-    
 }
 ?>
 

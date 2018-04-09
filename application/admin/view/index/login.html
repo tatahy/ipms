@@ -83,7 +83,7 @@
                     <label for="password">密码</label>
                     <div class="input-group">
                         <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
-                        <input type="password" id="pwd" name="pwd" class="form-control" placeholder="请输入密码" maxlength="20">
+                        <input type="password" id="pwd" name="pwd" class="form-control" placeholder="请输入密码" maxlength="20" autocomplete="off" required>
                     </div>
 
                     <span style="color:red;display: none;" class="tips"></span>
@@ -138,9 +138,11 @@
  * 功能二：随机验证码的验证
  * @example $.idcode.validateCode();	
  * @desc return true if user input value equal idcode. 
+ * 
+ * 使用自调用匿名函数的方式定义插件，即是用;(function($){...})(jQuery);来包裹代码
  **/
  
-(function($){
+;(function($){
 
 var settings = {
     e: 'idcode',
@@ -167,7 +169,6 @@ $.idcode = {
     setCode: function(option) {
         _commSetting(option);
         _setCodeStyle("#" + settings.e, settings.codeType.name, settings.codeType.len);
-
     },
     validateCode: function(option) {
         _commSetting(option);
