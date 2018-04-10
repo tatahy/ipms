@@ -72,6 +72,24 @@ class IndexController extends \think\Controller
       }
     }
     
+    public function index2(Request $request)
+    {
+      //用户是否已经登录。
+      $this->_loginUser();
+       
+      $this->assign([
+            //--在bg-head.html页面输出自定义信息的HTML代码块
+              'destr'=>$destrr= "请求方法:".$request->method()."</br>".
+                                "username:".$this->username."</br>".
+                                "log:".$this->log."</br>",
+              
+              'home'=>$request->domain(),
+              'username'=>$this->username,
+              
+        ]);
+      return view();
+    }
+    
      // 输出系统摘要模板
     public function sys_sumary()
     {
@@ -356,6 +374,9 @@ class IndexController extends \think\Controller
     {
       //通过$this->log判断是否是登录用户，非登录用户退回到登录页面
       $this->log=Session::get('log');
+      $this->username=Session::get('username');
+      $this->pwd=Session::get('pwd');
+      $this->dept=Session::get('dept');
       
       if(1!=$this->log){
         return $this->error('无用户名或密码，请先登录系统');
@@ -418,6 +439,7 @@ class IndexController extends \think\Controller
       $user = UserModel::where('username',$username)
                             ->where('pwd',$pwd)
                             ->where('rolety_id','in','8,9')
+                            ->whereOr('usergroup_id','in','8,9')
                             ->select();
                             
       if(empty($user)){
@@ -438,8 +460,8 @@ class IndexController extends \think\Controller
 //          $this->dept=Session::get('dept');
           
         // 重定向到index页面
-       // $this->redirect('index', ['username' => $username,'pwd' => $pwd]);
-       $this->redirect('index');
+       // $this->redirect('index');
+       $this->redirect('index2');
       }
       
     }
@@ -908,6 +930,345 @@ class IndexController extends \think\Controller
       
     }
     
+    // 根据前端发送的模板文件名，选择对应的页面文件返回
+    public function tplFile(Request $request)
+    {
+      $this->_loginUser();
+      //前端发送的是锚点值
+      if(!empty($request->param('sId'))){
+        $tplFile=$request->param('sId');
+      }else{
+        $tplFile='#sysSummary';
+      }
+      //前端发送的是文件名
+      if(!empty($request->param('tplFile'))){
+        $tplFile=$request->param('tplFile');
+      }
+      
+      //模板文件名
+      if(substr($tplFile,0,1)=='#'){
+        $tplFile=substr($tplFile,1);
+        $this->redirect($tplFile);
+      }else{
+        return view($tplFile);
+      }
+      
+     // return view($sId);
+    
+    }
+    
+     // 输出系统摘要模板
+    public function sysSummary()
+    {
+      $this->_loginUser();
+      //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
+      
+      $this->assign([
+               // 获取服务器域名 
+              'serverDomain'=>$_SERVER['SERVER_NAME'],
+              //获取服务器操作系统类型及版本号,PHP 5
+              'serverOS'=>php_uname('s').php_uname('v'),
+    			   // 获取MySQL版本信息
+              'mysqlVersion' => $this->_mysqlVersion(),
+    			   //获取服务器时间
+              'serverTime' => date('Y-m-d H:i:s', time()),
+              // 获取PHP版本信息，PHP 5
+              'phpVersion'=>phpversion(),
+              // 获取Apache版本信息，PHP 5
+              'apacheVersion'=>apache_get_version(),
+        ]);
+      return view();
+    }
+    
+    // 输出系统用户模板
+    public function sysUser(Request $request)
+    {
+      $this->_loginUser();
+      //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
+      
+      // 分页页数变量：“pageUserNum”
+      if(!empty($request->param('pageUserNum'))){
+          $pageUserNum=$request->param('pageUserNum');
+      }else{
+          $pageUserNum=1;
+      }
+      
+      //$userTableRows接收页面传来的分页时每页表格显示的记录行数，初始值为10
+        if(!empty($request->param('userTableRows'))){
+          $userTableRows=$request->param('userTableRows');
+        }else{
+          $userTableRows=10;
+        }
+        
+        // 查询词1，'searchUserName'
+        if(!empty($request->param('searchUserName'))){
+          $searchUserName=$request->param('searchUserName');
+        }else{
+          $searchUserName=0;
+        } 
+        
+        // 查询词2，'searchDept'
+        if(!empty($request->param('searchDept'))){
+          $searchDept=$request->param('searchDept');
+        }else{
+          $searchDept=0;
+        } 
+        
+        // 查询词3，'searchUserGroup'
+        if(!empty($request->param('searchUserGroup'))){
+          $searchUserGroup=$request->param('searchUserGroup');
+        }else{
+          $searchUserGroup=0;
+        } 
+        
+        //$sortName、$sort接收页面传来的排序信息
+        $sortName=$request->param('sortName');
+        $sort=$request->param('sort');
+        //  升序asc查询
+        if($sort=="_ASC"){
+          switch($sortName){
+            case '_USERNAME':
+              $strOrder='username asc';
+              
+            break;
+            
+            case '_DEPT':
+              $strOrder='dept asc';
+              
+            break;
+            
+            case '_USERGROUP':
+              $strOrder='rolety_id asc';
+             
+            break;
+            
+            case '_ENABLE':
+              $strOrder='enable asc';
+             
+            break;
+            
+            //默认按字段“username”的升序
+            default:
+              $strOrder='username asc';  
+              $sortName="_USERNAME";
+              $sort="_ASC";
+             
+            break;
+          } 
+        }else{
+          // 降序desc查询
+          switch($sortName){
+            case '_USERNAME':
+              $strOrder='username desc';
+              
+            break;
+            
+            case '_DEPT':
+              $strOrder='dept desc';
+              
+            break;
+            
+            case '_USERGROUP':
+              $strOrder='rolety_id desc';
+             
+            break;
+            
+            case '_ENABLE':
+              $strOrder='enable desc';
+             
+            break;
+            
+            //默认按字段“username”的升序
+            default:
+              $strOrder='username asc';  
+              $sortName="_USERNAME";
+              $sort="_ASC";
+              
+            break;
+          } 
+        }
+        
+        // 组合查询条件，
+        if($searchDept!='0'){
+          $map['dept'] = $searchDept;
+                
+          if(!empty($searchUserName) && $searchUserGroup!=0 ){
+            
+            $map['username'] = ['like','%'.$searchUserName.'%'];
+            $map['rolety_id'] = $searchUserGroup;
+            
+          }elseif(!empty($searchUserName) && $searchUserGroup==0  ){
+            
+            $map['username'] = ['like','%'.$searchUserName.'%'];
+            
+          }elseif($searchUserGroup!=0 && empty($searchUserName)){
+    
+            $map['rolety_id']  = $searchUserGroup;
+            
+          }else{
+            
+          }
+          
+        }else{
+          
+          if(!empty($searchUserName) && $searchUserGroup!=0 ){
+            $map['username'] = ['like','%'.$searchUserName.'%'];
+            $map['rolety_id'] = $searchUserGroup;
+            
+          }elseif(!empty($searchUserName) && $searchUserGroup==0  ){
+            $map['username'] = ['like','%'.$searchUserName.'%'];
+            
+          }elseif($searchUserGroup!=0 && empty($searchUserName)){
+            $map['rolety_id']  = $searchUserGroup;
+            
+          }else{
+            $map='';
+          }
+          
+        }
+        
+        // 查出所有的用户并分页，根据“strOrder”排序，设定前端页面显示的锚点（hash值）为“div1”，设定分页页数变量：“pageUserNum”
+        // 带上每页显示记录行数$userTableRows和3个查询词，实现查询结果分页显示。
+        $users = UserModel::where('id','>',0)
+                            //->where('dept',$searchDept)
+                            ->where($map)
+                            ->order($strOrder)
+                            ->paginate($userTableRows,false,['type'=>'bootstrap','fragment'=>'div1','var_page'=>'pageUserNum',
+                            'query'=>['userTableRows'=>$userTableRows,'searchDept'=>$searchDept,'searchUserName'=>$searchUserName,'searchUserGroup'=>$searchUserGroup]]);                     
+          
+        // 分页变量
+        $pageUser = $users->render();
+        
+        // 记录总数
+        $userRecords= UserModel::where('id','>',0)
+                            ->where($map)
+                            //->where('dept',$searchDept)
+                            ->count();
+        
+        // 查出所有的用户总数
+        $users1= UserModel::where('id','>',0)
+                            ->where($map)
+                            //->where('dept',$searchDept)
+                            ->group('username')
+                            ->select();
+        //$usersNum=count($users1);     
+        $usersNum=count(UserModel::where('id','>',0)
+                            ->where($map)
+                            //->where('dept',$searchDept)
+                            ->group('username')
+                            ->select());    
+ 
+        foreach($users as $v){
+            $user1 = UserModel::get($v['id']);
+            // 使用User模型中定义的关联关系(role)查出用户对应用户组名称(name)
+            $roleName=$user1->role->name;
+            // 将用户对应的用户组名称加入数据集$users中。
+            $v['rolename']=$roleName;
+        }
+      
+      $this->assign([
+             'home'=>$request->domain(),
+             
+             // 所有用户信息
+              'users'=>$users,
+              'usersNum'=>$usersNum,
+              'userRecords'=>$userRecords,
+              
+              'pageUser'=>$pageUser,
+              'pageUserNum'=>$pageUserNum,
+              
+              // 表格搜索字段
+              'searchUserName'=>$searchUserName,
+              'searchDept'=>$searchDept,
+              'searchUserGroup'=>$searchUserGroup,
+              
+              // 表格排序信息
+              'sortName'=>$sortName,
+              'sort'=>$sort,
+              'userTableRows'=>$userTableRows,
+             
+        ]);
+      return view();
+    }
+    
+    // 输出系统用户组模板
+    public function sysUsergroup(Request $request)
+    {
+      $this->_loginUser();
+      //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
+     
+      // 查出所有用户组
+      $groups = RoletyModel::where('id','>',0)
+                              ->order('name asc')
+                              ->select(); 
+      $this->assign([
+              'home'=>$request->domain(),
+              // 所有用户组信息
+              'groups'=>$groups,
+        ]);
+      return view();
+    }
+    
+     // 输出系统设置模板
+    public function sysSetting(Request $request)
+    {
+      $this->_loginUser();
+      //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
+      
+      // 查出所有部门信息
+      $depts = DeptModel::all();
+      
+      $this->assign([
+              'home'=>$request->domain(),
+      
+              'depts'=>$depts,
+              
+        ]);
+      return view();
+    }
+    
+     // 用户CDUR，接收客户端通过Ajax，post来的参数，返回json数据
+    public function userOprt(Request $request,UserModel $userMdl)
+    {
+      $this->_loginUser();
+      
+      $oprt=$request->param('oprt');
+       
+      switch($oprt){
+        case "_CREATE":
+        
+        break;
+        
+        case "_UPDATE":
+        
+        break;
+        
+        case "_DELETE":
+        
+        break;
+        
+        case"_DISABLE":
+          $userMdl::update(['enable'=> 0], ['id' => $id]);
+          
+          $result='success';
+          // 返回前端JSON数据
+          return ['result'=>$result,'uid'=>$id];
+          
+        break;
+        
+        case"_ENABLE":
+          $userMdl::update(['enable'=> 1], ['id' => $id]);
+          
+          $result='success';
+          // 返回前端JSON数据
+          return ['result'=>$result,'uid'=>$id];
+          
+        break;
+        
+        
+      }
+      
+    }
     
     
     

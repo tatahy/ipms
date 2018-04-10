@@ -1,0 +1,349 @@
+<!-- editUser.html -->
+	
+<form role="form" action="" method="post">
+	<div class="form-group has-feedback">
+		<label for="username">用户名</label>
+		<!-- // bootstrap实现矢量图在输入框开头 -->
+		<div class="input-group">
+			<span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+			<input type="text" class="form-control" id="username" name="username" placeholder="输入用户名">	
+		</div>
+					
+		<!-- // 配合jQuery 中的内容验证代码-->
+		<span style="color:red;display:none;" class="tips"></span>
+        <span style="display: none;" class=" glyphicon glyphicon-remove form-control-feedback"></span>
+        <span style="display: none;" class="glyphicon glyphicon-ok form-control-feedback"></span>	
+	</div>
+				
+	<div class="form-group has-feedback">
+		<label for="psw">密码</label>
+		<!-- // bootstrap实现矢量图在输入框开头 -->
+		<div class="input-group">
+			<span class="input-group-addon"><span class="glyphicon glyphicon-eye-open"></span></span>
+			<input type="password" class="form-control" id="pwd" name="pwd" placeholder="输入密码">
+		</div>		
+		<!-- // 配合jQuery 中的内容验证代码-->
+		<span style="color:red;display:none;" class="tips"></span>
+        <span style="display: none;" class=" glyphicon glyphicon-remove form-control-feedback"></span>
+        <span style="display: none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+	</div>
+				
+	<div class="form-group">
+		<label for="selDept">所属部门</label>
+		<div class="input-group">
+			<span class="input-group-addon"><span class="glyphicon glyphicon-tree-conifer"></span></span>
+			<select class="form-control" id="selDept" name="dept">
+    			<option value="">1</option>
+    			<option value="">2</option>
+    		</select>
+		</div>
+	</div>
+				
+	<div class="form-group">
+		<label for="selUserGroup">&nbsp;所属用户组</label>
+		<div class="input-group">
+			<span class="input-group-addon"><span class="glyphicon glyphicon-education"></span></span>
+			<select class="form-control" id="selUserGroup" name="userGroup">
+    			<option value="">1</option>
+    			<option value="">2</option>
+    		</select>
+		</div>
+	</div>
+				
+				<!-- <div class="checkbox">
+				  <label><input type="checkbox" value="" checked>Remember me</label>
+				</div> -->
+	<hr>
+	<button id="btnCreate" type="submit" class="btn btn-primary btn-sm" data-oprt="_CREATE"><span class="glyphicon glyphicon-ok-circle"></span>&nbsp;新增</button>
+				
+	<button id="btnReset" type="reset" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-refresh"></span>&nbsp;重置</button>
+				
+	<button type="button" class="btn btn-danger btn-sm pull-right" data-dismiss="modal"><span class="glyphicon glyphicon-remove-circle"></span> 取消</button>
+</form>
+
+<script>
+
+$(document).ready(function(){
+
+// 校验“用户名”和“密码”输入框的内容
+ 	var regUsername = /^[a-zA-Z_][a-zA-Z0-9_]{4,19}$/;
+	var regPasswordSpecial = /[~!@#%&=;':",./<>_\}\]\-\$\(\)\*\+\.\[\?\\\^\{\|]/;
+	var regPasswordAlpha = /[a-zA-Z]/;
+	var regPasswordNum = /[0-9]/;
+	var password;
+	var check = [false, false];
+	
+	// 单选框#searchDept的内容
+	showDept($("#selDept"),[{"text":"...不限","val":"0"}]);
+	// 单选框#searchUserGroup的内容
+	showUserGroup($("#selUserGroup"),[{"text":"...不限","val":"0"}]);
+	
+	<!-- // 检查“用户名”输入框的内容 -->
+	$("#username").change(function() { 
+    	//test(),正则的验证函数，验证value是否符合regUsername要求。
+    	//jquery的test()是获取或设置标签内文本既等于innerText。
+    	//HY,待确认
+    	if (regUsername.test($(this).val())) {
+        	success($(this), 0);
+    	} else if ($(this).val().length < 5) {
+        	fail($(this), 0, '用户名太短，不能少于5个字符');
+    	} else {
+        	fail($(this), 0, '用户名只能为英文数字和下划线,且不能以数字开头')
+    	}
+
+	});
+	
+	<!-- // 检查“密码”输入框的内容 -->
+	$("#pwd").change(function(){
+    	password = $(this).val();
+    	if ($(this).val().length < 8) {
+        	fail($(this), 1, '密码太短，不能少于8个字符');
+    	} else {
+        	if (atLeastTwo($(this).val()) < 2) {
+            	fail($(this), 1, '密码中至少包含字母、数字、特殊字符的两种')
+        	} else {
+            	success($(this), 1);
+        	}
+		}	
+    });
+	
+	<!-- // 提交按钮#btnCreate -->
+	$('#btnCreate').click(function(event) {
+  	//JavaScript的数组处理方法every(callback)，对数组中的每个元素都执行一次
+	//callback函数，直到callback返回false，every就返回false；
+	//若全部元素执行callback后都返回ture，every就返回true。
+	//此处的用意是只要数组check中存在false，将该项找出，并把该项对应的input用“has-error”突出显示。
+		var flag=check.every(function(value) {
+            return value == true
+        });
+			
+		<!-- // jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作 -->
+        event.preventDefault();
+		if (!flag) {
+			<!-- //check中存在false,对应的input用“has-error”突出显示。 -->
+        	for (key in check) {
+            	if (!check[key]) {
+                	$("#addUser").find("input").eq(key).parent().parent().removeClass("has-success").addClass("has-error");
+            	}else{
+					$("#addUser").find("input").eq(key).parent().parent().removeClass("has-error").addClass("has-success");
+				}
+        	}
+    	}
+		else{
+				
+			<!-- // 组装通过“post”提交的数据 -->
+			var sendData = {"oprt":"add","username":$("#username").val(),"pwd":$("#pwd").val(),"dept":$("#selDept").val(),"userGroup":$("#selUserGroup").val()};
+			$("#addUser").modal("hide");
+			$.ajax({
+				type : "post",
+				async : true,  //异步请求
+				url : "userOprt", 
+				<!-- // 发送到服务器的数据 -->
+				data : sendData,
+				timeout:1000,
+				<!-- // 指定服务器端response的数据类型为json -->
+				dataType:"json",
+				success:function(backData){
+					var data=backData;
+					<!-- alert(data.msg); -->
+					if(data.result=='success'){
+					//添加成功，弹出自定义提示页面 
+						$.confirm(data.msg,function(e){
+							con=e;
+							if(true==con){
+								//刷新页面并回到"#div1"页面
+								window.location.hash="#div1";
+								window.location.reload(true);
+							}else{
+								$('#btnReset').click();
+								//刷新页面并回到"#div0"页面
+								window.location.hash="#div0";
+								window.location.reload(true);
+							}
+						}).ok('继续添加').cancel('返回首页');
+					}else{
+						// 添加不成功，弹出自定义提示页面 
+						$.confirm(data.msg,function(e){
+							con=e;
+							if(true==con){
+								// 返回"#addUser".modal页面
+								$("#addUser").modal("show");
+							}else{
+								$('#btnReset').click();
+							}
+						}).ok('返回').cancel('取消');	
+						
+					}
+
+				},
+				error: function() {
+               		alert("失败1，请稍后再试！");
+            	}
+			});
+
+		}
+
+	});
+	
+	$('#btnReset').click(function() {
+		// 应用jQuery的slice()方法将匹配元素的子集构造一个新的jQuery对象
+		<!-- $('#addUser input').slice(0,2).parent().parent().removeClass('has-error has-success'); -->
+			
+		for (key in check) {
+            $("#addUser").find("input").eq(key).parent().parent().removeClass("has-success has-error");
+        }
+    	$('#addUser .tips').hide();
+    	$('#addUser .glyphicon-ok').hide();
+    	$('#addUser .glyphicon-remove').hide();
+    	check = [false, false];
+	
+	});
+
+<!-- function -->
+	//校验成功函数
+		function success(Obj, counter) {
+    		Obj.parent().parent().removeClass('has-error').addClass('has-success');
+    		$('#addUser .tips').eq(counter).hide();
+    		$('#addUser .glyphicon-ok').eq(counter).show();
+    		$('#addUser .glyphicon-remove').eq(counter).hide();
+    		check[counter] = true;
+
+		}
+
+		// 校验失败函数
+		function fail(Obj, counter, msg) {
+    		Obj.parent().parent().removeClass('has-success').addClass('has-error');
+    		$('#addUser .glyphicon-remove').eq(counter).show();
+    		$('#addUser .glyphicon-ok').eq(counter).hide();
+    		$('#addUser .tips').eq(counter).text(msg).show();
+    		check[counter] = false;
+		}
+	
+		// 匹配字母、数字、特殊字符至少两种的函数
+		function atLeastTwo(password) {
+    		var a = regPasswordSpecial.test(password) ? 1 : 0;
+    		var b = regPasswordAlpha.test(password) ? 1 : 0;
+    		var c = regPasswordNum.test(password) ? 1 : 0;
+    		return a + b + c;
+		}
+		
+	//**
+ 	//*/向单选框填充"部门"的内容选项
+	//* 参数1：Obj，必须。类型：对象，值：单选框的对象名称
+	//* //参数2：attach，可为空。类型：json数组，值：需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
+	//*参数3：selected，可为空。类型：字符，值：单选框拟选定option项的value值。
+ 	//**/
+	function showDept(Obj,attach,selected){
+		<!-- // 应用Ajax向服务器请求“部门”单选框内容所需数据，并组装好HTML语句 -->
+		$.ajax({
+			type : "post",
+			async : true,  //异步请求
+			url : "dept",
+			// 发送到服务器的数据，可无
+			<!-- data : data, -->
+			timeout:1000,
+			<!-- // 服务器端response的数据类型为json-->
+			dataType:"json",
+			success:function(backData){
+				var data=backData;
+
+				var str="";
+				if(attach){
+					for(i=0;i<attach.length;i++){
+						str+="<option value='"+attach[i].val+"'>"+attach[i].text+"</option>";
+					}
+					
+				}
+				
+				<!-- // 遍历data数组组装HTML语句 -->
+				<!-- // data的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
+				$.each(data,function(n1,v1){
+					$.each(v1,function(n2,v2){
+						if(n2=="name"){
+							str+="<option value='"+v2+"'>"+v2+" （简称：";
+						}
+						if(n2=="abbr"){
+							str+=v2+"）</option>";
+						}
+					});
+				});
+				
+				<!--// 清空单选框Obj的所有选项-->
+				Obj.empty();
+				<!--// 添加单选框Obj的新选项-->
+				Obj.append(str);
+				
+				<!-- // value=selected 的项为选定项-->
+				if (selected){
+					Obj.val(selected).attr('selected','selected');
+				}
+			},
+			error: function() {
+               alert("失败dept，请稍后再试！");
+            }
+		});
+	}
+	
+	//**
+ 	//* 向单选框填充"用户组"的内容选项
+	//* 参数1：Obj，类型：对象。值：必须，单选框的对象名称
+	//* //参数2：attach，类型：json数组。值：可为空，需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
+	//*参数3：selected，类型：字符。值：字符，可为空。
+ 	//**/ 
+	function showUserGroup(Obj,attach,selected){
+		<!-- // 应用Ajax向服务器请求“用户组”单选框内容所需数据，并组装好HTML语句 -->
+		$.ajax({
+			type : "post",
+			async : true,  //异步请求
+			url : "userGroup",
+			// 发送到服务器的数据，可无
+			<!-- data : data, -->
+			timeout:1000,
+			<!-- // 指定服务器端response的数据类型为json-->
+			dataType:"json",
+			success:function(backData){
+				var data=backData;
+				var str="";
+				if(attach){
+					for(i=0;i<attach.length;i++){
+						str+="<option value='"+attach[i].val+"'>"+attach[i].text+"</option>";
+					}
+					
+				}
+				<!-- // 遍历data数组组装HTML语句 -->
+				<!-- // data的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
+				$.each(data,function(n1,v1){
+					$.each(v1,function(n2,v2){
+						if(n2=="id"){
+							str+="<option value='"+v2+"'>";
+						}
+						if(n2=="name"){
+							str+=v2+"</option>";
+						}
+					});
+				});
+				
+				<!--// 清空单选框Obj的所有选项-->
+				Obj.empty();
+				<!--// 添加单选框Obj的新选项-->
+				Obj.append(str);
+				
+				<!-- // value=selected 的项为选定项-->
+				if (selected){
+					Obj.val(selected).attr('selected','selected');
+				}
+				<!-- Obj.val(selected).attr('selected','selected'); -->
+				
+			},
+			error: function() {
+               alert("失败Group，请稍后再试！");
+            }
+		});
+	}
+<!--/ function -->
+	
+});
+
+</script>
+
+

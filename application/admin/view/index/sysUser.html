@@ -1,0 +1,578 @@
+<!-- <div class="hy-box"> -->
+	<!-- <p><strong>选择用户类型</strong></p> -->
+	
+	<!-- <p><strong>用户列表</strong></p> -->
+	
+	<!-- <p><strong>用户列表分页</strong></p>	 -->
+				
+				
+<!-- </div> -->
+
+<!-- <div class="panel panel-default "> -->
+		<!-- <div class="panel-heading"> -->
+		<h4>
+		<strong>系统用户总数：</strong><span class="label label-warning badge">{$usersNum}</span>
+		</h4>
+		<div>用户管理&nbsp;
+			<!--// bootstap通过button调用Model -->
+			<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalEditUser">新增&nbsp;<span class="glyphicon glyphicon-file"></span></button>
+				
+			<button id="btnSearchInfo" type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divCollapse">显示搜索&nbsp;<span class="glyphicon glyphicon-collapse-down"></span></button>
+				
+			<button id="btnDiv1Reset" type="button" class="btn btn-primary btn-sm">重置&nbsp;<span class="glyphicon glyphicon-refresh"></span></button>
+			
+		</div> 
+		
+		<br>		
+		<!-- </div> -->
+		
+		<div id="divUser" >	
+			
+			<div id="divCollapse" class="collapse">
+			<form method="get" action="{$home}/admin/index/sys_user#div1" id="userSearch" class="form-inline">
+				<div class="form-group">
+					<label class="" for="searchUserName">用户名</label>
+					<input class="form-control" id="searchUserName" name="searchUserName" type="text" value="{$searchUserName}" placeholder="...不限">
+										
+				</div>
+					
+				<div class="form-group">
+					<label class="control-label" for="searchDept">部门</label>
+					<select class="form-control" id="searchDept" name="searchDept">
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+											
+					</select>
+				</div>
+									
+				<div class="form-group">
+					<label class="control-label" for="searchUserGroup">用户组</label>
+					<select class="form-control" id="searchUserGroup" name="searchUserGroup">
+						<option value="_a">a</option>
+						<option value="_b">b</option>
+						<option value="_c">c</option>
+											
+					</select>
+				</div>
+				
+				<!-- <input type="submit" class="btn btn-primary btn-sm" value="搜索 >>"> -->
+				
+				<button id="btnSearchUser" type="button" class="btn btn-primary btn-sm">搜索&nbsp;<span class="glyphicon glyphicon-search"></span></button>
+				
+				<!-- <input type="reset" class="btn btn-primary btn-sm" value="重置" id="btnDiv1Reset"><span class="glyphicon glyphicon-refresh"></span> -->
+				
+			</form>
+			<hr>
+			</div>
+			
+			<div class="table-responsive" >
+			<table class="table table-hover table-condensed">
+				<thead>
+					<tr>
+						<th>序号</th>
+						
+						<th><a data-toggle="tooltip" data-placement="bottom" title="点击排序" href="#div1" sort="{$sort}" sortName="_USERNAME">用户名&nbsp;</a></th>
+						
+						<th><a data-toggle="tooltip" data-placement="bottom" title="点击排序" href="#div1" sort="{$sort}" sortName="_DEPT">所属部门&nbsp;</a></th>
+						
+						<th ><a data-toggle="tooltip" data-placement="bottom" title="点击排序" href="#div1" sort="{$sort}" sortName="_USERGROUP">用户组名（组#）&nbsp;</a></th>
+						
+						<th><a data-toggle="tooltip" data-placement="bottom" title="点击排序" href="#div1" sort="{$sort}" sortName="_ENABLE">操作&nbsp;</a></th>
+					</tr>
+				</thead>
+				
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="users" id="vo" empty="暂时没有数据"}
+					<tr>
+						<td>{$i+($pageUserNum-1)*$userTableRows}</td>
+						<td>{$vo.username}</td>
+						<td>{$vo.dept}</td>
+						<!-- <td>{$vo.rolety_id}</td>  -->
+						<td>{$vo.rolename}（{$vo.usergroup_id}）</td>
+						<td>
+							<button uid="{$vo.id}" class="del btn-link"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>&nbsp;
+							
+							<button uid="{$vo.id}" class="dis btn-link"><span class="text-warning glyphicon glyphicon-ban-circle"></span>禁用</button>
+							
+							<span>（已禁用）</span><button uid="{$vo.id}" class="en btn-link" value="{$vo.enable}"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
+							
+						</td>	
+					
+					</tr>
+					{/volist}
+				</tbody>
+				
+				<tfoot >
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tfoot>
+				
+			</table>
+			</div>
+			
+			<div id="divUserTableRows" class="col-sm-12 text-right search">
+				<div class="col-sm-10 text-right">{$pageUser}</div>
+						
+				<div class="form-group form-group-sm col-sm-2">
+					<span class="">每页记录行数：</span>
+					<select class="form-control" id="userTableRows">
+						<option value="5">5</option>
+						<option value="10">10</option>
+						<option value="15">15</option>
+						<option value="30">30</option>
+						<option value="50">50</option>
+					</select>
+						
+				</div>
+			</div>
+			
+			
+		</div>
+<!-- </div> -->
+
+<!-- Modal "modalEditUser" -->
+<div class="modal fade" id="modalEditUser" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header bg-info" style="border-radius: 5px;">
+          	<button type="button" class="close" data-dismiss="modal">&times;</button>
+		  
+          	<h4><strong>新增用户</strong></h4>
+        </div>
+		
+        <div class="modal-body">
+		
+			<div id="divEditUser_load"><p class="text-center" style="font-size:28px;">加载中……</p></div>
+			
+        </div>
+		
+        <!-- <div class="modal-footer"> -->
+		
+          	<!-- <button type="button" class="btn btn-danger btn-default pull-right" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 取消</button> -->
+          
+        <!-- </div> -->
+      </div>
+      
+    </div>
+</div>
+<!-- / Modal "modalEditUser" -->
+
+<script>
+
+$(function(){
+	
+	// 单选框#searchDept的内容
+	showDept($("#searchDept"),[{"text":"...不限","val":"0"}]);
+	// 单选框#searchUserGroup的内容
+	showUserGroup($("#searchUserGroup"),[{"text":"...不限","val":"0"}]);
+	
+	<!-- // 对用户表格中<td>里的<button>进行格式设置 -->
+	$("#divUser tbody td button").each(function(){
+		if($(this).attr("value")=='1'){
+			$(this).prevAll('button').show();
+            $(this).prev('span').hide();
+			$(this).hide();
+			$(this).parent().parent().removeClass("danger text-muted");
+		}else{
+			$(this).prevAll('button').hide();
+			$(this).show();
+			$(this).parent().parent().addClass("danger text-muted");
+		}
+	});
+	
+	<!-- // 用户表格中<td>内容含“superadmin”的去除<button>及附ept属span -->
+	$("#divUser tbody td").each(function(){
+		var str=$(this).text();
+		if(str.indexOf('superadmin')>=0){
+			$(this).nextAll().children("button").remove();
+            $(this).nextAll().children("span").remove();
+		
+		}
+	});
+	
+	<!-- // 显示搜索条件的div，修改触发"显示"的btn内容-->
+	$("#divCollapse").on("hide.bs.collapse", function(){
+    	$("#btnSearchInfo").html('显示搜索&nbsp;<span class="glyphicon glyphicon-collapse-down"></span>');
+  	});
+	
+	<!-- // 隐藏搜索条件的div，修改触发"隐藏"的btn内容-->
+  	$("#divCollapse").on("show.bs.collapse", function(){
+    	$("#btnSearchInfo").html('隐藏搜索&nbsp;<span class="glyphicon glyphicon-collapse-up"></span>');
+  	});
+	
+	<!-- // bootstrap3，enable所有的tooltip -->
+	<!-- $('[data-toggle="tooltip"]').tooltip();  -->
+	
+	// 添加bootstrap的tooltip属性
+	$("#divUser thead th a").tooltip({title: "点击排序", placement: "bottom"}); 
+	
+	// 根据后端控制器给出的排序字段{$sortName},排序方式{$sort}，修改th中a的显示形式
+	$("#divUser thead a").each(function(){
+	
+		var glyAsc='<span class="small glyphicon glyphicon-sort-by-attributes text-muted"></span>';
+		var glyDesc='<span class="small glyphicon glyphicon-sort-by-attributes-alt text-warning"></span>';
+		
+		//排序字段
+		var sortName=$(this).attr("sortName");
+		var sort=$(this).attr("sort");
+		
+		<!-- // 后端控制器给出的排序字段{$sortName},排序方式{$sort} -->
+		if (sortName=="{$sortName}"){
+			if(sort=="_ASC"){
+				$(this).append(glyAsc);
+				$(this).attr("sort","_DESC");
+				$(this).attr('data-original-title','点击后降序');
+				// bootstap3中修改tooltip的options属性值
+				<!-- $(this).data("bs.tooltip").options.title="点击后降序"; -->
+				$(this).data("bs.tooltip").options.placement="top";
+			}else{
+				$(this).append(glyDesc);
+				$(this).attr("sort","_ASC");
+				$(this).attr('data-original-title','点击后升序');
+				// bootstap3中修改tooltip的options属性值
+				<!-- $(this).data("bs.tooltip").options.title="点击后降序"; -->
+				$(this).data("bs.tooltip").options.placement="top";
+			}
+		}
+	});
+	
+	// 点击th中的a，表格中的内容根据a中的属性值进行排序
+	$('#divUser thead a').click(function(){
+		
+		var sort=$(this).attr("sort");
+		var sortName=$(this).attr("sortName");
+		
+		<!-- //根据每页显示记录行数，排序字段，排序方式加载页面 -->
+		loadSysUser($("#userTableRows").val(),sortName,sort);
+		
+	});
+	
+	<!-- // 点击分页中的a，表格中的内容根据a中的属性值进行排序 -->
+	$('#divUserTableRows a').click(function(event){
+		// a所在分页页数
+		var pageStr=$(this).text();
+		var pageNum;
+		//(li.active)所代表的页数
+		var pageNumActive=$('#divUserTableRows li.active').children('span').text();
+		
+		// jQuery的preventDefault()方法阻止元素发生默认的行为。阻止访问a的URL
+        event.preventDefault();
+		<!-- alert("pageStr:"+pageStr+" active:"+pageNumActive); -->
+		
+		switch(pageStr){
+			case'»':
+				//用"*"确保得到的是加法运算结果，而不是字符串
+				pageNum=(pageNumActive*1+1);
+			break;
+			
+			case'«':
+				pageNum=(pageNumActive*1-1);
+			break;
+			
+			default:
+				pageNum=pageStr;
+			break;
+		
+		}
+		<!-- alert("pageNum:"+pageNum); -->
+		
+		<!-- //根据每页显示记录行数，排序字段，排序方式，分页页数加载页面 -->
+		loadSysUser($("#userTableRows").val(),"{$sortName}","{$sort}",pageNum)
+	
+	});
+	
+	<!-- // bootstap3中修改tooltipd的title -->
+				<!-- $(this).attr('data-original-title','点击后降序'); -->
+				
+	<!-- // bootstap3中从命名空间“bs”修改tooltip的options属性值 -->
+	<!-- $(this).data("bs.tooltip").options.placement="top"; -->
+	<!-- $(this).data("bs.tooltip").options.title="点击后降序"; -->
+	
+	<!-- // 在#addUser的model显示之前，应用show.bs.modal事件将#addUser的model内容准备好 -->
+	$('#modalEditUser').on('show.bs.modal', function () {
+        
+		$('#divEditUser_load').load('tplFile',{'tplFile':'editUser'});
+		
+	});	
+	
+<!-- //<button class='en'> ajax事件-->
+	$("#divUser button.en").click(function() {
+  		
+		<!-- // 组装通过“post”提交的数据 -->
+		var sendData = {"oprt":"enable","id":$(this).attr("uid")};
+				
+		$.ajax({
+			type : "post",
+			async : true,  //异步请求
+			url : "{$home}/admin/index/oprtUser", 
+			<!-- // 发送到服务器的数据 -->
+			data : sendData,
+			timeout:1000,
+			<!-- // 指定服务器端response的数据类型为json -->
+			dataType:"json",
+			success:function(backData){
+				var data=backData;
+						
+			},
+			error: function() {
+               	alert("<button>.en.click失败，请稍后再试！");
+            }
+		});	
+		
+		$(this).prevAll('button').show();
+        $(this).prev('span').hide();
+		$(this).hide();
+		$(this).parent().parent().removeClass("danger text-muted");
+	
+	});
+	
+	<!-- //<button class='dis'> ajax事件-->
+	$("#divUser button.dis").click(function() {
+  		
+		<!-- // 组装通过“post”提交的数据 -->
+		var sendData = {"oprt":"disable","id":$(this).attr("uid")};
+				
+		$.ajax({
+			type : "post",
+			async : true,  //异步请求
+			url : "{$home}/admin/index/oprtUser", 
+			<!-- // 发送到服务器的数据 -->
+			data : sendData,
+			timeout:1000,
+			<!-- // 指定服务器端response的数据类型为json -->
+			dataType:"json",
+			success:function(backData){
+				var data=backData;
+						
+			},
+			error: function() {
+               	alert("<button>.en.click失败，请稍后再试！");
+            }
+		});
+		
+		$(this).prev().hide();
+		$(this).hide();
+		$(this).nextAll().show();
+		$(this).parent().parent().addClass("danger text-muted");
+	
+	});
+	
+	<!-- //<button class='del'> ajax事件-->
+	$("#divUser button.del").click(function() {
+  		var id=$(this).attr("uid");
+		var selBtn='.del button[uid="'+id+'"]';
+		
+		<!-- // 组装通过“post”提交的数据 -->
+		var sendData = {"oprt":"delete","id":id};
+		
+		//弹出自定义提示页面 
+		$.confirm('确定删除该用户？',function(e){
+			var con=e;
+			if(true==con){
+				$.ajax({
+					type : "post",
+					async : true,  //异步请求
+					url : "{$home}/admin/index/oprtUser", 
+					<!-- // 发送到服务器的数据 -->
+					data : sendData,
+					timeout:1000,
+					<!-- // 指定服务器端response的数据类型为json -->
+					dataType:"json",
+					success:function(backData){
+						var data=backData;
+						//删除所在行<tr>
+						$(selBtn).parent().parent().remove();
+						//刷新页面并回到锚点"#div1"页面
+						window.location.hash="#div1";
+						window.location.reload(true);
+					},
+					error: function() {
+               			alert("删除失败，请稍后再试！");
+            		}
+				});
+			}else{
+				
+				$('#btnReset').click();
+			}
+		}).ok('(Y)删除').cancel('(N)取消');
+		
+	});
+	
+	<!-- //表格每页显示记录行数 -->
+	$("#userTableRows").val('{$userTableRows}'); 
+	
+	$("#userTableRows").change(function(){
+		<!-- //根据每页显示记录行数加载页面 -->
+		loadSysUser($(this).val());
+	
+	});
+	
+	$("#btnSearchUser").click(function(){
+		<!-- //根据每页显示记录行数加载页面 -->
+		loadSysUser($("#userTableRows").val());
+	});
+	
+	<!-- // 页面重新加载 -->
+	$("#btnDiv1Reset").click(function(){
+		$("#content").load("sys_user");
+		
+	});
+
+<!-- function -->
+	//加载sys_user.html页面内容到index.html页面中<div id="content"></div>
+	function loadSysUser(rows,sortName,sort,pageUserNum){
+		// 每页显示的记录行数
+		var rows=rows;
+		var sortName=sortName;
+		var sort=sort;
+		
+		// 分页页数
+		var pageUserNum=pageUserNum;
+		
+		// 本页的3个查询词
+		var searchUserName=$("#searchUserName").val();
+		var searchDept=$("#searchDept").val();
+		var searchUserGroup=$("#searchUserGroup").val();
+		
+		// 升序or降序
+		if(sort){}else{sort='_ASC';}
+		
+		// 排序的关键词
+		if(sortName){}else{sortName='_USERNAME';}
+		
+		// 组装通过“post”提交的数据，名称与后端所用一致
+		var sendData = {"sortName":sortName,"sort":sort,"userTableRows":rows,"searchUserName":searchUserName,"searchDept":searchDept,"searchUserGroup":searchUserGroup,"pageUserNum":pageUserNum};
+		
+		// jquery load()方法，加载sys_user.html页面内容到index.html页面中<div id="content"></div>
+		$("#content").load("sys_user",sendData);
+	
+	}
+	
+	//**
+ 	//*/向单选框填充"部门"的内容选项
+	//* 参数1：Obj，必须。类型：对象，值：单选框的对象名称
+	//* //参数2：attach，可为空。类型：json数组，值：需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
+	//*参数3：selected，可为空。类型：字符，值：单选框拟选定option项的value值。
+ 	//**/
+	function showDept(Obj,attach,selected){
+		<!-- // 应用Ajax向服务器请求“部门”单选框内容所需数据，并组装好HTML语句 -->
+		$.ajax({
+			type : "post",
+			async : true,  //异步请求
+			url : "{$home}/admin/index/dept",
+			// 发送到服务器的数据，可无
+			<!-- data : data, -->
+			timeout:1000,
+			<!-- // 服务器端response的数据类型为json-->
+			dataType:"json",
+			success:function(backData){
+				var data=backData;
+
+				var str="";
+				if(attach){
+					for(i=0;i<attach.length;i++){
+						str+="<option value='"+attach[i].val+"'>"+attach[i].text+"</option>";
+					}
+					
+				}
+				
+				<!-- // 遍历data数组组装HTML语句 -->
+				<!-- // data的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
+				$.each(data,function(n1,v1){
+					$.each(v1,function(n2,v2){
+						if(n2=="name"){
+							str+="<option value='"+v2+"'>"+v2+" （简称：";
+						}
+						if(n2=="abbr"){
+							str+=v2+"）</option>";
+						}
+					});
+				});
+				
+				<!--// 清空单选框Obj的所有选项-->
+				Obj.empty();
+				<!--// 添加单选框Obj的新选项-->
+				Obj.append(str);
+				
+				<!-- // value=selected 的项为选定项-->
+				if (selected){
+					Obj.val(selected).attr('selected','selected');
+				}
+			},
+			error: function() {
+               alert("失败dept，请稍后再试！");
+            }
+		});
+	}
+	
+	//**
+ 	//* 向单选框填充"用户组"的内容选项
+	//* 参数1：Obj，类型：对象。值：必须，单选框的对象名称
+	//* //参数2：attach，类型：json数组。值：可为空，需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
+	//*参数3：selected，类型：字符。值：字符，可为空。
+ 	//**/ 
+	function showUserGroup(Obj,attach,selected){
+		<!-- // 应用Ajax向服务器请求“用户组”单选框内容所需数据，并组装好HTML语句 -->
+		$.ajax({
+			type : "post",
+			async : true,  //异步请求
+			url : "{$home}/admin/index/userGroup",
+			// 发送到服务器的数据，可无
+			<!-- data : data, -->
+			timeout:1000,
+			<!-- // 指定服务器端response的数据类型为json-->
+			dataType:"json",
+			success:function(backData){
+				var data=backData;
+				var str="";
+				if(attach){
+					for(i=0;i<attach.length;i++){
+						str+="<option value='"+attach[i].val+"'>"+attach[i].text+"</option>";
+					}
+					
+				}
+				<!-- // 遍历data数组组装HTML语句 -->
+				<!-- // data的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
+				$.each(data,function(n1,v1){
+					$.each(v1,function(n2,v2){
+						if(n2=="id"){
+							str+="<option value='"+v2+"'>";
+						}
+						if(n2=="name"){
+							str+=v2+"</option>";
+						}
+					});
+				});
+				
+				<!--// 清空单选框Obj的所有选项-->
+				Obj.empty();
+				<!--// 添加单选框Obj的新选项-->
+				Obj.append(str);
+				
+				<!-- // value=selected 的项为选定项-->
+				if (selected){
+					Obj.val(selected).attr('selected','selected');
+				}
+				<!-- Obj.val(selected).attr('selected','selected'); -->
+				
+			},
+			error: function() {
+               alert("失败Group，请稍后再试！");
+            }
+		});
+	}
+<!--/ function -->
+	
+});
+
+</script>
+
+

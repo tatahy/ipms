@@ -378,9 +378,11 @@ $(document).ready(function(){
 				$(this).addClass('label label-success');
 				//出现，增加'empty-check'，列入非空检查
 				$('#divPatAuthInfo').show().children().find('.form-control').addClass('empty-check');
+				$('#divPatRenewAuthInfo').show().children().find('.form-control').addClass('empty-check');
 				//隐藏并取消非空检查
 				$('#maintainMsg').removeClass('empty-check');
 				$('#divPatRejectInfo').hide().children().find('.form-control').removeClass('empty-check');
+				$('#divPatRenewRejectInfo').hide().children().find('.form-control').removeClass('empty-check');
 				//以yyyy-mm-dd格式显示系统当前日期
 				$('#patAuthDate').val(dateValue());
 				$('#patRenewAuthDate').val(dateValue());
@@ -394,8 +396,10 @@ $(document).ready(function(){
 				//出现，增加'empty-check'，列入非空检查
 				$('#maintainMsg').addClass('empty-check');
 				$('#divPatRejectInfo').show().children().find('.form-control').addClass('empty-check');
+				$('#divPatRenewRejectInfo').show().children().find('.form-control').addClass('empty-check');
 				//隐藏并取消非空检查
 				$('#divPatAuthInfo').hide().children().find('.form-control').removeClass('empty-check');
+				$('#divPatRenewAuthInfo').hide().children().find('.form-control').removeClass('empty-check');
 				//以yyyy-mm-dd格式显示系统当前日期
 				$('#patRejectDate').val(dateValue());
 				$('#patRenewRejectDate').val(dateValue());
@@ -419,7 +423,6 @@ $(document).ready(function(){
 	
 	//附加#btnReset 的click事件
 	$('#btnReset').click(function(){	
-	
 		$('#maintainResult').removeClass('label label-danger label-primary label-success');
 		
 	});
@@ -434,8 +437,11 @@ $(document).ready(function(){
 	function dateValue(){
 		var mydate=new Date();
 		//mydate.getMonth()的取值为0~11，将月份统一为mm的格式
-		var str=(mydate.getMonth()+1)>9?(mydate.getMonth()+1).toString():'0'+(mydate.getMonth()+1);
-		var today=mydate.getFullYear()+'-'+str+'-'+mydate.getDate();
+		var strMonth=(mydate.getMonth()+1)>9?(mydate.getMonth()+1).toString():'0'+(mydate.getMonth()+1);
+		//将天数统一为dd格式
+		var strDate=mydate.getDate()>9?mydate.getDate().toString():'0'+mydate.getDate();
+		
+		var today=mydate.getFullYear()+'-'+strMonth+'-'+strDate;
 		//系统当前时间字符串
 		<!-- var todayDate=mydate.toLocaleString(); -->
 		return today;
