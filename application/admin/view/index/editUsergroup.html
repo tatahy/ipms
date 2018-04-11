@@ -1,255 +1,135 @@
 <!-- //editUsergroup.html -->
 
-<div class="">
-	<form role="form" action="{$home}/admin/index/index" method="post">
-		<input id="oprtId" type="text" hidden disabled>
-				
-		<div class="form-group has-feedback">
+	
+<form id="fmUsergroup" role="form" action="" method="post">
+	<input id="oprtId" type="text" name="" value="" class="sr-only">
+	<div class="myFieldset">
+		<div class="myLegend"><span class="label label-info"><span class="glyphicon glyphicon-duplicate"></span>&nbsp;用户组信息</span></div>
+		<div class="row myRow">		
+		<div class="form-group has-feedback col-sm-6">
 			<label for="userGroupName">用户组名</label>
 			<!-- // bootstrap实现矢量图在输入框开头 -->
 			<div class="input-group">
 				<span class="input-group-addon"><span class="glyphicon glyphicon-education"></span></span>
 						
 				<input type="text" class="form-control textUserGroup" id="userGroupName" name="userGroupName" placeholder="输入用户组名">
-			</div>
-					
+			</div>	
 			<!-- // 配合jQuery 中的内容验证代码-->
 			<span style="color:red;display: none;" class="tips"></span>
       		<span style="display: none;"  class="glyphicon glyphicon-ok form-control-feedback"></span>
-			<span style="display: none;" class="glyphicon glyphicon-remove form-control-feedback"></span>
-					
+			<span style="display: none;" class="glyphicon glyphicon-remove form-control-feedback"></span>		
 		</div>
-				
-		<div class="form-group">
-				
-			<label for="feAu">前端权限</label>
-			</br>
-					
-			<div id="feAu" style="border:solid 1px #ccc; padding-left:10px;">
+		</div>
+	</div>
+
+	<div class="myFieldset">
+		<div class="myLegend"><span class="label label-info"><span class="glyphicon glyphicon-alert"></span>&nbsp;用户组权限</span></div>
+		
+		<div class="row myRow">		
+		<div class="form-group col-sm-6">	
+			<label for="authIss"><span class="text-info">【事务】</span>模块</label>	
+			<div id="authIss" style="border-bottom:solid 1px #ccc; padding:5px;">
+				<label class="checkbox-inline"><input type="checkbox" name="edit" value="1" checked>编辑</label>
+				<label class="checkbox-inline"><input type="checkbox" name="audit" value="1">审核</label>
+				<label class="checkbox-inline"><input type="checkbox" name="approve" value="1">审批</label>
+				<label class="checkbox-inline"><input type="checkbox" name="execute" value="1">执行</label>
+				<label class="checkbox-inline"><input type="checkbox" name="maintain" value="1">维护</label>
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label for="authPat"><span class="text-warning">【专利】</span>模块</label>	
+			<div id="authPat" style="border-bottom:solid 1px #ccc; padding:5px;">
 				<label class="checkbox-inline"><input type="checkbox" name="addnew" value="1" checked>新增</label>
 				<label class="checkbox-inline"><input type="checkbox" name="submit" value="1">提交</label>
 				<label class="checkbox-inline"><input type="checkbox" name="modify" value="1">修改</label>
 				<label class="checkbox-inline"><input type="checkbox" name="upfile" value="1">上传</label>
 				<label class="checkbox-inline"><input type="checkbox" name="downfile" value="1">下载</label>
-				</br>
-					
-				<label class="checkbox-inline"><input type="checkbox" name="audit" value="1">审核</label>
-				<label class="checkbox-inline"><input type="checkbox" name="refuse" value="1">返回</label>
-				<label class="checkbox-inline"><input type="checkbox" name="reject" value="1">驳回</label>
-				<label class="checkbox-inline"><input type="checkbox" name="approve" value="1">批准</label>
-				<label class="checkbox-inline"><input type="checkbox" name="inspect" value="1">检查</label>
 			</div>
 		</div>
-				
-		<div id="divBeAu" class="form-group">
-			<label for="bgoEn">后端权限</label>
-			<label class="radio-inline">
-      			<input type="radio" name="bgoEn" value="1" ><span >有</span>
-    		</label>
-    		<label class="radio-inline">
-      			<input type="radio" name="bgoEn" value="0" checked><span>无</span>
-    		</label>
+		
+		<div class="form-group col-sm-6">	
+			<label for="authPro"><span class="text-primary">【项目】</span>模块</label>	
+			<div id="authPro" style="border-bottom:solid 1px #ccc; padding:5px;">
+				<label class="checkbox-inline"><input type="checkbox" name="addnew" value="1" checked>新增</label>
+				<label class="checkbox-inline"><input type="checkbox" name="submit" value="1">提交</label>
+				<label class="checkbox-inline"><input type="checkbox" name="modify" value="1">修改</label>
+				<label class="checkbox-inline"><input type="checkbox" name="upfile" value="1">上传</label>
+				<label class="checkbox-inline"><input type="checkbox" name="downfile" value="1">下载</label>
+			</div>
 		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label for="authThe"><span class="text-default">【论文】</span>模块</label>	
+			<div id="authThe" style="border-bottom:solid 1px #ccc; padding:5px;">
+				<label class="checkbox-inline"><input type="checkbox" name="addnew" value="1" checked>新增</label>
+				<label class="checkbox-inline"><input type="checkbox" name="submit" value="1">提交</label>
+				<label class="checkbox-inline"><input type="checkbox" name="modify" value="1">修改</label>
+				<label class="checkbox-inline"><input type="checkbox" name="upfile" value="1">上传</label>
+				<label class="checkbox-inline"><input type="checkbox" name="downfile" value="1">下载</label>
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label for="authAtt"><span class="text-danger">【附件】</span>模块</label>	
+			<div id="authAtt" style="border-bottom:solid 1px #ccc; padding:5px;">
+				<label class="checkbox-inline"><input type="checkbox" name="upload" value="1" checked>上传</label>
+				<label class="checkbox-inline"><input type="checkbox" name="download" value="1" checked>下载</label>
+				<label class="checkbox-inline"><input type="checkbox" name="copy" value="1">复制</label>
+				<label class="checkbox-inline"><input type="checkbox" name="move" value="1">移动</label>
+				<label class="checkbox-inline"><input type="checkbox" name="erase" value="1">删除</label>
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label for="authAdmin"><span class="text-danger">【管理】</span>模块</label>	
+			<div id="authAdmin" class="form-group" style="border-bottom:solid 1px #ccc; padding:5px;">
+				<label class="radio-inline">
+      				<input type="radio" name="adminEn" value="1" ><span class="label label-default">有</span>
+    			</label>
+    			<label class="radio-inline">
+      				<input type="radio" name="adminEn" value="0" checked><span class="label label-default">无</span>
+    			</label>
+			</div>
+		</div>
+		</div>
+		
+	</div>
+				
+
 				
 		<div id="divUserGroupEn" class="form-group">
-			<label class="" for="userGroupEn">用户组启用</label>
+			<label class="" for="usergroupEn">用户组启用</label>
 			<label class="radio-inline">
-      			<input type="radio" name="userGroupEn" value="1"checked><span>是</span>
+      			<input type="radio" name="usergroupEn" value="1" checked><span class="label label-info">是</span>
     		</label>
     		<label class="radio-inline">
-      			<input type="radio" name="userGroupEn" value="0" ><span>否</span>
+      			<input type="radio" name="usergroupEn" value="0" ><span class="label label-default">否</span>
     		</label>
-		</div>
-				
+		</div>	
 		<hr>
+
+		<button id="btnCreate" type="submit" class="btn btn-primary btn-sm" data-oprt="_CREATE"><span class="glyphicon glyphicon-ok"></span>&nbsp;新增</button>
+	
+		<div class="pull-right">	
+			<button id="btnReset" type="reset" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-refresh"></span>&nbsp;重置</button>
 				
-		<button id="btnAddUserGroup" type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-ok-circle"></span>&nbsp;新增</button>
-		<button id="btnResetUserGroup" type="reset" class="btn btn-warning btn-sm"><span class="glyphicon glyphicon-refresh"></span>&nbsp;重置</button>
-		<button type="button" class="btn btn-danger btn-sm pull-right" data-dismiss="modal"><span class="glyphicon glyphicon-remove-circle"></span> 取消</button>
+			<button type="button" class="btn btn-warning btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 取消</button>
+		</div>		
 	</form>
-</div>
+
 	
 <script>
 $(document).ready(function(){
 	
-	// 存储#modalUserGroupDept标题
-	var hStr=$("#modalUserGroup").find('h4').html();
-	// 存储#btnAddUserGroup名称
-	var btnStr=$("#btnAddUserGroup").html();
-	
-	//点击新增用户组按钮
-	$("h4 button").click(function() {
-		// #modalUserGroup标题内容恢复
-		$("#modalUserGroup h4").html(hStr);
-		//#modalUserGroup标题底色恢复
-		$(".modal-header").addClass("bg-info");
-			
-		<!-- //表单input:text元素设定初始值 -->
-		$("#oprtId").val('');	
-		<!-- $("#userGroupName").val(''); -->
-			
-		// 表单input:check元素赋值清空
-		$("#modalUserGroup input:checkbox").each(function(){
-			$(this).prop("checked",false);
-
-		});
-		// 设置input:checkbox选中元素
-		$("#modalUserGroup input:checkbox[name='addnew']").prop("checked",true);
-		
-		// 表单input:radio:[name='bgoEn']元素赋值
-		$("#modalUserGroup input:radio[name='bgoEn'][value='1']").prop("checked",false);
-		$("#modalUserGroup input:radio[name='bgoEn'][value='0']").prop("checked",true);
-		// 设置input:radio选中元素的背景色
-		$("input:radio[name='bgoEn']").each(function(){
-			var objChecked=$("input:radio[name='bgoEn']:checked");
-			radioBg(objChecked,'有','无');
-		});
-		
-		// 表单input:radio:[name='userGroupEn']元素赋值
-		$("#modalUserGroup input:radio[name='userGroupEn'][value='1']").prop("checked",true);
-		$("#modalUserGroup input:radio[name='userGroupEn'][value='0']").prop("checked",false);
-		// 设置input:radio选中元素的背景色
-		$("input:radio[name='userGroupEn']").each(function(){
-			var objChecked=$("input:radio[name='userGroupEn']:checked");
-			radioBg(objChecked);
-		});
-
-		// #btnAddUserGroup恢复
-		$("#btnAddUserGroup").html(btnStr);
-		$("#btnResetUserGroup").show();
-		
-		// 清除输入框的格式
-		$(".modal input").parent().parent().removeClass("has-success").removeClass("has-error"); 
-		// 注意限定.tips/glyphicon-ok/glyphicon-remove所在标签.modal，否则会殃及其他标签的.tips/glyphicon-ok/glyphicon-remove
-    	$('.modal .tips').hide();
-    	$('.modal .glyphicon-ok').hide();
-    	$('.modal .glyphicon-remove').hide();
-		
-	});
-	
-	<!-- //<button class='edit'> 事件-->
-	$("tbody button.edit").click(function() {
-		<!-- // 组装通过“post”提交的数据 -->
-		var sendData = {"oprt":"edit","id":$(this).attr("userGroupId")};
-		
-		$.ajax({
-			type : "post",
-			async : true,  //异步请求
-			url : "{$home}/admin/index/oprtUserGroup", 
-			<!-- // 发送到服务器的数据 -->
-			data : sendData,
-			timeout:1000,
-			<!-- // 指定服务器端response的数据类型为json -->
-			dataType:"json",
-			success:function(backData){	
-				var data=backData;
-				<!-- // 遍历data.result对象，其结构为{addnew: 0, submit: 0, … ,modify: 0}
-				$.each(data.result,function(k,v){
-				// 表单input:checkbox元素赋值
-				$("#modalUserGroup input:checkbox").each(function(){
-				
-					var n=$(this).attr("name");
-					if(k==n){
-						if(v==1){
-							$(this).prop("checked",true);
-						}else{
-							$(this).prop("checked",false);
-						}
-					}
-					
-					// 表单#oprtId赋值
-					if(k=="id"){
-						<!-- oprtId=v; -->
-						// 表单#oprtId赋值
-						$("#oprtId").val(v);
-					}
-				});
-						
-				// 表单input:text元素赋值
-				if(k=="name"){
-					$("#userGroupName").val(v);
-				}
-						
-				// 表单input:radio:[name='bgoEn']元素赋值
-				if(k=="bgo"){
-					if(v){
-						$("#modalUserGroup input:radio[name='bgoEn'][value='1']").prop("checked",true);
-						$("#modalUserGroup input:radio[name='bgoEn'][value='0']").prop("checked",false);
-					}else{
-						$("#modalUserGroup input:radio[name='bgoEn'][value='1']").prop("checked",false);
-						$("#modalUserGroup input:radio[name='bgoEn'][value='0']").prop("checked",true);
-					}
-				}
-						
-				// 表单input:radio:[name='userGroupEn']元素赋值
-				if(k=="enable"){
-					if(v){
-						$("#modalUserGroup input:radio[name='userGroupEn'][value='1']").prop("checked",true);
-						$("#modalUserGroup input:radio[name='userGroupEn'][value='0']").prop("checked",false);
-					}else{
-						$("#modalUserGroup input:radio[name='userGroupEn'][value='1']").prop("checked",false);
-						$("#modalUserGroup input:radio[name='userGroupEn'][value='0']").prop("checked",true);
-					}
-				}
-		
-				});
-				
-				// 设置input:radio选中元素的背景色
-				$("input:radio[name='bgoEn']").each(function(){
-					var n=$(this).is(":checked");
-					if(n){radioBg($(this),'有','无');}
-				});
-		
-				// 设置input:radio选中元素的背景色
-				$("input:radio[name='userGroupEn']").each(function(){
-					var n=$(this).is(":checked");
-					if(n){radioBg($(this));}
-				});
-				
-			},
-			error: function() {
-               	alert("<button>.en.click失败，请稍后再试！");
-            }
-		});	
-			
-		// 标题改名
-		$("#modalUserGroup h4").text("编辑用户组信息");
-			
-		//去掉标题底色
-		$(".modal-header").removeClass("bg-info");
-			
-		$("#btnResetUserGroup").hide();
-		// #btnAddUserGroup改名
-		$("#btnAddUserGroup").html('<span class="glyphicon glyphicon-ok-circle"></span>&nbsp;保存');
-		
-		// 清除输入框的格式
-		$(".modal input").parent().parent().removeClass("has-success").removeClass("has-error"); 
-		// 注意限定.tips/glyphicon-ok/glyphicon-remove所在标签.modal，否则会殃及其他标签的.tips/glyphicon-ok/glyphicon-remove
-    	$('.modal .tips').hide();
-    	$('.modal .glyphicon-ok').hide();
-    	$('.modal .glyphicon-remove').hide();
-		
-	});
-	
 	// 表单input:radio选中元素加背景色
-	$("input:radio[name='bgoEn']").change(function(){
-		var objChecked=$("input:radio[name='bgoEn']:checked");
-		radioBg(objChecked,'有','无');
+	$('input:radio').change(function(){
+		radioBg($('input:radio[name="adminEn"]:checked'));
+		radioBg($('input:radio[name="usergroupEn"]:checked'));
 	});
 	
-	// 表单input:radio选中元素加背景色
-	$("input:radio[name='userGroupEn']").change(function(){
-		var objChecked=$("input:radio[name='userGroupEn']:checked");
-		radioBg(objChecked);
-	});
-	
-	<!-- // 提交按钮#btnAddUserGroup -->
-	$('#btnAddUserGroup').click(function(event){
-		//JavaScript的数组处理方法every(callback)，对数组中的每个元素都执行一次
-		//callback函数，直到callback返回false，every就返回false；
-		//若全部元素执行callback后都返回ture，every就返回true。
-		//此处的用意是只要数组check中存在false，将该项找出，并把该项对应的input用“has-error”突出显示。
-		
+	<!-- // 新增按钮 -->
+	$('#btnCreate').click(function(event){
 		<!-- // jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作 -->
         event.preventDefault();
 		
@@ -267,17 +147,17 @@ $(document).ready(function(){
 		}else{
 			
 			<!-- // 组装通过“post”提交的数据 -->
-			var sendData = {"oprt":"add","userGroupName":$("#userGroupName").val(),"addnew":$("input:checkbox[name='addnew']").prop("checked"),"submit":$("input:checkbox[name='submit']").prop("checked"),"modify":$("input:checkbox[name='modify']").prop("checked"),"upfile":$("input:checkbox[name='upfile']").prop("checked"),"downfile":$("input:checkbox[name='downfile']").prop("checked"),"audit":$("input:checkbox[name='audit']").prop("checked"),"refuse":$("input:checkbox[name='refuse']").prop("checked"),"reject":$("input:checkbox[name='reject']").prop("checked"),"approve":$("input:checkbox[name='approve']").prop("checked"),"inspect":$("input:checkbox[name='inspect']").prop("checked"),"bgoEn":$("input:radio[name='bgoEn']").prop("checked"),"userGroupEn":$("input:radio[name='userGroupEn']").prop("checked"),"oprtId":$("#oprtId").val()};
+			var sendData = {"oprt":"add","userGroupName":$("#userGroupName").val(),"addnew":$("input:checkbox[name='addnew']").prop("checked"),"submit":$("input:checkbox[name='submit']").prop("checked"),"modify":$("input:checkbox[name='modify']").prop("checked"),"upfile":$("input:checkbox[name='upfile']").prop("checked"),"downfile":$("input:checkbox[name='downfile']").prop("checked"),"audit":$("input:checkbox[name='audit']").prop("checked"),"refuse":$("input:checkbox[name='refuse']").prop("checked"),"reject":$("input:checkbox[name='reject']").prop("checked"),"approve":$("input:checkbox[name='approve']").prop("checked"),"inspect":$("input:checkbox[name='inspect']").prop("checked"),"adminEn":$("input:radio[name='adminEn']").prop("checked"),"usergroupEn":$("input:radio[name='usergroupEn']").prop("checked"),"oprtId":$("#oprtId").val()};
 			
 			// 这种写法获得radio内属性value的值
-			<!-- "bgoEn":$("input:radio[name='bgoEn']:checked").val(),"userGroupEn":$("input:radio[name='userGroupEn']:checked").val() -->
+			<!-- "adminEn":$("input:radio[name='adminEn']:checked").val(),"usergroupEn":$("input:radio[name='usergroupEn']:checked").val() -->
 						
-			$("#modalUserGroup").modal("hide");
+			$("#modalEditUsergroup").modal("hide");
 				
 			$.ajax({
 				type : "post",
 				async : true,  //异步请求
-				url : "{$home}/admin/index/oprtUserGroup", 
+				url : "oprtUserGroup", 
 				<!-- // 发送到服务器的数据 -->
 				data : sendData,
 				timeout:1000,
@@ -298,7 +178,7 @@ $(document).ready(function(){
 								<!-- window.location.reload(true); -->
 								
 								
-								$("#modalUserGroup").modal("show");
+								$("#modalEditUsergroup").modal("show");
 							}else{
 								$("#content").load("sys_usergroup");
 								<!-- $('#btnResetUserGroup').click(); -->
@@ -315,7 +195,7 @@ $(document).ready(function(){
 							con=e;
 							if(true==con){
 								// 返回"#addUser".modal页面
-								$("#modalUserGroup").modal("show");
+								$("#modalEditUsergroup").modal("show");
 							}else{
 								$('#btnResetUserGroup').click();
 							}
@@ -334,155 +214,28 @@ $(document).ready(function(){
 		
 	});
 	
-	//<button class='del'> ajax事件
-	$("tbody button.del").click(function() {
-		// 组装通过“post”提交的数据
-		var name=$(this).parent().parent().find('.name').text();
-		var sendData = {"oprt":"delete","id":$(this).attr("userGroupId"),"userGroupName":name};
+	<!-- // 重置按钮 -->
+	$('#btnReset').click(function(){
+		<!-- $('input:radio[name="adminEn"][value="1"]').next().removeClass("label-info").addClass("label-default"); -->
+		<!-- $('input:radio[name="usergroupEn"][value="1"]').next().removeClass("label-info").addClass("label-default"); -->
+		radioBg($('input:radio[name="adminEn"]:checked'));
+		console.log(1);
+		radioBg($('input:radio[name="usergroupEn"]:checked'));
+		console.log(2);	
 		
-		$.confirm('确定删除【'+name+'】用户组？',function(e){
-			con=e;
-			if(true==con){
-				$.ajax({
-					type : "post",
-					async : true,  //异步请求
-					url : "{$home}/admin/index/oprtUserGroup", 
-					// 发送到服务器的数据
-					data : sendData,
-					timeout:1000,
-					// 指定服务器端response的数据类型为json
-					dataType:"json",
-					success:function(backData){
-						var data=backData;
-						$.alert(data.msg);						
-					},
-					error: function() {
-               			alert("删除失败，请稍后再试！");
-            		}
-				});
-				$("#content").load("sys_usergroup");		
-			}
-			<!-- else{ -->
-				<!-- 			 -->
-			<!-- } -->
-		}).ok('确定(Y)').cancel('取消(N)');
+		<!-- $('input:radio[value="1"]').each(function(){			 -->
+			<!-- if($(this).prop('checked')){ -->
+				<!-- $(this).next().removeClass("label-default").addClass("label-info"); -->
+				<!-- console.log($(this).prop('checked')); -->
+			<!-- }else{ -->
+				<!-- $(this).next().removeClass("label-info").addClass("label-default"); -->
+				<!-- console.log($(this).prop('checked')); -->
+			<!-- }			 -->
+		<!-- }); -->
 	
 	});
-	
-	<!-- //<button class='en'> ajax事件-->
-	$("tbody button.en").click(function() {
-  		
-		<!-- // 组装通过“post”提交的数据 -->
-		var sendData = {"oprt":"enable","id":$(this).attr("userGroupId")};
-				
-		$.ajax({
-			type : "post",
-			async : true,  //异步请求
-			url : "{$home}/admin/index/oprtUserGroup", 
-			<!-- // 发送到服务器的数据 -->
-			data : sendData,
-			timeout:1000,
-			<!-- // 指定服务器端response的数据类型为json -->
-			dataType:"json",
-			success:function(backData){
-				var data=backData;
-						
-			},
-			error: function() {
-               	alert("<button>.en.click失败，请稍后再试！");
-            }
-		});	
-		
-		$(this).prevAll('button').show();
-        $(this).prev('span').hide();
-		$(this).hide();
-		$(this).parent().parent().removeClass("danger text-muted");
-	
-	});
-	
-	
-	<!-- //<button class='dis'> ajax事件-->
-	$("tbody button.dis").click(function() {
-  		
-		<!-- // 组装通过“post”提交的数据 -->
-		var sendData = {"oprt":"disable","id":$(this).attr("userGroupId")};
-				
-		$.ajax({
-			type : "post",
-			async : true,  //异步请求
-			url : "{$home}/admin/index/oprtUserGroup", 
-			<!-- // 发送到服务器的数据 -->
-			data : sendData,
-			timeout:1000,
-			<!-- // 指定服务器端response的数据类型为json -->
-			dataType:"json",
-			success:function(backData){
-				var data=backData;
-						
-			},
-			error: function() {
-               	alert("<button>.dis.click失败，请稍后再试！");
-            }
-		});
-		
-		$(this).prevAll().hide();
-		$(this).hide();
-		$(this).nextAll().show();
-		// “启用”有关按钮显示
-		<!-- $(this).nextAll().find('span').show(); -->
-		<!-- $(this).nextAll().find('.en').show(); -->
-		
-		$(this).parent().parent().addClass("danger text-muted");
-	
-	});
-	
-	<!-- userGroupName内容验证 -->
-	$("#userGroupName").change(function(){
-        if(regUserGroupName.test($(this).val())){
-			success($(this),0);	
-		}else if ($(this).val().length < 5) {
-        	if($(this).val()==''){
-				fail($(this), 0, '用户组名不能为空。');
-			}else{
-				fail($(this), 0, '用户组名太短，不能少于5个字符。');
-			}
-		}
-		else {
-        	fail($(this), 0, '用户组名为英文、数字、中文和下划线，但不能以数字开头。')
-    	}
-  	});
-	
-	// 设置重置后modal中各元素默认格式
-	$('#btnResetUserGroup').click(function() {
-		
-		// 清除输入框的格式
-		$(".modal input").parent().parent().removeClass("has-success").removeClass("has-error"); 
-		
-		// 注意限定.tips/glyphicon-ok/glyphicon-remove所在标签.modal，否则会殃及其他标签的.tips/glyphicon-ok/glyphicon-remove
-    	$('.modal .tips').hide();
-    	$('.modal .glyphicon-ok').hide();
-    	$('.modal .glyphicon-remove').hide();
-		
-		// 设置input:radio选中元素及其背景色
-		// 默认value='0'选中
-		$("input:radio[name='bgoEn'][value='0']").prop("checked",true)
-		$("input:radio[name='bgoEn']").each(function(){
-			var n=$(this).is(":checked");
-			if(n){radioBg($(this),'有','无');}
-		});
-		
-		// 设置input:radio选中元素的背景色
-		// 默认value='1'选中
-		$("input:radio[name='userGroupEn'][value='1']").prop("checked",true)
-		$("input:radio[name='userGroupEn']").each(function(){
-			var n=$(this).is(":checked");
-			if(n){radioBg($(this),'是','否');}
-		});
-		
-	});	
 	
 <!-- function -->
-
 // 正则表达式，可以为英文、数字、中文和下划线,但不能以数字开头,unicode编码中的汉字范围:\u2E80-\u9FFF
 var regUserGroupName = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{4,19}$/;
 
@@ -513,37 +266,16 @@ function fail(Obj, counter, msg) {
 }
 	
 // 设置input:radio选中元素的背景色，适用于有2个radio，都带有“value”属性，第一个value=1，第二个为0。
-function radioBg(objChecked,str1st,str2nd){
-	
-	var v=objChecked.val();
-	var str1=str1st;
-	var str2=str2nd;
-	
-	// 默认第一个radio后显示的字符
-	if(str1==null){
-		str1="是";
-	}
-	
-	// 默认第二个radio后显示的字符
-	if(str2==null){
-		str2="否";
-	} 	
-	
-	var y='<span class="lable label-info" style="padding:2px;border-radius:3px;">&nbsp;'+str1+'&nbsp;</span>'; 
-	var n='<span class="lable label-warning" style="padding:2px;border-radius: 3px;">&nbsp;'+str2+'&nbsp;</span>';
-	objChecked.nextAll('span').remove();
-	if(v==1){
-		objChecked.after(y);
-		objChecked.parent().next().find('span').removeClass("lable label-warning");
+function radioBg(obj){	
+	if(obj.val()==1){
+		obj.next().removeClass("label-default").addClass("label-info");
 	}else{
-		objChecked.after(n);
-		objChecked.parent().prev().find('span').removeClass("lable label-info");
+		obj.parent().prev().find('span').removeClass("label-info").addClass("label-default");
 	}	
 
 }
 
 <!--/ function -->
-		
 	
 });
 

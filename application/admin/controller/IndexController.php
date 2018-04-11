@@ -948,12 +948,15 @@ class IndexController extends \think\Controller
       //模板文件名
       if(substr($tplFile,0,1)=='#'){
         $tplFile=substr($tplFile,1);
+        
         $this->redirect($tplFile);
-      }else{
+      }
+      else{
+        
         return view($tplFile);
       }
       
-     // return view($sId);
+     //return view($tplFile);
     
     }
     

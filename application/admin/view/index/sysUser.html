@@ -1,35 +1,19 @@
-<!-- <div class="hy-box"> -->
-	<!-- <p><strong>选择用户类型</strong></p> -->
-	
-	<!-- <p><strong>用户列表</strong></p> -->
-	
-	<!-- <p><strong>用户列表分页</strong></p>	 -->
-				
-				
-<!-- </div> -->
-
-<!-- <div class="panel panel-default "> -->
-		<!-- <div class="panel-heading"> -->
-		<h4>
-		<strong>系统用户总数：</strong><span class="label label-warning badge">{$usersNum}</span>
-		</h4>
-		<div>用户管理&nbsp;
+<!-- sysUser.html -->
+<div>
+		<h4><span class="label label-warning" style="font-size:16px;">系统用户总数&nbsp;<span class="badge">{$usersNum}</span></span></h4>
+		<p>用户&nbsp;
 			<!--// bootstap通过button调用Model -->
 			<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalEditUser">新增&nbsp;<span class="glyphicon glyphicon-file"></span></button>
 				
 			<button id="btnSearchInfo" type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divCollapse">显示搜索&nbsp;<span class="glyphicon glyphicon-collapse-down"></span></button>
 				
-			<button id="btnDiv1Reset" type="button" class="btn btn-primary btn-sm">重置&nbsp;<span class="glyphicon glyphicon-refresh"></span></button>
-			
-		</div> 
-		
-		<br>		
-		<!-- </div> -->
+			<button id="btnReset" type="button" class="btn btn-primary btn-sm">重置&nbsp;<span class="glyphicon glyphicon-refresh"></span></button>	
+		</p> 		
 		
 		<div id="divUser" >	
 			
 			<div id="divCollapse" class="collapse">
-			<form method="get" action="{$home}/admin/index/sys_user#div1" id="userSearch" class="form-inline">
+			<form method="get" action="{$home}/admin/index/sysUser#sysUser" id="userSearch" class="form-inline">
 				<div class="form-group">
 					<label class="" for="searchUserName">用户名</label>
 					<input class="form-control" id="searchUserName" name="searchUserName" type="text" value="{$searchUserName}" placeholder="...不限">
@@ -60,7 +44,7 @@
 				
 				<button id="btnSearchUser" type="button" class="btn btn-primary btn-sm">搜索&nbsp;<span class="glyphicon glyphicon-search"></span></button>
 				
-				<!-- <input type="reset" class="btn btn-primary btn-sm" value="重置" id="btnDiv1Reset"><span class="glyphicon glyphicon-refresh"></span> -->
+				<!-- <input type="reset" class="btn btn-primary btn-sm" value="重置" id=""><span class="glyphicon glyphicon-refresh"></span> -->
 				
 			</form>
 			<hr>
@@ -131,10 +115,8 @@
 						
 				</div>
 			</div>
-			
-			
 		</div>
-<!-- </div> -->
+</div>
 
 <!-- Modal "modalEditUser" -->
 <div class="modal fade" id="modalEditUser" role="dialog">
@@ -296,7 +278,7 @@ $(function(){
 	<!-- $(this).data("bs.tooltip").options.placement="top"; -->
 	<!-- $(this).data("bs.tooltip").options.title="点击后降序"; -->
 	
-	<!-- // 在#addUser的model显示之前，应用show.bs.modal事件将#addUser的model内容准备好 -->
+	<!-- // 在#modalEditUser的model显示之前，应用show.bs.modal事件将#modalEditUser的model内容准备好 -->
 	$('#modalEditUser').on('show.bs.modal', function () {
         
 		$('#divEditUser_load').load('tplFile',{'tplFile':'editUser'});
@@ -421,8 +403,8 @@ $(function(){
 	});
 	
 	<!-- // 页面重新加载 -->
-	$("#btnDiv1Reset").click(function(){
-		$("#content").load("sys_user");
+	$("#btnReset").click(function(){
+		$("#content").load("sysUser");
 		
 	});
 
@@ -451,8 +433,8 @@ $(function(){
 		// 组装通过“post”提交的数据，名称与后端所用一致
 		var sendData = {"sortName":sortName,"sort":sort,"userTableRows":rows,"searchUserName":searchUserName,"searchDept":searchDept,"searchUserGroup":searchUserGroup,"pageUserNum":pageUserNum};
 		
-		// jquery load()方法，加载sys_user.html页面内容到index.html页面中<div id="content"></div>
-		$("#content").load("sys_user",sendData);
+		// jquery load()方法，加载sysUser.html页面内容到index.html页面中<div id="content"></div>
+		$("#content").load("sysUser",sendData);
 	
 	}
 	

@@ -610,14 +610,14 @@ $(document).ready(function(){
 	}
 	
 	//**函数名：inputsNotEmpty
- 	//* 作用：检查所有的input(class="form-control empty-check")是否都填入内容，作用：无内容的加'has-error'和tooltip，在第一个无内容的input显示tooltip提示返回一个结果（true/false）
+ 	//* 作用：检查所有的input(class="form-control empty-check")是否都填入内容，
+	//*效果：无内容的加'has-error'和tooltip，在第一个无内容的input显示tooltip提示
+	//*返回：true/在第一个无内容的input显示tooltip提示
 	//* 参数，类型：对象。值：不为空。说明：。
 	function inputsNotEmpty(){
-		
 		var obj=$('.empty-check');
 		var arr=[];
-		var i=0;
-		//检查所有的input(class="form-control")是否都填入内容并不为0，无内容的加'has-error'和tooltip
+		var i=0;	//检查所有的input(class="form-control")是否都填入内容并不为0，无内容的加'has-error'和tooltip
 		for (i;i<obj.length;i++){
 			if(obj.eq(i).val()!=0){
 				<!-- obj.eq(i).removeClass('bg-danger'); -->

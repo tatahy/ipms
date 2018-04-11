@@ -12,7 +12,7 @@
     left: 0;
     background-color: #f2f2f2;
     overflow-x: hidden;
-    transition: 0s;
+    transition: 0.5s;
     //padding-top: 50px;
 }
 
@@ -30,7 +30,8 @@
 
 <div id="divContainer" class="container-fluid" >
 	<div id="mySidenav" class="sidenav">
-		<a id="closeBtn" href="#" class="text-primary" ><span class="glyphicon glyphicon-chevron-left" style="margin-left:60%;margin-top:10px;margin-bottom:10px;">收起</span></a>
+		<!-- <a id="closeBtn" href="#" class="text-primary" ><span class="glyphicon glyphicon-chevron-left" style="margin-left:60%;margin-top:10px;margin-bottom:10px;">收起</span></a> -->
+		<button id="closeBtn" class="btn btn-link btn-lg" style="margin-left:70%;"><span class="glyphicon glyphicon-chevron-left"></span></button>
 		
 		<!-- nav 与 jQuery结合实现菜单栏导航效果-->
 		<ul class="nav nav-pills nav-stacked" >
@@ -52,7 +53,9 @@
 	</div>
 	
 	<div id="main">
-  		<a id="openBtn" href="#" class="text-primary"><span class="glyphicon glyphicon-chevron-right" style="margin-top:10px;margin-bottom:10px;">展开</span></a>
+  		<!-- <a id="openBtn" href="#" class="text-primary"><span class="glyphicon glyphicon-chevron-right" style="margin-top:10px;margin-bottom:10px;">展开</span></a> -->
+		
+  		<button id="openBtn"  class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-chevron-right"></span></button>
   
   		<div id="content"><p class="text-center" style="font-size:28px;">加载中……</p></div>
 	</div>	
@@ -64,21 +67,28 @@
 
 <script>
 $(document).ready(function(){
-    
 	loadTplFile(window.location.hash);
 	
 	<!-- //点击nav-pills中的各个按钮后，显示对应的页面-->
 	$('.aTab').click(function(){
-        var sId = $(this).attr('href');  //a的attr属性值
-		window.location.hash = sId;  //设置锚点
+        var sId = $(this).attr('href');  //a的href属性值即是页面的锚点值
+		<!-- window.location.hash = sId;  //设置锚点 -->
 		//a所在li高亮
 		$(this).tab('show');
         loadTplFile(sId);              //加载锚点对应的页面文件
     });	
+	//锚点值与a的href属性值相同的a所在li高亮
+	$('.aTab').each(function(){
+		if(window.location.hash==$(this).attr('href')){
+			$(this).tab('show');
+		}
+    });	
 	//显示SideNavbar
 	$('#openBtn').click(function(){
-        $('#mySidenav').css('width','150px');
+		$('#mySidenav').css('width','150px');
+		//#main的内容不被遮蔽就需要修改'margin-left'与#mySidenav的'width'相同
     	$('#main').css('margin-left','150px');
+		//隐藏
 		$(this).hide();
     });	
 	//关闭SideNavbar
@@ -100,19 +110,7 @@ $(document).ready(function(){
 
 
 });
-    
-<!-- function -->
-<!-- function openNav() { -->
-    <!-- document.getElementById("mySidenav").style.width = "150px"; -->
-    <!-- document.getElementById("main").style.marginLeft = "150px"; -->
-<!-- } -->
 
-<!-- function closeNav() { -->
-    <!-- document.getElementById("mySidenav").style.width = "0"; -->
-    <!-- document.getElementById("main").style.marginLeft= "0"; -->
-<!-- } -->
-<!--/ function -->
-	
 </script>
 
 
