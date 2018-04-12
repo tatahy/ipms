@@ -640,9 +640,67 @@ $(document).ready(function(){
 
 <!--  HY 2018/4/9 -->	
 <script>
-//当给extend方法传递一个以上的参数时，它会将所有参数对象合并到第一个里；同时，如果对象中有同名属性是，合并的时候后面的会覆盖前面的。
+//当给extend方法传递一个以上的参数时，它会将所有参数对象合并到第一个里；同时，如果对象中有同名属性时，合并的时候后面的会覆盖前面的。
 var param=$.extend({},fmIssPatDataJson,fmAttDataJson,{'oprt':'_ADDNEW','auth':auth,'patId':data.patId});
 //上述代码的含义：param的值是4个参数对象的合集。
+</script>
+
+<!--/  HY 2018/4/2 -->	
+
+<!--  HY 2018/4/2 -->
+//form的reset事件，自动完成form中各个元素的值回滚，并在reset后触发其他的事件，
+<html>
+<form>
+    <select>
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+    </select>
+   
+    <br>
+    <input type="test" />
+    <input id="in" type="reset" value="Reset" />
+</form> 
+</html>
+
+	
+<script>
+//To execute code after html form reset
+
+//方法一
+$('#in').click(function(){
+	
+	setTimeout(function(){
+		alert("changed");
+	},50);
+	
+});
+//方法二
+$('#in').click(function(event){
+
+     	alert('before reset: ');
+    
+     	event.preventDefault();// stops the form from resetting after this function
+     	$(this).closest('form').get(0).reset();// resets the form before continuing the function
+     
+     	alert('after reset: ');// executes after the form has been reset
+     
+
+ });
+</script>
+
+<script>
+//自动到时转换和点击转换
+//（To reset an interval you need to store it to a variable then call clearInterval on it before creating the new one.）
+// on load
+var interval = setInterval(imagechanger, 5000);
+
+$('body').on('click', '#next', function() {
+    clearInterval(interval); // clear current interval
+    imagechanger(); // call instantly
+    interval = setInterval(imagechanger, 5000); // create new interval   
+});
 </script>
 
 <!--/  HY 2018/4/2 -->	
