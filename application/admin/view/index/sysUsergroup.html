@@ -1,20 +1,26 @@
 <!-- sysUsergroup.html -->
 <div>
 	<h4><span class="label label-info" style="font-size:16px;">系统用户组总数&nbsp;<span class="badge">{ $usergrpoupsNum}</span></span></h4>
-	<p>用户组&nbsp;
+	<p>
 		<!--// bootstap通过button调用Model -->		
 		<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalEditUsergroup"><strong>新增</strong>&nbsp;<span class="glyphicon glyphicon-duplicate"></span></button>
 				
 	</p> 	
 			
-	<div class="table-responsive">	
-		<table class="table table-hover table-condensed">
+	<div class="table-responsive">
+	
+		<table class="table table-hover table-condensed table-bordered">
+			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>用户组列表</h4></caption>	
 			<thead>
 				<tr >
 					<th class="text-center">序号</th>
 					<th>用户组名</th>
-					<th class="text-center">前台权限</th>
-					<th class="text-center">后台权限</th>
+					<th class="text-center">“事务”权限</th>
+					<th class="text-center">“专利”权限</th>
+					<th class="text-center">“项目”权限</th>
+					<th class="text-center">“论文”权限</th>
+					<th class="text-center">“附件”权限</th>
+					<th class="text-center">“管理”权限</th>
 					<th>操作</th>
 				</tr>
 			</thead>
@@ -24,22 +30,53 @@
 				<tr class="text-center">
 					<td>{$i}</td>
 					<td class="name text-left">{$vo.name}</td>
-					<td class="authority">
+					<!-- //iss -->
+					<td class="authority"> 
 						<div style="padding-top:3px">
-							<span class="" title="add" value="{$vo.addnew}">新增</span>
-							<span class="" title="submit" value="{$vo.submit}">提交</span>
-							<span class="" title="modify" value="{$vo.modify}">修改</span>
-							<span class="" title="upload" value="{$vo.upfile}">上传</span>
-							<span class="" title="download" value="{$vo.downfile}">下载</span>
-							<span class="" title="audit" value="{$vo.audit}">审核</span>
-							<span class="" title="return" value="{$vo.refuse}">返回</span>
-							<span class="" title="reject" value="{$vo.reject}">驳回</span>
-							<span class="" title="inspect" value="{$vo.inspect}">检查</span>
-							<span class="" title="approve" value="{$vo.approve}">批准</span>
+						{foreach name="$vo.authority.iss" item="v" }
+    						<span value="{$v}">{$key}</span>
+						{/foreach}
+						</div>
+					</td>
+					<!-- //pat -->
+					<td class="authority"> 
+						<div style="padding-top:3px">
+						{foreach name="$vo.authority.pat" item="v" }
+    						<span value="{$v}">{$key}</span>
+						{/foreach}
+						</div>
+					</td>
+					<!-- //pro -->
+					<td class="authority"> 
+						<div style="padding-top:3px">
+						{foreach name="$vo.authority.pro" item="v" }
+    						<span value="{$v}">{$key}</span>
+						{/foreach}
+						</div>
+					</td>
+					<!-- //the -->
+					<td class="authority"> 
+						<div style="padding-top:3px">
+						{foreach name="$vo.authority.the" item="v" }
+    						<span value="{$v}">{$key}</span>
+						{/foreach}
+						</div>
+					</td>
+					<!-- //att -->
+					<td class="authority"> 
+						<div style="padding-top:3px" class="authatt">
+						{foreach name="$vo.authority.att" item="v" }
+    						<span value="{$v}">{$key}</span>
+						{/foreach}
 						</div>
 					</td>
 					<td class="authority">
-						<div style="padding-top:3px"><span class="" value="{$vo.bgo}" >访问后台</span></div>
+						<div style="padding-top:3px">
+						{foreach name="$vo.authority.admin" item="v" }
+    						<span value="{$v}">{$key}</span>
+						{/foreach}	
+							<!-- <span class="" value="{ $vo.bgo}" >访问后台</span> -->
+						</div>
 					</td>
 					<td class="button text-left">
 						<button type="button" class="edit btn-link" userGroupId="{$vo.id}" data-toggle="modal" data-target="#modalEditUsergroup"><span class="glyphicon glyphicon-edit"></span>编辑</button>
@@ -55,6 +92,21 @@
 				{/volist}
 			</tbody>
 		</table>
+	</div>
+	<div id="divUsergroupTableRows" class="col-sm-12 text-right search">
+		<div class="col-sm-10 text-right">{$ pageUsergroup}</div>
+						
+		<div class="form-group form-group-sm col-sm-2">
+			<span class="">每页记录行数：</span>
+			<select class="form-control" id="usergroupTableRows">
+				<option value="5">5</option>
+				<option value="10">10</option>
+				<option value="15">15</option>
+				<option value="30">30</option>
+				<option value="50">50</option>
+			</select>
+						
+		</div>
 	</div>
 </div>
 

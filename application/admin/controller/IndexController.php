@@ -8,6 +8,7 @@ use think\Model;
 use app\user\model\User as UserModel;
 use app\user\model\Rolety as RoletyModel;
 use app\admin\model\Dept as DeptModel;
+use app\admin\model\Usergroup as UsergroupModel;
 
 
 class IndexController extends \think\Controller
@@ -1201,7 +1202,8 @@ class IndexController extends \think\Controller
       //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
      
       // 查出所有用户组
-      $groups = RoletyModel::where('id','>',0)
+      $groups = UsergroupModel::where('id','>',0)
+      //$groups = RoletyModel::where('id','>',0)
                               ->order('name asc')
                               ->select(); 
       $this->assign([
