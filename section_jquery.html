@@ -242,6 +242,26 @@ $('input:radio[name="attUpload"][value="1"]').prop('checked',true);
 		});
 	});
 
+<!-- // 遍历json对象组装HTML语句 -->
+	var str="";
+	var data={"copy": 1, "move": 0, "erase":0, "upload":0, "download":0}
+	$.each(data,function(k,v){
+		str+="<span value='"+v+"'>"+k+" </span>";
+	});
+	console.log(str);
+	
+	<!-- //可嵌套取出key/value组装HTML语句-->
+	var str1="";
+	var data1={"att": {"copy": 1, "move": 0, "erase":0, "upload":0, "download":0},"iss": {"edit": 1, "audit":0, "approve": 0, "execute":0, "maintain": 0},"pat": {"edit": 1, "audit": 0, "approve": 0, "execute": 0, "maintain": 0},"pro": {"edit": 1, "audit":0, "approve": 0, "execute":0, "maintain": 0},"the": {"edit": 1, "audit":0, "approve": 0, "execute":0, "maintain": 0}}
+	$.each(data1,function(k1,v1){
+		$.each(v1,function(k2,v2){
+			str+="<span value='"+v2+"'>"+k2+" </span>";
+		});
+		$('.auth'+k1).html(str);
+	});
+	console.log(str);
+
+
 </script>
 <!--/  HY 2018/2/8 -->	
 

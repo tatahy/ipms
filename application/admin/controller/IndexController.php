@@ -1201,15 +1201,50 @@ class IndexController extends \think\Controller
       $this->_loginUser();
       //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
      
-      // 查出所有用户组
-      $groups = UsergroupModel::where('id','>',0)
-      //$groups = RoletyModel::where('id','>',0)
+     // 查出所有的用户组并分页，根据“strOrder”排序，设定前端页面显示的锚点（hash值）为“div1”，设定分页页数变量：“pageUserNum”
+        // 带上每页显示记录行数$userTableRows和3个查询词，实现查询结果分页显示。
+//        $users = UserModel::where('id','>',0)
+//                            ->where('dept',$searchDept)
+//                            ->where($map)
+//                            ->order($strOrder)
+//                            ->paginate($userTableRows,false,['type'=>'bootstrap','fragment'=>'div1','var_page'=>'pageUserNum',
+//                            'query'=>['userTableRows'=>$userTableRows,'searchDept'=>$searchDept,'searchUserName'=>$searchUserName,'searchUserGroup'=>$searchUserGroup]]);                     
+//          
+        // 分页页数变量：“usergroupPageNum”
+      if(!empty($request->param('usergroupPageNum'))){
+          $usergroupPageNum=$request->param('usergroupPageNum');
+      }else{
+          $usergroupPageNum=1;
+      }
+      
+      //$usergroupTableRows接收页面传来的分页时每页表格显示的记录行数，初始值为10
+        if(!empty($request->param('usergroupTableRows'))){
+          $usergroupTableRows=$request->param('usergroupTableRows');
+        }else{
+          $usergroupTableRows=10;
+        }
+       
+        // 查出所有用户组
+        $usergroup = UsergroupModel::where('id','>',0)
                               ->order('name asc')
-                              ->select(); 
+                              ->paginate($usergroupTableRows,false,['type'=>'bootstrap','var_page'=>'usergroupPageNum']);                     
+        
+        // 分页变量
+        $usergroupPage = $usergroup->render();
+        
+        // 记录总数
+        $usergroupNum = UsergroupModel::where('id','>',0)
+                            ->count();
+     
+      
       $this->assign([
               'home'=>$request->domain(),
               // 所有用户组信息
-              'groups'=>$groups,
+              'usergroup'=>$usergroup,
+              'usergroupNum'=>$usergroupNum,
+              'usergroupPage'=>$usergroupPage,
+              'usergroupPageNum'=>$usergroupPageNum,
+              'usergroupTableRows'=>$usergroupTableRows
         ]);
       return view();
     }
@@ -1234,6 +1269,49 @@ class IndexController extends \think\Controller
     
      // 用户CDUR，接收客户端通过Ajax，post来的参数，返回json数据
     public function userOprt(Request $request,UserModel $userMdl)
+    {
+      $this->_loginUser();
+      
+      $oprt=$request->param('oprt');
+       
+      switch($oprt){
+        case "_CREATE":
+        
+        break;
+        
+        case "_UPDATE":
+        
+        break;
+        
+        case "_DELETE":
+        
+        break;
+        
+        case"_DISABLE":
+          $userMdl::update(['enable'=> 0], ['id' => $id]);
+          
+          $result='success';
+          // 返回前端JSON数据
+          return ['result'=>$result,'uid'=>$id];
+          
+        break;
+        
+        case"_ENABLE":
+          $userMdl::update(['enable'=> 1], ['id' => $id]);
+          
+          $result='success';
+          // 返回前端JSON数据
+          return ['result'=>$result,'uid'=>$id];
+          
+        break;
+        
+        
+      }
+      
+    }
+    
+    // 用户组CDUR，接收客户端通过Ajax，post来的参数，返回json数据
+    public function usergroupOprt(Request $request,UsergroupModel $usergroupMdl)
     {
       $this->_loginUser();
       

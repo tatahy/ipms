@@ -1,5 +1,4 @@
 <!-- //editUsergroup.html -->
-
 	
 <form id="fmUsergroup" role="form" action="" method="post">
 	<input id="oprtId" type="text" name="" value="" class="sr-only">
@@ -7,17 +6,18 @@
 		<div class="myLegend"><span class="label label-info"><span class="glyphicon glyphicon-duplicate"></span>&nbsp;用户组信息</span></div>
 		<div class="row myRow">		
 		<div class="form-group has-feedback col-sm-6">
-			<label for="userGroupName">用户组名</label>
+			
+			<label for="usergroupName">用户组名</label>
 			<!-- // bootstrap实现矢量图在输入框开头 -->
-			<div class="input-group">
+			<div class="input-group ">
 				<span class="input-group-addon"><span class="glyphicon glyphicon-education"></span></span>
 						
-				<input type="text" class="form-control textUserGroup" id="userGroupName" name="userGroupName" placeholder="输入用户组名">
+				<input type="text" class="form-control textUserGroup" id="usergroupName" name="usergroupName" placeholder="输入用户组名">
 			</div>	
 			<!-- // 配合jQuery 中的内容验证代码-->
 			<span style="color:red;display: none;" class="tips"></span>
-      		<span style="display: none;"  class="glyphicon glyphicon-ok form-control-feedback"></span>
-			<span style="display: none;" class="glyphicon glyphicon-remove form-control-feedback"></span>		
+      		<span style="display: none;margin-right:17px;"  class="glyphicon glyphicon-ok form-control-feedback"></span>
+			<span style="display: none;margin-right:17px;" class="glyphicon glyphicon-remove form-control-feedback"></span>		
 		</div>
 		</div>
 	</div>
@@ -110,19 +110,33 @@
 		</div>
 	</div>	
 		<hr>
-
+	<div class="row myRow">	
 		<button id="btnCreate" type="submit" class="btn btn-primary btn-sm" data-oprt="_CREATE"><span class="glyphicon glyphicon-ok"></span>&nbsp;新增</button>
+		
+		<button id="btnUpdate" type="submit" class="btn btn-primary btn-sm" data-oprt="_UPDATE"><span class="glyphicon glyphicon-ok"></span>&nbsp;保存</button>
 	
 		<div class="pull-right">	
 			<button id="btnReset" type="reset" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-refresh"></span>&nbsp;重置</button>
 				
 			<button type="button" class="btn btn-warning btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 取消</button>
-		</div>		
+		</div>
+	</div>			
 	</form>
 
 	
 <script>
 $(document).ready(function(){
+	//根据#spOprt的值选定button
+	$('button:submit').each(function(){
+		<!-- var oprt=$('#modalEditUsergroup').attr('data-oprt');  -->
+		var oprt=$(this).closest('.modal').attr('data-oprt'); 
+		if($(this).attr('data-oprt')==oprt){
+			$(this).show();
+		}else{
+			$(this).hide();
+		}
+		
+	});
 	
 	<!-- // 新增按钮 -->
 	$('#btnCreate').click(function(event){
@@ -143,7 +157,7 @@ $(document).ready(function(){
 		}else{
 			
 			<!-- // 组装通过“post”提交的数据 -->
-			var sendData = {"oprt":"add","userGroupName":$("#userGroupName").val(),"addnew":$("input:checkbox[name='addnew']").prop("checked"),"submit":$("input:checkbox[name='submit']").prop("checked"),"modify":$("input:checkbox[name='modify']").prop("checked"),"upfile":$("input:checkbox[name='upfile']").prop("checked"),"downfile":$("input:checkbox[name='downfile']").prop("checked"),"audit":$("input:checkbox[name='audit']").prop("checked"),"refuse":$("input:checkbox[name='refuse']").prop("checked"),"reject":$("input:checkbox[name='reject']").prop("checked"),"approve":$("input:checkbox[name='approve']").prop("checked"),"inspect":$("input:checkbox[name='inspect']").prop("checked"),"adminEn":$("input:radio[name='adminEn']").prop("checked"),"usergroupEn":$("input:radio[name='usergroupEn']").prop("checked"),"oprtId":$("#oprtId").val()};
+			var sendData = {"oprt":"add","usergroupName":$("#usergroupName").val(),"addnew":$("input:checkbox[name='addnew']").prop("checked"),"submit":$("input:checkbox[name='submit']").prop("checked"),"modify":$("input:checkbox[name='modify']").prop("checked"),"upfile":$("input:checkbox[name='upfile']").prop("checked"),"downfile":$("input:checkbox[name='downfile']").prop("checked"),"audit":$("input:checkbox[name='audit']").prop("checked"),"refuse":$("input:checkbox[name='refuse']").prop("checked"),"reject":$("input:checkbox[name='reject']").prop("checked"),"approve":$("input:checkbox[name='approve']").prop("checked"),"inspect":$("input:checkbox[name='inspect']").prop("checked"),"adminEn":$("input:radio[name='adminEn']").prop("checked"),"usergroupEn":$("input:radio[name='usergroupEn']").prop("checked"),"oprtId":$("#oprtId").val()};
 			
 			// 这种写法获得radio内属性value的值
 			<!-- "adminEn":$("input:radio[name='adminEn']:checked").val(),"usergroupEn":$("input:radio[name='usergroupEn']:checked").val() -->
@@ -210,6 +224,17 @@ $(document).ready(function(){
 		
 	});
 	
+	<!-- // 保存按钮 -->
+	$('#btnUpdate').click(function(event){
+		<!-- // jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作 -->
+        event.preventDefault();
+		
+		var flag=check.every(function(value) {
+            return value == true
+        });
+		
+	});
+	
 	// 表单input:radio选中元素改变背景色
 	$('input:radio').change(function(){
 		radioBg($('input:radio[name="adminEn"]:checked'));
@@ -224,6 +249,8 @@ $(document).ready(function(){
 		checkboxBg($(this));
 	});
 	
+	
+	
 	<!-- // 重置按钮 -->
 	$('#btnReset').click(function(e){
 		e.preventDefault();
@@ -236,6 +263,22 @@ $(document).ready(function(){
 		});
 	
 	});
+	
+	<!-- usergroupName内容验证 -->
+	$("#usergroupName").change(function(){
+        if(regUserGroupName.test($(this).val())){
+			success($(this),0);	
+		}else if ($(this).val().length < 5) {
+        	if($(this).val()==''){
+				fail($(this), 0, '用户组名不能为空。');
+			}else{
+				fail($(this), 0, '用户组名太短，不能少于5个字符。');
+			}
+		}
+		else {
+        	fail($(this), 0, '用户组名为英文、数字、中文和下划线，但不能以数字开头。')
+    	}
+  	});
 	
 <!-- function -->
 // 正则表达式，可以为英文、数字、中文和下划线,但不能以数字开头,unicode编码中的汉字范围:\u2E80-\u9FFF

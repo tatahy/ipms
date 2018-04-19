@@ -1,9 +1,9 @@
 <!-- sysUsergroup.html -->
 <div>
-	<h4><span class="label label-info" style="font-size:16px;">系统用户组总数&nbsp;<span class="badge">{ $usergrpoupsNum}</span></span></h4>
+	<h4><span class="label label-info" style="font-size:16px;">系统用户组总数&nbsp;<span class="badge">{$usergroupNum}</span></span></h4>
 	<p>
 		<!--// bootstap通过button调用Model -->		
-		<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalEditUsergroup"><strong>新增</strong>&nbsp;<span class="glyphicon glyphicon-duplicate"></span></button>
+		<button id="btnAddUsergroup" type="button" class="btn btn-primary btn-sm" data-oprt="_CREATE" data-toggle="modal" data-target="#modalEditUsergroup"><strong>新增</strong>&nbsp;<span class="glyphicon glyphicon-duplicate"></span></button>
 				
 	</p> 	
 			
@@ -26,13 +26,13 @@
 			</thead>
 				
 			<tbody><!-- 此处显示数据库查询后的数据集 -->
-			{volist name="groups" id="vo" empty="暂时没有数据"}
+			{volist name="$usergroup" id="vo" empty="暂时没有数据"}
 				<tr class="text-center">
-					<td>{$i}</td>
+					<td>{$i+($usergroupPageNum-1)*$usergroupTableRows}</td>
 					<td class="name text-left">{$vo.name}</td>
 					<!-- //iss -->
 					<td class="authority"> 
-						<div style="padding-top:3px">
+						<div style="padding-top:3px" class="text-left">
 						{foreach name="$vo.authority.iss" item="v" }
     						<span value="{$v}">{$key}</span>
 						{/foreach}
@@ -40,7 +40,7 @@
 					</td>
 					<!-- //pat -->
 					<td class="authority"> 
-						<div style="padding-top:3px">
+						<div style="padding-top:3px" class="text-left">
 						{foreach name="$vo.authority.pat" item="v" }
     						<span value="{$v}">{$key}</span>
 						{/foreach}
@@ -48,7 +48,7 @@
 					</td>
 					<!-- //pro -->
 					<td class="authority"> 
-						<div style="padding-top:3px">
+						<div style="padding-top:3px" class="text-left">
 						{foreach name="$vo.authority.pro" item="v" }
     						<span value="{$v}">{$key}</span>
 						{/foreach}
@@ -56,15 +56,15 @@
 					</td>
 					<!-- //the -->
 					<td class="authority"> 
-						<div style="padding-top:3px">
+						<div style="padding-top:3px" class="text-left">
 						{foreach name="$vo.authority.the" item="v" }
     						<span value="{$v}">{$key}</span>
 						{/foreach}
 						</div>
 					</td>
 					<!-- //att -->
-					<td class="authority"> 
-						<div style="padding-top:3px" class="authatt">
+					<td class="authority "> 
+						<div style="padding-top:3px" class="authatt text-left">
 						{foreach name="$vo.authority.att" item="v" }
     						<span value="{$v}">{$key}</span>
 						{/foreach}
@@ -79,13 +79,13 @@
 						</div>
 					</td>
 					<td class="button text-left">
-						<button type="button" class="edit btn-link" userGroupId="{$vo.id}" data-toggle="modal" data-target="#modalEditUsergroup"><span class="glyphicon glyphicon-edit"></span>编辑</button>
+						<button type="button" class="btn-link" data-id="{$vo.id}" data-oprt="_UPDATE" data-toggle="modal" data-target="#modalEditUsergroup" ><span class="glyphicon glyphicon-edit"></span>编辑</button>
 							
-						<button type="button" class="del btn-link" userGroupId="{$vo.id}"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>
+						<button type="button" class="del btn-link" usergroupId="{$vo.id}"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>
 							
-						<button type="button" class="dis btn-link " userGroupId="{$vo.id}"><span class="text-warning glyphicon glyphicon-ban-circle"></span>停用</button>
+						<button type="button" class="dis btn-link " usergroupId="{$vo.id}"><span class="text-warning glyphicon glyphicon-ban-circle"></span>停用</button>
 							
-						<span>（已停用）</span><button class="en btn-link" userGroupId="{$vo.id}" enable="{$vo.enable}"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
+						<span>（已停用）</span><button class="en btn-link" usergroupId="{$vo.id}" enable="{$vo.enable}"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
 						
 					</td>
 				</tr>
@@ -94,7 +94,7 @@
 		</table>
 	</div>
 	<div id="divUsergroupTableRows" class="col-sm-12 text-right search">
-		<div class="col-sm-10 text-right">{$ pageUsergroup}</div>
+		<div class="col-sm-10 text-right">{$usergroupPage}</div>
 						
 		<div class="form-group form-group-sm col-sm-2">
 			<span class="">每页记录行数：</span>
@@ -111,10 +111,9 @@
 </div>
 
 <!-- Modal "modalEditUsergroup" -->
-<div class="modal fade" id="modalEditUsergroup" role="dialog">
+<div class="modal fade" id="modalEditUsergroup" role="dialog" data-oprt=""> 
     <div class="modal-dialog modal-lg">
-    
-      <!-- Modal content-->
+
       <div class="modal-content">
         <div class="modal-header bg-info" style="border-radius: 5px;">
           	<button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -146,17 +145,19 @@ $(document).ready(function(){
 			$(this).prevAll('button').show();
             $(this).prev('span').hide();
 			$(this).hide();
+			//所在行去掉上色
 			$(this).parent().parent().removeClass("danger text-muted");
 		}else{
 			$(this).prevAll('button').hide();
 			$(this).show();
+			//所在行上色
 			$(this).parent().parent().addClass("danger text-muted");
 		}
 	});
 	//对“superadmin”组只有编辑权限。进一步优化：若登录用户属于“superadmin”组才有，其他的用户都没有。
 	$("tbody tr").each(function(){
 		var name=$(this).find("td.name").text();
-		var str='<button type="button" class="edit btn-link" userGroupId="9" data-toggle="modal" data-target="#modalEditUsergroup"><span class="glyphicon glyphicon-edit"></span>编辑</button>';
+		var str='<button type="button" class="edit btn-link" usergroupId="9" data-toggle="modal" data-target="#modalEditUsergroup"><span class="glyphicon glyphicon-edit"></span>编辑</button>';
 		
 		if("superadmin"==name){
 			$(this).find("td.button").children().remove();
@@ -184,17 +185,20 @@ $(document).ready(function(){
 	var btnStr=$("#btnAddUserGroup").html();
 	
 	//点击新增用户组按钮
-	$("h4 button").click(function() {
-		// #modalUserGroup标题内容恢复
-		$("#modalEditUsergroup h4").html(hStr);
-		//#modalUserGroup标题底色恢复
+	$("#btnAddUsergroup").click(function() {
+		var oprt=$(this).attr('data-oprt');
+		
+		//标题内容
+		$("#modalEditUsergroup h4").html('【'+$(this).html()+'】用户组');
+		//修改#modalEditUsergroup的data-oprt属性值
+		$('#modalEditUsergroup').attr('data-oprt',oprt);
+		//标题底色恢复
 		$(".modal-header").addClass("bg-info");
 			
 		<!-- //表单input:text元素设定初始值 -->
 		$("#oprtId").val('');	
-		<!-- $("#userGroupName").val(''); -->
 			
-		// 表单input:check元素赋值清空
+		// 表单input:checkbox元素赋值清空
 		$("#modalEditUsergroup input:checkbox").each(function(){
 			$(this).prop("checked",false);
 
@@ -219,10 +223,6 @@ $(document).ready(function(){
 			var objChecked=$("input:radio[name='userGroupEn']:checked");
 			radioBg(objChecked);
 		});
-
-		// #btnAddUserGroup恢复
-		$("#btnAddUserGroup").html(btnStr);
-		$("#btnResetUserGroup").show();
 		
 		// 清除输入框的格式
 		$(".modal input").parent().parent().removeClass("has-success").removeClass("has-error"); 
@@ -233,15 +233,24 @@ $(document).ready(function(){
 		
 	});
 	
-	<!-- //<button class='edit'> 事件-->
-	$("tbody button.edit").click(function() {
+	<!-- //<button data-oprt="_UPDATE"> 事件-->
+	$('tbody button[data-oprt="_UPDATE"]').click(function() {
+		var oprt=$(this).attr('data-oprt');
+		// 标题改名
+		$("#modalEditUsergroup h4").html('【'+$(this).html()+'】用户组');
+		//修改#modalEditUsergroup的data-oprt属性值
+		$('#modalEditUsergroup').attr('data-oprt',oprt);
+			
+		//去掉标题底色
+		$(".modal-header").removeClass("bg-info");
+		
 		<!-- // 组装通过“post”提交的数据 -->
-		var sendData = {"oprt":"edit","id":$(this).attr("userGroupId")};
+		var sendData = {'oprt':'_UPDATE',"id":$(this).attr('data-id')};
 		
 		$.ajax({
-			type : "post",
+			type : 'post',
 			async : true,  //异步请求
-			url : "{$home}/admin/index/oprtUserGroup", 
+			url : 'usergroupOprt', 
 			<!-- // 发送到服务器的数据 -->
 			data : sendData,
 			timeout:1000,
@@ -317,16 +326,6 @@ $(document).ready(function(){
                	alert("<button>.en.click失败，请稍后再试！");
             }
 		});	
-			
-		// 标题改名
-		$("#modalEditUsergroup h4").text("编辑用户组信息");
-			
-		//去掉标题底色
-		$(".modal-header").removeClass("bg-info");
-			
-		$("#btnResetUserGroup").hide();
-		// #btnAddUserGroup改名
-		$("#btnAddUserGroup").html('<span class="glyphicon glyphicon-ok-circle"></span>&nbsp;保存');
 		
 		// 清除输入框的格式
 		$(".modal input").parent().parent().removeClass("has-success").removeClass("has-error"); 
@@ -341,7 +340,7 @@ $(document).ready(function(){
 	$("tbody button.del").click(function() {
 		// 组装通过“post”提交的数据
 		var name=$(this).parent().parent().find('.name').text();
-		var sendData = {"oprt":"delete","id":$(this).attr("userGroupId"),"userGroupName":name};
+		var sendData = {"oprt":"delete","id":$(this).attr("usergroupId"),"userGroupName":name};
 		
 		$.confirm('确定删除【'+name+'】用户组？',function(e){
 			con=e;
@@ -376,7 +375,7 @@ $(document).ready(function(){
 	$("tbody button.en").click(function() {
   		
 		<!-- // 组装通过“post”提交的数据 -->
-		var sendData = {"oprt":"enable","id":$(this).attr("userGroupId")};
+		var sendData = {"oprt":"enable","id":$(this).attr("usergroupId")};
 				
 		$.ajax({
 			type : "post",
@@ -406,9 +405,8 @@ $(document).ready(function(){
 	
 	<!-- //<button class='dis'> ajax事件-->
 	$("tbody button.dis").click(function() {
-  		
 		<!-- // 组装通过“post”提交的数据 -->
-		var sendData = {"oprt":"disable","id":$(this).attr("userGroupId")};
+		var sendData = {"oprt":"disable","id":$(this).attr("usergroupId")};
 				
 		$.ajax({
 			type : "post",
@@ -491,8 +489,49 @@ $(document).ready(function(){
 		
 	});	
 	
+	<!-- //表格每页显示记录行数 -->
+	$("#usergroupTableRows").val('{$usergroupTableRows}'); 
+	
+	$("#usergroupTableRows").change(function(){
+		<!-- //根据每页显示记录行数加载页面 -->
+		$("#content").load("sysUsergroup",{"usergroupTableRows":$(this).val()});
+	
+	});
+	
+	<!-- // 点击分页中的a，表格中的内容根据a中的属性值进行排序 -->
+	$('#divUsergroupTableRows a').click(function(event){
+		// a所在分页页数
+		var pageStr=$(this).text();
+		var pageNum;
+		//(li.active)所代表的页数
+		var pageNumActive=$('#divUsergroupTableRows li.active').children('span').text();
+		var rows= $('#usergroupTableRows').val();
+		
+		// jQuery的preventDefault()方法阻止元素发生默认的行为。阻止访问a的URL
+        event.preventDefault();
+		<!-- alert("pageStr:"+pageStr+" active:"+pageNumActive); -->
+		
+		switch(pageStr){
+			case'»':
+				//用"*"确保得到的是加法运算结果，而不是字符串
+				pageNum=(pageNumActive*1+1);
+			break;
+			
+			case'«':
+				pageNum=(pageNumActive*1-1);
+			break;
+			
+			default:
+				pageNum=pageStr;
+			break;
+		
+		}
+		
+		// jquery load()方法，加载sysUser.html页面内容到index.html页面中<div id="content"></div>
+		$("#content").load("sysUsergroup",{"usergroupPageNum":pageNum,"usergroupTableRows":rows});
+	});
+	
 <!-- function -->
-
 
 
 <!--/ function -->
