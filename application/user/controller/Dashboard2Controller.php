@@ -114,35 +114,35 @@ class Dashboard2Controller extends \think\Controller
         //done
         $map['status'] ='完结';
         
-        if($this->auth['authiss']['edit']){
+        if($this->auth['iss']['edit']){
           $numIssPatEdit=$issSet->where($mapEdit)->count(); 
           $auth='_EDIT';
         }else{
           $numIssPatEdit=0;
         }
         
-        if($this->auth['authiss']['audit']){
+        if($this->auth['iss']['audit']){
           $numIssPatAudit=$issSet->where($mapAudit)->count(); 
           $auth='_AUDIT';
         }else{
           $numIssPatAudit=0;
         }
         
-        if($this->auth['authiss']['approve']){
+        if($this->auth['iss']['approve']){
           $numIssPatApprove=$issSet->where($mapApprove)->count(); 
           $auth='_APPROVE';
         }else{
           $numIssPatApprove=0;
         }
         
-        if($this->auth['authiss']['execute']){
+        if($this->auth['iss']['execute']){
           $numIssPatExecute=$issSet->where($mapExecute)->count();
           $auth='_EXECUTE'; 
         }else{
           $numIssPatExecute=0;
         }
         
-        if($this->auth['authiss']['maintain']){
+        if($this->auth['iss']['maintain']){
           $auth='_MAINTAIN';
           $numIssPatMaintain=$issSet->where($mapMaintain)->count(); 
           //得到满足续费条件的专利数
@@ -408,35 +408,35 @@ class Dashboard2Controller extends \think\Controller
           $auth='_DONE';
         }
         
-        if($this->auth['authiss']['edit']){
+        if($this->auth['iss']['edit']){
           $numIssPatEdit=$issSet->where($mapEdit)->count(); 
           //$auth='_EDIT';
         }else{
           $numIssPatEdit=0;
         }
         
-        if($this->auth['authiss']['audit']){
+        if($this->auth['iss']['audit']){
           $numIssPatAudit=$issSet->where($mapAudit)->count();
           //$auth='_AUDIT'; 
         }else{
           $numIssPatAudit=0;
         }
         
-        if($this->auth['authiss']['approve']){
+        if($this->auth['iss']['approve']){
           $numIssPatApprove=$issSet->where($mapApprove)->count();
           //$auth='_APPROVE'; 
         }else{
           $numIssPatApprove=0;
         }
         
-        if($this->auth['authiss']['execute']){
+        if($this->auth['iss']['execute']){
           $numIssPatExecute=$issSet->where($mapExecute)->count();
           //$auth='_EXECUTE'; 
         }else{
           $numIssPatExecute=0;
         }
         
-        if($this->auth['authiss']['maintain']){
+        if($this->auth['iss']['maintain']){
           $numIssPatMaintain=$issSet->where($mapMaintain)->count(); 
           //得到满足续费条件的专利数
           $deadline=date('Y-m-d',strtotime("+6 month"));

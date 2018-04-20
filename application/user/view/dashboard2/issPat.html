@@ -2,7 +2,7 @@
 
 				<ul class="nav nav-pills" style="border-bottom: 1px solid #faebcc;">
 				<!-- <ul class="nav nav-tabs" > -->
-					{eq name="$authArray.authiss.edit" value="1"}
+					{eq name="$authArray.iss.edit" value="1"}
 					<li class="" ><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_EDIT" ><span class="glyphicon glyphicon-pencil"></span>编辑
 						{eq name="$numIssPatEdit" value="0"}
 							<span class="badge issPat span_EDIT">{$numIssPatEdit}</span>
@@ -12,7 +12,7 @@
 					</a></li>
 					{/eq}
 					
-					{eq name="$authArray.authiss.audit" value="1"}
+					{eq name="$authArray.iss.audit" value="1"}
 					<li style="marging-left:0px;"><a class="aTab" href="#"  data-issue-type="_PATENT" data-issue-authority="_AUDIT"><span class="glyphicon glyphicon-check"></span>审核
 						{eq name="$numIssPatAudit" value="0"}
 							<span class="badge issPat span_AUDIT">{$numIssPatAudit}</span>
@@ -22,7 +22,7 @@
 					</a></li>
 					{/eq}
 					
-					{eq name="$authArray.authiss.approve" value="1"}
+					{eq name="$authArray.iss.approve" value="1"}
 					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_APPROVE"><span class="glyphicon glyphicon-ok"></span>审批
 						{eq name="$numIssPatApprove" value="0"}
 							<span class="badge issPat span_APPROVE">{$numIssPatApprove}</span>
@@ -32,7 +32,7 @@
 					</a></li>
 					{/eq}
 					
-					{eq name="$authArray.authiss.execute" value="1"}
+					{eq name="$authArray.iss.execute" value="1"}
 					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_EXECUTE"><span class="glyphicon glyphicon-random"></span>&nbsp;执行
 						{eq name="$numIssPatExecute" value="0"}
 							<span class="badge issPat span_EXECUTE">{$numIssPatExecute}</span>
@@ -42,7 +42,7 @@
 					</a></li>
 					{/eq}
 					
-					{eq name="$authArray.authiss.maintain" value="1"}
+					{eq name="$authArray.iss.maintain" value="1"}
 					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_MAINTAIN"><span class="glyphicon glyphicon-calendar"></span>维护
 						{eq name="$numIssPatMaintain" value="0"}
 							<span class="badge issPat span_MAINTAIN">{$numIssPatMaintain}</span>
@@ -52,7 +52,7 @@
 					</a></li>
 					{/eq}
 
-					{eq name="$authArray.authiss.maintain" value="1"}
+					{eq name="$authArray.iss.maintain" value="1"}
 					<li><a id="aPatRenew" class="aTab" href="#" data-issue-type="_PATENT" data-oprt="_RENEW"><span class="glyphicon glyphicon-repeat"></span>续费
 						{eq name="$numPatRenewTotal" value="0"}
 							<span class="badge issPat span_RENEW">{$numPatRenewTotal}</span>

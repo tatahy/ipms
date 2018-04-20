@@ -1,7 +1,8 @@
 <!-- //editUsergroup.html -->
 	
-<form id="fmUsergroup" role="form" action="" method="post">
-	<input id="oprtId" type="text" name="" value="" class="sr-only">
+<form id="fmUsergroup" role="form" action="{$home}/admin/index/usergroupOprt" method="post">
+	<input id="id" type="text" name="id" value="{$usergroup.id}" class="sr-only">
+	<input id="oprt" type="text" name="oprt" value="" class="sr-only">
 	<div class="myFieldset">
 		<div class="myLegend"><span class="label label-info"><span class="glyphicon glyphicon-duplicate"></span>&nbsp;用户组信息</span></div>
 		<div class="row myRow">		
@@ -12,7 +13,7 @@
 			<div class="input-group ">
 				<span class="input-group-addon"><span class="glyphicon glyphicon-education"></span></span>
 						
-				<input type="text" class="form-control textUserGroup" id="usergroupName" name="usergroupName" placeholder="输入用户组名">
+				<input type="text" class="form-control textUserGroup" id="usergroupName" name="usergroupName" value="{$usergroup.name}" placeholder="输入用户组名">
 			</div>	
 			<!-- // 配合jQuery 中的内容验证代码-->
 			<span style="color:red;display: none;" class="tips"></span>
@@ -29,55 +30,95 @@
 		<div class="form-group col-sm-6">	
 			<label for="authIss"><span class="text-info">【事务】</span>模块</label>	
 			<div id="authIss" style="border-bottom:solid 1px #ccc; padding:5px;">
-				<label class="checkbox-inline"><input type="checkbox" name="edit" value="1" checked><span>编辑</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="audit" value="1"><span>审核</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="approve" value="1"><span>审批</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="execute" value="1"><span>执行</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="maintain" value="1"><span>维护</span></label>
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="issEdit" value="1" checked><span>编辑</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="issAudit" value="1"><span>审核</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="issApprove" value="1"><span>审批</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="issExecute" value="1"><span>执行</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="issMaintain" value="1"><span>维护</span></label> -->
+				
+				{foreach name="$usergroup.authority.iss" item="v" }
+    			{if condition="($v==1)"} 
+				<label class="checkbox-inline"><input type="checkbox" name="iss{$key}" value="1" checked><span>{$key}</span></label>
+				{else /} 
+				<label class="checkbox-inline"><input type="checkbox" name="iss{$key}" value="1"><span>{$key}</span></label>
+				{/if}
+				{/foreach}
 			</div>
 		</div>
 		
 		<div class="form-group col-sm-6">	
 			<label for="authPat"><span class="text-default">【专利】</span>模块</label>	
 			<div id="authPat" style="border-bottom:solid 1px #ccc; padding:5px;">
-				<label class="checkbox-inline"><input type="checkbox" name="edit" value="1" checked><span>编辑</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="audit" value="1"><span>审核</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="approve" value="1"><span>审批</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="execute" value="1"><span>执行</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="maintain" value="1"><span>维护</span></label>
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="patEdit" value="1" checked><span>编辑</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="patAudit" value="1"><span>审核</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="patApprove" value="1"><span>审批</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="patExecute" value="1"><span>执行</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="patMaintain" value="1"><span>维护</span></label> -->
+				
+				{foreach name="$usergroup.authority.pat" item="v" }
+    			{if condition="($v==1)"} 
+				<label class="checkbox-inline"><input type="checkbox" name="pat{$key}" value="1" checked><span>{$key}</span></label>
+				{else /} 
+				<label class="checkbox-inline"><input type="checkbox" name="pat{$key}" value="1"><span>{$key}</span></label>
+				{/if}
+				{/foreach}
 			</div>
 		</div>
 		
 		<div class="form-group col-sm-6">	
 			<label for="authPro"><span class="text-default">【项目】</span>模块</label>	
 			<div id="authPro" style="border-bottom:solid 1px #ccc; padding:5px;">
-				<label class="checkbox-inline"><input type="checkbox" name="edit" value="1" checked><span>编辑</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="audit" value="1"><span>审核</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="approve" value="1"><span>审批</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="execute" value="1"><span>执行</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="maintain" value="1"><span>维护</span></label>
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="proEdit" value="1" checked><span>编辑</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="proAudit" value="1"><span>审核</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="proApprove" value="1"><span>审批</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="proExecute" value="1"><span>执行</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="proMaintain" value="1"><span>维护</span></label> -->
+				
+				{foreach name="$usergroup.authority.pro" item="v" }
+    			{if condition="($v==1)"} 
+				<label class="checkbox-inline"><input type="checkbox" name="pro{$key}" value="1" checked><span>{$key}</span></label>
+				{else /} 
+				<label class="checkbox-inline"><input type="checkbox" name="pro{$key}" value="1"><span>{$key}</span></label>
+				{/if}
+				{/foreach}
 			</div>
 		</div>
 		
 		<div class="form-group col-sm-6">	
 			<label for="authThe"><span class="text-default">【论文】</span>模块</label>	
 			<div id="authThe" style="border-bottom:solid 1px #ccc; padding:5px;">
-				<label class="checkbox-inline"><input type="checkbox" name="edit" value="1" checked><span>编辑</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="audit" value="1"><span>审核</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="approve" value="1"><span>审批</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="execute" value="1"><span>执行</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="maintain" value="1"><span>维护</span></label>
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="theEdit" value="1" checked><span>编辑</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="theAudit" value="1"><span>审核</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="theApprove" value="1"><span>审批</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="theExecute" value="1"><span>执行</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="theMaintain" value="1"><span>维护</span></label> -->
+				
+				{foreach name="$usergroup.authority.the" item="v" }
+    			{if condition="($v==1)"} 
+				<label class="checkbox-inline"><input type="checkbox" name="the{$key}" value="1" checked><span>{$key}</span></label>
+				{else /} 
+				<label class="checkbox-inline"><input type="checkbox" name="the{$key}" value="1"><span>{$key}</span></label>
+				{/if}
+				{/foreach}
 			</div>
 		</div>
 		
 		<div class="form-group col-sm-6">	
 			<label for="authAtt"><span class="text-danger">【附件】</span>模块</label>	
 			<div id="authAtt" style="border-bottom:solid 1px #ccc; padding:5px;">
-				<label class="checkbox-inline"><input type="checkbox" name="upload" value="1" checked><span>上传</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="download" value="1" checked><span>下载</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="copy" value="1"><span>复制</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="move" value="1"><span>移动</span></label>
-				<label class="checkbox-inline"><input type="checkbox" name="erase" value="1"><span>删除</span></label>
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="attUpload" value="1" checked><span>上传</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="attDownload" value="1" checked><span>下载</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="attCopy" value="1"><span>复制</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="attMove" value="1"><span>移动</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="attErase" value="1"><span>删除</span></label> -->
+				
+				{foreach name="$usergroup.authority.att" item="v" }
+    			{if condition="($v==1)"} 
+				<label class="checkbox-inline"><input type="checkbox" name="att{$key}" value="1" checked><span>{$key}</span></label>
+				{else /} 
+				<label class="checkbox-inline"><input type="checkbox" name="att{$key}" value="1"><span>{$key}</span></label>
+				{/if}
+				{/foreach}
 			</div>
 		</div>
 		
@@ -114,6 +155,8 @@
 		<button id="btnCreate" type="submit" class="btn btn-primary btn-sm" data-oprt="_CREATE"><span class="glyphicon glyphicon-ok"></span>&nbsp;新增</button>
 		
 		<button id="btnUpdate" type="submit" class="btn btn-primary btn-sm" data-oprt="_UPDATE"><span class="glyphicon glyphicon-ok"></span>&nbsp;保存</button>
+		
+		<button id="btnDelete" type="submit" class="btn btn-danger btn-sm" data-oprt="_DELETE"><span class="glyphicon glyphicon-remove"></span>删除</button>
 	
 		<div class="pull-right">	
 			<button id="btnReset" type="reset" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-refresh"></span>&nbsp;重置</button>
@@ -126,23 +169,21 @@
 	
 <script>
 $(document).ready(function(){
-	//根据#spOprt的值选定button
-	$('button:submit').each(function(){
-		<!-- var oprt=$('#modalEditUsergroup').attr('data-oprt');  -->
-		var oprt=$(this).closest('.modal').attr('data-oprt'); 
-		if($(this).attr('data-oprt')==oprt){
-			$(this).show();
-		}else{
-			$(this).hide();
-		}
-		
-	});
+	if({$usergroup.authority.admin.enable}){
+		$('input:radio[name="adminEn"][value="1"]').prop('checked',true);	
+	}else{
+		$('input:radio[name="adminEn"][value="0"]').prop('checked',true);
+	}
+	radioBg($('input:radio[name="adminEn"]:checked'));
 	
 	<!-- // 新增按钮 -->
-	$('#btnCreate').click(function(event){
+	$('#btnCreate').click(function(){
 		<!-- // jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作 -->
-        event.preventDefault();
-		
+       
+		var formData=new FormData();
+		formData=$('#fmUsergroup').get(0);
+		console.log(formData);
+		<!-- event.preventDefault(); -->
 		var flag=check.every(function(value) {
             return value == true
         });
@@ -155,21 +196,17 @@ $(document).ready(function(){
             	}
         	}
 		}else{
-			
-			<!-- // 组装通过“post”提交的数据 -->
-			var sendData = {"oprt":"add","usergroupName":$("#usergroupName").val(),"addnew":$("input:checkbox[name='addnew']").prop("checked"),"submit":$("input:checkbox[name='submit']").prop("checked"),"modify":$("input:checkbox[name='modify']").prop("checked"),"upfile":$("input:checkbox[name='upfile']").prop("checked"),"downfile":$("input:checkbox[name='downfile']").prop("checked"),"audit":$("input:checkbox[name='audit']").prop("checked"),"refuse":$("input:checkbox[name='refuse']").prop("checked"),"reject":$("input:checkbox[name='reject']").prop("checked"),"approve":$("input:checkbox[name='approve']").prop("checked"),"inspect":$("input:checkbox[name='inspect']").prop("checked"),"adminEn":$("input:radio[name='adminEn']").prop("checked"),"usergroupEn":$("input:radio[name='usergroupEn']").prop("checked"),"oprtId":$("#oprtId").val()};
-			
 			// 这种写法获得radio内属性value的值
 			<!-- "adminEn":$("input:radio[name='adminEn']:checked").val(),"usergroupEn":$("input:radio[name='usergroupEn']:checked").val() -->
 						
-			$("#modalEditUsergroup").modal("hide");
+			$('#modalEditUsergroup').modal('hide');
 				
 			$.ajax({
 				type : "post",
 				async : true,  //异步请求
-				url : "oprtUserGroup", 
+				url : "usergroupOprt", 
 				<!-- // 发送到服务器的数据 -->
-				data : sendData,
+				data : formData,
 				timeout:1000,
 				<!-- // 指定服务器端response的数据类型为json -->
 				dataType:"json",
@@ -190,7 +227,7 @@ $(document).ready(function(){
 								
 								$("#modalEditUsergroup").modal("show");
 							}else{
-								$("#content").load("sys_usergroup");
+								$("#content").load("sysUsergroup");
 								<!-- $('#btnResetUserGroup').click(); -->
 								//刷新页面并回到"#div0"页面
 								<!-- window.location.hash="#div0"; -->
@@ -228,10 +265,30 @@ $(document).ready(function(){
 	$('#btnUpdate').click(function(event){
 		<!-- // jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作 -->
         event.preventDefault();
+		var formData=new FormData($('#fmUsergroup').get(0));
+		var h4Html=$('#h4Title').html();
+		console.log(formData);
 		
 		var flag=check.every(function(value) {
             return value == true
         });
+		
+		$('#fmUsergroup').closest('.modal').hide();
+		
+		<!-- ajaxModalShow($('#fmUsergroup').closest('.modal'),'usergroupOprt',formData,h4Html) -->
+		
+	});
+	
+	<!-- // 删除按钮 -->
+	$('#btnDelete').click(function(){
+		var param={};
+		$('#oprt').val('_DELETE');
+		<!-- // jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作 -->
+        <!-- event.preventDefault(); -->
+		
+		<!-- $.post('usergroupOprt',param,function(data){ -->
+		
+		<!-- }); -->
 		
 	});
 	
@@ -249,10 +306,9 @@ $(document).ready(function(){
 		checkboxBg($(this));
 	});
 	
-	
-	
 	<!-- // 重置按钮 -->
 	$('#btnReset').click(function(e){
+		var modalObj=$('#modalEditUsergroup');
 		e.preventDefault();
 		//本按钮所在form进行reset
 		$(this).closest('form').get(0).reset();
@@ -261,6 +317,10 @@ $(document).ready(function(){
 		$('input:checkbox').each(function(){
 			checkboxBg($(this));
 		});
+		
+		<!-- modalObj.find('.modal .tips').hide(); -->
+    	<!-- modalObj.find('.modal .glyphicon-ok').hide(); -->
+    	<!-- modalObj.find('.modal .glyphicon-remove').hide(); -->
 	
 	});
 	
@@ -279,6 +339,21 @@ $(document).ready(function(){
         	fail($(this), 0, '用户组名为英文、数字、中文和下划线，但不能以数字开头。')
     	}
   	});
+	
+	<!-- $("#usergroupName").blur(function(){ -->
+        <!-- if(regUserGroupName.test($(this).val())){ -->
+			<!-- success($(this),0);	 -->
+		<!-- }else if ($(this).val().length < 5) { -->
+        	<!-- if($(this).val()==''){ -->
+				<!-- fail($(this), 0, '用户组名不能为空。'); -->
+			<!-- }else{ -->
+				<!-- fail($(this), 0, '用户组名太短，不能少于5个字符。'); -->
+			<!-- } -->
+		<!-- } -->
+		<!-- else { -->
+        	<!-- fail($(this), 0, '用户组名为英文、数字、中文和下划线，但不能以数字开头。') -->
+    	<!-- } -->
+  	<!-- }); -->
 	
 <!-- function -->
 // 正则表达式，可以为英文、数字、中文和下划线,但不能以数字开头,unicode编码中的汉字范围:\u2E80-\u9FFF
@@ -330,6 +405,89 @@ function checkboxBg(obj){
 		obj.next().removeClass('label label-info');
 	}
 }
+
+//**函数名：ajaxModalShow
+ 	//* 作用：ajaxModalShow
+	//* 参数modalObj，类型：对象。值：不为空。说明：modal对象。
+	//* 异步请求的url,类型：字符串。值：不为空。说明：ajax操作的URL。
+	//* 参数id，类型：数值。值：调用函数的对象的属性'data-id'值。
+	//* 参数oprt，类型：字符串。值：调用函数的对象的属性'data-oprt'值。
+	//* 参数h4Html，类型：字符串。值：调用函数的对象的html值。
+	//* 返回值：无
+	function ajaxModalShow(modalObj,url,id,oprt,h4Html){
+		
+		//load成功后修改modal页面显示
+		$('#divEditUsergroup_load').load(url,{'oprt':oprt,'id':id},function(){
+			// 标题改名
+			modalObj.find('h4').html('【'+h4Html+'】用户组');
+			//修改#modalEditUsergroup的data-oprt属性值
+			modalObj.attr('data-oprt',oprt);
+			
+			//去掉标题底色
+			switch(oprt){
+				case '_ADDNEW':
+					modalObj.find('.modal-header').addClass("bg-info");
+				break;
+				case '_EDIT':
+					modalObj.find('.modal-header').removeClass("bg-info");
+				break;
+			}
+			// 清除输入框的格式
+			modalObj.find('.modal input').parent().parent().removeClass("has-success").removeClass("has-error"); 
+			// 注意限定.tips/glyphicon-ok/glyphicon-remove所在标签.modal，否则会殃及其他标签的.tips/glyphicon-ok/glyphicon-remove
+    		modalObj.find('.modal .tips').hide();
+    		modalObj.find('.modal .glyphicon-ok').hide();
+    		modalObj.find('.modal .glyphicon-remove').hide();
+			
+			//根据.modal的'data-oprt'值选定button，初始化赋值
+			$('button:submit').hide();
+			switch($('.modal').attr('data-oprt')){
+				case '_ADDNEW':
+					$('#btnCreate').show();
+					$('#oprt').val('_CREATE');
+				break;
+				case '_EDIT':
+					$('#btnUpdate').show();
+					$('#btnDelete').show();
+					$('#oprt').val('_UPDATE');
+				break;
+			}
+		}); 
+	}
+
+	//**函数名：ajaxOprt
+ 	//* 作用：ajax操作
+	//* 参数btnObj，类型：对象。值：不为空。说明：btn对象。
+	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
+	//* 参数id，类型：数值。值：调用函数的对象的属性'data-id'值。
+	//* 参数oprt，类型：字符串。值：调用函数的对象的属性'data-oprt'值。
+	//* 返回值：无
+	function ajaxOprt(btnObj,url,id,oprt){
+		$.ajax({
+			type : 'post',
+			async : true,  //异步请求
+			url : url, 
+			<!-- // 发送到服务器的数据 -->
+			data : {'oprt':oprt,'id':id},
+			timeout:2000,
+			<!-- // 指定服务器端response的数据类型为json -->
+			dataType:"json",
+			success:function(backData){
+				<!-- var obj=$('tbody button[data-oprt="_ENABLE"][data-id="'+backData.id+'"]'); -->
+				btnObj.hide();
+				//本行上色
+				btnObj.closest('tr').addClass('warning');
+				if(backData.enable){
+					$.alert('用户组【'+btnObj.closest('tr').children('.name').text()+'】修改<span class="label label-success">成功</span>&nbsp;');
+				}else{
+					$.alert('用户组【'+btnObj.closest('tr').children('.name').text()+'】修改<span class="label label-danger">失败</span>&nbsp;');
+				}
+			},
+			error: function() {
+               	$.alert('与服务器通讯超时，请稍后再试！');
+            }
+		});	
+	}
 
 <!--/ function -->
 	

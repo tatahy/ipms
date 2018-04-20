@@ -148,30 +148,41 @@ class User extends Model
       $user=$this->where('username',$username)->where('pwd',$pwd)->where('enable',1)->select();
       $usergroup_id= explode(",", $user[0]['usergroup_id']);//$usergroup_id=array(8,9,10)
       
-      $iss=array("edit"=>0,"audit"=>0,"approve"=>0,"execute"=>0,"maintain"=>0);
-      $pat=array("edit"=>0,"audit"=>0,"approve"=>0,"execute"=>0,"maintain"=>0);
-      $att=array("upload"=>0,"download"=>0,"erase"=>0,"move"=>0,"copy"=>0);
-      $pro=array("edit"=>0,"audit"=>0,"approve"=>0,"execute"=>0,"maintain"=>0);
-      $the=array("edit"=>0,"audit"=>0,"approve"=>0,"execute"=>0,"maintain"=>0); 
+      //$iss=array("edit"=>0,"audit"=>0,"approve"=>0,"execute"=>0,"maintain"=>0);
+//      $pat=array("edit"=>0,"audit"=>0,"approve"=>0,"execute"=>0,"maintain"=>0);
+//      $att=array("upload"=>0,"download"=>0,"erase"=>0,"move"=>0,"copy"=>0);
+//      $pro=array("edit"=>0,"audit"=>0,"approve"=>0,"execute"=>0,"maintain"=>0);
+//      $the=array("edit"=>0,"audit"=>0,"approve"=>0,"execute"=>0,"maintain"=>0); 
+     // $admin=array("enable"=>0);
+      
+      $iss=_commonModuleAuth('_ISS');
+      $pat=_commonModuleAuth('_PAT');
+      $att=_commonModuleAuth('_ATT');
+      $pro=_commonModuleAuth('_PRO');
+      $the=_commonModuleAuth('_THE');
+      $admin=_commonModuleAuth('_ADMIN');
       
       for($i=0;$i<count($usergroup_id);$i++){
-        //根据usergroup_id，应用模型$userGourpMdl分别取出对应usergroup的iss/pat/pro/the/att权限的项，
+        //根据usergroup_id，应用模型UsergroupModel分别取出对应usergroup的iss/pat/pro/the/att权限的项，
         $usergroup=UsergroupModel::get($usergroup_id[$i]);
         //array_filter($arr)去除数组$arr中值为false的键值对后的新数组
         //array_merge再重新合并成新数组，得到用户所在所有用户组权限的交集。
         $iss=array_merge($iss,array_filter($usergroup['authority']['iss']));
         $pat=array_merge($pat,array_filter($usergroup['authority']['pat']));
-        $pro=array_merge($pro,array_filter($usergroup['authority']['pro']));
-        $the=array_merge($the,array_filter($usergroup['authority']['the']));
-        $att=array_merge($att,array_filter($usergroup['authority']['att']));
+        $pro=array_merge($att,array_filter($usergroup['authority']['pro']));
+        $the=array_merge($pro,array_filter($usergroup['authority']['the']));
+        $att=array_merge($the,array_filter($usergroup['authority']['att']));
+        $admin=array_merge($admin,array_filter($usergroup['authority']['admin']));
       }
       //组装数据
-      $authority=array("authiss"=>$iss,
-                        "authatt"=>$att,
-                        "authpat"=>$pat,
-                        "authpro"=>$pro,
-                        "auththe"=>$the
+      $authority=array("iss"=>$iss,
+                        "att"=>$att,
+                        "pat"=>$pat,
+                        "pro"=>$pro,
+                        "the"=>$the,
+                        "admin"=>$admin
                         );
+        
         
       // 使用静态方法，向User表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
       $this::update([

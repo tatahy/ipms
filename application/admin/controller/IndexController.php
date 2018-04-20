@@ -5,11 +5,11 @@ use think\Request;
 use think\Session;
 use think\Model;
 
-use app\user\model\User as UserModel;
+
 use app\user\model\Rolety as RoletyModel;
 use app\admin\model\Dept as DeptModel;
 use app\admin\model\Usergroup as UsergroupModel;
-
+use app\admin\model\User as UserModel;
 
 class IndexController extends \think\Controller
 {
@@ -418,7 +418,7 @@ class IndexController extends \think\Controller
     }
     
     // 验证用户名、密码是否为数据库中有效管理员，是就显示后台主页，否就退回登录页面
-    public function check(Request $request)
+    public function check(Request $request,UserModel $userMdl)
     {
       //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
       
@@ -441,24 +441,20 @@ class IndexController extends \think\Controller
                             ->where('pwd',$pwd)
                             ->where('rolety_id','in','8,9')
                             ->whereOr('usergroup_id','in','8,9')
-                            ->select();
+                            ->find();
                             
       if(empty($user)){
         $this->error('用户名或密码错误，请重新登录');
           //return view("login"); 
       }else{
         // 写入session
-          Session::set('pwd',$user[0]['pwd']);
-          Session::set('username',$user[0]['username']);
+          Session::set('pwd',$user->pwd);
+          Session::set('username',$user->username);
           Session::set('log',1);
           Session::set('role','管理员');
-          Session::set('dept',$user[0]['dept']);
-          
-          //$this->username=Session::get('username');
-//          $this->pwd=Session::get('pwd');
-//          $this->log=Session::get('log');
-//          $this->roles=Session::get('role');
-//          $this->dept=Session::get('dept');
+          Session::set('dept',$user->dept);
+          //调用User模型层定义的refreshUserAuth()方法，刷新登录用户的各个模块权限
+          $userMdl->refreshUserAuth($user->username,$user->pwd);
           
         // 重定向到index页面
        // $this->redirect('index');
@@ -931,8 +927,8 @@ class IndexController extends \think\Controller
       
     }
     
-    // 根据前端发送的模板文件名，选择对应的页面文件返回
-    public function tplFile(Request $request)
+    // 根据前端发送的模板文件名参数，选择对应的页面文件返回
+    public function tplFile(Request $request,UsergroupModel $usergroupMdl)
     {
       $this->_loginUser();
       //前端发送的是锚点值
@@ -944,6 +940,13 @@ class IndexController extends \think\Controller
       //前端发送的是文件名
       if(!empty($request->param('tplFile'))){
         $tplFile=$request->param('tplFile');
+        //组装返回前端的数据
+        if($request->param('id')!=0){
+          $usergroup=$usergroupMdl::get($request->param('id'));
+        }else{
+          //应用公共文件common.php中定义了公共函数_commonModuleAuth();
+          $usergroup=array('id'=>0,'name'=>'','authority'=>_commonModuleAuth());
+        }
       }
       
       //模板文件名
@@ -953,7 +956,10 @@ class IndexController extends \think\Controller
         $this->redirect($tplFile);
       }
       else{
-        
+        $this->assign([
+             'home'=>$request->domain(),
+             'usergroup'=>$usergroup,
+        ]);
         return view($tplFile);
       }
       
@@ -1311,45 +1317,72 @@ class IndexController extends \think\Controller
     }
     
     // 用户组CDUR，接收客户端通过Ajax，post来的参数，返回json数据
-    public function usergroupOprt(Request $request,UsergroupModel $usergroupMdl)
+    public function usergroupOprt(Request $request,UsergroupModel $usergroupMdl,$oprt='_CREATE',$id='0')
     {
       $this->_loginUser();
-      
+    
       $oprt=$request->param('oprt');
-       
+      $id=$request->param('id');        
+      
       switch($oprt){
-        case "_CREATE":
-        
+        case '_ADDNEW':
+          $usergroup=array('id'=>$id,'name'=>'','authority'=>_commonModuleAuth());
         break;
         
-        case "_UPDATE":
+        case '_EDIT':
+          //调用Usergroup模型层定义的refreshUsergroupAuth()方法，刷新用户组的各个模块权限
+          $usergroupMdl->refreshUsergroupAuth($id);
+          $usergroup=$usergroupMdl::get($id);
+        break;
         
+        case '_CREATE':
+          
+          $usergroup=array('id'=>$id,'name'=>'','authority'=>_commonModuleAuth());
+        break;
+        
+        case '_UPDATE':
+          
+          //调用Usergroup模型层定义的refreshUsergroupAuth()方法，刷新用户组的各个模块权限
+          $usergroupMdl->refreshUsergroupAuth($id);
+          
+          $usergroup=$usergroupMdl::get($id);
         break;
         
         case "_DELETE":
-        
-        break;
-        
-        case"_DISABLE":
-          $userMdl::update(['enable'=> 0], ['id' => $id]);
-          
-          $result='success';
-          // 返回前端JSON数据
-          return ['result'=>$result,'uid'=>$id];
+          $name=$usergroupMdl::get($id)->name;
           
         break;
         
-        case"_ENABLE":
-          $userMdl::update(['enable'=> 1], ['id' => $id]);
-          
-          $result='success';
-          // 返回前端JSON数据
-          return ['result'=>$result,'uid'=>$id];
-          
+        case'_DISABLE':
+          $usergroupMdl::update(array('enable'=> 0), ['id' => $id]);         
         break;
         
-        
+        case'_ENABLE':
+          $usergroupMdl::update(array('enable'=> 1), ['id' => $id]);          
+        break;
       }
+     //分情况返回前端数据
+     if ($oprt=='_ADDNEW' || $oprt=='_EDIT'){
+        $this->assign([
+             'home'=>$request->domain(),
+             'usergroup'=>$usergroup
+        ]);
+        // 返回前端模板文件
+        return view('editUsergroup');
+     }elseif($oprt=='_CREATE' || $oprt=='_UPDATE'){
+        // 返回前端JSON数据 
+        return json_encode(['id'=>$id]);
+     }elseif($oprt=='_DISABLE' || $oprt=='_ENABLE'){
+        // 返回前端JSON数据 
+        return ['enable'=>$usergroupMdl::get($id)->enable,'id'=>$id];
+     }else{
+        //$oprt=='_DELETE'
+        return json_encode(['name'=>$name,'auth'=>$usergroupMdl::get($id)->authority]);
+      
+     }
+      
+      
+      
       
     }
     

@@ -1253,12 +1253,13 @@ sha1_file('example.txt');
 
 
 
-<!--/  HY 2018/3/21 -->
+<!--/  HY 2018/3/22 -->
 
+<!--  HY 2018/4/20 -->
+//common.php
+整个应用的公共函数放在\application\common.php中，
+某个模块的公共函数放在\application\模块名\common.php中，
+框架自动加载上述common.php文件，定义好的公共函数可随时引用。
 
-<input name="attId[]" value="{$vo.id}" type="text" class="sr-only">
-<input name="attFileObjStr[]" value="{$vo.attpath}" type="text" class="sr-only">
-<input name="attFileName[]" value="{$vo.attfilename}" type="text" class="sr-only">
-
-'<input name="attFileName[]" value="'+data.attpath+'" type="text" class="sr-only">
+<!--  HY 2018/4/20 -->
 
