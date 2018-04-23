@@ -66,12 +66,37 @@ class User extends Model
         $usergroup=UsergroupModel::get($usergroup_id[$i]);
         //array_filter($arr)去除数组$arr中值为false的键值对后的新数组
         //array_merge再重新合并成新数组，得到用户所在所有用户组权限的交集。
-        $iss=array_merge($iss,array_filter($usergroup['authority']['iss']));
-        $pat=array_merge($pat,array_filter($usergroup['authority']['pat']));
-        $pro=array_merge($pro,array_filter($usergroup['authority']['pro']));
-        $the=array_merge($the,array_filter($usergroup['authority']['the']));
-        $att=array_merge($att,array_filter($usergroup['authority']['att']));
-        $admin=array_merge($admin,array_filter($usergroup['authority']['admin']));
+        //$iss=array_merge($iss,array_filter($usergroup['authority']['iss']));
+//        $pat=array_merge($pat,array_filter($usergroup['authority']['pat']));
+//        $pro=array_merge($pro,array_filter($usergroup['authority']['pro']));
+//        $the=array_merge($the,array_filter($usergroup['authority']['the']));
+//        $att=array_merge($att,array_filter($usergroup['authority']['att']));
+//        $admin=array_merge($admin,array_filter($usergroup['authority']['admin']));
+
+        //$iss=array_merge($iss,array($usergroup['authority']['iss']));
+//        $pat=array_merge($pat,array($usergroup['authority']['pat']));
+//        $pro=array_merge($pro,array($usergroup['authority']['pro']));
+//        $the=array_merge($the,array($usergroup['authority']['the']));
+//        $att=array_merge($att,array($usergroup['authority']['att']));
+//        $admin=array_merge($admin,array($usergroup['authority']['admin']));
+
+        if(array_filter($usergroup['authority']['iss'])){
+          $iss=array_merge($iss,array_filter($usergroup['authority']['iss']));
+        }
+        if(array_filter($usergroup['authority']['pat'])){
+          $pat=array_merge($pat,array_filter($usergroup['authority']['pat']));
+        }
+        if(array_filter($usergroup['authority']['pro'])){
+          $pro=array_merge($pro,array_filter($usergroup['authority']['pro']));
+        }
+        if(array_filter($usergroup['authority']['the'])){
+          $the=array_merge($the,array_filter($usergroup['authority']['the']));
+        }
+        if(array_filter($usergroup['authority']['att'])){
+          $att=array_merge($att,array_filter($usergroup['authority']['att']));
+        }
+        
+        
       }
       //组装数据
       $authority=array("iss"=>$iss,

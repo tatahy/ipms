@@ -103,7 +103,7 @@
 			<div id="authAdmin" class="form-group" style="border-bottom:solid 1px #ccc; padding:5px;">
 				{eq name="$usergroup.authority.admin.enable" value="1"} 
 				<label class="radio-inline">
-      				<input type="radio" name="adminEn" value="1" checked="true"><span class="label label-default">有</span>
+      				<input type="radio" name="adminEn" value="1" checked><span class="label label-default">有</span>
     			</label>
     			<label class="radio-inline">
       				<input type="radio" name="adminEn" value="0" ><span class="label label-default">无</span>
@@ -113,7 +113,7 @@
       				<input type="radio" name="adminEn" value="1" ><span class="label label-default">有</span>
     			</label>
     			<label class="radio-inline">
-      				<input type="radio" name="adminEn" value="0" checked="true"><span class="label label-default">无</span>
+      				<input type="radio" name="adminEn" value="0" checked><span class="label label-default">无</span>
     			</label>
 				{/eq}
 			</div>
@@ -155,36 +155,60 @@
 <script>
 $(document).ready(function(){
 	radioBg($('input:radio[name="adminEn"]:checked'));
-	$('.inputCheck').eq(0).focus();
+	
+	<!-- usergroupName内容验证 -->
+	$("#usergroupName").focusout(function(){
+        if(regUserGroupName.test($(this).val())){
+			//$(this)为本页面第0个输入框
+			success($(this),0);	
+		}else if ($(this).val().length < 5) {
+        	if($(this).val()==''){
+				fail($(this), 0, '用户组名不能为空。');
+			}else{
+				fail($(this), 0, '用户组名太短，不能少于5个字符。');
+			}
+		}
+		else {
+        	fail($(this), 0, '用户组名为英文、数字、中文和下划线，但不能以数字开头。')
+    	}
+  	});
 	
 	//button:submit按钮
 	$('button:submit').click(function(event){
 		var url='usergroupOprt';
-		var name=$('#usergroupName').val();
+		<!-- var name=$('#usergroupName').val(); -->
 		var oprt=$(this).attr('data-oprt');
 		var formData=new FormData($('#fmUsergroup').get(0));
 		var flag=check.every(function(value) {
             return value == true
         });
+		
 		//阻止表单提交动作
 		event.preventDefault();
-		//分2类'_DELETE';'_CREATE'、'_UPDATE'
-		if(oprt=='_DELETE'){
+		formData.append('oprt',oprt);
 		
-		}else{
+		//分2类'_DELETE';'_CREATE'、'_UPDATE'
+		<!-- if(oprt=='_DELETE'){ -->
+		
+		<!-- }else{ -->
 			//输入框内容有误时的处理
 			if (!flag) {
+				var i=0;
 				<!-- //check中存在false,对应的input用“has-error”突出显示。 -->
         		for (key in check) {
-            	if (!check[key]) {
+            		if (!check[key]) {
                 		$(this).closest('form').find('.inputCheck').eq(key).closest('.has-feedback').removeClass('has-success').addClass('has-error');
             		}
+					if(i<key)i=key;
         		}
+				$('.inputCheck').eq(i).focus();
+				
 			}else{
 				$.ajax({
 					type: 'post',
             		url: url,
             		data: formData,
+					timeout:2000,
 					<!-- datatype: 'JSON', -->
             		contentType: false,// 当有文件要上传时，此项是必须的，否则会导致后台无法识别文件流的起始位置
             		processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)。当使用FormData()，必须设为false，否则jqurey默认将FormData()转换为查询字符串。
@@ -200,7 +224,6 @@ $(document).ready(function(){
 									//所在行上色'bg-warning'
 									$('button[data-id="'+dataBack.id+'"]').closest('tr').addClass('bg-warning');
 									$.alert('用户组【'+dataBack.name+'】<span class="label label-success">'+dataBack.msg+'</span>'+dataBack.msgPatch);
-								
 								}
 							);
 						}else{
@@ -212,20 +235,7 @@ $(document).ready(function(){
 					}
 				});			
 			}
-		}
-	});
-	
-	<!-- // 删除按钮 -->
-	$('#btnDelete').click(function(){
-		var param={};
-		$('#oprt').val('_DELETE');
-		<!-- // jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作 -->
-        <!-- event.preventDefault(); -->
-		
-		<!-- $.post('usergroupOprt',param,function(data){ -->
-		
-		<!-- }); -->
-		
+		<!-- } -->
 	});
 	
 	// 表单input:radio选中元素改变背景色
@@ -262,39 +272,7 @@ $(document).ready(function(){
 		fmParent.find('.inputCheck').eq(0).focus();
 	
 	});
-	
-	<!-- usergroupName内容验证 -->
-	$("#usergroupName").focusout(function(){
-        if(regUserGroupName.test($(this).val())){
-			//$(this)为本页面第0个输入框
-			success($(this),0);	
-		}else if ($(this).val().length < 5) {
-        	if($(this).val()==''){
-				fail($(this), 0, '用户组名不能为空。');
-			}else{
-				fail($(this), 0, '用户组名太短，不能少于5个字符。');
-			}
-		}
-		else {
-        	fail($(this), 0, '用户组名为英文、数字、中文和下划线，但不能以数字开头。')
-    	}
-  	});
-	
-	<!-- $("#usergroupName").blur(function(){ -->
-        <!-- if(regUserGroupName.test($(this).val())){ -->
-			<!-- success($(this),0);	 -->
-		<!-- }else if ($(this).val().length < 5) { -->
-        	<!-- if($(this).val()==''){ -->
-				<!-- fail($(this), 0, '用户组名不能为空。'); -->
-			<!-- }else{ -->
-				<!-- fail($(this), 0, '用户组名太短，不能少于5个字符。'); -->
-			<!-- } -->
-		<!-- } -->
-		<!-- else { -->
-        	<!-- fail($(this), 0, '用户组名为英文、数字、中文和下划线，但不能以数字开头。') -->
-    	<!-- } -->
-  	<!-- }); -->
-	
+			
 <!-- function -->
 // 正则表达式，可以为英文、数字、中文和下划线,但不能以数字开头,unicode编码中的汉字范围:\u2E80-\u9FFF
 var regUserGroupName = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{4,19}$/;
@@ -342,81 +320,6 @@ function checkboxBg(obj){
 		obj.next().removeClass('label label-info');
 	}
 }
-
-//**函数名：ajaxModalShow
- 	//* 作用：ajaxModalShow
-	//* 参数modalObj，类型：对象。值：不为空。说明：modal对象。
-	//* 异步请求的url,类型：字符串。值：不为空。说明：ajax操作的URL。
-	//* 参数id，类型：数值。值：调用函数的对象的属性'data-id'值。
-	//* 参数oprt，类型：字符串。值：调用函数的对象的属性'data-oprt'值。
-	//* 参数h4Html，类型：字符串。值：调用函数的对象的html值。
-	//* 返回值：无
-	function ajaxModalShow(modalObj,url,id,oprt,h4Html){
-		
-		//load成功后修改modal页面显示
-		$('#divEditUsergroup_load').load(url,{'oprt':oprt,'id':id},function(){
-			// 标题改名
-			modalObj.find('h4').html('【'+h4Html+'】用户组');
-			//修改#modalEditUsergroup的data-oprt属性值
-			modalObj.attr('data-oprt',oprt);
-			
-			//去掉标题底色
-			switch(oprt){
-				case '_ADDNEW':
-					modalObj.find('.modal-header').addClass("bg-info");
-				break;
-				case '_EDIT':
-					modalObj.find('.modal-header').removeClass("bg-info");
-				break;
-			}
-			// 清除输入框的格式
-			<!-- modalObj.find('.modal input').parent().parent().removeClass("has-success").removeClass("has-error");  -->
-			modalObj.find('.has-feedback').removeClass('has-success').removeClass('has-error'); 
-		
-    		modalObj.find('.spTips').hide();
-    		modalObj.find('.spOk').hide();
-    		modalObj.find('.spRemove').hide();
-			
-			//根据.modal的'data-oprt'值选定button，初始化赋值
-			$('button:submit').hide();
-			switch($('.modal').attr('data-oprt')){
-				case '_ADDNEW':
-					$('#btnCreate').show();
-					$('#oprt').val('_CREATE');
-				break;
-				case '_EDIT':
-					$('#btnUpdate').show();
-					$('#btnDelete').show();
-					$('#oprt').val('_UPDATE');
-				break;
-			}
-		}); 
-	}
-
-	//**函数名：ajaxData
- 	//* 作用：ajax操作
-	//* 参数btnObj，类型：对象。值：不为空。说明：btn对象。
-	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
-	//* 参数data，类型：数值。值：调用函数的对象的属性'data-id'值。
-	//* 返回值：无
-	function ajaxData(btnObj,url,data){
-		$.ajax({
-			type : 'post',
-			async : true,  //异步请求
-			url : url, 
-			<!-- // 发送到服务器的数据 -->
-			data : {'oprt':oprt,'id':id},
-			timeout:2000,
-			<!-- // 指定服务器端response的数据类型为json -->
-			dataType:"json",
-			success:function(backData){
-				
-			},
-			error: function() {
-               	$.alert('与服务器通讯超时，请稍后再试！');
-            }
-		});	
-	}
 
 <!--/ function -->
 	

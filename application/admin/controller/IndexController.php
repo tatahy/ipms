@@ -6,7 +6,7 @@ use think\Session;
 use think\Model;
 
 
-use app\user\model\Rolety as RoletyModel;
+use app\admin\model\Rolety as RoletyModel;
 use app\admin\model\Dept as DeptModel;
 use app\admin\model\Usergroup as UsergroupModel;
 use app\admin\model\User as UserModel;
@@ -436,11 +436,11 @@ class IndexController extends \think\Controller
       }
       
       // 查询数据库中是否存在页面传来的数据
-      // 限制登录的用户必须rolety_id=8（admin）或9（superadmin）
+      // 限制登录的用户必须rolety_id=6（admin）或7（superadmin）
       $user = UserModel::where('username',$username)
                             ->where('pwd',$pwd)
                             ->where('rolety_id','in','8,9')
-                            ->whereOr('usergroup_id','in','8,9')
+                            ->whereOr('usergroup_id','in','6,7')
                             ->find();
                             
       if(empty($user)){
@@ -1232,7 +1232,7 @@ class IndexController extends \think\Controller
        
         // 查出所有用户组
         $usergroup = UsergroupModel::where('id','>',0)
-                              ->order('name asc')
+                              ->order('id asc')
                               ->paginate($usergroupTableRows,false,['type'=>'bootstrap','var_page'=>'usergroupPageNum']);                     
         
         // 分页变量
@@ -1324,6 +1324,9 @@ class IndexController extends \think\Controller
     
       $oprt=$request->param('oprt');
       $id=$request->param('id');
+      $result='';
+      $msg='';
+      $msgPatch='';
       
       if($oprt=='_CREATE' || $oprt=='_UPDATE') {
         if(count($request->param('authIss/a'))){
@@ -1389,9 +1392,6 @@ class IndexController extends \think\Controller
         $usergroupData=array('name'=>$request->param('usergroupName'),
                                 'enable'=>$request->param('usergroupEn'),
                                 'authority'=>$authority);
-        $result='';
-        $msg='';
-        $msgPatch='';
       }
       
       switch($oprt){
@@ -1402,7 +1402,7 @@ class IndexController extends \think\Controller
         
         case '_EDIT':
           //调用Usergroup模型层定义的initUsergroupAuth()方法，初始化用户组的各个模块权限
-          $usergroupMdl->initUsergroupAuth($id);
+          //$usergroupMdl->initUsergroupAuth($id);
           $usergroup=$usergroupMdl::get($id);
         break;
         
@@ -1417,14 +1417,18 @@ class IndexController extends \think\Controller
             $usergroup=$usergroupMdl::create($usergroupData,true);
             $result='success';
             $msg='创建成功。';
+            $id=$usergroup->id;
           }
         break;
         
         case '_UPDATE': 
-        //count($usergroupMdl::all(['name'=>$request->param('usergroupName')]))
-        $n=count($usergroupMdl->where('name',$request->param('usergroupName'))->select());
-        $name=$usergroupMdl::get($id)->name;    
-          if($n){
+          $n=count($usergroupMdl->where('name',$request->param('usergroupName'))->select());
+          $name=$usergroupMdl::get($id)->name;
+          if($request->param('usergroupName')==$name){
+            $usergroup = $usergroupMdl::update($usergroupData,['id'=>$id],true);
+            $result='success';
+            $msg='更新成功。<br>';
+          }else if($request->param('usergroupName')!=$name && $n){  
             $usergroup=$usergroupMdl::get($id);
             $result='false';
             $msg='修改失败。<br>';
@@ -1433,7 +1437,6 @@ class IndexController extends \think\Controller
           }else{
             // 使用静态方法，向Usergroup表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
             $usergroup = $usergroupMdl::update($usergroupData,['id'=>$id],true);
-            //$id=$usergroup->id;
             $result='success';
             $msg='修改成功。<br>';
             $msgPatch='修改为【'.$request->param('usergroupName').'】';
@@ -1441,8 +1444,13 @@ class IndexController extends \think\Controller
           
         break;
         
-        case "_DELETE":
-          $name=$usergroupMdl::get($id)->name;
+        case '_DELETE':
+          $name=$usergroupMdl::get($id)->name;  
+          $usergroupMdl::destroy($id);
+          $result='success';
+          $msg='删除成功。<br>';
+          //返回默认的$id
+          $id=$usergroupMdl::where('id','>',0)->min('id');
           
         break;
         
@@ -1462,20 +1470,13 @@ class IndexController extends \think\Controller
         ]);
         // 返回前端模板文件
         return view('editUsergroup');
-     }elseif($oprt=='_CREATE' || $oprt=='_UPDATE'){
+     }elseif($oprt=='_CREATE' || $oprt=='_UPDATE' || $oprt=='_DELETE'){
         // 返回前端JSON数据 
         return ['result'=>$result,'id'=>$id,'name'=>$name,'msg'=>$msg,'msgPatch'=>$msgPatch];
      }elseif($oprt=='_DISABLE' || $oprt=='_ENABLE'){
         // 返回前端JSON数据 
         return ['enable'=>$usergroupMdl::get($id)->enable,'id'=>$id];
-     }else{
-        //$oprt=='_DELETE'
-        return json_encode(['name'=>$name,'auth'=>$usergroupMdl::get($id)->authority]);
-      
      }
-      
-      
-      
       
     }
     

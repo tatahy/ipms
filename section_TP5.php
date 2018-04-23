@@ -331,10 +331,30 @@ class Index
 ?>
 
 模型类的静态CURD操作其实都是内部自动实例化而已，所以说白了提供的这些静态操作方法只是对动态CURD操作方法的静态封装罢了。查询时，模型方式返回的数据集包含符合查询条件的模型对象实例的数组。
-至于静态方法的场景，主要是不想实例化或者不方便实例化的需求，而且支持变量的静态调用，例如：
-<?php
 
-//save方法的返回值不是自增主键的值（和Db的execute方法一样返回影响的记录数），要获取自增主键的值可以使用下面的方式：
+至于静态方法的场景，主要是不想实例化或者不方便实例化的需求，而且支持变量的静态调用。
+<?php
+//create方法,创建。返回值是创建的User模型的对象实例
+//update方法,更新。返回值是更新的User模型的对象实例
+//destroy方法,删除。返回值是影响的记录数。
+//get方法,读取单个。返回值单个符合查询条件的User模型的对象实例
+//all方法,读取多个。返回值多个符合查询条件的User模型的对象实例
+
+create方法
+//静态调用
+$user = User::create([
+    'name'  => 'thinkphp',
+    'email' => 'thinkphp@qq.com',
+]);
+echo $user->id;
+//或者：
+$model = '\app\index\model\User';
+$user  = $model::create([
+    'name'  => 'thinkphp',
+    'email' => 'thinkphp@qq.com',
+]);
+echo $user->id;
+//模型类
 $user        = new User;
 $user->name  = 'thinkphp';
 $user->email = 'thinkphp@qq.com';
@@ -342,13 +362,57 @@ $user->save();
 // 获取用户的主键数据
 echo $user->id;
 
-$model = '\app\index\model\User';
-$user  = $model::create([
-    'name'  => 'thinkphp',
-    'email' => 'thinkphp@qq.com',
-]);
-echo $user->id;
 //create方法的返回值是User模型的对象实例，所以可以通过$user->id得到create后的id值。
+//save方法的返回值不是自增主键的值（和Db的execute方法一样返回影响的记录数），要获取自增主键的值可以使用下面的方式：
+
+
+update方法
+//静态调用
+User::update([
+    'name'  => 'topthink',
+    'email' => 'topthink@qq.com',
+], ['id' => 1]);
+//模型类
+$user        = User::get(1);
+$user->name  = 'topthink';
+$user->email = 'topthink@qq.com';
+$user->save();
+
+
+all方法，destroy方法。
+//1.根据主键值查询/删除
+//静态调用
+User::all([1, 2, 3]);
+User::destroy([1, 2, 3]);
+//模型类
+$user = User::get(1);
+$user->delete();
+
+//2.闭包查询/删除。闭包方法中可以使用任何的查询类方法（但不需要在闭包里面调用查询）。闭包只有一个参数，就是查询对象。
+//静态调用
+$users = User::all(function ($query) {
+    $query->where('name', 'like', '%think')
+        ->where('id', 'between', [1, 5])
+        ->order('id desc')
+        ->limit(5);
+});
+
+User::destroy(function ($query) {
+    $query->where('id', '>', 0)
+        ->where('status', 0);
+});
+
+//3.传入数组查询/删除条件
+//静态调用
+$users = User::all([
+    'name' => 'thinkphp',
+    'id'   => ['>', 1],
+]);
+
+User::destroy([
+    'status' => 0,
+]);
+
 ?>
 
 以name属性为例，获取模型数据的方式有下列三种：

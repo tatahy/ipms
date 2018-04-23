@@ -276,6 +276,10 @@ $(document).ready(function(){
 					$('#oprt').val('_UPDATE');
 				break;
 			}
+
+			$('.modal').on('shown.bs.modal', function(){
+				$('.inputCheck').eq(0).focus();
+			});			
 		}); 
 	}
 	
