@@ -1317,35 +1317,128 @@ class IndexController extends \think\Controller
     }
     
     // 用户组CDUR，接收客户端通过Ajax，post来的参数，返回json数据
+    //前端传来的oprt值:_CREATE、_UPDATE、_ADDNEW、_EDIT、_DISABLE、_ENABLE
     public function usergroupOprt(Request $request,UsergroupModel $usergroupMdl,$oprt='_CREATE',$id='0')
     {
       $this->_loginUser();
     
       $oprt=$request->param('oprt');
-      $id=$request->param('id');        
+      $id=$request->param('id');
+      
+      if($oprt=='_CREATE' || $oprt=='_UPDATE') {
+        if(count($request->param('authIss/a'))){
+          foreach($request->param('authIss/a') as $v){
+            $iss[$v]=1;
+          }
+        }else{
+          $iss=array();
+        }
+        
+        if(count($request->param('authPat/a'))){
+          foreach($request->param('authPat/a') as $v){
+            $pat[$v]=1;
+          }
+        }else{
+          $pat=array();
+        }
+
+        if(count($request->param('authPro/a'))){
+          foreach($request->param('authPro/a') as $v){
+            $pro[$v]=1;
+          }
+        }else{
+          $pro=array();
+        }
+        
+        if(count($request->param('authThe/a'))){
+          foreach($request->param('authThe/a') as $v){
+            $the[$v]=1;
+          }
+        }else{
+          $the=array();
+        }
+        
+        if(count($request->param('authAtt/a'))){
+          foreach($request->param('authAtt/a') as $v){
+            $att[$v]=1;
+          }
+        }else{
+          $att=array();
+        }
+        
+        if(!empty($request->param('adminEn')) && $request->param('adminEn')){
+          $admin=['enable'=>1];
+        }else{
+          $admin=['enable'=>0];
+        }
+        //array_merge再重新合并成新数组，得到用户组新的权限集。
+        $iss=array_merge(_commonModuleAuth('_ISS'),$iss);
+        $pat=array_merge(_commonModuleAuth('_PAT'),$pat);
+        $pro=array_merge(_commonModuleAuth('_PRO'),$pro);
+        $the=array_merge(_commonModuleAuth('_THE'),$the);
+        $att=array_merge(_commonModuleAuth('_ATT'),$att);
+        $admin=array_merge(_commonModuleAuth('_ADMIN'),$admin);    
+        //组装数据
+        $authority=array("iss"=>$iss,
+                            "att"=>$att,
+                            "pat"=>$pat,
+                            "pro"=>$pro,
+                            "the"=>$the,
+                            "admin"=>$admin
+                            );
+        $usergroupData=array('name'=>$request->param('usergroupName'),
+                                'enable'=>$request->param('usergroupEn'),
+                                'authority'=>$authority);
+        $result='';
+        $msg='';
+        $msgPatch='';
+      }
       
       switch($oprt){
         case '_ADDNEW':
           $usergroup=array('id'=>$id,'name'=>'','authority'=>_commonModuleAuth());
+          
         break;
         
         case '_EDIT':
-          //调用Usergroup模型层定义的refreshUsergroupAuth()方法，刷新用户组的各个模块权限
-          $usergroupMdl->refreshUsergroupAuth($id);
+          //调用Usergroup模型层定义的initUsergroupAuth()方法，初始化用户组的各个模块权限
+          $usergroupMdl->initUsergroupAuth($id);
           $usergroup=$usergroupMdl::get($id);
         break;
         
         case '_CREATE':
-          
-          $usergroup=array('id'=>$id,'name'=>'','authority'=>_commonModuleAuth());
+          $usergroup=$usergroupMdl::all(['name'=>$request->param('usergroupName')]);
+          $name=$request->param('usergroupName');
+          if(count($usergroup)){
+            $result='false';
+            $msg='创建失败。<br>';
+            $msgPatch='用户组【'.$request->param('usergroupName').'】已存在。';
+          }else{
+            $usergroup=$usergroupMdl::create($usergroupData,true);
+            $result='success';
+            $msg='创建成功。';
+          }
         break;
         
-        case '_UPDATE':
+        case '_UPDATE': 
+        //count($usergroupMdl::all(['name'=>$request->param('usergroupName')]))
+        $n=count($usergroupMdl->where('name',$request->param('usergroupName'))->select());
+        $name=$usergroupMdl::get($id)->name;    
+          if($n){
+            $usergroup=$usergroupMdl::get($id);
+            $result='false';
+            $msg='修改失败。<br>';
+            $msgPatch='用户组【'.$request->param('usergroupName').'】已存在。';
+            
+          }else{
+            // 使用静态方法，向Usergroup表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
+            $usergroup = $usergroupMdl::update($usergroupData,['id'=>$id],true);
+            //$id=$usergroup->id;
+            $result='success';
+            $msg='修改成功。<br>';
+            $msgPatch='修改为【'.$request->param('usergroupName').'】';
+          }
           
-          //调用Usergroup模型层定义的refreshUsergroupAuth()方法，刷新用户组的各个模块权限
-          $usergroupMdl->refreshUsergroupAuth($id);
-          
-          $usergroup=$usergroupMdl::get($id);
         break;
         
         case "_DELETE":
@@ -1371,7 +1464,7 @@ class IndexController extends \think\Controller
         return view('editUsergroup');
      }elseif($oprt=='_CREATE' || $oprt=='_UPDATE'){
         // 返回前端JSON数据 
-        return json_encode(['id'=>$id]);
+        return ['result'=>$result,'id'=>$id,'name'=>$name,'msg'=>$msg,'msgPatch'=>$msgPatch];
      }elseif($oprt=='_DISABLE' || $oprt=='_ENABLE'){
         // 返回前端JSON数据 
         return ['enable'=>$usergroupMdl::get($id)->enable,'id'=>$id];

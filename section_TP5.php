@@ -232,7 +232,7 @@ return view('dashboard'.DS.'pat'.DS.$role);
             url: 'patIssOprt',
             data: formData,
             contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
-            processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)
+            processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)。当使用FormData()，必须设为false，否则jqurey默认将FormData()转换为查询字符串。
 			// 进度条显示上传进度
 			xhr: xhrOnProgress(function(e){
                 var percent=(e.loaded / e.total)*100;//计算百分比
@@ -330,7 +330,7 @@ class Index
 }
 ?>
 
-模型类的静态CURD操作其实都是内部自动实例化而已，所以说白了提供的这些静态操作方法只是对动态CURD操作方法的静态封装罢了。
+模型类的静态CURD操作其实都是内部自动实例化而已，所以说白了提供的这些静态操作方法只是对动态CURD操作方法的静态封装罢了。查询时，模型方式返回的数据集包含符合查询条件的模型对象实例的数组。
 至于静态方法的场景，主要是不想实例化或者不方便实例化的需求，而且支持变量的静态调用，例如：
 <?php
 
@@ -425,6 +425,7 @@ $user->allowField(true)
     ->save();
 	
 //data方法属于链式操作方法，用于设置数据
+
 ?>
 
 
@@ -464,7 +465,7 @@ User::update(request()->param(), ['id' => 1], ['nickname', 'address']);
 
 User::create(request()->param(), true);
 User::update(request()->param(), ['id' => 1], true);
-
+//save方法返回影响的记录数，而update方法返回的则是模型的对象实例。
 ?>
 模型中添加业务逻辑
 添加业务逻辑，模型的优势不是用来做基础的CURD操作的，实际的应用中，一般都需要根据业务需求来增加额外的业务逻辑方法。

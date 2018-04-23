@@ -179,6 +179,13 @@ $(document).ready(function(){
 		}else{
 			ajaxOprt($(this),'usergroupOprt',id,oprt);
 		}
+		
+		if(oprt!='_ADDNEW'){
+			//先去掉上色
+			$(this).closest('tbody').children('tr').removeClass('bg-warning');
+			//所在行上色
+			$(this).closest('tr').addClass('bg-warning');
+		}
 	});
 	
 	<!-- //表格每页显示记录行数 -->
@@ -249,11 +256,12 @@ $(document).ready(function(){
 				break;
 			}
 			// 清除输入框的格式
-			modalObj.find('.modal input').parent().parent().removeClass("has-success").removeClass("has-error"); 
-			// 注意限定.tips/glyphicon-ok/glyphicon-remove所在标签.modal，否则会殃及其他标签的.tips/glyphicon-ok/glyphicon-remove
-    		modalObj.find('.modal .tips').hide();
-    		modalObj.find('.modal .glyphicon-ok').hide();
-    		modalObj.find('.modal .glyphicon-remove').hide();
+			<!-- modalObj.find('.modal input').parent().parent().removeClass("has-success").removeClass("has-error");  -->
+			modalObj.find('.has-feedback').removeClass("has-success").removeClass("has-error"); 
+		
+    		modalObj.find('.spTips').hide();
+    		modalObj.find('.spOk').hide();
+    		modalObj.find('.spRemove').hide();
 			
 			//根据.modal的'data-oprt'值选定button，初始化赋值
 			$('button:submit').hide();

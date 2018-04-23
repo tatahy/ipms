@@ -24,9 +24,9 @@ class Usergroup extends Model
     ];
     
     /**
-     * 刷新用户组的各个模块（issue，project，patent，thesis，attachment）权限
+     * 初始化用户组的各个模块（issue，project，patent，thesis，attachment）权限
      */
-     public function refreshUsergroupAuth($id)
+     public function initUsergroupAuth($id)
     {
       $usergroup=$this::get($id);
 
@@ -53,7 +53,9 @@ class Usergroup extends Model
           'authority'  => $authority,
         ], ['id'=>$id]);
       return $authority;
-    }     
+    }
+    
+         
 }
 ?>
 
