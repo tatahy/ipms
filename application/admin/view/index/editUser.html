@@ -1,18 +1,20 @@
 <!-- editUser.html -->
 	
-<form role="form" action="" method="post">
+<form id="fmUser" role="form" action="{$home}/admin/index/userOprt"  method="post">
+	<input id="id" type="text" name="id" value="{$user.id}" class="sr-only">
+	<input id="oprt" type="text" name="oprt" value="" class="sr-only">
 	<div class="form-group has-feedback">
 		<label for="username">用户名</label>
 		<!-- // bootstrap实现矢量图在输入框开头 -->
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-			<input type="text" class="form-control" id="username" name="username" placeholder="输入用户名">	
+			<input type="text" class="form-control inputCheck" id="userName" name="userName" value="{$user.username}" placeholder="输入用户名">	
 		</div>
 					
 		<!-- // 配合jQuery 中的内容验证代码-->
-		<span style="color:red;display:none;" class="tips"></span>
-        <span style="display: none;" class=" glyphicon glyphicon-remove form-control-feedback"></span>
-        <span style="display: none;" class="glyphicon glyphicon-ok form-control-feedback"></span>	
+		<span style="color:red;display:none;" class="spTips"></span>
+        <span style="display: none;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span>
+        <span style="display: none;" class="spOk glyphicon glyphicon-ok form-control-feedback"></span>	
 	</div>
 				
 	<div class="form-group has-feedback">
@@ -20,12 +22,12 @@
 		<!-- // bootstrap实现矢量图在输入框开头 -->
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-eye-open"></span></span>
-			<input type="password" class="form-control" id="pwd" name="pwd" placeholder="输入密码">
+			<input type="password" class="form-control inputCheck" id="pwd" name="pwd" placeholder="输入密码">
 		</div>		
 		<!-- // 配合jQuery 中的内容验证代码-->
-		<span style="color:red;display:none;" class="tips"></span>
-        <span style="display: none;" class=" glyphicon glyphicon-remove form-control-feedback"></span>
-        <span style="display: none;" class="glyphicon glyphicon-ok form-control-feedback"></span>
+		<span style="color:red;display:none;" class="spTips"></span>
+        <span style="display: none;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span>
+        <span style="display: none;" class="spOk glyphicon glyphicon-ok form-control-feedback"></span>	
 	</div>
 				
 	<div class="form-group">
@@ -72,20 +74,22 @@
 $(document).ready(function(){
 
 // 校验“用户名”和“密码”输入框的内容
- 	var regUsername = /^[a-zA-Z_][a-zA-Z0-9_]{4,19}$/;
+ 	//可以为英文、数字、中文和下划线,但不能以数字开头,unicode编码中的汉字范围:\u2E80-\u9FFF
+	var regUsername = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{4,19}$/;
 	var regPasswordSpecial = /[~!@#%&=;':",./<>_\}\]\-\$\(\)\*\+\.\[\?\\\^\{\|]/;
 	var regPasswordAlpha = /[a-zA-Z]/;
 	var regPasswordNum = /[0-9]/;
 	var password;
 	var check = [false, false];
-	
+		
 	// 单选框#searchDept的内容
-	showDept($("#selDept"),[{"text":"...不限","val":"0"}]);
+	ajaxShowSelect('selectResponse',{'req':'_DEPT'},$("#selDept"),[{'text':'...不限','val':'0'}]);
+	
 	// 单选框#searchUserGroup的内容
-	showUserGroup($("#selUserGroup"),[{"text":"...不限","val":"0"}]);
+	ajaxShowSelect('selectResponse',{'req':'_USERGROUP'},$("#selUserGroup"),[{'text':'...不限','val':'0'}]);
 	
 	<!-- // 检查“用户名”输入框的内容 -->
-	$("#username").change(function() { 
+	$("#username").focusout(function() { 
     	//test(),正则的验证函数，验证value是否符合regUsername要求。
     	//jquery的test()是获取或设置标签内文本既等于innerText。
     	//HY,待确认
@@ -113,162 +117,228 @@ $(document).ready(function(){
 		}	
     });
 	
+	//button:submit按钮
+	$('button:submit').click(function(event){
+		var url='userOprt';
+		var name=$('#userName').val();
+		var oprt=$(this).attr('data-oprt');
+		var formData=new FormData($('#fmUser').get(0));
+		var anchor=window.location.hash;
+		var strHtml=$(this).html();
+		var flag=check.every(function(value) {
+            return value == true
+        });
+		//阻止表单提交动作
+		event.preventDefault();
+		formData.append('oprt',oprt);
+		if(oprt=='_DELETE'){
+			strHtml='<span class="label label-danger">'+strHtml+'</span>';
+		}else{
+			strHtml='<span class="label label-primary">'+strHtml+'</span>';
+		}
+		
+		if (!flag) {
+			var i=0;
+			<!-- //check中存在false,对应的input用“has-error”突出显示。 -->
+        	for (key in check) {
+            	if (!check[key]) {
+                	$(this).closest('form').find('.inputCheck').eq(key).closest('.has-feedback').removeClass('has-success').addClass('has-error');
+            	}
+				if(key!=0){i=key};
+        	}
+			//序号最小的$('.inputCheck').eq(i)获得焦点？？
+			$('.inputCheck').eq(i).focus();	
+		}else{
+			$('.modal').modal('hide');
+			$.confirm(strHtml+'【'+name+'】',function(e){
+				con=e;
+				if(true==con){
+					ajaxProcess(url,formData,anchor);
+				}
+				else{
+					$('.modal').modal('show');
+				}
+			}).ok('确定(Y)').cancel('取消(N)');		
+		}
+	});
 	
-	$('#btnReset').click(function() {
-		// 应用jQuery的slice()方法将匹配元素的子集构造一个新的jQuery对象
-		<!-- $('#addUser input').slice(0,2).parent().parent().removeClass('has-error has-success'); -->
-			
-		for (key in check) {
-            $("#addUser").find("input").eq(key).parent().parent().removeClass("has-success has-error");
-        }
-    	$('#addUser .tips').hide();
-    	$('#addUser .glyphicon-ok').hide();
-    	$('#addUser .glyphicon-remove').hide();
+	
+	$('#btnReset').click(function(e) {
+		$.alert('reset');
+		var fmParent=$(this).closest('form');
+		e.preventDefault();
+		//本按钮所在form进行reset
+		fmParent.get(0).reset();
+		
+		<!-- for (key in check) { -->
+            <!-- $("#addUser").find("input").eq(key).parent().parent().removeClass("has-success has-error"); -->
+        <!-- } -->
+    	<!-- $('#addUser .tips').hide(); -->
+    	<!-- $('#addUser .glyphicon-ok').hide(); -->
+    	<!-- $('#addUser .glyphicon-remove').hide(); -->
+		
+		fmParent.find('.has-feedback').removeClass('has-success').removeClass('has-error'); 
+		
+		fmParent.find('.spTips').hide();
+    	fmParent.find('.spOk').hide();
+    	fmParent.find('.spRemove').hide();
+		
+		fmParent.find('.inputCheck').eq(0).focus();
     	check = [false, false];
 	
 	});
 
 <!-- function -->
-	//校验成功函数
-		function success(Obj, counter) {
-    		Obj.parent().parent().removeClass('has-error').addClass('has-success');
-    		$('#addUser .tips').eq(counter).hide();
-    		$('#addUser .glyphicon-ok').eq(counter).show();
-    		$('#addUser .glyphicon-remove').eq(counter).hide();
-    		check[counter] = true;
+//校验成功函数
+function success(obj, counter) {
+    var divParent=obj.closest('.has-feedback');
+	divParent.removeClass('has-error').addClass('has-success');
+	divParent.find('.spTips').hide();
+    divParent.find('.spOk').show();
+    divParent.find('.spRemove').hide();
+    check[counter] = true;
+}
 
-		}
+// 校验失败函数
+function fail(obj, counter, msg) {
+    var divParent=obj.closest('.has-feedback');
+	divParent.removeClass('has-success').addClass('has-error');
+	divParent.find('.spTips').text(msg).show();
+    divParent.find('.spOk').hide();
+    divParent.find('.spRemove').show();
+    check[counter] = false;
+}
 
-		// 校验失败函数
-		function fail(Obj, counter, msg) {
-    		Obj.parent().parent().removeClass('has-success').addClass('has-error');
-    		$('#addUser .glyphicon-remove').eq(counter).show();
-    		$('#addUser .glyphicon-ok').eq(counter).hide();
-    		$('#addUser .tips').eq(counter).text(msg).show();
-    		check[counter] = false;
-		}
+	<!-- //校验成功函数 -->
+<!-- function success(Obj, counter) { -->
+    <!-- Obj.parent().parent().removeClass('has-error').addClass('has-success'); -->
+    <!-- $('#addUser .tips').eq(counter).hide(); -->
+    <!-- $('#addUser .glyphicon-ok').eq(counter).show(); -->
+    <!-- $('#addUser .glyphicon-remove').eq(counter).hide(); -->
+    <!-- check[counter] = true; -->
+<!-- } -->
+
+	<!-- // 校验失败函数 -->
+<!-- function fail(Obj, counter, msg) { -->
+    <!-- Obj.parent().parent().removeClass('has-success').addClass('has-error'); -->
+    <!-- $('#addUser .glyphicon-remove').eq(counter).show(); -->
+    <!-- $('#addUser .glyphicon-ok').eq(counter).hide(); -->
+    <!-- $('#addUser .tips').eq(counter).text(msg).show(); -->
+    <!-- check[counter] = false; -->
+<!-- } -->
 	
-		// 匹配字母、数字、特殊字符至少两种的函数
-		function atLeastTwo(password) {
-    		var a = regPasswordSpecial.test(password) ? 1 : 0;
-    		var b = regPasswordAlpha.test(password) ? 1 : 0;
-    		var c = regPasswordNum.test(password) ? 1 : 0;
-    		return a + b + c;
-		}
+	// 匹配字母、数字、特殊字符至少两种的函数
+function atLeastTwo(password) {
+    var a = regPasswordSpecial.test(password) ? 1 : 0;
+    var b = regPasswordAlpha.test(password) ? 1 : 0;
+    var c = regPasswordNum.test(password) ? 1 : 0;
+    return a + b + c;
+}
 		
-	//**
- 	//*/向单选框填充"部门"的内容选项
-	//* 参数1：Obj，必须。类型：对象，值：单选框的对象名称
-	//* //参数2：attach，可为空。类型：json数组，值：需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
-	//*参数3：selected，可为空。类型：字符，值：单选框拟选定option项的value值。
- 	//**/
-	function showDept(Obj,attach,selected){
-		<!-- // 应用Ajax向服务器请求“部门”单选框内容所需数据，并组装好HTML语句 -->
-		$.ajax({
-			type : "post",
-			async : true,  //异步请求
-			url : "dept",
-			// 发送到服务器的数据，可无
-			<!-- data : data, -->
-			timeout:1000,
-			<!-- // 服务器端response的数据类型为json-->
-			dataType:"json",
-			success:function(backData){
-				var data=backData;
+	//**函数名：ajaxShowSelect
+ 	//* 作用：本页面ajax过程向服务器请求特定单选框内容所需数据，并组装好HTML语句
+	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
+	//* 参数data，类型：数值。值：传送给后端的键值对数据。
+	//* 参数obj，类型：对象。值：必须，单选框的对象名称
+	//*参数attach，类型：json数组。值：可为空，需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
+	//*参数selected，类型：字符。值：字符，可为空。
+	//* 返回值：无
+function ajaxShowSelect(url,data,obj,attach,selected){
+	$.ajax({
+		type : 'post',
+		async : true,  //异步请求
+		url : url,
+		data : data,
+		timeout:2000,
+		<!-- // 指定服务器端response的数据类型为json-->
+		dataType:'json',
+		success:function(backData){
+			var str='';
+			if(attach){
+				for(i=0;i<attach.length;i++){
+					str+='<option value="'+attach[i].val+'">'+attach[i].text+'</option>';
+				}
+			}
+			<!-- // 遍历backData数组组装HTML语句 -->
+			<!-- // backData的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
+			$.each(backData,function(n1,v1){
+				$.each(v1,function(n2,v2){
+					switch(data.req){
+						case '_DEPT':
+							if(n2=='name'){
+								str+='<option value="'+v2+'">'+v2+' （简称：';
+							}
+							if(n2=='abbr'){
+								str+=v2+'）</option>';
+							}
+						break;
+						
+						case '_USERGROUP':
+							if(n2=='id'){
+								str+='<option value="'+v2+'">';
+							}
+							if(n2=='name'){
+								str+=v2+'</option>';
+							}
+						break;
+					}
+				});
+			});
+			<!--// 清空单选框Obj的所有选项-->
+			obj.empty();
+			<!--// 添加单选框Obj的新选项-->
+			obj.append(str);
+				
+			<!-- // value=selected 的项为选定项-->
+			if (selected){
+				obj.val(selected).attr('selected','selected');
+			}
+			<!-- Obj.val(selected).attr('selected','selected'); -->
+		},
+		error: function() {
+            alert("失败Group，请稍后再试！");
+        }
+	});
+}
 
-				var str="";
-				if(attach){
-					for(i=0;i<attach.length;i++){
-						str+="<option value='"+attach[i].val+"'>"+attach[i].text+"</option>";
+//**函数名：ajaxProcess
+ 	//* 作用：本页面ajax过程
+	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
+	//* 参数data，类型：数值。值：传送给后端的键值对数据。
+	//* 参数archor，类型：字符串。值：本页面锚点值：window.location.hash。
+	//* 返回值：无
+function ajaxProcess(url,data,archor){
+	$.ajax({
+		type: 'post',
+        url: url,
+        data: data,
+		timeout:2000,
+		<!-- datatype: 'JSON', -->
+        contentType: false,// 当有文件要上传时，此项是必须的，否则会导致后台无法识别文件流的起始位置
+        processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)。当使用FormData()，必须设为false，否则jqurey默认将FormData()转换为查询字符串。
+		success: function(dataBack){
+			<!-- $('.modal').modal('hide'); -->
+			//dataBack的5个返回值id,result,name,msg,msgPatch
+			if(dataBack.result=='success'){
+				//ajax更新页面信息
+				$("#content").load(
+					'tplFile',
+					{'sId':archor},
+					function(){
+						//所在行上色'bg-warning'
+						$('button[data-id="'+dataBack.id+'"]').closest('tr').addClass('bg-warning');
+						$.alert('用户组【'+dataBack.name+'】<span class="label label-success">'+dataBack.msg+'</span>'+dataBack.msgPatch);
 					}
-					
-				}
-				
-				<!-- // 遍历data数组组装HTML语句 -->
-				<!-- // data的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
-				$.each(data,function(n1,v1){
-					$.each(v1,function(n2,v2){
-						if(n2=="name"){
-							str+="<option value='"+v2+"'>"+v2+" （简称：";
-						}
-						if(n2=="abbr"){
-							str+=v2+"）</option>";
-						}
-					});
-				});
-				
-				<!--// 清空单选框Obj的所有选项-->
-				Obj.empty();
-				<!--// 添加单选框Obj的新选项-->
-				Obj.append(str);
-				
-				<!-- // value=selected 的项为选定项-->
-				if (selected){
-					Obj.val(selected).attr('selected','selected');
-				}
-			},
-			error: function() {
-               alert("失败dept，请稍后再试！");
-            }
-		});
-	}
-	
-	//**
- 	//* 向单选框填充"用户组"的内容选项
-	//* 参数1：Obj，类型：对象。值：必须，单选框的对象名称
-	//* //参数2：attach，类型：json数组。值：可为空，需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
-	//*参数3：selected，类型：字符。值：字符，可为空。
- 	//**/ 
-	function showUserGroup(Obj,attach,selected){
-		<!-- // 应用Ajax向服务器请求“用户组”单选框内容所需数据，并组装好HTML语句 -->
-		$.ajax({
-			type : "post",
-			async : true,  //异步请求
-			url : "userGroup",
-			// 发送到服务器的数据，可无
-			<!-- data : data, -->
-			timeout:1000,
-			<!-- // 指定服务器端response的数据类型为json-->
-			dataType:"json",
-			success:function(backData){
-				var data=backData;
-				var str="";
-				if(attach){
-					for(i=0;i<attach.length;i++){
-						str+="<option value='"+attach[i].val+"'>"+attach[i].text+"</option>";
-					}
-					
-				}
-				<!-- // 遍历data数组组装HTML语句 -->
-				<!-- // data的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
-				$.each(data,function(n1,v1){
-					$.each(v1,function(n2,v2){
-						if(n2=="id"){
-							str+="<option value='"+v2+"'>";
-						}
-						if(n2=="name"){
-							str+=v2+"</option>";
-						}
-					});
-				});
-				
-				<!--// 清空单选框Obj的所有选项-->
-				Obj.empty();
-				<!--// 添加单选框Obj的新选项-->
-				Obj.append(str);
-				
-				<!-- // value=selected 的项为选定项-->
-				if (selected){
-					Obj.val(selected).attr('selected','selected');
-				}
-				<!-- Obj.val(selected).attr('selected','selected'); -->
-				
-			},
-			error: function() {
-               alert("失败Group，请稍后再试！");
-            }
-		});
-	}
+				);
+			}else{
+				$.alert('用户组【'+dataBack.name+'】<span class="label label-danger">'+dataBack.msg+'</span>'+dataBack.msgPatch);	
+			}
+		},
+		error: function(){
+			$.alert('与服务器通讯超时，请稍后再试！');
+		}
+	});	
+}
 <!--/ function -->
 	
 });

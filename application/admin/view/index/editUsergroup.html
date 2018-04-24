@@ -202,9 +202,9 @@ $(document).ready(function(){
             	if (!check[key]) {
                 	$(this).closest('form').find('.inputCheck').eq(key).closest('.has-feedback').removeClass('has-success').addClass('has-error');
             	}
-				if(i<key)i=key;
+				if(i!=key)i=key;
         	}
-			//序号最小的$('.inputCheck').eq(i)获得焦点？？
+			//未通过验证的序号最小的$('.inputCheck').eq(i)获得焦点
 			$('.inputCheck').eq(i).focus();	
 		}else{
 			$('.modal').modal('hide');
@@ -253,7 +253,7 @@ $(document).ready(function(){
     	fmParent.find('.spRemove').hide();
 		
 		fmParent.find('.inputCheck').eq(0).focus();
-	
+		check = [false];
 	});
 			
 <!-- function -->

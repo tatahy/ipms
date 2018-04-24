@@ -405,6 +405,25 @@ class IndexController extends \think\Controller
         return json($groups);
     }
     
+    //响应前端请求，返回信息
+    public function selectResponse(Request $request)
+    {
+      $this->_loginUser();
+      $req=$request->param('req');
+      switch($req){
+        case '_DEPT':
+          $res=DeptModel::where('enable','1')->select();
+        break;
+        
+        case '_USERGROUP':
+          $res=UsergroupModel::field('id,name')->select();
+        break;
+        
+      }
+      // 将数组转化为json
+      return json($res);
+    }
+    
     // 
     public function login(Request $request)
     {
@@ -938,33 +957,14 @@ class IndexController extends \think\Controller
       }else{
         $tplFile='#sysSummary';
       }
-      //前端发送的是文件名
-      if(!empty($request->param('tplFile'))){
-        $tplFile=$request->param('tplFile');
-        //组装返回前端的数据
-        if($request->param('id')!=0){
-          $usergroup=$usergroupMdl::get($request->param('id'));
-        }else{
-          //应用公共文件common.php中定义了公共函数_commonModuleAuth();
-          $usergroup=array('id'=>0,'name'=>'','authority'=>_commonModuleAuth());
-        }
-      }
       
-      //模板文件名
+      //返回模板文件
       if(substr($tplFile,0,1)=='#'){
         $tplFile=substr($tplFile,1);
-        
         $this->redirect($tplFile);
+      }else{
+        return '模板文件不存在。';
       }
-      else{
-        $this->assign([
-             'home'=>$request->domain(),
-             'usergroup'=>$usergroup,
-        ]);
-        return view($tplFile);
-      }
-      
-     //return view($tplFile);
     
     }
     
@@ -992,7 +992,7 @@ class IndexController extends \think\Controller
     }
     
     // 输出系统用户模板
-    public function sysUser(Request $request)
+    public function sysUser(Request $request,UsergroupModel $usergroupMdl)
     {
       $this->_loginUser();
       //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
@@ -1172,9 +1172,29 @@ class IndexController extends \think\Controller
         foreach($users as $v){
             $user1 = UserModel::get($v['id']);
             // 使用User模型中定义的关联关系(role)查出用户对应用户组名称(name)
-            $roleName=$user1->userGroups->name;
+            $roleName=$user1->role->name;
             // 将用户对应的用户组名称加入数据集$users中。
             $v['rolename']=$roleName;
+        }
+        
+        //添加groupNameNum字段到数据集$users中
+        //字段内容：根据user的usergroup_id字段添加UserGroup.name的内容后生成$groupNameNum字符串
+        foreach($users as $v){
+          $groupNameNum='';
+          //$groupNameNum=array();
+          //根据user的usergroup_id字段生成数组
+          $usergroup_id= explode(",", $v['usergroup_id']);//$usergroup_id=array(8,9,10)
+          if(count($usergroup_id)){
+            //由数组每个元素查找对应的name值
+            for($i=0;$i<count($usergroup_id);$i++){
+              //$groupNameNum[]=$usergroupMdl::get($usergroup_id[$i])['name'].'('.$usergroup_id[$i].')&nbsp;';
+              //由数组每个元素查及对应的name值拼接成字符串
+              $groupNameNum.=$usergroupMdl::get($usergroup_id[$i])['name'].'('.$usergroup_id[$i].')&nbsp;<br>';
+            }
+          }
+          //$v['groupNameNum']=json_encode($groupNameNum);
+          //添加groupNameNum字段到数据集$users中
+          $v['groupNameNum']=$groupNameNum;
         }
       
       $this->assign([
@@ -1290,33 +1310,44 @@ class IndexController extends \think\Controller
       
       //2.分情况执行业务逻辑，与数据库打交道 
       switch($oprt){
-        case "_CREATE":
+        case '_ADDNEW':
+          $user=array('id'=>$id,'username'=>'','dept'=>'');
+          
+        break;
+        
+        case '_EDIT':
+          //调用Usergroup模型层定义的initUsergroupAuth()方法，初始化用户组的各个模块权限
+          //$usergroupMdl->initUsergroupAuth($id);
+          $user=$userMdl::get($id);
+        break;
+        
+        case '_CREATE':
         
         break;
         
-        case "_UPDATE":
+        case '_UPDATE':
         
         break;
         
-        case "_DELETE":
-        
+        case '_DELETE':
+          $name=$userMdl::get($id)->name;  
+          $userMdl::destroy($id);
+          $result='success';
+          $msg='删除成功。<br>';
+          //返回默认的$id
+          $id=$userMdl::where('id','>',0)->min('id');
         break;
         
-        case"_DISABLE":
+        case'_DISABLE':
           $userMdl::update(['enable'=> 0], ['id' => $id]);
           
           $result='success';
-          // 返回前端JSON数据
-          return ['result'=>$result,'uid'=>$id];
-          
         break;
         
-        case"_ENABLE":
+        case'_ENABLE':
           $userMdl::update(['enable'=> 1], ['id' => $id]);
           
           $result='success';
-          // 返回前端JSON数据
-          return ['result'=>$result,'uid'=>$id];
           
         break;
         
@@ -1327,16 +1358,16 @@ class IndexController extends \think\Controller
        if ($oprt=='_ADDNEW' || $oprt=='_EDIT'){
           $this->assign([
                'home'=>$request->domain(),
-               'usergroup'=>$usergroup
+               'user'=>$user
           ]);
           // 返回前端模板文件
-          return view('editUsergroup');
+          return view('editUser');
        }elseif($oprt=='_CREATE' || $oprt=='_UPDATE' || $oprt=='_DELETE'){
           // 返回前端JSON数据 
           return ['result'=>$result,'id'=>$id,'name'=>$name,'msg'=>$msg,'msgPatch'=>$msgPatch];
        }elseif($oprt=='_DISABLE' || $oprt=='_ENABLE'){
           // 返回前端JSON数据 
-          return ['enable'=>$usergroupMdl::get($id)->enable,'id'=>$id];
+          return ['enable'=>$userMdl::get($id)->enable,'id'=>$id];
        }
       
     }

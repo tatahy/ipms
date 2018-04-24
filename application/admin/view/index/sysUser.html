@@ -60,9 +60,9 @@
 						
 						<th><a data-toggle="tooltip" data-placement="bottom" title="点击排序" href="#div1" sort="{$sort}" sortName="_DEPT">所属部门&nbsp;</a></th>
 						
-						<th ><a data-toggle="tooltip" data-placement="bottom" title="点击排序" href="#div1" sort="{$sort}" sortName="_USERGROUP">用户组名&nbsp;</a></th>
+						<th><a data-toggle="tooltip" data-placement="bottom" title="点击排序" href="#div1" sort="{$sort}" sortName="_USERGROUP">用户组名&nbsp;</a></th>
 						
-						<th >用户组编号</th>
+						<th>用户组名/编号</th>
 						
 						<!-- <th><a data-toggle="tooltip" data-placement="bottom" title="点击排序" href="#div1" sort="{$sort}" sortName="_ENABLE">操作&nbsp;</a></th> -->
 						
@@ -74,11 +74,11 @@
 					{volist name="users" id="vo" empty="暂时没有数据"}
 					<tr>
 						<td>{$i+($pageUserNum-1)*$userTableRows}</td>
-						<td>{$vo.username}</td>
+						<td class="name">{$vo.username}</td>
 						<td>{$vo.dept}</td>
 						<!-- <td>{$vo.rolety_id}</td>  -->
 						<td>{$vo.rolename}</td>
-						<td>{$vo.usergroup_id}</td>
+						<td>{$vo.groupNameNum}</td>
 						<td>
 							<button type="button" class="btn-link btnUser" data-id="{$vo.id}" data-oprt="_EDIT" data-toggle="modal" data-target="#modalEditUser" ><span class="glyphicon glyphicon-edit"></span>编辑</button>
 						
@@ -123,7 +123,7 @@
 </div>
 
 <!-- Modal "modalEditUser" -->
-<div class="modal fade" id="modalEditUser" role="dialog">
+<div class="modal fade" id="modalEditUser" role="dialog" data-oprt="">
     <div class="modal-dialog">
     
       <!-- Modal content-->
@@ -154,14 +154,13 @@
 <script>
 
 $(function(){
-	
 	// 单选框#searchDept的内容
-	ajaxShowSelect('dept',{'val':0},$('#searchDept'),[{'text':'...不限','val':'0'}]);
+	ajaxShowSelect('selectResponse',{'req':'_DEPT'},$('#searchDept'),[{'text':'...不限','val':'0'}]);
 	
 	// 单选框#searchUserGroup的内容
-	ajaxShowSelect('userGroup',{'val':0},$('#searchUserGroup'),[{'text':'...不限','val':'0'}]);
+	ajaxShowSelect('selectResponse',{'req':'_USERGROUP'},$('#searchUserGroup'),[{'text':'...不限','val':'0'}]);
 	
-	<!-- // 对用户表格中<td>里的<button>进行格式设置 -->
+	<!-- //<td>里的<button>进行格式设置 -->
 	$('tbody td button').each(function(){
 		if($(this).attr('enable')=='1'){
 			$(this).prevAll('button').show();
@@ -175,7 +174,7 @@ $(function(){
 		}
 	});
 	
-	<!-- // 用户表格中<td>内容含“superadmin”的去除<button>及附ept属span -->
+	<!-- //<td>内容含“superadmin”的去除<button>及附属span -->
 	$("tbody td").each(function(){
 		var str=$(this).text();
 		if(str.indexOf('superadmin')>=0){
@@ -247,7 +246,6 @@ $(function(){
 		var pageNum;
 		//(li.active)所代表的页数
 		var pageNumActive=$('#divUserTableRows li.active').children('span').text();
-		
 		// jQuery的preventDefault()方法阻止元素发生默认的行为。阻止访问a的URL
         event.preventDefault();
 		<!-- alert("pageStr:"+pageStr+" active:"+pageNumActive); -->
@@ -268,7 +266,6 @@ $(function(){
 		
 		}
 		<!-- alert("pageNum:"+pageNum); -->
-		
 		<!-- //根据每页显示记录行数，排序字段，排序方式，分页页数加载页面 -->
 		loadSysUser($("#userTableRows").val(),"{$sortName}","{$sort}",pageNum)
 	
@@ -280,12 +277,6 @@ $(function(){
 	<!-- // bootstap3中从命名空间“bs”修改tooltip的options属性值 -->
 	<!-- $(this).data("bs.tooltip").options.placement="top"; -->
 	<!-- $(this).data("bs.tooltip").options.title="点击后降序"; -->
-	
-	<!-- // 在#modalEditUser的model显示之前，应用show.bs.modal事件将#modalEditUser的model内容准备好 -->
-	$('#modalEditUser').on('show.bs.modal', function(){
-		$('#divEditUser_load').load('tplFile',{'tplFile':'editUser'});
-		
-	});	
 	
 	//.btnUser的按钮分类动作_ADDNEW、_EDIT、_DISABLE、_ENABLE
 	$('button.btnUser').click(function(){
@@ -384,8 +375,8 @@ function ajaxShowSelect(url,data,obj,attach,selected){
 			<!-- // backData的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
 			$.each(backData,function(n1,v1){
 				$.each(v1,function(n2,v2){
-					switch(url){
-						case 'dept':
+					switch(data.req){
+						case '_DEPT':
 							if(n2=='name'){
 								str+='<option value="'+v2+'">'+v2+' （简称：';
 							}
@@ -394,7 +385,7 @@ function ajaxShowSelect(url,data,obj,attach,selected){
 							}
 						break;
 						
-						case 'userGroup':
+						case '_USERGROUP':
 							if(n2=='id'){
 								str+='<option value="'+v2+'">';
 							}
@@ -405,138 +396,22 @@ function ajaxShowSelect(url,data,obj,attach,selected){
 					}
 				});
 			});
+			<!--// 清空单选框Obj的所有选项-->
+			obj.empty();
+			<!--// 添加单选框Obj的新选项-->
+			obj.append(str);
 				
-				<!--// 清空单选框Obj的所有选项-->
-				obj.empty();
-				<!--// 添加单选框Obj的新选项-->
-				obj.append(str);
-				
-				<!-- // value=selected 的项为选定项-->
-				if (selected){
-					obj.val(selected).attr('selected','selected');
-				}
-				<!-- Obj.val(selected).attr('selected','selected'); -->
-				
-			},
-			error: function() {
-               alert("失败Group，请稍后再试！");
-            }
-		});
+			<!-- // value=selected 的项为选定项-->
+			if (selected){
+				obj.val(selected).attr('selected','selected');
+			}
+			<!-- Obj.val(selected).attr('selected','selected'); -->
+		},
+		error: function() {
+            alert("失败Group，请稍后再试！");
+        }
+	});
 }
-	
-	//**
- 	//*/向单选框填充"部门"的内容选项
-	//* 参数1：Obj，必须。类型：对象，值：单选框的对象名称
-	//* //参数2：attach，可为空。类型：json数组，值：需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
-	//*参数3：selected，可为空。类型：字符，值：单选框拟选定option项的value值。
- 	//**/
-	function showDept(Obj,attach,selected){
-		<!-- // 应用Ajax向服务器请求“部门”单选框内容所需数据，并组装好HTML语句 -->
-		$.ajax({
-			type : "post",
-			async : true,  //异步请求
-			url : "{$home}/admin/index/dept",
-			// 发送到服务器的数据，可无
-			<!-- data : data, -->
-			timeout:1000,
-			<!-- // 服务器端response的数据类型为json-->
-			dataType:"json",
-			success:function(backData){
-				var data=backData;
-
-				var str="";
-				if(attach){
-					for(i=0;i<attach.length;i++){
-						str+="<option value='"+attach[i].val+"'>"+attach[i].text+"</option>";
-					}
-					
-				}
-				
-				<!-- // 遍历data数组组装HTML语句 -->
-				<!-- // data的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
-				$.each(data,function(n1,v1){
-					$.each(v1,function(n2,v2){
-						if(n2=="name"){
-							str+="<option value='"+v2+"'>"+v2+" （简称：";
-						}
-						if(n2=="abbr"){
-							str+=v2+"）</option>";
-						}
-					});
-				});
-				
-				<!--// 清空单选框Obj的所有选项-->
-				Obj.empty();
-				<!--// 添加单选框Obj的新选项-->
-				Obj.append(str);
-				
-				<!-- // value=selected 的项为选定项-->
-				if (selected){
-					Obj.val(selected).attr('selected','selected');
-				}
-			},
-			error: function() {
-               $.alert('与服务器通讯超时，请稍后再试！');
-            }
-		});
-	}
-	
-	//**
- 	//* 向单选框填充"用户组"的内容选项
-	//* 参数1：Obj，类型：对象。值：必须，单选框的对象名称
-	//* //参数2：attach，类型：json数组。值：可为空，需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
-	//*参数3：selected，类型：字符。值：字符，可为空。
- 	//**/ 
-	function showUserGroup(Obj,attach,selected){
-		<!-- // 应用Ajax向服务器请求“用户组”单选框内容所需数据，并组装好HTML语句 -->
-		$.ajax({
-			type : "post",
-			async : true,  //异步请求
-			url : "{$home}/admin/index/userGroup",
-			// 发送到服务器的数据，可无
-			<!-- data : data, -->
-			timeout:1000,
-			<!-- // 指定服务器端response的数据类型为json-->
-			dataType:"json",
-			success:function(backData){
-				var data=backData;
-				var str="";
-				if(attach){
-					for(i=0;i<attach.length;i++){
-						str+="<option value='"+attach[i].val+"'>"+attach[i].text+"</option>";
-					}
-					
-				}
-				<!-- // 遍历data数组组装HTML语句 -->
-				<!-- // data的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
-				$.each(data,function(n1,v1){
-					$.each(v1,function(n2,v2){
-						if(n2=="id"){
-							str+="<option value='"+v2+"'>";
-						}
-						if(n2=="name"){
-							str+=v2+"</option>";
-						}
-					});
-				});
-				
-				<!--// 清空单选框Obj的所有选项-->
-				Obj.empty();
-				<!--// 添加单选框Obj的新选项-->
-				Obj.append(str);
-				
-				<!-- // value=selected 的项为选定项-->
-				if (selected){
-					Obj.val(selected).attr('selected','selected');
-				}
-				<!-- Obj.val(selected).attr('selected','selected'); -->
-				
-			},
-			error: function() {
-               alert("失败Group，请稍后再试！");
-            }
-		});
-	}
 
 	<!-- function -->
 	//**函数名：ajaxModalShow
@@ -550,10 +425,10 @@ function ajaxShowSelect(url,data,obj,attach,selected){
 	function ajaxModalShow(modalObj,url,id,oprt,h4Html){
 		
 		//load成功后修改modal页面显示
-		$('#divEditUsergroup_load').load(url,{'oprt':oprt,'id':id},function(){
+		$('#divEditUser_load').load(url,{'oprt':oprt,'id':id},function(){
 			// 标题改名
 			modalObj.find('h4').html('【'+h4Html+'】用户组');
-			//修改#modalEditUsergroup的data-oprt属性值
+			//修改#modalEditUser的data-oprt属性值
 			modalObj.attr('data-oprt',oprt);
 			
 			//去掉标题底色
@@ -618,13 +493,13 @@ function ajaxShowSelect(url,data,obj,attach,selected){
 					btnObj.prev('span').hide();
 					//本行去掉上色
 					btnObj.closest('tr').removeClass("danger text-muted");
-					$.alert('用户组【'+btnObj.closest('tr').children('.name').text()+'】<span class="label label-success">启用</span>&nbsp;成功');
+					$.alert('用户【'+btnObj.closest('tr').children('.name').text()+'】<span class="label label-success">启用</span>&nbsp;成功');
 				}else{
 					btnObj.prevAll().hide();
 					btnObj.nextAll().show();
 					//本行上色
 					btnObj.closest('tr').addClass("danger text-muted");
-					$.alert('用户组【'+btnObj.closest('tr').children('.name').text()+'】<span class="label label-danger">停用</span>&nbsp;成功');
+					$.alert('用户【'+btnObj.closest('tr').children('.name').text()+'】<span class="label label-danger">停用</span>&nbsp;成功');
 				}
 			},
 			error: function() {
