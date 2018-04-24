@@ -26,10 +26,11 @@ class User extends Model
     /**
      * 获取用户所属的角色信息
      */
-  	public function role()
-      {
+  	public function userGroups()
+   {
       	return $this->belongsTo('Rolety');
-      }
+        //return $this->belongsTo('Usergroup');
+   }
     
    /**
      * 获取用户所属的角色信息，与Rolety通过虚拟中间表‘auth’建立多对多关联

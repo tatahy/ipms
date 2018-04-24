@@ -54,7 +54,11 @@
 				  <label><input type="checkbox" value="" checked>Remember me</label>
 				</div> -->
 	<hr>
-	<button id="btnCreate" type="submit" class="btn btn-primary btn-sm" data-oprt="_CREATE"><span class="glyphicon glyphicon-ok"></span>&nbsp;新增</button>
+	<button id="btnCreate" type="submit" class="btn btn-primary btn-sm" data-oprt="_CREATE"><span class="glyphicon glyphicon-file"></span>&nbsp;新增</button>
+	
+	<button id="btnUpdate" type="submit" class="btn btn-primary btn-sm" data-oprt="_UPDATE"><span class="glyphicon glyphicon-ok"></span>&nbsp;保存</button>
+		
+	<button id="btnDelete" type="submit" class="btn btn-danger btn-sm" data-oprt="_DELETE"><span class="glyphicon glyphicon-remove"></span>删除</button>
 	
 	<div class="pull-right">	
 		<button id="btnReset" type="reset" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-refresh"></span>&nbsp;重置</button>
@@ -109,83 +113,6 @@ $(document).ready(function(){
 		}	
     });
 	
-	<!-- // 提交按钮#btnCreate -->
-	$('#btnCreate').click(function(event) {
-  	//JavaScript的数组处理方法every(callback)，对数组中的每个元素都执行一次
-	//callback函数，直到callback返回false，every就返回false；
-	//若全部元素执行callback后都返回ture，every就返回true。
-	//此处的用意是只要数组check中存在false，将该项找出，并把该项对应的input用“has-error”突出显示。
-		var flag=check.every(function(value) {
-            return value == true
-        });
-			
-		<!-- // jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作 -->
-        event.preventDefault();
-		if (!flag) {
-			<!-- //check中存在false,对应的input用“has-error”突出显示。 -->
-        	for (key in check) {
-            	if (!check[key]) {
-                	$("#addUser").find("input").eq(key).parent().parent().removeClass("has-success").addClass("has-error");
-            	}else{
-					$("#addUser").find("input").eq(key).parent().parent().removeClass("has-error").addClass("has-success");
-				}
-        	}
-    	}
-		else{
-				
-			<!-- // 组装通过“post”提交的数据 -->
-			var sendData = {"oprt":"add","username":$("#username").val(),"pwd":$("#pwd").val(),"dept":$("#selDept").val(),"userGroup":$("#selUserGroup").val()};
-			$("#addUser").modal("hide");
-			$.ajax({
-				type : "post",
-				async : true,  //异步请求
-				url : "userOprt", 
-				<!-- // 发送到服务器的数据 -->
-				data : sendData,
-				timeout:1000,
-				<!-- // 指定服务器端response的数据类型为json -->
-				dataType:"json",
-				success:function(backData){
-					var data=backData;
-					<!-- alert(data.msg); -->
-					if(data.result=='success'){
-					//添加成功，弹出自定义提示页面 
-						$.confirm(data.msg,function(e){
-							con=e;
-							if(true==con){
-								//刷新页面并回到"#div1"页面
-								window.location.hash="#div1";
-								window.location.reload(true);
-							}else{
-								$('#btnReset').click();
-								//刷新页面并回到"#div0"页面
-								window.location.hash="#div0";
-								window.location.reload(true);
-							}
-						}).ok('继续添加').cancel('返回首页');
-					}else{
-						// 添加不成功，弹出自定义提示页面 
-						$.confirm(data.msg,function(e){
-							con=e;
-							if(true==con){
-								// 返回"#addUser".modal页面
-								$("#addUser").modal("show");
-							}else{
-								$('#btnReset').click();
-							}
-						}).ok('返回').cancel('取消');	
-						
-					}
-
-				},
-				error: function() {
-               		alert("失败1，请稍后再试！");
-            	}
-			});
-
-		}
-
-	});
 	
 	$('#btnReset').click(function() {
 		// 应用jQuery的slice()方法将匹配元素的子集构造一个新的jQuery对象

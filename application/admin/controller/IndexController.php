@@ -399,7 +399,8 @@ class IndexController extends \think\Controller
     {
         $this->_loginUser();
         
-        $groups=RoletyModel::field('id,name')->select();
+        //$groups=RoletyModel::field('id,name')->select();
+        $groups=UsergroupModel::field('id,name')->select();
         // 将数组转化为json
         return json($groups);
     }
@@ -1171,7 +1172,7 @@ class IndexController extends \think\Controller
         foreach($users as $v){
             $user1 = UserModel::get($v['id']);
             // 使用User模型中定义的关联关系(role)查出用户对应用户组名称(name)
-            $roleName=$user1->role->name;
+            $roleName=$user1->userGroups->name;
             // 将用户对应的用户组名称加入数据集$users中。
             $v['rolename']=$roleName;
         }
@@ -1274,12 +1275,20 @@ class IndexController extends \think\Controller
     }
     
      // 用户CDUR，接收客户端通过Ajax，post来的参数，返回json数据
-    public function userOprt(Request $request,UserModel $userMdl)
+    public function userOprt(Request $request,UserModel $userMdl,$oprt='_CREATE',$id='0')
     {
       $this->_loginUser();
       
       $oprt=$request->param('oprt');
-       
+      $id=$request->param('id');
+      $result='';
+      $msg='';
+      $msgPatch='';
+      
+      //1.分情况变量赋值
+      
+      
+      //2.分情况执行业务逻辑，与数据库打交道 
       switch($oprt){
         case "_CREATE":
         
@@ -1313,6 +1322,22 @@ class IndexController extends \think\Controller
         
         
       }
+      
+      //3.分情况返回前端数据
+       if ($oprt=='_ADDNEW' || $oprt=='_EDIT'){
+          $this->assign([
+               'home'=>$request->domain(),
+               'usergroup'=>$usergroup
+          ]);
+          // 返回前端模板文件
+          return view('editUsergroup');
+       }elseif($oprt=='_CREATE' || $oprt=='_UPDATE' || $oprt=='_DELETE'){
+          // 返回前端JSON数据 
+          return ['result'=>$result,'id'=>$id,'name'=>$name,'msg'=>$msg,'msgPatch'=>$msgPatch];
+       }elseif($oprt=='_DISABLE' || $oprt=='_ENABLE'){
+          // 返回前端JSON数据 
+          return ['enable'=>$usergroupMdl::get($id)->enable,'id'=>$id];
+       }
       
     }
     

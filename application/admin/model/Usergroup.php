@@ -23,6 +23,12 @@ class Usergroup extends Model
         'authority'  =>  'json',
     ];
     
+    // 关联关系
+    public function users()
+    {
+        return $this->hasMany('User');
+    }
+    
     /**
      * 初始化用户组的各个模块（issue，project，patent，thesis，attachment）权限
      */

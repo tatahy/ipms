@@ -176,9 +176,11 @@ $(document).ready(function(){
 	//button:submit按钮
 	$('button:submit').click(function(event){
 		var url='usergroupOprt';
-		<!-- var name=$('#usergroupName').val(); -->
+		var name=$('#usergroupName').val();
 		var oprt=$(this).attr('data-oprt');
 		var formData=new FormData($('#fmUsergroup').get(0));
+		var anchor=window.location.hash;
+		var strHtml=$(this).html();
 		var flag=check.every(function(value) {
             return value == true
         });
@@ -187,55 +189,36 @@ $(document).ready(function(){
 		event.preventDefault();
 		formData.append('oprt',oprt);
 		
-		//分2类'_DELETE';'_CREATE'、'_UPDATE'
-		<!-- if(oprt=='_DELETE'){ -->
+		if(oprt=='_DELETE'){
+			strHtml='<span class="label label-danger">'+strHtml+'</span>';
+		}else{
+			strHtml='<span class="label label-primary">'+strHtml+'</span>';
+		}
 		
-		<!-- }else{ -->
-			//输入框内容有误时的处理
-			if (!flag) {
-				var i=0;
-				<!-- //check中存在false,对应的input用“has-error”突出显示。 -->
-        		for (key in check) {
-            		if (!check[key]) {
-                		$(this).closest('form').find('.inputCheck').eq(key).closest('.has-feedback').removeClass('has-success').addClass('has-error');
-            		}
-					if(i<key)i=key;
-        		}
-				$('.inputCheck').eq(i).focus();
-				
-			}else{
-				$.ajax({
-					type: 'post',
-            		url: url,
-            		data: formData,
-					timeout:2000,
-					<!-- datatype: 'JSON', -->
-            		contentType: false,// 当有文件要上传时，此项是必须的，否则会导致后台无法识别文件流的起始位置
-            		processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)。当使用FormData()，必须设为false，否则jqurey默认将FormData()转换为查询字符串。
-					success: function(dataBack){
-						$('.modal').modal('hide');
-						//dataBack的5个返回值id,result,name,msg,msgPatch
-						if(dataBack.result=='success'){
-							//ajax更新页面信息
-							$("#content").load(
-								'tplFile',
-								{'sId':window.location.hash},
-								function(){
-									//所在行上色'bg-warning'
-									$('button[data-id="'+dataBack.id+'"]').closest('tr').addClass('bg-warning');
-									$.alert('用户组【'+dataBack.name+'】<span class="label label-success">'+dataBack.msg+'</span>'+dataBack.msgPatch);
-								}
-							);
-						}else{
-							$.alert('用户组【'+dataBack.name+'】<span class="label label-danger">'+dataBack.msg+'</span>'+dataBack.msgPatch);	
-						}
-					},
-					error: function(){
-						$.alert('与服务器通讯超时，请稍后再试！');
-					}
-				});			
-			}
-		<!-- } -->
+		if (!flag) {
+			var i=0;
+			<!-- //check中存在false,对应的input用“has-error”突出显示。 -->
+        	for (key in check) {
+            	if (!check[key]) {
+                	$(this).closest('form').find('.inputCheck').eq(key).closest('.has-feedback').removeClass('has-success').addClass('has-error');
+            	}
+				if(i<key)i=key;
+        	}
+			//序号最小的$('.inputCheck').eq(i)获得焦点？？
+			$('.inputCheck').eq(i).focus();	
+		}else{
+			$('.modal').modal('hide');
+			$.confirm(strHtml+'【'+name+'】',function(e){
+				con=e;
+				if(true==con){
+					ajaxProcess(url,formData,anchor);
+				}
+				else{
+					$('.modal').modal('show');
+				}
+			}).ok('确定(Y)').cancel('取消(N)');		
+			
+		}
 	});
 	
 	// 表单input:radio选中元素改变背景色
@@ -300,14 +283,13 @@ function fail(obj, counter, msg) {
     check[counter] = false;
 }
 	
-// 设置input:radio选中元素的背景色，适用于有2个radio，都带有“value”属性，第一个value=1，第二个为0。
+//设置input:radio选中元素的背景色，适用于有2个radio，都带有“value”属性，第一个value=1，第二个为0。
 function radioBg(obj){	
 	if(obj.val()==1){
 		obj.next().removeClass("label-default").addClass("label-info");
 	}else if(obj.val()==0){
 		obj.parent().siblings('label').find('span').removeClass("label-info").addClass("label-default");
 	}	
-
 }
 
 //设置input:checkbox元素的背景色
@@ -321,6 +303,44 @@ function checkboxBg(obj){
 	}
 }
 
+	//**函数名：ajaxProcess
+ 	//* 作用：本页面ajax过程
+	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
+	//* 参数data，类型：数值。值：传送给后端的键值对数据。
+	//* 参数archor，类型：字符串。值：本页面锚点值：window.location.hash。
+	//* 返回值：无
+function ajaxProcess(url,data,archor){
+	$.ajax({
+		type: 'post',
+        url: url,
+        data: data,
+		timeout:2000,
+		<!-- datatype: 'JSON', -->
+        contentType: false,// 当有文件要上传时，此项是必须的，否则会导致后台无法识别文件流的起始位置
+        processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)。当使用FormData()，必须设为false，否则jqurey默认将FormData()转换为查询字符串。
+		success: function(dataBack){
+			<!-- $('.modal').modal('hide'); -->
+			//dataBack的5个返回值id,result,name,msg,msgPatch
+			if(dataBack.result=='success'){
+				//ajax更新页面信息
+				$("#content").load(
+					'tplFile',
+					{'sId':archor},
+					function(){
+						//所在行上色'bg-warning'
+						$('button[data-id="'+dataBack.id+'"]').closest('tr').addClass('bg-warning');
+						$.alert('用户组【'+dataBack.name+'】<span class="label label-success">'+dataBack.msg+'</span>'+dataBack.msgPatch);
+					}
+				);
+			}else{
+				$.alert('用户组【'+dataBack.name+'】<span class="label label-danger">'+dataBack.msg+'</span>'+dataBack.msgPatch);	
+			}
+		},
+		error: function(){
+			$.alert('与服务器通讯超时，请稍后再试！');
+		}
+	});	
+}
 <!--/ function -->
 	
 });

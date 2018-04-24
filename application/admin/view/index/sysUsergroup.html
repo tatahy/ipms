@@ -137,8 +137,8 @@
 $(document).ready(function(){
 		
 	<!-- // 对用户组表格中<td>里的<button>进行格式设置 -->
-	$("tbody td button").each(function(){
-		if($(this).attr("enable")=='1'){
+	$('tbody td button').each(function(){
+		if($(this).attr('enable')=='1'){
 			$(this).prevAll('button').show();
             $(this).prev('span').hide();
 			$(this).hide();
@@ -169,7 +169,7 @@ $(document).ready(function(){
 		}	
 		
    	});
-	//.btnUsergroup的按钮分类动作
+	//.btnUsergroup的按钮分类动作_ADDNEW、_EDIT、_DISABLE、_ENABLE
 	$('button.btnUsergroup').click(function(){
 		var id=$(this).attr('data-id');
 		var oprt=$(this).attr('data-oprt');
@@ -230,7 +230,7 @@ $(document).ready(function(){
 	
 <!-- function -->
 	//**函数名：ajaxModalShow
- 	//* 作用：ajaxModalShow
+ 	//* 作用：本页面内ajaxModalShow
 	//* 参数modalObj，类型：对象。值：不为空。说明：modal对象。
 	//* 异步请求的url,类型：字符串。值：不为空。说明：ajax操作的URL。
 	//* 参数id，类型：数值。值：调用函数的对象的属性'data-id'值。
@@ -284,7 +284,7 @@ $(document).ready(function(){
 	}
 	
 	//**函数名：ajaxOprt
- 	//* 作用：ajax操作
+ 	//* 作用：本页面ajax操作
 	//* 参数btnObj，类型：对象。值：不为空。说明：btn对象。
 	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
 	//* 参数id，类型：数值。值：调用函数的对象的属性'data-id'值。

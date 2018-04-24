@@ -725,6 +725,97 @@ $('body').on('click', '#next', function() {
 
 <!--/  HY 2018/4/2 -->	
 
+<!-- HY 2018/4/24 -->	
+//正则表达式检查输入框内容，bootstrap3+jQuery1.12
+<html>
+
+<div class="form-group has-feedback col-sm-6">
+	<label for="usergroupName">用户组名</label>
+	<!-- // bootstrap实现矢量图在输入框开头 -->
+	<div class="input-group ">
+		<span class="input-group-addon"><span class="glyphicon glyphicon-education"></span></span>
+						
+		<input type="text" class="form-control" id="usergroupName" name="usergroupName" value="" placeholder="输入用户组名">
+	</div>	
+	<!-- // 配合jQuery 中的内容验证代码-->
+	<span style="color:red;display: none;" class="spTips"></span>
+     <span style="display: none;margin-right:17px;"  class="spOk glyphicon glyphicon-ok form-control-feedback"></span>
+	<span style="display: none;margin-right:17px;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span>		
+</div>
+
+</html>
+
+<script>
+<!-- usergroupName内容验证 -->
+	$("#usergroupName").focusout(function(){
+        if(regUserGroupName.test($(this).val())){
+			//$(this)为本页面第0个输入框
+			success($(this),0);	
+		}else if ($(this).val().length < 5) {
+        	if($(this).val()==''){
+				fail($(this), 0, '用户组名不能为空。');
+			}else{
+				fail($(this), 0, '用户组名太短，不能少于5个字符。');
+			}
+		}
+		else {
+        	fail($(this), 0, '用户组名为英文、数字、中文和下划线，但不能以数字开头。')
+    	}
+  	});
+	
+	$('#btnCreate').click(function(event) {
+  	//JavaScript的数组处理方法every(callback)，对数组中的每个元素都执行一次
+	//callback函数，直到callback返回false，every就返回false；
+	//若全部元素执行callback后都返回ture，every就返回true。
+	//此处的用意是只要数组check中存在false，将该项找出，并把该项对应的input用“has-error”突出显示。
+		var flag=check.every(function(value) {
+            return value == true
+        });
+			
+		<!-- // jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作 -->
+        event.preventDefault();
+		if (!flag) {
+			<!-- //check中存在false,对应的input用“has-error”突出显示。 -->
+        	for (key in check) {
+            	if (!check[key]) {
+                	$("#addUser").find("input").eq(key).parent().parent().removeClass("has-success").addClass("has-error");
+            	}else{
+					$("#addUser").find("input").eq(key).parent().parent().removeClass("has-error").addClass("has-success");
+				}
+        	}
+    	}
+	});
+
+// 正则表达式，可以为英文、数字、中文和下划线,但不能以数字开头,unicode编码中的汉字范围:\u2E80-\u9FFF
+var regUserGroupName = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{4,19}$/;
+
+// 数组，存储表单中输入框内容验证结果“true/false”。数组下标应与输入框下标一致，便于编程选择输入框
+var check = [false];
+
+	//校验成功函数
+function success(obj, counter) {
+    var divParent=obj.closest('.has-feedback');
+	divParent.removeClass('has-error').addClass('has-success');
+	divParent.find('.spTips').hide();
+    divParent.find('.spOk').show();
+    divParent.find('.spRemove').hide();
+    check[counter] = true;
+}
+
+// 校验失败函数
+function fail(obj, counter, msg) {
+    var divParent=obj.closest('.has-feedback');
+	divParent.removeClass('has-success').addClass('has-error');
+	divParent.find('.spTips').text(msg).show();
+    divParent.find('.spOk').hide();
+    divParent.find('.spRemove').show();
+    check[counter] = false;
+}
+</script>
+
+<!--/  HY 2018/4/24 -->	
+
+
 
 
 <!-- ......................问题................................ -->
