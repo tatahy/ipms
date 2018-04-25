@@ -124,11 +124,11 @@
 
 <!-- Modal "modalEditUser" -->
 <div class="modal fade" id="modalEditUser" role="dialog" data-oprt="">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
     
       <!-- Modal content-->
       <div class="modal-content">
-        <div class="modal-header bg-info" style="border-radius: 5px;">
+        <div class="modal-header bg-warning" style="border-radius: 5px;">
           	<button type="button" class="close" data-dismiss="modal">&times;</button>
 		  
           	<h4><strong>新增用户</strong></h4>
@@ -268,7 +268,6 @@ $(function(){
 		<!-- alert("pageNum:"+pageNum); -->
 		<!-- //根据每页显示记录行数，排序字段，排序方式，分页页数加载页面 -->
 		loadSysUser($("#userTableRows").val(),"{$sortName}","{$sort}",pageNum)
-	
 	});
 	
 	<!-- // bootstap3中修改tooltipd的title -->
@@ -288,7 +287,6 @@ $(function(){
 		}else{
 			ajaxOprt($(this),'userOprt',id,oprt);
 		}
-		
 		if(oprt!='_ADDNEW'){
 			//先去掉上色
 			$(this).closest('tbody').children('tr').removeClass('bg-warning');
@@ -298,22 +296,22 @@ $(function(){
 	});
 	
 	<!-- //表格每页显示记录行数 -->
-	$("#userTableRows").val('{$userTableRows}'); 
-	
-	$("#userTableRows").change(function(){
+	$('#userTableRows').val('{$userTableRows}'); 
+
+	$('#userTableRows').change(function(){
 		<!-- //根据每页显示记录行数加载页面 -->
 		loadSysUser($(this).val());
 	
 	});
 	
-	$("#btnSearchUser").click(function(){
+	$('#btnSearchUser').click(function(){
 		<!-- //根据每页显示记录行数加载页面 -->
-		loadSysUser($("#userTableRows").val());
+		loadSysUser($('#userTableRows').val());
 	});
 	
 	<!-- // 页面重新加载 -->
-	$("#btnReset").click(function(){
-		$("#content").load("sysUser");
+	$('#btnReset').click(function(){
+		$('#content').load('sysUser');
 		
 	});
 
@@ -329,9 +327,9 @@ $(function(){
 		var pageUserNum=pageUserNum;
 		
 		// 本页的3个查询词
-		var searchUserName=$("#searchUserName").val();
-		var searchDept=$("#searchDept").val();
-		var searchUserGroup=$("#searchUserGroup").val();
+		var searchUserName=$('#searchUserName').val();
+		var searchDept=$('#searchDept').val();
+		var searchUserGroup=$('#searchUserGroup').val();
 		
 		// 升序or降序
 		if(sort){}else{sort='_ASC';}
@@ -340,10 +338,10 @@ $(function(){
 		if(sortName){}else{sortName='_USERNAME';}
 		
 		// 组装通过“post”提交的数据，名称与后端所用一致
-		var sendData = {"sortName":sortName,"sort":sort,"userTableRows":rows,"searchUserName":searchUserName,"searchDept":searchDept,"searchUserGroup":searchUserGroup,"pageUserNum":pageUserNum};
+		var sendData = {'sortName':sortName,'sort':sort,'userTableRows':rows,'searchUserName':searchUserName,'searchDept':searchDept,'searchUserGroup':searchUserGroup,'pageUserNum':pageUserNum};
 		
 		// jquery load()方法，加载sysUser.html页面内容到index.html页面中<div id="content"></div>
-		$("#content").load("sysUser",sendData);
+		$('#content').load('sysUser',sendData);
 	
 	}
 	
@@ -427,22 +425,22 @@ function ajaxShowSelect(url,data,obj,attach,selected){
 		//load成功后修改modal页面显示
 		$('#divEditUser_load').load(url,{'oprt':oprt,'id':id},function(){
 			// 标题改名
-			modalObj.find('h4').html('【'+h4Html+'】用户组');
+			modalObj.find('h4').html('【'+h4Html+'】用户');
 			//修改#modalEditUser的data-oprt属性值
 			modalObj.attr('data-oprt',oprt);
 			
 			//去掉标题底色
 			switch(oprt){
 				case '_ADDNEW':
-					modalObj.find('.modal-header').addClass("bg-info");
+					modalObj.find('.modal-header').addClass("bg-warning");
 				break;
 				case '_EDIT':
-					modalObj.find('.modal-header').removeClass("bg-info");
+					modalObj.find('.modal-header').removeClass("bg-warning");
 				break;
 			}
 			// 清除输入框的格式
 			<!-- modalObj.find('.modal input').parent().parent().removeClass("has-success").removeClass("has-error");  -->
-			modalObj.find('.has-feedback').removeClass("has-success").removeClass("has-error"); 
+			modalObj.find('.has-feedback').removeClass('has-success').removeClass('has-error'); 
 		
     		modalObj.find('.spTips').hide();
     		modalObj.find('.spOk').hide();
@@ -459,6 +457,7 @@ function ajaxShowSelect(url,data,obj,attach,selected){
 					$('#btnUpdate').show();
 					$('#btnDelete').show();
 					$('#oprt').val('_UPDATE');
+					$('#pwd').closest('.has-feedback').remove();
 				break;
 			}
 

@@ -1304,10 +1304,15 @@ class IndexController extends \think\Controller
       $result='';
       $msg='';
       $msgPatch='';
-      
-      //1.分情况变量赋值
-      
-      
+      //分情况变量赋值
+      if($oprt=='_CREATE' || $oprt=='_UPDATE') {
+        
+        
+        
+        $userData=array('name'=>$request->param('usergroupName'),
+                                'enable'=>$request->param('usergroupEn'),
+                                'authority'=>$authority);
+      }
       //2.分情况执行业务逻辑，与数据库打交道 
       switch($oprt){
         case '_ADDNEW':
@@ -1322,11 +1327,41 @@ class IndexController extends \think\Controller
         break;
         
         case '_CREATE':
-        
+          $user=$usergroupMdl::all(['name'=>$request->param('usergroupName')]);
+          $name=$request->param('userName');
+          if(count($usergroup)){
+            $result='false';
+            $msg='创建失败。<br>';
+            $msgPatch='用户组【'.$request->param('usergroupName').'】已存在。';
+          }else{
+            $usergroup=$usergroupMdl::create($usergroupData,true);
+            $result='success';
+            $msg='创建成功。';
+            $id=$usergroup->id;
+          }
         break;
         
-        case '_UPDATE':
-        
+        case '_UPDATE': 
+          $n=count($usergroupMdl->where('name',$request->param('usergroupName'))->select());
+          $name=$usergroupMdl::get($id)->name;
+          if($request->param('usergroupName')==$name){
+            $usergroup = $usergroupMdl::update($usergroupData,['id'=>$id],true);
+            $result='success';
+            $msg='更新成功。<br>';
+          }else if($request->param('usergroupName')!=$name && $n){  
+            $usergroup=$usergroupMdl::get($id);
+            $result='false';
+            $msg='修改失败。<br>';
+            $msgPatch='用户组【'.$request->param('usergroupName').'】已存在。';
+            
+          }else{
+            // 使用静态方法，向Usergroup表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
+            $usergroup = $usergroupMdl::update($usergroupData,['id'=>$id],true);
+            $result='success';
+            $msg='修改成功。<br>';
+            $msgPatch='修改为【'.$request->param('usergroupName').'】';
+          }
+          
         break;
         
         case '_DELETE':
@@ -1383,7 +1418,7 @@ class IndexController extends \think\Controller
       $result='';
       $msg='';
       $msgPatch='';
-      
+      //1.分情况变量赋值
       if($oprt=='_CREATE' || $oprt=='_UPDATE') {
         if(count($request->param('authIss/a'))){
           foreach($request->param('authIss/a') as $v){
@@ -1449,7 +1484,7 @@ class IndexController extends \think\Controller
                                 'enable'=>$request->param('usergroupEn'),
                                 'authority'=>$authority);
       }
-      
+      //2. 分情况操作数据库
       switch($oprt){
         case '_ADDNEW':
           $usergroup=array('id'=>$id,'name'=>'','authority'=>_commonModuleAuth());
@@ -1518,7 +1553,7 @@ class IndexController extends \think\Controller
           $usergroupMdl::update(array('enable'=> 1), ['id' => $id]);          
         break;
       }
-     //分情况返回前端数据
+     //3.分情况返回前端数据
      if ($oprt=='_ADDNEW' || $oprt=='_EDIT'){
         $this->assign([
              'home'=>$request->domain(),

@@ -3,7 +3,9 @@
 <form id="fmUser" role="form" action="{$home}/admin/index/userOprt"  method="post">
 	<input id="id" type="text" name="id" value="{$user.id}" class="sr-only">
 	<input id="oprt" type="text" name="oprt" value="" class="sr-only">
-	<div class="form-group has-feedback">
+	
+	<div class="row">
+	<div class="form-group has-feedback col-sm-4">
 		<label for="username">用户名</label>
 		<!-- // bootstrap实现矢量图在输入框开头 -->
 		<div class="input-group">
@@ -13,24 +15,21 @@
 					
 		<!-- // 配合jQuery 中的内容验证代码-->
 		<span style="color:red;display:none;" class="spTips"></span>
-        <span style="display: none;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span>
-        <span style="display: none;" class="spOk glyphicon glyphicon-ok form-control-feedback"></span>	
+        <span style="display: none;margin-right:17px;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span>
+        <span style="display: none;margin-right:17px;" class="spOk glyphicon glyphicon-ok form-control-feedback"></span>	
 	</div>
 				
-	<div class="form-group has-feedback">
-		<label for="psw">密码</label>
+	<div class="form-group col-sm-4">
+		<label for="psw">登录密码（同用户名）</label>
 		<!-- // bootstrap实现矢量图在输入框开头 -->
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-eye-open"></span></span>
-			<input type="password" class="form-control inputCheck" id="pwd" name="pwd" placeholder="输入密码">
+			<input type="password" class="form-control" id="pwd" name="pwd" readonly="true" autocomplete="pwd">
 		</div>		
-		<!-- // 配合jQuery 中的内容验证代码-->
-		<span style="color:red;display:none;" class="spTips"></span>
-        <span style="display: none;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span>
-        <span style="display: none;" class="spOk glyphicon glyphicon-ok form-control-feedback"></span>	
+		
 	</div>
 				
-	<div class="form-group">
+	<div class="form-group col-sm-4">
 		<label for="selDept">所属部门</label>
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-tree-conifer"></span></span>
@@ -40,17 +39,33 @@
     		</select>
 		</div>
 	</div>
-				
-	<div class="form-group">
-		<label for="selUserGroup">&nbsp;所属用户组</label>
+	</div>	
+	
+	<div class="row">
+	<div class="form-group col-sm-6">
+		<label for="selUsergroup">&nbsp;可选用户组</label>
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-education"></span></span>
-			<select class="form-control" id="selUserGroup" name="userGroup">
+			<select class="form-control" id="selUsergroup">
     			<option value="">1</option>
     			<option value="">2</option>
     		</select>
 		</div>
 	</div>
+	
+	<div class="form-group has-feedback col-sm-6">
+		<label for="selectedUsergroup">&nbsp;已选用户组</label>
+		<div class="input-group">
+			<span class="input-group-addon"><span class="glyphicon glyphicon-education"></span></span>
+			<select class="form-control inputCheck" id="selectedUsergroup" name="selectedUsergroup">
+    			<option value="0">……已选</option>
+    		</select>
+		</div>
+		<span style="color:red;display:none;" class="spTips">至少有一个用户组</span>
+		<span style="display: none;margin-right:8px;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span>
+		
+	</div>
+	</div>	
 				
 				<!-- <div class="checkbox">
 				  <label><input type="checkbox" value="" checked>Remember me</label>
@@ -63,9 +78,9 @@
 	<button id="btnDelete" type="submit" class="btn btn-danger btn-sm" data-oprt="_DELETE"><span class="glyphicon glyphicon-remove"></span>删除</button>
 	
 	<div class="pull-right">	
-		<button id="btnReset" type="reset" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-refresh"></span>&nbsp;重置</button>
+		<button id="btnFormReset" type="reset" class="btn btn-primary btn-sm">重置</button>
 				
-		<button type="button" class="btn btn-warning btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 取消</button>
+		<button type="button" class="btn btn-warning btn-sm" data-dismiss="modal">取消</button>
 	</div>
 </form>
 
@@ -73,49 +88,91 @@
 
 $(document).ready(function(){
 
-// 校验“用户名”和“密码”输入框的内容
- 	//可以为英文、数字、中文和下划线,但不能以数字开头,unicode编码中的汉字范围:\u2E80-\u9FFF
-	var regUsername = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{4,19}$/;
-	var regPasswordSpecial = /[~!@#%&=;':",./<>_\}\]\-\$\(\)\*\+\.\[\?\\\^\{\|]/;
-	var regPasswordAlpha = /[a-zA-Z]/;
-	var regPasswordNum = /[0-9]/;
-	var password;
-	var check = [false, false];
+//正则表达式，由英文、数字、中文和下划线组成,但不能以数字开头,长度为2到20个字符。unicode编码中的汉字范围:\u2E80-\u9FFF
+	var regUsername = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{1,19}$/;
+	var check = [false,false];
 		
 	// 单选框#searchDept的内容
 	ajaxShowSelect('selectResponse',{'req':'_DEPT'},$("#selDept"),[{'text':'...不限','val':'0'}]);
 	
 	// 单选框#searchUserGroup的内容
-	ajaxShowSelect('selectResponse',{'req':'_USERGROUP'},$("#selUserGroup"),[{'text':'...不限','val':'0'}]);
+	ajaxShowSelect('selectResponse',{'req':'_USERGROUP'},$("#selUsergroup"),[{'text':'...待选','val':'0'}]);
+	
+	$('#selUsergroup').change(function(){
+	<!-- $('#selUsergroup').dblclick(function(){ -->
+		var obj=$(this).find('option:selected');
+		var v=obj.val();//var v=$(this).val();
+		<!-- var str=$('#selUsergroup option:selected').text(); -->
+		var str=obj.text();
+		obj.remove();
+		$(this).children('option').eq(0).text('剩余用户组：'+(this.length-1));
+		$('#selectedUsergroupText').html(v+'_'+str);
+		<!-- $('#selUsergroup option:selected').hide(); -->
+		<!-- $('#selUsergroup option:selected').remove(); -->
+		<!-- var option1=$('option').val(v).text(str); -->
+		<!-- $('#selectedUsergroup').append(option1); -->
+		var option='<option value="'+v+'">'+str+'</option>';
+		<!-- $(option).appendTo('#selectedUsergroup'); -->
+		$('#selectedUsergroup').append(option);
+		var len=$('#selectedUsergroup').find('option').length;
+		//对#selectedUsergroup的操作
+		$('#selectedUsergroup').children('option').eq(0).text('已选用户组：'+(len-1));
+		$('#selectedUsergroup').closest('.has-feedback').removeClass('has-error');
+		$('#selectedUsergroup').closest('.has-feedback').children('span').hide();
+		check[1]=true;
+		
+	});
+	
+	$('#selectedUsergroup').change(function(){
+		var obj=$(this).find('option:selected');
+		var v=obj.val();//var v=$(this).val();
+		var str=obj.text();
+		obj.remove();
+		$(this).children('option').eq(0).text('已选用户组：'+(this.length-1));
+		if($(this).find('option:last').val()==0){
+			$(this).closest('.has-feedback').addClass('has-error');	
+			$(this).closest('.has-feedback').children('span').show();
+			check[1]=false;
+		}else{
+			$(this).closest('.has-feedback').removeClass('has-error');
+			$(this).closest('.has-feedback').children('span').hide();
+			check[1]=true;
+		
+		}
+		//对#selUsergroup的操作
+		var option='<option value="'+v+'">'+str+'</option>';
+		$('#selUsergroup').append(option);
+		var len=$('#selUsergroup').find('option').length;
+		$('#selUsergroup').children('option').eq(0).text('剩余用户组：'+(len-1));
+	});
+	
+	$('#selectedUsergroup').focusout(function(){
+		if($(this).find('option:last').val()==0){
+			$(this).closest('.has-feedback').addClass('has-error');	
+			$(this).closest('.has-feedback').children('span').show();
+			check[1]=false;
+		}else{
+			$(this).closest('.has-feedback').removeClass('has-error');
+			$(this).closest('.has-feedback').children('span').hide();
+			check[1]=true;
+		}
+	});
 	
 	<!-- // 检查“用户名”输入框的内容 -->
-	$("#username").focusout(function() { 
+	$('#userName').focusout(function() { 
     	//test(),正则的验证函数，验证value是否符合regUsername要求。
     	//jquery的test()是获取或设置标签内文本既等于innerText。
     	//HY,待确认
     	if (regUsername.test($(this).val())) {
         	success($(this), 0);
-    	} else if ($(this).val().length < 5) {
-        	fail($(this), 0, '用户名太短，不能少于5个字符');
+			$('#pwd').val($(this).val());
+    	} else if ($(this).val().length < 2) {
+        	fail($(this), 0, '用户名太短，不能少于2个字符。');
     	} else {
-        	fail($(this), 0, '用户名只能为英文数字和下划线,且不能以数字开头')
+        	fail($(this), 0, '用户组名由英文、数字、中文和下划线组成，但不能以数字开头。')
     	}
 
 	});
-	
-	<!-- // 检查“密码”输入框的内容 -->
-	$("#pwd").change(function(){
-    	password = $(this).val();
-    	if ($(this).val().length < 8) {
-        	fail($(this), 1, '密码太短，不能少于8个字符');
-    	} else {
-        	if (atLeastTwo($(this).val()) < 2) {
-            	fail($(this), 1, '密码中至少包含字母、数字、特殊字符的两种')
-        	} else {
-            	success($(this), 1);
-        	}
-		}	
-    });
 	
 	//button:submit按钮
 	$('button:submit').click(function(event){
@@ -125,29 +182,31 @@ $(document).ready(function(){
 		var formData=new FormData($('#fmUser').get(0));
 		var anchor=window.location.hash;
 		var strHtml=$(this).html();
+		var selectedUsergroup=$('#selectedUsergroup').find('option:last').val();
 		var flag=check.every(function(value) {
             return value == true
         });
 		//阻止表单提交动作
 		event.preventDefault();
+		console.log(check);
 		formData.append('oprt',oprt);
 		if(oprt=='_DELETE'){
 			strHtml='<span class="label label-danger">'+strHtml+'</span>';
 		}else{
 			strHtml='<span class="label label-primary">'+strHtml+'</span>';
 		}
-		
 		if (!flag) {
-			var i=0;
+			var arr=[];
 			<!-- //check中存在false,对应的input用“has-error”突出显示。 -->
         	for (key in check) {
-            	if (!check[key]) {
-                	$(this).closest('form').find('.inputCheck').eq(key).closest('.has-feedback').removeClass('has-success').addClass('has-error');
+            	if(!check[key]){
+                	<!-- $(this).closest('form').find('.inputCheck').eq(key).closest('.has-feedback').removeClass('has-success').addClass('has-error'); -->
+                	$(this).closest('form').find('.has-feedback').eq(key).removeClass('has-success').addClass('has-error');
+					arr.push(key);
             	}
-				if(key!=0){i=key};
         	}
-			//序号最小的$('.inputCheck').eq(i)获得焦点？？
-			$('.inputCheck').eq(i).focus();	
+			//序号最小的$('.inputCheck').eq(i)获得焦点
+			$('.inputCheck').eq(Math.min.apply(null, arr)).focus();	
 		}else{
 			$('.modal').modal('hide');
 			$.confirm(strHtml+'【'+name+'】',function(e){
@@ -162,29 +221,20 @@ $(document).ready(function(){
 		}
 	});
 	
-	
-	$('#btnReset').click(function(e) {
-		$.alert('reset');
-		var fmParent=$(this).closest('form');
-		e.preventDefault();
+	$('#btnFormReset').click(function(event) {
+		//阻止表单reset
+		event.preventDefault();
 		//本按钮所在form进行reset
-		fmParent.get(0).reset();
+		$(this).closest('form').get(0).reset();
 		
-		<!-- for (key in check) { -->
-            <!-- $("#addUser").find("input").eq(key).parent().parent().removeClass("has-success has-error"); -->
-        <!-- } -->
-    	<!-- $('#addUser .tips').hide(); -->
-    	<!-- $('#addUser .glyphicon-ok').hide(); -->
-    	<!-- $('#addUser .glyphicon-remove').hide(); -->
+		$('.has-feedback').removeClass('has-success').removeClass('has-error'); 
+		$('.spTips').hide();
+    	$('.spOk').hide();
+    	$('.spRemove').hide();
 		
-		fmParent.find('.has-feedback').removeClass('has-success').removeClass('has-error'); 
+		$('.inputCheck').eq(0).focus();
 		
-		fmParent.find('.spTips').hide();
-    	fmParent.find('.spOk').hide();
-    	fmParent.find('.spRemove').hide();
-		
-		fmParent.find('.inputCheck').eq(0).focus();
-    	check = [false, false];
+		<!-- check = [false,false]; -->
 	
 	});
 
@@ -208,37 +258,11 @@ function fail(obj, counter, msg) {
     divParent.find('.spRemove').show();
     check[counter] = false;
 }
-
-	<!-- //校验成功函数 -->
-<!-- function success(Obj, counter) { -->
-    <!-- Obj.parent().parent().removeClass('has-error').addClass('has-success'); -->
-    <!-- $('#addUser .tips').eq(counter).hide(); -->
-    <!-- $('#addUser .glyphicon-ok').eq(counter).show(); -->
-    <!-- $('#addUser .glyphicon-remove').eq(counter).hide(); -->
-    <!-- check[counter] = true; -->
-<!-- } -->
-
-	<!-- // 校验失败函数 -->
-<!-- function fail(Obj, counter, msg) { -->
-    <!-- Obj.parent().parent().removeClass('has-success').addClass('has-error'); -->
-    <!-- $('#addUser .glyphicon-remove').eq(counter).show(); -->
-    <!-- $('#addUser .glyphicon-ok').eq(counter).hide(); -->
-    <!-- $('#addUser .tips').eq(counter).text(msg).show(); -->
-    <!-- check[counter] = false; -->
-<!-- } -->
-	
-	// 匹配字母、数字、特殊字符至少两种的函数
-function atLeastTwo(password) {
-    var a = regPasswordSpecial.test(password) ? 1 : 0;
-    var b = regPasswordAlpha.test(password) ? 1 : 0;
-    var c = regPasswordNum.test(password) ? 1 : 0;
-    return a + b + c;
-}
 		
 	//**函数名：ajaxShowSelect
  	//* 作用：本页面ajax过程向服务器请求特定单选框内容所需数据，并组装好HTML语句
 	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
-	//* 参数data，类型：数值。值：传送给后端的键值对数据。
+	//* 参数data，类型：json。值：传送给后端的键值对数据。{'req':'','':}
 	//* 参数obj，类型：对象。值：必须，单选框的对象名称
 	//*参数attach，类型：json数组。值：可为空，需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
 	//*参数selected，类型：字符。值：字符，可为空。
@@ -263,6 +287,7 @@ function ajaxShowSelect(url,data,obj,attach,selected){
 			<!-- // backData的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
 			$.each(backData,function(n1,v1){
 				$.each(v1,function(n2,v2){
+					//根据data的内容安排backData
 					switch(data.req){
 						case '_DEPT':
 							if(n2=='name'){
@@ -327,11 +352,11 @@ function ajaxProcess(url,data,archor){
 					function(){
 						//所在行上色'bg-warning'
 						$('button[data-id="'+dataBack.id+'"]').closest('tr').addClass('bg-warning');
-						$.alert('用户组【'+dataBack.name+'】<span class="label label-success">'+dataBack.msg+'</span>'+dataBack.msgPatch);
+						$.alert('用户【'+dataBack.name+'】<span class="label label-success">'+dataBack.msg+'</span>'+dataBack.msgPatch);
 					}
 				);
 			}else{
-				$.alert('用户组【'+dataBack.name+'】<span class="label label-danger">'+dataBack.msg+'</span>'+dataBack.msgPatch);	
+				$.alert('用户【'+dataBack.name+'】<span class="label label-danger">'+dataBack.msg+'</span>'+dataBack.msgPatch);	
 			}
 		},
 		error: function(){

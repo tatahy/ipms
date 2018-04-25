@@ -161,15 +161,15 @@ $(document).ready(function(){
         if(regUserGroupName.test($(this).val())){
 			//$(this)为本页面第0个输入框
 			success($(this),0);	
-		}else if ($(this).val().length < 5) {
+		}else if ($(this).val().length < 3) {
         	if($(this).val()==''){
 				fail($(this), 0, '用户组名不能为空。');
 			}else{
-				fail($(this), 0, '用户组名太短，不能少于5个字符。');
+				fail($(this), 0, '用户组名太短，不能少于3个字符。');
 			}
 		}
 		else {
-        	fail($(this), 0, '用户组名为英文、数字、中文和下划线，但不能以数字开头。')
+        	fail($(this), 0, '用户组名由英文、数字、中文和下划线组成，但不能以数字开头。')
     	}
   	});
 	
@@ -236,29 +236,29 @@ $(document).ready(function(){
 	});
 	
 	<!-- // 重置按钮 -->
-	$('#btnReset').click(function(e){
-		var fmParent=$(this).closest('form');
+	$('#btnReset').click(function(e){	
 		e.preventDefault();
 		//本按钮所在form进行reset
-		fmParent.get(0).reset();
-		radioBg(fmParent.find('input:radio[name="adminEn"]:checked'));
-		radioBg(fmParent.find('input:radio[name="usergroupEn"]:checked'));
-		fmParent.find('input:checkbox').each(function(){
+		$(this).closest('form').get(0).reset();
+		radioBg($('input:radio[name="adminEn"]:checked'));
+		radioBg($('input:radio[name="usergroupEn"]:checked'));
+		$('input:checkbox').each(function(){
 			checkboxBg($(this));
 		});
-		fmParent.find('.has-feedback').removeClass('has-success').removeClass('has-error'); 
+		$('.has-feedback').removeClass('has-success').removeClass('has-error'); 
 		
-		fmParent.find('.spTips').hide();
-    	fmParent.find('.spOk').hide();
-    	fmParent.find('.spRemove').hide();
+		$('.spTips').hide();
+    	$('.spOk').hide();
+    	$('.spRemove').hide();
 		
-		fmParent.find('.inputCheck').eq(0).focus();
+		$('.inputCheck').eq(0).focus();
+		
 		check = [false];
 	});
 			
 <!-- function -->
-// 正则表达式，可以为英文、数字、中文和下划线,但不能以数字开头,unicode编码中的汉字范围:\u2E80-\u9FFF
-var regUserGroupName = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{4,19}$/;
+// 正则表达式，由英文、数字、中文和下划线组成,但不能以数字开头,长度为3到20个字符。unicode编码中的汉字范围:\u2E80-\u9FFF
+var regUserGroupName = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{2,19}$/;
 
 // 数组，存储表单中输入框内容验证结果“true/false”。数组下标应与输入框下标一致，便于编程选择输入框
 var check = [false];
