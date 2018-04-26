@@ -1,8 +1,8 @@
 <!-- sysUser.html -->
-<div>
-		<h4><span class="label label-warning" style="font-size:16px;">系统用户总数&nbsp;<span class="badge">{$usersNum}</span></span></h4>
+<div id="divSysUser">
+		<h4 class="label label-warning" style="font-size:16px;"><span id="spTitle">系统用户总数：</span><span class="badge">{$usersNum}</span></h4>
 		
-		<p>
+		<p style="margin-top:5px;">
 			<!--// bootstap通过button调用Model -->
 			<button type="button" class="btn-link btnUser" data-oprt="_ADDNEW" data-id="0" data-toggle="modal" data-target="#modalEditUser"><span class="glyphicon glyphicon-file">新增</span></button>
 				
@@ -12,10 +12,10 @@
 			
 		</p>
 		<div id="divCollapse" class="collapse">
-			<form method="get" action="{$home}/admin/index/sysUser#sysUser" id="userSearch" class="form-inline">
+			<form method="get" id="userSearch" class="form-inline">
 				<div class="form-group">
 					<label class="" for="searchUserName">用户名</label>
-					<input class="form-control" id="searchUserName" name="searchUserName" type="text" value="{$searchUserName}" placeholder="...不限">
+					<input class="form-control" id="searchUserName" name="searchUserName" type="text" value="" placeholder="...不限">
 										
 				</div>
 					
@@ -30,8 +30,8 @@
 				</div>
 									
 				<div class="form-group">
-					<label class="control-label" for="searchUserGroup">用户组</label>
-					<select class="form-control" id="searchUserGroup" name="searchUserGroup">
+					<label class="control-label" for="searchUsergroup">用户组</label>
+					<select class="form-control" id="searchUsergroup" name="searchUsergroup">
 						<option value="_a">a</option>
 						<option value="_b">b</option>
 						<option value="_c">c</option>
@@ -60,7 +60,7 @@
 						
 						<th><a data-toggle="tooltip" data-placement="bottom" title="点击排序" href="#div1" sort="{$sort}" sortName="_DEPT">所属部门&nbsp;</a></th>
 						
-						<th><a data-toggle="tooltip" data-placement="bottom" title="点击排序" href="#div1" sort="{$sort}" sortName="_USERGROUP">用户组名&nbsp;</a></th>
+						<!-- <th><a data-toggle="tooltip" data-placement="bottom" title="点击排序" href="#div1" sort="{$sort}" sortName="_USERGROUP">用户组名&nbsp;</a></th> -->
 						
 						<th>用户组名/编号</th>
 						
@@ -76,8 +76,8 @@
 						<td>{$i+($pageUserNum-1)*$userTableRows}</td>
 						<td class="name">{$vo.username}</td>
 						<td>{$vo.dept}</td>
-						<!-- <td>{$vo.rolety_id}</td>  -->
-						<td>{$vo.rolename}</td>
+						<!-- <td>{ $vo.rolety_id}</td>  -->
+						<!-- <td>{ $vo.rolename}</td> -->
 						<td>{$vo.groupNameNum}</td>
 						<td>
 							<button type="button" class="btn-link btnUser" data-id="{$vo.id}" data-oprt="_EDIT" data-toggle="modal" data-target="#modalEditUser" ><span class="glyphicon glyphicon-edit"></span>编辑</button>
@@ -155,10 +155,10 @@
 
 $(function(){
 	// 单选框#searchDept的内容
-	ajaxShowSelect('selectResponse',{'req':'_DEPT'},$('#searchDept'),[{'text':'...不限','val':'0'}]);
+	ajaxShowSelect('selectResponse',{'req':'_DEPT'},$('#searchDept'),[{'text':'...不限','val':'0'}],'{$searchDept}');
 	
 	// 单选框#searchUserGroup的内容
-	ajaxShowSelect('selectResponse',{'req':'_USERGROUP'},$('#searchUserGroup'),[{'text':'...不限','val':'0'}]);
+	ajaxShowSelect('selectResponse',{'req':'_USERGROUP'},$('#searchUsergroup'),[{'text':'...不限','val':'0'}],'{$searchUsergroup}');
 	
 	<!-- //<td>里的<button>进行格式设置 -->
 	$('tbody td button').each(function(){
@@ -185,13 +185,13 @@ $(function(){
 	});
 	
 	<!-- // 显示搜索条件的div，修改触发"显示"的btn内容-->
-	$("#divCollapse").on("hide.bs.collapse", function(){
-    	$("#btnSearchInfo").html('<span class="glyphicon glyphicon-collapse-down">搜索</span>');
+	$('#divCollapse').on('hide.bs.collapse', function(){
+    	$('#btnSearchInfo').html('<span class="glyphicon glyphicon-collapse-down">搜索</span>');
   	});
 	
 	<!-- // 隐藏搜索条件的div，修改触发"隐藏"的btn内容-->
-  	$("#divCollapse").on("show.bs.collapse", function(){
-    	$("#btnSearchInfo").html('<span class="glyphicon glyphicon-collapse-up">隐藏搜索</span>');
+  	$('#divCollapse').on('show.bs.collapse', function(){
+    	$('#btnSearchInfo').html('<span class="glyphicon glyphicon-collapse-up">隐藏搜索</span>');
   	});
 	
 	<!-- // bootstrap3，enable所有的tooltip -->
@@ -202,7 +202,6 @@ $(function(){
 	
 	// 根据后端控制器给出的排序字段{$sortName},排序方式{$sort}，修改th中a的显示形式
 	$('thead a').each(function(){
-	
 		var glyAsc='<span class="small glyphicon glyphicon-sort-by-attributes text-muted"></span>';
 		var glyDesc='<span class="small glyphicon glyphicon-sort-by-attributes-alt text-warning"></span>';
 		
@@ -316,32 +315,31 @@ $(function(){
 	});
 
 <!-- function -->
-	//加载sys_user.html页面内容到index.html页面中<div id="content"></div>
+//**函数名：loadSysUser
+ 	//* 作用：加载sysUser.html页面
+	//* 参数rows，类型：数值。值：不为空。说明：每页显示的记录行数。
+	//* 参数sortName，类型：字符串。值：可为空。说明：排序字段值。
+	//* 参数sort，类型：字符串。值：可为空。说明：升序or降序。
+	//* 参数pageUserNum，类型：数值。值：可为空。说明：分页页数。
+	//* 返回值：无
 	function loadSysUser(rows,sortName,sort,pageUserNum){
-		// 每页显示的记录行数
-		var rows=rows;
-		var sortName=sortName;
-		var sort=sort;
-		
-		// 分页页数
-		var pageUserNum=pageUserNum;
-		
 		// 本页的3个查询词
 		var searchUserName=$('#searchUserName').val();
 		var searchDept=$('#searchDept').val();
-		var searchUserGroup=$('#searchUserGroup').val();
-		
-		// 升序or降序
+		var searchUsergroup=$('#searchUsergroup').val();
 		if(sort){}else{sort='_ASC';}
-		
-		// 排序的关键词
 		if(sortName){}else{sortName='_USERNAME';}
 		
 		// 组装通过“post”提交的数据，名称与后端所用一致
-		var sendData = {'sortName':sortName,'sort':sort,'userTableRows':rows,'searchUserName':searchUserName,'searchDept':searchDept,'searchUserGroup':searchUserGroup,'pageUserNum':pageUserNum};
+		var sendData = {'sortName':sortName,'sort':sort,'userTableRows':rows,'searchUserName':searchUserName,'searchDept':searchDept,'searchUsergroup':searchUsergroup,'pageUserNum':pageUserNum};
 		
 		// jquery load()方法，加载sysUser.html页面内容到index.html页面中<div id="content"></div>
-		$('#content').load('sysUser',sendData);
+		$('#content').load('sysUser',sendData,function(){
+			$('#spTitle').text('符合查询条件用户数：');
+			$('#searchUserName').val(searchUserName);
+			$('#divCollapse').collapse('show');
+			
+		});
 	
 	}
 	
@@ -398,12 +396,10 @@ function ajaxShowSelect(url,data,obj,attach,selected){
 			obj.empty();
 			<!--// 添加单选框Obj的新选项-->
 			obj.append(str);
-				
 			<!-- // value=selected 的项为选定项-->
 			if (selected){
-				obj.val(selected).attr('selected','selected');
+				obj.val(selected);
 			}
-			<!-- Obj.val(selected).attr('selected','selected'); -->
 		},
 		error: function() {
             alert("失败Group，请稍后再试！");

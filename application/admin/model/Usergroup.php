@@ -22,7 +22,7 @@ class Usergroup extends Model
         'authority'  =>  'json',
     ];
     
-    // 关联关系
+    // 与模型User（表user）的关联关系
     public function users()
     {
         return $this->hasMany('User');

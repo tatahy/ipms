@@ -286,9 +286,9 @@ function fail(obj, counter, msg) {
 //设置input:radio选中元素的背景色，适用于有2个radio，都带有“value”属性，第一个value=1，第二个为0。
 function radioBg(obj){	
 	if(obj.val()==1){
-		obj.next().removeClass("label-default").addClass("label-info");
+		obj.next().removeClass('label-default').addClass('label-info');
 	}else if(obj.val()==0){
-		obj.parent().siblings('label').find('span').removeClass("label-info").addClass("label-default");
+		obj.parent().siblings('label').find('span').removeClass('label-info').addClass("label-default");
 	}	
 }
 
@@ -323,12 +323,12 @@ function ajaxProcess(url,data,archor){
 			//dataBack的5个返回值id,result,name,msg,msgPatch
 			if(dataBack.result=='success'){
 				//ajax更新页面信息
-				$("#content").load(
+				$('#content').load(
 					'tplFile',
 					{'sId':archor},
 					function(){
 						//所在行上色'bg-warning'
-						$('button[data-id="'+dataBack.id+'"]').closest('tr').addClass('bg-warning');
+						$('button[data-id="'+dataBack.id+'"]').closest('tr').addClass('bg-warning').focus();
 						$.alert('用户组【'+dataBack.name+'】<span class="label label-success">'+dataBack.msg+'</span>'+dataBack.msgPatch);
 					}
 				);

@@ -271,6 +271,8 @@ Javascript,数组的最大值、数组的最小值
 var arr=[];
 for (var i=0;i<2;i++){
 	arr.push(i);
+	//join函数将数组arr转换成以‘,’分隔的字符串
+	str=arr.join(',');
 }
 
 var min=Math.min.apply(null, arr);//min=0
@@ -724,6 +726,61 @@ $('body').on('click', '#next', function() {
 </script>
 
 <!--/  HY 2018/4/2 -->	
+
+<!--  HY 2018/4/13 -->	
+
+<script>
+"window.location"
+
+//设置或获取整个url为字符串：
+window.location.href
+
+//页面跳转并传参 
+window.location.href="xx.php?param1="+p1+"&m2="+p2+"";
+
+//设置或获取href属性中在井号“#”后面的分段(锚点？？)：
+window.location.hash
+
+//设置或获取location 或 URL 的 hostname 和 port 号码：
+window.location.host
+
+//设置或获取href属性中跟在问号后面的部分：
+window.location.search
+
+//设置或获取对象指定的文件名或路径：
+window.location.pathname
+
+//设置或获取与URL关联的端口号码：
+window.location.port
+
+//设置或获取 URL 的协议部分：
+window.location.protocol
+
+//同样的要在frameset中获取到指定的页面的url也是可以的只要把window换成你指定的页面就可以了，比如：
+
+//设置或获取整个url为字符串：
+window.parent.frames["framesId"].location.href
+
+//设置或获取href属性中在井号“#”后面的分段：
+window.parent.frames["framesId"].location.hash
+
+//设置或获取location 或 URL 的 hostname 和 port 号码：
+window.parent.frames["framesId"].location.host
+
+//设置或获取href属性中跟在问号后面的部分：
+window.parent.frames["framesId"].location.search
+
+//设置或获取对象指定的文件名或路径：
+window.parent.frames["framesId"].location.pathname
+
+//设置或获取与URL关联的端口号码：
+window.parent.frames["framesId"].location.port
+
+//设置或获取 URL 的协议部分：
+window.parent.frames["framesId"].location.protocol
+
+</script>
+<!--/  HY 2018/4/13 -->	
 
 <!-- HY 2018/4/24 -->	
 //正则表达式检查输入框内容，bootstrap3+jQuery1.12

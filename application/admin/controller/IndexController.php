@@ -148,11 +148,11 @@ class IndexController extends \think\Controller
           $searchDept=0;
         } 
         
-        // 查询词3，'searchUserGroup'
-        if(!empty($request->param('searchUserGroup'))){
-          $searchUserGroup=$request->param('searchUserGroup');
+        // 查询词3，'$searchUsergroup'
+        if(!empty($request->param('$searchUsergroup'))){
+          $searchUsergroup=$request->param('$searchUsergroup');
         }else{
-          $searchUserGroup=0;
+          $searchUsergroup=0;
         } 
         
         //$sortName、$sort接收页面传来的排序信息
@@ -226,18 +226,18 @@ class IndexController extends \think\Controller
         if($searchDept!='0'){
           $map['dept'] = $searchDept;
                 
-          if(!empty($searchUserName) && $searchUserGroup!=0 ){
+          if(!empty($searchUserName) && $searchUsergroup!=0 ){
             
             $map['username'] = ['like','%'.$searchUserName.'%'];
-            $map['rolety_id'] = $searchUserGroup;
+            $map['rolety_id'] = $searchUsergroup;
             
-          }elseif(!empty($searchUserName) && $searchUserGroup==0  ){
+          }elseif(!empty($searchUserName) && $searchUsergroup==0  ){
             
             $map['username'] = ['like','%'.$searchUserName.'%'];
             
-          }elseif($searchUserGroup!=0 && empty($searchUserName)){
+          }elseif($searchUsergroup!=0 && empty($searchUserName)){
     
-            $map['rolety_id']  = $searchUserGroup;
+            $map['rolety_id']  = $searchUsergroup;
             
           }else{
             
@@ -245,15 +245,15 @@ class IndexController extends \think\Controller
           
         }else{
           
-          if(!empty($searchUserName) && $searchUserGroup!=0 ){
+          if(!empty($searchUserName) && $searchUsergroup!=0 ){
             $map['username'] = ['like','%'.$searchUserName.'%'];
-            $map['rolety_id'] = $searchUserGroup;
+            $map['rolety_id'] = $searchUsergroup;
             
-          }elseif(!empty($searchUserName) && $searchUserGroup==0  ){
+          }elseif(!empty($searchUserName) && $searchUsergroup==0  ){
             $map['username'] = ['like','%'.$searchUserName.'%'];
             
-          }elseif($searchUserGroup!=0 && empty($searchUserName)){
-            $map['rolety_id']  = $searchUserGroup;
+          }elseif($searchUsergroup!=0 && empty($searchUserName)){
+            $map['rolety_id']  = $searchUsergroup;
             
           }else{
             $map='';
@@ -268,7 +268,7 @@ class IndexController extends \think\Controller
                             ->where($map)
                             ->order($strOrder)
                             ->paginate($userTableRows,false,['type'=>'bootstrap','fragment'=>'div1','var_page'=>'pageUserNum',
-                            'query'=>['userTableRows'=>$userTableRows,'searchDept'=>$searchDept,'searchUserName'=>$searchUserName,'searchUserGroup'=>$searchUserGroup]]);                     
+                            'query'=>['userTableRows'=>$userTableRows,'searchDept'=>$searchDept,'searchUserName'=>$searchUserName,'$searchUsergroup'=>$searchUsergroup]]);                     
           
         // 分页变量
         $pageUser = $users->render();
@@ -314,7 +314,7 @@ class IndexController extends \think\Controller
               // 表格搜索字段
               'searchUserName'=>$searchUserName,
               'searchDept'=>$searchDept,
-              'searchUserGroup'=>$searchUserGroup,
+              '$searchUsergroup'=>$searchUsergroup,
               
               // 表格排序信息
               'sortName'=>$sortName,
@@ -1004,16 +1004,19 @@ class IndexController extends \think\Controller
           $pageUserNum=1;
       }
       
-      //$userTableRows接收页面传来的分页时每页表格显示的记录行数，初始值为10
+       //$userTableRows接收页面传来的分页时每页表格显示的记录行数，初始值为10
         if(!empty($request->param('userTableRows'))){
           $userTableRows=$request->param('userTableRows');
         }else{
           $userTableRows=10;
         }
-        
+        // 基本查询条件， 
+        $map['id']=['>',0];  
         // 查询词1，'searchUserName'
         if(!empty($request->param('searchUserName'))){
           $searchUserName=$request->param('searchUserName');
+          // 组合查询条件1，
+          $map['username']=['like','%'.$searchUserName.'%'];
         }else{
           $searchUserName=0;
         } 
@@ -1021,17 +1024,21 @@ class IndexController extends \think\Controller
         // 查询词2，'searchDept'
         if(!empty($request->param('searchDept'))){
           $searchDept=$request->param('searchDept');
+          // 组合查询条件2，
+          $map['dept']=$searchDept;
         }else{
           $searchDept=0;
         } 
         
-        // 查询词3，'searchUserGroup'
-        if(!empty($request->param('searchUserGroup'))){
-          $searchUserGroup=$request->param('searchUserGroup');
+        // 查询词3，'$searchUsergroup'
+        if(!empty($request->param('searchUsergroup'))){
+          $searchUsergroup=$request->param('searchUsergroup');
+          // 组合查询条件3，
+          $map['usergroup_id']=['like','%'.$searchUsergroup.'%'];
         }else{
-          $searchUserGroup=0;
-        } 
-        
+          $searchUsergroup=0;
+        }
+
         //$sortName、$sort接收页面传来的排序信息
         $sortName=$request->param('sortName');
         $sort=$request->param('sort');
@@ -1048,10 +1055,10 @@ class IndexController extends \think\Controller
               
             break;
             
-            case '_USERGROUP':
-              $strOrder='rolety_id asc';
-             
-            break;
+           // case '_USERGROUP':
+//              $strOrder='rolety_id asc';
+//             
+//            break;
             
             case '_ENABLE':
               $strOrder='enable asc';
@@ -1079,10 +1086,10 @@ class IndexController extends \think\Controller
               
             break;
             
-            case '_USERGROUP':
-              $strOrder='rolety_id desc';
-             
-            break;
+           // case '_USERGROUP':
+//              $strOrder='rolety_id desc';
+//             
+//            break;
             
             case '_ENABLE':
               $strOrder='enable desc';
@@ -1099,53 +1106,13 @@ class IndexController extends \think\Controller
           } 
         }
         
-        // 组合查询条件，
-        if($searchDept!='0'){
-          $map['dept'] = $searchDept;
-                
-          if(!empty($searchUserName) && $searchUserGroup!=0 ){
-            
-            $map['username'] = ['like','%'.$searchUserName.'%'];
-            $map['rolety_id'] = $searchUserGroup;
-            
-          }elseif(!empty($searchUserName) && $searchUserGroup==0  ){
-            
-            $map['username'] = ['like','%'.$searchUserName.'%'];
-            
-          }elseif($searchUserGroup!=0 && empty($searchUserName)){
-    
-            $map['rolety_id']  = $searchUserGroup;
-            
-          }else{
-            
-          }
-          
-        }else{
-          
-          if(!empty($searchUserName) && $searchUserGroup!=0 ){
-            $map['username'] = ['like','%'.$searchUserName.'%'];
-            $map['rolety_id'] = $searchUserGroup;
-            
-          }elseif(!empty($searchUserName) && $searchUserGroup==0  ){
-            $map['username'] = ['like','%'.$searchUserName.'%'];
-            
-          }elseif($searchUserGroup!=0 && empty($searchUserName)){
-            $map['rolety_id']  = $searchUserGroup;
-            
-          }else{
-            $map='';
-          }
-          
-        }
-        
         // 查出所有的用户并分页，根据“strOrder”排序，设定前端页面显示的锚点（hash值）为“div1”，设定分页页数变量：“pageUserNum”
         // 带上每页显示记录行数$userTableRows和3个查询词，实现查询结果分页显示。
-        $users = UserModel::where('id','>',0)
-                            //->where('dept',$searchDept)
-                            ->where($map)
+        $users = UserModel::where($map)
                             ->order($strOrder)
-                            ->paginate($userTableRows,false,['type'=>'bootstrap','fragment'=>'div1','var_page'=>'pageUserNum',
-                            'query'=>['userTableRows'=>$userTableRows,'searchDept'=>$searchDept,'searchUserName'=>$searchUserName,'searchUserGroup'=>$searchUserGroup]]);                     
+                            ->paginate($userTableRows,false,['type'=>'bootstrap','fragment'=>'sysUser','var_page'=>'pageUserNum']);
+                           // ->paginate($userTableRows,false,['query'=>['userTableRows'=>$userTableRows,'searchUsergroup'=>$searchUsergroup,'searchDept'=>$searchDept,'searchUserName'=>$searchUserName]
+//                                                              ,'type'=>'bootstrap','fragment'=>'sysUser','var_page'=>'pageUserNum']);                                                                           
           
         // 分页变量
         $pageUser = $users->render();
@@ -1169,13 +1136,13 @@ class IndexController extends \think\Controller
                             ->group('username')
                             ->select());    
  
-        foreach($users as $v){
-            $user1 = UserModel::get($v['id']);
-            // 使用User模型中定义的关联关系(role)查出用户对应用户组名称(name)
-            $roleName=$user1->role->name;
-            // 将用户对应的用户组名称加入数据集$users中。
-            $v['rolename']=$roleName;
-        }
+       // foreach($users as $v){
+//            $user1 = UserModel::get($v['id']);
+//            // 使用User模型中定义的关联关系(role)查出用户对应用户组名称(name)
+//            $roleName=$user1->role->name;
+//            // 将用户对应的用户组名称加入数据集$users中。
+//            $v['rolename']=$roleName;
+//        }
         
         //添加groupNameNum字段到数据集$users中
         //字段内容：根据user的usergroup_id字段添加UserGroup.name的内容后生成$groupNameNum字符串
@@ -1211,7 +1178,7 @@ class IndexController extends \think\Controller
               // 表格搜索字段
               'searchUserName'=>$searchUserName,
               'searchDept'=>$searchDept,
-              'searchUserGroup'=>$searchUserGroup,
+              'searchUsergroup'=>$searchUsergroup,
               
               // 表格排序信息
               'sortName'=>$sortName,
@@ -1235,7 +1202,7 @@ class IndexController extends \think\Controller
 //                            ->where($map)
 //                            ->order($strOrder)
 //                            ->paginate($userTableRows,false,['type'=>'bootstrap','fragment'=>'div1','var_page'=>'pageUserNum',
-//                            'query'=>['userTableRows'=>$userTableRows,'searchDept'=>$searchDept,'searchUserName'=>$searchUserName,'searchUserGroup'=>$searchUserGroup]]);                     
+//                            'query'=>['userTableRows'=>$userTableRows,'searchDept'=>$searchDept,'searchUserName'=>$searchUserName,'searchUsergroup'=>$searchUsergroup]]);                     
 //          
         // 分页页数变量：“usergroupPageNum”
       if(!empty($request->param('usergroupPageNum'))){
@@ -1304,19 +1271,28 @@ class IndexController extends \think\Controller
       $result='';
       $msg='';
       $msgPatch='';
-      //分情况变量赋值
-      if($oprt=='_CREATE' || $oprt=='_UPDATE') {
+      //1.分情况变量赋值
+      if($oprt=='_CREATE') {
+        $userData=array('username'=>$request->param('userName'),
+                        'pwd'=>md5($request->param('pwd')),
+                        'dept'=>$request->param('dept'),
+                        'enable'=>$request->param('userEn'),
+                        'usergroup_id'=>$request->param('usergroup_id'),
+                        );
+      
+      }elseif($oprt=='_UPDATE'){
+        $userData=array('username'=>$request->param('userName'),
+                        'dept'=>$request->param('dept'),
+                        'enable'=>$request->param('userEn'),
+                        'usergroup_id'=>$request->param('usergroup_id'),
+                        );
         
-        
-        
-        $userData=array('name'=>$request->param('usergroupName'),
-                                'enable'=>$request->param('usergroupEn'),
-                                'authority'=>$authority);
       }
-      //2.分情况执行业务逻辑，与数据库打交道 
+      
+      //2.分情况执行业务逻辑，生成返回前端的数据、操作数据库等 
       switch($oprt){
         case '_ADDNEW':
-          $user=array('id'=>$id,'username'=>'','dept'=>'');
+          $user=array('id'=>$id,'username'=>'','dept'=>'','mobile'=>'');
           
         break;
         
@@ -1327,40 +1303,39 @@ class IndexController extends \think\Controller
         break;
         
         case '_CREATE':
-          $user=$usergroupMdl::all(['name'=>$request->param('usergroupName')]);
+          $user=$userMdl::get(['username'=>$request->param('userName')]);
           $name=$request->param('userName');
-          if(count($usergroup)){
-            $result='false';
+          $result='success';
+          $id=$user->id;
+          if(count($user)){
             $msg='创建失败。<br>';
-            $msgPatch='用户组【'.$request->param('usergroupName').'】已存在。';
+            $msgPatch='用户【'.$request->param('userName').'】已存在。';
           }else{
-            $usergroup=$usergroupMdl::create($usergroupData,true);
-            $result='success';
+            $user=$userMdl::create($userData,true);
             $msg='创建成功。';
-            $id=$usergroup->id;
           }
         break;
         
         case '_UPDATE': 
-          $n=count($usergroupMdl->where('name',$request->param('usergroupName'))->select());
-          $name=$usergroupMdl::get($id)->name;
-          if($request->param('usergroupName')==$name){
-            $usergroup = $usergroupMdl::update($usergroupData,['id'=>$id],true);
-            $result='success';
-            $msg='更新成功。<br>';
-          }else if($request->param('usergroupName')!=$name && $n){  
-            $usergroup=$usergroupMdl::get($id);
-            $result='false';
-            $msg='修改失败。<br>';
-            $msgPatch='用户组【'.$request->param('usergroupName').'】已存在。';
-            
-          }else{
-            // 使用静态方法，向Usergroup表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
-            $usergroup = $usergroupMdl::update($usergroupData,['id'=>$id],true);
-            $result='success';
-            $msg='修改成功。<br>';
-            $msgPatch='修改为【'.$request->param('usergroupName').'】';
-          }
+          //$n=count($usergroupMdl->where('name',$request->param('usergroupName'))->select());
+//          $name=$usergroupMdl::get($id)->name;
+//          if($request->param('usergroupName')==$name){
+//            $usergroup = $usergroupMdl::update($usergroupData,['id'=>$id],true);
+//            $result='success';
+//            $msg='更新成功。<br>';
+//          }else if($request->param('usergroupName')!=$name && $n){  
+//            $usergroup=$usergroupMdl::get($id);
+//            $result='false';
+//            $msg='修改失败。<br>';
+//            $msgPatch='用户组【'.$request->param('usergroupName').'】已存在。';
+//            
+//          }else{
+//            // 使用静态方法，向Usergroup表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
+//            $usergroup = $usergroupMdl::update($usergroupData,['id'=>$id],true);
+//            $result='success';
+//            $msg='修改成功。<br>';
+//            $msgPatch='修改为【'.$request->param('usergroupName').'】';
+//          }
           
         break;
         
@@ -1389,7 +1364,7 @@ class IndexController extends \think\Controller
         
       }
       
-      //3.分情况返回前端数据
+      //3.分情况组装数据，返回前端
        if ($oprt=='_ADDNEW' || $oprt=='_EDIT'){
           $this->assign([
                'home'=>$request->domain(),
@@ -1498,17 +1473,16 @@ class IndexController extends \think\Controller
         break;
         
         case '_CREATE':
-          $usergroup=$usergroupMdl::all(['name'=>$request->param('usergroupName')]);
+          $usergroup=$usergroupMdl::get(['name'=>$request->param('usergroupName')]);
           $name=$request->param('usergroupName');
+          $result='success';
+          $id=$usergroup->id;
           if(count($usergroup)){
-            $result='false';
             $msg='创建失败。<br>';
             $msgPatch='用户组【'.$request->param('usergroupName').'】已存在。';
           }else{
             $usergroup=$usergroupMdl::create($usergroupData,true);
-            $result='success';
             $msg='创建成功。';
-            $id=$usergroup->id;
           }
         break;
         

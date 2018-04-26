@@ -5,8 +5,8 @@
 	<input id="oprt" type="text" name="oprt" value="" class="sr-only">
 	
 	<div class="row">
-	<div class="form-group has-feedback col-sm-4">
-		<label for="username">用户名</label>
+	<div class="form-group has-feedback col-sm-6">
+		<label for="username">用户名<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 		<!-- // bootstrap实现矢量图在输入框开头 -->
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
@@ -19,23 +19,38 @@
         <span style="display: none;margin-right:17px;" class="spOk glyphicon glyphicon-ok form-control-feedback"></span>	
 	</div>
 				
-	<div class="form-group col-sm-4">
-		<label for="psw">登录密码（同用户名）</label>
+	<div class="form-group col-sm-6">
+		<label for="psw">登录密码<span class="small text-muted">（自动生成，同用户名）</span></label>
 		<!-- // bootstrap实现矢量图在输入框开头 -->
 		<div class="input-group">
-			<span class="input-group-addon"><span class="glyphicon glyphicon-eye-open"></span></span>
+			<span class="input-group-addon"><span class="glyphicon glyphicon-th-large"></span></span>
 			<input type="password" class="form-control" id="pwd" name="pwd" readonly="true" autocomplete="pwd">
 		</div>		
 		
 	</div>
-				
-	<div class="form-group col-sm-4">
-		<label for="selDept">所属部门</label>
+	</div>
+	
+	<div class="row">
+	<div class="form-group col-sm-6">
+		<label for="userMobile">手机号<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+		<!-- // bootstrap实现矢量图在输入框开头 -->
+		<div class="input-group">
+			<span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+			<input type="text" class="form-control" id="userMobile" name="userMobile" value="{$user.mobile}" placeholder="输入用户手机号">	
+		</div>
+					
+		<!-- // 配合jQuery 中的内容验证代码-->
+		<span style="color:red;display:none;" class="spTips"></span>
+        <span style="display: none;margin-right:17px;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span>
+        <span style="display: none;margin-right:17px;" class="spOk glyphicon glyphicon-ok form-control-feedback"></span>	
+	</div>
+	
+	<div class="form-group col-sm-6">
+		<label for="selDept">选择部门<span class="glyphicon glyphicon-asterisk text-danger"></span><span class="small text-muted">（单选）</span></label>
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-tree-conifer"></span></span>
 			<select class="form-control" id="selDept" name="dept">
-    			<option value="">1</option>
-    			<option value="">2</option>
+    			<option value="0">……选择一个部门</option>
     		</select>
 		</div>
 	</div>
@@ -43,9 +58,9 @@
 	
 	<div class="row">
 	<div class="form-group col-sm-6">
-		<label for="selUsergroup">&nbsp;可选用户组</label>
+		<label for="selUsergroup">选择用户组<span class="small text-primary">（单击加入）</span></label>
 		<div class="input-group">
-			<span class="input-group-addon"><span class="glyphicon glyphicon-education"></span></span>
+			<span class="input-group-addon"><span class="glyphicon glyphicon-plus"></span></span>
 			<select class="form-control" id="selUsergroup">
     			<option value="">1</option>
     			<option value="">2</option>
@@ -54,10 +69,10 @@
 	</div>
 	
 	<div class="form-group has-feedback col-sm-6">
-		<label for="selectedUsergroup">&nbsp;已选用户组</label>
+		<label for="selectedUsergroup">已加入用户组<span class="glyphicon glyphicon-asterisk text-danger"></span><span class="small text-danger">（单击退出）</span></label>
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-education"></span></span>
-			<select class="form-control inputCheck" id="selectedUsergroup" name="selectedUsergroup">
+			<select class="form-control inputCheck" id="selectedUsergroup">
     			<option value="0">……已选</option>
     		</select>
 		</div>
@@ -67,7 +82,21 @@
 	</div>
 	</div>	
 				
-				<!-- <div class="checkbox">
+	<div class="myFieldset form-group">
+		<div class="myLegend">
+		<!-- <span id="spUserEn" class="spUserEn"><span class="glyphicon glyphicon-magnet"></span>&nbsp;用户启用</span> -->
+		<span class="label label-info glyphicon glyphicon-magnet">用户启用</span>
+		
+			<!-- <label class="" for="usergroupEn">用户组启用</label> -->
+			<label class="radio-inline">
+      			<input type="radio" name="userEn" value="1" checked><span class="label label-info">是</span>
+    		</label>
+    		<label class="radio-inline">
+      			<input type="radio" name="userEn" value="0" ><span class="label label-default">否</span>
+    		</label>
+		</div>
+	</div>
+	<!-- <div class="checkbox">
 				  <label><input type="checkbox" value="" checked>Remember me</label>
 				</div> -->
 	<hr>
@@ -93,7 +122,7 @@ $(document).ready(function(){
 	var check = [false,false];
 		
 	// 单选框#searchDept的内容
-	ajaxShowSelect('selectResponse',{'req':'_DEPT'},$("#selDept"),[{'text':'...不限','val':'0'}]);
+	ajaxShowSelect('selectResponse',{'req':'_DEPT'},$("#selDept"),[{'text':'...选择一个部门','val':'0'}]);
 	
 	// 单选框#searchUserGroup的内容
 	ajaxShowSelect('selectResponse',{'req':'_USERGROUP'},$("#selUsergroup"),[{'text':'...待选','val':'0'}]);
@@ -105,7 +134,7 @@ $(document).ready(function(){
 		<!-- var str=$('#selUsergroup option:selected').text(); -->
 		var str=obj.text();
 		obj.remove();
-		$(this).children('option').eq(0).text('剩余用户组：'+(this.length-1));
+		$(this).children('option').eq(0).text('可加入用户组数：'+(this.length-1));
 		$('#selectedUsergroupText').html(v+'_'+str);
 		<!-- $('#selUsergroup option:selected').hide(); -->
 		<!-- $('#selUsergroup option:selected').remove(); -->
@@ -116,7 +145,7 @@ $(document).ready(function(){
 		$('#selectedUsergroup').append(option);
 		var len=$('#selectedUsergroup').find('option').length;
 		//对#selectedUsergroup的操作
-		$('#selectedUsergroup').children('option').eq(0).text('已选用户组：'+(len-1));
+		$('#selectedUsergroup').children('option').eq(0).text('已加入用户组数：'+(len-1));
 		$('#selectedUsergroup').closest('.has-feedback').removeClass('has-error');
 		$('#selectedUsergroup').closest('.has-feedback').children('span').hide();
 		check[1]=true;
@@ -128,7 +157,7 @@ $(document).ready(function(){
 		var v=obj.val();//var v=$(this).val();
 		var str=obj.text();
 		obj.remove();
-		$(this).children('option').eq(0).text('已选用户组：'+(this.length-1));
+		$(this).children('option').eq(0).text('已加入用户组数：'+(this.length-1));
 		if($(this).find('option:last').val()==0){
 			$(this).closest('.has-feedback').addClass('has-error');	
 			$(this).closest('.has-feedback').children('span').show();
@@ -143,7 +172,7 @@ $(document).ready(function(){
 		var option='<option value="'+v+'">'+str+'</option>';
 		$('#selUsergroup').append(option);
 		var len=$('#selUsergroup').find('option').length;
-		$('#selUsergroup').children('option').eq(0).text('剩余用户组：'+(len-1));
+		$('#selUsergroup').children('option').eq(0).text('可加入用户组数：'+(len-1));
 	});
 	
 	$('#selectedUsergroup').focusout(function(){
@@ -186,10 +215,28 @@ $(document).ready(function(){
 		var flag=check.every(function(value) {
             return value == true
         });
+		//组装usergroup_id字符串的函数
+		var usergroupStr=function(obj){
+  			var str='';
+			var arr=[];
+  			if(obj.find('option:last').val()){
+    			for (var i=1;i<obj.find('option').length;i++){
+      				str+=obj.find('option').eq(i).val()+',';
+					arr.push(obj.find('option').eq(i).val());
+    			}
+  			}else{
+    			str=obj.find('option:last').val();
+				arr.push(obj.find('option:last').val());
+  			}
+			str=arr.join(',');			
+  			return str;
+		};
+		
 		//阻止表单提交动作
 		event.preventDefault();
-		console.log(check);
+		<!-- console.log(check); -->
 		formData.append('oprt',oprt);
+		formData.append('usergroup_id',usergroupStr($('#selectedUsergroup')));
 		if(oprt=='_DELETE'){
 			strHtml='<span class="label label-danger">'+strHtml+'</span>';
 		}else{
@@ -208,6 +255,7 @@ $(document).ready(function(){
 			//序号最小的$('.inputCheck').eq(i)获得焦点
 			$('.inputCheck').eq(Math.min.apply(null, arr)).focus();	
 		}else{
+			
 			$('.modal').modal('hide');
 			$.confirm(strHtml+'【'+name+'】',function(e){
 				con=e;
@@ -218,6 +266,15 @@ $(document).ready(function(){
 					$('.modal').modal('show');
 				}
 			}).ok('确定(Y)').cancel('取消(N)');		
+		}
+	});
+	
+	// 表单input:radio选中元素改变背景色
+	$('input:radio').change(function(){
+		if($(this).val()==1){
+			$(this).closest('div').children('span').addClass('label label-info');
+		}else{
+			$(this).closest('div').children('span').removeClass('label label-info');
 		}
 	});
 	
@@ -233,6 +290,8 @@ $(document).ready(function(){
     	$('.spRemove').hide();
 		
 		$('.inputCheck').eq(0).focus();
+		
+		$('input:radio').closest('div').children('span').addClass('label label-info');
 		
 		<!-- check = [false,false]; -->
 	
@@ -346,12 +405,12 @@ function ajaxProcess(url,data,archor){
 			//dataBack的5个返回值id,result,name,msg,msgPatch
 			if(dataBack.result=='success'){
 				//ajax更新页面信息
-				$("#content").load(
+				$('#content').load(
 					'tplFile',
 					{'sId':archor},
 					function(){
 						//所在行上色'bg-warning'
-						$('button[data-id="'+dataBack.id+'"]').closest('tr').addClass('bg-warning');
+						$('button[data-id="'+dataBack.id+'"]').closest('tr').addClass('bg-warning').focus();
 						$.alert('用户【'+dataBack.name+'】<span class="label label-success">'+dataBack.msg+'</span>'+dataBack.msgPatch);
 					}
 				);
