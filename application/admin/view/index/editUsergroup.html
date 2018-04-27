@@ -329,11 +329,11 @@ function ajaxProcess(url,data,archor){
 					function(){
 						//所在行上色'bg-warning'
 						$('button[data-id="'+dataBack.id+'"]').closest('tr').addClass('bg-warning').focus();
-						$.alert('用户组【'+dataBack.name+'】<span class="label label-success">'+dataBack.msg+'</span>'+dataBack.msgPatch);
+						$.alert('用户组【'+dataBack.name+'】<span class="label label-success">'+dataBack.msg+'</span><br>'+dataBack.msgPatch);
 					}
 				);
 			}else{
-				$.alert('用户组【'+dataBack.name+'】<span class="label label-danger">'+dataBack.msg+'</span>'+dataBack.msgPatch);	
+				$.alert('用户组【'+dataBack.name+'】<span class="label label-danger">'+dataBack.msg+'</span><br>'+dataBack.msgPatch);	
 			}
 		},
 		error: function(){

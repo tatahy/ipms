@@ -56,7 +56,7 @@
 						<th><a data-toggle="tooltip" data-placement="bottom" title="点击排序" href="#sysUser" sort="{$sort}" sortName="_DEPT">所属部门&nbsp;</a></th>
 						
 						<!-- <th><a data-toggle="tooltip" data-placement="bottom" title="点击排序" href="#div1" sort="{$sort}" sortName="_USERGROUP">用户组名&nbsp;</a></th> -->
-						
+						<th>手机号</th>
 						<th>用户组名/编号</th>
 						
 						<!-- <th><a data-toggle="tooltip" data-placement="bottom" title="点击排序" href="#div1" sort="{$sort}" sortName="_ENABLE">操作&nbsp;</a></th> -->
@@ -73,6 +73,7 @@
 						<td>{$vo.dept}</td>
 						<!-- <td>{ $vo.rolety_id}</td>  -->
 						<!-- <td>{ $vo.rolename}</td> -->
+						<td>{$vo.mobile}</td>
 						<td>{$vo.groupNameNum}</td>
 						<td>
 							<button type="button" class="btn-link btnUser" data-id="{$vo.id}" data-oprt="_EDIT" data-toggle="modal" data-target="#modalEditUser" ><span class="glyphicon glyphicon-edit"></span>编辑</button>
@@ -298,14 +299,6 @@ $(document).ready(function(){
 	$('#btnSearchUser').click(function(){
 		<!-- //根据每页显示记录行数加载页面 -->
 		loadSysUser($('#userTableRows').val());
-		
-		// 组装通过“post”提交的数据，名称与后端所用一致
-		<!-- var sendData = {'userTableRows':$('#userTableRows').val(),'searchUserName':$('#searchUserName').val(),'searchDept':$('#searchDept').val(),'searchUsergroup':$('#searchUsergroup').val(),'pageUserNum':1}; -->
-		
-		<!-- $('#divUserTable_load').load('sysUser #divUserTable_load',sendData,function(){ -->
-			<!-- $('#spTitle').text('符合查询条件用户数：'); -->
-			
-		<!-- }); -->
 	});
 	
 	<!-- // 页面重新加载 -->
@@ -333,13 +326,17 @@ $(document).ready(function(){
 		// 组装通过“post”提交的数据，名称与后端所用一致
 		var sendData = {'sortName':sortName,'sort':sort,'userTableRows':rows,'searchUserName':searchUserName,'searchDept':searchDept,'searchUsergroup':searchUsergroup,'pageUserNum':pageUserNum};
 		
-		$('#content').load('sysUser',sendData,function(){
-			$('#spTitle').text('符合查询条件用户数：');
-			$('#searchUserName').val(searchUserName);
-			$('#searchDept').val(searchDept);
-			$('#searchUsergroup').val(searchUsergroup);
-			$('#divCollapse').collapse('show');
-		});
+		if(searchUserName!='' || searchDept!=0 || searchUsergroup!=0){
+			$('#content').load('sysUser',sendData,function(){
+				$('#spTitle').text('符合查询条件用户数：');
+				$('#searchUserName').val(searchUserName);
+				$('#searchDept').val(searchDept);
+				$('#searchUsergroup').val(searchUsergroup);
+				$('#divCollapse').collapse('show');
+			});
+		}else{
+			$('#content').load('sysUser',sendData);
+		}
 		
 		<!-- if(searchUserName!='' || searchDept!=0 || searchUsergroup!=0){ -->
 			<!-- $('#divUserTable_load').text('加载中……'); -->

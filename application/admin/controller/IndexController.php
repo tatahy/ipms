@@ -1243,6 +1243,7 @@ class IndexController extends \think\Controller
       if($oprt=='_CREATE') {
         $userData=array('username'=>$request->param('userName'),
                         'pwd'=>md5($request->param('pwd')),
+                        'mobile'=>$request->param('mobile'),
                         'dept'=>$request->param('dept'),
                         'enable'=>$request->param('userEn'),
                         'usergroup_id'=>$request->param('usergroup_id'),
@@ -1250,6 +1251,7 @@ class IndexController extends \think\Controller
       
       }elseif($oprt=='_UPDATE'){
         $userData=array('username'=>$request->param('userName'),
+                        'mobile'=>$request->param('mobile'),
                         'dept'=>$request->param('dept'),
                         'enable'=>$request->param('userEn'),
                         'usergroup_id'=>$request->param('usergroup_id'),
@@ -1271,39 +1273,46 @@ class IndexController extends \think\Controller
         break;
         
         case '_CREATE':
-          $user=$userMdl::get(['username'=>$request->param('userName')]);
+          $user=$userMdl::get(['mobile'=>$request->param('mobile')]);
           $name=$request->param('userName');
-          $result='success';
           $id=$user->id;
           if(count($user)){
-            $msg='创建失败。<br>';
-            $msgPatch='用户【'.$request->param('userName').'】已存在。';
+            $result='false';
+            $msg='创建失败';
+            $msgPatch='手机号：'.$request->param('mobile').'已存在。';
           }else{
+            $result='success';
             $user=$userMdl::create($userData,true);
-            $msg='创建成功。';
+            $msg='创建成功';
           }
         break;
         
         case '_UPDATE': 
-          //$n=count($usergroupMdl->where('name',$request->param('usergroupName'))->select());
-//          $name=$usergroupMdl::get($id)->name;
-//          if($request->param('usergroupName')==$name){
-//            $usergroup = $usergroupMdl::update($usergroupData,['id'=>$id],true);
-//            $result='success';
-//            $msg='更新成功。<br>';
-//          }else if($request->param('usergroupName')!=$name && $n){  
-//            $usergroup=$usergroupMdl::get($id);
-//            $result='false';
-//            $msg='修改失败。<br>';
-//            $msgPatch='用户组【'.$request->param('usergroupName').'】已存在。';
-//            
-//          }else{
-//            // 使用静态方法，向Usergroup表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
-//            $usergroup = $usergroupMdl::update($usergroupData,['id'=>$id],true);
-//            $result='success';
-//            $msg='修改成功。<br>';
-//            $msgPatch='修改为【'.$request->param('usergroupName').'】';
-//          }
+          $name=$userMdl::get($id)->username;
+          $mobile=$userMdl::get($id)->mobile;
+          
+          //手机号要唯一
+          if($request->param('mobile')==$mobile){
+              $result='success';
+              $msg='保存成功';
+              if($request->param('userName')!=$name){
+                  $msgPatch='用户名更新为【'.$request->param('userName').'】。';
+              }
+              $userMdl::update($userData,['id'=>$id],true);
+          }else{
+              if(count($userMdl::get(['mobile'=>$request->param('mobile')]))){
+                  $result='false';
+                  $msg='保存失败';
+                  $msgPatch='该手机号：'.$request->param('mobile').'已存在。';
+              }else{
+                  $result='success';
+                  $msg='保存成功';
+                  if($request->param('userName')!=$name){
+                      $msgPatch='用户名更新为【'.$request->param('userName').'】。';
+                  }
+                  $userMdl::update($userData,['id'=>$id],true);
+              }
+          }
           
         break;
         
@@ -1311,7 +1320,7 @@ class IndexController extends \think\Controller
           $name=$userMdl::get($id)->name;  
           $userMdl::destroy($id);
           $result='success';
-          $msg='删除成功。<br>';
+          $msg='删除成功';
           //返回默认的$id
           $id=$userMdl::where('id','>',0)->min('id');
         break;
@@ -1336,7 +1345,8 @@ class IndexController extends \think\Controller
        if ($oprt=='_ADDNEW' || $oprt=='_EDIT'){
           $this->assign([
                'home'=>$request->domain(),
-               'user'=>$user
+               'user'=>$user,
+               'oprt'=>$oprt
           ]);
           // 返回前端模板文件
           return view('editUser');
@@ -1446,11 +1456,11 @@ class IndexController extends \think\Controller
           $result='success';
           $id=$usergroup->id;
           if(count($usergroup)){
-            $msg='创建失败。<br>';
+            $msg='创建失败';
             $msgPatch='用户组【'.$request->param('usergroupName').'】已存在。';
           }else{
             $usergroup=$usergroupMdl::create($usergroupData,true);
-            $msg='创建成功。';
+            $msg='创建成功';
           }
         break;
         
@@ -1460,18 +1470,18 @@ class IndexController extends \think\Controller
           if($request->param('usergroupName')==$name){
             $usergroup = $usergroupMdl::update($usergroupData,['id'=>$id],true);
             $result='success';
-            $msg='更新成功。<br>';
+            $msg='更新成功';
           }else if($request->param('usergroupName')!=$name && $n){  
             $usergroup=$usergroupMdl::get($id);
             $result='false';
-            $msg='修改失败。<br>';
+            $msg='修改失败';
             $msgPatch='用户组【'.$request->param('usergroupName').'】已存在。';
             
           }else{
             // 使用静态方法，向Usergroup表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
             $usergroup = $usergroupMdl::update($usergroupData,['id'=>$id],true);
             $result='success';
-            $msg='修改成功。<br>';
+            $msg='修改成功';
             $msgPatch='修改为【'.$request->param('usergroupName').'】';
           }
           
@@ -1481,7 +1491,7 @@ class IndexController extends \think\Controller
           $name=$usergroupMdl::get($id)->name;  
           $usergroupMdl::destroy($id);
           $result='success';
-          $msg='删除成功。<br>';
+          $msg='删除成功';
           //返回默认的$id
           $id=$usergroupMdl::where('id','>',0)->min('id');
           

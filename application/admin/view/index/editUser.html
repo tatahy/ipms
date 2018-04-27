@@ -2,11 +2,11 @@
 	
 <form id="fmUser" role="form" action="{$home}/admin/index/userOprt"  method="post">
 	<input id="id" type="text" name="id" value="{$user.id}" class="sr-only">
-	<input id="oprt" type="text" name="oprt" value="" class="sr-only">
+	<input id="oprt" type="text" name="oprt" value="{$oprt}" class="sr-only">
 	
 	<div class="row">
 	<div class="form-group has-feedback col-sm-6">
-		<label for="username">用户名<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+		<label for="username">用户名<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
 		<!-- // bootstrap实现矢量图在输入框开头 -->
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
@@ -18,25 +18,26 @@
         <span style="display: none;margin-right:17px;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span>
         <span style="display: none;margin-right:17px;" class="spOk glyphicon glyphicon-ok form-control-feedback"></span>	
 	</div>
-				
+	{eq name="$oprt" value="_ADDNEW"}			
 	<div class="form-group col-sm-6">
 		<label for="psw">登录密码<span class="small text-muted">（自动生成，同用户名）</span></label>
 		<!-- // bootstrap实现矢量图在输入框开头 -->
 		<div class="input-group">
-			<span class="input-group-addon"><span class="glyphicon glyphicon-th-large"></span></span>
+			<span class="input-group-addon"><span class="small glyphicon glyphicon-th-large"></span></span>
 			<input type="password" class="form-control" id="pwd" name="pwd" readonly="true" autocomplete="pwd">
 		</div>		
 		
 	</div>
+	{/eq}
 	</div>
 	
 	<div class="row">
 	<div class="form-group col-sm-6">
-		<label for="userMobile">手机号<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+		<label for="userMobile">手机号<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
 		<!-- // bootstrap实现矢量图在输入框开头 -->
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-			<input type="text" class="form-control" id="userMobile" name="userMobile" value="{$user.mobile}" placeholder="输入用户手机号">	
+			<input type="text" class="form-control" id="userMobile" name="mobile" value="{$user.mobile}" placeholder="输入用户手机号">	
 		</div>
 					
 		<!-- // 配合jQuery 中的内容验证代码-->
@@ -46,7 +47,7 @@
 	</div>
 	
 	<div class="form-group col-sm-6">
-		<label for="selDept">选择部门<span class="glyphicon glyphicon-asterisk text-danger"></span><span class="small text-muted">（单选）</span></label>
+		<label for="selDept">选择部门<span class="small glyphicon glyphicon-asterisk text-danger">（单选）</span></label>
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-tree-conifer"></span></span>
 			<select class="form-control" id="selDept" name="dept">
@@ -69,11 +70,11 @@
 	</div>
 	
 	<div class="form-group has-feedback col-sm-6">
-		<label for="selectedUsergroup">已加入用户组<span class="glyphicon glyphicon-asterisk text-danger"></span><span class="small text-danger">（单击退出）</span></label>
+		<label for="selectedUsergroup">已加入用户组<span class="small  glyphicon glyphicon-asterisk text-danger">（单击退出）</span></label>
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-education"></span></span>
 			<select class="form-control inputCheck" id="selectedUsergroup">
-    			<option value="0">……已选</option>
+    			<option value="0">…已选</option>
     		</select>
 		</div>
 		<span style="color:red;display:none;" class="spTips">至少有一个用户组</span>
@@ -411,11 +412,11 @@ function ajaxProcess(url,data,archor){
 					function(){
 						//所在行上色'bg-warning'
 						$('button[data-id="'+dataBack.id+'"]').closest('tr').addClass('bg-warning').focus();
-						$.alert('用户【'+dataBack.name+'】<span class="label label-success">'+dataBack.msg+'</span>'+dataBack.msgPatch);
+						$.alert('用户【'+dataBack.name+'】<span class="label label-success">'+dataBack.msg+'</span><br>'+dataBack.msgPatch);
 					}
 				);
 			}else{
-				$.alert('用户【'+dataBack.name+'】<span class="label label-danger">'+dataBack.msg+'</span>'+dataBack.msgPatch);	
+				$.alert('用户【'+dataBack.name+'】<span class="label label-danger">'+dataBack.msg+'</span><br>'+dataBack.msgPatch);	
 			}
 		},
 		error: function(){
