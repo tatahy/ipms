@@ -1,7 +1,6 @@
 <!-- sysUser.html -->
 <div id="divSysUser">
 		<h4 class="label label-warning" style="font-size:16px;"><span id="spTitle">系统用户总数：</span><span class="badge">{$usersNum}</span></h4>
-		
 		<p style="margin-top:5px;">
 			<!--// bootstap通过button调用Model -->
 			<button type="button" class="btn-link btnUser" data-oprt="_ADDNEW" data-id="0" data-toggle="modal" data-target="#modalEditUser"><span class="glyphicon glyphicon-file">新增</span></button>
@@ -22,9 +21,7 @@
 				<div class="form-group">
 					<label class="control-label" for="searchDept">部门</label>
 					<select class="form-control" id="searchDept" name="searchDept">
-						<option value="1">1</option>
-						<option value="2">2</option>
-						<option value="3">3</option>
+						<option value="0">...不限</option>
 											
 					</select>
 				</div>
@@ -32,9 +29,7 @@
 				<div class="form-group">
 					<label class="control-label" for="searchUsergroup">用户组</label>
 					<select class="form-control" id="searchUsergroup" name="searchUsergroup">
-						<option value="_a">a</option>
-						<option value="_b">b</option>
-						<option value="_c">c</option>
+						<option value="0">...不限</option>
 											
 					</select>
 				</div>
@@ -48,17 +43,17 @@
 			</form>
 			<hr>
 		</div> 
-		<div id="divUser" >
-			<div class="table-responsive" >
-			<table class="table table-hover table-condensed">
+		<div>
+			<div id="divUserTable_load" class="table-responsive" >
+			<table id="tblUser"  class="table table-hover table-condensed">
 				<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>用户列表</h4></caption>
 				<thead>
 					<tr>
 						<th>序号</th>
 						
-						<th><a data-toggle="tooltip" data-placement="bottom" title="点击排序" href="#div1" sort="{$sort}" sortName="_USERNAME">用户名&nbsp;</a></th>
+						<th><a data-toggle="tooltip" data-placement="bottom" title="点击排序" href="#sysUser" sort="{$sort}" sortName="_USERNAME">用户名&nbsp;</a></th>
 						
-						<th><a data-toggle="tooltip" data-placement="bottom" title="点击排序" href="#div1" sort="{$sort}" sortName="_DEPT">所属部门&nbsp;</a></th>
+						<th><a data-toggle="tooltip" data-placement="bottom" title="点击排序" href="#sysUser" sort="{$sort}" sortName="_DEPT">所属部门&nbsp;</a></th>
 						
 						<!-- <th><a data-toggle="tooltip" data-placement="bottom" title="点击排序" href="#div1" sort="{$sort}" sortName="_USERGROUP">用户组名&nbsp;</a></th> -->
 						
@@ -104,8 +99,8 @@
 			</div>
 			<hr>
 			
-			<div id="divUserTableRows" class="col-sm-12 text-right search">
-				<div class="col-sm-10 text-right">{$pageUser}</div>
+			<div class="col-sm-12 text-right search">
+				<div id="divUserTableRows" class="col-sm-10 text-right">{$pageUser}</div>
 						
 				<div class="form-group form-group-sm col-sm-2">
 					<span class="">每页记录行数：</span>
@@ -152,14 +147,7 @@
 <!-- / Modal "modalEditUser" -->
 
 <script>
-
-$(function(){
-	// 单选框#searchDept的内容
-	ajaxShowSelect('selectResponse',{'req':'_DEPT'},$('#searchDept'),[{'text':'...不限','val':'0'}],'{$searchDept}');
-	
-	// 单选框#searchUserGroup的内容
-	ajaxShowSelect('selectResponse',{'req':'_USERGROUP'},$('#searchUsergroup'),[{'text':'...不限','val':'0'}],'{$searchUsergroup}');
-	
+$(document).ready(function(){
 	<!-- //<td>里的<button>进行格式设置 -->
 	$('tbody td button').each(function(){
 		if($(this).attr('enable')=='1'){
@@ -192,6 +180,11 @@ $(function(){
 	<!-- // 隐藏搜索条件的div，修改触发"隐藏"的btn内容-->
   	$('#divCollapse').on('show.bs.collapse', function(){
     	$('#btnSearchInfo').html('<span class="glyphicon glyphicon-collapse-up">隐藏搜索</span>');
+		// 单选框#searchDept的内容
+		ajaxShowSelect('selectResponse',{'req':'_DEPT'},$('#searchDept'),[{'text':'...不限','val':'0'}],'{$searchDept}');
+	
+		// 单选框#searchUserGroup的内容
+		ajaxShowSelect('selectResponse',{'req':'_USERGROUP'},$('#searchUsergroup'),[{'text':'...不限','val':'0'}],'{$searchUsergroup}');
   	});
 	
 	<!-- // bootstrap3，enable所有的tooltip -->
@@ -204,22 +197,23 @@ $(function(){
 	$('thead a').each(function(){
 		var glyAsc='<span class="small glyphicon glyphicon-sort-by-attributes text-muted"></span>';
 		var glyDesc='<span class="small glyphicon glyphicon-sort-by-attributes-alt text-warning"></span>';
+		var str=$(this).text();
 		
 		//排序字段
-		var sortName=$(this).attr("sortName");
-		var sort=$(this).attr("sort");
+		var sortName=$(this).attr('sortName');
+		var sort=$(this).attr('sort');
 		
 		<!-- // 后端控制器给出的排序字段{$sortName},排序方式{$sort} -->
 		if (sortName=="{$sortName}"){
 			if(sort=="_ASC"){
-				$(this).append(glyAsc);
+				$(this).html(str+glyAsc);
 				$(this).attr("sort","_DESC");
 				$(this).attr('data-original-title','点击后降序');
 				// bootstap3中修改tooltip的options属性值
 				<!-- $(this).data("bs.tooltip").options.title="点击后降序"; -->
 				$(this).data("bs.tooltip").options.placement="top";
 			}else{
-				$(this).append(glyDesc);
+				$(this).html(str+glyDesc);
 				$(this).attr("sort","_ASC");
 				$(this).attr('data-original-title','点击后升序');
 				// bootstap3中修改tooltip的options属性值
@@ -238,7 +232,7 @@ $(function(){
 		
 	});
 	
-	<!-- // 点击分页中的a，表格中的内容根据a中的属性值进行排序 -->
+	// 点击分页中的a，表格中的内容根据a中的属性值进行排序
 	$('#divUserTableRows a').click(function(event){
 		// a所在分页页数
 		var pageStr=$(this).text();
@@ -247,7 +241,6 @@ $(function(){
 		var pageNumActive=$('#divUserTableRows li.active').children('span').text();
 		// jQuery的preventDefault()方法阻止元素发生默认的行为。阻止访问a的URL
         event.preventDefault();
-		<!-- alert("pageStr:"+pageStr+" active:"+pageNumActive); -->
 		
 		switch(pageStr){
 			case'»':
@@ -264,8 +257,7 @@ $(function(){
 			break;
 		
 		}
-		<!-- alert("pageNum:"+pageNum); -->
-		<!-- //根据每页显示记录行数，排序字段，排序方式，分页页数加载页面 -->
+		//根据每页显示记录行数，排序字段，排序方式，分页页数加载页面
 		loadSysUser($("#userTableRows").val(),"{$sortName}","{$sort}",pageNum)
 	});
 	
@@ -306,6 +298,14 @@ $(function(){
 	$('#btnSearchUser').click(function(){
 		<!-- //根据每页显示记录行数加载页面 -->
 		loadSysUser($('#userTableRows').val());
+		
+		// 组装通过“post”提交的数据，名称与后端所用一致
+		<!-- var sendData = {'userTableRows':$('#userTableRows').val(),'searchUserName':$('#searchUserName').val(),'searchDept':$('#searchDept').val(),'searchUsergroup':$('#searchUsergroup').val(),'pageUserNum':1}; -->
+		
+		<!-- $('#divUserTable_load').load('sysUser #divUserTable_load',sendData,function(){ -->
+			<!-- $('#spTitle').text('符合查询条件用户数：'); -->
+			
+		<!-- }); -->
 	});
 	
 	<!-- // 页面重新加载 -->
@@ -333,14 +333,32 @@ $(function(){
 		// 组装通过“post”提交的数据，名称与后端所用一致
 		var sendData = {'sortName':sortName,'sort':sort,'userTableRows':rows,'searchUserName':searchUserName,'searchDept':searchDept,'searchUsergroup':searchUsergroup,'pageUserNum':pageUserNum};
 		
-		// jquery load()方法，加载sysUser.html页面内容到index.html页面中<div id="content"></div>
 		$('#content').load('sysUser',sendData,function(){
 			$('#spTitle').text('符合查询条件用户数：');
 			$('#searchUserName').val(searchUserName);
+			$('#searchDept').val(searchDept);
+			$('#searchUsergroup').val(searchUsergroup);
 			$('#divCollapse').collapse('show');
-			
 		});
-	
+		
+		<!-- if(searchUserName!='' || searchDept!=0 || searchUsergroup!=0){ -->
+			<!-- $('#divUserTable_load').text('加载中……'); -->
+			<!-- // jquery load()方法，加载sysUser.html页面内容到index.html页面中<div id="content"></div> -->
+			<!-- $('#divUserTable_load').load('sysUser #tblUser',sendData,function(){ -->
+				<!-- $.extend(sendData,{'req':'_PAGEUSER'}); -->
+				<!-- $.post('sysUser',sendData,function(data){ -->
+					<!-- $('#divUserTableRows').html(data); -->
+				<!-- }); -->
+			<!-- }); -->
+			<!-- $('#spTitle').text('符合查询条件用户数：'); -->
+			<!-- $('#searchUserName').val(searchUserName); -->
+			<!-- $('#searchDept').val(searchDept); -->
+			<!-- $('#searchUsergroup').val(searchUsergroup); -->
+			
+			//$('#divCollapse').collapse('show');
+		<!-- }else{ -->
+			<!-- $('#content').load('sysUser',sendData); -->
+		<!-- } -->
 	}
 	
 	//**函数名：ajaxShowSelect

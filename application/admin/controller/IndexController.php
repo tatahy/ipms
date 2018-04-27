@@ -420,8 +420,8 @@ class IndexController extends \think\Controller
         break;
         
       }
-      // 将数组转化为json
-      return json($res);
+      // 返回前端数组
+      return $res;
     }
     
     // 
@@ -1110,40 +1110,18 @@ class IndexController extends \think\Controller
         // 带上每页显示记录行数$userTableRows和3个查询词，实现查询结果分页显示。
         $users = UserModel::where($map)
                             ->order($strOrder)
-                            ->paginate($userTableRows,false,['type'=>'bootstrap','fragment'=>'sysUser','var_page'=>'pageUserNum']);
-                           // ->paginate($userTableRows,false,['query'=>['userTableRows'=>$userTableRows,'searchUsergroup'=>$searchUsergroup,'searchDept'=>$searchDept,'searchUserName'=>$searchUserName]
-//                                                              ,'type'=>'bootstrap','fragment'=>'sysUser','var_page'=>'pageUserNum']);                                                                           
+                           // ->paginate($userTableRows,false,['type'=>'bootstrap','var_page'=>'pageUserNum']);
+                            ->paginate($userTableRows,false,['query'=>['userTableRows'=>$userTableRows,'searchUserName'=>$searchUserName,'searchUsergroup'=>$searchUsergroup,'searchDept'=>$searchDept]
+                                                              ,'type'=>'bootstrap','fragment'=>'sysUser','var_page'=>'pageUserNum']);                                                                           
           
         // 分页变量
         $pageUser = $users->render();
         
-        // 记录总数
-        $userRecords= UserModel::where('id','>',0)
-                            ->where($map)
-                            //->where('dept',$searchDept)
-                            ->count();
-        
         // 查出所有的用户总数
-        $users1= UserModel::where('id','>',0)
-                            ->where($map)
-                            //->where('dept',$searchDept)
+        $usersNum=count(UserModel::where($map)
                             ->group('username')
-                            ->select();
-        //$usersNum=count($users1);     
-        $usersNum=count(UserModel::where('id','>',0)
-                            ->where($map)
-                            //->where('dept',$searchDept)
-                            ->group('username')
-                            ->select());    
- 
-       // foreach($users as $v){
-//            $user1 = UserModel::get($v['id']);
-//            // 使用User模型中定义的关联关系(role)查出用户对应用户组名称(name)
-//            $roleName=$user1->role->name;
-//            // 将用户对应的用户组名称加入数据集$users中。
-//            $v['rolename']=$roleName;
-//        }
-        
+                            ->select()); 
+                            
         //添加groupNameNum字段到数据集$users中
         //字段内容：根据user的usergroup_id字段添加UserGroup.name的内容后生成$groupNameNum字符串
         foreach($users as $v){
@@ -1170,7 +1148,6 @@ class IndexController extends \think\Controller
              // 所有用户信息
               'users'=>$users,
               'usersNum'=>$usersNum,
-              'userRecords'=>$userRecords,
               
               'pageUser'=>$pageUser,
               'pageUserNum'=>$pageUserNum,
@@ -1194,16 +1171,7 @@ class IndexController extends \think\Controller
     {
       $this->_loginUser();
       //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
-     
-     // 查出所有的用户组并分页，根据“strOrder”排序，设定前端页面显示的锚点（hash值）为“div1”，设定分页页数变量：“pageUserNum”
-        // 带上每页显示记录行数$userTableRows和3个查询词，实现查询结果分页显示。
-//        $users = UserModel::where('id','>',0)
-//                            ->where('dept',$searchDept)
-//                            ->where($map)
-//                            ->order($strOrder)
-//                            ->paginate($userTableRows,false,['type'=>'bootstrap','fragment'=>'div1','var_page'=>'pageUserNum',
-//                            'query'=>['userTableRows'=>$userTableRows,'searchDept'=>$searchDept,'searchUserName'=>$searchUserName,'searchUsergroup'=>$searchUsergroup]]);                     
-//          
+      
         // 分页页数变量：“usergroupPageNum”
       if(!empty($request->param('usergroupPageNum'))){
           $usergroupPageNum=$request->param('usergroupPageNum');

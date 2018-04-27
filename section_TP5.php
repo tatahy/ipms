@@ -109,7 +109,17 @@ break;
 $list = User::all(function($query){
   $query->where('status',1)->whereOr('id','>',10)->limit(3)->order('id', 'asc');
 });
-
+//闭包查询仅有一个参数$query,use引入闭包外部变量
+$usersNum=count(User::all(function($query) use ($searchUsergroup,$searchDept,$searchUserName){
+	$query->where('id',3)
+    	->where([
+                'usergroup_id'=>['like','%'.$searchUsergroup.'%'],
+                'dept'=>$searchDept,
+                'username'=>['like','%'.$searchUserName.'%']
+            ])
+        ->group('username');
+    })
+); 
 
 //或者在实例化模型后调用查询方法
 
