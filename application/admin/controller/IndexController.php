@@ -1275,15 +1275,15 @@ class IndexController extends \think\Controller
         case '_CREATE':
           $user=$userMdl::get(['mobile'=>$request->param('mobile')]);
           $name=$request->param('userName');
-          $id=$user->id;
           if(count($user)){
             $result='false';
             $msg='创建失败';
             $msgPatch='手机号：'.$request->param('mobile').'已存在。';
           }else{
-            $result='success';
             $user=$userMdl::create($userData,true);
+            $result='success';
             $msg='创建成功';
+            $id=$user->id;
           }
         break;
         
@@ -1293,12 +1293,12 @@ class IndexController extends \think\Controller
           
           //手机号要唯一
           if($request->param('mobile')==$mobile){
-              $result='success';
-              $msg='保存成功';
               if($request->param('userName')!=$name){
                   $msgPatch='用户名更新为【'.$request->param('userName').'】。';
               }
               $userMdl::update($userData,['id'=>$id],true);
+              $result='success';
+              $msg='保存成功';
           }else{
               if(count($userMdl::get(['mobile'=>$request->param('mobile')]))){
                   $result='false';
@@ -1317,23 +1317,21 @@ class IndexController extends \think\Controller
         break;
         
         case '_DELETE':
-          $name=$userMdl::get($id)->name;  
+          $name=$userMdl::get($id)->username;  
           $userMdl::destroy($id);
           $result='success';
           $msg='删除成功';
-          //返回默认的$id
+          //返回最小的$id
           $id=$userMdl::where('id','>',0)->min('id');
         break;
         
         case'_DISABLE':
           $userMdl::update(['enable'=> 0], ['id' => $id]);
-          
           $result='success';
         break;
         
         case'_ENABLE':
           $userMdl::update(['enable'=> 1], ['id' => $id]);
-          
           $result='success';
           
         break;

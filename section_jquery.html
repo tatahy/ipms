@@ -269,11 +269,17 @@ $('input:radio[name="attUpload"][value="1"]').prop('checked',true);
 Javascript,数组的最大值、数组的最小值
 <script>
 var arr=[];
+var str='';
 for (var i=0;i<2;i++){
 	arr.push(i);
-	//join函数将数组arr转换成以‘,’分隔的字符串
-	str=arr.join(',');
 }
+//join函数将数组arr转换成以‘,’分隔的字符串
+str=arr.join(',');
+str=arr.toString();
+
+//split函数将以‘,’分隔的字符串转换成数组arr
+arr=str.split(',');
+
 
 var min=Math.min.apply(null, arr);//min=0
 var max=Math.max.apply(null, arr);//max=1
