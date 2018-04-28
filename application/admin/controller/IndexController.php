@@ -410,6 +410,7 @@ class IndexController extends \think\Controller
     {
       $this->_loginUser();
       $req=$request->param('req');
+           
       switch($req){
         case '_DEPT':
           $res=DeptModel::where('enable','1')->select();
@@ -421,6 +422,7 @@ class IndexController extends \think\Controller
         
       }
       // 返回前端数组
+      //return json_encode($res).json_encode($showVal).json_encode($removeVal);
       return $res;
     }
     
@@ -1262,7 +1264,7 @@ class IndexController extends \think\Controller
       //2.分情况执行业务逻辑，生成返回前端的数据、操作数据库等 
       switch($oprt){
         case '_ADDNEW':
-          $user=array('id'=>$id,'username'=>'','dept'=>'','mobile'=>'');
+          $user=array('id'=>$id,'username'=>'','dept'=>'','mobile'=>'','usergroup_id'=>0);
           
         break;
         
@@ -1278,7 +1280,7 @@ class IndexController extends \think\Controller
           if(count($user)){
             $result='false';
             $msg='创建失败';
-            $msgPatch='手机号：'.$request->param('mobile').'已存在。';
+            $msgPatch='手机号：'.$request->param('mobile').',已存在。';
           }else{
             $user=$userMdl::create($userData,true);
             $result='success';
@@ -1303,7 +1305,7 @@ class IndexController extends \think\Controller
               if(count($userMdl::get(['mobile'=>$request->param('mobile')]))){
                   $result='false';
                   $msg='保存失败';
-                  $msgPatch='该手机号：'.$request->param('mobile').'已存在。';
+                  $msgPatch='手机号：'.$request->param('mobile').',已存在。';
               }else{
                   $result='success';
                   $msg='保存成功';

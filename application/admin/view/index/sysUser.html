@@ -66,7 +66,7 @@
 				</thead>
 				
 				<tbody><!-- 此处显示数据库查询后的数据集 -->
-					{volist name="users" id="vo" empty="暂时没有数据"}
+					{volist name="users" id="vo" empty="不存在用户数据"}
 					<tr>
 						<td>{$i+($pageUserNum-1)*$userTableRows}</td>
 						<td class="name">{$vo.username}</td>
@@ -468,7 +468,7 @@ function ajaxShowSelect(url,data,obj,attach,selected){
 					$('#btnUpdate').show();
 					$('#btnDelete').show();
 					$('#oprt').val('_UPDATE');
-					$('#pwd').closest('.has-feedback').remove();
+					$('#pwd').closest('.form-group').remove();
 				break;
 			}
 

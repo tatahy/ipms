@@ -3,7 +3,6 @@
 <form id="fmUser" role="form" action="{$home}/admin/index/userOprt"  method="post">
 	<input id="id" type="text" name="id" value="{$user.id}" class="sr-only">
 	<input id="oprt" type="text" name="oprt" value="{$oprt}" class="sr-only">
-	<p id="p1">p1</p>
 	<div class="row">
 	<div class="form-group has-feedback col-sm-6">
 		<label for="username">用户名<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
@@ -19,7 +18,7 @@
         <span style="display: none;margin-right:17px;" class="spOk glyphicon glyphicon-ok form-control-feedback"></span>	
 	</div>
 	
-	<div class="form-group has-feedback col-sm-6">
+	<div class="form-group col-sm-6">
 		<label for="psw">登录密码<span class="small text-muted">（自动生成，同用户名）</span></label>
 		<!-- // bootstrap实现矢量图在输入框开头 -->
 		<div class="input-group">
@@ -51,7 +50,7 @@
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-tree-conifer"></span></span>
 			<select class="form-control" id="selDept" name="dept">
-    			<option value="0">……选择一个部门</option>
+    			<option value="reserved">……选择一个部门</option>
     		</select>
 		</div>
 	</div>
@@ -63,8 +62,7 @@
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-plus"></span></span>
 			<select class="form-control" id="selUsergroup">
-    			<option value="">1</option>
-    			<option value="">2</option>
+    			<option value="reserved">…可选</option>
     		</select>
 		</div>
 	</div>
@@ -74,7 +72,7 @@
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-education"></span></span>
 			<select class="form-control inputCheck" id="selectedUsergroup">
-    			<option value="0">…已选</option>
+    			<option value="">…已选</option>
     		</select>
 		</div>
 		<span style="color:red;display:none;" class="spTips">至少有一个用户组</span>
@@ -123,16 +121,11 @@ $(document).ready(function(){
 	var check = [false,false];
 		
 	<!-- // 单选框#selDept的内容 -->
-	ajaxShowSelect('selectResponse',{'req':'_DEPT'},$('#selDept'),[{'text':'...选择一个部门','val':'0'}],'{$user.dept}');
-	
+	ajaxSelectOption($('#selDept'),{"url":"selectResponse","ajaxData":{"req":"_DEPT"},"selected":{"val":"{$user.dept}"}});
 	// 单选框#selUsergroup的内容
-	ajaxShowSelect('selectResponse',{'req':'_USERGROUP'},$("#selUsergroup"),[{'text':'...待选','val':'0'}]);
-	
+	ajaxSelectOption($('#selUsergroup'),{"url":"selectResponse","ajaxData":{"req":"_USERGROUP"},"remove":{"val":"{$user.usergroup_id}"}});
 	// 单选框#selectedUsergroup的内容
-	<!-- ajaxShowSelect($('#selectedUsergroup'),param); -->
-	<!-- param={"url":"selectResponse","ajdxdata":{"req":"_USERGROUP"},"attach":[{"val":"0","text":"已加入用户组数：0"}],"show":[{"val":"{$user.dept}"}],"remove":0,"selected":0}; -->
-	$('#selectedUsergroup').empty().append(ajaxReturnOption($(this),param));
-	
+	ajaxSelectOption($('#selectedUsergroup'),{"url":"selectResponse","ajaxData":{"req":"_USERGROUP"},"show":{"val":"{$user.usergroup_id}"}});
 	
 	$('#selUsergroup').change(function(){
 	<!-- $('#selUsergroup').dblclick(function(){ -->
@@ -143,14 +136,12 @@ $(document).ready(function(){
 		obj.remove();
 		$(this).children('option').eq(0).text('可加入用户组数：'+(this.length-1));
 		$('#selectedUsergroupText').html(v+'_'+str);
-		<!-- $('#selUsergroup option:selected').hide(); -->
-		<!-- $('#selUsergroup option:selected').remove(); -->
-		<!-- var option1=$('option').val(v).text(str); -->
-		<!-- $('#selectedUsergroup').append(option1); -->
+		
 		var option='<option value="'+v+'">'+str+'</option>';
 		<!-- $(option).appendTo('#selectedUsergroup'); -->
 		$('#selectedUsergroup').append(option);
 		var len=$('#selectedUsergroup').find('option').length;
+		
 		//对#selectedUsergroup的操作
 		$('#selectedUsergroup').children('option').eq(0).text('已加入用户组数：'+(len-1));
 		$('#selectedUsergroup').closest('.has-feedback').removeClass('has-error');
@@ -325,74 +316,6 @@ function fail(obj, counter, msg) {
     divParent.find('.spRemove').show();
     check[counter] = false;
 }
-		
-	//**函数名：ajaxShowSelect
- 	//* 作用：本页面ajax过程向服务器请求特定单选框内容所需数据，并组装好HTML语句
-	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
-	//* 参数data，类型：json。值：传送给后端的键值对数据。{'req':'','':}
-	//* 参数obj，类型：对象。值：必须，单选框的对象名称
-	//*参数attach，类型：json数组。值：可为空，需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
-	//*参数selected，类型：字符。值：字符，可为空。
-	//* 返回值：无
-function ajaxShowSelect(url,data,obj,attach,selected){
-	$.ajax({
-		type : 'post',
-		async : true,  //异步请求
-		url : url,
-		data : data,
-		timeout:2000,
-		<!-- // 指定服务器端response的数据类型为json-->
-		dataType:'json',
-		success:function(backData){
-			var str='';
-			if(attach){
-				for(i=0;i<attach.length;i++){
-					str+='<option value="'+attach[i].val+'">'+attach[i].text+'</option>';
-				}
-			}
-			<!-- // 遍历backData数组组装HTML语句 -->
-			<!-- // backData的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
-			$.each(backData,function(n1,v1){
-				$.each(v1,function(n2,v2){
-					//根据data的内容安排backData
-					switch(data.req){
-						case '_DEPT':
-							if(n2=='name'){
-								str+='<option value="'+v2+'">'+v2+' （简称：';
-							}
-							if(n2=='abbr'){
-								str+=v2+'）</option>';
-							}
-						break;
-						
-						case '_USERGROUP':
-							if(n2=='id'){
-								str+='<option value="'+v2+'">';
-							}
-							if(n2=='name'){
-								str+=v2+'</option>';
-							}
-						break;
-						
-					}
-				});
-			});
-			<!--// 清空单选框Obj的所有选项-->
-			obj.empty();
-			<!--// 添加单选框Obj的新选项-->
-			obj.append(str);
-				
-			<!-- // value=selected 的项为选定项-->
-			if (selected){
-				obj.val(selected).attr('selected','selected');
-			}
-			<!-- Obj.val(selected).attr('selected','selected'); -->
-		},
-		error: function() {
-            alert("失败Group，请稍后再试！");
-        }
-	});
-}
 
 //**函数名：ajaxProcess
  	//* 作用：本页面ajax过程
@@ -432,6 +355,102 @@ function ajaxProcess(url,data,archor){
 		}
 	});	
 }
+
+//**函数名：ajaxSelectOption
+ 	//* 作用：本页面ajax过程向服务器请求特定单选框内容所需数据，并组装好HTML语句
+	//* 参数obj，类型：对象。值：不为空。说明：调用函数的对象。
+	//* 参数param，类型：json。值：param={"url":"selectResponse","ajdxdata":{"req":"_DEPT"},"show":{"val":"1,2,3","text":"t"},"remove":{"val":"v","text":"t"},"selected":{"val":"v","text":"t"},'multiple':0}
+	//*param.url,类型：字符串。值：不为空。说明：函数中ajax操作的URL。
+	//*param.ajaxdata,类型：json。值：不为空。说明：函数中ajax传送的data。
+	//*param.show,类型：json。值：默认为0。说明：调用函数后需要的option项val值字符串，text字符串。
+	//*param.remove,类型：json。值：默认为0。说明：调用函数后要不需要的option项val值字符串，text字符串。
+	//*param.selected,类型：json。值：默认为0。说明：调用函数后选定的option项val值字符串，text字符串。
+	//*param.multiple,类型：boolean。值：默认为0。说明：调用函数后obj是否为单选框，默认为单选框。
+	//* 返回值：无
+function ajaxSelectOption(obj,param){
+	var defaultParam={"url":0,"ajaxData":0,"show":0,"remove":0,"selected":0,'multiple':0};
+    param=$.extend({},defaultParam,param); 
+    var str='';
+	$.ajax({
+		type : 'post',
+		async : true,  //异步请求
+		url : param.url,
+		data : param.ajaxData,
+		timeout:2000,
+		<!-- // 指定服务器端response的数据类型为json-->
+		dataType:'json',
+		success:function(backData){
+			var str='';
+			<!-- // 遍历backData数组组装HTML语句 -->
+			<!-- // backData的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
+			$.each(backData,function(n1,v1){
+				$.each(v1,function(n2,v2){
+					//根据data的内容安排backData
+					switch(param.ajaxData.req){
+						case '_DEPT':
+							if(n2=='name'){
+								str+='<option value="'+v2+'">'+v2+' （简称：';
+							}
+							if(n2=='abbr'){
+								str+=v2+'）</option>';
+							}
+						break;
+						
+						case '_USERGROUP':
+							if(n2=='id'){
+								str+='<option value="'+v2+'">';
+							}
+							if(n2=='name'){
+								str+=v2+'</option>';
+							}
+						break;	
+					}
+				});
+			});
+			obj.append(str);
+			
+			//showSelectOption
+			if(param.multiple==1){
+        		obj.attr('multiple',true);
+    		}else{
+				obj.attr('multiple',false);
+			}
+			if(param.show!=0){
+        		obj.find('option').each(function(){
+					if(param.show.val.indexOf($(this).val())==-1){
+            			$(this).remove();
+        			}
+    			});
+				obj.find('option:first').text('已加入用户组数：'+(obj.find('option').length-1));
+    		}
+			if(param.remove!=0){
+				obj.find('option').each(function(){
+					if(param.remove.val.indexOf($(this).val())!=-1){
+            			$(this).remove();
+        			}
+    			});
+				obj.find('option:first').text('可加入用户组数：'+(obj.find('option').length-1));
+    		}
+    		if(param.selected==0){
+        		//第一项为选中项
+				obj.find('option:first').attr('selected','selected');
+    		}else{
+				//param.selected.val是option的value值字符串，设定值在param.selected.val中的option为选定项
+				obj.find('option').each(function(){
+	    			if(param.selected.val.indexOf($(this).val())!=-1){
+                		$(this).attr('selected',true);
+            		}else{
+                		$(this).attr('selected',false);
+           			}
+				});	
+    		}
+		},
+		error: function() {
+            $.alert('与服务器通讯超时，请稍后再试！');
+        }
+	});
+}
+
 <!--/ function -->
 	
 });
