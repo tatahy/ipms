@@ -880,6 +880,124 @@ function fail(obj, counter, msg) {
 
 
 
+<!--  HY 2018/4/29 -->	
+
+jquery 判断获得元素的类型:
+<script>
+//把jquery对象转换成Dom对象，应用js的‘tagName’返回的是标签的大写名
+$('#id')[0].tagName;
+//转换成小写
+$('#id')[0].tagName.toLowerCase();
+$('#id').get(0).tagName;
+//直接用jQuery封装的方法得到
+$("#id").prop("nodeName");
+
+</script> 
+
+把jquery对象装换为js对象
+<script>
+//说明：jQuery通过任何选择器取得的对象都是jquery对象而不是JavaScript的dom，jquery对象不能用js的方法进行操作， 而需要使用jquery对象支持的方法 。如果是通过class的话，取得的是jquery对象数组。
+
+//1.单个对象转换
+var obj = $('#xx')[0];
+//2. 数组对象转换
+var obj = $('.xx').each(function(){
+	alert(this);//这里 this获得的就是一个dom对象组
+	alert(this.index($(this))); //获取单个jQuery对象（$(this)）下标
+};
+</script> 
+
+<!--/  HY 2018/4/29 -->	
+
+
+<!--  HY 2018/4/30 -->	
+//自定义函数中得到其包含的ajax函数的返回值并返回给函数调用者
+
+<script> 
+// 1.保持异步，定义一个回调函数
+function load_val(callback){//定义一个回调函数
+    $.getJSON('test.php' , function(data){
+        callback(data);//将返回结果当作参数返回
+    });
+}
+ 
+load_val(function(data){
+    alert(data);//这里可以得到值
+});
+ 
+//2.用同步ajax来实现
+function load_val2(){
+    var result;
+    $.ajax({
+        dataType:'json',
+        url : 'test.php',
+        async:false,//这里选择异步为false，那么这个程序执行到这里的时候会暂停，等待
+                    //数据加载完成后才继续执行
+        success : function(data){
+            result = data;
+        }
+    });
+    return result;
+}
+ 
+var data = load_val();//这里可以直接拿到数据
+
+//函数内部对函数的参数data的赋值
+data = (data==null || data=="" || typeof(data)=="undefined")? {"date": new Date().getTime()} : data;
+</script> 
+
+//jquery ajax $.ajax如何使用自定义函数？
+<script> 
+//1.直接用函数名来赋值给success
+$.ajax({url: "demo.php",type: "POST",data:{Name:"keyun"},  success: scss });
+
+//2.二次包装一下ajax这个方法
+var  myAjax = function(opt){
+        $.ajax({            
+			url:opt['url'],
+            type:opt['method'],
+            data:opt['data'],
+            success:function(msg){
+            	opt['callBack'](msg);
+            }
+       });
+  }      
+   
+var test = function(){
+   var opt = {
+         url:'demo.php',
+         method:'post',
+         data:{key:'a',value:'1'},
+        callBack:scss
+    }
+   myAjax(opt);
+}
+function scss(res){  alert(res);}
+
+</script> 
+
+
+//jquery ajax，表单提交，序列化表单数据
+<script> 
+$("form").on("submit",function(){
+    var url = this.action;   //可以直接取到表单的action
+    var formData = $(this).serialize();
+    $.post(url,formData,
+        function(data){
+            //返回成功，可以做一个其他事情
+            console.log(data);
+        },'json');
+
+    //阻止表单默认提交行为
+    return false;
+});
+
+
+</script> 
+
+<!--/  HY 2018/4/30 -->	
+
+
 
 <!-- ......................问题................................ -->
 
