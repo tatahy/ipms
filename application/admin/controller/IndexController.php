@@ -1297,10 +1297,18 @@ class IndexController extends \think\Controller
           if($request->param('mobile')==$mobile){
               if($request->param('userName')!=$name){
                   $msgPatch='用户名更新为【'.$request->param('userName').'】。';
+                  
               }
               $userMdl::update($userData,['id'=>$id],true);
               $result='success';
               $msg='保存成功';
+              //else{
+//                  $result='false';
+//                  $msg='保存失败';
+//                  $msgPatch='手机号：'.$request->param('mobile').',已存在。';
+//                
+//              }
+              
           }else{
               if(count($userMdl::get(['mobile'=>$request->param('mobile')]))){
                   $result='false';

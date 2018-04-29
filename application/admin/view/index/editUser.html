@@ -58,7 +58,7 @@
 	
 	<div class="row">
 	<div class="form-group col-sm-6">
-		<label for="selUsergroup">选择用户组<span class="small text-primary">（单击加入）</span></label>
+		<label for="selUsergroup"><span class="spTitle">选择用户组</span><span class="small text-primary">（单击加入）</span></label>
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-plus"></span></span>
 			<select class="form-control" id="selUsergroup">
@@ -68,7 +68,7 @@
 	</div>
 	
 	<div class="form-group has-feedback col-sm-6">
-		<label for="selectedUsergroup">已加入用户组<span class="small  glyphicon glyphicon-asterisk text-danger">（单击退出）</span></label>
+		<label for="selectedUsergroup"><span class="spTitle">已加入用户组</span><span class="small  glyphicon glyphicon-asterisk text-danger">（单击退出）</span></label>
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-education"></span></span>
 			<select class="form-control inputCheck" id="selectedUsergroup">
@@ -134,7 +134,8 @@ $(document).ready(function(){
 		<!-- var str=$('#selUsergroup option:selected').text(); -->
 		var str=obj.text();
 		obj.remove();
-		$(this).children('option').eq(0).text('可加入用户组数：'+(this.length-1));
+		<!-- $(this).children('option').eq(0).text('可加入用户组数：'+(this.length-1)); -->
+		$(this).closest('.form-group').find('.spTitle').text('可加入用户组数：'+(this.length-1));
 		$('#selectedUsergroupText').html(v+'_'+str);
 		
 		var option='<option value="'+v+'">'+str+'</option>';
@@ -143,7 +144,7 @@ $(document).ready(function(){
 		var len=$('#selectedUsergroup').find('option').length;
 		
 		//对#selectedUsergroup的操作
-		$('#selectedUsergroup').children('option').eq(0).text('已加入用户组数：'+(len-1));
+		$('#selectedUsergroup').closest('.form-group').find('.spTitle').text('已加入用户组数：'+(len-1));
 		$('#selectedUsergroup').closest('.has-feedback').removeClass('has-error');
 		$('#selectedUsergroup').closest('.has-feedback').children('span').hide();
 		check[1]=true;
@@ -152,10 +153,17 @@ $(document).ready(function(){
 	
 	$('#selectedUsergroup').change(function(){
 		var obj=$(this).find('option:selected');
+		
+		obj.each(function(){
+			
+			
+			
+    	});
+		
 		var v=obj.val();//var v=$(this).val();
 		var str=obj.text();
 		obj.remove();
-		$(this).children('option').eq(0).text('已加入用户组数：'+(this.length-1));
+		$(this).closest('.form-group').find('.spTitle').text('已加入用户组数：'+(this.length-1));
 		if($(this).find('option:last').val()==0){
 			$(this).closest('.has-feedback').addClass('has-error');	
 			$(this).closest('.has-feedback').children('span').show();
@@ -170,7 +178,7 @@ $(document).ready(function(){
 		var option='<option value="'+v+'">'+str+'</option>';
 		$('#selUsergroup').append(option);
 		var len=$('#selUsergroup').find('option').length;
-		$('#selUsergroup').children('option').eq(0).text('可加入用户组数：'+(len-1));
+		$('#selUsergroup').closest('.form-group').find('.spTitle').text('可加入用户组数：'+(len-1));
 	});
 	
 	$('#selectedUsergroup').focusout(function(){
@@ -421,7 +429,9 @@ function ajaxSelectOption(obj,param){
             			$(this).remove();
         			}
     			});
-				obj.find('option:first').text('已加入用户组数：'+(obj.find('option').length-1));
+				<!-- obj.find('option:first').text('已加入用户组数：'+(obj.find('option').length-1)); -->
+				obj.closest('.form-group').find('.spTitle').text('已加入用户组数：'+(obj.find('option').length-1));
+				
     		}
 			if(param.remove!=0){
 				obj.find('option').each(function(){
@@ -429,7 +439,9 @@ function ajaxSelectOption(obj,param){
             			$(this).remove();
         			}
     			});
-				obj.find('option:first').text('可加入用户组数：'+(obj.find('option').length-1));
+				<!-- obj.find('option:first').text('可加入用户组数：'+(obj.find('option').length-1)); -->
+				
+				obj.closest('.form-group').find('.spTitle').text('可加入用户组数：'+(obj.find('option').length-1));
     		}
     		if(param.selected==0){
         		//第一项为选中项
