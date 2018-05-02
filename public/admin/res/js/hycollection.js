@@ -10,29 +10,30 @@
 //jQuery version:1.12.4 
 //**函数名：ajaxSelectOption
  	//* 作用：本页面ajax过程向服务器请求特定单选框内容所需数据，并组装好HTML语句
-	//* 参数obj，类型：对象。值：不为空。说明：调用函数的对象。
-	//* 参数param，类型：json。值：param={"url":"selectResponse","ajdxdata":{"req":"_DEPT"},"show":{"val":"1,2,3","text":"t"},"remove":{"val":"v","text":"t"},"selected":{"val":"v","text":"t"},'multiple':0}
-	//*param.url,类型：字符串。值：不为空。说明：函数中ajax操作的URL。
-	//*param.ajaxdata,类型：json。值：不为空。说明：函数中ajax传送的data。
+	//* 参数obj，类型：对象。值：不为空。说明：调用函数的select对象。
+	//* 参数param，类型：json。值：param={"async":true,"url":"selectResponse","ajdxdata":{"req":"_DEPT"},"first":{"val":"0","text":"t"},"show":{"val":"1,2,3","text":"t"},"remove":{"val":"v","text":"t"},"selected":{"val":"v","text":"t"},'multiple':0}
+	//*param.async,类型：Boolean。值：必须。说明：函数同步/异步操作。	
+	//*param.url,类型：字符串。值：必须。说明：函数中ajax操作的URL。	//*param.ajaxdata,类型：json。值：必须。说明：函数中ajax传送的data。	//*param.first,类型：json。值：默认为{"val":"0","text":"第一项"}。说明：调用函数后创建的第一项option的val值（字符串），text值（字符串）。
 	//*param.show,类型：json。值：默认为0。说明：调用函数后需要的option项val值字符串，text字符串。
 	//*param.remove,类型：json。值：默认为0。说明：调用函数后要不需要的option项val值字符串，text字符串。
 	//*param.selected,类型：json。值：默认为0。说明：调用函数后选定的option项val值字符串，text字符串。
 	//*param.multiple,类型：boolean。值：默认为0。说明：调用函数后obj是否为单选框，默认为单选框。
-	//* 返回值：无
+	//* 返回值：optionHtml
 function ajaxSelectOption(obj,param){
-	var defaultParam={"url":0,"ajaxData":0,"show":0,"remove":0,"selected":0,'multiple':0};
+	var defaultParam={"async":true,"url":0,"ajaxData":0,"first":{"val":"0","text":"first"},"show":0,"remove":0,"selected":0,'multiple':0};
     param=$.extend({},defaultParam,param); 
     var str='';
+	var optionHtml='';
 	$.ajax({
 		type : 'post',
-		async : true,  //异步请求
+		async : param.async,  //true:异步请求，false：同步请求
 		url : param.url,
 		data : param.ajaxData,
 		timeout:2000,
 		<!-- // 指定服务器端response的数据类型为json-->
 		dataType:'json',
 		success:function(backData){
-			var str='';
+			var str='<option value="'+param.first.val+'">'+param.first.text+'</option>';
 			<!-- // 遍历backData数组组装HTML语句 -->
 			<!-- // backData的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
 			$.each(backData,function(n1,v1){
@@ -59,6 +60,7 @@ function ajaxSelectOption(obj,param){
 					}
 				});
 			});
+			obj.empty();
 			obj.append(str);
 			
 			//showSelectOption
@@ -69,23 +71,20 @@ function ajaxSelectOption(obj,param){
 			}
 			if(param.show!=0){
         		obj.find('option').each(function(){
-					if(param.show.val.indexOf($(this).val())==-1){
+					if(param.show.val.indexOf($(this).val())==-1 && $(this).val()!=0){
             			$(this).remove();
         			}
     			});
-				<!-- obj.find('option:first').text('已加入用户组数：'+(obj.find('option').length-1)); -->
-				obj.closest('.form-group').find('.spTitle').text('已加入用户组数：'+(obj.find('option').length-1));
+				obj.closest('.form-group').find('.spNum').text(obj.find('option').length-1);
 				
     		}
 			if(param.remove!=0){
 				obj.find('option').each(function(){
-					if(param.remove.val.indexOf($(this).val())!=-1){
+					if(param.remove.val.indexOf($(this).val())!=-1 && $(this).val()!=0){
             			$(this).remove();
         			}
     			});
-				<!-- obj.find('option:first').text('可加入用户组数：'+(obj.find('option').length-1)); -->
-				
-				obj.closest('.form-group').find('.spTitle').text('可加入用户组数：'+(obj.find('option').length-1));
+				obj.closest('.form-group').find('.spNum').text(obj.find('option').length-1);
     		}
     		if(param.selected==0){
         		//第一项为选中项
@@ -100,11 +99,17 @@ function ajaxSelectOption(obj,param){
            			}
 				});	
     		}
+			
+			optionHtml=obj.html();
 		},
 		error: function() {
             $.alert('与服务器通讯超时，请稍后再试！');
         }
 	});
+	//同步就返回值
+	if(param.async==false){
+		return optionHtml;
+	}
 }
 
 //jQuery version:1.12.4 

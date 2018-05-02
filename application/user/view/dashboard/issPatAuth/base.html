@@ -252,7 +252,7 @@ $(document).ready(function(){
 		var topic=$(this).attr('data-issTopic');
 		var auth=$(this).attr('data-issue-authority');
 		var aHtml=$(this).html();
-		//向后端“issPatSingle”(TP5中 'issPatSingle'='{$home}/user/dashboard2/issPatSingle' )发送数据(后端用于选择返回的模板文件)		
+		//向后端“issPatSingle”(TP5中 'issPatSingle'='{$home}/user/dashboard/issPatSingle' )发送数据(后端用于选择返回的模板文件)		
 		$.post('issPatAuthSingle',
 			{
 				'issId':issId,
@@ -304,7 +304,7 @@ $(document).ready(function(){
 		// 组装通过“post”提交的数据，名称与后端所用一致
 		var sendData = {'sortName':sortName,'sort':sort,'issPatTableRows':rows,'pageTotalNum':pageTotalNum,'searchDept':searchDept,'searchPatName':searchPatName,'searchPatStatus':searchPatStatus,'searchPatType':searchPatType,'searchWriter':searchWriter,'auth':$('.btnTpl a').attr('data-issue-authority')};
 		
-		<!-- // jquery load()方法，本文件加载到index2.html的指定区域<div id="divIssPatAuth_load"></div> -->
+		<!-- // jquery load()方法，本文件加载到index.html的指定区域<div id="divIssPatAuth_load"></div> -->
 		$('#divIssPatAuth_load').load('issPatAuth',sendData);
 	}
 

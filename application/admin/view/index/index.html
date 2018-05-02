@@ -2,38 +2,63 @@
 
 <!-- pagewrap  -->
 
+<style>
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 50px;
+    left: 0;
+    background-color: #f2f2f2;
+    overflow-x: hidden;
+    transition: 0.5s;
+    //padding-top: 50px;
+}
+
+#main {
+    transition: margin-left 0.5s;
+    //padding-top: 60px;
+	margin-top: 60px;
+}
+
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
+</style>
+
 <div id="divContainer" class="container-fluid" >
-	<div class="row content" >
-		<div class="col-sm-2" >
-			<!-- nav 与 jQuery结合实现菜单栏导航效果-->
-			<ul class="nav nav-pills nav-stacked hy-box" >
-				<li id="li0" class="active"><a class="aTab" href="#div0"><span class="glyphicon glyphicon-inbox"></span>&nbsp;系统概况</a></li>
+	<div id="mySidenav" class="sidenav">
+		<!-- <a id="closeBtn" href="#" class="text-primary" ><span class="glyphicon glyphicon-chevron-left" style="margin-left:60%;margin-top:10px;margin-bottom:10px;">收起</span></a> -->
+		<button id="closeBtn" type="button" class="btn btn-link btn-lg" style="margin-left:70%;"><span class="glyphicon glyphicon-chevron-left"></span></button>
+		
+		<!-- nav 与 jQuery结合实现菜单栏导航效果-->
+		<ul class="nav nav-pills nav-stacked" >
+			<li id="li0" class="active"><a class="aTab" href="#sysSummary"><span class="glyphicon glyphicon-inbox"></span>&nbsp;系统概况</a></li>
 				
-				<li class="dropdown">
-					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span>&nbsp;系统用户
-					<span class="caret"></span></a>
-					<ul class="dropdown-menu">
-					  <li id="li1" class="text-right"><a class="aTab" href="#div1">用户&nbsp;<span class="glyphicon glyphicon-file"></span></a></li>
-					  <li id="li2" class="text-right"><a class="aTab" href="#div2">用户组&nbsp;<span class="glyphicon glyphicon-duplicate"></span></a></li>
+			<li class="dropdown">
+				<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span>&nbsp;系统用户<span class="caret"></span></a>
+				<ul class="dropdown-menu">
+					<li id="li1" class="text-right"><a class="aTab" href="#sysUser">用户&nbsp;<span class="glyphicon glyphicon-file"></span></a></li>
+					<li id="li2" class="text-right"><a class="aTab" href="#sysUsergroup">用户组&nbsp;<span class="glyphicon glyphicon-duplicate"></span></a></li>
 					  <!-- //<li><a href="#"><span class="glyphicon glyphicon-link"></span>&nbsp;功能1-3</a></li> -->
-					</ul>
-				</li>
+				</ul>
+			</li>
 				
-				<li id="li3"><a class="aTab" href="#div3"><span class="glyphicon glyphicon-wrench"></span>&nbsp;系统设置</a></li>
-			</ul>
-			
-		</div>
-		
-		<div class="col-sm-10 tab-content" >
-			
-			<div id="content"></div>
-			
-		</div>
-		
-		
-		
+			<li id="li3"><a class="aTab" href="#sysSetting"><span class="glyphicon glyphicon-wrench"></span>&nbsp;系统设置</a></li>
+		</ul>
+
+  
 	</div>
 	
+	<div id="main">
+  		<!-- <a id="openBtn" href="#" class="text-primary"><span class="glyphicon glyphicon-chevron-right" style="margin-top:10px;margin-bottom:10px;">展开</span></a> -->
+		
+  		<button id="openBtn" type="button" class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-chevron-right"></span></button>
+  
+  		<div id="content"><p class="text-center" style="font-size:28px;">加载中……</p></div>
+	</div>	
 
 </div>
 
@@ -42,51 +67,49 @@
 
 <script>
 $(document).ready(function(){
-	
-	var sId = window.location.hash;
-    loadInner(sId);
+	loadTplFile(window.location.hash);
 	
 	<!-- //点击nav-pills中的各个按钮后，显示对应的页面-->
-	$(".aTab").click(function(){
-        var sId = $(this).attr("href");  //a的attr属性值
-		window.location.hash = sId;  //设置锚点
-        loadInner(sId);              //加载锚点对应的页面文件
+	$('.aTab').click(function(){
+        var sId = $(this).attr('href');  //a的href属性值即是页面的锚点值
+		<!-- window.location.hash = sId;  //设置锚点 -->
+		//a所在li高亮
+		$(this).tab('show');
+        loadTplFile(sId);              //加载锚点对应的页面文件
     });	
+	//锚点值与a的href属性值相同的a所在li高亮
+	$('.aTab').each(function(){
+		if(window.location.hash==$(this).attr('href')){
+			$(this).tab('show');
+		}
+    });	
+	//显示SideNavbar
+	$('#openBtn').click(function(){
+		$('#mySidenav').css('width','150px');
+		//#main的内容不被遮蔽就需要修改'margin-left'与#mySidenav的'width'相同
+    	$('#main').css('margin-left','150px');
+		//隐藏
+		$(this).hide();
+    });	
+	//关闭SideNavbar
+	$('#closeBtn').click(function(){
+        $('#mySidenav').css('width','0');
+    	$('#main').css('margin-left','0');
+		$('#openBtn').show();
+    });		
 	
-	// 作用：加载锚点对应的页面文件
-	function loadInner(sId){
-        var sId = window.location.hash;
-        var pathn;
-        switch(sId){
-        	case "#div0": 
-				pathn = "sys_sumary"; 
-				$('.nav-pills a[href="#div0"]').tab('show');//a所在li高亮，对应页面显示 
-			break;
-			case "#div1": 
-				pathn = "sys_user"; 
-				$('.nav-pills a[href="#div1"]').tab('show');//a所在li高亮，对应页面显示 
-			break;
-        	case "#div2": 
-				pathn = "sys_usergroup";
-				$('.nav-pills a[href="#div2"]').tab('show');//a所在li高亮，对应页面显示 
-			break;
-        	case "#div3": 
-				pathn = "sys_param"; 
-				$('.nav-pills a[href="#div3"]').tab('show');//a所在li高亮，对应页面显示 
-			break;
-　　		default: 
-				pathn = "sys_sumary"; break;   //#div0
-				$('.nav-pills a[href="#div0"]').tab('show');//a所在li高亮，对应页面显示 
-			break;
-        }
-        $("#content").load(pathn); //加载相对应的页面文件
- 
+<!-- function -->
+	// 作用：提交锚点值给后端，由后端返回需加载的页面文件
+	function loadTplFile(sId){
+		if(null==sId || sId=='#undefined'){sId='#sysSummary';}
+        //提交锚点值给后端，由后端返回需加载的页面文件
+		$("#content").load('tplFile',{'sId':sId}); 
     }
 	
-    
+<!-- function -->
+
 
 });
-
 
 </script>
 

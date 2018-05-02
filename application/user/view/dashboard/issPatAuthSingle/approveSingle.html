@@ -1,6 +1,6 @@
 <!-- // issPat:approveSingle.html： -->
 
-{extend name="../application/user/view/dashboard2/issPatAuthSingle/baseSingle.html" /}
+{extend name="../application/user/view/dashboard/issPatAuthSingle/baseSingle.html" /}
 
 
 
@@ -183,7 +183,7 @@ $(document).ready(function(){
 		$.ajax({
 			type : "post",
 			async : true,  //异步请求
-			url : "{$home}/user/dashboard2/selectExecuter",
+			url : "selectExecuter",
 			// 发送到服务器的数据，可无
 			<!-- data : data, -->
 			timeout:1000,

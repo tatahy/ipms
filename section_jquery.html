@@ -911,8 +911,8 @@ var obj = $('.xx').each(function(){
 
 
 <!--  HY 2018/4/30 -->	
-//二次封装的ajax函数，实现返回值并返回给函数调用者
-// 以下代码可在chrome、Firefox显示的网页的console里（F12）直接运行，网页需含有jQuery库文件
+//二次封装的ajax函数，实现返回值给函数调用者
+// 以下代码可在chrome、Firefox显示的网页的console里（F12）直接运行，网页需含有jQuery库文件(jQuery，version 1.12测试通过)
 <script> 
 
 //全局变量
@@ -926,7 +926,7 @@ if(async){
 	kk=getAjaxReturn(async,success_function,fail_function);
 }
 
-//例3，通过传入函数实现ajax二次封装后异步执行，同步回传。
+//通过传入函数实现ajax二次封装后异步执行，同步回传。
 function getAjaxReturn(p_async,sf,ff)
 { 
   	var sequence='ajax同步执行。';

@@ -1,4 +1,4 @@
-{include file="../application/common/headeruser.html" title="个人事务中心" }
+{include file="../application/common/headeruser.html" title="个人中心" }
 
 <!-- pagewrap  -->
 <div class="container-fluid" style="padding-top: 55px;">
@@ -22,79 +22,152 @@
 	<!-- </h4> -->
 	<!-- <hr> -->
 	<!-- <a href="{$home}/user/index/index">旧版</a> -->
-	<ul class="nav nav-pills" style="border-bottom:solid 0.1px #ddd;">
-		<li><a class="aTab" href="#writer"><span class="glyphicon glyphicon-folder-open"></span>&nbsp;撰写人</a></li>
-		<li><a class="aTab" href="#operator"><span class="glyphicon glyphicon-folder-close"></span>&nbsp;执行人</a></li>
-		<li><a class="aTab" href="#approver"><span class="glyphicon glyphicon-fire"></span>&nbsp;批准人</a></li>
+	<!-- <ul class="nav nav-pills" > -->
 		
-		<li><a class="aTab" href="#reviewer"><span class="glyphicon glyphicon-eye-open"></span>&nbsp;审查人</a></li>
-		<li><a class="aTab" href="#formchecker"><span class="glyphicon glyphicon-exclamation-sign"></span>&nbsp;形式审查人</a></li> 
-		<li><a class="aTab" href="#financialchecker"><span class="glyphicon glyphicon-warning-sign"></span>&nbsp;财务审查人</a></li>
-		<li><a class="aTab" href="#maintainer" ><span class="glyphicon glyphicon-calendar" ></span>&nbsp;维护人</a></li>
-		<li><a href="{$home}/user/dashboard2/index2">json权限版</a> </li>
-	</ul>
+		<!-- <li><a href="{$home}/user/dashboard/index">roles版</a> </li> -->
+	<!-- </ul> -->
 
-	<div class="tab-content" style="padding-top:5px;">
-    	
-		<div id="role"></div>	
-	</div>
+	<div class="panel-group" id="accordion">
+		<div id="panelProIss" class="panel panel-default">
+			<div class="panel-heading">
+			<h4 class="panel-title">
+        		<a data-toggle="collapse" data-parent="#accordion" href="#collapsePro"><span class="glyphicon glyphicon-inbox"></span>&nbsp;<strong>
+        		项目事务</strong>&nbsp;<span class="span0">0</span></a>
+      		</h4>
+			
+			</div>
+			
+			<div id="collapsePro" class="panel-collapse collapse">
+			<div class="panel-body " >	
+			
+				<!-- //需load其他模板文件的div -->
+				<div id="divIssPro_load"><h4 style="margin:50px;">加载中……</h4></div>
+			
+			</div>
+			</div>
+			
+		</div>
+		
+		<div id="panelIssPat" class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+        			<a data-toggle="collapse" data-parent="#accordion" href="#collapsePat"><span class="glyphicon glyphicon-wrench"></span>&nbsp;<strong>
+        			专利事务</strong>&nbsp;
+					{eq name="$numTotal" value="0"}
+					<span class="span0">{$numTotal}</span>
+					{else/}
+					<span class="span0 badge">{$numTotal}</span>
+					{/eq}
+					</a>
+      			</h4>
+			
+			</div>
+			
+			<div id="collapsePat" class="panel-collapse collapse in">
+			<div class="panel-body " >
+				
+				<!-- //需load其他模板文件的div -->
+				<div id="divIssPat_load"><h4 style="margin:50px;">加载中……</h4></div>
+				
+			</div>
+			</div>
+			
+		</div>
+		
+		<div id="panelTheIss" class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+        			<a data-toggle="collapse" data-parent="#accordion" href="#collapseThe"><span class="glyphicon glyphicon-list"></span>&nbsp;<strong>
+        			论文事务</strong>&nbsp;<span class="span0">0</span></a>
+      			</h4>
+			
+			</div>
+		
+			<div id="collapseThe" class="panel-collapse collapse">
+			<div class="panel-body " >
+				
+				<!-- //需load其他模板文件的div -->
+				<div id="divIssThe_load"><h4 style="margin:50px;">加载中……</h4></div>
+		
+			</div>
+			</div>
+	
+		</div>
+		
+		<div id="panelAttManage" class="panel panel-warning">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+        			<a data-toggle="collapse" data-parent="#accordion" href="#collapseAttManage"><span class="glyphicon glyphicon-bookmark"></span>&nbsp;<strong>
+        			附件管理</strong>&nbsp;<span class="span"></span></a>
+      			</h4>
+			
+			</div>
+		
+			<div id="collapseAttManage" class="panel-collapse collapse">
+			<div class="panel-body " >
+				
+				<!-- //需load其他模板文件的div -->
+				<div id="divAttManage_load"><h4 style="margin:50px;">开发中……</h4></div>
+		
+			</div>
+			</div>
+	
+		</div>
+		
+		<div id="panelUserInfo" class="panel panel-info">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+        			<a data-toggle="collapse" data-parent="#accordion" href="#collapseUserInfo"><span class="glyphicon glyphicon-pushpin"></span>&nbsp;<strong>
+        			个人信息</strong>&nbsp;<span class="span"></span></a>
+      			</h4>
+			
+			</div>
+		
+			<div id="collapseUserInfo" class="panel-collapse collapse">
+			<div class="panel-body " >
+				
+				<!-- //需load其他模板文件的div -->
+				<div id="divUserInfo_load"><h4 style="margin:50px;">开发中……</h4></div>
+		
+			</div>
+			</div>
+	
+		</div>
 		
 </div>
-
-
-
 
 <!-- /pagewrap  -->
 
 <script>
 $(document).ready(function(){
+	//默认加载issPat
+	$("#divIssPat_load").load('issPat',{'auth':'{$auth}'});
 	
-	//加载锚点对应的页面文件
-	$("#role").load('role',{'role':window.location.hash});
+	// 在collapsePat出现前应用jQuery的load方法加载对应文件。
+	$("#collapsePat").on("show.bs.collapse", function(){
+    	
+		$("#divIssPat_load").load('issPat',{'auth':'{$auth}'});
+  	});
 	
-	<!-- //点击.aTab中的各个按钮后，默认显示相应状态的pat内容-->
-	$('.aTab').click(function(){
-        var sId = $(this).attr('href');  //a的attr属性值
-		window.location.hash = sId;  //设置锚点
-		$(this).tab('show');
-		
-		//加载锚点对应的页面文件
-		$('#role').load('role',{'role':sId});
-    });	
+	// 在collapsePro出现前应用jQuery的load方法加载对应文件。
+	$("#collapsePro").on("show.bs.collapse", function(){
+    	$("#divIssPro_load").load('issPro');
+  	});
 	
-	// 仅显示$roles数组对应的li标签
-	$('.aTab').hide();
-	$('.aTab').each(function(){
-		// 显示边框
-		$(this).css("border","solid 1px #ddd");
-		//	为锚点值对应的li添加.active
-		if($(this).attr('href')==window.location.hash){
-			$(this).parent().addClass('active');
-		}
-			
-		// TP5框架在前端模板应用“foreach”标签对后端传送的数组变量进行遍历操作
-		{foreach name="roles" item="vo"}	
-		var roleStr=$(this).attr('href'); 
-		if('{$vo}'==roleStr.substr(1)){
-			$(this).show();
-		}
-		{/foreach}
-			
-	});
+	// 在collapseThe出现前应用jQuery的load方法加载对应文件。
+	$("#collapseThe").on("show.bs.collapse", function(){
+    	$("#divIssThe_load").load('issThe'); 
+  	});
 	
-	// 锚点为空，默认显示$roles数组第一个role对应的li标签及其内容	
-	if(window.location.hash==''){
-		var sId='#'+'{$roles[0]}';
-		$('.aTab').each(function(){
-			// 显示边框
-			$(this).css("border","solid 1px #ddd");
-			//	为锚点值对应的li添加.active
-			if($(this).attr('href')==sId){
-				$(this).parent().addClass('active');
-			}
-		
-		});
-	}
+	// 在collapseUserInfo出现前应用jQuery的load方法加载对应文件。
+	$("#collapseUserInfo").on("show.bs.collapse", function(){
+    	$("#divUserInfo_load").load('userInfo'); 
+  	});
+	
+	// 在collapseAttManage出现前应用jQuery的load方法加载对应文件。
+	$("#collapseAttManage").on("show.bs.collapse", function(){
+    	$("#divAttManage_load").load('attManage'); 
+  	});
 	
 <!-- function  -->
 	

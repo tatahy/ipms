@@ -14,13 +14,16 @@
 			<ul class="list-group">
 						
 				<a class="list-group-item">服务器域名：{$serverDomain}</a>
-				<a class="list-group-item">服务器时间：{$serverTime}</a>
+				<a class="list-group-item">服务器IP：{$serverIP}</a>
+				<a class="list-group-item">服务器端口：{$serverPort}</a>
+				<!-- <a class="list-group-item">SERVER变量内容：{ $serverList}</a> -->
+				<!-- <a class="list-group-item">ENV变量内容：{ $serverENV}</a> -->
+				
+				<a class="list-group-item">服务器时间：<span id="spServerTime">{$serverTime}</span>&nbsp;<button id="btnUpdateTime" type="button" class="btn-link"><span class="glyphicon glyphicon-time">更新</span></button></a>
 				<a class="list-group-item">服务器OS：{$serverOS}</a>
 				<a class="list-group-item">Apache版本：{$apacheVersion}</a>
 				<a class="list-group-item">MySQL版本：MySQL/{$mysqlVersion}</a>
 				<a class="list-group-item">PHP版本：PHP/{$phpVersion}</a>
-				
-				
 					
 			</ul>
 		</div>
@@ -105,4 +108,26 @@
 	</div>
 	</div>			
 </div>
-		
+
+<script>
+$(document).ready(function(){
+	<!-- //每隔5秒更新一次页面的服务器时间 -->
+	<!-- setInterval(serverTimeUpdate, 5000); -->
+
+<!-- // function -->
+<!-- function serverTimeUpdate(){ -->
+	<!-- $.post('selectResponse',{req:'_TIME'},function(data){ -->
+		<!-- $('#spServerTime').text(data); -->
+	<!-- }); -->
+<!-- } -->
+	$('#btnUpdateTime').click(function(){
+		$.post('selectResponse',{req:'_TIME'},function(data){
+			$('#spServerTime').text(data);
+		});
+	});
+
+<!--// function -->
+
+});
+
+</script>		
