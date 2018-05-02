@@ -911,20 +911,145 @@ var obj = $('.xx').each(function(){
 
 
 <!--  HY 2018/4/30 -->	
-//自定义函数中得到其包含的ajax函数的返回值并返回给函数调用者
+//二次封装的ajax函数，实现返回值并返回给函数调用者
+// 以下代码可在chrome、Firefox显示的网页的console里（F12）直接运行，网页需含有jQuery库文件
+<script> 
+
+//全局变量
+var kk=0;
+var async=true;
+if(async){
+	//ajax异步执行，无返回值。
+	getAjaxReturn(async,success_function,fail_function);
+}else{
+	//ajax同步执行。kk=返回值。
+	kk=getAjaxReturn(async,success_function,fail_function);
+}
+
+//例3，通过传入函数实现ajax二次封装后异步执行，同步回传。
+function getAjaxReturn(p_async,sf,ff)
+{ 
+  	var sequence='ajax同步执行。';
+	var rt=0;
+	if(p_async){
+		sequence='ajax异步执行。';
+	}
+	
+	$.ajax({
+    	type:"POST",
+    	url: "xx",
+		async:p_async,
+    	data:{'req':'_DEPT'},
+    	success:function(databack){
+			rt=1;
+			console.log(databack);	
+			if(databack[0].id){   
+   				sf(sequence+'处理成功');
+				
+    		}
+    	},
+		error:function() {
+			rt=1;
+			ff(sequence+'处理失败');
+        }
+  	});
+	//同步就返回值rt
+	if(p_async==false){
+		return rt;
+	}
+	
+}
+
+function success_function(info)
+{
+	alert(info);
+	//return info;
+}
+
+function fail_function(info)
+{
+	alert(info);
+}
+
+alert('同步。全局变量kk='+kk);
+</script> 
+
+
+//注，异步执行中的回调函数，是因为你不知道何时可以调用它，所以委托给浏览器在合适的时候帮你调用它。
+
+//所以，在$.ajax中，你不知道何时可以获得success的返回值，所以一切基于这个返回值来做的后续工作，也应该作为回调放在success函数里面。
 
 <script> 
-// 1.保持异步，定义一个回调函数
+// 1.保持异步，定义一个回调函数k
+//例1
+k();
+function k(){
+ 	select(function(result){
+		result=result+1
+		console.log(result);
+  	});
+
+}
+
+function select(k) {
+  	
+	$.ajax({
+    	url: "userOprt",
+    	success: function(obj) {
+ 			obj=1;
+    		k(obj);
+    	}
+  	});
+}
+
+//例2
 function load_val(callback){//定义一个回调函数
     $.getJSON('test.php' , function(data){
         callback(data);//将返回结果当作参数返回
     });
 }
- 
+
 load_val(function(data){
     alert(data);//这里可以得到值
 });
- 
+
+//例3，通过传入一个函数解决这个问题。
+function getAjaxReturn(success_function,fail_function)
+{
+    var bol=false;
+  	$.ajax({
+    	type:"POST",
+    	url:"ajax/userexist.aspx",
+    	data:"username="+vusername.value,
+    	success:function(msg){
+    		if(msg=="ok"){   
+   				showtipex(vusername.id,"<img src='images/ok.gif'/><b><font color='#ffff00'>该用户名可以使用</font></b>",false);
+				success_function(msg);
+    		}
+    		else
+    		{    
+    			showtipex(vusername.id,"<img src='images/cancel.gif'/><b><font color='#ffff00'>该用户已被注册</font></b>",false);
+      			vusername.className="bigwrong";
+				fail_function(msg);
+      			//return false;
+    		}
+    	}
+  	});
+}
+
+function success_function(info)
+{
+//do what you want do
+alert(info);
+}
+
+function fail_function(info)
+{
+//do what you  want do
+alert(info);
+}
+
+
 //2.用同步ajax来实现
 function load_val2(){
     var result;

@@ -61,21 +61,21 @@
 	
 	<div class="row">
 	<div class="form-group col-sm-6">
-		<label for="selUsergroup"><span class="spTitle">选择用户组</span><span class="small text-primary">（单击加入）</span></label>
+		<label for="selUsergroup">可加入用户组数：<span class="spNum"></span><span class="small text-primary">（单击加入）</span></label>
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-plus"></span></span>
 			<select class="form-control" id="selUsergroup">
-    			<option value="0">可选…</option>
+    			
     		</select>
 		</div>
 	</div>
 	
 	<div class="form-group has-feedback col-sm-6">
-		<label for="selectedUsergroup"><span class="spTitle">已加入用户组</span><span class="small  glyphicon glyphicon-asterisk text-danger">（单击退出）</span></label>
+		<label for="selectedUsergroup">已加入用户组数：<span class="spNum text-danger"></span>&nbsp;<span class="small  glyphicon glyphicon-asterisk text-danger">（单击退出）</span></label>
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-education"></span></span>
 			<select class="form-control inputCheck" id="selectedUsergroup">
-    			<option value="">已选…</option>
+    			
     		</select>
 		</div>
 		
@@ -127,20 +127,21 @@ $(document).ready(function(){
 //mobile正则表达式，11位数字。必须以1开头。
 	var regMobile = /^1[0-9]{10}$/;
 	var check = [];
-	
 	$('.inputCheck').each(function(){
 		var i=$('.inputCheck').index($(this));
 		check[i]=false;
 	});
 		
 	<!-- // 单选框#selDept的内容 -->
-	ajaxSelectOption($('#selDept'),{"url":"selectResponse","ajaxData":{"req":"_DEPT"},"first":{"val":"0","text":"请选择一个部门…"},"selected":{"val":"{$user.dept}"}});
-	// 单选框#selUsergroup的内容
-	var selUsergroupStr=ajaxSelectOption($('#selUsergroup'),{"url":"selectResponse","ajaxData":{"req":"_USERGROUP"},"first":{"val":"0","text":"可选…"},"remove":{"val":"{$user.usergroup_id}"}});
-	// 单选框#selectedUsergroup的内容
-	var selectedUsergroupStr=ajaxSelectOption($('#selectedUsergroup'),{"url":"selectResponse","ajaxData":{"req":"_USERGROUP"},"first":{"val":"0","text":"已选…"},"show":{"val":"{$user.usergroup_id}"},"selected":0,"multiple":0});
-	
-	alert(selUsergroupStr+'<br>'+selectedUsergroupStr);
+	ajaxSelectOption($('#selDept'),{"async":true,"url":"selectResponse","ajaxData":{"req":"_DEPT"},"first":{"val":"0","text":"请选择一个部门…"},"selected":{"val":"{$user.dept}"}});
+	// 得到页面加载时单选框#selUsergroup的option内容，页面“重置”时加载
+	var selUsergroupStr=ajaxSelectOption($('#selUsergroup'),{"async":false,"url":"selectResponse","ajaxData":{"req":"_USERGROUP"},"first":{"val":"0","text":"可选…"},"remove":{"val":"{$user.usergroup_id}"}});
+	// 保留页面加载时单选框#selUsergroup的label内容，页面“重置”时加载
+	var spNumSelUsergroup=$('#selUsergroup').closest('.form-group').find('.spNum').text();
+	// 得到页面加载时单选框#selectedUsergroup的option内容，页面“重置”时加载
+	var selectedUsergroupStr=ajaxSelectOption($('#selectedUsergroup'),{"async":false,"url":"selectResponse","ajaxData":{"req":"_USERGROUP"},"first":{"val":"0","text":"已加入…"},"show":{"val":"{$user.usergroup_id}"},"selected":0,"multiple":0});
+	// 保留页面加载时单选框#selectedUsergroup的label内容，页面“重置”时加载
+	var spNumSelectedUsergroup=$('#selectedUsergroup').closest('.form-group').find('.spNum').text();
 	
 	$('#selUsergroup').change(function(){
 		selOptionChange($(this),$('#selectedUsergroup'));
@@ -178,7 +179,7 @@ $(document).ready(function(){
 		if (regMobile.test($(this).val())) {
         	success($(this), i);
     	} else if (len< 11) {
-        	fail($(this), i, '只有'+len+'位，手机号由1开头的11位数字组成。');
+        	fail($(this), i, '只有'+len+'位。手机号是11位数字，必须以1开头。');
     	} else if (len > 11) {
         	fail($(this), i, '有'+len+'位，手机号由1开头的11位数字组成。');
     	}else {
@@ -205,8 +206,6 @@ $(document).ready(function(){
 			success($(this), i);
 		}
 	});
-	
-	
 	
 	//button:submit按钮
 	$('button:submit').click(function(event){
@@ -248,7 +247,7 @@ $(document).ready(function(){
 		}else{
 			strHtml='<span class="label label-primary">'+strHtml+'</span>';
 		}
-		if (!flag) {
+		if (!flag && oprt!='_DELETE') {
 			var arr=[];
 			<!-- //check中存在false,对应的input用“has-error”突出显示。 -->
         	for (key in check) {
@@ -296,12 +295,10 @@ $(document).ready(function(){
 		$('.inputCheck').eq(0).focus();
 		
 		$('input:radio').closest('div').children('span').addClass('label label-info');
-		
-		$('#selUsergroup').html(selUsergroupStr);
-	
-		$('#selectedUsergroup').html(selectedUsergroupStr);
-		
-		<!-- check = [false,false]; -->
+		//#selUsergroup的option、.spNum内容恢复到页面加载时的内容
+		$('#selUsergroup').html(selUsergroupStr).closest('.form-group').find('.spNum').text(spNumSelUsergroup);
+		//#selectedUsergroup的option、label内容恢复到页面加载时的内容
+		$('#selectedUsergroup').html(selectedUsergroupStr).closest('.form-group').find('.spNum').text(spNumSelectedUsergroup);
 	
 	});
 
@@ -311,7 +308,6 @@ function success(obj, counter) {
 	divParent.removeClass('has-error').addClass('has-success');
 	divParent.children('span').hide();
 	divParent.children('.spOk').show();
-  
     check[counter] = true;
 }
 
@@ -367,7 +363,8 @@ function ajaxProcess(url,data,archor){
 //**函数名：ajaxSelectOption
  	//* 作用：本页面ajax过程向服务器请求特定单选框内容所需数据，并组装好HTML语句
 	//* 参数obj，类型：对象。值：不为空。说明：调用函数的对象。
-	//* 参数param，类型：json。值：param={"url":"selectResponse","ajdxdata":{"req":"_DEPT"},"first":{"val":"0","text":"t"},"show":{"val":"1,2,3","text":"t"},"remove":{"val":"v","text":"t"},"selected":{"val":"v","text":"t"},'multiple':0}
+	//* 参数param，类型：json。值：param={"async":true,"url":"selectResponse","ajdxdata":{"req":"_DEPT"},"first":{"val":"0","text":"t"},"show":{"val":"1,2,3","text":"t"},"remove":{"val":"v","text":"t"},"selected":{"val":"v","text":"t"},'multiple':0}
+	//*param.async,类型：Boolean。值：必须。说明：函数同步/异步操作。	
 	//*param.url,类型：字符串。值：必须。说明：函数中ajax操作的URL。	//*param.ajaxdata,类型：json。值：必须。说明：函数中ajax传送的data。	//*param.first,类型：json。值：默认为{"val":"0","text":"第一项"}。说明：调用函数后创建的第一项option的val值（字符串），text值（字符串）。
 	//*param.show,类型：json。值：默认为0。说明：调用函数后需要的option项val值字符串，text字符串。
 	//*param.remove,类型：json。值：默认为0。说明：调用函数后要不需要的option项val值字符串，text字符串。
@@ -375,14 +372,13 @@ function ajaxProcess(url,data,archor){
 	//*param.multiple,类型：boolean。值：默认为0。说明：调用函数后obj是否为单选框，默认为单选框。
 	//* 返回值：optionHtml
 function ajaxSelectOption(obj,param){
-	var defaultParam={"url":0,"ajaxData":0,"first":{"val":"0","text":"first"},"show":0,"remove":0,"selected":0,'multiple':0};
+	var defaultParam={"async":true,"url":0,"ajaxData":0,"first":{"val":"0","text":"first"},"show":0,"remove":0,"selected":0,'multiple':0};
     param=$.extend({},defaultParam,param); 
     var str='';
-	var optionHtml='11';
+	var optionHtml='';
 	$.ajax({
 		type : 'post',
-		async : false,  //同步请求
-		<!-- async : true,  //异步请求 -->
+		async : param.async,  //true:异步请求，false：同步请求
 		url : param.url,
 		data : param.ajaxData,
 		timeout:2000,
@@ -427,23 +423,20 @@ function ajaxSelectOption(obj,param){
 			}
 			if(param.show!=0){
         		obj.find('option').each(function(){
-					if(param.show.val.indexOf($(this).val())==-1){
+					if(param.show.val.indexOf($(this).val())==-1 && $(this).val()!=0){
             			$(this).remove();
         			}
     			});
-				<!-- obj.find('option:first').text('已加入用户组数：'+(obj.find('option').length-1)); -->
-				obj.closest('.form-group').find('.spTitle').text('已加入用户组数：'+(obj.find('option').length-1));
+				obj.closest('.form-group').find('.spNum').text(obj.find('option').length-1);
 				
     		}
 			if(param.remove!=0){
 				obj.find('option').each(function(){
-					if(param.remove.val.indexOf($(this).val())!=-1){
+					if(param.remove.val.indexOf($(this).val())!=-1 && $(this).val()!=0){
             			$(this).remove();
         			}
     			});
-				<!-- obj.find('option:first').text('可加入用户组数：'+(obj.find('option').length-1)); -->
-				
-				obj.closest('.form-group').find('.spTitle').text('可加入用户组数：'+(obj.find('option').length-1));
+				obj.closest('.form-group').find('.spNum').text(obj.find('option').length-1);
     		}
     		if(param.selected==0){
         		//第一项为选中项
@@ -465,8 +458,10 @@ function ajaxSelectOption(obj,param){
             $.alert('与服务器通讯超时，请稍后再试！');
         }
 	});
-	
-	return optionHtml;
+	//同步就返回值rt
+	if(param.async==false){
+		return optionHtml;
+	}
 }
 
 //**函数名：selOptionChange
@@ -482,10 +477,10 @@ function selOptionChange(obj,partner){
 		str+='<option value="'+$(this).val()+'">'+$(this).text()+'</option>';
 		$(this).remove();
     });
-	obj.closest('.form-group').find('.spTitle').text('已加入用户组数：'+(obj.children('option').length-1));
+	obj.closest('.form-group').find('.spNum').text(obj.children('option').length-1);
 	//对partner的操作
 	partner.append(str);
-	partner.closest('.form-group').find('.spTitle').text('可加入用户组数：'+(partner.children('option').length-1));
+	partner.closest('.form-group').find('.spNum').text(partner.children('option').length-1);
 }
 
 <!--/ function -->
