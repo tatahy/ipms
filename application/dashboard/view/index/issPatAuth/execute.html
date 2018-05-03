@@ -1,0 +1,13 @@
+<!-- // 绝对文件路径加载父模板-->
+{extend name="../application/dashboard/view/index/issPatAuth/base.html" /}
+{block name="titleSpan"}
+	<span class="label label-info">执行&nbsp;
+{/block}
+
+{block name="btnTpl"}
+	<td class="btnTpl">
+		<a class="audit" href="#modalIssPatAuthSingle" data-issId="{$vo.id}" data-issTopic="{$vo.topic}" data-issue-authority="_EXECUTE" data-toggle="modal" ><span class="glyphicon glyphicon-random text-primary"></span>_执行</a>
+	</td>
+{/block}
+
+

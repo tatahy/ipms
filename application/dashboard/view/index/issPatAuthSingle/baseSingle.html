@@ -1,0 +1,671 @@
+<!-- //issPat:baseSingle.html： -->
+
+{/*  总共有6处block用于子模板修改用，
+	name="abstract"
+	name="patInput"，
+	name="attInput"，
+	name="issPatInput"，
+	name="btn"，
+	name="script"  
+	所有需要用户输入，并通过button[type="submit"]的click事件传到后端的数据，都要在输入框加上class="empty-check"再分类放入3个form中（#fmIssPat、#fmPat、#fmAtt）。因为自定义的inputsNotEmpty函数通过".empty-check"来逐个检查该输入项是否为空。
+	
+*/}
+
+{block name="script"}
+
+{/block}
+
+{block name="abstract"}
+	<div class="myFieldset">
+	
+		<div id="divAbstractCollapse" class="myLegend" data-toggle="collapse" data-target="#divAbstract"><span class="label label-warning">概要隐藏<span class="glyphicon glyphicon-menu-up"></span></span></div>
+		
+		<div id="divAbstract" class="row myRow-noform-group collapse in">
+			<div class="bs-callout bs-callout-warning">
+			<h4 class="text-warning">专利事务：<strong>{$iss.topic}</strong></h4>
+			<ul>
+				<li>撰写人：{$iss.writer}；执行人：{$iss.executer}；</li>
+				<li>事务类型：{$iss.issmap_type}；</li>
+				<li>简介：{$iss.abstract}</li>
+				<li>状态：
+					<a href="{$home}/issue/index/issrecords/id/{$iss.id}" target="_blank" data-toggle="tooltip" title="过程记录">
+				{switch name="$iss.status"}
+    				{case value="专利授权|续费授权"}
+					<span class="label label-success">{$iss.status}</span>
+					{/case}
+					{case value="专利驳回"}
+					<span class="label label-danger">{$iss.status}</span>
+					{/case}
+					{case value="放弃续费|申报修改|修改完善"}
+					<span class="label label-warning">{$iss.status}</span>
+					{/case}
+					{case value="完结"}
+					<span class="label label-default">{$iss.status}</span>
+					{/case}
+					
+					{default /}
+					<span class="label label-primary">{$iss.status}</span>
+				{/switch}
+					</a>
+				</li>
+			</ul>
+			<footer>
+				<div class="row">
+					<div class="col-sm-3">
+						<a href="{$home}/issue/index/issinfo/id/{$iss.id}" target="_blank" data-toggle="tooltip" title="事务详情">查看详情</a>
+					</div>
+					<div id="divAddNewDate" class="col-sm-3">填报时间：{$iss.addnewdate}</div>
+				</div>
+			</footer>
+			</div>
+			
+			<div class="bs-callout bs-callout-default">
+			<h4 class="text-info">关联专利：<strong>{$pat.topic}</strong></h4>
+			<ul>
+				<li>发明人：{$pat.inventor}；&nbsp;&nbsp;其他发明人：{$pat.otherinventor}；</li>
+				<li>专利类型：{$pat.pattype}；</li>
+				<li>简介：{$pat.summary}</li>
+				<li>状态：
+					<a href="{$home}/patent/index/patrecords/id/{$pat.id}" target="_blank" data-toggle="tooltip" title="过程记录">
+				{switch name="$pat.status"}
+    				{case value="授权|续费授权|续费中"}
+					<span class="label label-success">{$pat.status}</span>
+					{/case}
+					{case value="驳回|驳回续费"}
+					<span class="label label-danger">{$pat.status}</span>
+					{/case}
+					{case value="放弃续费"}
+					<span class="label label-warning">{$pat.status}</span>
+					{/case}
+					{case value="超期无效"}
+					<span class="label label-default">{$pat.status}</span>
+					{/case}
+					
+					{default /}
+					<span class="label label-primary">{$pat.status}</span>
+				{/switch}
+						
+					</a>
+				</li>
+			</ul>
+			<footer>
+				<div class="row">
+					<div class="col-sm-3">
+						<a href="{$home}/patent/index/patinfo/id/{$pat.id}" target="_blank" data-toggle="tooltip" title="专利详情">查看详情</a>
+					</div>
+					<div id="" class="col-sm-3">填报时间：{$pat.addnewdate}</div>
+					<div id="" class="col-sm-3">专利所有人：{$pat.patowner}</div>
+					<div id="" class="col-sm-3">专利撰写人：{$pat.author}</div>				
+				</div>
+			</footer>
+			</div>				
+		</div>	
+	</div>			
+
+{/block}
+		
+{block name="patInput"}
+	<div class="myFieldset">
+		<div class="myLegend"><span class="label label-warning">专利XX（表单）</span></div>
+		<form action="" id="fmPat">
+		<!-- // class="sr-only" 仅源代码文件中显示-->
+			<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
+		</form>
+	</div>	
+{/block}			
+
+{block name="attInput"}
+	<!-- //附件显示 -->
+	<div class="myFieldset">
+	
+		<div id="divAttCollapse" class="myLegend" data-toggle="collapse" data-target="#fmAtt"><span class="label label-warning">附件显示<span class="glyphicon glyphicon-menu-down"></span></span></div>			
+		
+		<form id="fmAtt" class="collapse row myRow-noform-group">				
+			<div class="table-responsive" >	
+				<table class="table table-bordered table-responsive table-hover">
+				<thead>
+					<tr>
+						<!-- <th>选择</th> -->
+						<th class="text-center">序号</th>
+						<th class="text-center">附件类型</th>
+						<th class="text-center">附件名称</th>
+						<th class="text-center">上传日期</th>
+						<th class="text-center">上传人</th>
+						<th class="text-center">系统角色</th>
+						<th class="text-center">操作</th>
+					</tr>
+				</thead>
+						
+				<tbody id="tbattFileList">
+				<!-- 此处显示数据库查询后的数据集 -->
+					{volist name="att" id="vo" empty="暂无附件"}
+					<tr>
+						
+						<td>{$i}
+							<input name="attId[]" value="{$vo.id}" type="text" class="sr-only">
+							<input name="attFileObjStr[]" value="{$vo.attpath}" type="text" class="sr-only">
+							<input name="attFileName[]" value="{$vo.attfilename}" type="text" class="sr-only">
+						</td>
+						<td>{$vo.atttype}</td>
+						<td>{$vo.name}</td>
+						<td>{$vo.uploaddate}</td>
+						<td>{$vo.uploader}</td>
+						<td>{$vo.rolename}</td>
+						
+						<td>
+							<a href="{$home}/attachment/index/download/id/{$vo.id}">下载</a>&nbsp;
+							{in name="$vo.deldisplay" value="1"}
+							<a href="{$home}/attachment/index/delete/id/{$vo.id}">删除</a>&nbsp;
+							{/in}
+						</td>
+						
+					</tr>
+								
+					{/volist}
+				</tbody>
+				</table>
+			</div>
+	
+			</form>	
+	
+	</div>
+	
+	<!-- //附件上传 -->
+	<div class="myFieldset">
+		<div class="myLegend">		
+			<h5>
+				<span id="spAttFileUploadCollapse" class="label label-warning" data-toggle="collapse" data-target="#fmAttFileUpload">附件上传<span class="glyphicon glyphicon-menu-down"></span></span>
+				<label class="radio-inline ">
+      				<input type="radio" name="attUpload" value="0" readonly checked><span class="label label-default">无</span>
+    			</label>
+				<label class="radio-inline">
+      				<input type="radio" name="attUpload" value="1" readonly><span class="label label-default">上传</span>
+   				</label>
+    		</h5>	
+		</div>	
+			
+			<form id="fmAttFileUpload" class="collapse">
+				<div class="row myRow sr-only">
+				<input name="attmap_id" value="{$iss.id}" type="text" class="sr-only">
+				<input name="attmap_type" value="_ATTO1" type="text" class="sr-only">
+				<input name="attRoleName" value="{$auth}" type="text" class="sr-only">
+				<input name="uploader" value="{$username}" type="text" class="sr-only">
+				<input name="deldisplay" value="1" type="text" class="sr-only">
+				</div>
+				
+				<div class="row myRow" >			
+				<div class="form-group col-sm-6">
+					<label for="attFile">选择附件<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input type="file" name="attFile" id="attFile" class="btn btn-sm" accept=".jpg,.jpeg,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.rar" required>
+					<blockquote>
+						<h5>附件大小：<span class="label label-danger">&le;&nbsp;10MB </span></h5>
+						<h5 >允许附件类型：
+							<li style="margin-top:10px;">文档：<span class="label label-info">pdf、doc、docx、xls、xlsx、ppt、pptx</span></li>
+							<li style="margin-top:10px;">图片：<span class="label label-info">jpg、jpeg、png</span></li>
+							<li style="margin-top:10px;">压缩文件：<span class="label label-info">rar</span></li>
+						</h5>
+					
+					</blockquote>
+					
+				</div>
+				
+				<div class="form-group col-sm-2">
+					
+					<label for="attType">附件类型<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<select class="form-control" id="attType" name="attType" required>
+						<option value=""></option>
+						<option value="_ATTT1">申请</option>
+						<option value="_ATTT2">请示</option>
+						<option value="_ATTT3">报告</option>
+						<option value="_ATTT4">预算报告</option>
+					</select>
+					
+				</div>
+		
+				<div class="form-group col-sm-4">
+					<label for="attName">附件名称<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control" id="attName" name="attName" value="" type="text" required>
+				</div>
+				
+				<div class="form-group col-sm-6">
+					<button id="btnAttFileUpload" class="btn btn-primary btn-sm" data-oprt="" data-btnLabel=""><span class="glyphicon glyphicon-upload"></span>附件上传</button>
+					<br>
+					<label for="" class="attuploadbar" hidden>上传进度</label>	
+					<div class="progress attuploadbar" hidden>
+						<div id="divUpLoadProcess" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><span class="text-info">0%</span>
+						</div>
+					</div>
+				</div>
+				</div>
+				
+			</form>
+	</div>
+
+{/block}
+
+{block name="issPatInput"}
+	<div class="myFieldset">	
+		<div class="myLegend"><span class="label label-warning">事务XX（表单）</span></div>
+			
+		<form action="" id="fmIssPat">
+		<!-- // class="sr-only" 仅源代码文件中显示-->
+			<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
+		</form>
+
+	</div>
+{/block}
+
+	<div class="row">
+	<hr>
+	<div class="form-group col-sm-12">
+			
+		<!-- // 按钮-->
+		<div class="pull-left">
+		
+{block name="btn"}{/block}
+		</div>
+		<div  class="pull-right">
+			<input id="btnReset" type="button" class="btn btn-primary btn-sm" value="重置">
+			<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
+		</div>
+	</div>
+</div>
+</div>
+
+
+<script>
+$(document).ready(function(){
+	//enable all tooltips in the document
+	$('[data-toggle="tooltip"]').tooltip(); 
+	$('.modal-footer').attr('hidden',true);
+	
+	//#divAbstractCollapse“概要显示”
+	$('#divAbstract').on('hide.bs.collapse', function(){
+    	$('#divAbstractCollapse').html('<span class="label label-warning">概要显示<span class="glyphicon glyphicon-menu-down"></span></span>');
+  	});
+	//#divAbstractCollapse“概要隐藏”
+  	$('#divAbstract').on('show.bs.collapse', function(){
+    	$('#divAbstractCollapse').html('<span class="label label-warning">概要隐藏<span class="glyphicon glyphicon-menu-up"></span></span>');
+  	});
+	
+	//#divAttCollapse“附件显示”
+	$('#fmAtt').on('hide.bs.collapse', function(){
+    	$('#divAttCollapse').html('<span class="label label-warning">附件显示<span class="glyphicon glyphicon-menu-down"></span></span>');
+  	});
+	//#divAttCollapse“附件隐藏”
+  	$('#fmAtt').on('show.bs.collapse', function(){
+    	$('#divAttCollapse').html('<span class="label label-warning">附件隐藏<span class="glyphicon glyphicon-menu-up"></span></span>');
+  	});
+	
+	//#spAttFileUploadCollapse“附件上传”
+	//无附件上传，#fmAttFileUpload的hide.bs.collapse事件
+	$('#fmAttFileUpload').on('hide.bs.collapse', function(){
+    	$('#spAttFileUploadCollapse').html('附件上传<span class="glyphicon glyphicon-menu-down"></span></span>').addClass('label-warning');
+			
+		//input变为“无”选中；
+		$('input:radio[name="attUpload"][value="0"]').prop('checked',true);
+		//去掉input“有”的上色
+		$('input:radio[name="attUpload"][value="1"]').next().removeClass('label-warning');
+		//#fmAttFileUpload隐藏后重置
+		$('#fmAttFileUpload')[0].reset();
+		
+		<!-- //表单中所有输入框去掉'empty-check'，退出非空检查 -->
+		<!-- $(this).children('.form-control').removeClass('empty-check'); -->
+  	});
+	//#spAttFileUploadCollapse“取消上传”
+	//有附件上传，#fmAttFileUpload的show.bs.collapse事件
+  	$('#fmAttFileUpload').on('show.bs.collapse', function(){
+		$('#spAttFileUploadCollapse').html('取消上传<span class="glyphicon glyphicon-remove"></span></span>').removeClass('label-warning').addClass('label-default');
+		//input变为“有”选中；
+		$('input:radio[name="attUpload"][value="1"]').prop('checked',true);
+		//input“有”上色
+		$('input:radio[name="attUpload"][value="1"]').next().addClass('label-warning');
+		//表单中所有输入框增加'empty-check'，列入非空检查
+		$(this).children('.form-control').addClass('empty-check');
+  	});
+	
+	// 单选按钮change事件。
+	$('input:radio[name="attUpload"]').change(function(){
+		// 选中的单选按钮的value值，值为“1”是选中的“上传”项
+		var v=$(this).attr('value');
+		if(v==1){
+			//“上传”项上色
+			$(this).next().addClass('label-warning');
+			//show表单#fmAttFileUpload
+			$('#fmAttFileUpload').collapse('show');
+			//表单中所有输入框增加'empty-check'，列入非空检查
+			$('#fmAttFileUpload').children('.form-control').addClass('empty-check');
+			
+		}else{
+			//“上传”项褪色
+			$('input:radio[name="attUpload"][value="1"]').next().removeClass('label-warning');
+			//hide表单#fmAttFileUpload
+			$('#fmAttFileUpload').collapse('hide');
+			//#fmAttFileUpload隐藏后重置
+			$('#fmAttFileUpload')[0].reset();
+			//表单中所有输入框去掉'empty-check'，退出非空检查
+			$('#fmAttFileUpload').children('.form-control').removeClass('empty-check');
+		}
+	
+	});
+		
+	//各个type="submit"按钮的click事件:向后端传数据
+	$('button[type="submit"]').click(function(){
+			
+			var oprt=$(this).attr('data-oprt');
+			var topic=$(this).attr('data-issTopic');
+			
+			if(oprt=='_ADDNEW'){
+				topic=$('#issPatTopic').val();
+			}
+			var auth='{$auth}';
+			
+			<!-- var btnHtml='<span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:14px;">'+$(this).html()+'</span>《'+topic+'》'; -->
+			var btnHtml='<span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:14px;">'+$(this).html()+'</span>';
+			var aHtml=$('.modal-header').find('strong').html();
+
+			var url='issPatOprt';
+			<!-- var url='test'; -->
+			
+			
+			//预处理3个表单的数据,利用自定义的serializeJson()函数
+			var fmPatDataJson=serializeJson($('#fmPat'));
+			var fmIssPatDataJson=serializeJson($('#fmIssPat'));
+			var fmAttDataJson=serializeJson($('#fmAtt'));
+			
+			//声明对象变量
+			var param={};
+			var formData= new FormData;
+			//引用自定义函数inputCheck检查所有的input(class="form-control")是否都填入内容，返回一个结果（true/）。		
+			var v1=inputsNotEmpty();
+			//获得input“无”按钮的状态，“1”为选中，“0”为未选中
+			var noAttFileChecked=$('input:radio[name="attUpload"][value="0"]').prop('checked');			
+
+			//启动ajax传数据的条件；
+			//1.所有的input(class="form-control")都填入内容，v1==true
+			//2.input为“无”选中，noAttFileChecked==true
+			//或者oprt=='_DELETE'
+			if(v1==true && noAttFileChecked==true || oprt=='_DELETE'){
+				$('#modalIssPatAuthSingle').modal('hide');
+				//是否开始ajax传3个form的数据
+				$.confirm('《'+topic+'》'+btnHtml,function(e){
+					con=e;
+					if(true==con){
+						if(oprt=='_ADDNEW'){
+							//通过ajax嵌套完成新增
+							//1.提交#fmPat数据
+							$.extend(param,fmPatDataJson,{'oprt':'_ADDNEW','auth':auth});
+							
+							var jqxhr=$.post(url,param,function(data){
+							<!-- var jqxhr=$.post(url,$('#fmPat').serialize(),function(data){ -->
+								//返回的data.patId不为0，说明已经新增pat成功
+								if(data.patId){
+									//2.提交#fmIssPat和#fmAtt的数据
+									param={};
+									$.extend(param,fmIssPatDataJson,fmAttDataJson,{'oprt':'_ADDNEW','auth':auth,'patId':data.patId});
+									$.post(url,param,function(data1){
+										//后端数据处理成功后，刷新#divIssPat_load和#divIssPatAuth_load的内容
+										$("#divIssPat_load").load('issPat',{'auth':'{$auth}'},function(){
+											//弹窗显示信息
+											$.alert('《'+data1.topic+'》'+btnHtml+data1.msg);
+										});	
+							
+									});
+									
+								}
+								//新增pat失败，
+								else{
+									$.alert(data.msg);
+								}
+							})
+							.fail(function(){
+								$.alert('与服务器连接失败，请重试');
+							});
+						
+						}else{
+							formData.append('fmPatDataJson',fmPatDataJson);
+							formData.append('fmIssPatDataJson',fmIssPatDataJson);
+							formData.append('fmAttDataJson',fmAttDataJson);
+							$.extend(param,fmPatDataJson,fmIssPatDataJson,fmAttDataJson,{'oprt':oprt,'auth':auth});
+							$.post(url,param,function(data){
+								//后端数据处理成功后，刷新#divIssPat_load和#divIssPatAuth_load的内容
+								$("#divIssPat_load").load('issPat',{'auth':'{$auth}'},function(){
+									if(oprt=='_UPDATE' || oprt=='_REVIEW'){
+										//显示#modalIssPatAuthSingle
+										//向后端“issPatSingle”发送数据(后端用于选择返回的模板文件)		
+										$.post('issPatAuthSingle',
+											{
+												'issId':data.issId,
+												'auth':auth,
+												'returnType':0,
+											},
+											//得到后端返回的data2(模板文件)
+											function(data2){
+												$('#modalIssPatAuthSingle').on('show.bs.modal', function(){ 
+    												//在本文件#divIssPatSingle_load处渲染显示data2
+													$('#divIssPatSingle_load').html(data2);
+													$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务：</span>【<strong>'+aHtml+'</strong>】《'+data.topic+'》');	
+												});						
+												$('#modalIssPatAuthSingle').modal('show');
+											}
+										);
+									
+									}else{
+										//弹窗显示信息
+										$.alert('《'+data.topic+'》'+btnHtml+data.msg);
+									}
+								});	
+							});
+							<!-- console.log('backData='); -->
+							<!-- console.dir(backData); -->
+							<!-- console.dir('data.fileName='+data.fileName); -->
+						}
+					}else{
+						$('#modalIssPatAuthSingle').modal('show');
+					}
+				}).cancel('否(N)').ok('是(Y)');				
+			}else{
+				$('#btnAttFileUpload').focus().tooltip({title: '点击!，完成附件上传', placement: 'bottom'}).tooltip('show');
+			}	
+	});
+	
+	//上传附件文件
+	$('#btnAttFileUpload').click(function(){
+		
+		//防止触发#fmAttFileUpload的提交事件
+		$('#fmAttFileUpload').submit(function(evt){
+			evt.preventDefault();
+		
+		var formData = new FormData($('#fmAttFileUpload')[0]);
+		//显示上传进度条
+		$('.attuploadbar').show();
+		$.ajax({
+			type: 'post',
+            url: 'uploadAttTemp',
+            data: formData,
+			<!-- datatype: 'JSON', -->
+            contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
+            processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)
+				
+			//显示上传进度
+			xhr:xhrFileUploadBar,
+			success: function(data){
+				<!-- $('#divUpLoadProcess1').text('【附件上传】成功') -->
+				//列表增加上传文件内容
+				$('tr:last').after('<tr class=""><td>'+($('#tbattFileList').children('tr').length+1)+'<input name="attId[]" value="'+data.id+'" type="text" class="sr-only"><input name="attFileObjStr[]" value="'+data.attpath+'" type="text" class="sr-only"><input name="attFileName[]" value="'+data.attfilename+'" type="text" class="sr-only"></td><td>'+data.atttype+'</td><td>'+data.name+'</td><td>'+data.uploaddate+'</td><td>'+data.uploader+'</td><td>'+data.rolename+'</td><td><a href="{$home}/attachment/index/download/id/'+data.id+'" target="_blank">下载</a>&nbsp;<a href="{$home}/attachment/index/delete/id/'+data.id+'" target="_blank">删除</a>&nbsp;</td></tr>');
+					
+				//所有的行去掉颜色
+				$('tr').removeClass('bg-warning');
+				
+				//给新加的行（最后一行）上色
+				$('tr:last').addClass('bg-warning');
+				
+				//附件列表显示
+				$('#divAttFilelist').show();
+					
+				//上传form重置
+				$('#fmAttFileUpload')[0].reset();
+				
+				//上传form隐藏
+				$('#fmAttFileUpload').collapse('hide');
+					
+				//进度条隐藏
+				$('.attuploadbar').hide();
+					
+				//进度条归0
+				$('#divUpLoadProcess').css('width','0%').text('0%');
+					
+				//input变为“无”选中；
+				$('input:radio[name="attUpload"][value="0"]').prop('checked',true);
+					
+				//#modalIssPatAuthSingle,show
+				$('#modalIssPatAuthSingle').modal('show');
+					
+			},
+			error: function(){
+				//#modalIssPatAuthSingle,hide
+				$('#modalIssPatAuthSingle').modal('hide');
+				$.alert('【附件上传】失败');
+			}
+		
+		});	
+		
+		});
+	
+	});
+	//检查form里的input（class="empty-check"）是否为空或0，为空或0做出'has-error'和tooltip提示，不为空去掉'has-error'和tooltip提示
+	$('.empty-check').each(function(){
+		$(this).focusout(function(){
+			if($(this).val()!=0){
+				$(this).parent().removeClass('has-error');
+				$(this).tooltip('destroy');
+			}else{
+				$(this).parent().addClass('has-error');
+				$(this).tooltip({title: '请填写此项', placement: 'bottom'}).tooltip('show');
+			}
+		});
+	});
+	
+	//本页内的所有form重置，同时去掉'.form-control'的tooltip和'has-error'
+	$('#btnReset').click(function(){	
+		//本页内的所有form重置
+		$('#fmIssPat')[0].reset();
+		$('#fmPat')[0].reset();
+		$('#fmAtt')[0].reset();
+		$('#fmAttFileUpload')[0].reset();
+		
+		//#fmAttFileUpload隐藏
+		$('#fmAttFileUpload').collapse('hide');
+		
+		//.attuploadbar隐藏
+		$('.attuploadbar').hide();
+		
+		//去掉'.form-control'的tooltip和'has-error'
+		$('.form-control').tooltip('destroy').parent().removeClass('has-error');
+		
+		//隐藏
+		$('.resetHide').hide();
+		
+		// select显示为模板变量值
+		$('#patType').val('{$patType}').attr('selected');
+	
+	});
+
+<!-- function -->
+	//**函数名：xhrFileUploadBar
+ 	//* 作用：应用XMLHttpRequest对象的progress事件显示文件上传进程
+	//* 参数obj，类型：对象。值：不为空。说明：为progress所在元素的id。类似$('#obj')
+	function xhrFileUploadBar(){
+		//jQuery中得到XMLHttpRequest对象	
+		var xhr= $.ajaxSettings.xhr();
+		var v=$('input:radio[name="attUpload"][value="1"]').prop('checked');
+		//有附件需要上传
+		if(v==true){
+		
+			//显示上传进度
+			xhr.upload.onprogress=function(progress){
+				if(progress.lengthComputable){
+					//计算百分比并取整
+					var percent=Math.round(progress.loaded/progress.total*100);
+					//在浏览器控制台显示的内容
+					console.log(percent);
+					//附件上传的进度条显示上传进度
+					$('#divUpLoadProcess').css("width",percent + "%").text(percent + "%");
+				}
+			};
+			xhr.upload.onloadstart=function(){
+				console.log('started...');
+			};		
+			xhr.upload.onloadend=function(){
+				console.log('finished!!  xhr.upload='+xhr.upload+' v='+v);
+				<!-- $.alert('附件上传完成'); -->
+			};
+		}else{
+			console.log('无附件上传'+' xhr.readyState='+xhr.readyState);
+			//$.alert('无附件上传');
+		}
+			
+		return xhr;
+	
+	}
+	
+	//**函数名：inputsNotEmpty
+ 	//* 作用：检查本页内所有的input(class="form-control empty-check")是否都填入内容，
+	//*效果：无内容的加'has-error'和tooltip，在第一个无内容的input显示tooltip提示
+	//*返回：true/在第一个无内容的input显示tooltip提示
+	//* 参数，类型：对象。值：不为空。说明：。
+	function inputsNotEmpty(){
+		var obj=$('.empty-check');
+		var arr=[];
+		var i=0;	//检查所有的input(class="form-control")是否都填入内容并不为0，无内容的加'has-error'和tooltip
+		for (i;i<obj.length;i++){
+			if(obj.eq(i).val()!=0){
+				<!-- obj.eq(i).removeClass('bg-danger'); -->
+				<!-- obj.eq(i).next().hide(); -->
+				obj.eq(i).parent().removeClass('has-error');
+			}else{
+				<!-- obj.eq(i).addClass('bg-danger'); -->
+				<!-- obj.eq(i).next().show(); -->
+				obj.eq(i).tooltip({title: '请填写此项', placement: 'bottom'}).parent().addClass('has-error');
+				arr.push(i);				
+			}	
+		}
+		//在第一个无内容的input显示tooltip提示。
+		if(arr.length){
+			<!-- obj.eq(Math.min(arr)).focus(); -->
+			return obj.eq(Math.min.apply(null, arr)).focus().tooltip('show');
+		}else{
+			return true;
+		}
+	
+	}	
+	
+	//**函数名：serializeJson
+ 	//* 作用：对表单内容进行JSON对象序列化
+	//* 参数fmObj，类型：对象。值：不为空。说明：表单对象。
+	//* 返回值：JSON对象
+	function serializeJson(fmObj){
+		var serializeObj={};
+		var arr=fmObj.serializeArray();
+		var str=fmObj.serialize();
+		$.each(arr,function(){
+			if(serializeObj[this.name]){
+				if($.isArray(serializeObj[this.name])){
+					serializeObj[this.name].push(this.value);
+				}else{
+					serializeObj[this.name]=[serializeObj[this.name],this.value];
+				}
+			
+			}else{
+				serializeObj[this.name]=this.value;
+			}
+		});
+		return serializeObj;
+	}
+		
+<!--// function -->
+	
+});
+
+</script>
+

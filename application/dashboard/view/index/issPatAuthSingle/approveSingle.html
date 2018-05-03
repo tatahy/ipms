@@ -1,0 +1,229 @@
+<!-- // issPat:approveSingle.html： -->
+{extend name="../application/dashboard/view/index/issPatAuthSingle/baseSingle.html" /}
+
+
+
+{block name="abstract"}
+{__block__}
+
+{/block}
+
+{block name="patInput"}
+
+			<form action="" id="fmPat">
+<!-- // class="sr-only" 仅源代码文件中显示-->
+				<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
+				<input id="patTopic" name="patTopic" value="{$pat.topic}" type="text" class="sr-only">
+			
+			</form>
+{/block}
+
+{block name="attInput"}
+{__block__}
+
+{/block}
+
+{block name="issPatInput"}
+<div class="myFieldset">
+	
+	<div class="myLegend"><span class="label label-warning">审批</span></div>
+	<form action="" id="fmIssPat" >
+		<!-- // class="sr-only" 仅源代码文件中显示-->
+		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
+		<input id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" class="sr-only">
+	
+	{eq name="$iss.status" value="变更申请"}
+	
+	<div class="row myRow ">
+	{if condition="$iss.executer != $iss.executerchangeto"}
+		<div id="divExecuterChange" class="form-group col-sm-6" >
+			<p class="myedge-left-info">执行人【<span class="text-primary"><strong>{$iss.executer}</strong></span>】申请变更"执行人"为【<span class="text-danger"><strong>{$iss.executerchangeto}</strong></span>】</p>
+			<p class="myedge-left-info">申请变更原因：</br><span class="text-primary">{$iss.executerchangemsg}</span></p>	
+		</div>
+	{else /}
+		<div id="divElseChange" class="form-group col-sm-6" >
+			<p class="myedge-left-info">执行人【<span class="text-primary">{$iss.executer}</span>】申请变更原因：</br><span class="text-primary">{$iss.executerchangemsg}</span></p>	
+		</div>
+	{/if}
+	</div>
+	{/eq}
+		
+	<div class="row myRow">
+		<div class="form-group col-sm-4">
+		<label for="approveResult">结果<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+		<select id="approveResult" class="empty-check form-control" name="auditResult" style="font-size:100%;">
+			<option value="0" class="text-warning bg-warning" >……</option>
+		{in name="$iss.status" value="拟续费,变更申请"}
+			<option class="text-success bg-success" value="_PERMIT">批准</option>
+			<option class="text-danger bg-danger" value="_VETO">否决</option>
+			
+					
+					
+		{else/}
+			<option class="text-success bg-success" value="_PERMIT">批准</option>
+			<option class="text-danger bg-danger" value="_VETO">否决</option>
+			<option class="text-primary bg-info" value="_COMPLETE">修改完善</option>	
+				
+		{/in}
+		</select>
+		</div>
+		
+		<div id="divExecuter" class="resetHide form-group col-sm-8">
+			<label for="executer">选定执行人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<!-- <input class="form-control" id="operator" name="operator" value="" type="text" required="true"> -->
+			<select class="form-control" id="executer" name="executer">
+				<option value="0"></option>
+				<option value="1">1</option>
+					
+			</select>
+			
+		</div>
+		
+		<div id="divApproveMsg" class="resetHide form-group col-sm-8 ">
+			<label for="attName">具体意见<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<textarea class="empty-check form-control" rows="5" id="approveMsg" name="approveMsg" type="text" placeholder="请填入具体的审批意见" required></textarea>
+		</div>
+
+	</div>
+		
+	</form>
+</div>
+
+{/block}
+
+
+{block name="btn"}
+{in name="$iss.status" value="拟续费,变更申请"}
+	<button type="submit" id="btnPermit" class="resetHide btn btn-success btn-sm" data-oprt="_PERMIT" data-issTopic="{$iss.topic}" data-btnLabel="label-success"><span class="glyphicon glyphicon-ok"></span>批准</button>
+	<button type="submit" id="btnVeto" class="resetHide btn btn-danger btn-sm" data-oprt="_VETO" data-issTopic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-remove"></span>否决</button>
+
+{else/}
+	<button type="submit" id="btnPermit" class="resetHide btn btn-success btn-sm" data-oprt="_PERMIT" data-issTopic="{$iss.topic}" data-btnLabel="label-success"><span class="glyphicon glyphicon-ok"></span>批准</button>
+	<button type="submit" id="btnVeto" class="resetHide btn btn-danger btn-sm" data-oprt="_VETO" data-issTopic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-remove"></span>否决</button>
+	
+	<button type="submit" id="btnComplete" class="resetHide btn btn-primary btn-sm" data-oprt="_COMPLETE" data-issTopic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-erase"></span>修改完善</button>
+
+{/in}	
+	
+{/block}
+
+{block name="script"}
+{__block__}
+<script>
+$(document).ready(function(){	
+	$('.resetHide').hide();
+	
+	// 准备好Executer名单
+	showExecuter($("#executer"),[],'{$iss.writer}');
+		
+	// 单选框approveResult的change事件，出现approveMsg输入框等。
+	$('#approveResult').change(function(){	
+		//恢复到default状态
+		$('.resetHide').hide();
+		$(this).removeClass('label label-danger label-primary label-success');
+		//#approveMsg去掉'empty-check'，不列入非空检查
+		$('#approveMsg').removeClass('empty-check');
+		
+		switch($(this).val()){
+			case '_VETO':
+				$('#divApproveMsg').show();
+				$('#btnVeto').show();
+				$(this).addClass('label label-danger');
+				//#approveMsg增加'empty-check'，列入非空检查
+				$('#approveMsg').addClass('empty-check');
+			break;
+			 
+			case '_COMPLETE':
+				$('#divApproveMsg').show();
+				$('#btnComplete').show();
+				$(this).addClass('label label-primary');
+				//#approveMsg增加'empty-check'，列入非空检查
+				$('#approveMsg').addClass('empty-check');
+			break;
+			
+			case '_PERMIT':
+				$('#divApproveMsg').hide();
+				$('#btnPermit').show();
+				$('#divExecuter').show();
+				$(this).addClass('label label-success');
+				//#executer增加'empty-check'，列入非空检查
+				$('#executer').addClass('empty-check');
+				//#approveMsg去掉'empty-check'，不列入非空检查
+				$('#approveMsg').removeClass('empty-check');
+			break;
+			
+			case '0':
+				$('.resetHide').hide();
+				$(this).removeClass('label label-danger label-primary label-success');
+				//#approveMsg去掉'empty-check'，不列入非空检查
+				$('#approveMsg').removeClass('empty-check');
+			break;
+		}			
+				
+	
+	});
+	
+	//附加#btnReset 的click事件
+	$('#btnReset').click(function(){	
+	
+		$('#approveResult').removeClass('label label-danger label-primary label-success');
+		
+	});
+
+<!-- function -->	
+	//**函数名：showExecuter
+ 	//*作用：向单选框填充"执行人"的内容选项
+	//* 参数1：Obj，必须。类型：对象，值：单选框的对象名称
+	//*参数2：attach，可为空。类型：json数组，值：需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
+	//*参数3：selected，可为空。类型：字符，值：单选框拟选定option项的value值。
+ 	//**/
+	function showExecuter(Obj,attach,selected){
+		<!-- // 应用Ajax向服务器请求“部门”单选框内容所需数据，并组装好HTML语句 -->
+		$.ajax({
+			type : "post",
+			async : true,  //异步请求
+			url : "selectExecuter",
+			// 发送到服务器的数据，可无
+			<!-- data : data, -->
+			timeout:1000,
+			<!-- // 服务器端response的数据类型为json-->
+			dataType:"json",
+			success:function(backData){
+				var data=backData;
+				var str='<option value="">……</option>';
+				if(attach){
+					for(i=0;i<attach.length;i++){
+						str+="<option value='"+attach[i].val+"'>"+attach[i].text+"</option>";
+					}
+				}
+				<!-- // 遍历data数组组装HTML语句 -->
+				<!-- // data的结构是数组类的：[{id:1,username:"xx", dept:"yy"},{}],所以要进行嵌套取出id，username和dept的值组装HTML语句-->
+				$.each(data,function(n1,v1){
+					$.each(v1,function(n2,v2){
+						if(n2=="username"){
+							str+="<option value='"+v2+"'>"+v2+" （部门：";
+						}
+						if(n2=="dept"){
+							str+=v2+"）</option>";
+						}
+					});
+				});
+				<!--// 清空单选框Obj的所有选项-->
+				Obj.empty();
+				<!--// 添加单选框Obj的新选项-->
+				Obj.append(str);
+				<!-- // value=selected 的项为选定项-->
+				if (selected){
+					Obj.val(selected).attr('selected','selected');
+				}
+			},
+			error: function() {
+               $.alert('获取执行人列表失败，请稍后再试！');
+            }
+		});
+	}
+<!--// function -->
+	
+});
+</script>
+{/block}

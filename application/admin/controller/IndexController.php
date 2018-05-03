@@ -139,6 +139,7 @@ class IndexController extends \think\Controller
       // 限制登录的用户必须rolety_id=6（admin）或7（superadmin）
       $user = UserModel::where('username',$username)
                             ->where('pwd',$pwd)
+                            ->where('enable',1)
                             ->where('rolety_id','in','8,9')
                             ->whereOr('usergroup_id','in','6,7')
                             ->find();

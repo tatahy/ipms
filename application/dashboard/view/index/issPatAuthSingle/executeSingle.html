@@ -1,0 +1,396 @@
+<!-- // issPatApproveSingle.html： -->
+{extend name="../application/dashboard/view/index/issPatAuthSingle/baseSingle.html" /}
+
+
+
+{block name="abstract"}
+
+{switch name="$iss.status"}
+    {case value="批准申报|准予变更"}	
+	{__block__}
+					
+	{/case}
+		
+	{case value="申报执行|申报修改|否决变更"}
+	<div class="row">
+		<div class="form-group col-sm-4">
+			<h4>撰写人：{$username}</h4>
+		</div>
+		
+		<div class="form-group col-sm-8">
+			<h4>所属部门：{$dept}</h4>
+		</div>
+	</div>			
+				
+	
+	{/case}
+    
+{/switch}
+	
+
+{/block}
+
+{block name="patInput"}
+
+{switch name="$iss.status"}
+    {case value="批准申报|准予变更"}	
+	<form action="" id="fmPat">
+		<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
+		<input id="patTopic" name="patTopic" value="{$pat.topic}" type="text" class="sr-only">
+			
+	</form>
+					
+	{/case}
+		
+	{case value="申报执行|申报修改|否决变更"}
+	<div class="myFieldset">
+	
+	<div class="myLegend"><span class="label label-warning"><span class="glyphicon glyphicon-wrench"></span>专利信息</span></div>
+		<form action="" id="fmPat">
+			<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
+			
+			<div class="row myRow">
+				<div class="form-group col-sm-6">
+					<label class="control-label" for="patTopic">专利名称<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="empty-check form-control" id="patTopic" name="patTopic" value="{$pat.topic}" type="text" placeholder="xx专利" required>
+			
+				</div>
+				
+				<div class="form-group col-sm-4">
+					<label class="control-label" for="patType">专利类型<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<select class="empty-check form-control" id="patType" name="patType">
+						<option value="">……</option>
+						<option value="_PATT1">发明专利</option>
+						<option value="_PATT2">实用新型专利</option>
+                		<option value="_PATT3">外观设计专利</option>
+                		<option value="_PATT4">软件版权</option>
+                		<option value="_PATT5">著作权</option>
+                		<option value="_PATT6">集成电路图</option>
+                
+					</select>
+				</div>
+				
+				<div class="form-group col-sm-2">
+					<label class="control-label" for="patStatus">专利状态</label>
+					<a href="{$home}/patent/index/patrecords/id/{$pat.id}" target="_blank" data-toggle="tooltip" title="过程记录"><span class="btn btn-sm btn-primary">{$pat.status}</span></a>
+			
+				</div>
+			</div>
+			
+			<div class="row myRow">
+				<div class="form-group col-sm-6">
+					<label class="control-label" for="patOwner">专利所有人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="empty-check form-control" id="patOwner" name="patOwner" value="{$pat.patowner}" type="text" placeholder="广州市光机电技术研究院" required>
+			
+				</div>
+				<div class="form-group col-sm-2">
+					<label class="control-label" for="patInventor">专利发明人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="empty-check form-control" id="patInventor" name="patInventor" value="{$pat.inventor}" type="text" placeholder="{$username}" required>
+				</div>
+		
+				<div class="form-group col-sm-4">
+					<label class="control-label" for="patOtherInventor">专利其他发明人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="empty-check form-control" id="patOtherInventor" name="patOtherInventor" value="{$pat.otherinventor}" type="text" placeholder="无" required>
+				</div>
+			</div>
+		</form>
+	</div>
+	{/case}
+    
+{/switch}
+{/block}
+
+{block name="attInput"}
+{__block__}
+
+{/block}
+
+{block name="issPatInput"}
+
+<div class="myFieldset">
+	
+	<div class="myLegend"><span class="label label-warning">执行事务</span></div>
+	{switch name="$iss.status"}
+    {case value="批准申报|准予变更"}	
+	<form action="" id="fmIssPat" >
+		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
+		<input id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" class="sr-only">
+		
+		<div class="row myRow">
+			<div class="form-group col-sm-4">
+				<label for="executeResult">情况<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<select id="executeResult" class="empty-check form-control" name="executeResult" style="font-size:100%;">
+					<option value="0" class="text-warning bg-warning" >……</option>
+					<option class="text-primary bg-info" value="_ACCEPT">领受</option>
+					<option class="text-danger bg-danger" value="_REFUSE">变更申诉</option>	
+				</select>
+			</div>
+
+			<div id="divChangeExecuter" class="resetHide form-group col-sm-4" >
+				<strong class="">变更执行人</strong></br>
+				<label class="radio-inline ">
+      			<input type="radio" name="changeExecuter" value="0" checked><span class="label label-default">无</span>
+    			</label>
+				<label class="radio-inline">
+      			<input type="radio" name="changeExecuter" value="1"><span class="label label-default">是</span>
+    			</label>
+			</div>
+  
+			<div id="divExecuter" class="resetHide form-group col-sm-4">
+				<label for="executer">推荐执行人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				
+				<select class="form-control" id="executer" name="executer">
+					<option value="">……</option>
+					<option value="1">1</option>
+					
+				</select>
+			
+			</div>			
+		
+		</div>
+		
+		<div class="row myRow">		
+			<div id="divExecuteMsg" class="resetHide form-group col-sm-8 ">
+				<label for="executeMsg">具体原因/内容<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<textarea class="empty-check form-control" rows="5" id="executeMsg" name="executeMsg" type="text" placeholder="请填入具体的原因/内容" required></textarea>
+			</div>
+		
+		</div>
+	</form>		
+	{/case}
+		
+	{case value="申报执行|申报修改|否决变更"}
+	<form action="" id="fmIssPat" >	
+		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">		
+				
+		<div class="row myRow">
+			<div class="form-group col-sm-6">
+				<label class="control-label" for="issPatTopic">事务标题<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<input class="empty-check form-control" id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" placeholder="关于XX专利的授权申报" required>
+			</div>
+		
+			<div class="form-group col-sm-4">
+				<label for="issType">事务类型</label>
+				<input class="empty-check form-control" id="issType" name="issType" value="专利授权申报" type="text" readonly>
+			</div>
+			
+			<div class="form-group col-sm-2">
+				<label class="control-label" for="">事务状态</label>
+				<a href="{$home}/issue/index/issrecords/id/{$iss.id}" target="_blank" data-toggle="tooltip" title="过程记录"><span class="btn btn-sm btn-primary">{$iss.status}</span></a>
+			
+			</div>
+			
+			{notin name="$iss.statussummary" value="0"}
+			<div class="form-group col-sm-6">
+				<label class="control-label" for="">事务反馈意见</label>
+				<p class="myedge-left-info">{$iss.statussummary}</p>
+			
+			</div>
+			{/notin}
+		</div>
+
+		<div class="row myRow">
+			<div class="form-group col-sm-12">
+				<label class="control-label" for="issPatAbstract">事务简介<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<textarea class="empty-check form-control" rows="5" id="issPatAbstract" name="issPatAbstract" placeholder="填写事务的主要内容，字数不超过100字。" required>{$iss.abstract}</textarea>
+			</div>
+		</div>
+		
+		<div class="row myRow">		
+			<div id="divExecuteMsg" class="form-group col-sm-8 ">
+				<label for="executeMsg">报告/完成说明<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<textarea class="empty-check form-control" rows="5" id="executeMsg" name="executeMsg" type="text" placeholder="请填入简短报告/完成说明" required></textarea>
+			</div>
+		
+		</div>		
+	</form>	
+	{/case}
+    
+{/switch}
+	
+	
+	
+</div>
+{/block}
+
+{block name="btn"}
+{switch name="$iss.status"}
+    {case value="批准申报|准予变更"}
+		<button type="submit" id="btnAccept" class="resetHide btn btn-primary btn-sm" data-oprt="_ACCEPT" data-issTopic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-saved"></span>领受</button>
+		<button type="submit" id="btnRefuse" class="resetHide btn btn-danger btn-sm" data-oprt="_REFUSE" data-issTopic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-open"></span>申述</button>
+	{/case}
+		
+	{case value="申报执行|申报修改|否决变更"}
+		<button type="submit" id="btnReport" class="btn btn-primary btn-sm" data-oprt="_REPORT" data-issTopic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-upload"></span>报告</button>
+		<button type="submit" id="btnFinish" class="btn btn-danger btn-sm" data-oprt="_FINISH" data-issTopic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-folder-close"></span>完成</button>
+	{/case}
+    
+{/switch}
+
+{/block}
+
+{block name="script"}
+{__block__}
+<script>
+$(document).ready(function(){	
+	$('.resetHide').hide();
+	// select显示为模板变量值
+	$('#patType').val('{$patType}').attr('selected');
+		
+	// 单选框executeResult的change事件，出现executeMsg输入框等。
+	$('#executeResult').change(function(){	
+		//恢复到default状态
+		$('.resetHide').hide();
+		$(this).removeClass('label label-danger label-primary label-success');
+		//#executeMsg去掉'empty-check'，不列入非空检查
+		$('#executeMsg').removeClass('empty-check');
+		
+		switch($(this).val()){
+			case '_REFUSE':
+				$('#divExecuteMsg').show();
+				$('#btnRefuse').show();
+				$('#divChangeExecuter').show();
+				$(this).addClass('label label-danger');
+				//增加'empty-check'，列入非空检查
+				$('#executeMsg').addClass('empty-check');
+				
+			break;
+			
+			case '_FINISH':
+				$('#divExecuteMsg').show();
+				$('#btnFinish').show();
+				$(this).addClass('label label-danger');
+				//#executeMsg增加'empty-check'，列入非空检查
+				$('#executeMsg').addClass('empty-check');
+			break;
+						 
+			case '_ACCEPT':
+				$('#divExecuteMsg').hide();
+				$('#btnAccept').show();
+				$(this).addClass('label label-primary');
+				//#executeMsg去掉'empty-check'，不列入非空检查
+				$('#executeMsg').removeClass('empty-check');
+			break;
+			
+			case '_REPORT':
+				$('#divExecuteMsg').show();
+				$('#btnReport').show();
+				$(this).addClass('label label-primary');
+				//#executeMsg增加'empty-check'，列入非空检查
+				$('#executeMsg').addClass('empty-check');
+			break;
+			
+			case '0':
+				$('.resetHide').hide();
+				$(this).removeClass('label label-danger label-primary label-success');
+				//“是”项褪色
+				$('input:radio[name="changeExecuter"][value="1"]').next().removeClass('label-warning');
+				//“无”项选中
+				$('input:radio[name="changeExecuter"][value="0"]').prop('checked',true);
+				//#executer去掉'empty-check'，退出非空检查
+				$('#executer').removeClass('empty-check');
+				//#executeMsg去掉'empty-check'，不列入非空检查
+				$('#executeMsg').removeClass('empty-check');
+			break;
+		}
+	
+	});
+	
+	//附加#btnReset 的click事件
+	$('#btnReset').click(function(){	
+	
+		$('#executeResult').removeClass('label label-danger label-primary label-success');
+		//“是”项褪色
+		$('input:radio[name="changeExecuter"][value="1"]').next().removeClass('label-warning');
+		//#executer去掉'empty-check'，退出非空检查
+		$('#executer').removeClass('empty-check');
+		
+	});
+	
+	// 单选按钮change事件。
+	$('input:radio[name="changeExecuter"]').change(function(){
+		// 选中的单选按钮的value值，值为“1”选中的“是”项
+		var v=$(this).attr('value');
+		if(v==1){
+			//“是”项上色
+			$(this).next().addClass('label-warning');
+			//show#executer
+			$('#divExecuter').show();
+			//#executer增加'empty-check'，列入非空检查
+			$('#executer').addClass('empty-check');
+			// 准备好Executer名单
+			showExecuter($("#executer"));
+			
+		}else{
+			//“是”项褪色
+			$('input:radio[name="changeExecuter"][value="1"]').next().removeClass('label-warning');
+			//hide#executer
+			$('#divExecuter').hide();
+			//#executer去掉'empty-check'，退出非空检查
+			$('#executer').removeClass('empty-check');
+		}
+	
+	});
+	
+	<!-- function -->	
+	//**函数名：showExecuter
+ 	//*作用：向单选框填充"执行人"的内容选项
+	//* 参数1：Obj，必须。类型：对象，值：单选框的对象名称
+	//*参数2：attach，可为空。类型：json数组，值：需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
+	//*参数3：selected，可为空。类型：字符，值：单选框拟选定option项的value值。
+ 	//**/
+	function showExecuter(Obj,attach,selected){
+		<!-- // 应用Ajax向服务器请求“部门”单选框内容所需数据，并组装好HTML语句 -->
+		$.ajax({
+			type : "post",
+			async : true,  //异步请求
+			url : "selectExecuter",
+			// 发送到服务器的数据，可无
+			<!-- data : data, -->
+			timeout:1000,
+			<!-- // 服务器端response的数据类型为json-->
+			dataType:"json",
+			success:function(backData){
+				var data=backData;
+
+				var str='<option value="">……</option>';
+				if(attach){
+					for(i=0;i<attach.length;i++){
+						str+="<option value='"+attach[i].val+"'>"+attach[i].text+"</option>";
+					}
+					
+				}
+				<!-- // 遍历data数组组装HTML语句 -->
+				<!-- // data的结构是数组类的：[{id:1,username:"xx", dept:"yy"},{}],所以要进行嵌套取出id，username和dept的值组装HTML语句-->
+				$.each(data,function(n1,v1){
+					$.each(v1,function(n2,v2){
+						if(n2=="username"){
+							str+="<option value='"+v2+"'>"+v2+" （部门：";
+						}
+						if(n2=="dept"){
+							str+=v2+"）</option>";
+						}
+					});
+				});
+				
+				<!--// 清空单选框Obj的所有选项-->
+				Obj.empty();
+				<!--// 添加单选框Obj的新选项-->
+				Obj.append(str);
+				
+				<!-- // value=selected 的项为选定项-->
+				if (selected){
+					Obj.val(selected).attr('selected','selected');
+				}
+			},
+			error: function() {
+               alert("失败operator，请稍后再试！");
+            }
+		});
+	}
+<!--// function -->
+		
+	
+});
+</script>
+{/block}

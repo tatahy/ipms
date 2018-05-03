@@ -1,0 +1,139 @@
+<!-- // issPat:editSingle.html： -->
+{extend name="../application/dashboard/view/index/issPatAuthSingle/baseSingle.html" /}
+
+{block name="abstract"}
+	<div class="row">
+		<div class="form-group col-sm-4">
+			<h4>撰写人：{$username}</h4>
+		</div>
+		
+		<div class="form-group col-sm-8">
+			<h4>所属部门：{$dept}</h4>
+		</div>
+	</div>
+{/block}
+
+{block name="patInput"}
+	<!-- <h4><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利信息</h4> -->
+	
+	
+	<div class="myFieldset">
+	
+	<div class="myLegend"><span class="label label-warning"><span class="glyphicon glyphicon-wrench"></span>专利信息</span></div>
+		
+	<form action="" id="fmPat">
+	<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
+	<input id="" name="patAuthor" value="{$username}" type="text" class="sr-only">
+	<input id="" name="dept" value="{$dept}" type="text" class="sr-only">
+	
+	<div class="row myRow">
+		<div class="form-group col-sm-8">
+			<label class="control-label" for="patTopic">专利名称<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<input class="empty-check form-control" id="patTopic" name="patTopic" value="{$pat.topic}" type="text" placeholder="xx专利" required>
+			
+		</div>
+		<div class="form-group col-sm-4">
+			<label class="control-label" for="patType">专利类型<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<select class="empty-check form-control" id="patType" name="patType">
+				<option value="">……</option>
+				<option value="_PATT1">发明专利</option>
+				<option value="_PATT2">实用新型专利</option>
+                <option value="_PATT3">外观设计专利</option>
+                <option value="_PATT4">软件版权</option>
+                <option value="_PATT5">著作权</option>
+                <option value="_PATT6">集成电路图</option>
+                
+			</select>
+		</div>
+	</div>
+	
+	<div class="row myRow">
+		<div class="form-group col-sm-6">
+			<label class="control-label" for="patOwner">专利所有人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<input class="empty-check form-control" id="patOwner" name="patOwner" value="{$pat.patowner}" type="text" placeholder="广州市光机电技术研究院" required>
+			
+		</div>
+		<div class="form-group col-sm-2">
+			<label class="control-label" for="patInventor">专利发明人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<input class="empty-check form-control" id="patInventor" name="patInventor" value="{$pat.inventor}" type="text" placeholder="{$username}" required>
+		</div>
+		
+		<div class="form-group col-sm-4">
+			<label class="control-label" for="patOtherInventor">专利其他发明人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<input class="empty-check form-control" id="patOtherInventor" name="patOtherInventor" value="{$pat.otherinventor}" type="text" placeholder="无" required>
+		</div>
+	</div>
+	</form>
+	</div>
+{/block}
+
+{block name="attInput"}
+{__block__}
+
+{/block}
+
+{block name="issPatInput"}
+
+	<div class="myFieldset">
+	
+	<div class="myLegend"><span class="label label-warning">事务信息</span></div>
+	
+	<form action="" id="fmIssPat">
+	<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
+	<div class="row myRow">
+		<div class="form-group col-sm-8">
+			<label class="control-label" for="issPatTopic">事务标题<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<input class="empty-check form-control" id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" placeholder="关于XX专利的授权申报" required>
+		</div>
+		
+		<div class="form-group col-sm-4">
+			<label for="issType">事务类型</label>
+			<input class="empty-check form-control" id="issType" name="issType" value="专利授权申报" type="text" readonly>
+		</div>
+	</div>
+	
+	<div class="row myRow">
+		<div class="form-group col-sm-12">
+			<label class="control-label" for="issPatAbstract">事务简介<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<textarea class="empty-check form-control" rows="5" id="issPatAbstract" name="issPatAbstract" placeholder="填写事务的主要内容，字数不超过100字。" required>{$iss.abstract}</textarea>
+		</div>
+	</div>
+	</form>
+	</div>
+{/block}
+
+{block name="btn"}
+
+{eq name="$oprt" value="_ADDNEW"}
+	<button type="submit" id="btnAddNew" class="btn btn-primary btn-sm" data-oprt="_ADDNEW" data-issTopic="" data-btnLabel="label-primary"><span class="glyphicon glyphicon-tag"></span>新增</button>
+
+{else/}
+	
+	<button type="submit" id="btnUpdate" class="btn btn-primary btn-sm" data-oprt="_UPDATE" data-issTopic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-refresh"></span>更新</button>
+	<button type="submit" id="btnSubmit" class="btn btn-primary btn-sm" data-oprt="_SUBMIT" data-issTopic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-ok"></span>提交</button>
+	{in name="$iss.status" value="填报"}
+		<button type="submit" id="btnDelete" class="btn btn-danger btn-sm" data-oprt="_DELETE" data-issTopic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-remove"></span>删除</button>
+	{/in}
+	
+{/eq}
+{/block}
+
+{block name="script"}
+<script>
+$(document).ready(function(){	
+	// select显示为模板变量值
+	$('#patType').val('{$patType}').attr('selected');
+	
+});
+</script>
+{/block}
+
+
+	
+		
+
+	
+	
+	
+
+
