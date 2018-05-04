@@ -1,157 +1,189 @@
-{include file="../application/common/headeruser.html" title="个人中心" }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>个人中心</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">  
+ {/* TP5中的模板注释格式，多行。<!-- TP5的资源文件加载写法 -->
+ 内容不会出现在发送给浏览器的HTML文件中 */} 
+  {css href="/home/res/css/bootstrap3.3.7.min.css" }
+  {css href="/home/res/css/style.css" }
+  {js href="/home/res/js/jquery1.12.4.min.js" }
+  {js href="/home/res/js/bootstrap3.3.7.min.js" } 
+
+  {// TP5中的模板注释格式，单行。} 
+  {js href="/home/res/js/alert.min.js" }
+
+  <style> 
+  {// 实现nav固定在页面顶端效果的补充代码块，同时还需设置nav的data-offset-top="-3"防止鼠标单击页面时出现跳动 }
+
+  .affix {
+      top: 0;
+      width: 100%;
+  }
+
+  .affix + .container-fluid {
+      //padding-top: 70px;
+  }
+  
+   .sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 50px;
+    left: 0;
+    background-color: #f2f2f2;
+    overflow-x: hidden;
+    transition: 0.5s;
+    //padding-top: 50px;
+}
+
+#main {
+    transition: margin-left 0.5s;
+    //padding-top: 60px;
+	//margin-top: 60px;
+	
+}
+
+#footer {
+	background-color:#f2f2f2;
+	padding-top: 10px;
+	border:1px solid #e3e3e3;
+	margin-bottom:1px;
+	<!-- height: 10%; -->
+	<!-- bottom:5px; -->
+	<!-- position: fixed; -->
+	<!-- width:100%; -->
+	<!-- z-index: 1; -->
+}
+
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
+  
+  </style>
+  
+</head>
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top" data-spy="affix" data-offset-top="-3">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>                        
+			</button>
+			<!-- <a class="navbar-brand" href="#">撰写人：username&nbsp;<span class="glyphicon glyphicon-user"></span>&nbsp;个人中心</a> -->
+			<span class="navbar-brand">
+				<a href="{$home}/dashboard/index/index" data-toggle="tooltip" data-placement="bottom" title="个人中心">
+					<strong>IPMS【{$username}】</strong>个人中心
+				</a>
+			</span>
+		</div>
+		<div class="collapse navbar-collapse" id="myNavbar">
+			<ul class="nav navbar-nav navbar-right">
+				<li id="liSearch" class="">
+				<form target="_blank" method="post" class="navbar-form" role="form" action="{$home}/search/index/searchresult">
+					<div class="form-group">
+						<label class="sr-only" for="searchword">关键词:</label>
+						<input class="form-control" id="searchword" name="searchword" type="text" placeholder="关键词（题目/作者/部门) "size="30">
+						<input class="form-control hidden" id="htype" name="htype" type="text" value="all" >
+					</div>	
+						<button type="submit" class="btn btn-default form-control"><span class="glyphicon glyphicon-search"></span>&nbsp;搜索</button>
+						<a target="_blank" href="{$home}/search/index/index" data-toggle="tooltip" title="精细查找"  data-placement="bottom">更多...</a>
+					
+				</form>
+				</li>
+				<li><a href="{$home}/index/index/index"><span class="glyphicon glyphicon-home"></span>&nbsp;首页</a></li>
+				<!-- <li><a href="{$home}/user/index/index"><span class="glyphicon glyphicon-pushpin"></span>个人事务中心（旧版）</a></li> -->
+				
+				<li id="liQuit"><a href="{$home}/index/index/logout"><span class="glyphicon glyphicon-log-out"></span>&nbsp;退出</a></li>
+			</ul>
+		</div>
+	</div>
+</nav>
 
 <!-- pagewrap  -->
 <div class="container-fluid" style="padding-top: 55px;">
+	<div id="mySidenav" class="sidenav">
+		<button id="closeBtn" type="button" class="btn btn-link btn-lg" style="margin-left:70%;"><span class="glyphicon glyphicon-chevron-left"></span></button>
+		
+		<!-- nav 与 jQuery结合实现菜单栏导航效果-->
+		<ul class="nav nav-pills nav-stacked" >
+			<li><a class="aTab" href="#issPro"><span class="glyphicon glyphicon-inbox"></span>&nbsp;项目事务</a></li>
+			<li class="active"><a class="aTab" href="#issPat"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利事务<span class="badge"></span></a></li>
+			<li><a class="aTab" href="#issThe"><span class="glyphicon glyphicon-list"></span>&nbsp;论文事务</a></li>
+			<li><a class="aTab" href="#attManage"><span class="glyphicon glyphicon-bookmark"></span>&nbsp;附件管理</a></li>
+			<li><a class="aTab" href="#userInfo"><span class="glyphicon glyphicon-pushpin"></span>&nbsp;个人信息</a></li>
+				
+		</ul>
+		
+		
+	</div>
+	
+	<div id="main">
+		<button id="openBtn" type="button" class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-chevron-right"></span></button>
+  
+  		<div id="divContent_load"><p class="text-center" style="font-size:28px;">加载中……</p></div>
+	</div>
+	
+</div>
 
-	<div class="panel-group" id="accordion">
-		<div id="panelProIss" class="panel panel-default">
-			<div class="panel-heading">
-			<h4 class="panel-title">
-        		<a data-toggle="collapse" data-parent="#accordion" href="#collapsePro"><span class="glyphicon glyphicon-inbox"></span>&nbsp;<strong>
-        		项目事务</strong>&nbsp;<span class="span0">0</span></a>
-      		</h4>
-			
-			</div>
-			
-			<div id="collapsePro" class="panel-collapse collapse">
-			<div class="panel-body " >	
-			
-				<!-- //需load其他模板文件的div -->
-				<div id="divIssPro_load"><h4 style="margin:50px;">加载中……</h4></div>
-			
-			</div>
-			</div>
-			
-		</div>
-		
-		<div id="panelIssPat" class="panel panel-default">
-			<div class="panel-heading">
-				<h4 class="panel-title">
-        			<a data-toggle="collapse" data-parent="#accordion" href="#collapsePat"><span class="glyphicon glyphicon-wrench"></span>&nbsp;<strong>
-        			专利事务</strong>&nbsp;
-					{eq name="$numTotal" value="0"}
-					<span class="span0">{$numTotal}</span>
-					{else/}
-					<span class="span0 badge">{$numTotal}</span>
-					{/eq}
-					</a>
-      			</h4>
-			
-			</div>
-			
-			<div id="collapsePat" class="panel-collapse collapse in">
-			<div class="panel-body " >
-				
-				<!-- //需load其他模板文件的div -->
-				<div id="divIssPat_load"><h4 style="margin:50px;">加载中……</h4></div>
-				
-			</div>
-			</div>
-			
-		</div>
-		
-		<div id="panelTheIss" class="panel panel-default">
-			<div class="panel-heading">
-				<h4 class="panel-title">
-        			<a data-toggle="collapse" data-parent="#accordion" href="#collapseThe"><span class="glyphicon glyphicon-list"></span>&nbsp;<strong>
-        			论文事务</strong>&nbsp;<span class="span0">0</span></a>
-      			</h4>
-			
-			</div>
-		
-			<div id="collapseThe" class="panel-collapse collapse">
-			<div class="panel-body " >
-				
-				<!-- //需load其他模板文件的div -->
-				<div id="divIssThe_load"><h4 style="margin:50px;">加载中……</h4></div>
-		
-			</div>
-			</div>
-	
-		</div>
-		
-		<div id="panelAttManage" class="panel panel-warning">
-			<div class="panel-heading">
-				<h4 class="panel-title">
-        			<a data-toggle="collapse" data-parent="#accordion" href="#collapseAttManage"><span class="glyphicon glyphicon-bookmark"></span>&nbsp;<strong>
-        			附件管理</strong>&nbsp;<span class="span"></span></a>
-      			</h4>
-			
-			</div>
-		
-			<div id="collapseAttManage" class="panel-collapse collapse">
-			<div class="panel-body " >
-				
-				<!-- //需load其他模板文件的div -->
-				<div id="divAttManage_load"><h4 style="margin:50px;">开发中……</h4></div>
-		
-			</div>
-			</div>
-	
-		</div>
-		
-		<div id="panelUserInfo" class="panel panel-info">
-			<div class="panel-heading">
-				<h4 class="panel-title">
-        			<a data-toggle="collapse" data-parent="#accordion" href="#collapseUserInfo"><span class="glyphicon glyphicon-pushpin"></span>&nbsp;<strong>
-        			个人信息</strong>&nbsp;<span class="span"></span></a>
-      			</h4>
-			
-			</div>
-		
-			<div id="collapseUserInfo" class="panel-collapse collapse">
-			<div class="panel-body " >
-				
-				<!-- //需load其他模板文件的div -->
-				<div id="divUserInfo_load"><h4 style="margin:50px;">开发中……</h4></div>
-		
-			</div>
-			</div>
-	
-		</div>
-		
+<div id="footer" class="text-center">
+	<p >Powered by HY Copyright © {$year-1}-{$year}。推荐使用<a href="#">Chrome</a>、<a href="#">Firefox</a>浏览器<br>广州市光机电技术研究院（GZOME）. All rights reserved</p>
 </div>
 
 <!-- /pagewrap  -->
 
 <script>
 $(document).ready(function(){
-	//默认加载issPat
-	$("#divIssPat_load").load('issPat',{'auth':'{$auth}'});
+	$('[data-toggle="tooltip"]').tooltip();
 	
-	// 在collapsePat出现前应用jQuery的load方法加载对应文件。
-	$("#collapsePat").on("show.bs.collapse", function(){
-    	
-		$("#divIssPat_load").load('issPat',{'auth':'{$auth}'});
-  	});
+	loadTplFile(window.location.hash);
 	
-	// 在collapsePro出现前应用jQuery的load方法加载对应文件。
-	$("#collapsePro").on("show.bs.collapse", function(){
-    	$("#divIssPro_load").load('issPro');
-  	});
+	<!-- //点击nav-pills中的各个按钮后，加载对应的页面-->
+	$('.aTab').click(function(){
+        var sId = $(this).attr('href');  //a的href属性值即是页面的锚点值
+		<!-- window.location.hash = sId;  //设置锚点 -->
+		//a所在li高亮
+		$(this).tab('show');
+        loadTplFile(sId);              //加载锚点对应的页面文件
+    });	
 	
-	// 在collapseThe出现前应用jQuery的load方法加载对应文件。
-	$("#collapseThe").on("show.bs.collapse", function(){
-    	$("#divIssThe_load").load('issThe'); 
-  	});
-	
-	// 在collapseUserInfo出现前应用jQuery的load方法加载对应文件。
-	$("#collapseUserInfo").on("show.bs.collapse", function(){
-    	$("#divUserInfo_load").load('userInfo'); 
-  	});
-	
-	// 在collapseAttManage出现前应用jQuery的load方法加载对应文件。
-	$("#collapseAttManage").on("show.bs.collapse", function(){
-    	$("#divAttManage_load").load('attManage'); 
-  	});
+	//显示SideNavbar
+	$('#openBtn').click(function(){
+		$('#mySidenav').css('width','150px');
+		//#main的内容不被遮蔽就需要修改'margin-left'与#mySidenav的'width'相同
+    	$('#main').css('margin-left','150px');
+    	$('#footer').css('margin-left','150px');
+		//隐藏
+		$(this).hide();
+    });	
+	//关闭SideNavbar
+	$('#closeBtn').click(function(){
+        $('#mySidenav').css('width','0');
+    	$('#main').css('margin-left','0');
+    	$('#footer').css('margin-left','0');
+		$('#openBtn').show();
+    });			
 	
 <!-- function  -->
 	
-
+// 作用：提交锚点值给后端，由后端返回需加载的页面文件
+	function loadTplFile(sId){
+		if(null==sId || sId=='#undefined'){sId='#issPat';}
+        //提交锚点值给后端，由后端返回需加载的页面文件
+		$("#divContent_load").load('tplFile',{'sId':sId}); 
+    }
 
 <!--/ function -->
 
 });
 </script>
 
-{include file="../application/common/footer.html"}
+</body>
+
+</html>

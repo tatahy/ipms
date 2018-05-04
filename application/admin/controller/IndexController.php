@@ -52,6 +52,7 @@ class IndexController extends \think\Controller
               
               'home'=>$request->domain(),
               'username'=>$this->username,
+              'year'=>date('Y')
               
         ]);
       return view();

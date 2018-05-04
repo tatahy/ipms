@@ -1,9 +1,19 @@
 <!-- // issPat.html： -->
+<div>
+<h4><span class="label label-warning" style="font-size:16px;">专利事务&nbsp;
+   	{eq name=" $numTotal" value="0"}
+		<span class="span0">{$numTotal}</span>
+	{else/}
+		<span class="span0 badge">{$numTotal}</span>
+	{/eq}
+	</span>
+</h4>
 
-				<ul class="nav nav-pills" style="border-bottom: 1px solid #faebcc;">
+
+				<ul class="nav nav-pills" style="margin-top:10px;border-bottom: 1px solid #faebcc;">
 				<!-- <ul class="nav nav-tabs" > -->
 					{eq name="$authArray.iss.edit" value="1"}
-					<li class="" ><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_EDIT" ><span class="glyphicon glyphicon-pencil"></span>编辑
+					<li class="" ><a class="aPill" href="#" data-issue-type="_PATENT" data-issue-authority="_EDIT" ><span class="glyphicon glyphicon-pencil"></span>编辑
 						{eq name="$numIssPatEdit" value="0"}
 							<span class="badge issPat span_EDIT">{$numIssPatEdit}</span>
 						{else/}
@@ -13,7 +23,7 @@
 					{/eq}
 					
 					{eq name="$authArray.iss.audit" value="1"}
-					<li style="marging-left:0px;"><a class="aTab" href="#"  data-issue-type="_PATENT" data-issue-authority="_AUDIT"><span class="glyphicon glyphicon-check"></span>审核
+					<li style="marging-left:0px;"><a class="aPill" href="#"  data-issue-type="_PATENT" data-issue-authority="_AUDIT"><span class="glyphicon glyphicon-check"></span>审核
 						{eq name="$numIssPatAudit" value="0"}
 							<span class="badge issPat span_AUDIT">{$numIssPatAudit}</span>
 						{else/}
@@ -23,7 +33,7 @@
 					{/eq}
 					
 					{eq name="$authArray.iss.approve" value="1"}
-					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_APPROVE"><span class="glyphicon glyphicon-ok"></span>审批
+					<li><a class="aPill" href="#" data-issue-type="_PATENT" data-issue-authority="_APPROVE"><span class="glyphicon glyphicon-ok"></span>审批
 						{eq name="$numIssPatApprove" value="0"}
 							<span class="badge issPat span_APPROVE">{$numIssPatApprove}</span>
 						{else/}
@@ -33,7 +43,7 @@
 					{/eq}
 					
 					{eq name="$authArray.iss.execute" value="1"}
-					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_EXECUTE"><span class="glyphicon glyphicon-random"></span>&nbsp;执行
+					<li><a class="aPill" href="#" data-issue-type="_PATENT" data-issue-authority="_EXECUTE"><span class="glyphicon glyphicon-random"></span>&nbsp;执行
 						{eq name="$numIssPatExecute" value="0"}
 							<span class="badge issPat span_EXECUTE">{$numIssPatExecute}</span>
 						{else/}
@@ -43,7 +53,7 @@
 					{/eq}
 					
 					{eq name="$authArray.iss.maintain" value="1"}
-					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_MAINTAIN"><span class="glyphicon glyphicon-calendar"></span>维护
+					<li><a class="aPill" href="#" data-issue-type="_PATENT" data-issue-authority="_MAINTAIN"><span class="glyphicon glyphicon-calendar"></span>维护
 						{eq name="$numIssPatMaintain" value="0"}
 							<span class="badge issPat span_MAINTAIN">{$numIssPatMaintain}</span>
 						{else/}
@@ -53,7 +63,7 @@
 					{/eq}
 
 					{eq name="$authArray.iss.maintain" value="1"}
-					<li><a id="aPatRenew" class="aTab" href="#" data-issue-type="_PATENT" data-oprt="_RENEW"><span class="glyphicon glyphicon-repeat"></span>续费
+					<li><a id="aPatRenew" class="aPill" href="#" data-issue-type="_PATENT" data-oprt="_RENEW"><span class="glyphicon glyphicon-repeat"></span>续费
 						{eq name="$numPatRenewTotal" value="0"}
 							<span class="badge issPat span_RENEW">{$numPatRenewTotal}</span>
 						{else/}
@@ -62,7 +72,7 @@
 					</a></li>
 					{/eq}
 
-					<li><a class="aTab" href="#" data-issue-type="_PATENT" data-issue-authority="_DONE"><span class="glyphicon glyphicon-off"></span>完结
+					<li><a class="aPill" href="#" data-issue-type="_PATENT" data-issue-authority="_DONE"><span class="glyphicon glyphicon-off"></span>完结
 						{eq name="$numIssPatDone" value="0"}
 							<span class="badge issPat span_DONE">{$numIssPatDone}</span>
 						{else/}
@@ -83,12 +93,16 @@
 					<!-- //需load其他模板文件的div -->
 					<div id="divIssPatAuth_load"><h4 style="margin:50px;">加载中……</h4></div>
 				</div>
-
+</div>
 <!-- /pagewrap  -->
 
 
 <script>
 $(document).ready(function(){
+	//侧边栏对应选中项添加数字
+	$('.nav .active .badge').text({$numTotal});
+	
+	$('#divIssPatAuth_load').empty().load('issPatAuth',{'auth':'{$auth}'});
 	// 根据后端传来的$auth决定本页面载入时默认load的文件,以及设置数字的显示格式，设置li为“active”,并对其a标签添加顶部色条。
 	switch('{$auth}'){
 		case '_EDIT':
@@ -125,12 +139,9 @@ $(document).ready(function(){
 		
 	}
 	
-	<!-- //TP5中 'issPatAuth'='{$home}/dashboard/index/issPatAuth' -->
-	$('#divIssPatAuth_load').load('{$home}/dashboard/index/issPatAuth',{'auth':'{$auth}'});
-	
-	//ul.nav-tabs调整.aTab
+	//ul.nav-tabs调整.aPill
 	//1.缩小padding
-	$('.aTab').each(function(){
+	$('.aPill').each(function(){
 		$(this).css('padding','5px 10px');
 		
 		//去掉底部边框圆角
@@ -142,16 +153,19 @@ $(document).ready(function(){
 	$('span.label').css({'padding-bottom':'1px','margin-bottom':'2px'});	
 	
 	<!-- //点击.aTab中的各个按钮后，改变显示格式，默认显示相应状态的issPat内容-->
-	$('.aTab').click(function(){
-        var issType=$(this).attr('data-issue-type');
-		var authority=$(this).attr('data-issue-authority');
+	$('.aPill').click(function(){
+        <!-- var issType=$(this).attr('data-issue-type'); -->
+		<!-- var authority=$(this).attr('data-issue-authority'); -->
+		//使用bootstrap后，获取绑定到data上的属性值
+		var issType=$(this).data('issue-type');
+		var authority=$(this).data('issue-authority');
 		var oprt='';
 		
 		//恢复数字显示的初始格式
 		$('.numSingle').removeClass('badge').removeClass('mycolorred-bgwhite').addClass('mycolorwhite-bgtransparent');
 		
 		//设置所有标签a的顶部色条为透明
-		<!-- $('.aTab').addClass('myedge-top-transparent'); -->
+		<!-- $('.aPill').addClass('myedge-top-transparent'); -->
 		
 		//本次点击的数字显示格式
 		$(this).find('.numSingle').addClass('badge').addClass('mycolorred-bgwhite');
@@ -161,28 +175,13 @@ $(document).ready(function(){
 		
 		$(this).tab('show');
 		$(this).parent().addClass('active');
-		if($(this).attr('data-oprt')=='_RENEW'){
+		<!-- if($(this).attr('data-oprt')=='_RENEW'){ -->
+		if($(this).data('oprt')=='_RENEW'){
 			$('#divIssPatAuth_load').load('patRenew');
 		}else{
 			$('#divIssPatAuth_load').load('issPatAuth',{'auth':authority});
 		}
     });	
-	
-	<!-- // 在collapsePat出现前应用jQuery的load方法加载对应文件。 -->
-	<!-- $("#collapsePat").on("show.bs.collapse", function(){ -->
-    	
-		<!-- $("#divIssPatAuth_load").load('issPatEdit'); -->
-  	<!-- }); -->
-	
-	<!-- // 在collapsePro出现前应用jQuery的load方法加载对应文件。 -->
-	<!-- $("#collapsePro").on("show.bs.collapse", function(){ -->
-    	
-  	<!-- }); -->
-	
-	<!-- // 在collapseThe出现前应用jQuery的load方法加载对应文件。 -->
-	<!-- $("#collapseThe").on("show.bs.collapse", function(){ -->
-    	
-  	<!-- }); -->
 	
 <!-- function  -->
 	

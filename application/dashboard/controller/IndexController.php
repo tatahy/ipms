@@ -206,6 +206,8 @@ class IndexController extends \think\Controller
           'numIssPatDone'=>$numIssPatDone,
           'numTotal'=>$numTotal,
           'numPatRenewTotal'=>$numPatRenewTotal,
+          
+          'year'=>date('Y')
       	
         ]);
         //return view();
@@ -365,6 +367,27 @@ class IndexController extends \think\Controller
       // 将数组转化为json
       return json($executer);
       
+    }
+    
+    // 根据前端发送的模板文件名参数，选择对应的页面文件返回
+    public function tplFile(Request $request)
+    {
+      $this->_loginUser();
+      //前端发送的是锚点值
+      if(!empty($request->param('sId'))){
+        $tplFile=$request->param('sId');
+      }else{
+        $tplFile='#issPat';
+      }
+      
+      //返回模板文件
+      if(substr($tplFile,0,1)=='#'){
+        $tplFile=substr($tplFile,1);
+        $this->redirect($tplFile);
+      }else{
+        return '模板文件不存在。';
+      }
+    
     }
     
      public function issPat(Request $request)

@@ -106,6 +106,7 @@ class IndexController extends \think\Controller
                 'numpatadd'=>$numpatadd,
                 'numpatapp'=>$numpatapp,
                 'numpataut'=>$numpataut,
+                'year'=>date('Y')
                 ]);
             //return view();
             return $this->fetch();
@@ -120,6 +121,7 @@ class IndexController extends \think\Controller
                         
         $this->assign([
         'home'=>$request->domain(),
+        'year'=>date('Y')
        
         ]);
                 
