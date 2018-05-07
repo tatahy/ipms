@@ -117,10 +117,13 @@
 {block name="attInput"}
 	<!-- //附件显示 -->
 	<div class="myFieldset">
-	
-		<div id="divAttCollapse" class="myLegend" data-toggle="collapse" data-target="#fmAtt"><span class="label label-warning">附件显示<span class="glyphicon glyphicon-menu-down"></span></span></div>			
-		
-		<form id="fmAtt" class="collapse row myRow-noform-group">				
+		{empty name="att"}
+		<div id="divAttCollapse" class="myLegend" data-toggle="collapse" data-target="#fmAtt"><span class="label label-warning">附件显示<span class="glyphicon glyphicon-menu-down"></span></span></div>
+			<form id="fmAtt" class="collapse row myRow-noform-group">
+		{else /}
+		<div id="divAttCollapse" class="myLegend" data-toggle="collapse" data-target="#fmAtt"><span class="label label-warning">附件隐藏<span class="glyphicon glyphicon-menu-up"></span></span></div>
+			<form id="fmAtt" class="collapse in row myRow-noform-group">
+		{/empty}				
 			<div class="table-responsive" >	
 				<table class="table table-bordered table-responsive table-hover">
 				<thead>
@@ -351,9 +354,9 @@ $(document).ready(function(){
 		
 	//各个type="submit"按钮的click事件:向后端传数据
 	$('button[type="submit"]').click(function(){
-			
-			var oprt=$(this).attr('data-oprt');
-			var topic=$(this).attr('data-issTopic');
+			//bootstap下用.data('*')获得data-*属性值
+			var oprt=$(this).data('oprt');
+			var topic=$(this).data('issTopic');
 			
 			if(oprt=='_ADDNEW'){
 				topic=$('#issPatTopic').val();
@@ -405,7 +408,8 @@ $(document).ready(function(){
 									$.extend(param,fmIssPatDataJson,fmAttDataJson,{'oprt':'_ADDNEW','auth':auth,'patId':data.patId});
 									$.post(url,param,function(data1){
 										//后端数据处理成功后，刷新#divIssPat_load和#divIssPatAuth_load的内容
-										$("#divIssPat_load").load('issPat',{'auth':'{$auth}'},function(){
+										<!-- $("#divContent_load").load('tplFile',{'sId':'#issPat'},function(){ -->
+										$("#divIssPatAuth_load").load('issPatAuth',{'auth':auth},function(){
 											//弹窗显示信息
 											$.alert('《'+data1.topic+'》'+btnHtml+data1.msg);
 										});	
@@ -429,7 +433,8 @@ $(document).ready(function(){
 							$.extend(param,fmPatDataJson,fmIssPatDataJson,fmAttDataJson,{'oprt':oprt,'auth':auth});
 							$.post(url,param,function(data){
 								//后端数据处理成功后，刷新#divIssPat_load和#divIssPatAuth_load的内容
-								$("#divIssPat_load").load('issPat',{'auth':'{$auth}'},function(){
+								<!-- $("#divIssPat_load").load('issPat',{'auth':'{$auth}'},function(){ -->
+								<!-- $("#divContent_load").load('tplFile',{'sId':'#issPat'},function(){ -->
 									if(oprt=='_UPDATE' || oprt=='_REVIEW'){
 										//显示#modalIssPatAuthSingle
 										//向后端“issPatSingle”发送数据(后端用于选择返回的模板文件)		
@@ -455,7 +460,7 @@ $(document).ready(function(){
 										$.alert('《'+data.topic+'》'+btnHtml+data.msg);
 									}
 								});	
-							});
+							<!-- }); -->
 							<!-- console.log('backData='); -->
 							<!-- console.dir(backData); -->
 							<!-- console.dir('data.fileName='+data.fileName); -->
@@ -536,12 +541,12 @@ $(document).ready(function(){
 	//检查form里的input（class="empty-check"）是否为空或0，为空或0做出'has-error'和tooltip提示，不为空去掉'has-error'和tooltip提示
 	$('.empty-check').each(function(){
 		$(this).focusout(function(){
-			if($(this).val()!=0){
-				$(this).parent().removeClass('has-error');
-				$(this).tooltip('destroy');
-			}else{
+			if($(this).val()==0 || $(this).val()==''){
 				$(this).parent().addClass('has-error');
 				$(this).tooltip({title: '请填写此项', placement: 'bottom'}).tooltip('show');
+			}else{
+				$(this).parent().removeClass('has-error');
+				$(this).tooltip('destroy');
 			}
 		});
 	});
@@ -619,15 +624,12 @@ $(document).ready(function(){
 		var arr=[];
 		var i=0;	//检查所有的input(class="form-control")是否都填入内容并不为0，无内容的加'has-error'和tooltip
 		for (i;i<obj.length;i++){
-			if(obj.eq(i).val()!=0){
-				<!-- obj.eq(i).removeClass('bg-danger'); -->
-				<!-- obj.eq(i).next().hide(); -->
-				obj.eq(i).parent().removeClass('has-error');
-			}else{
-				<!-- obj.eq(i).addClass('bg-danger'); -->
-				<!-- obj.eq(i).next().show(); -->
+			if(obj.eq(i).val()==0 || obj.eq(i).val()==''){
 				obj.eq(i).tooltip({title: '请填写此项', placement: 'bottom'}).parent().addClass('has-error');
-				arr.push(i);				
+				arr.push(i);
+				
+			}else{
+				obj.eq(i).parent().removeClass('has-error');				
 			}	
 		}
 		//在第一个无内容的input显示tooltip提示。
@@ -664,8 +666,11 @@ $(document).ready(function(){
 	}
 		
 <!--// function -->
+
+
 	
 });
 
 </script>
+
 

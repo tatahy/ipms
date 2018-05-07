@@ -14,7 +14,7 @@
 	{eq name="$numTotal" value="0"}
 		<span class="badge">{$numTotal}</span>
 	{else/}
-		{notin name="$auth" value="_DONE"}
+		{notin name="$auth" value="done"}
 			<span class="badge mycolorred-bgwhite">{$numTotal}</span>
 		{else/}
 			<span class="badge mycolor777-bgwhite">{$numTotal}</span>
@@ -45,7 +45,7 @@
 					
 					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_DEPT" sort="{$sort}">所属部门</a></th>
 					
-				{notin name="$auth" value="_DONE"}
+				{notin name="$auth" value="done"}
 					<th class="tpl text-center"><a data-toggle="tooltip" href="#" sortName="_OPERATION" sort="{$sort}">操作</a></th>
 				{/notin}
 
@@ -72,9 +72,9 @@
 					
 					<td>{$vo.dept}</td>
 {block name="btnTpl"}
-					{notin name="$auth" value="_DONE"}
+					{notin name="$auth" value="done"}
 					<td class="btnTpl">
-						<a class="" href="#modalIssPatAuthSingle" data-issId="{$vo.id}" data-issTopic="{$vo.topic}" data-issue-authority="_EDIT" data-toggle="modal" ><span class="glyphicon glyphicon-pencil text-primary"></span>_编辑</a>
+						<a class="" href="#modalIssPatAuthSingle" data-issId="{$vo.id}" data-issTopic="{$vo.topic}" data-issue-authority="edit" data-toggle="modal" ><span class="glyphicon glyphicon-pencil text-primary"></span>_编辑</a>
 				
 					</td>
 					{/notin}

@@ -144,12 +144,15 @@ $(document).ready(function(){
 	
 	loadTplFile(window.location.hash);
 	
+	
 	<!-- //点击nav-pills中的各个按钮后，加载对应的页面-->
 	$('.aTab').click(function(){
         var sId = $(this).attr('href');  //a的href属性值即是页面的锚点值
 		<!-- window.location.hash = sId;  //设置锚点 -->
 		//a所在li高亮
 		$(this).tab('show');
+		//各个badge恢复初始颜色
+		$('.nav').find('.badge').css('color','#fff');
         loadTplFile(sId);              //加载锚点对应的页面文件
     });	
 	

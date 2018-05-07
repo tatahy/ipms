@@ -11,7 +11,7 @@
 
 {block name="btnTpl"}
 	<td class="btnTpl">
-		<a class="audit" href="#modalIssPatAuthSingle" data-issId="{$vo.id}" data-issTopic="{$vo.topic}" data-issue-authority="_MAINTAIN" data-toggle="modal" >
+		<a class="audit" href="#modalIssPatAuthSingle" data-issId="{$vo.id}" data-issTopic="{$vo.topic}" data-issue-authority="maintain" data-toggle="modal" >
 	{switch name="$vo.status" }
     	{case value="申报复核" }
 			<span class="glyphicon glyphicon-check text-info"></span>_复核

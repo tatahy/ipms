@@ -7,13 +7,13 @@
 
 {block name="addLabel"}
 	
-	&nbsp;<a id="btnAddNew" href="#modalIssPatAuthSingle" class="btn btn-xs" data-issue-authority="_EDIT" data-issue-oprt="_ADDNEW" data-toggle="modal" style="font-size:14px;"><span class="glyphicon glyphicon-tag text-primary"></span>_新增</a>
+	&nbsp;<a id="btnAddNew" href="#modalIssPatAuthSingle" class="btn btn-xs" data-issue-authority="edit" data-issue-oprt="_ADDNEW" data-toggle="modal" style="font-size:14px;"><span class="glyphicon glyphicon-tag text-primary"></span>_新增</a>
 {/block}	
 
 
 {block name="btnTpl"}
 	<td class="btnTpl">
-		<a class="" href="#modalIssPatAuthSingle" data-issId="{$vo.id}" data-issTopic="{$vo.topic}" data-issue-authority="_EDIT" data-toggle="modal" ><span class="glyphicon glyphicon-pencil text-primary"></span>_编辑</a>
+		<a class="" href="#modalIssPatAuthSingle" data-issId="{$vo.id}" data-issTopic="{$vo.topic}" data-issue-authority="edit" data-toggle="modal" ><span class="glyphicon glyphicon-pencil text-primary"></span>_编辑</a>
 	</td>
 {/block}
 

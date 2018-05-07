@@ -35,7 +35,7 @@
 		<div class="form-group col-sm-4">
 			<label class="control-label" for="patType">专利类型<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 			<select class="empty-check form-control" id="patType" name="patType">
-				<option value="">……</option>
+				<option value="0">……</option>
 				<option value="_PATT1">发明专利</option>
 				<option value="_PATT2">实用新型专利</option>
                 <option value="_PATT3">外观设计专利</option>
@@ -82,8 +82,8 @@
 	<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
 	<div class="row myRow">
 		<div class="form-group col-sm-8">
-			<label class="control-label" for="issPatTopic">事务标题<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-			<input class="empty-check form-control" id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" placeholder="关于XX专利的授权申报" required>
+			<label class="control-label" for="issPatTopic">事务标题</label>
+			<input class="form-control" id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" readonly>
 		</div>
 		
 		<div class="form-group col-sm-4">
@@ -123,6 +123,15 @@
 $(document).ready(function(){	
 	// select显示为模板变量值
 	$('#patType').val('{$patType}').attr('selected');
+	
+	//#patTopic内容变化，issPatTopic的内容自动跟随生成
+	$('#patTopic').change(function(){ 	
+		if($(this).val()==''){
+			$(this).focus();
+		}else{
+			$('#issPatTopic').val('关于“'+$(this).val()+'”的授权申报');
+		}
+	});
 	
 });
 </script>
