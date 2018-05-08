@@ -126,11 +126,6 @@ $(document).ready(function(){
 	
 //mobile正则表达式，11位数字。必须以1开头。
 	var regMobile = /^1[0-9]{10}$/;
-	var check = [];
-	$('.inputCheck').each(function(){
-		var i=$('.inputCheck').index($(this));
-		check[i]=false;
-	});
 		
 	<!-- // 单选框#selDept的内容 -->
 	ajaxSelectOption($('#selDept'),{"async":true,"url":"selectResponse","ajaxData":{"req":"_DEPT"},"first":{"val":"0","text":"请选择一个部门…"},"selected":{"val":"{$user.dept}"}});
@@ -142,6 +137,15 @@ $(document).ready(function(){
 	var selectedUsergroupStr=ajaxSelectOption($('#selectedUsergroup'),{"async":false,"url":"selectResponse","ajaxData":{"req":"_USERGROUP"},"first":{"val":"0","text":"已加入…"},"show":{"val":"{$user.usergroup_id}"},"selected":0,"multiple":0});
 	// 保留页面加载时单选框#selectedUsergroup的label内容，页面“重置”时加载
 	var spNumSelectedUsergroup=$('#selectedUsergroup').closest('.form-group').find('.spNum').text();
+	var check = [];
+	$('.inputCheck').each(function(){
+		var i=$('.inputCheck').index($(this));
+		//‘新增’时{$user.id}==0，
+		if({$user.id}==0){
+			check[i]=false;
+		}
+		
+	});
 	
 	$('#selUsergroup').change(function(){
 		selOptionChange($(this),$('#selectedUsergroup'));

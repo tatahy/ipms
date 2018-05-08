@@ -368,7 +368,7 @@ class IndexController extends \think\Controller
     }
     
     // 根据前端发送的模板文件名参数，选择对应的页面文件返回
-    public function tplFile(Request $request)
+    public function tplFile(Request $request,$auth='',$id='')
     {
       $this->_loginUser();
       //前端发送的是锚点值
@@ -380,23 +380,41 @@ class IndexController extends \think\Controller
       
       if(!empty($request->param('auth'))){
         $auth=$request->param('auth');
-      }else{
-        $auth='';
+      }
+      
+      if(!empty($request->param('id'))){
+        $id=$request->param('id');
       }
       
       //返回模板文件
       if(substr($tplFile,0,1)=='#'){
         $tplFile=substr($tplFile,1);
-        $this->redirect($tplFile,['auth' =>$auth]);
+        $this->redirect($tplFile,['auth' =>$auth,'id'=>$id]);
       }else{
         return '模板文件不存在。';
       }
     
     }
     
-     public function issPat(Request $request,$auth='done')
+     public function issPat(Request $request,$auth='done',$issId='')
     {
        $this->_loginUser();
+       
+       // $auth接收前端页面传来的auth值
+        if(!empty($request->param('auth'))){
+          $auth=$request->param('auth');
+        }else{
+          foreach($this->auth['iss'] as $key=>$value){
+            if($value){
+              $auth=$key;
+              break;
+            }
+          }
+        }
+        // $issId接收前端页面传来issId值
+       if(!empty($request->param('id'))){
+        $issId=$request->param('id');
+       }
       
       //使用模型Issinfo
         $issSet = new IssinfoModel; 
@@ -419,19 +437,6 @@ class IndexController extends \think\Controller
                                       '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
         //done
         $map['status'] ='完结';
-        
-        // $auth接收前端页面传来的auth值
-        if(!empty($request->param('auth'))){
-          $auth=$request->param('auth');
-        }else{
-          foreach($this->auth['iss'] as $key=>$value){
-            if($value){
-              $auth=$key;
-              break;
-            }
-          }
-          
-        }
         
         if($this->auth['iss']['edit']){
           $numIssPatEdit=$issSet->where($mapEdit)->count(); 
@@ -507,6 +512,8 @@ class IndexController extends \think\Controller
           'numIssPatDone'=>$numIssPatDone,
           'numTotal'=>$numTotal,
           'numPatRenewTotal'=>$numPatRenewTotal,
+          
+          'issId'=>$issId,
       	
         ]);
       return view();
@@ -515,7 +522,7 @@ class IndexController extends \think\Controller
     } 
     
     //根据前端传来的权限，选择返回前端的模板文件及内容
-    public function issPatAuth(Request $request,$auth='done')
+    public function issPatAuth(Request $request,$auth='done',$issId='')
     {
       $this->_loginUser();
       
@@ -523,6 +530,11 @@ class IndexController extends \think\Controller
       if(!empty($request->param('auth'))){
         $auth=$request->param('auth');
       }
+      
+       // $issId接收前端页面传来issId值
+       if(!empty($request->param('id'))){
+        $issId=$request->param('id');
+       }
       
       // $returnType接收前端页面传来的returnType值，‘0’为模板文件，‘1’为数据
       if(!empty($request->param('returnType'))){
@@ -718,6 +730,11 @@ class IndexController extends \think\Controller
                             'query'=>['issPatTableRows'=>$issPatTableRows]]);
      // 获取分页显示
      $pageTotal = $issPatTotal->render();
+     
+     if($issId==''){
+        $issId=$issPatTotal[0]->id;
+     }
+      
       //返回数据还是模板文件,‘0’为模板文件，‘1’为数据
       if($returnType){
         //响应前端的请求，返回前端要求条件的issPat数量
@@ -744,7 +761,8 @@ class IndexController extends \think\Controller
               // 表格排序信息
               'sortName'=>$sortName,
               'sort'=>$sort,
-              'auth'=>$auth          
+              'auth'=>$auth,
+              'issId'=>$issId,          
               
         ]);
         
@@ -834,7 +852,7 @@ class IndexController extends \think\Controller
     
     //根据前端传来的操作类型，对数据库进行操作
     //结构：1.变量赋初值  //结构2.20个oprt接收前端页面传来的数据，分别对变量赋值再进行数据库表的操作
-    public function issPatOprt(Request $request,IssinfoModel $issMdl,IssrecordModel $issRdMdl,
+    public function issPatOprt(Request $request,$auth='done',IssinfoModel $issMdl,IssrecordModel $issRdMdl,
                                 PatinfoModel $patMdl,PatrecordModel $patRdMdl,AttinfoModel $attMdl)
     {
       $this->_loginUser();
@@ -850,8 +868,6 @@ class IndexController extends \think\Controller
       // $auth接收前端页面传来的auth值,表示rolename（映射“用户组名”）
       if(!empty($request->param('auth'))){
         $auth=$request->param('auth');
-      }else{
-        $auth='done';
       }
       
       // $patId接收前端页面传来的patId值
@@ -919,7 +935,7 @@ class IndexController extends \think\Controller
       
       $oprtCHNStr='';
 
-      $msg='完成<br>';
+      $msg='';
       
 //<结构2.----------------------------------------------------------------------------------------->
 //21个oprt接收前端页面传来的数据，分别对变量赋值再进行数据库表的操作
@@ -997,7 +1013,7 @@ class IndexController extends \think\Controller
             
             //4.issrecord表新增
             //issRdData
-            $msg.='专利事务【新增】成功。<br>';  
+            $msg.='成功。<br>';  
             
             $issRdData=array('act'=>'填报',
                               'actdetail'=>'专利事务《'.$issReturn->topic.'》新增填报',
@@ -1107,7 +1123,7 @@ class IndexController extends \think\Controller
           //5.删除att，模型destroy()方法
           $attMdl::destroy(['attmap_id'=>$issId]);
           
-          $msg.='专利事务【删除】成功。<br>';  
+          $msg.='成功。<br>';  
           return json(array('msg'=>$msg,'topic'=>$request->param('issPatTopic'),'patId'=>$patId));
         break;
         

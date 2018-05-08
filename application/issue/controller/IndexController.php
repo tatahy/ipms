@@ -254,54 +254,54 @@ class IndexController extends \think\Controller
         //--!       
         
         $this->assign([
-        //在index.html页面通过'destr'输出自定义的信息
-        'destr'=>$destr,
-        //在index.html页面通过'array'输出自定义的数组内容
-        'array'=>$this->roles, 
-        
-        'home'=>$request->domain(),
-        'username'=>$this->username,
-        'rolename'=>$rolename,
-        'role'=>$roleparam,
-        'active'=>$active,
-        'typename'=>$typename,
-        'type'=>$type,
-        
-        'writer1'=>$writer1,
-        'num_writer1'=>$num_writer1,
-        'writer2'=>$writer2,
-        'num_writer2'=>$num_writer2,
-        'writer3'=>$writer3,
-        'num_writer3'=>$num_writer3,
-        'writer4'=>$writer4,
-        'num_writer4'=>$num_writer4,
-        
-        'reviewer1'=>$reviewer1,
-        'num_reviewer1'=>$num_reviewer1,
-        'reviewer2'=>$reviewer2,
-        'num_reviewer2'=>$num_reviewer2,
-        'reviewer3'=>$reviewer3,
-        'num_reviewer3'=>$num_reviewer3,
-        'reviewer4'=>$reviewer4,
-        'num_reviewer4'=>$num_reviewer4,
-        
-        'approver1'=>$approver1,
-        'num_approver1'=>$num_approver1,
-        'approver2'=>$approver2,
-        'num_approver2'=>$num_approver2,
-        'approver3'=>$approver3,
-        'num_approver3'=>$num_approver3,
-        'approver4'=>$approver4,
-        'num_approver4'=>$num_approver4,
-        
-        'operator1'=>$operator1,
-        'num_operator1'=>$num_operator1,
-        'operator2'=>$operator2,
-        'num_operator2'=>$num_operator2,
-        'operator3'=>$operator3,
-        'num_operator3'=>$num_operator3,
-        
-        
+          //在index.html页面通过'destr'输出自定义的信息
+          'destr'=>$destr,
+          //在index.html页面通过'array'输出自定义的数组内容
+          'array'=>$this->roles, 
+          
+          'home'=>$request->domain(),
+          'username'=>$this->username,
+          'rolename'=>$rolename,
+          'role'=>$roleparam,
+          'active'=>$active,
+          'typename'=>$typename,
+          'type'=>$type,
+          
+          'writer1'=>$writer1,
+          'num_writer1'=>$num_writer1,
+          'writer2'=>$writer2,
+          'num_writer2'=>$num_writer2,
+          'writer3'=>$writer3,
+          'num_writer3'=>$num_writer3,
+          'writer4'=>$writer4,
+          'num_writer4'=>$num_writer4,
+          
+          'reviewer1'=>$reviewer1,
+          'num_reviewer1'=>$num_reviewer1,
+          'reviewer2'=>$reviewer2,
+          'num_reviewer2'=>$num_reviewer2,
+          'reviewer3'=>$reviewer3,
+          'num_reviewer3'=>$num_reviewer3,
+          'reviewer4'=>$reviewer4,
+          'num_reviewer4'=>$num_reviewer4,
+          
+          'approver1'=>$approver1,
+          'num_approver1'=>$num_approver1,
+          'approver2'=>$approver2,
+          'num_approver2'=>$num_approver2,
+          'approver3'=>$approver3,
+          'num_approver3'=>$num_approver3,
+          'approver4'=>$approver4,
+          'num_approver4'=>$num_approver4,
+          
+          'operator1'=>$operator1,
+          'num_operator1'=>$num_operator1,
+          'operator2'=>$operator2,
+          'num_operator2'=>$num_operator2,
+          'operator3'=>$operator3,
+          'num_operator3'=>$num_operator3,
+          
+          'year'=>date('Y')
         ]);
         return view();
     }

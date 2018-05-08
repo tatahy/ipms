@@ -354,17 +354,17 @@ $(document).ready(function(){
 		
 	//各个type="submit"按钮的click事件:向后端传数据
 	$('button[type="submit"]').click(function(){
-			//bootstap下用.data('*')获得data-*属性值
+			//bootstap下用.data('*')获得data-*属性值,必须全小写
 			var oprt=$(this).data('oprt');
-			var topic=$(this).data('issTopic');
-			
+			var topic=$(this).data('topic');
+		
 			if(oprt=='_ADDNEW'){
 				topic=$('#issPatTopic').val();
 			}
 			var auth='{$auth}';
 			
 			<!-- var btnHtml='<span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:14px;">'+$(this).html()+'</span>《'+topic+'》'; -->
-			var btnHtml='<span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:14px;">'+$(this).html()+'</span>';
+			var btnHtml='<p class="text-center"><span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:14px;">'+$(this).html()+'</spam></p>';
 			var aHtml=$('.modal-header').find('strong').html();
 
 			var url='issPatOprt';
@@ -391,7 +391,7 @@ $(document).ready(function(){
 			if(v1==true && noAttFileChecked==true || oprt=='_DELETE'){
 				$('#modalIssPatAuthSingle').modal('hide');
 				//是否开始ajax传3个form的数据
-				$.confirm('《'+topic+'》'+btnHtml,function(e){
+				$.confirm('<p class="text-center"><span class="label label-info" style="font-size:14px;">《'+topic+'》</span></p>'+btnHtml,function(e){
 					con=e;
 					if(true==con){
 						if(oprt=='_ADDNEW'){
@@ -407,11 +407,11 @@ $(document).ready(function(){
 									param={};
 									$.extend(param,fmIssPatDataJson,fmAttDataJson,{'oprt':'_ADDNEW','auth':auth,'patId':data.patId});
 									$.post(url,param,function(data1){
-										//后端数据处理成功后，刷新#divIssPat_load和#divIssPatAuth_load的内容
-										<!-- $("#divContent_load").load('tplFile',{'sId':'#issPat'},function(){ -->
-										$("#divIssPatAuth_load").load('issPatAuth',{'auth':auth},function(){
-											//弹窗显示信息
-											$.alert('《'+data1.topic+'》'+btnHtml+data1.msg);
+										//后端数据处理成功后，刷新内容
+										$('#divContent_load').empty().html('<p class="text-center" style="font-size:28px;">加载中……</p>');
+										$("#divContent_load").load('tplFile',{'sId':'#issPat','auth':auth,'id':data1.issId},function(){
+											//成功，弹窗显示信息
+											$.alert('<p class="text-center"><span class="label label-info" style="font-size:14px;">《'+data1.topic+'》</span></p>'+btnHtml+'<p class="text-center"><span">'+data.msg+'</span></p>');
 										});	
 							
 									});
@@ -432,34 +432,12 @@ $(document).ready(function(){
 							formData.append('fmAttDataJson',fmAttDataJson);
 							$.extend(param,fmPatDataJson,fmIssPatDataJson,fmAttDataJson,{'oprt':oprt,'auth':auth});
 							$.post(url,param,function(data){
-								//后端数据处理成功后，刷新#divIssPat_load和#divIssPatAuth_load的内容
-								<!-- $("#divIssPat_load").load('issPat',{'auth':'{$auth}'},function(){ -->
-								<!-- $("#divContent_load").load('tplFile',{'sId':'#issPat'},function(){ -->
-									if(oprt=='_UPDATE' || oprt=='_REVIEW'){
-										//显示#modalIssPatAuthSingle
-										//向后端“issPatSingle”发送数据(后端用于选择返回的模板文件)		
-										$.post('issPatAuthSingle',
-											{
-												'issId':data.issId,
-												'auth':auth,
-												'returnType':0,
-											},
-											//得到后端返回的data2(模板文件)
-											function(data2){
-												$('#modalIssPatAuthSingle').on('show.bs.modal', function(){ 
-    												//在本文件#divIssPatSingle_load处渲染显示data2
-													$('#divIssPatSingle_load').html(data2);
-													$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务：</span>【<strong>'+aHtml+'</strong>】《'+data.topic+'》');	
-												});						
-												$('#modalIssPatAuthSingle').modal('show');
-											}
-										);
-									
-									}else{
-										//弹窗显示信息
-										$.alert('《'+data.topic+'》'+btnHtml+data.msg);
-									}
-								});	
+								$('#divContent_load').empty().html('<p class="text-center" style="font-size:28px;">加载中……</p>');
+								$('#divContent_load').load('tplFile',{'sId':'#issPat','auth':auth,'id':data.issId},function(){				
+									//成功，弹窗显示信息
+									$.alert('<p class="text-center"><span class="label label-info" style="font-size:14px;">《'+data.topic+'》</span></p>'+btnHtml+'<p class="text-center"><span">'+data.msg+'</span></p>');
+								});
+							});	
 							<!-- }); -->
 							<!-- console.log('backData='); -->
 							<!-- console.dir(backData); -->

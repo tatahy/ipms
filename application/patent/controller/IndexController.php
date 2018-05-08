@@ -109,16 +109,17 @@ class IndexController extends \think\Controller
         //--!       
         
         $this->assign([
-        //在index.html页面通过'destr'输出自定义的信息
-        'destr'=>$destr,
-        //在index.html页面通过'array'输出自定义的数组内容
-        'array'=>$roles, 
-        
-        'home'=>$request->domain(),
-        'username'=>$username,
-        'rolename'=>$rolename,
-        'role'=>$roleparam,
-        'active'=>$active,
+          //在index.html页面通过'destr'输出自定义的信息
+          'destr'=>$destr,
+          //在index.html页面通过'array'输出自定义的数组内容
+          'array'=>$roles, 
+          
+          'home'=>$request->domain(),
+          'username'=>$username,
+          'rolename'=>$rolename,
+          'role'=>$roleparam,
+          'active'=>$active,
+          'year'=>date('Y')
         ]);
         return view();
     }
@@ -310,51 +311,53 @@ class IndexController extends \think\Controller
         //--!    
         
         $this->assign([
-        //在index.html页面通过'destr'输出自定义的信息
-        'destr'=>$destr,
-        //在index.html页面通过'array'输出自定义的数组内容
-        'array'=>$roles,  
-                          
-        'numtotal'=>$numtotal,
-        'listtotal'=>$patstotal, 
-        'pagetotal'=>$pagetotal,
-        'pagetotalnum'=>$pagetotalnum,
-        
-        'numnew'=>$numnew,
-        'listnew'=>$patsnew,
-        'pagenew'=>$pagenew,
-        'pagenewnum'=>$pagenewnum,
-        
-        'numapp'=>$numapp,
-        'listapp'=>$patsapp,
-        'pageapp'=>$pageapp,
-        'pageappnum'=>$pageappnum,
-        
-        'numaut'=>$numaut,
-        'listaut'=>$patsaut,
-        'pageaut'=>$pageaut,
-        'pageautnum'=>$pageautnum,
-        
-        'numaba'=>$numaba,
-        'listaba'=>$patsaba,
-        'pageaba'=>$pageaba,
-        'pageabanum'=>$pageabanum,
-        
-        'numrej'=>$numrej,
-        'listrej'=>$patsrej,
-        'pagerej'=>$pagerej,
-        'pagerejnum'=>$pagerejnum,
-        
-        'numren'=>$numren,
-        'listren'=>$patsren,
-        'pageren'=>$pageren,
-        'pagerennum'=>$pagerennum,
-        
-        'pagex'=>$pagex,
-        'listrows'=>$listrows,
-        
-        'home'=>$request->domain(),
-        'username'=>$username,
+          //在index.html页面通过'destr'输出自定义的信息
+          'destr'=>$destr,
+          //在index.html页面通过'array'输出自定义的数组内容
+          'array'=>$roles,  
+                            
+          'numtotal'=>$numtotal,
+          'listtotal'=>$patstotal, 
+          'pagetotal'=>$pagetotal,
+          'pagetotalnum'=>$pagetotalnum,
+          
+          'numnew'=>$numnew,
+          'listnew'=>$patsnew,
+          'pagenew'=>$pagenew,
+          'pagenewnum'=>$pagenewnum,
+          
+          'numapp'=>$numapp,
+          'listapp'=>$patsapp,
+          'pageapp'=>$pageapp,
+          'pageappnum'=>$pageappnum,
+          
+          'numaut'=>$numaut,
+          'listaut'=>$patsaut,
+          'pageaut'=>$pageaut,
+          'pageautnum'=>$pageautnum,
+          
+          'numaba'=>$numaba,
+          'listaba'=>$patsaba,
+          'pageaba'=>$pageaba,
+          'pageabanum'=>$pageabanum,
+          
+          'numrej'=>$numrej,
+          'listrej'=>$patsrej,
+          'pagerej'=>$pagerej,
+          'pagerejnum'=>$pagerejnum,
+          
+          'numren'=>$numren,
+          'listren'=>$patsren,
+          'pageren'=>$pageren,
+          'pagerennum'=>$pagerennum,
+          
+          'pagex'=>$pagex,
+          'listrows'=>$listrows,
+          
+          'home'=>$request->domain(),
+          'username'=>$username,
+          
+          'year'=>date('Y')
 
         ]); 
         

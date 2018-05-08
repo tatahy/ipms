@@ -124,6 +124,8 @@ class IndexController extends \think\Controller
             
             'isses'=>$isses,
             'issesnum'=>$issesnum,
+            
+            'year'=>date('Y')
         
             ]);
         
@@ -618,6 +620,8 @@ class IndexController extends \think\Controller
             'today'=>date("Y-m-d"),
             //上个月的今天
             'lastday'=>date("Y-m-d",mktime(0,0,0,date("n")-1,date("j"),date("Y"))),
+            
+            'year'=>date('Y')
             ]);
         
         //return View('index/showresult');

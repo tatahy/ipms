@@ -36,7 +36,7 @@
     background-color: #f2f2f2;
     overflow-x: hidden;
     transition: 0.5s;
-    //padding-top: 50px;
+    padding-top: 10px;
 }
 
 #main {
@@ -109,7 +109,6 @@
 <!-- pagewrap  -->
 <div class="container-fluid" style="padding-top: 55px;">
 	<div id="mySidenav" class="sidenav">
-		<button id="closeBtn" type="button" class="btn btn-link btn-lg" style="margin-left:70%;"><span class="glyphicon glyphicon-chevron-left"></span></button>
 		
 		<!-- nav 与 jQuery结合实现菜单栏导航效果-->
 		<ul class="nav nav-pills nav-stacked" >
@@ -126,6 +125,8 @@
 	
 	<div id="main">
 		<button id="openBtn" type="button" class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-chevron-right"></span></button>
+		
+		<button id="closeBtn" type="button" class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-chevron-left"></span></button>
   
   		<div id="divContent_load"><p class="text-center" style="font-size:28px;">加载中……</p></div>
 	</div>
@@ -144,6 +145,7 @@ $(document).ready(function(){
 	
 	loadTplFile(window.location.hash);
 	
+	$('#closeBtn').hide();	
 	
 	<!-- //点击nav-pills中的各个按钮后，加载对应的页面-->
 	$('.aTab').click(function(){
@@ -158,19 +160,24 @@ $(document).ready(function(){
 	
 	//显示SideNavbar
 	$('#openBtn').click(function(){
+		//隐藏
+		$(this).hide();
+		$('#closeBtn').show();
 		$('#mySidenav').css('width','150px');
 		//#main的内容不被遮蔽就需要修改'margin-left'与#mySidenav的'width'相同
     	$('#main').css('margin-left','150px');
     	$('#footer').css('margin-left','150px');
-		//隐藏
-		$(this).hide();
+		
     });	
 	//关闭SideNavbar
 	$('#closeBtn').click(function(){
-        $('#mySidenav').css('width','0');
+        //隐藏
+		$(this).hide();
+		$('#openBtn').show();
+		$('#mySidenav').css('width','0');
     	$('#main').css('margin-left','0');
     	$('#footer').css('margin-left','0');
-		$('#openBtn').show();
+		
     });			
 	
 <!-- function  -->

@@ -105,14 +105,14 @@
 {block name="btn"}
 
 {eq name="$oprt" value="_ADDNEW"}
-	<button type="submit" id="btnAddNew" class="btn btn-primary btn-sm" data-oprt="_ADDNEW" data-issTopic="" data-btnLabel="label-primary"><span class="glyphicon glyphicon-tag"></span>新增</button>
+	<button type="submit" id="btnAddNew" class="btn btn-primary btn-sm" data-oprt="_ADDNEW" data-topic="" data-btnLabel="label-primary"><span class="glyphicon glyphicon-tag"></span>新增</button>
 
 {else/}
 	
-	<button type="submit" id="btnUpdate" class="btn btn-primary btn-sm" data-oprt="_UPDATE" data-issTopic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-refresh"></span>更新</button>
-	<button type="submit" id="btnSubmit" class="btn btn-primary btn-sm" data-oprt="_SUBMIT" data-issTopic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-ok"></span>提交</button>
+	<button type="submit" id="btnUpdate" class="btn btn-primary btn-sm" data-oprt="_UPDATE" data-topic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-refresh"></span>更新</button>
+	<button type="submit" id="btnSubmit" class="btn btn-primary btn-sm" data-oprt="_SUBMIT" data-topic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-ok"></span>提交</button>
 	{in name="$iss.status" value="填报"}
-		<button type="submit" id="btnDelete" class="btn btn-danger btn-sm" data-oprt="_DELETE" data-issTopic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-remove"></span>删除</button>
+		<button type="submit" id="btnDelete" class="btn btn-danger btn-sm" data-oprt="_DELETE" data-topic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-remove"></span>删除</button>
 	{/in}
 	
 {/eq}

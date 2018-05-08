@@ -216,13 +216,13 @@
 {block name="btn"}
 {switch name="$iss.status"}
     {case value="批准申报|准予变更"}
-		<button type="submit" id="btnAccept" class="resetHide btn btn-primary btn-sm" data-oprt="_ACCEPT" data-issTopic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-saved"></span>领受</button>
-		<button type="submit" id="btnRefuse" class="resetHide btn btn-danger btn-sm" data-oprt="_REFUSE" data-issTopic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-open"></span>申述</button>
+		<button type="submit" id="btnAccept" class="resetHide btn btn-primary btn-sm" data-oprt="_ACCEPT" data-topic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-saved"></span>领受</button>
+		<button type="submit" id="btnRefuse" class="resetHide btn btn-danger btn-sm" data-oprt="_REFUSE" data-topic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-open"></span>申述</button>
 	{/case}
 		
 	{case value="申报执行|申报修改|否决变更"}
-		<button type="submit" id="btnReport" class="btn btn-primary btn-sm" data-oprt="_REPORT" data-issTopic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-upload"></span>报告</button>
-		<button type="submit" id="btnFinish" class="btn btn-danger btn-sm" data-oprt="_FINISH" data-issTopic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-folder-close"></span>完成</button>
+		<button type="submit" id="btnReport" class="btn btn-primary btn-sm" data-oprt="_REPORT" data-topic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-upload"></span>报告</button>
+		<button type="submit" id="btnFinish" class="btn btn-danger btn-sm" data-oprt="_FINISH" data-topic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-folder-close"></span>完成</button>
 	{/case}
     
 {/switch}

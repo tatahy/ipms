@@ -94,14 +94,14 @@
 
 {block name="btn"}
 {in name="$iss.status" value="拟续费,变更申请"}
-	<button type="submit" id="btnPermit" class="resetHide btn btn-success btn-sm" data-oprt="_PERMIT" data-issTopic="{$iss.topic}" data-btnLabel="label-success"><span class="glyphicon glyphicon-ok"></span>批准</button>
-	<button type="submit" id="btnVeto" class="resetHide btn btn-danger btn-sm" data-oprt="_VETO" data-issTopic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-remove"></span>否决</button>
+	<button type="submit" id="btnPermit" class="resetHide btn btn-success btn-sm" data-oprt="_PERMIT" data-topic="{$iss.topic}" data-btnLabel="label-success"><span class="glyphicon glyphicon-ok"></span>批准</button>
+	<button type="submit" id="btnVeto" class="resetHide btn btn-danger btn-sm" data-oprt="_VETO" data-topic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-remove"></span>否决</button>
 
 {else/}
-	<button type="submit" id="btnPermit" class="resetHide btn btn-success btn-sm" data-oprt="_PERMIT" data-issTopic="{$iss.topic}" data-btnLabel="label-success"><span class="glyphicon glyphicon-ok"></span>批准</button>
-	<button type="submit" id="btnVeto" class="resetHide btn btn-danger btn-sm" data-oprt="_VETO" data-issTopic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-remove"></span>否决</button>
+	<button type="submit" id="btnPermit" class="resetHide btn btn-success btn-sm" data-oprt="_PERMIT" data-topic="{$iss.topic}" data-btnLabel="label-success"><span class="glyphicon glyphicon-ok"></span>批准</button>
+	<button type="submit" id="btnVeto" class="resetHide btn btn-danger btn-sm" data-oprt="_VETO" data-topic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-remove"></span>否决</button>
 	
-	<button type="submit" id="btnComplete" class="resetHide btn btn-primary btn-sm" data-oprt="_COMPLETE" data-issTopic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-erase"></span>修改完善</button>
+	<button type="submit" id="btnComplete" class="resetHide btn btn-primary btn-sm" data-oprt="_COMPLETE" data-topic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-erase"></span>修改完善</button>
 
 {/in}	
 	

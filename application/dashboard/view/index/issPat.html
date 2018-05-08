@@ -104,7 +104,7 @@ $(document).ready(function(){
 	
 	$('.span0').addClass('mycolorred-bgwhite');
 	
-	showIssPatList('issPatAuth','{$auth}');
+	showIssPatList('issPatAuth','{$auth}','{$issId}');
 		
 	//ul.nav-tabs调整.aPill
 	//1.缩小padding
@@ -121,8 +121,7 @@ $(document).ready(function(){
 	
 	<!-- //点击.aTab中的各个按钮后，改变显示格式，默认显示相应状态的issPat内容-->
 	$('.aPill').click(function(){
-		//使用bootstrap后，获取绑定到data上的属性值
-		var issType=$(this).data('issue-type');
+		<!-- //bootstap下用.data('*')获得data-*属性值 -->
 		var authority=$(this).data('issue-authority');
 		var oprt='';
 
@@ -131,10 +130,11 @@ $(document).ready(function(){
 		
 		$(this).tab('show');
 		if($(this).data('oprt')=='_RENEW'){
-			showIssPatList('patRenew','_RENEW');
+			showIssPatList('patRenew','_RENEW','{$issId}');
 		}else{
-			showIssPatList('issPatAuth',authority);
+			showIssPatList('issPatAuth',authority,'{$issId}');
 		}
+	
     });	
 	
 <!-- function  -->
@@ -142,9 +142,10 @@ $(document).ready(function(){
  	//* 作用：本页面加载issPatlist；设置各个‘aPill’中数字的显示格式，并设置其所在li为“active”。
 	//* 参数url，类型：字符串。值：不为空。说明：load操作的URL。
 	//* 参数auth，类型：字符串。值：不为空。说明：load操作的issPat的权限值。
+	//* 参数issId，类型：s数值。值：可为空。说明：要上色的行信息。
 	//* 返回值：无
-function showIssPatList(url,auth){
-	$('#divIssPatAuth_load').load(url,{'auth':auth},function(){
+function showIssPatList(url,auth,issId){
+	$('#divIssPatAuth_load').load(url,{'auth':auth,'issId':issId},function(){
 		var obj='';
 		
 		if(auth=='_RENEW'){
