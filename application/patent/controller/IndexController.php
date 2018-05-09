@@ -768,9 +768,10 @@ class IndexController extends \think\Controller
             'patadmin'=>$pat->patadmin,
             'abandonrejectreason'=>$pat->abandonrejectreason,
             
-            
             //专利附件信息
             'atts'=>$atts,
+            
+            'year'=>date('Y')
         
             ]);
             return view();

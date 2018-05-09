@@ -26,9 +26,9 @@
 					{volist name="pat" id="vo" empty="暂无专利授权到期"}
 					<tr id="tr{$vo.id}">
 						<td>{$i}</td>
-						<td>{$vo.topic}</td>
+						<td><a href="{$home}/patent/index/patinfo/id/{$vo.id}" target="_blank" data-toggle="tooltip">{$vo.topic}</a></td>
 						<td>{$vo.pattype}</td>
-						<td>{$vo.status}</td>
+						<td><a href="{$home}/patent/index/patrecords/id/{$vo.id}" target="_blank" data-toggle="tooltip">{$vo.status}</a></td>
 						<td>{$vo.authrejectdate}</td>
 						<td>{$vo.renewdeadlinedate}</td>
 						<td class="btnOprt">			
@@ -136,8 +136,6 @@
 
 <script>
 $(document).ready(function(){
-
-	
 	// 添加bootstrap的tooltip属性
 	$('a').tooltip({placement: 'bottom'});
 	
@@ -147,6 +145,9 @@ $(document).ready(function(){
 	$('span.badge').css({'margin-bottom':'1px'});
 	//
 	$('#aPatRenew').find('.numSingle').addClass('mycolorred-bgwhite');
+	
+	//为指定行上色
+	$('table').find('a[data-patId="{$patId}"]').closest('tr').addClass('bg-warning');
 	
 	// 表格中<td>里<a>标签的click事件,给标签所在行上色
 	$("td a").click(function(){

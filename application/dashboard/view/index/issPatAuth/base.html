@@ -145,9 +145,7 @@ $(document).ready(function(){
 	$('span.badge').css({'margin-bottom':'1px'});
 	
 	//为指定行上色
-	<!-- if({$issId}!=''){ -->
 	$('table').find('a[data-issid="{$issId}"]').closest('tr').addClass('bg-warning');	
-	<!-- } -->
 	
 	// 根据后端控制器给出的排序字段{$sortName},排序方式{$sort}，修改th中a的显示形式
 	$('#divIssPatAuth thead a').each(function(){

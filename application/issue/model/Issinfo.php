@@ -37,6 +37,51 @@ class Issinfo extends Model
         return ($result);
     }
     
+    //获取器，获取数据表issinfo中issmap_type字段值，转换为中文输出
+    protected function getIssmapTypeAttr($value)
+    {
+      $outPut='……';
+      switch($value){    
+        case '_ISST_PAT1':
+          $outPut='专利授权申报';
+        break;
+        
+        case '_ISST_PAT2':
+          $outPut='专利授权到期续费';
+        break;
+        
+        case '_ISST_PRO1':
+          $outPut='项目申报';
+        break;
+        
+        case '_ISST_PRO2':
+          $outPut='项目立项';
+        break;
+        
+        case '_ISST_PRO3':
+          $outPut='项目执行';
+        break;
+        
+        case '_ISST_PRO4':
+          $outPut='项目验收';
+        break;
+        
+        case '_ISST_THE1':
+          $outPut='论文审查';
+        break;
+        
+        case '_ISST_THE2':
+          $outPut='论文发表';
+        break;
+        
+        default:
+          $outPut=$value;
+        break;
+        
+      }
+      return $outPut;
+    }
+    
     /**
      * 获取对应patent的内容
      */    

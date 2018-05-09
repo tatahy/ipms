@@ -1,20 +1,19 @@
-{include file="../application/common/header.html" title="专利信息" }
+<!-- //文件路径是以入口文件为起点 -->
+{include file="../application/patent/view/header.html" title="专利信息" }
 
 <!-- pagewrap  -->
-<div class="container-fluid">
+<div class="container-fluid" style="margin-top:20px;">
 	
-	<h3>
-		<span class="label label-warning glyphicon glyphicon-wrench">&nbsp;专利信息</span>
-		<button type="submit" class="btn btn-primary btn-sm btnClose" >关闭本页</button>
-	</h3>
-	<div class="tab-content">
+	<h4 class="label label-warning" style="font-size:16px;">名称：《{$topic}》
+	</h4>
+	<div class="tab-content" style="margin-top:10px;">
 		
 		<!-- 专利基本信息表单 -->
 		<table class="table table-bordered table-striped table-responsive table-condensed">
 			<tbody>
 				<tr>
 					<td>
-						<div class="col-sm-4" ><p><strong>名称：</strong><span class="label label-warning" style="font-size:14px;">{$topic}</span></p></div>
+						
 						<div class="col-sm-2" ><p><strong>类型：</strong>{$pattype}</p></div>
 						<div class="col-sm-2" ><p><strong>撰写人：</strong>{$author}</p></div>
 						<div class="col-sm-3" ><p><strong>所属部门：</strong>{$dept}</p></div>
@@ -104,12 +103,12 @@
 			</tbody>
 		</table>
 		
+		<!-- 附件列表 -->
+		<!-- <h3><span class="label label-warning glyphicon glyphicon-wrench">&nbsp;</span></h3> -->
+		<h4 class="label label-warning" style="font-size:16px;">专利附件
+		</h4>
 		
-		
-		
-		<!-- 附件表单 -->
-		<h3><span class="label label-warning glyphicon glyphicon-wrench">&nbsp;专利附件</span></h3>
-		<div id="divAtt" class="table-responsive">
+		<div id="divAtt" class="table-responsive" style="margin-top:10px;">
 			<table id="tblAtt" class="table table-bordered table-hover table-condensed">
 				<thead>
 					<tr>
@@ -155,7 +154,7 @@
 			<button type="submit" class="btn btn-primary btnClose" >关闭本页</button>
 		</div>
 	
-</div>
+	</div>
 </div>
 
 </br>
@@ -250,4 +249,4 @@ $(document).ready(function(){
 </script>
 
 	
-{include file="../application/common/footer.html"}
+{include file="../application/patent/view/footer.html"}

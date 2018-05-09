@@ -36,6 +36,92 @@ class Attinfo extends Model
 //        
 //        return ($result);
 //    }
+
+ //获取器，获取数据表attinfo中rolename字段值，转换为中文输出
+    protected function getRolenameAttr($value)
+    {
+      $outPut='……';
+      switch($value){
+        case 'writer':
+          $outPut='撰写人';
+        break;
+        
+        case 'reviewer':
+          $outPut='审核人';
+        break;
+        
+        case 'approver':
+          $outPut='批准人';
+        break;
+        
+        case 'operator':
+          $outPut='执行人';
+        break;
+        
+        case 'maintainer':
+          $outPut='维护人';
+        break;
+        
+        case '_EDIT':
+          $outPut='撰写人';
+        break;
+        
+        case '_AUDIT':
+          $outPut='审核人';
+        break;
+        
+        case '_APPROVE':
+          $outPut='批准人';
+        break;
+        
+        case '_EXECUTE':
+          $outPut='执行人';
+        break;
+        
+        case '_MAINTAIN':
+          $outPut='维护人';
+        break;
+        
+        default:
+          $outPut=$value;
+        break;
+        
+      }
+      return $outPut;
+    }
+    
+    //获取器，获取数据表attinfo中atttype字段值，转换为中文输出
+    protected function getAtttypeAttr($value)
+    {
+      $outPut='……';
+      switch($value){    
+        case '_ATTT1':
+          $outPut='申请';
+        break;
+        
+        case '_ATTT2':
+          $outPut='请示';
+        break;
+        
+        case '_ATTT3':
+          $outPut='报告';
+        break;
+        
+        case '_ATTT4':
+          $outPut='预算报告';
+        break;
+        
+        case '_ATTT5':
+          $outPut='说明';
+        break;
+        
+        default:
+          $outPut=$value;
+        break;
+        
+      }
+      return $outPut;
+    }
     
     //获取issinfo的多态模型,涉及issinfo表中的num_id和num_type两个字段内容
      public function num()
