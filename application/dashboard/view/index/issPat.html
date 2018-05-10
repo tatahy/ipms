@@ -1,10 +1,11 @@
 <!-- // issPat.html： -->
 <div>
-<h4 class="label label-default" style="font-size:16px;"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利事务
-   	{eq name=" $numTotal" value="0"}
-		<span class="span0">{$numTotal}</span>
+<!-- <h4 class="label label-default" style="font-size:16px;"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利事务 -->
+<h4><span class="label label-info"><span class="glyphicon glyphicon-wrench"></span></span>&nbsp;专利事务
+   	{eq name="$numTotal" value="0"}
+		<span class="span0"></span>
 	{else/}
-		<span class="span0 badge">{$numTotal}</span>
+		<span class="span0 badge" style="font-size:14px;">{$numTotal}</span>
 	{/eq}
 </h4>
 
@@ -97,8 +98,10 @@
 
 <script>
 $(document).ready(function(){
-	//侧边栏对应选中项添加数字
-	$('.nav .active').find('.badge').text({$numTotal}).css('color','red');
+	//侧边栏消除li的active
+	$('.nav .active').removeClass('active');
+	//侧边栏本页对应a添加数字,其所在li加acitve
+	$('.nav a[href="'+window.location.hash+'"]').find('.badge').text({$numTotal}).css('color','red').closest('li').addClass('active');
 	
 	$('.span0').addClass('mycolorred-bgwhite');
 	
@@ -117,7 +120,7 @@ $(document).ready(function(){
 	//调整span.label
 	$('span.label').css({'padding-bottom':'1px','margin-bottom':'2px'});	
 	
-	<!-- //点击.aTab中的各个按钮后，改变显示格式，默认显示相应状态的issPat内容-->
+	<!-- //点击.aPill中的各个按钮后，改变显示格式，默认显示相应状态的issPat内容-->
 	$('.aPill').click(function(){
 		<!-- //bootstap下用.data('*')获得data-*属性值 -->
 		var authority=$(this).data('issue-authority');

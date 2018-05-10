@@ -17,6 +17,8 @@ use app\dashboard\model\Attinfo as AttinfoModel;
 class IndexController extends \think\Controller
 {
     //用户名
+    private $userId = null;
+    //用户名
     private $username = null;
     //用户密码
     private $pwd = null;
@@ -35,6 +37,7 @@ class IndexController extends \think\Controller
     // 初始化
     protected function _initialize()
     {
+        $this->userId=Session::get('userId');
         $this->username=Session::get('username');
         $this->pwd=Session::get('pwd');
         $this->log=Session::get('log');
@@ -60,150 +63,32 @@ class IndexController extends \think\Controller
       }    
     }
     
-    public function index(Request $request,$auth='done')
+    public function index(Request $request,IssinfoModel $issMdl,$auth='done')
     {
-       $this->_loginUser();
+        $this->_loginUser();
        
-//从session中取出登录用户的关键信息
-        $username=Session::get('username');
-        $pwd=Session::get('pwd');
-        $log=Session::get('log');
-        $roles=Session::get('role');
-        $dept=Session::get('dept');
-        $role=$request->param('role');
-        
         if(!empty($request->param('auth'))){
            $auth=$request->param('auth');
         }
-        
-         //传来的role值是否在$roles中
-        if(!empty($role)){
-            $i=0;
-            foreach ($roles as $value) {
-                if($value==$role)
-                $i=1;
-            }
-            if(1!=$i){
-               $this->error('未授权用户，请先登录系统');
-            }
-        }else{
-            $role=0;
-        }
-        
-        //使用模型Issinfo
-        $issSet = new IssinfoModel; 
-        //edit
-        $mapEdit['status'] =['in',['填报','返回修改','修改完善']];
-        $mapEdit['dept'] =$this->dept;
-        $mapEdit['writer']=$this->username;
-        
-        //audit
-        $mapAudit['status'] ='待审核';
-        $mapAudit['dept'] =$this->dept;
-        //approve
-        $mapApprove['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
-        //execute
-        $mapExecute['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
-        $mapExecute['dept'] =$this->dept;
-        $mapExecute['executer'] =$this->username;
-        //maintain
-        $mapMaintain['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
-                                      '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
-        //done
+        //$map['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
+//                                        '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
         $map['status'] ='完结';
+        $map['issmap_type']=['like','%_ISST_PAT%'];
         
-        if($this->auth['iss']['edit']){
-          $numIssPatEdit=$issSet->where($mapEdit)->count(); 
-          $auth='edit';
-        }else{
-          $numIssPatEdit=0;
-        }
+        //$numIssPat=$issMdl::where($map)->count();
+        $numIssPat=$issMdl->issPatNum($this->userId,'maintain');
         
-        if($this->auth['iss']['audit']){
-          $numIssPatAudit=$issSet->where($mapAudit)->count(); 
-          $auth='audit';
-        }else{
-          $numIssPatAudit=0;
-        }
-        
-        if($this->auth['iss']['approve']){
-          $numIssPatApprove=$issSet->where($mapApprove)->count(); 
-          $auth='approve';
-        }else{
-          $numIssPatApprove=0;
-        }
-        
-        if($this->auth['iss']['execute']){
-          $numIssPatExecute=$issSet->where($mapExecute)->count();
-          $auth='execute'; 
-        }else{
-          $numIssPatExecute=0;
-        }
-        
-        if($this->auth['iss']['maintain']){
-          $auth='maintain';
-          $numIssPatMaintain=$issSet->where($mapMaintain)->count(); 
-          //得到满足续费条件的专利数
-          $today=date('Y-m-d');
-          $deadline=date('Y-m-d',strtotime("+6 month"));
-          $mapRenew['status'] =['in',['授权','续费授权']];          
-          // 查出满足条件的patent
-          $numPatRenewTotal= PatinfoModel::where($mapRenew)->where('renewdeadlinedate','between time',[$today,$deadline])->count();
-        }else{
-          $numIssPatMaintain=0;
-          $numPatRenewTotal=0;
-        }
-        
-        $numIssPatDone=$issSet->where($map)->count(); 
-        
-        $numTotal=$numIssPatEdit+$numIssPatAudit+$numIssPatApprove+$numIssPatExecute+$numIssPatMaintain+$numPatRenewTotal;
-        
-        //取出user的authority字段值
-      //  $user=new UserModel;           
-//        $userlg=$user->where('username',$username)->where('pwd',$pwd)->find();
-//        $this->auth=$userlg->authority;
-        
-       // UserModel::update([
-//          'dept'=>'dept2',
-//          //'authority$.att$.delete'=>0,
-//          'authority'=>json_encode('{"isspat":{"create":0,"edit":0,"audit":1,"approve":1,"execute":1,"maintain":1},"isspro":{"create":0,"edit":0,"audit":0,"approve":0,"execute":0,"maintain":0},"issthe":{"create":0,"edit":0,"audit":0,"approve":0,"execute":0,"maintain":0},"att":{"upload":1,"download":1,"delete":1}}'),
-//        ], ['id' => $userlg->id]);
-        
-        //$user1=$userlg->data(array('dept'=>'dept2'),true)->save();
-
-        $destr= "请求方法:".$request->method()."<br/>".
-                "username:". $username."<br/>".
-                "pwd:".$pwd."<br/>".
-                "roles:".$roles[0]."<br/>".
-                "log:".$log."<br/>".
-                "auth:".json_encode($this->auth); 
-        
+        $numIssPro=count($issMdl::where('issmap_type','like','%_ISST_PRO%')->select());
+        $numIssThe=count($issMdl::where('issmap_type','like','%_ISST_THE%')->select());
+    
          // 模板变量赋值        
         $this->assign([
-          //在usercenter.html页面输出自定义的信息
-          //在index.html页面通过destr输出自定义的信息
-          'destr'=>$destr."</br>",
-          //在index.html页面通过array输出自定义的数组内容
-          'array'=>$roles, 
-          
           'home'=>$request->domain(),
-          'username'=>$username,
-          'roles'=>$roles,
-          //'roles'=>json($roles),
-          'role'=>$role,
-          'role1st'=>$roles[0],
-  
-          //向前端权限变量赋值
-          'auth'=>$auth, 
-          
-          'numIssPatEdit'=>$numIssPatEdit,
-          'numIssPatAudit'=>$numIssPatAudit,
-          'numIssPatApprove'=>$numIssPatApprove,
-          'numIssPatExecute'=>$numIssPatExecute,
-          'numIssPatMaintain'=>$numIssPatMaintain,
-          'numIssPatDone'=>$numIssPatDone,
-          'numTotal'=>$numTotal,
-          'numPatRenewTotal'=>$numPatRenewTotal,
+          'username'=>$this->username,
+         
+          'numIssPat'=>$numIssPat,
+          'numIssPro'=>$numIssPro,
+          'numIssThe'=>$numIssThe,
           
           'year'=>date('Y')
       	
@@ -418,25 +303,32 @@ class IndexController extends \think\Controller
       
       //使用模型Issinfo
         $issSet = new IssinfoModel; 
+        //
         //edit
         $mapEdit['status'] =['in',['填报','返回修改','修改完善']];
         $mapEdit['dept'] =$this->dept;
         $mapEdit['writer']=$this->username;
+        $mapEdit['issmap_type']=['like','%_ISST_PAT%'];
         
         //audit
         $mapAudit['status'] ='待审核';
         $mapAudit['dept'] =$this->dept;
+        $mapAudit['issmap_type']=['like','%_ISST_PAT%'];
         //approve
         $mapApprove['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
+        $mapApprove['issmap_type']=['like','%_ISST_PAT%'];
         //execute
         $mapExecute['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
         //$mapExecute['dept'] =$this->dept;
         $mapExecute['executer'] =$this->username;
+        $mapExecute['issmap_type']=['like','%_ISST_PAT%'];
         //maintain
         $mapMaintain['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
                                       '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
+        $mapMaintain['issmap_type']=['like','%_ISST_PAT%'];
         //done
         $map['status'] ='完结';
+        $map['issmap_type']=['like','%_ISST_PAT%'];
         
         if($this->auth['iss']['edit']){
           $numIssPatEdit=$issSet->where($mapEdit)->count(); 
@@ -2185,66 +2077,67 @@ class IndexController extends \think\Controller
         $mapEdit['status'] =['in',['填报','返回修改','修改完善']];
         $mapEdit['dept'] =$this->dept;
         $mapEdit['writer']=$this->username;
+        $mapEdit['issmap_type']=['like','%_ISST_THE%'];
         
         //audit
         $mapAudit['status'] ='待审核';
         $mapAudit['dept'] =$this->dept;
+        $mapAudit['issmap_type']=['like','%_ISST_THE%'];
         //approve
         $mapApprove['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
+        $mapApprove['issmap_type']=['like','%_ISST_THE%'];
         //execute
         $mapExecute['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
         //$mapExecute['dept'] =$this->dept;
         $mapExecute['executer'] =$this->username;
+        $mapExecute['issmap_type']=['like','%_ISST_THE%'];
         //maintain
         $mapMaintain['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
                                       '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
+        $mapMaintain['issmap_type']=['like','%_ISST_THE%'];
         //done
         $map['status'] ='完结';
+        $map['issmap_type']=['like','%_ISST_THE%'];
         
         if($this->auth['iss']['edit']){
-          $numIssPatEdit=$issSet->where($mapEdit)->count(); 
+          $numIssTheEdit=$issSet->where($mapEdit)->count(); 
           //$auth='_EDIT';
         }else{
-          $numIssPatEdit=0;
+          $numIssTheEdit=0;
         }
         
         if($this->auth['iss']['audit']){
-          $numIssPatAudit=$issSet->where($mapAudit)->count();
+          $numIssTheAudit=$issSet->where($mapAudit)->count();
           //$auth='_AUDIT'; 
         }else{
-          $numIssPatAudit=0;
+          $numIssTheAudit=0;
         }
         
         if($this->auth['iss']['approve']){
-          $numIssPatApprove=$issSet->where($mapApprove)->count();
+          $numIssTheApprove=$issSet->where($mapApprove)->count();
           //$auth='_APPROVE'; 
         }else{
-          $numIssPatApprove=0;
+          $numIssTheApprove=0;
         }
         
         if($this->auth['iss']['execute']){
-          $numIssPatExecute=$issSet->where($mapExecute)->count();
+          $numIssTheExecute=$issSet->where($mapExecute)->count();
           //$auth='_EXECUTE'; 
         }else{
-          $numIssPatExecute=0;
+          $numIssTheExecute=0;
         }
         
         if($this->auth['iss']['maintain']){
-          $numIssPatMaintain=$issSet->where($mapMaintain)->count(); 
-          //得到满足续费条件的专利数
-          $deadline=date('Y-m-d',strtotime("+6 month"));
-          $mapRenew['status'] =['in',['授权','续费授权']];          
-          // 查出满足条件的patent
-          $numPatRenewTotal= PatinfoModel::where($mapRenew)->where('renewdeadlinedate','between time',[$this->today,$deadline])->count();
-        //$auth='_MAINTAIN';
+          $numIssTheMaintain=$issSet->where($mapMaintain)->count(); 
+         
         }else{
-          $numIssPatMaintain=0;
-          $numPatRenewTotal=0;
+          $numIssTheMaintain=0;
+      
         }
         
-        $numIssPatDone=$issSet->where($map)->count(); 
+        $numIssTheDone=$issSet->where($map)->count(); 
         
-        $numTotal=$numIssPatEdit+$numIssPatAudit+$numIssPatApprove+$numIssPatExecute+$numIssPatMaintain+$numPatRenewTotal;
+        $numTotal=$numIssTheEdit+$numIssTheAudit+$numIssTheApprove+$numIssTheExecute+$numIssTheMaintain;
         
         $destr= "请求方法:".$request->method()."<br/>".
                 "username:". $this->username."<br/>".
@@ -2267,14 +2160,13 @@ class IndexController extends \think\Controller
           //当前权限
           'auth'=>$auth,  
           
-          'numIssPatEdit'=>$numIssPatEdit,
-          'numIssPatAudit'=>$numIssPatAudit,
-          'numIssPatApprove'=>$numIssPatApprove,
-          'numIssPatExecute'=>$numIssPatExecute,
-          'numIssPatMaintain'=>$numIssPatMaintain,
-          'numIssPatDone'=>$numIssPatDone,
+          'numIssTheEdit'=>$numIssTheEdit,
+          'numIssTheAudit'=>$numIssTheAudit,
+          'numIssTheApprove'=>$numIssTheApprove,
+          'numIssTheExecute'=>$numIssTheExecute,
+          'numIssTheMaintain'=>$numIssTheMaintain,
+          'numIssTheDone'=>$numIssTheDone,
           'numTotal'=>$numTotal,
-          'numPatRenewTotal'=>$numPatRenewTotal,
           
           'issId'=>$issId,
       	
@@ -2310,66 +2202,67 @@ class IndexController extends \think\Controller
         $mapEdit['status'] =['in',['填报','返回修改','修改完善']];
         $mapEdit['dept'] =$this->dept;
         $mapEdit['writer']=$this->username;
+        $mapEdit['issmap_type']=['like','%_ISST_PRO%'];
         
         //audit
         $mapAudit['status'] ='待审核';
         $mapAudit['dept'] =$this->dept;
+        $mapAudit['issmap_type']=['like','%_ISST_PRO%'];
         //approve
         $mapApprove['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
+        $mapApprove['issmap_type']=['like','%_ISST_PRO%'];
         //execute
         $mapExecute['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
         //$mapExecute['dept'] =$this->dept;
         $mapExecute['executer'] =$this->username;
+        $mapExecute['issmap_type']=['like','%_ISST_PRO%'];
         //maintain
         $mapMaintain['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
                                       '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
+        $mapMaintain['issmap_type']=['like','%_ISST_PRO%'];
         //done
         $map['status'] ='完结';
+        $map['issmap_type']=['like','%_ISST_PRO%'];
         
         if($this->auth['iss']['edit']){
-          $numIssPatEdit=$issSet->where($mapEdit)->count(); 
+          $numIssProEdit=$issSet->where($mapEdit)->count(); 
           //$auth='_EDIT';
         }else{
-          $numIssPatEdit=0;
+          $numIssProEdit=0;
         }
         
         if($this->auth['iss']['audit']){
-          $numIssPatAudit=$issSet->where($mapAudit)->count();
+          $numIssProAudit=$issSet->where($mapAudit)->count();
           //$auth='_AUDIT'; 
         }else{
-          $numIssPatAudit=0;
+          $numIssProAudit=0;
         }
         
         if($this->auth['iss']['approve']){
-          $numIssPatApprove=$issSet->where($mapApprove)->count();
+          $numIssProApprove=$issSet->where($mapApprove)->count();
           //$auth='_APPROVE'; 
         }else{
-          $numIssPatApprove=0;
+          $numIssProApprove=0;
         }
         
         if($this->auth['iss']['execute']){
-          $numIssPatExecute=$issSet->where($mapExecute)->count();
+          $numIssProExecute=$issSet->where($mapExecute)->count();
           //$auth='_EXECUTE'; 
         }else{
-          $numIssPatExecute=0;
+          $numIssProExecute=0;
         }
         
         if($this->auth['iss']['maintain']){
-          $numIssPatMaintain=$issSet->where($mapMaintain)->count(); 
-          //得到满足续费条件的专利数
-          $deadline=date('Y-m-d',strtotime("+6 month"));
-          $mapRenew['status'] =['in',['授权','续费授权']];          
-          // 查出满足条件的patent
-          $numPatRenewTotal= PatinfoModel::where($mapRenew)->where('renewdeadlinedate','between time',[$this->today,$deadline])->count();
-        //$auth='_MAINTAIN';
+          $numIssProMaintain=$issSet->where($mapMaintain)->count(); 
+          
         }else{
-          $numIssPatMaintain=0;
-          $numPatRenewTotal=0;
+          $numIssProMaintain=0;
+        
         }
         
-        $numIssPatDone=$issSet->where($map)->count(); 
+        $numIssProDone=$issSet->where($map)->count(); 
         
-        $numTotal=$numIssPatEdit+$numIssPatAudit+$numIssPatApprove+$numIssPatExecute+$numIssPatMaintain+$numPatRenewTotal;
+        $numTotal=$numIssProEdit+$numIssProAudit+$numIssProApprove+$numIssProExecute+$numIssProMaintain;
         
         $destr= "请求方法:".$request->method()."<br/>".
                 "username:". $this->username."<br/>".
@@ -2392,14 +2285,13 @@ class IndexController extends \think\Controller
           //当前权限
           'auth'=>$auth,  
           
-          'numIssPatEdit'=>$numIssPatEdit,
-          'numIssPatAudit'=>$numIssPatAudit,
-          'numIssPatApprove'=>$numIssPatApprove,
-          'numIssPatExecute'=>$numIssPatExecute,
-          'numIssPatMaintain'=>$numIssPatMaintain,
-          'numIssPatDone'=>$numIssPatDone,
+          'numIssProEdit'=>$numIssProEdit,
+          'numIssProAudit'=>$numIssProAudit,
+          'numIssProApprove'=>$numIssProApprove,
+          'numIssProExecute'=>$numIssProExecute,
+          'numIssProMaintain'=>$numIssProMaintain,
+          'numIssProDone'=>$numIssProDone,
           'numTotal'=>$numTotal,
-          'numPatRenewTotal'=>$numPatRenewTotal,
           
           'issId'=>$issId,
       	

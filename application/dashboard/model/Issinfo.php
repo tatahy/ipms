@@ -9,6 +9,9 @@ namespace app\dashboard\model;
 
 use think\Model;
 
+use app\dashboard\model\User as UserModel;
+use app\dashboard\model\Patinfo as PatinfoModel;
+
 class Issinfo extends Model
 {   
     //protected $auto = ['patnum','pronum'];
@@ -80,6 +83,92 @@ class Issinfo extends Model
         
       }
       return $outPut;
+    }
+    
+   /**
+     * 获取登录用户所有权限下isspat的各类总数
+     * 参数$issType，类型：字符串。值：不为空。说明：需要得到的iss类型。默认为‘_PAT’。
+     * 参数$userId，类型：数值。值：不为空。说明：登录用户的id。默认为空。
+     * 参数$auth，类型：字符串。值：可为空。说明：登录用户的iss权限。默认为空。
+     */
+    public function issPatNum($userId='',$auth='')
+    {   
+        if($userId==''){
+          return false;
+        }else{
+          $user=UserModel::get($userId);
+        }
+        //存放iss各个权限名称及其对应iss记录数的数组
+        $numIssPatArr=array();
+        
+        //登录用户的iss权限
+        $authIssArr=$user['authority']['iss'];
+    
+        foreach($authIssArr as $key=>$value){
+          //分情况写查询条件
+          $map['issmap_type']=['like','%_ISST_PAT%'];
+          if($value!=0){
+            
+            switch($key){
+              case'maintain':
+                 $map['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
+                                        '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
+              break;   
+              
+              case'edit':
+                $map['status'] =['in',['填报','返回修改','修改完善']];
+                $map['dept'] =$user->dept;
+                $map['writer']=$user->username;
+              break;
+              
+              case'audit':
+                $map['status'] ='待审核';
+                $map['dept'] =$user->dept;
+              break;
+              
+              case'approve':
+                $map['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
+              break;
+              
+              case'execute':
+                $map['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
+                $map['executer'] =$user->username;
+              break;
+                       
+            }
+            $numIssPatArr[$key]=$this->where($map)->count();
+           
+          }else{
+            $numIssPatArr[$key]=0;
+          }
+          
+          $iss=$this->where($map)->select();
+        }
+        //得到满足续费条件的专利数
+        $deadline=date('Y-m-d',strtotime("+6 month"));
+        $mapRenew['status'] =['in',['授权','续费授权']];          
+        // 查出满足条件的patent
+        //$numIssPatArr['maintain']+=PatinfoModel::where($mapRenew)->where('renewdeadlinedate','between time',[date('Y-m-d'),$deadline])->count();
+        $numIssPatArr['renew']=PatinfoModel::where($mapRenew)->where('renewdeadlinedate','between time',[date('Y-m-d'),$deadline])->count();
+        //done
+        $map['status'] ='完结';
+        $numIssPatArr['done']=$this->where($map)->count();
+        //total
+        $numTotal=0;
+        foreach($numIssPatArr as $key=>$value){
+          if($key!='done')$numTotal+=$value;
+        }
+        $numIssPatArr['total']=$numTotal;
+        $numIssPatArr['iss']=$iss;
+        //根据$auth的值返回值不同
+        if($auth==''){
+          //$num=$numIssPatArr['total'];
+          $num=json_encode($numIssPatArr);
+        }else{
+          $num=$numIssPatArr[$auth];
+        }
+        
+        return $num;
     }
     
     /**

@@ -60,8 +60,9 @@ class IndexController extends \think\Controller
 //            $role[$i]=$roles[$i]['name'];
 //        }    
             
-            Session::set('pwd',$pwd);
+            Session::set('userId',$user->id);
             Session::set('username',$username);
+            Session::set('pwd',$pwd);
             Session::set('log',1);
             Session::set('dept',$user->dept);       
         
