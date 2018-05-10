@@ -3,19 +3,32 @@
  * @author TATA
  * @copyright 2018
  * 应用公共文件
+ * 所有的公共函数都以"_common"开头，再遵循驼峰命名法。
  */
 
- //各个模块权限设置初始值
+
+  /**
+     * 各个模块权限设置初始值
+     * 参数$module，类型：字符串。值：可为空。说明：模块名称。默认值：'_ALL'
+     */
   function _commonModuleAuth($module='')
   {
-    $nameArr=array('_ISS','_PAT','_PRO','_THE','_ATT','_ADMIN');
-    if(empty($module)){
-      $module='_ALL';
+    //各个模块的名称
+    $nameArr=array('_ISS','_PAT','_PRO','_THE','_ATT','_ADMIN','');
+    //if(empty($module)){
+//      $module='_ALL';
+//    }else{
+//      //判断$module的取值是否在规定的数组范围内
+//      if (in_array($module,$nameArr)== FALSE) {
+//        $auth='wrong parameter for function.';
+//      }
+//    }
+    
+    //判断$module的取值是否在规定的数组范围内
+    if(in_array($module,$nameArr) && empty($module)){
+        $module='_ALL';
     }else{
-      //判断$module的取值是否在规定的数组范围内
-      if (in_array($module,$nameArr)== FALSE) {
         $auth='wrong parameter for function.';
-      }
     }
     
 //    $authIss=array('编辑'=>0,'审核'=>0,'审批'=>0,'执行'=>0,'维护'=>0);
@@ -58,5 +71,71 @@
       break;
     }
     return $auth;
+  }
+  
+  
+  /**
+     * issue的权限与issue状态的对应关系
+     * 参数$issType，类型：字符串。值：不为空。说明：需要得到的iss类型。
+     * 参数$authName，类型：字符串。值：不为空。说明：issue权限名称。
+     */
+  function _commonIssAuthStatus($issType='',$authName='')
+  {
+    $issTypeArr=array('_PAT','_PRO','_THE');
+    //判断$issType的取值是否在规定的数组范围内
+    if(in_array($issType,$issTypeArr)){
+        $issType='_PAT';
+    }else{
+        return 'The parameter should be a string in:'.json_encode($issTypeArr);
+    }
+    
+    $status=array();
+    
+    switch($issType){
+      case'_PAT':
+        $authNameArr=array_keys(_commonModuleAuth('_ISS'));
+        foreach($authNameArr as $value){
+            switch($value){
+              case'maintain':
+                  $status[$value]=array('申报复核','申报提交','续费提交','准予续费','否决申报',
+                                '专利授权','专利驳回','放弃续费','续费授权');
+              break;   
+              
+              case'edit':
+                  $status[$value]=array('填报','返回修改','修改完善');
+              break;
+              
+              case'audit':
+                  $status[$value]='待审核';
+              break;
+              
+              case'approve':
+                  $status[$value]=array('审核未通过','审核通过','变更申请','拟续费');
+              break;
+              
+              case'execute':
+                  $status[$value]=array('批准申报','申报执行','申报修改','准予变更','否决变更');
+              break;
+                       
+            }
+            
+        }
+        
+        
+      break;
+      
+      case'_PRO':
+        $authNameArr=array_keys(_commonModuleAuth('_ISS'));
+        
+      break;
+      
+      case'_THE':
+        $authNameArr=array_keys(_commonModuleAuth('_ISS'));
+        
+      break;
+    }
+    
+    return $status[$authName];
+  
   }
 
