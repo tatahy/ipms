@@ -25,8 +25,8 @@
 //    }
     
     //判断$module的取值是否在规定的数组范围内
-    if(in_array($module,$nameArr) && empty($module)){
-        $module='_ALL';
+    if(in_array($module,$nameArr)){
+        if(empty($module))$module='_ALL';
     }else{
         $auth='wrong parameter for function.';
     }
@@ -84,7 +84,7 @@
     $issTypeArr=array('_PAT','_PRO','_THE');
     //判断$issType的取值是否在规定的数组范围内
     if(in_array($issType,$issTypeArr)){
-        $issType='_PAT';
+        $issType;
     }else{
         return 'The parameter should be a string in:'.json_encode($issTypeArr);
     }
@@ -120,8 +120,6 @@
             }
             
         }
-        
-        
       break;
       
       case'_PRO':

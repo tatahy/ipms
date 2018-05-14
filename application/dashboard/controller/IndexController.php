@@ -29,7 +29,7 @@ class IndexController extends \think\Controller
     //用户所在部门
     private $dept = null;
     //用户权限
-    private $auth=array();
+    private $authArr=array();
     
     private $today=null;
     
@@ -43,6 +43,7 @@ class IndexController extends \think\Controller
         $this->log=Session::get('log');
         $this->roles=Session::get('role');
         $this->dept=Session::get('dept');
+        $this->authArr=Session::get('authArr');
         $this->today=date('Y-m-d');
         $this->now=date("Y-m-d H:i:s");
     }
@@ -59,7 +60,7 @@ class IndexController extends \think\Controller
         //取出user的authority字段值
         $user=new UserModel;           
         $userlg=$user->where('username',$this->username)->where('pwd',$this->pwd)->find();
-        $this->auth=$userlg->authority;
+        $this->authArr=$userlg->authority;
       }    
     }
     
@@ -73,7 +74,7 @@ class IndexController extends \think\Controller
         
         //调用模型Issinfo中定义的issPatNum($useId[,$auth])方法得到对应的issPat数量
         $numIssPat=$issMdl->issPatNum($this->userId);
-        //.json_encode(_commonIssAuthStatus('_PAT','edit'))
+        
         $numIssPro=$issMdl::where('issmap_type','like','%_ISST_PRO%')->count();
         $numIssThe=$issMdl::where('issmap_type','like','%_ISST_THE%')->count();
     
@@ -285,7 +286,7 @@ class IndexController extends \think\Controller
         if(!empty($request->param('auth'))){
           $auth=$request->param('auth');
         }else{
-          foreach($this->auth['iss'] as $key=>$value){
+          foreach($this->authArr['iss'] as $key=>$value){
             if($value){
               $auth=$key;
               break;
@@ -304,7 +305,7 @@ class IndexController extends \think\Controller
   
           //向前端权限变量赋值
           //所有权限
-          'authArray'=>$this->auth,
+          'authArray'=>$this->authArr,
           //当前权限
           'auth'=>$auth,  
 
@@ -546,7 +547,7 @@ class IndexController extends \think\Controller
       }else{
         $this->assign([
               'home'=>$request->domain(),
-              //"destr".$this->auth['isspro']['edit'],
+              //"destr".$this->authArr['isspro']['edit'],
               
               // 分页显示所需参数
               'issPatTotal'=>$issPatTotal,
@@ -1971,7 +1972,7 @@ class IndexController extends \think\Controller
         if(!empty($request->param('auth'))){
           $auth=$request->param('auth');
         }else{
-          foreach($this->auth['iss'] as $key=>$value){
+          foreach($this->authArr['iss'] as $key=>$value){
             if($value){
               $auth=$key;
               break;
@@ -2011,35 +2012,35 @@ class IndexController extends \think\Controller
         $map['status'] ='完结';
         $map['issmap_type']=['like','%_ISST_THE%'];
         
-        if($this->auth['iss']['edit']){
+        if($this->authArr['iss']['edit']){
           $numIssTheEdit=$issSet->where($mapEdit)->count(); 
           //$auth='_EDIT';
         }else{
           $numIssTheEdit=0;
         }
         
-        if($this->auth['iss']['audit']){
+        if($this->authArr['iss']['audit']){
           $numIssTheAudit=$issSet->where($mapAudit)->count();
           //$auth='_AUDIT'; 
         }else{
           $numIssTheAudit=0;
         }
         
-        if($this->auth['iss']['approve']){
+        if($this->authArr['iss']['approve']){
           $numIssTheApprove=$issSet->where($mapApprove)->count();
           //$auth='_APPROVE'; 
         }else{
           $numIssTheApprove=0;
         }
         
-        if($this->auth['iss']['execute']){
+        if($this->authArr['iss']['execute']){
           $numIssTheExecute=$issSet->where($mapExecute)->count();
           //$auth='_EXECUTE'; 
         }else{
           $numIssTheExecute=0;
         }
         
-        if($this->auth['iss']['maintain']){
+        if($this->authArr['iss']['maintain']){
           $numIssTheMaintain=$issSet->where($mapMaintain)->count(); 
          
         }else{
@@ -2055,7 +2056,7 @@ class IndexController extends \think\Controller
                 "username:". $this->username."<br/>".
                 "pwd:".$this->pwd."<br/>".
                 "log:".$this->log."<br/>".
-                "auth:".json_encode($this->auth); 
+                "auth:".json_encode($this->authArr); 
         
          // 模板变量赋值        
         $this->assign([
@@ -2068,7 +2069,7 @@ class IndexController extends \think\Controller
   
           //向前端权限变量赋值
           //所有权限
-          'authArray'=>$this->auth,
+          'authArray'=>$this->authArr,
           //当前权限
           'auth'=>$auth,  
           
@@ -2096,7 +2097,7 @@ class IndexController extends \think\Controller
         if(!empty($request->param('auth'))){
           $auth=$request->param('auth');
         }else{
-          foreach($this->auth['iss'] as $key=>$value){
+          foreach($this->authArr['iss'] as $key=>$value){
             if($value){
               $auth=$key;
               break;
@@ -2136,35 +2137,35 @@ class IndexController extends \think\Controller
         $map['status'] ='完结';
         $map['issmap_type']=['like','%_ISST_PRO%'];
         
-        if($this->auth['iss']['edit']){
+        if($this->authArr['iss']['edit']){
           $numIssProEdit=$issSet->where($mapEdit)->count(); 
           //$auth='_EDIT';
         }else{
           $numIssProEdit=0;
         }
         
-        if($this->auth['iss']['audit']){
+        if($this->authArr['iss']['audit']){
           $numIssProAudit=$issSet->where($mapAudit)->count();
           //$auth='_AUDIT'; 
         }else{
           $numIssProAudit=0;
         }
         
-        if($this->auth['iss']['approve']){
+        if($this->authArr['iss']['approve']){
           $numIssProApprove=$issSet->where($mapApprove)->count();
           //$auth='_APPROVE'; 
         }else{
           $numIssProApprove=0;
         }
         
-        if($this->auth['iss']['execute']){
+        if($this->authArr['iss']['execute']){
           $numIssProExecute=$issSet->where($mapExecute)->count();
           //$auth='_EXECUTE'; 
         }else{
           $numIssProExecute=0;
         }
         
-        if($this->auth['iss']['maintain']){
+        if($this->authArr['iss']['maintain']){
           $numIssProMaintain=$issSet->where($mapMaintain)->count(); 
           
         }else{
@@ -2180,7 +2181,7 @@ class IndexController extends \think\Controller
                 "username:". $this->username."<br/>".
                 "pwd:".$this->pwd."<br/>".
                 "log:".$this->log."<br/>".
-                "auth:".json_encode($this->auth); 
+                "auth:".json_encode($this->authArr); 
         
          // 模板变量赋值        
         $this->assign([
@@ -2193,7 +2194,7 @@ class IndexController extends \think\Controller
   
           //向前端权限变量赋值
           //所有权限
-          'authArray'=>$this->auth,
+          'authArray'=>$this->authArr,
           //当前权限
           'auth'=>$auth,  
           

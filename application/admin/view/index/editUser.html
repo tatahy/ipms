@@ -128,7 +128,7 @@ $(document).ready(function(){
 	var regMobile = /^1[0-9]{10}$/;
 		
 	<!-- // 单选框#selDept的内容 -->
-	ajaxSelectOption($('#selDept'),{"async":true,"url":"selectResponse","ajaxData":{"req":"_DEPT"},"first":{"val":"0","text":"请选择一个部门…"},"selected":{"val":"{$user.dept}"}});
+	ajaxSelectOption($('#selDept'),{"async":false,"url":"selectResponse","ajaxData":{"req":"_DEPT"},"first":{"val":"0","text":"请选择一个部门…"},"selected":{"val":"{$user.dept}"}});
 	// 得到页面加载时单选框#selUsergroup的option内容，页面“重置”时加载
 	var selUsergroupStr=ajaxSelectOption($('#selUsergroup'),{"async":false,"url":"selectResponse","ajaxData":{"req":"_USERGROUP"},"first":{"val":"0","text":"可选…"},"remove":{"val":"{$user.usergroup_id}"}});
 	// 保留页面加载时单选框#selUsergroup的label内容，页面“重置”时加载
@@ -137,25 +137,25 @@ $(document).ready(function(){
 	var selectedUsergroupStr=ajaxSelectOption($('#selectedUsergroup'),{"async":false,"url":"selectResponse","ajaxData":{"req":"_USERGROUP"},"first":{"val":"0","text":"已加入…"},"show":{"val":"{$user.usergroup_id}"},"selected":0,"multiple":0});
 	// 保留页面加载时单选框#selectedUsergroup的label内容，页面“重置”时加载
 	var spNumSelectedUsergroup=$('#selectedUsergroup').closest('.form-group').find('.spNum').text();
+	//必填输入框内容有效性判断结果数组
 	var check = [];
+	
 	$('.inputCheck').each(function(){
 		var i=$('.inputCheck').index($(this));
 		//‘新增’时{$user.id}==0，
 		if({$user.id}==0){
 			check[i]=false;
+		}else{
+			//有效性判断结果
+			check[i]=inputCheck($(this));
 		}
-		
+		<!-- console.log(check[i]); -->
 	});
 	
 	$('#selUsergroup').change(function(){
 		selOptionChange($(this),$('#selectedUsergroup'));
 		// 输入内容有效性判断，#selectedUsergroup
-		var i=$('.inputCheck').index($('#selectedUsergroup'));
-		if($('#selectedUsergroup').find('option:last').val()==0){
-			fail($('#selectedUsergroup'), i, '至少有一个用户组');
-		}else{
-			success($('#selectedUsergroup'), i);
-		}
+		check[$('.inputCheck').index($('#selectedUsergroup'))]=inputCheck($('#selectedUsergroup'));
 	});
 	
 	$('#selectedUsergroup').change(function(){
@@ -164,51 +164,23 @@ $(document).ready(function(){
 	
 	// 输入内容有效性判断，#userName
 	$('#userName').focusout(function() { 
-		var i=$('.inputCheck').index($(this));
-    	if (regUsername.test($(this).val())) {
-        	success($(this), i);
-			$('#pwd').val($(this).val());
-    	} else if ($(this).val().length < 2) {
-        	fail($(this), i, '用户名太短，不能少于2个字符。');
-    	} else {
-        	fail($(this), i, '用户名由英文、数字、中文和下划线组成，但不能以数字开头。')
-    	}
-
+		check[$('.inputCheck').index($(this))]=inputCheck($(this));
+		$('#pwd').val($(this).val());
 	});
 	
 	//输入内容有效性判断,#userMobile
 	$('#userMobile').focusout(function(){
-		var len=$(this).val().length;
-		var i=$('.inputCheck').index($(this));		
-		if (regMobile.test($(this).val())) {
-        	success($(this), i);
-    	} else if (len< 11) {
-        	fail($(this), i, '只有'+len+'位。手机号是11位数字，必须以1开头。');
-    	} else if (len > 11) {
-        	fail($(this), i, '有'+len+'位，手机号由1开头的11位数字组成。');
-    	}else {
-        	fail($(this), i, '已有'+len+'位，但必须是以1开头的11位数字')
-    	}
+		check[$('.inputCheck').index($(this))]=inputCheck($(this));
 	});
 	
 	//输入内容有效性判断,#selectedUsergroup
 	$('#selDept').focusout(function(){
-		var i=$('.inputCheck').index($(this));
-		if($(this).val()=='0'){
-			fail($(this), i, '请选择一个部门');
-		}else{
-			success($(this), i);
-		}
+		check[$('.inputCheck').index($(this))]=inputCheck($(this));
 	});
 	
 	//输入内容有效性判断,#selectedUsergroup
 	$('#selectedUsergroup').focusout(function(){
-		var i=$('.inputCheck').index($(this));
-		if($(this).find('option:last').val()==0){
-			fail($(this), i, '至少有一个用户组');
-		}else{
-			success($(this), i);
-		}
+		check[$('.inputCheck').index($(this))]=inputCheck($(this));
 	});
 	
 	//button:submit按钮
@@ -243,7 +215,7 @@ $(document).ready(function(){
 		
 		//阻止表单提交动作
 		event.preventDefault();
-		<!-- console.log(check); -->
+		
 		formData.append('oprt',oprt);
 		formData.append('usergroup_id',usergroupIdStr($('#selectedUsergroup')));
 		if(oprt=='_DELETE'){
@@ -306,23 +278,23 @@ $(document).ready(function(){
 	
 	});
 
-//校验成功函数
-function success(obj, counter) {
+//校验成功函数，返回true
+function success(obj) {
     var divParent=obj.closest('.has-feedback');
 	divParent.removeClass('has-error').addClass('has-success');
 	divParent.children('span').hide();
 	divParent.children('.spOk').show();
-    check[counter] = true;
+    return true;
 }
 
-// 校验失败函数
-function fail(obj, counter, msg) {
+// 校验失败函数，返回false
+function fail(obj,msg) {
     var divParent=obj.closest('.has-feedback');
 	divParent.removeClass('has-success').addClass('has-error');
 	divParent.children('span').hide();
 	divParent.children('.spTips').text(msg).show();
     divParent.children('.spRemove').show();
-    check[counter] = false;
+	return false;
 }
 
 //**函数名：ajaxProcess
@@ -485,6 +457,55 @@ function selOptionChange(obj,partner){
 	//对partner的操作
 	partner.append(str);
 	partner.closest('.form-group').find('.spNum').text(partner.children('option').length-1);
+}
+
+//**函数名：inputCheck
+ 	//* 作用：本页面必填输入框内容有效性判断
+	//* 参数obj，类型：对象。值：不为空。说明：调用函数的对象。
+	//* 返回值：boolean
+function inputCheck(obj){
+	var idName=obj.attr('id');
+	var i=$('.inputCheck').index(obj);
+	var result=false;
+	switch(idName){
+		case 'userName':
+			if (regUsername.test(obj.val())) {
+        		result=success(obj);
+    		} else if (obj.val().length < 2) {
+        		fail(obj,'用户名太短，不能少于2个字符。');
+    		} else {
+        		fail(obj,'用户名由英文、数字、中文和下划线组成，但不能以数字开头。')
+    		}
+		break;
+		case 'userMobile':
+			var len=obj.val().length;
+			if (regMobile.test(obj.val())) {
+        		result=success(obj);
+    		} else if (len< 11) {
+        		fail(obj, '只有'+len+'位。手机号是11位数字，必须以1开头。');
+    		} else if (len > 11) {
+        		fail(obj,'有'+len+'位，手机号由1开头的11位数字组成。');
+    		}else {
+        		fail(obj,'已有'+len+'位，但必须是以1开头的11位数字')
+    		}
+		break;
+		case 'selDept':
+			if(obj.val()){
+				result=success(obj);
+			}else{
+				fail(obj,'请选择一个部门');
+			}
+		break;
+		case 'selectedUsergroup':
+			if(obj.find('option:last').val()==0){
+				fail(obj,'至少有一个用户组');
+			}else{
+				result=success(obj);
+			}
+		break;
+		
+	}
+	return result;
 }
 
 <!--/ function -->

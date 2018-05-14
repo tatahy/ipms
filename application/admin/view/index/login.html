@@ -313,6 +313,9 @@ var password;
 // 数组的作用是在表单提交时对各个输入框的校验结果进行检查，数组值对应各个输入框的校验结果，全部为true才触发提交表单事件。
 var check = [false, false, false];
 
+// 随机验证码产生
+$.idcode.setCode();
+
 //校验成功函数
 function success(Obj, counter) {
     Obj.parent().parent().removeClass('has-error').addClass('has-success');
@@ -341,9 +344,9 @@ $("#username").change(function() {
     if (regUsername.test($(this).val())) {
         success($(this), 0);
     } else if ($(this).val().length < 5) {
-        fail($(this), 0, '用户名太短，不能少于5个字符');
+        fail($(this), 0, '账号太短，不能少于5个字符');
     } else {
-        fail($(this), 0, '用户名只能为英文数字和下划线,且不能以数字开头')
+        fail($(this), 0, '账号只能为英文数字和下划线,且不能以数字开头')
     }
 
 });
@@ -372,9 +375,6 @@ $("#pwd").change(function() {
         }
     }
 });
-
-// 随机验证码产生
-$.idcode.setCode();
 
 <!-- $('.container').find('input').eq(2).change(function() { -->
 $("#inIdcode").change(function() {
@@ -409,7 +409,7 @@ $('#submit').click(function(event) {
 $('#reset').click(function() {
 	// 应用jQuery的slice()方法将匹配元素的子集构造一个新的jQuery对象
 	
-    $('input').slice(0, 3).parent().parent().removeClass('has-error has-success');
+    $('input').slice(0, 3).closest('.has-feedback').removeClass('has-error has-success');
     $('.tips').hide();
     $('.glyphicon-ok').hide();
     $('.glyphicon-remove').hide();

@@ -11,7 +11,8 @@ use app\admin\model\User as UserModel;
 
 class IndexController extends \think\Controller
 {
-      
+     //用户名
+    private $userId = null;  
      //用户名
     private $username = null;
     //用户密码
@@ -22,6 +23,8 @@ class IndexController extends \think\Controller
     private $roles=array();
     //用户所在部门
     private $dept = null;
+    //用户权限
+    private $authArr=array();
     
     // 初始化
     protected function _initialize()
@@ -31,11 +34,14 @@ class IndexController extends \think\Controller
 //        $this->log=Session::get('log');
 //        $this->roles=Session::get('role');
 //        $this->dept=Session::get('dept');
+        $this->userId='';
         $this->username='';
         $this->pwd='';
         $this->log='';
         $this->roles=array();
         $this->dept='';
+        $this->authArr=array();
+        
 
     }
     
@@ -45,11 +51,6 @@ class IndexController extends \think\Controller
       $this->_loginUser();
        
       $this->assign([
-            //--在bg-head.html页面输出自定义信息的HTML代码块
-              'destr'=>$destrr= "请求方法:".$request->method()."</br>".
-                                "username:".$this->username."</br>".
-                                "log:".$this->log."</br>",
-              
               'home'=>$request->domain(),
               'username'=>$this->username,
               'year'=>date('Y')
@@ -71,9 +72,11 @@ class IndexController extends \think\Controller
     {
       //通过$this->log判断是否是登录用户，非登录用户退回到登录页面
       $this->log=Session::get('log');
+      $this->userId=Session::get('userId');
       $this->username=Session::get('username');
       $this->pwd=Session::get('pwd');
       $this->dept=Session::get('dept');
+      $this->authArr=Session::get('authArr');
       
       if(1!=$this->log){
         return $this->error('无用户名或密码，请先登录系统');
@@ -118,6 +121,15 @@ class IndexController extends \think\Controller
         return view();
     }
     
+     public function logout(Request $request)
+    {
+        Session::clear();
+        Session::destroy();
+        $this->success('安全退出系统','index/login');
+                                
+    }
+    
+    
     // 验证用户名、密码是否为数据库中有效管理员，是就显示后台主页，否就退回登录页面
     public function check(Request $request,UserModel $userMdl)
     {
@@ -149,14 +161,17 @@ class IndexController extends \think\Controller
         $this->error('用户名或密码错误，请重新登录');
           //return view("login"); 
       }else{
-        // 写入session
+       
+          //调用User模型层定义的refreshUserAuth()方法，刷新登录用户的各个模块权限
+          $userMdl->refreshUserAuth($user->username,$user->pwd);
+           // 写入session
+          Session::set('userId',$user->id);
           Session::set('pwd',$user->pwd);
           Session::set('username',$user->username);
           Session::set('log',1);
-          Session::set('role','管理员');
+          //Session::set('role','管理员');
           Session::set('dept',$user->dept);
-          //调用User模型层定义的refreshUserAuth()方法，刷新登录用户的各个模块权限
-          $userMdl->refreshUserAuth($user->username,$user->pwd);
+          Session::set('authArr',$user->authority);
           
         // 重定向到index页面
        // $this->redirect('index');
@@ -330,18 +345,16 @@ class IndexController extends \think\Controller
       $this->_loginUser();
       
       //遍历输出全局变量$_ENV
-      $strENV='';
-      if(!empty($_ENV)){
-        foreach($_ENV as $key=>$value){
-          $strENV+='$_ENV['.$key.']='.$value.'<br>';
-        }
-        
-      }else{
-        //$strENV=phpinfo(INFO_ENVIRONMENT);
-        
-      }
-      
-      
+      //$strENV='';
+//      if(!empty($_ENV)){
+//        foreach($_ENV as $key=>$value){
+//          $strENV+='$_ENV['.$key.']='.$value.'<br>';
+//        }
+//        
+//      }else{
+//        //$strENV=phpinfo(INFO_ENVIRONMENT);
+//        
+//      }
       $this->assign([
                // 获取服务器域名 
               'serverDomain'=>$_SERVER['SERVER_NAME'],

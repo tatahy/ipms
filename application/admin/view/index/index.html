@@ -84,7 +84,7 @@
 	<ul class="nav navbar-nav navbar-right">
 		
         <li><a>欢迎：<span class="glyphicon glyphicon-user"></span>【{$username}】</a></li>	
-        <li id="liQuit"><a href="{$home}/admin/index/login"><span class="glyphicon glyphicon-log-out"></span>&nbsp;退出</a></li>
+        <li id="liQuit"><a href="{$home}/admin/index/logout"><span class="glyphicon glyphicon-log-out"></span>&nbsp;退出</a></li>
       </ul>
     </div>
   </div>
@@ -96,18 +96,18 @@
 		
 		<!-- nav 与 jQuery结合实现菜单栏导航效果-->
 		<ul class="nav nav-pills nav-stacked" >
-			<li id="li0" class="active"><a class="aTab" href="#sysSummary"><span class="glyphicon glyphicon-inbox"></span>&nbsp;系统概况</a></li>
+			<li class="active"><a class="aTab" href="#sysSummary"><span class="glyphicon glyphicon-inbox"></span>&nbsp;系统概况</a></li>
 				
 			<li class="dropdown">
 				<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span>&nbsp;系统用户<span class="caret"></span></a>
 				<ul class="dropdown-menu">
-					<li id="li1" class="text-right"><a class="aTab" href="#sysUser">用户&nbsp;<span class="glyphicon glyphicon-file"></span></a></li>
-					<li id="li2" class="text-right"><a class="aTab" href="#sysUsergroup">用户组&nbsp;<span class="glyphicon glyphicon-duplicate"></span></a></li>
+					<li class="text-right"><a class="aTab" href="#sysUser">用户&nbsp;<span class="glyphicon glyphicon-file"></span></a></li>
+					<li class="text-right"><a class="aTab" href="#sysUsergroup">用户组&nbsp;<span class="glyphicon glyphicon-duplicate"></span></a></li>
 					  <!-- //<li><a href="#"><span class="glyphicon glyphicon-link"></span>&nbsp;功能1-3</a></li> -->
 				</ul>
 			</li>
 				
-			<li id="li3"><a class="aTab" href="#sysSetting"><span class="glyphicon glyphicon-wrench"></span>&nbsp;系统设置</a></li>
+			<li><a class="aTab" href="#sysSetting"><span class="glyphicon glyphicon-wrench"></span>&nbsp;系统设置</a></li>
 		</ul>
 
   

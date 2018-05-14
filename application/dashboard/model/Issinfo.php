@@ -103,7 +103,7 @@ class Issinfo extends Model
         
         //判断$authName的取值是否在规定的数组范围内
         if(in_array($authName,$authNameArr)){
-          if( empty($authName))
+          if(empty($authName))
           $authName='total';
         }else{
           return 'Wrong parameter for function.The parameter should be a string in:'.json_encode($authNameArr).'or empty.';

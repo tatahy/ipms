@@ -53,19 +53,6 @@ class IndexController extends \think\Controller
         if(empty($user)){
             $this->error('登录失败，用户名或密码错误。');
         }else{
-        //存在，则显示index.html页面，$username,$pwd,$log=1,所有的role都放入session
-         //通过rolied找出对应的role
-       // for($i=0;$i<sizeof($user);$i++){
-//            $roles[$i]=RoletyModel::where('id',$user[$i]['rolety_id'])->find();
-//            $role[$i]=$roles[$i]['name'];
-//        }    
-            
-            Session::set('userId',$user->id);
-            Session::set('username',$username);
-            Session::set('pwd',$pwd);
-            Session::set('log',1);
-            Session::set('dept',$user->dept);       
-        
             //patent数据,使用模型Patinfo
             $pats = new PatinfoModel;  
             
@@ -79,12 +66,16 @@ class IndexController extends \think\Controller
             //$numpataut=$pats->where('status',['=','授权'],['=','续费授权'],['=','续费中'],['=','放弃续费'],'or')->count();
             $numpataut=$pats->where('id','>',0)->where('status','in',['授权','续费授权','续费中','放弃续费'])->count();
     
-            $userA=new UserModel;
-            //调用User模型层定义的userAuth()方法，刷新登录用户的各个模块权限
-            //$authority=$userA->userAuth($username,$pwd);
-            
+            $userA=new UserModel;            
             //调用User模型层定义的refreshUserAuth()方法，刷新登录用户的各个模块权限
             $authority=$userA->refreshUserAuth($username,$pwd);
+            
+            Session::set('userId',$user->id);
+            Session::set('username',$username);
+            Session::set('pwd',$pwd);
+            Session::set('log',1);
+            Session::set('dept',$user->dept);   
+            Session::set('authArr',$user->authority);
             
               //--在index.html页面输出自定义信息的HTML代码块
             $destr= "请求方法:".$request->method()."</br>".
