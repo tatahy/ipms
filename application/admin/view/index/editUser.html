@@ -490,10 +490,10 @@ function inputCheck(obj){
     		}
 		break;
 		case 'selDept':
-			if(obj.val()){
-				result=success(obj);
-			}else{
+			if(obj.val()==0){
 				fail(obj,'请选择一个部门');
+			}else{
+				result=success(obj);
 			}
 		break;
 		case 'selectedUsergroup':
