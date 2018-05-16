@@ -192,7 +192,7 @@ $(document).ready(function(){
 	<!-- $('[data-toggle="tooltip"]').tooltip();  -->
 	
 	// 添加bootstrap的tooltip属性
-	$('thead th a').tooltip({title: '点击排序', placement: 'bottom'}); 
+	$('thead th a').tooltip({title: '点击后升序', placement: 'bottom'}); 
 	
 	// 根据后端控制器给出的排序字段{$sortName},排序方式{$sort}，修改th中a的显示形式
 	$('thead a').each(function(){
@@ -304,7 +304,6 @@ $(document).ready(function(){
 	<!-- // 页面重新加载 -->
 	$('#btnReset').click(function(){
 		$('#content').load('sysUser');
-		
 	});
 
 <!-- function -->
@@ -337,25 +336,6 @@ $(document).ready(function(){
 		}else{
 			$('#content').load('sysUser',sendData);
 		}
-		
-		<!-- if(searchUserName!='' || searchDept!=0 || searchUsergroup!=0){ -->
-			<!-- $('#divUserTable_load').text('加载中……'); -->
-			<!-- // jquery load()方法，加载sysUser.html页面内容到index.html页面中<div id="content"></div> -->
-			<!-- $('#divUserTable_load').load('sysUser #tblUser',sendData,function(){ -->
-				<!-- $.extend(sendData,{'req':'_PAGEUSER'}); -->
-				<!-- $.post('sysUser',sendData,function(data){ -->
-					<!-- $('#divUserTableRows').html(data); -->
-				<!-- }); -->
-			<!-- }); -->
-			<!-- $('#spTitle').text('符合查询条件用户数：'); -->
-			<!-- $('#searchUserName').val(searchUserName); -->
-			<!-- $('#searchDept').val(searchDept); -->
-			<!-- $('#searchUsergroup').val(searchUsergroup); -->
-			
-			//$('#divCollapse').collapse('show');
-		<!-- }else{ -->
-			<!-- $('#content').load('sysUser',sendData); -->
-		<!-- } -->
 	}
 	
 	//**函数名：ajaxShowSelect

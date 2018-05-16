@@ -472,9 +472,9 @@ function inputCheck(obj){
 			if (regUsername.test(obj.val())) {
         		result=success(obj);
     		} else if (obj.val().length < 2) {
-        		fail(obj,'用户名太短，不能少于2个字符。');
+        		fail(obj,'有'+obj.val().length+'个字符，不能少于2个字符。');
     		} else {
-        		fail(obj,'用户名由英文、数字、中文和下划线组成，但不能以数字开头。')
+        		fail(obj,'可由英文、数字、中文和下划线组成，但不能以数字开头。')
     		}
 		break;
 		case 'userMobile':

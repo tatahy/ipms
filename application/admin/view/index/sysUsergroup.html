@@ -167,7 +167,9 @@ $(document).ready(function(){
 		}else{
 			$(this).addClass("text-primary bg-info").css({"padding":"5px","border-radius":"3px"});
 		}	
-		
+		var str=$(this).text();
+		//将span的text转换成中文
+		$(this).text(textEnToChi(str));
    	});
 	//.btnUsergroup的按钮分类动作_ADDNEW、_EDIT、_DISABLE、_ENABLE
 	$('button.btnUsergroup').click(function(){
@@ -322,6 +324,50 @@ $(document).ready(function(){
             }
 		});	
 	}
+	
+	//**函数名：textEnToChi
+ 	//* 作用：本页面特定英文字符串转换成中文字符串
+	//* 参数text，类型：字符串。值：不为空。说明：待转换的英文字符串。
+	//* 返回值：中文字符串
+function textEnToChi(text){
+	switch(text){
+		case 'edit':
+            text='编辑';
+        break;
+        case 'audit':
+            text='审核';
+        break;
+        case 'approve':
+            text='审批';
+        break;
+        case 'execute':
+            text='执行';
+        break;
+        case 'maintain':
+            text='维护';
+        break;
+       //...................附件.....................
+        case 'upload':
+            text='上传';
+        break;
+        case 'download':
+            text='下载';
+        break;
+        case 'erase':
+            text='删除';
+        break;
+        case 'move':
+            text='移动';
+        break;
+        case 'copy':
+            text='复制';
+        break;
+		case 'enable':
+	        text='启用';
+         break;
+	}
+	return text;
+}
 	
 <!--/ function -->
 });

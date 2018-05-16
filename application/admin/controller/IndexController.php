@@ -115,7 +115,8 @@ class IndexController extends \think\Controller
       
       $this->assign([
         
-        'home'=>$request->domain(),
+        //'home'=>$request->domain(),
+        'home'=>Request::domain(),
         
         ]);
         return view();
@@ -180,7 +181,7 @@ class IndexController extends \think\Controller
       
     }
         
-    // 用户CDUR，接收客户端通过Ajax，post来的参数，返回json数据
+    // 部门CDUR，接收客户端通过Ajax，post来的参数，返回json数据
     public function deptOprt(Request $request)
     {
       $this->_loginUser();  
@@ -383,7 +384,7 @@ class IndexController extends \think\Controller
     }
     
     // 输出系统用户模板
-    public function sysUser(Request $request,UsergroupModel $usergroupMdl)
+    public function sysUser(Request $request,UsergroupModel $usergroupMdl,UserModel $userMdl)
     {
       $this->_loginUser();
       //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
@@ -499,7 +500,7 @@ class IndexController extends \think\Controller
         
         // 查出所有的用户并分页，根据“strOrder”排序，设定前端页面显示的锚点（hash值）为“div1”，设定分页页数变量：“pageUserNum”
         // 带上每页显示记录行数$userTableRows和3个查询词，实现查询结果分页显示。
-        $users = UserModel::where($map)
+        $users = $userMdl::where($map)
                             ->order($strOrder)
                            // ->paginate($userTableRows,false,['type'=>'bootstrap','var_page'=>'pageUserNum']);
                             ->paginate($userTableRows,false,['query'=>['userTableRows'=>$userTableRows,'searchUserName'=>$searchUserName,'searchUsergroup'=>$searchUsergroup,'searchDept'=>$searchDept]
@@ -508,10 +509,10 @@ class IndexController extends \think\Controller
         // 分页变量
         $pageUser = $users->render();
         
-        // 查出所有的用户总数
-        $usersNum=count(UserModel::where($map)
+        // 查出所有的用户总数        
+         $usersNum=$userMdl::where($map)
                             ->group('username')
-                            ->select()); 
+                            ->count(); 
                             
         //添加groupNameNum字段到数据集$users中
         //字段内容：根据user的usergroup_id字段添加UserGroup.name的内容后生成$groupNameNum字符串
@@ -558,7 +559,7 @@ class IndexController extends \think\Controller
     }
     
     // 输出系统用户组模板
-    public function sysUsergroup(Request $request)
+    public function sysUsergroup(Request $request,UsergroupModel $usrgroupMdl)
     {
       $this->_loginUser();
       //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
@@ -578,7 +579,7 @@ class IndexController extends \think\Controller
         }
        
         // 查出所有用户组
-        $usergroup = UsergroupModel::where('id','>',0)
+        $usergroup = $usrgroupMdl::where('id','>',0)
                               ->order('id asc')
                               ->paginate($usergroupTableRows,false,['type'=>'bootstrap','var_page'=>'usergroupPageNum']);                     
         
@@ -586,7 +587,7 @@ class IndexController extends \think\Controller
         $usergroupPage = $usergroup->render();
         
         // 记录总数
-        $usergroupNum = UsergroupModel::where('id','>',0)
+        $usergroupNum = $usrgroupMdl::where('id','>',0)
                             ->count();
      
       
@@ -603,19 +604,13 @@ class IndexController extends \think\Controller
     }
     
      // 输出系统设置模板
-    public function sysSetting(Request $request)
+    public function sysSetting(Request $request,DeptModel $deptMdl)
     {
       $this->_loginUser();
-      //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
-      
-      // 查出所有部门信息
-      $depts = DeptModel::all();
       
       $this->assign([
               'home'=>$request->domain(),
-      
-              'depts'=>$depts,
-              
+              'depts'=>$deptMdl::all(),
         ]);
       return view();
     }
@@ -658,8 +653,6 @@ class IndexController extends \think\Controller
         break;
         
         case '_EDIT':
-          //调用Usergroup模型层定义的initUsergroupAuth()方法，初始化用户组的各个模块权限
-          //$usergroupMdl->initUsergroupAuth($id);
           $user=$userMdl::get($id);
         break;
         
@@ -768,6 +761,7 @@ class IndexController extends \think\Controller
       $result='';
       $msg='';
       $msgPatch='';
+      $issTemp=array();
       //1.分情况变量赋值
       if($oprt=='_CREATE' || $oprt=='_UPDATE') {
         if(count($request->param('authIss/a'))){
@@ -821,7 +815,8 @@ class IndexController extends \think\Controller
         $pro=array_merge(_commonModuleAuth('_PRO'),$pro);
         $the=array_merge(_commonModuleAuth('_THE'),$the);
         $att=array_merge(_commonModuleAuth('_ATT'),$att);
-        $admin=array_merge(_commonModuleAuth('_ADMIN'),$admin);    
+        $admin=array_merge(_commonModuleAuth('_ADMIN'),$admin); 
+           
         //组装数据
         $authority=array("iss"=>$iss,
                             "att"=>$att,
@@ -838,12 +833,15 @@ class IndexController extends \think\Controller
       switch($oprt){
         case '_ADDNEW':
           $usergroup=array('id'=>$id,'name'=>'','authority'=>_commonModuleAuth());
-          
+          //将iss权限数组的$key转为中文_commonAuthArrKeyToCHN
+          //$usergroup['authority']['iss']=_commonAuthArrKeyToCHN($usergroup['authority']['iss']);
+//          $usergroup['authority']['pat']=_commonAuthArrKeyToCHN($usergroup['authority']['pat']);
+//          $usergroup['authority']['pro']=_commonAuthArrKeyToCHN($usergroup['authority']['pro']);
+//          $usergroup['authority']['the']=_commonAuthArrKeyToCHN($usergroup['authority']['the']);
+//          $usergroup['authority']['att']=_commonAuthArrKeyToCHN($usergroup['authority']['att']);     
         break;
         
         case '_EDIT':
-          //调用Usergroup模型层定义的initUsergroupAuth()方法，初始化用户组的各个模块权限
-          //$usergroupMdl->initUsergroupAuth($id);
           $usergroup=$usergroupMdl::get($id);
         break;
         
@@ -904,9 +902,10 @@ class IndexController extends \think\Controller
       }
      //3.分情况返回前端数据
      if ($oprt=='_ADDNEW' || $oprt=='_EDIT'){
+             
         $this->assign([
              'home'=>$request->domain(),
-             'usergroup'=>$usergroup
+             'usergroup'=>$usergroup,
         ]);
         // 返回前端模板文件
         return view('editUsergroup');

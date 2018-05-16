@@ -1,18 +1,18 @@
 	<!-- // bootstrap panel group+collapse -->
-<div id="sysParam" class="panel-group" >
+<div id="sysSetting" class="panel-group" >
 	
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h4 class="panel-title">
-        		<a data-toggle="collapse" data-parent="#sysParam" href="#sysParam1"><strong class="text-primary">
+        		<a data-toggle="collapse" data-parent="#sysSetting" href="#sysDept"><strong class="text-primary">
         		部门设置</strong></a>
       		</h4>
 			
 		</div>
-		<div id="sysParam1" class="panel-collapse collapse in">
+		<div id="sysDept" class="panel-collapse collapse in">
 			
 			<div class="panel-body " >
-				<h5><strong>部门列表</strong>&nbsp;<button id="btnModalOut" type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#modalDept">新增&nbsp;<span class="glyphicon glyphicon-tree-conifer"></span></button></h5>
+				<h5><strong>部门列表</strong>&nbsp;<button id="btnModalOut" type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#modalDept" data-oprt="_ADDNEW">新增&nbsp;<span class="glyphicon glyphicon-tree-conifer"></span></button></h5>
 			
 				<div class="table-responsive" >
 				<table class="table table-hover">
@@ -33,13 +33,13 @@
 							<td>{$vo.abbr}</td>
 						
 							<td>
-								<button deptId="{$vo.id}" class="edit btn-link" data-toggle="modal" data-target="#modalDept"><span class="text-primary glyphicon glyphicon-edit"></span>编辑</button>&nbsp;
+								<button class="dis btn-link" data-deptId="{$vo.id}" data-toggle="modal" data-target="#modalDept" data-oprt="_EDIT"><span class="text-primary glyphicon glyphicon-edit"></span>编辑</button>&nbsp;
 								
-								<button deptId="{$vo.id}" class="del btn-link"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>&nbsp;
+								<button class="dis btn-link" data-deptId="{$vo.id}" data-oprt="_DELETE"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>&nbsp;
 							
-								<button deptId="{$vo.id}" class="dis btn-link"><span class="text-warning glyphicon glyphicon-ban-circle"></span>停用</button>
+								<button class="dis btn-link" data-deptId="{$vo.id}" data-oprt="_DISANBLE"><span class="text-warning glyphicon glyphicon-ban-circle"></span>停用</button>
 							
-								<span>（已停用）</span><button deptId="{$vo.id}" class="en btn-link" enable="{$vo.enable}"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
+								<span class="en">（已停用）</span><button class="en btn-link" data-deptId="{$vo.id}" data-oprt="_ENABLE" enable="{$vo.enable}"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
 							
 							</td>	
 					
@@ -59,7 +59,7 @@
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h4 class="panel-title">
-        		<a data-toggle="collapse" data-parent="#sysParam" href="#sysParam2"><strong class="text-primary">
+        		<a data-toggle="collapse" data-parent="#sysSetting" href="#sysParam2"><strong class="text-primary">
         		系统信息</strong></a>
       		</h4>
 			
@@ -109,8 +109,8 @@
         </div>
 		
         <div class="modal-body">
-			<form role="form" action="{$home}/admin/index/index" method="post">
-				<input id="oprtId" type="text" hidden disabled>
+			<form role="form" action="" method="post">
+				<input id="oprtId" type="text" name="deptId" value="" class="sr-only">
 				
 				<div class="form-group has-feedback">
 					<label for="deptName">部门全称</label>
@@ -179,7 +179,7 @@
 $(document).ready(function(){
 	
 	<!-- // 对部门表格中<td>里的<button>进行格式设置 -->
-	$("#sysParam1 tbody td button").each(function(){
+	$("#sysDept tbody td button").each(function(){
 		if($(this).attr("enable")=='1'){
 			$(this).prevAll('button').show();
             $(this).prev('span').hide();
@@ -193,10 +193,10 @@ $(document).ready(function(){
 	});
 	
 	<!-- //<button class='en'> ajax事件-->
-	$("#sysParam1 button.en").click(function() {
+	$("#sysDept button.en").click(function() {
   		
 		<!-- // 组装通过“post”提交的数据 -->
-		var sendData = {"oprt":"enable","id":$(this).attr("deptId")};
+		var sendData = {"oprt":"enable","id":$(this).data("deptid")};
 				
 		$.ajax({
 			type : "post",
@@ -217,17 +217,16 @@ $(document).ready(function(){
 		$(this).prevAll('button').show();
 		$(this).prev('span').hide();
 		$(this).hide();
-		
-		$(this).parent().parent().removeClass("danger text-muted");
+		$(this).closest('tr').removeClass("danger text-muted");
 		
 	
 	});
 	
 	<!-- //<button class='dis'> ajax事件-->
-	$("#sysParam1 button.dis").click(function() {
+	$("#sysDept button.dis").click(function() {
   		
 		<!-- // 组装通过“post”提交的数据 -->
-		var sendData = {"oprt":"disable","id":$(this).attr("deptId")};
+		var sendData = {"oprt":"disable","id":$(this).data("deptid")};
 				
 		$.ajax({
 			type : "post",
@@ -259,11 +258,11 @@ $(document).ready(function(){
 	});
 	
 	<!-- //<button class='del'> ajax事件-->
-	$("#sysParam1 button.del").click(function() {
-		<!-- var selBtn='.del button[deptId="'+id+'"]'; -->
+	$("#sysDept button.del").click(function() {
+		<!-- var selBtn='.del button[deptid="'+id+'"]'; -->
 		
 		<!-- // 组装通过“post”提交的数据 -->
-		var sendData = {"oprt":"delete","id":$(this).attr("deptId")};
+		var sendData = {"oprt":"delete","id":$(this).data("deptid")};
 		
 		//弹出自定义提示页面 
 		$.confirm('确定删除该部门？',function(e){
@@ -337,9 +336,9 @@ $(document).ready(function(){
 	});
 	
 	<!-- //<button class='edit'> 事件-->
-	$("#sysParam1 button.edit").click(function() {
+	$("#sysDept button.edit").click(function() {
 		<!-- // 组装通过“post”提交的数据 -->
-		var sendData = {"oprt":"edit","id":$(this).attr("deptId")};
+		var sendData = {"oprt":"edit","id":$(this).data("deptid")};
 		var oprtId;
 		
 		$.ajax({

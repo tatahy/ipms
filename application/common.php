@@ -136,4 +136,63 @@
     return $status[$authName];
   
   }
+  
+   /**
+     * 将iss权限数组的$key转为中文
+     * 参数$authArr，类型：数组。值：不为空。说明：需要进行数组键名转换的数组。
+     */
+  function _commonAuthArrKeyToCHN($authArr=array())
+  {
+      $issTemp=array();
+      foreach($authArr as $k=>$v){
+              switch($k){
+                case 'edit':
+                  $issTemp['编辑']=$v;
+                break;
+                
+                case 'audit':
+                  $issTemp['审核']=$v;
+                break;
+                
+                case 'approve':
+                  $issTemp['审批']=$v;
+                break;
+                
+                case 'execute':
+                  $issTemp['执行']=$v;
+                break;
+                
+                case 'maintain':
+                  $issTemp['维护']=$v;
+                break;
+                //...................附件.....................
+                case 'upload':
+                  $issTemp['上传']=$v;
+                break;
+                
+                case 'download':
+                  $issTemp['下载']=$v;
+                break;
+                
+                case 'erase':
+                  $issTemp['删除']=$v;
+                break;
+                
+                case 'move':
+                  $issTemp['移动']=$v;
+                break;
+                
+                case 'copy':
+                  $issTemp['复制']=$v;
+                break;
+                //...................!附件.....................
+                
+               // case 'enable':
+//                  $issTemp['启用']=$v;
+//                break;
+              }
+          }
+      return $issTemp;
+    
+  }
 
