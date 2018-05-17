@@ -1,0 +1,79 @@
+<!-- editDept.html -->
+<form id="fmEditDept" role="form" action="" method="post" >	
+	<div class="form-group has-feedback">
+		<label for="deptName">部门全称</label>
+		<!-- // bootstrap实现矢量图在输入框开头 -->
+		<div class="input-group">
+			<span class="input-group-addon"><span class="glyphicon glyphicon-tree-conifer"></span></span>
+			<input type="text" class="form-control textDept" id="deptName" name="deptName" value="{$dept.name}" placeholder="输入部门全称">
+		</div>
+		<!-- // 配合jQuery 中的内容验证代码-->
+		<span style="color:red;display: none;" class="tips"></span>
+      	<span style="display: none;"  class="glyphicon glyphicon-ok form-control-feedback"></span>
+		<span style="display: none;" class="glyphicon glyphicon-remove form-control-feedback"></span>		  	
+	</div>
+				
+	<div class="form-group has-feedback">
+		<label for="deptAbbr">部门简称</label>
+		<div class="input-group">
+			<span class="input-group-addon"><span class="glyphicon glyphicon-grain"></span></span>
+			<input type="text" class="form-control textDept" id="deptAbbr" name="deptAbbr" value="{$dept.abbr}" placeholder="输入部门简称">
+		</div>
+		<!-- // 配合jQuery 中的内容验证代码-->
+		<span style="color:red;display: none;" class="tips"></span>
+      	<span style="display: none;"  class="glyphicon glyphicon-ok form-control-feedback"></span>
+		<span style="display: none;" class="glyphicon glyphicon-remove form-control-feedback"></span>
+	</div>
+				
+	<div id="divDeptEn" class="form-group ">
+		<label class="" for="deptEn">部门启用:</label>
+		<label class="radio-inline">
+		{eq name="$dept.enable" value="1"}
+			<input type="radio" name="deptEn" value="1" checked>
+		{else/}
+			<input type="radio" name="deptEn" value="1">
+		{/eq}是
+			<!-- <input type="radio" name="deptEn" value="1" checked>是 -->
+    	</label>
+    	<label class="radio-inline">			
+		{eq name="$dept.enable" value="1"}
+			<input type="radio" name="deptEn" value="0">
+		{else/}
+			<input type="radio" name="deptEn" value="0" checked>
+		{/eq}否
+			<!-- <input type="radio" name="deptEn" value="0">否 -->
+    	</label>
+	</div>
+	<hr>
+				
+	<button id="btnAddDept" type="submit" class="btn btn-primary btn-sm" data-deptId="0" data-oprt="_CREATE"><span class="glyphicon glyphicon-file"></span>&nbsp;新增</button>
+				
+	<button id="btnAddDept" type="submit" class="btn btn-primary btn-sm" data-deptId="{$dept.id}" data-oprt="_UPDATE"><span class="glyphicon glyphicon-ok"></span>&nbsp;保存</button>
+				
+	<div class="pull-right">	
+		<button id="btnFormReset" type="reset" class="btn btn-primary btn-sm">重置</button>
+		<button type="button" class="btn btn-warning btn-sm" data-dismiss="modal">取消</button>
+	</div>
+</form>
+
+<script>
+
+$(document).ready(function(){
+
+	$('#fmEditDept').submit(function(){
+		
+	
+	});
+	
+	$('button:submit').click(function(event){
+		var url='deptOprt1';
+	
+	});
+
+<!--/ function -->
+
+<!--/ function -->
+	
+});
+
+</script>

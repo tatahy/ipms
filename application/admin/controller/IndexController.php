@@ -182,13 +182,11 @@ class IndexController extends \think\Controller
     }
         
     // 部门CDUR，接收客户端通过Ajax，post来的参数，返回json数据
-    public function deptOprt(Request $request)
+    public function deptOprt(Request $request,DeptModel $deptMdl,$oprt='_EDIT',$id=0)
     {
       $this->_loginUser();  
       
       $oprt=$request->param('oprt');
-      $username=$request->param('username');
-      $pwd=md5($request->param('pwd'));
       $id=$request->param('id');
       
       // 表单提交数据
@@ -216,8 +214,12 @@ class IndexController extends \think\Controller
       }else{
         $oprtId=0;
       }   
+      
+      $result='';
+      $msg='';
      
       switch($oprt){
+        //_ADDNEW
         case "add":
           //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
           if($oprtId){
@@ -263,7 +265,7 @@ class IndexController extends \think\Controller
           return ['result'=>$result,'msg'=>$msg];
             
         break;
-        
+        //_DELETE
         case"delete":
           DeptModel::destroy($id);
           
@@ -271,7 +273,7 @@ class IndexController extends \think\Controller
           // 返回前端JSON数据
           return ['result'=>$result];
         break;
-        
+        //_DISABLE
         case"disable":
           DeptModel::update(['enable'=> 0], ['id' => $id]);
           
@@ -280,7 +282,7 @@ class IndexController extends \think\Controller
           return ['result'=>$result,'deptId'=>$id];
           
         break;
-        
+        //_ENABLE
         case"enable":
           DeptModel::update(['enable'=> 1], ['id' => $id]);
           
@@ -289,7 +291,7 @@ class IndexController extends \think\Controller
           return ['result'=>$result,'deptId'=>$id];
           
         break;
-        
+        //_EDIT
         case"edit":
           $result=DeptModel::get($id);
           // 返回前端JSON数据
@@ -918,6 +920,102 @@ class IndexController extends \think\Controller
      }
       
     }
+    
+    // 部门组CDUR，接收客户端通过Ajax，post来的参数，返回json数据
+    //前端传来的oprt值:_CREATE、_UPDATE、_ADDNEW、_EDIT、_DISABLE、_ENABLE
+    public function deptOprt1(Request $request,DeptModel $deptMdl,$oprt='_CREATE',$id='0')
+    {
+      $this->_loginUser();
+    
+      $oprt=$request->param('oprt');
+      $id=$request->param('id');
+      $result='';
+      $msg='';
+      $msgPatch='';
+      //1.分情况变量赋值
+      if($oprt=='_CREATE' || $oprt=='_UPDATE') {
+        $deptData=array('name'=>$request->param('deptName'),
+                        'abbr'=>$request->param('deptAbbr'),
+                        'enable'=>$request->param('deptEn'),
+                        );
+      }
+      //2. 分情况操作数据库
+      switch($oprt){
+        case '_ADDNEW':
+          $dept=array('id'=>0,'name'=>'','abbr'=>'','enable'=>1);
+        break;
+        
+        case '_EDIT':
+          $dept=$deptMdl::get($id);
+        break;
+        
+        case '_CREATE':
+          $dept=$deptMdl::get(['name'=>$request->param('deptName')]);
+          $name=$request->param('deptName');
+          $result='success';
+          if(count($dept)){
+            $msg='创建失败';
+            $msgPatch='部门【'.$request->param('deptName').'】已存在。';
+          }else{
+            $dept=$deptMdl::create($deptData,true);
+            $msg='创建成功';
+          }
+          $id=$dept->id;
+        break;
+        
+        case '_UPDATE': 
+          $dept=$deptMdl::get(['name'=>$request->param('deptName')]);
+          $name=$request->param('deptName');
+          if(count($dept)){
+            $result='fail';
+            $msg='修改失败';
+            $msgPatch='部门【'.$request->param('deptName').'】已存在。';
+          }else{
+            $result='success';
+            $dept=$deptMdl::update($deptData,['id' => $id],true);
+            $msg='修改成功';
+          }
+        break;
+        
+        case '_DELETE':
+          $name=$deptMdl::get($id)->name;  
+          $deptMdl::destroy($id);
+          $result='success';
+          $msg='删除成功';
+          //返回默认的$id
+          $id=$deptMdl::where('id','>',0)->min('id');
+          
+        break;
+        
+        case'_DISABLE':
+          $deptMdl::update(array('enable'=> 0), ['id' => $id]);         
+        break;
+        
+        case'_ENABLE':
+          $deptMdl::update(array('enable'=> 1), ['id' => $id]);          
+        break;
+      }
+     //3.分情况返回前端数据
+     if ($oprt=='_ADDNEW' || $oprt=='_EDIT'){
+             
+        $this->assign([
+             'home'=>$request->domain(),
+             'dept'=>$dept,
+        ]);
+        // 返回前端模板文件
+        return view('editDept');
+     }elseif($oprt=='_CREATE' || $oprt=='_UPDATE' || $oprt=='_DELETE'){
+        // 返回前端JSON数据 
+        return ['result'=>$result,'id'=>$id,'name'=>$name,'msg'=>$msg,'msgPatch'=>$msgPatch];
+     }elseif($oprt=='_DISABLE' || $oprt=='_ENABLE'){
+        // 返回前端JSON数据 
+        return ['enable'=>$deptMdl::get($id)->enable,'id'=>$id];
+     }
+      
+    }
+    
+    
+    
     
     
     
