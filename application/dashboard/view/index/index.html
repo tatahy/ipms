@@ -143,14 +143,14 @@
 $(document).ready(function(){
 	$('[data-toggle="tooltip"]').tooltip();
 	
-	loadTplFile(window.location.hash);
+	loadTplFile($('li.active').children('a').attr('href'));
 	
 	$('#closeBtn').hide();	
 	
 	<!-- //点击nav-pills中的各个按钮后，加载对应的页面-->
 	$('.aTab').click(function(){
         var sId = $(this).attr('href');  //a的href属性值即是页面的锚点值
-		<!-- window.location.hash = sId;  //设置锚点 -->
+		
 		//a所在li高亮
 		$(this).tab('show');
 		//各个badge恢复初始颜色
@@ -186,7 +186,10 @@ $(document).ready(function(){
 	function loadTplFile(sId){
 		if(null==sId || sId=='#undefined'){sId='#issPat';}
         //提交锚点值给后端，由后端返回需加载的页面文件
-		$("#divContent_load").load('tplFile',{'sId':sId}); 
+		$("#divContent_load").load('tplFile',{'sId':sId},function(){
+			//load的回调函数改变样式
+			$('.nav a[href="'+sId+'"]').find('.badge').css('color','red');
+		}); 
     }
 
 <!--/ function -->

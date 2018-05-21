@@ -115,9 +115,8 @@ class IndexController extends \think\Controller
       
       $this->assign([
         
-        //'home'=>$request->domain(),
-        'home'=>Request::domain(),
-        
+        'home'=>$request->domain(),
+       
         ]);
         return view();
     }
@@ -612,7 +611,7 @@ class IndexController extends \think\Controller
       
       $this->assign([
               'home'=>$request->domain(),
-              'depts'=>$deptMdl::all(),
+              'depts'=>$deptMdl::where('id','>',0)->order('name Asc')->select(),
         ]);
       return view();
     }
@@ -922,7 +921,7 @@ class IndexController extends \think\Controller
     }
     
     // 部门组CDUR，接收客户端通过Ajax，post来的参数，返回json数据
-    //前端传来的oprt值:_CREATE、_UPDATE、_ADDNEW、_EDIT、_DISABLE、_ENABLE
+    //前端传来的oprt值:_CREATE、_UPDATE、_ADDNEW、_EDIT、_DISABLE、_ENABLE、_DELETE
     public function deptOprt1(Request $request,DeptModel $deptMdl,$oprt='_CREATE',$id='0')
     {
       $this->_loginUser();
@@ -950,30 +949,78 @@ class IndexController extends \think\Controller
         break;
         
         case '_CREATE':
-          $dept=$deptMdl::get(['name'=>$request->param('deptName')]);
-          $name=$request->param('deptName');
-          $result='success';
-          if(count($dept)){
-            $msg='创建失败';
-            $msgPatch='部门【'.$request->param('deptName').'】已存在。';
-          }else{
-            $dept=$deptMdl::create($deptData,true);
-            $msg='创建成功';
-          }
-          $id=$dept->id;
-        break;
-        
-        case '_UPDATE': 
-          $dept=$deptMdl::get(['name'=>$request->param('deptName')]);
+          //$dept=$deptMdl::get(['name'=>$request->param('deptName')]);
+          $dept=$deptMdl::where('name',$request->param('deptName'))->select();
           $name=$request->param('deptName');
           if(count($dept)){
             $result='fail';
-            $msg='修改失败';
+            $msg='创建失败';
             $msgPatch='部门【'.$request->param('deptName').'】已存在。';
           }else{
-            $result='success';
-            $dept=$deptMdl::update($deptData,['id' => $id],true);
-            $msg='修改成功';
+            //$request->param('deptAbbr')已存在
+            if($deptMdl::where('abbr',$request->param('deptAbbr'))->count()){
+              $result='fail';
+              $msg='创建失败';
+              $msgPatch='部门简称【'.$request->param('deptAbbr').'】已存在。';
+            }else{
+              $result='success';
+              $dept=$deptMdl::create($deptData,true);
+              $msg='创建成功';
+              $id=$dept->id;
+              
+            }           
+          }
+          
+        break;
+        
+        case '_UPDATE': 
+          $deptDb=$deptMdl::get($id);
+          $getName=$deptMdl::get(['name'=>$request->param('deptName')]);//是否empty
+          $getAbbr=$deptMdl::get(['abbr'=>$request->param('deptAbbr')]);//是否empty
+          
+          $name=$deptDb->name;
+          if(count($getAbbr)){
+            if($id != $getAbbr->id){
+              $result='fail';
+              $msg='修改失败';
+              $msgPatch='部门简称【'.$request->param('deptAbbr').'】已存在。';
+            }else{
+              if(count($getName)){
+                if($id != $getName->id){
+                  $result='fail';
+                  $msg='修改失败';
+                  $msgPatch='部门【'.$request->param('deptName').'】已存在。';
+                }else{
+                  $result='success';
+                  $dept=$deptMdl::update($deptData,['id' => $id],true);
+                  $msg='修改成功';
+                  $msgPatch='部门简称修改为：【'.$request->param('deptAbbr').'】';
+                }
+              }else{
+                $result='success';
+                $dept=$deptMdl::update($deptData,['id' => $id],true);
+                $msg='修改成功';
+                $msgPatch='部门【'.$name.'】修改为：【'.$request->param('deptName').'】';
+              }
+            }
+          }else{
+            if(count($getName)){
+              if($id != $getName->id){
+                $result='fail';
+                $msg='修改失败';
+                $msgPatch='部门【'.$request->param('deptName').'】已存在。';
+              }else{
+                $result='success';
+                $dept=$deptMdl::update($deptData,['id' => $id],true);
+                $msg='修改成功';
+                $msgPatch='部门简称修改为：【'.$request->param('deptAbbr').'】';
+              }
+            }else{
+              $result='success';
+              $dept=$deptMdl::update($deptData,['id' => $id],true);
+              $msg='修改成功';
+              $msgPatch='部门【'.$name.'】修改为：【'.$request->param('deptName').'】';
+            }
           }
         break;
         
@@ -988,11 +1035,11 @@ class IndexController extends \think\Controller
         break;
         
         case'_DISABLE':
-          $deptMdl::update(array('enable'=> 0), ['id' => $id]);         
+          $deptMdl::update(array('enable'=> 0), ['id' => $id]);
         break;
         
         case'_ENABLE':
-          $deptMdl::update(array('enable'=> 1), ['id' => $id]);          
+          $deptMdl::update(array('enable'=> 1), ['id' => $id]); 
         break;
       }
      //3.分情况返回前端数据
@@ -1001,6 +1048,7 @@ class IndexController extends \think\Controller
         $this->assign([
              'home'=>$request->domain(),
              'dept'=>$dept,
+             'oprt'=>$oprt,
         ]);
         // 返回前端模板文件
         return view('editDept');

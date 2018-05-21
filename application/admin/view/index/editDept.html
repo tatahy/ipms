@@ -1,28 +1,30 @@
 <!-- editDept.html -->
 <form id="fmEditDept" role="form" action="" method="post" >	
+	<input id="id" type="text" name="id" value="{$dept.id}" class="sr-only">
+	<input id="oprt" type="text" value="{$oprt}" class="sr-only">
 	<div class="form-group has-feedback">
-		<label for="deptName">部门全称</label>
+		<label for="deptName">部门全称<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
 		<!-- // bootstrap实现矢量图在输入框开头 -->
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-tree-conifer"></span></span>
-			<input type="text" class="form-control textDept" id="deptName" name="deptName" value="{$dept.name}" placeholder="输入部门全称">
+			<input type="text" class="form-control inputCheck" id="deptName" name="deptName" value="{$dept.name}" placeholder="输入部门全称">
 		</div>
 		<!-- // 配合jQuery 中的内容验证代码-->
-		<span style="color:red;display: none;" class="tips"></span>
-      	<span style="display: none;"  class="glyphicon glyphicon-ok form-control-feedback"></span>
-		<span style="display: none;" class="glyphicon glyphicon-remove form-control-feedback"></span>		  	
+		<span style="color:red;display: none;" class="spTips"></span>
+      	<span style="display: none;"  class="spOk glyphicon glyphicon-ok form-control-feedback"></span>
+		<span style="display: none;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span>		  	
 	</div>
 				
 	<div class="form-group has-feedback">
-		<label for="deptAbbr">部门简称</label>
+		<label for="deptAbbr">部门简称<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-grain"></span></span>
-			<input type="text" class="form-control textDept" id="deptAbbr" name="deptAbbr" value="{$dept.abbr}" placeholder="输入部门简称">
+			<input type="text" class="form-control inputCheck" id="deptAbbr" name="deptAbbr" value="{$dept.abbr}" placeholder="输入部门简称">
 		</div>
 		<!-- // 配合jQuery 中的内容验证代码-->
-		<span style="color:red;display: none;" class="tips"></span>
-      	<span style="display: none;"  class="glyphicon glyphicon-ok form-control-feedback"></span>
-		<span style="display: none;" class="glyphicon glyphicon-remove form-control-feedback"></span>
+		<span style="color:red;display: none;" class="spTips"></span>
+      	<span style="display: none;"  class="spOk glyphicon glyphicon-ok form-control-feedback"></span>
+		<span style="display: none;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span>
 	</div>
 				
 	<div id="divDeptEn" class="form-group ">
@@ -32,7 +34,7 @@
 			<input type="radio" name="deptEn" value="1" checked>
 		{else/}
 			<input type="radio" name="deptEn" value="1">
-		{/eq}是
+		{/eq}<span class="label label-info">是</span>
 			<!-- <input type="radio" name="deptEn" value="1" checked>是 -->
     	</label>
     	<label class="radio-inline">			
@@ -40,15 +42,17 @@
 			<input type="radio" name="deptEn" value="0">
 		{else/}
 			<input type="radio" name="deptEn" value="0" checked>
-		{/eq}否
+		{/eq}<span class="label label-default">否</span>
 			<!-- <input type="radio" name="deptEn" value="0">否 -->
     	</label>
 	</div>
 	<hr>
 				
-	<button id="btnAddDept" type="submit" class="btn btn-primary btn-sm" data-deptId="0" data-oprt="_CREATE"><span class="glyphicon glyphicon-file"></span>&nbsp;新增</button>
+	<button id="btnCreateDept" type="submit" class="btn btn-primary btn-sm" data-deptId="0" data-oprt="_CREATE"><span class="glyphicon glyphicon-file"></span>&nbsp;新增</button>
 				
-	<button id="btnAddDept" type="submit" class="btn btn-primary btn-sm" data-deptId="{$dept.id}" data-oprt="_UPDATE"><span class="glyphicon glyphicon-ok"></span>&nbsp;保存</button>
+	<button id="btnUpdateDept" type="submit" class="btn btn-primary btn-sm" data-deptId="{$dept.id}" data-oprt="_UPDATE"><span class="glyphicon glyphicon-ok"></span>&nbsp;保存</button>
+	
+	<button id="btnDeleteDept" type="submit" class="btn btn-danger btn-sm" data-deptId="{$dept.id}" data-oprt="_DELETE"><span class="glyphicon glyphicon-remove"></span>删除</button>&nbsp;
 				
 	<div class="pull-right">	
 		<button id="btnFormReset" type="reset" class="btn btn-primary btn-sm">重置</button>
@@ -60,17 +64,173 @@
 
 $(document).ready(function(){
 
-	$('#fmEditDept').submit(function(){
-		
+//deptName正则表达式，由英文、数字、中文和下划线组成,但不能以数字开头,长度为2到20个字符。unicode编码中的汉字范围:\u2E80-\u9FFF
+	var regDeptName = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{4,19}$/;
 	
+//deptAbbr简称正则表达式，由英文、数字、中文和下划线组成,但不能以数字开头,长度为2到20个字符。unicode编码中的汉字范围:\u2E80-\u9FFF
+	var regDeptAbbr = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{1,19}$/;
+	
+	//必填输入框内容有效性判断结果数组
+	var check = [];
+	
+	$('.inputCheck').each(function(){
+		var i=$('.inputCheck').index($(this));
+		//‘新增’时{$dept.id}==0，
+		if({$dept.id}==0){
+			check[i]=false;
+		}else{
+			//有效性判断结果
+			check[i]=inputCheck($(this));
+		}
+		<!-- console.log(check[i]); -->
 	});
+	
+	// 2个输入框输入内容改变时有效性判断
+	$('.inputCheck').focusout(function() { 
+		check[$('.inputCheck').index($(this))]=inputCheck($(this));
+	});
+	
+	<!-- $('#fmEditDept').submit(function(){ -->
+		
+	<!-- }); -->
 	
 	$('button:submit').click(function(event){
 		var url='deptOprt1';
+		var name=$('#deptName').val();
+		//bootstrap得到属性“data-oprt”值
+		var oprt=$(this).data('oprt');
+		var anchor=window.location.hash;
+		<!-- var formData=new FormData($(this).closest('form').get(0)); -->
+		var formData=new FormData($('#fmEditDept').get(0));
+		var strHtml=$(this).html();
+		var flag=check.every(function(value) {
+            return value == true
+        });
+		//阻止表单提交动作
+		event.preventDefault();
+		formData.append('oprt',oprt);
+		
+		if(oprt=='_DELETE'){
+			strHtml='<span class="label label-danger">'+strHtml+'</span>';
+		}else{
+			strHtml='<span class="label label-primary">'+strHtml+'</span>';
+		}
 	
-	});
+		if (!flag && oprt!='_DELETE') {
+			var arr=[];
+			<!-- //check中存在false,对应的input用“has-error”突出显示。 -->
+        	for (key in check) {
+            	if(!check[key]){
+                	$(this).closest('form').find('.has-feedback').eq(key).removeClass('has-success').addClass('has-error');
+					arr.push(key);
+            	}
+        	}
+			//序号最小的$('.inputCheck').eq(i)获得焦点
+			$('.inputCheck').eq(Math.min.apply(null, arr)).focus();	
+		}else{
+			$('.modal').modal('hide');
+			$.confirm(strHtml+'【'+name+'】',function(e){
+				con=e;
+				if(true==con){
+					ajaxProcess(url,formData,anchor);
+				}
+				else{
+					$('.modal').modal('show');
+				}
+			}).ok('确定(Y)').cancel('取消(N)');		
+		}
+	
+	});	
 
 <!--/ function -->
+//校验成功函数，返回true
+function success(obj) {
+    var divParent=obj.closest('.has-feedback');
+	divParent.removeClass('has-error').addClass('has-success');
+	divParent.children('span').hide();
+	divParent.children('.spOk').show();
+    return true;
+}
+
+// 校验失败函数，返回false
+function fail(obj,msg) {
+    var divParent=obj.closest('.has-feedback');
+	divParent.removeClass('has-success').addClass('has-error');
+	divParent.children('span').hide();
+	divParent.children('.spTips').text(msg).show();
+    divParent.children('.spRemove').show();
+	return false;
+}
+
+//**函数名：inputCheck
+ 	//* 作用：本页面必填输入框(必须有Id值)内容有效性判断
+	//* 参数obj，类型：对象。值：不为空。说明：调用函数的对象。
+	//* 返回值：boolean
+function inputCheck(obj){
+	var idName=obj.attr('id');
+	var i=$('.inputCheck').index(obj);
+	var result=false;
+	switch(idName){
+		case 'deptName':
+			if (regDeptName.test(obj.val())) {
+        		result=success(obj);
+    		} else if (obj.val().length < 5) {
+        		fail(obj,'有'+obj.val().length+'个字符，不能少于5个字符。');
+    		} else {
+        		fail(obj,'可由英文、数字、中文和下划线组成，但不能以数字开头。')
+    		}
+		break;
+		case 'deptAbbr':
+			if (regDeptAbbr.test(obj.val())) {
+        		result=success(obj);
+    		} else if (obj.val().length < 2) {
+        		fail(obj,'有'+obj.val().length+'个字符，不能少于2个字符。');
+    		} else {
+        		fail(obj,'可由英文、数字、中文和下划线组成，但不能以数字开头。')
+    		}
+		break;		
+	}
+	return result;
+}
+
+//**函数名：ajaxProcess
+ 	//* 作用：本页面ajax过程
+	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
+	//* 参数data，类型：数值。值：传送给后端的键值对数据。
+	//* 参数archor，类型：字符串。值：本页面锚点值：window.location.hash。
+	//* 返回值：无
+	function ajaxProcess(url,data,archor){
+		$.ajax({
+			type : 'post',
+			url : url, 
+			data : data,
+			timeout:2000,
+			<!-- dataType:'JSON', -->
+			contentType: false,// 当有文件要上传时，此项是必须的，否则会导致后台无法识别文件流的起始位置
+			processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)。当使用FormData()，必须设为false，否则jqurey默认将FormData()转换为查询字符串。
+			
+			success:function(dataBack){		
+				if(dataBack.result=='success'){
+					//ajax更新页面信息
+					$('#content').load(
+						'tplFile',
+						{'sId':archor},
+						function(){
+							//所在行上色'bg-warning'
+							$('button[data-deptId="'+dataBack.id+'"]').closest('tr').addClass('bg-warning').focus();
+							$.alert('部门【'+dataBack.name+'】<span class="label label-success">'+dataBack.msg+'</span><br>'+dataBack.msgPatch);
+						}
+					);
+				}else{
+					$.alert('部门【'+dataBack.name+'】<span class="label label-danger">'+dataBack.msg+'</span><br>'+dataBack.msgPatch);	
+				}
+			},
+			error: function() {
+               	$.alert('与服务器通讯超时，请稍后再试！');
+            }
+		});	
+	}
+
 
 <!--/ function -->
 	

@@ -98,10 +98,6 @@
 
 <script>
 $(document).ready(function(){
-	//侧边栏消除li的active
-	$('.nav .active').removeClass('active');
-	//侧边栏本页对应a添加数字,其所在li加acitve
-	$('.nav a[href="'+window.location.hash+'"]').find('.badge').text({$numTotal}).css('color','red').closest('li').addClass('active');
 	
 	$('.span0').addClass('mycolorred-bgwhite');
 	

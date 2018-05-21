@@ -29,17 +29,15 @@
 						{volist name="depts" id="vo" empty="暂时没有数据"}
 						<tr>
 							<td>{$i}</td>
-							<td>{$vo.name}</td>
+							<td class="name">{$vo.name}</td>
 							<td>{$vo.abbr}</td>
 						
 							<td>
-								<button class="dis btn-link" data-deptId="{$vo.id}" data-toggle="modal" data-target="#modalDept" data-oprt="_EDIT"><span class="text-primary glyphicon glyphicon-edit"></span>编辑</button>&nbsp;
-								
-								<button class="dis btn-link" data-deptId="{$vo.id}" data-oprt="_DELETE"><span class="text-danger glyphicon glyphicon-remove"></span>删除</button>&nbsp;
+								<button class="dis btn-link" type="button" data-deptId="{$vo.id}" data-toggle="modal" data-target="#modalDept" data-oprt="_EDIT"><span class="text-primary glyphicon glyphicon-edit"></span>编辑</button>&nbsp;
 							
-								<button class="dis btn-link" data-deptId="{$vo.id}" data-oprt="_DISABLE"><span class="text-warning glyphicon glyphicon-ban-circle"></span>停用</button>
+								<button class="dis btn-link" type="button" data-deptId="{$vo.id}" data-oprt="_DISABLE"><span class="text-warning glyphicon glyphicon-ban-circle"></span>停用</button>
 							
-								<span class="en">（已停用）</span><button class="en btn-link" data-deptId="{$vo.id}" data-oprt="_ENABLE" enable="{$vo.enable}"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
+								<span class="en">（已停用）</span><button class="en btn-link" type="button" data-deptId="{$vo.id}" data-oprt="_ENABLE" enable="{$vo.enable}"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
 							
 							</td>	
 					
@@ -138,188 +136,105 @@ $(document).ready(function(){
 			$(this).closest('tr').addClass("danger text-muted");
 		}
 	});
-	
+	//#sysDept button的按钮分类动作_ADDNEW、_EDIT、_DISABLE、_ENABLE
 	$("#sysDept button").click(function() {
 		var oprt=$(this).data('oprt');
 		var sendData = {'oprt':oprt,'id':$(this).data('deptid')};
 		var url='deptOprt1';
-		//所有行去掉上色
-		$(this).closest('tbody').find('tr').removeClass('bg-warning');
-		//本行上色
-		$(this).closest('tr').addClass('bg-warning');
-	
-		if(oprt=='_ADDNEW' || oprt=='_EDIT' ){
-			$('#divModalBody_load').load(url,sendData);
-		}else{
-			ajaxProcess(url,sendData,window.location.hash);
+		if(oprt!='_ADDNEW'){
+			//先去掉上色
+			$(this).closest('tbody').children('tr').removeClass('bg-warning');
+			//所在行上色
+			$(this).closest('tr').addClass('bg-warning');
 		}
-	});
-	
-	
-	
-	
-	<!-- // 提交按钮#btnAddDept -->
-	$('#btnAddDept').click(function(event){
-		//JavaScript的数组处理方法every(callback)，对数组中的每个元素都执行一次
-		//callback函数，直到callback返回false，every就返回false；
-		//若全部元素执行callback后都返回ture，every就返回true。
-		//此处的用意是只要数组check中存在false，将该项找出，并把该项对应的input用“has-error”突出显示。
-		
-		var flag=check.every(function(value) {
-            return value == true
-        });
-		
-		
-		<!-- // jQuery的preventDefault()方法阻止元素发生默认的行为。阻止表单提交动作 -->
-        event.preventDefault();
-	
-		if (!flag) {
-			<!-- //check中存在false,对应的input用“has-error”突出显示。 -->
-        	for (key in check) {
-            	if (!check[key]) {
-                	$(".modal").find(".textDept").eq(key).parent().parent().removeClass("has-success").addClass("has-error");
-            	}
-        	}
+		if(oprt=='_ADDNEW' || oprt=='_EDIT'){
+			ajaxModalShow($('#modalDept'),url,sendData);
 		}else{
-			<!-- // 组装通过“post”提交的数据 -->
-			var sendData = {"oprt":"add","deptName":$("#deptName").val(),"deptAbbr":$("#deptAbbr").val(),"deptEn":$("input:radio[name='deptEn']").prop("checked"),"oprtId":$("#oprtId").val()
-			};
-						
-			$("#modalDept").modal("hide");
-			
-			$.ajax({
-				type : "post",
-				async : true,  //异步请求
-				url : "{$home}/admin/index/deptOprt", 
-				<!-- // 发送到服务器的数据 -->
-				data : sendData,
-				timeout:1000,
-				<!-- // 指定服务器端response的数据类型为json -->
-				dataType:"json",
-				success:function(backData){
-					var data=backData;
-					<!-- alert(data.msg); -->
-							
-					if(data.result=='success'){
-
-					//添加成功，弹出自定义提示页面 
-						$.confirm(data.msg,function(e){
-							con=e;
-							if(true==con){								
-								$("#modalDept").modal("show");
-							}else{
-								$("#content").load("sys_param");
-								<!-- $('#btnResetUserGroup').click(); -->
-								//刷新页面并回到"#div0"页面
-								<!-- window.location.hash="#div0"; -->
-								<!-- window.location.reload(true); -->
-									
-							}
-						}).ok('继续').cancel('完成');
-							
-					}else{
-						// 添加不成功，弹出自定义提示页面 
-						$.confirm(data.msg,function(e){
-							con=e;
-							if(true==con){
-								// 返回"#addUser".modal页面
-								$("#modalDept").modal("show");
-							}else{
-								$('#btnResetDept').click();
-							}
-						}).ok('继续').cancel('取消');	
-						
-					}
-
-				},
-					error: function() {
-               			// 应用自定义的alert提示框
-						$.alert("失败1，请稍后再试！");
-            		}
-			});
-		}
-	
-	});
-	
-	// 设置重置后modal中各元素默认格式
-	$('#btnResetDept').click(function() {
-		
-		// 清除输入框的格式
-		$(".modal input").parent().parent().removeClass("has-success").removeClass("has-error"); 
-		
-		// 注意限定.tips/glyphicon-ok/glyphicon-remove所在标签.modal，否则会殃及其他标签的.tips/glyphicon-ok/glyphicon-remove
-    	$('.modal .tips').hide();
-    	$('.modal .glyphicon-ok').hide();
-    	$('.modal .glyphicon-remove').hide();
-		
-		check=[false,false];
-		
+			ajaxDeptEn($(this),url,sendData);
+		}		
 	});	
-	
-	<!-- deptName内容验证 -->
-	$("#deptName").change(function(){
-        if(regDeptName.test($(this).val())){
-			success($(this),0);	
-		}else if ($(this).val().length < 5) {
-        	if($(this).val()==''){
-				fail($(this), 0, '部门全称不能为空。');
-			}else{
-				fail($(this), 0, '部门全称太短，不能少于5个字符。');
-			}
-		}
-		else {
-        	fail($(this), 0, '部门全称为英文、数字、中文和下划线，但不能以数字开头。')
-    	}
-  	});
-	
-	<!-- deptAbbr内容验证 -->
-	$("#deptAbbr").change(function(){
-        if(regDeptAbbr.test($(this).val())){
-			success($(this),1);	
-		}else if ($(this).val().length < 2) {
-        	if($(this).val()==''){
-				fail($(this), 1, '部门简称不能为空。');
-			}else{
-				fail($(this), 1, '部门简称太短，不能少于2个字符。');
-			}
-		}
-		else {
-        	fail($(this), 1, '部门简称为英文、数字、中文和下划线，但不能以数字开头。')
-    	}
-  	});
 	
 <!-- function -->
 
-// 正则表达式，可以为英文、数字、中文和下划线,但不能以数字开头,unicode编码中的汉字范围:\u2E80-\u9FFF
-var regDeptName = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{4,19}$/;
-var regDeptAbbr = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{1,19}$/;
+//**函数名：ajaxModalShow
+ 	//* 作用：本页面内ajaxModalShow
+	//* 参数modalObj，类型：对象。值：不为空。说明：modal对象。
+	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
+	//* 参数sendData，类型：json。值：不为空。sendData = {'oprt':oprt,'id':$(this).data('deptid')}
+	//* 返回值：无
+	function ajaxModalShow(modalObj,url,sendData){
+		var oprt=sendData.oprt;
+		//回调函数modal调整
+		$('#divModalBody_load').load(url,sendData,function(){
+			
+			// 清除输入框的格式
+			modalObj.find('.has-feedback').removeClass('has-success').removeClass('has-error'); 
+		
+    		modalObj.find('.spTips').hide();
+    		modalObj.find('.spOk').hide();
+    		modalObj.find('.spRemove').hide();
+			
+			//根据.modal的'data-oprt'值选定button，初始化赋值
+			$('button:submit').hide();
+			switch(oprt){
+				case '_ADDNEW':
+					$('#modalTitle').addClass('bg-info').find('strong').text('新增部门');
+					//仅有“新增”按钮
+					$('#btnCreateDept').show();
+				break;
+				case '_EDIT':
+					$('#modalTitle').removeClass('bg-info').find('strong').text('编辑部门');
+					//“保存”按钮
+					$('#btnUpdateDept').show();
+					//“删除”按钮
+					$('#btnDeleteDept').show();
+				break;
+			}
 
-// 数组，存储表单中输入框内容验证结果“true/false”。数组下标应与输入框下标一致，便于编程选择输入框
-var check = [false,false];
+			$('.modal').on('shown.bs.modal', function(){
+				$('.inputCheck').eq(0).focus();
+			});			
+		}); 
+	}
 
-	//校验成功函数
-function success(Obj, counter) {
-    Obj.parent().parent().removeClass('has-error').addClass('has-success');
-	
-	// 注意限定.tips/glyphicon-ok/glyphicon-remove所在标签.modal，否则会殃及其他标签的.tips/glyphicon-ok/glyphicon-remove
-	$('.modal .tips').eq(counter).hide();
-    $('.modal .glyphicon-ok').eq(counter).show();
-    $('.modal .glyphicon-remove').eq(counter).hide();
-    check[counter] = true;
 
-}
-
-// 校验失败函数
-function fail(Obj, counter, msg) {
-    Obj.parent().parent().removeClass('has-success').addClass('has-error');
-   
-   // 注意限定.tips/glyphicon-ok/glyphicon-remove所在标签.modal，否则会殃及其他标签的.tips/glyphicon-ok/glyphicon-remove
-	$('.modal .glyphicon-remove').eq(counter).show();
-    $('.modal .glyphicon-ok').eq(counter).hide();
-    $('.modal .tips').eq(counter).text(msg).show();
-    check[counter] = false;
-}
-
+//**函数名：ajaxDeptEn
+ 	//* 作用：本页面ajax操作，部门启用/停用
+	//* 参数btnObj，类型：对象。值：不为空。说明：btn对象。
+	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
+	//* 参数sendData，类型：json。值：不为空。sendData = {'oprt':oprt,'id':$(this).data('deptid')}
+	//* 返回值：无
+	function ajaxDeptEn(btnObj,url,sendData){
+		var oprt=sendData.oprt;
+		$.ajax({
+			type : 'post',
+			async : true,  //异步请求
+			url : url, 
+			<!-- // 发送到服务器的数据 -->
+			data : sendData,
+			timeout:2000,
+			<!-- // 指定服务器端response的数据类型为json -->
+			dataType:'json',
+			success:function(backData){		
+				if(backData.enable){
+					btnObj.closest('tr').find('.dis').show();
+					btnObj.closest('tr').find('.en').hide();
+					//本行去掉上色
+					btnObj.closest('tr').removeClass("danger text-muted");
+					$.alert('部门【'+btnObj.closest('tr').children('.name').text()+'】<span class="label label-success">启用</span>&nbsp;成功');
+				}else{
+					btnObj.closest('tr').find('.dis').hide();
+					btnObj.closest('tr').find('.en').show();
+					//本行上色
+					btnObj.closest('tr').addClass("danger text-muted");
+					$.alert('部门【'+btnObj.closest('tr').children('.name').text()+'】<span class="label label-danger">停用</span>&nbsp;成功');
+				}
+			},
+			error: function() {
+               	$.alert('与服务器通讯超时，请稍后再试！');
+            }
+		});	
+	}
 
 <!--/ function -->	
 	
