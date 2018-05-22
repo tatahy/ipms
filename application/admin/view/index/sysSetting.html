@@ -12,10 +12,14 @@
 		<div id="sysDept" class="panel-collapse collapse in">
 			
 			<div class="panel-body " >
-				<h5><strong>部门列表</strong>&nbsp;<button id="btnModalOut" type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#modalDept" data-oprt="_ADDNEW" data-deptId="0">新增&nbsp;<span class="glyphicon glyphicon-tree-conifer"></span></button></h5>
+				<h5><strong>部门总数</strong>&nbsp;<span class="badge">{$numDept}</span></h5>
+				<p>
+				<button id="btnModalOut" type="button" class="btn-link" data-toggle="modal" data-target="#modalDept" data-oprt="_ADDNEW" data-deptId="0"><span class="glyphicon glyphicon-tree-conifer"></span>新增</button>
+				</p>
 			
 				<div class="table-responsive" >
 				<table class="table table-hover">
+					<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>部门列表</h4></caption>
 					<thead>
 						<tr>
 							<th>序号</th>
@@ -140,7 +144,7 @@ $(document).ready(function(){
 	$("#sysDept button").click(function() {
 		var oprt=$(this).data('oprt');
 		var sendData = {'oprt':oprt,'id':$(this).data('deptid')};
-		var url='deptOprt1';
+		var url='deptOprt';
 		if(oprt!='_ADDNEW'){
 			//先去掉上色
 			$(this).closest('tbody').children('tr').removeClass('bg-warning');

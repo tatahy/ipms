@@ -95,7 +95,7 @@ $(document).ready(function(){
 	<!-- }); -->
 	
 	$('button:submit').click(function(event){
-		var url='deptOprt1';
+		var url='deptOprt';
 		var name=$('#deptName').val();
 		//bootstrap得到属性“data-oprt”值
 		var oprt=$(this).data('oprt');
@@ -208,7 +208,6 @@ function inputCheck(obj){
 			<!-- dataType:'JSON', -->
 			contentType: false,// 当有文件要上传时，此项是必须的，否则会导致后台无法识别文件流的起始位置
 			processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)。当使用FormData()，必须设为false，否则jqurey默认将FormData()转换为查询字符串。
-			
 			success:function(dataBack){		
 				if(dataBack.result=='success'){
 					//ajax更新页面信息
