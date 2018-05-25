@@ -1338,3 +1338,45 @@ sha1_file('example.txt');
 
 <!--  HY 2018/4/20 -->
 
+
+<!--  HY 2018/5/24 -->
+扩展类可以部署到任意目录
+1、类名首字母大写。
+2、类的文件名和类名一致。(类的文件名：类名.php)
+3、类的命名空间（引用的时候use到类的文件名;类自身声明的时候到自己所在文件夹名即可，如果把类直接放到extend目录，类本身和引用可以不用use, 直接 new \类名即可, 如果放在其它任意目录或者extend子目录，在类本身的头部需要namespace, 引用可以use或者直接new '\'+命名空间）。
+
+//自动注册
+只需要把自己的类库包目录放入EXTEND_PATH目录（默认为extend，可配置,可以在入口文件中随意修改extend目录的名称，例如：define('EXTEND_PATH', '../extension/');），就可以自动注册对应的命名空间，例如：
+我们在extend目录下面新增一个my目录，然后定义一个\my\Test类（ 类文件位于extend/my/Test.php）如下：
+<?php
+namespace my;
+
+class Test 
+{
+    public function sayHello()
+    {
+        echo 'hello';
+    }
+}
+
+?>
+
+我们就可以直接实例化和调用：
+<?php
+$Test = new \my\Test();
+$Test->sayHello();
+?>
+或者
+<?php
+use my\test;
+$Test = new Test();
+$Test->sayHello();
+?>
+
+ThinkPHP5建议所有的扩展类库都使用命名空间定义，如果你的类库没有使用命名空间，则不支持自动加载，必须使用Loader::import方法先导入文件后才能使用。
+<?php
+Loader::import('first.second.Foo');
+$foo = new \Foo();
+?>
+
+<!--  HY 2018/5/24 -->

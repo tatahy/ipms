@@ -41,7 +41,7 @@ class Issrecord extends Model
           $outPut='维护人';
         break;
         
-         case '_EDIT':
+        case '_EDIT':
           $outPut='撰写人';
         break;
         
@@ -58,6 +58,26 @@ class Issrecord extends Model
         break;
         
         case '_MAINTAIN':
+          $outPut='维护人';
+        break;
+        
+        case 'edit':
+          $outPut='撰写人';
+        break;
+        
+        case 'audit':
+          $outPut='审核人';
+        break;
+        
+        case 'approv':
+          $outPut='批准人';
+        break;
+        
+        case 'execute':
+          $outPut='执行人';
+        break;
+        
+        case 'maintain':
           $outPut='维护人';
         break;
                 

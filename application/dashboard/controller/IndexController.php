@@ -657,37 +657,24 @@ class IndexController extends \think\Controller
     
     //根据前端传来的操作类型，对数据库进行操作
     //结构：1.变量赋初值  //结构2.20个oprt接收前端页面传来的数据，分别对变量赋值再进行数据库表的操作
-    public function issPatOprt(Request $request,$auth='done',IssinfoModel $issMdl,IssrecordModel $issRdMdl,
-                                PatinfoModel $patMdl,PatrecordModel $patRdMdl,AttinfoModel $attMdl)
+    public function issPatOprt(Request $request,IssinfoModel $issMdl,IssrecordModel $issRdMdl,
+                                PatinfoModel $patMdl,PatrecordModel $patRdMdl,AttinfoModel $attMdl,
+                                $oprt,$auth,$patId,$issId)
     {
       $this->_loginUser();
       
       //结构：1.变量赋初值 
       // $oprt接收前端页面传来的oprt值
-      if(!empty($request->param('oprt'))){
-        $oprt=$request->param('oprt');
-      }else{
-        $oprt='_NONE';
-      }
+      $oprt=!empty($request->param('oprt'))?$request->param('oprt'):'_NONE';
       
       // $auth接收前端页面传来的auth值,表示rolename（映射“用户组名”）
-      if(!empty($request->param('auth'))){
-        $auth=$request->param('auth');
-      }
+      $auth=!empty($request->param('auth'))?$request->param('auth'):'done';
       
       // $patId接收前端页面传来的patId值
-      if(!empty($request->param('patId'))){
-        $patId=$request->param('patId');
-      }else{
-        $patId=0;
-      }
+      $patId=!empty($request->param('patId'))?$request->param('patId'):0;
       
       // $issId接收前端页面传来的issId值
-      if(!empty($request->param('issId'))){
-        $issId=$request->param('issId');
-      }else{
-        $issId=0;
-      }
+      $issId=!empty($request->param('issId'))?$request->param('issId'):0;
       
      //接收前端页面传来的附件文件信息
      //如果要通过$request->param()获取的数据为数组，要加上 /a 修饰符才能正确获取。
