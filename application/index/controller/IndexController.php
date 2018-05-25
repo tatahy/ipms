@@ -8,6 +8,9 @@ use app\common\validate\Ipvalidate;
 use app\index\model\User as UserModel;
 use app\patent\model\Patinfo as PatinfoModel;
 
+//use liftfsm\Client;
+use lightfsm\Client;
+
 class IndexController extends \think\Controller
 {
     public function index(Request $request)
@@ -86,7 +89,7 @@ class IndexController extends \think\Controller
                     "<strong>authority Now [JSON string]:</strong>".json_encode($authority)."</br>";
                     //"session:".dump($request->session());
             //--!
-            
+            $fsm=new Client();
             $this->assign([
                 //在index.html页面通过'destr'输出自定义的信息
                 'destr'=>$destr."</br>",
@@ -98,7 +101,9 @@ class IndexController extends \think\Controller
                 'numpatadd'=>$numpatadd,
                 'numpatapp'=>$numpatapp,
                 'numpataut'=>$numpataut,
-                'year'=>date('Y')
+                'year'=>date('Y'),
+                
+                'fsm'=>$fsm->display()
                 ]);
             //return view();
             return $this->fetch();
