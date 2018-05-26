@@ -11,16 +11,17 @@ class Client
 {
     private $light;
     private $result;
+    
     public function __construct()
     {
         $this->result='light<br>';
         $this->light = new Light();
 
-        $this->result.=$this->light->turnLightOn().'On<br>';
-        $this->result.=$this->light->turnLightBrighter().'Brighter<br>';
-        $this->result.=$this->light->turnLigthBrightest().'Brightest<br>';
-        $this->result.=$this->light->turnLightOff().'Off<br>';
-        $this->result.=$this->light->turnLigthBrightest().'Brightest<br>';
+        $this->light->turnLightOn().'On<br>';
+        $this->light->turnLightBrighter().'Brighter<br>';
+        $this->light->turnLigthBrightest().'Brightest<br>';
+        $this->light->turnLightOff().'Off<br>';
+        $this->light->turnLigthBrightest().'Brightest<br>';
     }
     
     public function display()

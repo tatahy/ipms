@@ -4,4 +4,6 @@ composer.lock
 *v*.zip
 temp.*
 vim.*
-
+/runtime/
+/uploads/
+/~*/

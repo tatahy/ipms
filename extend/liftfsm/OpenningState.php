@@ -13,7 +13,8 @@ class OpenningState extends LiftState {
 	 *
 	 */
 	public function close() {
-		//状态修改
+		$this->fwdata(" _OPENSTATE. lift close...<br>");
+    //状态修改
 		$this->_context->setLiftState(Context::$closeingState);
 		//动作委托为CloseState来执行
 		$this->_context->getLiftState()->close();
@@ -21,16 +22,18 @@ class OpenningState extends LiftState {
 
 	//打开电梯门
 	public function open() {
-		return 'lift open...<br/>';
+    $this->fwdata(" _OPENSTATE. lift open...<br>");
 	}
 	//门开着电梯就想跑，这电梯，吓死你！
 	public function run() {
 		//do nothing;
+    $this->fwdata(" _OPENSTATE. Not allow to run...<br>");
 	}
 
 	//开门还不停止？
 	public function stop() {
 		//do nothing;
+    $this->fwdata(" _OPENSTATE. lift stopped...<br>");
 	}
 
 }

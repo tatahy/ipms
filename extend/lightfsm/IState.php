@@ -12,6 +12,7 @@ abstract class IState{
     public abstract function turnBrighter();
     public abstract function turnBrightest();
     
+    //继承的子类可以使用的方法
     protected function fwdata($str ){
         $fileName='../extend/lightfsm/data.txt';
         $handle=fopen($fileName,'a+');

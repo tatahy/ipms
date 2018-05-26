@@ -8,8 +8,8 @@ use app\common\validate\Ipvalidate;
 use app\index\model\User as UserModel;
 use app\patent\model\Patinfo as PatinfoModel;
 
-//use liftfsm\Client;
-use lightfsm\Client;
+use liftfsm\Client;
+//use lightfsm\Client;
 
 class IndexController extends \think\Controller
 {

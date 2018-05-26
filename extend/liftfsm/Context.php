@@ -7,7 +7,7 @@ use liftfsm\ClosingState;
 use liftfsm\RunningState;
 use liftfsm\StoppingState;
 /**
- * 环境类:定义客户感兴趣的接口。维护一个ConcreteState子类的实例，这个实例定义当前状态。
+ * 环境类，保存电梯状态的上下文，给出电梯可以进行的操作。
  */ 
 class Context {
 	//定义出所有的电梯状态
@@ -16,7 +16,7 @@ class Context {
 	static  $runningState  = null;
 	static  $stoppingState = null;
 
-    public function __construct() {
+  public function __construct() {
 		self::$openningState = new OpenningState();
 		self::$closeingState = new ClosingState();
 		self::$runningState =  new RunningState();
@@ -24,11 +24,12 @@ class Context {
 
 	}
 
-	//定一个当前电梯状态
+	//当前电梯状态
 	private  $_liftState;
 
 	public function getLiftState() {
-		return $this->_liftState;
+		//返回一个LiftState对象
+    return $this->_liftState;
 	}
 
 	public function setLiftState($liftState) {
@@ -36,7 +37,6 @@ class Context {
 		//把当前的环境通知到各个实现类中
 		$this->_liftState->setContext($this);
 	}
-
 
 	public function open(){
 		$this->_liftState->open();
@@ -53,6 +53,7 @@ class Context {
 	public function stop(){
 		$this->_liftState->stop();
 	}
+  
 }
 
 ?>
