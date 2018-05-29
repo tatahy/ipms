@@ -8,8 +8,8 @@ use app\common\validate\Ipvalidate;
 use app\index\model\User as UserModel;
 use app\patent\model\Patinfo as PatinfoModel;
 
+use isspatfsm\IssPatFSM;
 use liftfsm\Client;
-//use lightfsm\Client;
 
 class IndexController extends \think\Controller
 {
@@ -89,7 +89,15 @@ class IndexController extends \think\Controller
                     "<strong>authority Now [JSON string]:</strong>".json_encode($authority)."</br>";
                     //"session:".dump($request->session());
             //--!
-            $fsm=new Client();
+            //$fsm=new IssPatFSM('','ling',0);
+            $fsm=new IssPatFSM();
+            $param=array('auth'=>'_EDIT','status'=>'填报','oprt'=>'_ADDNEW');
+            $data=array('pat'=>array('id'=>1,'data'=>0,'rdData'=>0,'rdDataPatch'=>0),
+                'iss'=>array('id'=>2,'data'=>0,'rdData'=>0,'rdDataPatch'=>0),
+                'att'=>array('arrId'=>0,'arrFileName'=>0,'arrFileObjStr'=>0)
+                );
+            $liftFSM=new Client();
+            //$fsm->setFSM('_EDIT');
             $this->assign([
                 //在index.html页面通过'destr'输出自定义的信息
                 'destr'=>$destr."</br>",
@@ -103,7 +111,9 @@ class IndexController extends \think\Controller
                 'numpataut'=>$numpataut,
                 'year'=>date('Y'),
                 
-                'fsm'=>$fsm->display()
+                'liftFSM'=>$liftFSM->display(),
+                //'fsm'=>$fsm->selectFSM()->setFSMState('33')
+                'fsm'=>$fsm->setFSM($param)->result($data)
                 ]);
             //return view();
             return $this->fetch();

@@ -31,6 +31,7 @@ class Client {
       fwrite($handle,'lift<br>');
       fclose($handle);
       return $this->result;
+      //return json_encode($this);
   }
 }
 

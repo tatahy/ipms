@@ -98,11 +98,11 @@
             switch($value){
               case'maintain':
                   $status[$value]=array('申报复核','申报提交','续费提交','准予续费','否决申报',
-                                '专利授权','专利驳回','放弃续费','续费授权');
+                                '专利授权','专利驳回','放弃续费','续费授权','续费新增');
               break;   
               
               case'edit':
-                  $status[$value]=array('填报','返回修改','修改完善');
+                  $status[$value]=array('申报新增','填报','返回修改','修改完善');
               break;
               
               case'audit':

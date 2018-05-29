@@ -25,7 +25,7 @@ class Context {
 	}
 
 	//当前电梯状态
-	private  $_liftState;
+	private $_liftState;
 
 	public function getLiftState() {
 		//返回一个LiftState对象

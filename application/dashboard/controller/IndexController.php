@@ -656,7 +656,7 @@ class IndexController extends \think\Controller
     }
     
     //根据前端传来的操作类型，对数据库进行操作
-    //结构：1.变量赋初值  //结构2.20个oprt接收前端页面传来的数据，分别对变量赋值再进行数据库表的操作
+    //结构：1.变量赋初值  //结构2.21个oprt接收前端页面传来的数据，分别对变量赋值再进行数据库表的操作
     public function issPatOprt(Request $request,IssinfoModel $issMdl,IssrecordModel $issRdMdl,
                                 PatinfoModel $patMdl,PatrecordModel $patRdMdl,AttinfoModel $attMdl,
                                 $oprt,$auth,$patId,$issId)
