@@ -220,70 +220,72 @@ class IssPatFSM
   //FSM起作用，根据$this->_oprt确定$this->_context->oprt()处理$this->_data
   private function oprtData(){
     if($this->_errFlag==0){
+      //中转oprt中要处理的数据
+      $this->_context->transferData($this->_data);
       //21个oprt
       switch($this->_oprt){
         case '_ADDNEW':
-          $this->_msg=$this->_context->addNew($this->_data);
+            $this->_msg=$this->_context->addNew();
         break;
         case '_SUBMIT':
-          $this->_msg=$this->_context->submit($this->_data);
+          $this->_msg=$this->_context->submit();
         break;
         case '_DELETE':
-          $this->_msg=$this->_context->delete($this->_data);
+          $this->_msg=$this->_context->delete();
         break;
         case '_UPDATE':
-          $this->_msg=$this->_context->update($this->_data);
+          $this->_msg=$this->_context->update();
         break;
         case '_PASS':
-          $this->_msg=$this->_context->pass($this->_data);
+          $this->_msg=$this->_context->pass();
         break;
         case '_FAIL':
-          $this->_msg=$this->_context->fail($this->_data);
+          $this->_msg=$this->_context->fail();
         break;
         case '_MODIFY':
-          $this->_msg=$this->_context->modify($this->_data);
+          $this->_msg=$this->_context->modify();
         break;
         case '_PERMIT':
-          $this->_msg=$this->_context->permit($this->_data);
+          $this->_msg=$this->_context->permit();
         break;
         case '_VETO':
-          $this->_msg=$this->_context->veto($this->_data);
+          $this->_msg=$this->_context->veto();
         break;
         case '_COMPLETE':
-          $this->_msg=$this->_context->complete($this->_data);
+          $this->_msg=$this->_context->complete();
         break;
         case '_ACCEPT':
-          $this->_msg=$this->_context->accept($this->_data);
+          $this->_msg=$this->_context->accept();
         break;
         case '_REFUSE':
-          $this->_msg=$this->_context->refuse($this->_data);
+          $this->_msg=$this->_context->refuse();
         break;
         case '_REPORT':
-          $this->_msg=$this->_context->report($this->_data);
+          $this->_msg=$this->_context->report();
         break;
         case '_FINISH':
-          $this->_msg=$this->_context->finish($this->_data);
+          $this->_msg=$this->_context->finish();
         break;
         case '_APPLY':
-          $this->_msg=$this->_context->apply($this->_data);
+          $this->_msg=$this->_context->apply();
         break;
         case '_REVIEW':
-          $this->_msg=$this->_context->review($this->_data);
+          $this->_msg=$this->_context->review();
         break;
         case '_IMPROVE':
-          $this->_msg=$this->_context->improve($this->_data);
+          $this->_msg=$this->_context->improve();
         break;
         case '_AUTHORIZE':
-          $this->_msg=$this->_context->authorize($this->_data);
+          $this->_msg=$this->_context->authorize();
         break;
         case '_REJECT':
-          $this->_msg=$this->_context->reject($this->_data);
+          $this->_msg=$this->_context->reject();
         break;
         case '_ADDRENEW':
-          $this->_msg=$this->_context->addRenew($this->_data);
+          $this->_msg=$this->_context->addRenew();
         break;
         case '_CLOSE':
-          $this->_msg=$this->_context->close($this->_data);
+          $this->_msg=$this->_context->close();
         break;
       }
     }

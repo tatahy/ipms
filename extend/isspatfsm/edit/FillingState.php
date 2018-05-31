@@ -12,21 +12,26 @@ use isspatfsm\edit\EditContex;
 use isspatfsm\audit\AuditContext;
 
 class FillingState extends EditState{
-  public function addNew($data){
-    //无操作
-    //$data['iss']['info']['status']='issVar';
+  //public function addNew(){
+//    $data=$this->_oprtData;
+//    //无操作
+//    $data['iss']['info']['status']='issVar';
+//    $data['iss']['info']['abstract']='issAbs';
 //    $data['pat']['info']['status']='patVar';
 //    //$dataPatch=array('pat'=>array('data'=>array('status'=>'issArray')),
 ////                'iss'=>array('data'=>array('status'=>'patArray'))
 ////                );
-////    $data=array_merge($data,$dataPatch);
+//    //$data=array_merge($data,$dataPatch);
 //    $msg= '<br>无效addNew操作<br>'.json_encode($data);
-    $msg=$this->_mdl->test($data);
-    return '<br>无效addNew<br>'.$msg;
-    //return json_encode($data);
-  }
+//    return json_encode($data);
+//    
+//    //$msg=$this->_mdl->test($data);
+////    return '<br>无效addNew<br>'.$msg;
+//    
+//  }
   
-  public function delete($data){
+  public function delete(){
+    $data=$this->_oprtData;
     //delete操作代码
     $this->_mdl->patDelete($data);
     

@@ -12,13 +12,8 @@ use isspatfsm\edit\EditContex;
 use isspatfsm\audit\AuditContext;
 
 class CompletingState extends EditState{
-  public function addNew($data){
-    //无操作
-    return '无此addNew操作';
-    //return json_encode($data);
-  }
   
-  public function delete($data){  
+  public function delete(){  
     return '无此delete操作';
   }  
   

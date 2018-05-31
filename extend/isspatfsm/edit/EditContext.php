@@ -50,21 +50,27 @@ class EditContext{
     $this->_currentState->setContext($this);
   }
   
+  //中转state中要处理的数据
+  public function transferData($data){
+    //state接收要处理的数据
+    $this->_currentState->getData($data);
+  }
+  
   //_EDIT的4种操作
-  public function addNew($data){
-   return $this->_currentState->addNew($data);
+  public function addNew(){
+   return $this->_currentState->addNew();
   }
   
-  public function submit($data){
-    $this->_currentState->submit($data);
+  public function submit(){
+    $this->_currentState->submit();
   }
   
-  public function delete($data){
-    $this->_currentState->delete($data);
+  public function delete(){
+    $this->_currentState->delete();
   }
   
-  public function update($data){
-    $this->_currentState->update($data);
+  public function update(){
+    $this->_currentState->update();
   }
   
   

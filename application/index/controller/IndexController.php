@@ -3,6 +3,7 @@ namespace app\index\controller;
 
 use think\Request;
 use think\Session;
+use think\Controller;
 
 use app\common\validate\Ipvalidate;
 use app\index\model\User as UserModel;
@@ -11,7 +12,7 @@ use app\patent\model\Patinfo as PatinfoModel;
 use isspatfsm\IssPatFSM;
 use liftfsm\Client;
 
-class IndexController extends \think\Controller
+class IndexController extends Controller
 {
     public function index(Request $request)
     {
@@ -92,7 +93,7 @@ class IndexController extends \think\Controller
             //$fsm=new IssPatFSM('','ling',0);
             $fsm=new IssPatFSM();
             $param=array('auth'=>'_EDIT','status'=>'填报','oprt'=>'_ADDNEW');
-            $data=array('pat'=>array('id'=>3,'info'=>array('status'=>0),'record'=>0),
+            $data=array('pat'=>array('id'=>3,'info'=>array('status'=>'哈哈哈'),'record'=>0),
                 'iss'=>array('id'=>1,'info'=>array('status'=>0),'record'=>0),
                 'att'=>array('arrId'=>0,'arrFileName'=>0,'arrFileObjStr'=>0)
                 );
@@ -113,7 +114,7 @@ class IndexController extends \think\Controller
                 
                 'liftFSM'=>$liftFSM->display(),
                 //'fsm'=>$fsm->selectFSM()->setFSMState('33')
-                'fsm'=>$fsm->setFSM($param)->result($data)
+                'fsm'=>$fsm->setFSM($param)->result($data).'<br>'
                 ]);
             //return view();
             return $this->fetch();

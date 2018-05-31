@@ -12,23 +12,24 @@ use isspatfsm\edit\EditContex;
 use isspatfsm\edit\EditState;
 
 class ApplyCreatingState extends EditState{
-  public function addNew($data){
+  public function addNew(){
+    $data=$this->_oprtData;
     //确保写入数据库的关键信息无误（前端无法准确给出??）
-    //$data['iss']['data']['status']='新增';
-    //$data['pat']['data']['status']='内审';
-    $data=array_merge($data,array($data['iss']['data']['status']=>'新增',$data['pat']['data']['status']=>'内审'));
+    //$data['iss']['info']['status']='新增';
+    //$data['pat']['info']['status']='内审';
+    $data=array_merge($data,array($data['iss']['info']['status']=>'新增',$data['pat']['info']['status']=>'内审'));
     
     //1.patinfo新增
-    $this->_mdl->patCreate($data);
+    $this->_mdl->patCreate($data['pat']['info']);
     
     //2.patrecord新增
-    $this->_mdl->patRdCreate($data);
+    $this->_mdl->patRdCreate($data['pat']['record']);
     
     //3.issinfo新增
-    $this->_mdl->issCreate($data);
+    $this->_mdl->issCreate($data['iss']['info']);
     
     //4.issrecord新增
-    $this->_mdl->issRdCreate($data);
+    $this->_mdl->issRdCreate($data['iss']['record']);
     
     //5.attinfo更新???
     
@@ -39,17 +40,17 @@ class ApplyCreatingState extends EditState{
    // return json_encode($data);
   }
   
-  public function submit($data){
+  public function submit(){
     //oprt=="submit"要进行的操作
     return '<br>无submit操作';
     
   }
   
-  public function delete($data){
+  public function delete(){
     return '<br>无delete操作';
   }
   
-  public function update($data){
+  public function update(){
     return '<br>无update操作';
   }
   

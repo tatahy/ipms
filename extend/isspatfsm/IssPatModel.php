@@ -1,12 +1,6 @@
 <?php
-
-/**
- * @author tatahy
- * @copyright 2018
- * ¶¨ÒåÒ»¸öIssPatModelÀà,·â×°isspatÖĞ¶Ô5¸ömodelµÄÒıÓÃ,·â×°isspatÖĞ¶ÔÊı¾İ¿âµÄ²Ù×÷
- */
-
 namespace isspatfsm;
+use think\Controller; 
 
 use isspatfsm\model\Issinfo as IssinfoModel;
 use isspatfsm\model\Issrecord as IssrecordModel;
@@ -14,8 +8,15 @@ use isspatfsm\model\Patinfo as PatinfoModel;
 use isspatfsm\model\Patrecord as PatrecordModel;
 use isspatfsm\model\Attinfo as AttinfoModel;
 
-class IssPatModel{
-  //¾²Ì¬ÊôĞÔ£¬·â×°Êı¾İ¿âÄ£ĞÍµÄ¶ÔÏóÊµÀı
+/**
+ * @author tatahy
+ * @copyright 2018
+ * å®šä¹‰ä¸€ä¸ªIssPatModelç±»,å°è£…isspatä¸­å¯¹5ä¸ªmodelçš„å¼•ç”¨,å°è£…isspatä¸­å¯¹æ•°æ®åº“çš„æ“ä½œ
+ */
+ 
+
+class IssPatModel extends Controller {
+  //é™æ€å±æ€§ï¼Œå°è£…æ•°æ®åº“æ¨¡å‹çš„å¯¹è±¡å®ä¾‹
   static $issMdl = null;
   static $issRdMdl = null;
   static $patMdl = null;
@@ -23,7 +24,7 @@ class IssPatModel{
   static $attMdl = null; 
   
   public function __construct(){
-    //·ÃÎÊ±¾ÀàÖĞ¶¨ÒåµÄ¾²Ì¬ÊôĞÔ
+    //è®¿é—®æœ¬ç±»ä¸­å®šä¹‰çš„é™æ€å±æ€§
     self::$issMdl = new IssinfoModel();
     self::$issRdMdl = new IssrecordModel();
     self::$patMdl = new PatinfoModel();
@@ -31,162 +32,166 @@ class IssPatModel{
     self::$attMdl = new AttinfoModel();
   }
   
-  //¾²Ì¬·½·¨£¬·â×°¶ÔÊı¾İ¿âµÄ²Ù×÷¡£issĞÂÔö
+  //é™æ€æ–¹æ³•ï¼Œå°è£…å¯¹æ•°æ®åº“çš„æ“ä½œã€‚issæ–°å¢
   static function issCreate($data){ 
     self::$issMdl->create($data['iss']['info'],true);
   }
-  //¾²Ì¬·½·¨£¬·â×°¶ÔÊı¾İ¿âµÄ²Ù×÷¡£iss¸üĞÂ
+  //é™æ€æ–¹æ³•ï¼Œå°è£…å¯¹æ•°æ®åº“çš„æ“ä½œã€‚issæ›´æ–°
   static function issUpdate($data){ 
-    //save·½·¨·µ»ØÊÜÓ°ÏìµÄ¶ÔÏóÊı¡£
+    //saveæ–¹æ³•è¿”å›å—å½±å“çš„å¯¹è±¡æ•°ã€‚
     $id=self::$issMdl->save($data['iss']['info'],['id' => $data['iss']['id']],true);
     if($id){
         $msg="updated.";
-        $msg.=self::$issMdl->get($data['iss']['id'])->statussummary;
+        $msg.=self::$issMdl->get($data['iss']['id'])->topic;
     }else{
         $msg="no update.";
     }
     return $msg;
     
-    //update·½·¨·µ»ØÒªĞŞ¸ÄµÄÊôĞÔ¼üÖµ¶ÔÊı×é
+    //updateæ–¹æ³•è¿”å›è¦ä¿®æ”¹çš„å±æ€§é”®å€¼å¯¹æ•°ç»„
    // $id=self::$issMdl->update($data['iss']['info'],['id' => $data['iss']['id']],true);
 //    return json_encode($id);
   } 
-  //¾²Ì¬·½·¨£¬·â×°¶ÔÊı¾İ¿âµÄ²Ù×÷¡£issÉ¾³ı
+  //é™æ€æ–¹æ³•ï¼Œå°è£…å¯¹æ•°æ®åº“çš„æ“ä½œã€‚issåˆ é™¤
   static function issDelete($data){
     self::$issMdl->destroy($data['iss']['id']);
   }
-  //¾²Ì¬·½·¨£¬·â×°¶ÔÊı¾İ¿âµÄ²Ù×÷¡£issRdĞÂÔö
+  //é™æ€æ–¹æ³•ï¼Œå°è£…å¯¹æ•°æ®åº“çš„æ“ä½œã€‚issRdæ–°å¢
   static function issRdCreate($data){ 
     self::$issRdRdMdl->create($data['iss']['record'],true);
   }
   
-  //¾²Ì¬·½·¨£¬·â×°¶ÔÊı¾İ¿âµÄ²Ù×÷¡£issRd¸üĞÂ
+  //é™æ€æ–¹æ³•ï¼Œå°è£…å¯¹æ•°æ®åº“çš„æ“ä½œã€‚issRdæ›´æ–°
   static function issRdUpdate($data){ 
     //??
   }
-  //¾²Ì¬·½·¨£¬·â×°¶ÔÊı¾İ¿âµÄ²Ù×÷¡£issRdÉ¾³ı
+  //é™æ€æ–¹æ³•ï¼Œå°è£…å¯¹æ•°æ®åº“çš„æ“ä½œã€‚issRdåˆ é™¤
   static function issRdDelete($data){
     self::$issRdMdl->destroy(['issinfo_id'=>$data['iss']['id']]);
   }
   
-   //¾²Ì¬·½·¨£¬·â×°¶ÔÊı¾İ¿âµÄ²Ù×÷¡£patĞÂÔö
+   //é™æ€æ–¹æ³•ï¼Œå°è£…å¯¹æ•°æ®åº“çš„æ“ä½œã€‚patæ–°å¢
   static function patCreate($data){ 
     self::$patMdl->create($data['pat']['info'],true);
   } 
-  //¾²Ì¬·½·¨£¬·â×°¶ÔÊı¾İ¿âµÄ²Ù×÷¡£pat¸üĞÂ
+  //é™æ€æ–¹æ³•ï¼Œå°è£…å¯¹æ•°æ®åº“çš„æ“ä½œã€‚patæ›´æ–°
   static function patUpdate($data){ 
     self::$patMdl->update($data['pat']['info'],['id' => $data['pat']['id']],true);
   }
-  //¾²Ì¬·½·¨£¬·â×°¶ÔÊı¾İ¿âµÄ²Ù×÷¡£patÉ¾³ı
+  //é™æ€æ–¹æ³•ï¼Œå°è£…å¯¹æ•°æ®åº“çš„æ“ä½œã€‚patåˆ é™¤
   static function patDelete($data){
     self::$patMdl->destroy($data['pat']['id']);
   }
    
-  //¾²Ì¬·½·¨£¬·â×°¶ÔÊı¾İ¿âµÄ²Ù×÷¡£patRdĞÂÔö
+  //é™æ€æ–¹æ³•ï¼Œå°è£…å¯¹æ•°æ®åº“çš„æ“ä½œã€‚patRdæ–°å¢
   static function patRdCreate($data){ 
     self::$patRdMdl->create($data['pat']['record'],true);
   }
-  //¾²Ì¬·½·¨£¬·â×°¶ÔÊı¾İ¿âµÄ²Ù×÷¡£patRd¸üĞÂ
+  //é™æ€æ–¹æ³•ï¼Œå°è£…å¯¹æ•°æ®åº“çš„æ“ä½œã€‚patRdæ›´æ–°
   static function patRdUpdate($data){ 
-    //£¿£¿
+    //ï¼Ÿï¼Ÿ
   }
-  //¾²Ì¬·½·¨£¬·â×°¶ÔÊı¾İ¿âµÄ²Ù×÷¡£patRdÉ¾³ı
+  //é™æ€æ–¹æ³•ï¼Œå°è£…å¯¹æ•°æ®åº“çš„æ“ä½œã€‚patRdåˆ é™¤
   static function patRdDelete($data){ 
     self::$patRdMdl->destroy(['patinfo_id'=>$data['pat']['id']]); 
   }
   
-   //¾²Ì¬·½·¨£¬·â×°¶ÔÊı¾İ¿âµÄ²Ù×÷¡£attĞÂÔö
+   //é™æ€æ–¹æ³•ï¼Œå°è£…å¯¹æ•°æ®åº“çš„æ“ä½œã€‚attæ–°å¢
   static function attCreate($data){ 
     self::$attMdl->create($data['att']['info'],true);
   } 
-  //¾²Ì¬·½·¨£¬·â×°¶ÔÊı¾İ¿âµÄ²Ù×÷¡£att¸üĞÂ
+  //é™æ€æ–¹æ³•ï¼Œå°è£…å¯¹æ•°æ®åº“çš„æ“ä½œã€‚attæ›´æ–°
   static function attUpdate($data){ 
     $issSet=self::$issMdl->get($data['iss']['id']);
-    //Ñ­»·¸üĞÂattMdl,½«ÎÄ¼ş´ÓÏÖÓĞµÄ¡®temp¡¯Ä¿Â¼ÒÆ¶¯µ½Ö¸¶¨Ä¿Â¼
+    //å¾ªç¯æ›´æ–°attMdl,å°†æ–‡ä»¶ä»ç°æœ‰çš„â€˜tempâ€™ç›®å½•ç§»åŠ¨åˆ°æŒ‡å®šç›®å½•
     for($i=0;$i<count($data['att']['arrId']);$i++){
         $fileStr=$data['att']['arrFileObjStr'][$i];
         $name=$data['att']['arrFileName'][$i];
-        //ÓĞ¡®temp¡¯×Ö·û´®²ÅÒÆ¶¯µ½Ö¸¶¨Ä¿Â¼
+        //æœ‰â€˜tempâ€™å­—ç¬¦ä¸²æ‰ç§»åŠ¨åˆ°æŒ‡å®šç›®å½•
         if(substr_count($fileStr,'temp')){
             $newDir='..'.DS.'uploads'.DS.$issSet->issnum;
-            //µ÷ÓÃAttinfoModelÖĞ¶¨ÒåµÄfileMove()·½·¨£¬·µ»Øtrueºó²Å¸üĞÂAttinfo±í
+            //è°ƒç”¨AttinfoModelä¸­å®šä¹‰çš„fileMove()æ–¹æ³•ï¼Œè¿”å›trueåæ‰æ›´æ–°Attinfoè¡¨
             if(self::$attMdl->fileMove($fileStr,$name,$newDir)){
               $attData=array('deldisplay'=>0,
                                 'num_id'=>$issSet->issnum,
                                 'attmap_id'=>$issSet->id,
                                 'attpath'=>$newDir.DS.$name,
                                 );
-              //¸üĞÂatt
+              //æ›´æ–°att
               self::$attMdl->update($attData,['id'=>$data['iss']['id'][$i]],true);
                             
-              $msg.="¸½¼ş".$name."ÒÑÉÏ´«¡£</br>"; 
+              $msg.="é™„ä»¶".$name."å·²ä¸Šä¼ ã€‚</br>"; 
             }else{
-              $msg.="¸½¼ş".$name."ÉÏ´«Ê§°Ü¡£</br>"; 
+              $msg.="é™„ä»¶".$name."ä¸Šä¼ å¤±è´¥ã€‚</br>"; 
             }
           }
     }
     
   }
-  //¾²Ì¬·½·¨£¬·â×°¶ÔÊı¾İ¿âµÄ²Ù×÷¡£attÉ¾³ı
+  //é™æ€æ–¹æ³•ï¼Œå°è£…å¯¹æ•°æ®åº“çš„æ“ä½œã€‚attåˆ é™¤
   static function attDelete($data){ 
     self::$attMdl->destroy(['attmap_id'=>$data['iss']['id']]);
   } 
   
-  //¾²Ì¬·½·¨£¬·â×°¶ÔÊı¾İ¿âµÄ²Ù×÷¡£isspat×´Ì¬±ä»¯
+  //é™æ€æ–¹æ³•ï¼Œå°è£…å¯¹æ•°æ®åº“çš„æ“ä½œã€‚isspatçŠ¶æ€å˜åŒ–
   static function issPatStatusChange($data){
     //patId!=0,issId!=0
     
-    //1.patinfo¸üĞÂ
+    //1.patinfoæ›´æ–°
     self::patUpdate($data);
           
-    //2.patrecordĞÂÔö
+    //2.patrecordæ–°å¢
     self::$patRdCreate($data);
           
-    //3.issinfo¸üĞÂ
+    //3.issinfoæ›´æ–°
     self::$issUpdate($data);
                           
-    //4.issrecordĞÂÔö
+    //4.issrecordæ–°å¢
     self::$issRdCreate($data);
           
-    //5.attinfo¸üĞÂ
+    //5.attinfoæ›´æ–°
     $attData=array('deldisplay'=>0);
     $issSet=self::$issMdl->get($issId);
-        //Ñ­»·¸üĞÂattMdl,½«ÎÄ¼ş´ÓÏÖÓĞµÄ¡®temp¡¯Ä¿Â¼ÒÆ¶¯µ½Ö¸¶¨Ä¿Â¼
+        //å¾ªç¯æ›´æ–°attMdl,å°†æ–‡ä»¶ä»ç°æœ‰çš„â€˜tempâ€™ç›®å½•ç§»åŠ¨åˆ°æŒ‡å®šç›®å½•
         for($i=0;$i<count($arrAttId);$i++){
           
           $fileStr=$arrAttFileObjStr[$i];
           $name=$arrAttFileName[$i];
           
-          //ÓĞ¡®temp¡¯×Ö·û´®²ÅÒÆ¶¯µ½Ö¸¶¨Ä¿Â¼
+          //æœ‰â€˜tempâ€™å­—ç¬¦ä¸²æ‰ç§»åŠ¨åˆ°æŒ‡å®šç›®å½•
           if(substr_count($fileStr,'temp')){
             $newDir='..'.DS.'uploads'.DS.$issSet->issnum;
             
-            //µ÷ÓÃAttinfoModelÖĞ¶¨ÒåµÄfileMove()·½·¨£¬·µ»Øtrueºó²Å¸üĞÂAttinfo±í
+            //è°ƒç”¨AttinfoModelä¸­å®šä¹‰çš„fileMove()æ–¹æ³•ï¼Œè¿”å›trueåæ‰æ›´æ–°Attinfoè¡¨
             if($attMdl->fileMove($fileStr,$name,$newDir)){
               $attDataPatch=array('num_id'=>$issSet->issnum,
                               'attmap_id'=>$issSet->id,
                               'attpath'=>$newDir.DS.$name,
                               );
-              //¸üĞÂatt
+              //æ›´æ–°att
               self::$attMdl->update(array_merge($attData,$attDataPatch),['id'=>$arrAttId[$i]],true);
                             
-              $msg.="¸½¼ş".$name."ÒÑÉÏ´«¡£</br>"; 
+              $msg.="é™„ä»¶".$name."å·²ä¸Šä¼ ã€‚</br>"; 
             }else{
-              $msg.="¸½¼ş".$name."ÉÏ´«Ê§°Ü¡£</br>"; 
+              $msg.="é™„ä»¶".$name."ä¸Šä¼ å¤±è´¥ã€‚</br>"; 
             }
           }
         }
     
   }
   
-  //¾²Ì¬·½·¨£¬²âÊÔ¡£
-  static function test($data){ 
+  //é™æ€æ–¹æ³•ï¼Œæµ‹è¯•ã€‚
+  public function test($data){ 
     //$data['iss']['info']['status']='issVarT';
 //    $data['pat']['info']['status']='patVarT';
 //    $msg= '<br>'.json_encode($data).'<br>';
-    $data=array('iss'=>array('id'=>4,'info'=>array('abstract'=>'¹ş¹ş','num_id'=>01))
+//\u6797\u5219\u5f90ï¼šæ—åˆ™å¾
+    
+    $data=array('iss'=>array('id'=>4,'info'=>array('abstract'=>'æ—åˆ™å¾','num_id'=>2))
                 );
     $msg=self::issUpdate($data);
+    //$msg=json_encode($data,JSON_UNESCAPED_UNICODE);
+    //$msg.=json_last_error();
     return $msg;
   }
   
