@@ -14,26 +14,33 @@ use isspatfsm\audit\AuditContext;
 class FillingState extends EditState{
   public function addNew($data){
     //无操作
-    return '<br>无效addNew操作';
+    //$data['iss']['info']['status']='issVar';
+//    $data['pat']['info']['status']='patVar';
+//    //$dataPatch=array('pat'=>array('data'=>array('status'=>'issArray')),
+////                'iss'=>array('data'=>array('status'=>'patArray'))
+////                );
+////    $data=array_merge($data,$dataPatch);
+//    $msg= '<br>无效addNew操作<br>'.json_encode($data);
+    $msg=$this->_mdl->test($data);
+    return '<br>无效addNew<br>'.$msg;
     //return json_encode($data);
   }
   
   public function delete($data){
     //delete操作代码
-    //1.删除pat，模型destroy()方法
-    Mdl::$patMdl->destroy($data['pat']['id']);
+    $this->_mdl->patDelete($data);
     
     //2.删除patRd，模型destroy()方法
-    Mdl::$patRdMdl->destroy(['patinfo_id'=>$data['pat']['id']]);
+    $this->_mdl->patRdDelete($data);
     
     //3.删除iss，模型destroy()方法
-    Mdl::$issMdl->destroy($data['iss']['id']);
+    $this->_mdl->issDelete($data);
     
     //4.删除issRd，模型destroy()方法
-    Mdl::$issRdMdl->destroy(['issinfo_id'=>$data['iss']['id']]);
+    $this->_mdl->issRdDelete($data);
     
     //5.删除att，模型destroy()方法
-    Mdl::$attMdl->destroy(['attmap_id'=>$data['iss']['id']]);
+    $this->_mdl->attDelete($data);
     
     return 'delete结果：';
   }

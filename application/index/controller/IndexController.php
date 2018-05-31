@@ -92,8 +92,8 @@ class IndexController extends \think\Controller
             //$fsm=new IssPatFSM('','ling',0);
             $fsm=new IssPatFSM();
             $param=array('auth'=>'_EDIT','status'=>'填报','oprt'=>'_ADDNEW');
-            $data=array('pat'=>array('id'=>1,'data'=>0,'rdData'=>0,'rdDataPatch'=>0),
-                'iss'=>array('id'=>2,'data'=>0,'rdData'=>0,'rdDataPatch'=>0),
+            $data=array('pat'=>array('id'=>3,'info'=>array('status'=>0),'record'=>0),
+                'iss'=>array('id'=>1,'info'=>array('status'=>0),'record'=>0),
                 'att'=>array('arrId'=>0,'arrFileName'=>0,'arrFileObjStr'=>0)
                 );
             $liftFSM=new Client();

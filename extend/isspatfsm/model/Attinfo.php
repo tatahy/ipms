@@ -5,7 +5,7 @@
  * @copyright 2017
  */
 
-namespace app\dashboard\model;
+namespace isspatfsm\model;
 
 use think\Model;
 use think\Request;

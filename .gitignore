@@ -2,7 +2,7 @@
 composer.lock
 *.log
 *v*.zip
-temp.*
+temp*.*
 vim.*
 /runtime/
 /uploads/

@@ -71,7 +71,7 @@ class IssPatFSM
     }
     
   //选择FSM，根据$this->_auth确定xxContext()
-  private function selectFSM(){
+  private function authFSMContext(){
     //$this->_auth=$auth;
     if($this->_errFlag==0){
       switch($this->_auth){
@@ -97,7 +97,7 @@ class IssPatFSM
   }
   
   //设定FSM的状态，根据$this->_status确定xxState()
-  private function setFSMState(){
+  private function statusFSMState(){
   
     //$this->_status=in_array($status,self::ISSPATSTATUS)?$status:0;
     
@@ -218,7 +218,7 @@ class IssPatFSM
     
   }
   //FSM起作用，根据$this->_oprt确定$this->_context->oprt()处理$this->_data
-  private function processingData(){
+  private function oprtData(){
     if($this->_errFlag==0){
       //21个oprt
       switch($this->_oprt){
@@ -300,7 +300,7 @@ class IssPatFSM
         $this->_auth=$param['auth'];
         $flag1=0;
       }else{
-        $this->_msg.='<br>Wrong auth."auth" should be among'.json_encode(self::ISSAUTH);
+        $this->_msg.='<br>Wrong auth."auth" should be one of '.json_encode(self::ISSAUTH);
         $flag1=1;
       }
       
@@ -308,7 +308,7 @@ class IssPatFSM
         $this->_status=$param['status'];
         $flag2=0;
       }else{
-        $this->_msg.='<br>Wrong status."status" should be among'.json_encode(self::ISSPATSTATUSCH);
+        $this->_msg.='<br>Wrong status."status" should be one of '.json_encode(self::ISSPATSTATUSCH);
         $flag2=1;
       }
       
@@ -316,7 +316,7 @@ class IssPatFSM
         $this->_oprt=$param['oprt'];
         $flag3=0;
       }else{
-        $this->_msg.='<br>Wrong operation."oprt" should be among'.json_encode(self::ISSPATOPRT);
+        $this->_msg.='<br>Wrong operation."oprt" should be one of '.json_encode(self::ISSPATOPRT);
         $flag3=1;
       }
       
@@ -332,22 +332,22 @@ class IssPatFSM
   }
   
   public function result($initData){
-    $data=array('pat'=>array('id'=>0,'data'=>0,'rdData'=>0,'rdDataPatch'=>0),
-                'iss'=>array('id'=>0,'data'=>0,'rdData'=>0,'rdDataPatch'=>0),
+    $data=array('pat'=>array('id'=>0,'data'=>0,'rdData'=>0),
+                'iss'=>array('id'=>0,'data'=>0,'rdData'=>0),
                 'att'=>array('arrId'=>0,'arrFileName'=>0,'arrFileObjStr'=>0)
                 );
     
     if(!is_array($initData)){
         $this->_msg.='<br>Wrong Data."data" should be an array like: <br>'.json_encode($data).'<br>';
         $this->_errFlag=1;
+    }else{
+        $this->_data=array_merge($data,$initData);
     }
-    
-    $this->_data=array_merge($data,$initData);
     
     if($this->_errFlag){
       return $this->_msg;
     }else{
-      $this->selectFSM()->setFSMState()->processingData();
+      $this->authFSMContext()->statusFSMState()->oprtData();
       return $this->_msg;
     }
   }

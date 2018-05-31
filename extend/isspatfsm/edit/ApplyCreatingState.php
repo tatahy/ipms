@@ -13,19 +13,22 @@ use isspatfsm\edit\EditState;
 
 class ApplyCreatingState extends EditState{
   public function addNew($data){
+    //确保写入数据库的关键信息无误（前端无法准确给出??）
+    //$data['iss']['data']['status']='新增';
+    //$data['pat']['data']['status']='内审';
+    $data=array_merge($data,array($data['iss']['data']['status']=>'新增',$data['pat']['data']['status']=>'内审'));
+    
     //1.patinfo新增
-    //模型create()方法
-    //array_merge($data['pat']['data'],$patData);
-    Mdl::$patMdl->create($data['pat']['data'],true);
+    $this->_mdl->patCreate($data);
     
     //2.patrecord新增
-    Mdl::$patRdMdl->create($data['pat']['rdData'],true);
+    $this->_mdl->patRdCreate($data);
     
     //3.issinfo新增
-    Mdl::$issMdl->create($data['iss']['data'],true);
+    $this->_mdl->issCreate($data);
     
     //4.issrecord新增
-    Mdl::$issRdMdl->create($data['iss']['rdData'],true);
+    $this->_mdl->issRdCreate($data);
     
     //5.attinfo更新???
     
@@ -38,16 +41,16 @@ class ApplyCreatingState extends EditState{
   
   public function submit($data){
     //oprt=="submit"要进行的操作
-    return '无此操作';
+    return '<br>无submit操作';
     
   }
   
   public function delete($data){
-    return '无此操作';
+    return '<br>无delete操作';
   }
   
   public function update($data){
-    return '无此操作';
+    return '<br>无update操作';
   }
   
 }
