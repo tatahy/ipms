@@ -3,18 +3,22 @@
 /**
  * @author tatahy
  * @copyright 2018
- * 继承、实现抽象类：EditState
+ * 缁ф壙銆佸疄鐜版娊璞＄被锛欵ditState
  */
 
 namespace isspatfsm\edit;
 
 use isspatfsm\edit\EditContex;
-use isspatfsm\audit\AuditContext;
+use isspatfsm\edit\EditState;
 
 class ModifyingState extends EditState{
-    
+  
+  public function addNew(){
+    return '<br>鏃犳晥addNew鎿嶄綔';
+  }  
+  
   public function delete(){  
-    return '无此delete操作';
+    return '<br>鏃犳晥delete鎿嶄綔';
   }  
 }
 
