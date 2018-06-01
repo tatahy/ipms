@@ -14,8 +14,8 @@ use app\dashboard\model\Patinfo as PatinfoModel;
 
 class Issinfo extends Model
 {   
-    //protected $auto = ['patnum','pronum'];
-    protected $insert = ['issnum'];  
+    protected $auto = ['issmap_type','issnum'];
+    protected $insert = ['issmap_type','issnum'];  
     //protected $update = ['topic','abstract','addnewdate'];  
    
     //只读字段，这个字段的值一旦写入，就无法更改。
@@ -83,6 +83,51 @@ class Issinfo extends Model
         
       }
       return $outPut;
+    }
+    
+    //修改器，获取数据表issinfo中issmap_type字段值，转换为中文输出
+    protected function setIssmapTypeAttr($value)
+    {
+      $setVal='……';
+      switch($value){
+        case '专利授权申报':
+          $setVal='_ISST_PAT1';
+        break;
+        
+        case '专利授权到期续费':
+          $outPut='_ISST_PAT2';
+        break;
+        
+        case '论文审查':
+          $outPut='_ISST_THE1';
+        break;
+        
+        case '论文发表':
+          $outPut='_ISST_THE2';
+        break;
+        
+        case '项目申报':
+          $outPut='_ISST_PRO1';
+        break;
+        
+        case '项目立项':
+          $outPut='_ISST_PRO2';
+        break;
+        
+        case '项目执行':
+          $outPut='_ISST_PRO3';
+        break;
+        
+        case '项目验收':
+          $outPut='_ISST_PRO4';
+        break;
+        
+        default:
+          $setVal=$value;
+        break;
+        
+      }
+      return $setVal;
     }
     
    /**

@@ -1,6 +1,5 @@
 <?php
 namespace isspatfsm;
-use think\Controller; 
 
 use isspatfsm\model\Issinfo as IssinfoModel;
 use isspatfsm\model\Issrecord as IssrecordModel;
@@ -15,7 +14,7 @@ use isspatfsm\model\Attinfo as AttinfoModel;
  */
  
 
-class IssPatModel extends Controller {
+class IssPatModel {
   //静态属性，封装数据库模型的对象实例
   static $issMdl = null;
   static $issRdMdl = null;

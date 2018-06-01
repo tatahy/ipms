@@ -622,10 +622,10 @@ class IndexController extends \think\Controller
       }
       
       if($oprt=='_ADDNEW'){
-        $iss=array('id'=>'','topic'=>'','abstract'=>'');
+        $iss=array('id'=>0,'topic'=>'','abstract'=>'');
         //查询当前用户已上传的所有附件信息
         $att= AttinfoModel::all(['attmap_id'=>0,'uploader'=>$this->username,'rolename'=>'edit','deldisplay'=>1]);
-        $pat=array('id'=>'','topic'=>'','patowner'=>'','otherinventor'=>'','inventor'=>'');
+        $pat=array('id'=>0,'topic'=>'','patowner'=>'','otherinventor'=>'','inventor'=>'');
         $patType=0;
       }else{
         //得到模板文件中需显示的内容
@@ -658,23 +658,22 @@ class IndexController extends \think\Controller
     //根据前端传来的操作类型，对数据库进行操作
     //结构：1.变量赋初值  //结构2.21个oprt接收前端页面传来的数据，分别对变量赋值再进行数据库表的操作
     public function issPatOprt(Request $request,IssinfoModel $issMdl,IssrecordModel $issRdMdl,
-                                PatinfoModel $patMdl,PatrecordModel $patRdMdl,AttinfoModel $attMdl,
-                                $oprt,$auth,$patId,$issId)
+                                PatinfoModel $patMdl,PatrecordModel $patRdMdl,AttinfoModel $attMdl)
     {
       $this->_loginUser();
       
       //结构：1.变量赋初值 
       // $oprt接收前端页面传来的oprt值
-      $oprt=!empty($request->param('oprt'))?$request->param('oprt'):'_NONE';
+      $oprt=empty($request->param('oprt'))?'_NONE':$request->param('oprt');
       
       // $auth接收前端页面传来的auth值,表示rolename（映射“用户组名”）
-      $auth=!empty($request->param('auth'))?$request->param('auth'):'done';
+      $auth=empty($request->param('auth'))?'done':$request->param('auth');
       
       // $patId接收前端页面传来的patId值
-      $patId=!empty($request->param('patId'))?$request->param('patId'):0;
+      $patId=empty($request->param('patId'))?0:$request->param('patId');
       
       // $issId接收前端页面传来的issId值
-      $issId=!empty($request->param('issId'))?$request->param('issId'):0;
+      $issId=empty($request->param('issId'))?0:$request->param('issId');
       
      //接收前端页面传来的附件文件信息
      //如果要通过$request->param()获取的数据为数组，要加上 /a 修饰符才能正确获取。
@@ -1892,6 +1891,14 @@ class IndexController extends \think\Controller
       //return ':)<br> attManage 模块开发中……';
       return view();
      
+    }
+    //检查前端送来的topic是否已存在，返回前端检查结果（json格式）。
+    public function checkPatTopic(Request $request,PatinfoModel $patMdl)
+    {
+        $exist=$patMdl::where('topic','like',$request->param('topic'))->count();
+      
+        return array('exist'=>$exist);  
+        
     }
     
      public function test(Request $request,AttinfoModel $attMdl)
