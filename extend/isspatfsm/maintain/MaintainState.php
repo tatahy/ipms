@@ -3,51 +3,55 @@
 /**
  * @author tatahy
  * @copyright 2018
- * ¶¨ÒåÒ»¸öisspat,_MAINTAINÈ¨ÏÞÏÂµÄstate³éÏóÀà¡°MaintainState¡±
+ * å®šä¹‰ä¸€ä¸ªisspat,_MAINTAINæƒé™ä¸‹çš„stateæŠ½è±¡ç±»â€œMaintainStateâ€
  */
 
-namespace isspatfsm\execute;
-//ÒýÈë²Ù×÷Êý¾Ý¿âµÄ5¸öÄ£ÐÍ
-use isspatfsm\IssPatModel as Mdl;
+namespace isspatfsm\maintain;
+//å¼•å…¥æ“ä½œæ•°æ®åº“çš„5ä¸ªæ¨¡åž‹
+use isspatfsm\IssPatModel;
 
 use isspatfsm\maintain\MaintainContext;
 
 abstract class MaintainState{
   
-  //¶¨ÒåÒ»¸ö»·¾³ÊôÐÔ£¬¼Ì³ÐµÄ×ÓÀà²ÅÓÐ£¬ÊôÐÔÖµÊÇExecuteContext¶ÔÏóÊµÀý¡£
+  //å®šä¹‰ä¸€ä¸ªçŽ¯å¢ƒå±žæ€§ï¼Œç»§æ‰¿çš„å­ç±»æ‰æœ‰ï¼Œå±žæ€§å€¼æ˜¯EditContextå¯¹è±¡å®žä¾‹ã€‚
   protected $_context;
+  //
+  protected $_mdl;
+  //æ“ä½œæ‰€éœ€æ•°æ®
+  protected $_oprtData;
   
   public function __construct(){
-    //·ÃÎÊ±¾ÀàÖÐ¶¨ÒåµÄ¾²Ì¬ÊôÐÔ
-    
+    //å®žä¾‹åŒ–IssPatModelç±»ï¼Œä¾¿äºŽä½¿ç”¨å…¶å°è£…çš„æ–¹æ³•ã€‚
+    $this->_mdl = new IssPatModel();
+  }
+ 
+ //å¾—åˆ°æ“ä½œæ‰€éœ€çš„æ•°æ®
+  public function getData($data){
+    $this->_oprtData = $data;
   }
   
-  //Éè¶¨ÉÏÏÂÎÄ»·¾³
+  //è®¾å®šä¸Šä¸‹æ–‡çŽ¯å¢ƒ
   public function setContext(MaintainContext $context){
 	$this->_context = $context;
  }
   
-  //_MAINTAINµÄ7ÖÖ²Ù×÷
-  abstract function apply($data);
-  abstract function review($data);
-  abstract function improve($data);
-  abstract function authorize($data);
-  abstract function reject($data);
-  abstract function addRenew($data);
-  public function close($data){
-    $this->_updateStatus($data);
-    //×´Ì¬ÐÞ¸Ä
+  //_MAINTAINçš„7ç§æ“ä½œ
+  abstract function apply();
+  abstract function review();
+  abstract function improve();
+  abstract function authorize();
+  abstract function reject();
+  abstract function addRenew();
+  public function close(){
+    //å†™å…¥æ•°æ®åº“çš„ä¿¡æ¯
+    $this->_oprtData['iss']['info']['status'] = 'å®Œç»“';
+    //è°ƒç”¨IssPatModelçš„setMdlData()æ–¹æ³•ï¼Œè®¾å®šè¦è¿›è¡Œå¤„ç†çš„æ•°æ®ã€‚
+    $this->_mdl->setMdlData($this->_oprtData);
+    return '<br>close:'.$this->_mdl->test();
+    //çŠ¶æ€ä¿®æ”¹
     $this->_context->setState(MaintainContext::$closedState);
-    return '<br>close½á¹û£º';
-  }
-  //Ê¹ÓÃMdlÖÐ·â×°ºÃµÄ¶ÔÊý¾Ý¿âµÄ²Ù×÷·½·¨¡£
-  protected function _updateStatus($data){
-    //patId!=0,issId!=0
-    Mdl::issUpdate($data);
-    Mdl::issRdCreate($data);
-    Mdl::patUpdate($data);
-    Mdl::patRdCreate($data);
-    Mdl::attUpdate($data);
+    return '<br>closeç»“æžœï¼š';
   }
   
 }

@@ -6,7 +6,7 @@
  * 定义一个控制类，实现_APPROVE权限下对issPat的11种状态的转换，3种操作的执行。
  */
 
-namespace isspatfsm\audit;
+namespace isspatfsm\approve;
 
 use isspatfsm\approve\ApproveState;
 
@@ -68,18 +68,21 @@ class ApproveContext{
     //把当前的环境通知到各个实现类中
     $this->_currentState->setContext($this);
   }
-  
+  //中转state中要处理的数据
+  public function transferData($data)
+  {
+    //state接收要处理的数据
+    $this->_currentState->getData($data);
+  }  
   //_APPROVE的3种操作
-  public function permit($data){
-   return $this->_currentState->permit($data);
+  public function permit(){
+    return $this->_currentState->permit();
   }
-  
-  public function veto($data){
-    $this->_currentState->veto($data);
+  public function veto(){
+    return $this->_currentState->veto();
   }
-  
-  public function complete($data){
-    $this->_currentState->complete($data);
+  public function complete(){
+    return $this->_currentState->complete();
   }
   
 }

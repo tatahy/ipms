@@ -25,7 +25,7 @@ abstract class EditState
   public function __construct()
   {
     //实例化IssPatModel类，便于使用其封装的方法。
-    $this->_mdl = new IsspatModel();
+    $this->_mdl = new IssPatModel();
   }
 
   //设定上下文环境
@@ -41,13 +41,13 @@ abstract class EditState
   }
 
   //_EDIT的4种操作
-  public abstract function addNew();
-  public abstract function delete();
+  abstract function addNew();
+  abstract function delete();
 
   //abstract function submit();
   public function submit()
   {
-    return 'delete结果：';
+    return '<br>delete结果：';
     $data = $this->_oprtData;
     //确保写入数据库的关键信息无误（前端无法准确给出??）
     $data['iss']['info']['status'] = '待审核';

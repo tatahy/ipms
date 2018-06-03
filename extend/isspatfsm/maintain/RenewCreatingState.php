@@ -3,7 +3,7 @@
 /**
  * @author tatahy
  * @copyright 2018
- * ¼Ì³Ğ¡¢ÊµÏÖ³éÏóÀà£ºMaintainState
+ * ç»§æ‰¿ã€å®ç°æŠ½è±¡ç±»ï¼šMaintainState
  */
 
 namespace isspatfsm\maintain;
@@ -13,37 +13,42 @@ use isspatfsm\maintain\MaintainContext;
 
 class RenewCreatingState extends MaintainState{
   
-  public function apply($data){  
-    return '<br>ÎŞĞ§apply²Ù×÷';
+  public function apply(){  
+    return '<br>æ— applyæ“ä½œ';
   }
-  public function review($data){
+  public function review(){
   
-    return '<br>ÎŞĞ§review²Ù×÷';
+    return '<br>æ— reviewæ“ä½œ';
   }
-  public function improve($data){
+  public function improve(){
     
-    return '<br>ÎŞĞ§improve²Ù×÷£º';
+    return '<br>æ— improveæ“ä½œï¼š';
   }
-  public function authorize($data){
+  public function authorize(){
     
-    return '<br>ÎŞĞ§authorize²Ù×÷';
+    return '<br>æ— authorizeæ“ä½œ';
   }
   
-  public function reject($data){  
-    return '<br>ÎŞĞ§reject²Ù×÷';
+  public function reject(){  
+    return '<br>æ— rejectæ“ä½œ';
   }
   
-  public function close($data){  
-    return '<br>ÎŞĞ§close²Ù×÷';
+  public function close(){  
+    return '<br>æ— closeæ“ä½œ';
   }
   
-  public function addRenew($data){  
-    $this->_updateStatus($data);
-    //×´Ì¬ĞŞ¸Ä
+  public function addRenew(){  
+    //å†™å…¥æ•°æ®åº“çš„ä¿¡æ¯
+    $this->_oprtData['iss']['info']['status'] = 'æ‹Ÿç»­è´¹';
+    $this->_oprtData['pat']['info']['status'] = 'ç»­è´¹ä¸­';
+    //è°ƒç”¨IssPatModelçš„setMdlData()æ–¹æ³•ï¼Œè®¾å®šè¦è¿›è¡Œå¤„ç†çš„æ•°æ®ã€‚
+    $this->_mdl->setMdlData($this->_oprtData);
+    return '<br>addRenew:'.$this->_mdl->test();
+    
+    //çŠ¶æ€ä¿®æ”¹
     $this->_context->setState(MaintainContext::$renewPlanningState);
-    return '<br>addRenew½á¹û';
+    return '<br>addRenewç»“æœ';
   }
-  
   
 }
 

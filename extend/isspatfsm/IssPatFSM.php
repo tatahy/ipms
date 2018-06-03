@@ -204,89 +204,88 @@ class IssPatFSM
           break;
           //case 'checking':
         case '待审核':
-          $this->_context->setState(EditContext::$checkingState);
+          $this->_context->setState(AuditContext::$checkingState);
           break;
           //case 'auditPassed':
         case '审核通过':
-          $this->_context->setState(new AuditPassedState());
+          $this->_context->setState(ApproveContext::$auditPassedState);
           break;
           //case 'auditFailed':
         case '审核未通过':
-          $this->_context->setState(new AuditFailedState());
+          $this->_context->setState(ApproveContext::$auditFailedState);
           break;
           //case 'exeChanging':
         case '变更申请':
-          $this->_context->setState(new ExeChangingState());
+          $this->_context->setState(ApproveContext::$exeChangingState);
           break;
           //case 'renewPlanning':
         case '拟续费':
-          $this->_context->setState(new RenewPlanningState());
+          $this->_context->setState(ApproveContext::$renewPlanningState);
           break;
           //case 'applyApproved':
         case '批准申报':
-          $this->_context->setState(new ApplyApprovedState());
+          $this->_context->setState(ExecuteContext::$applyApprovedState);
           break;
           //case 'applyVetoed':
         case '否决申报':
-          $this->_context->setState(new ApplyVetoedState());
+          $this->_context->setState(MaintainContext::$applyVetoedState);
           break;
           //case 'exeChApproved':
         case '准予变更':
-          $this->_context->setState(new ExeChApprovedState());
+          $this->_context->setState(ExecuteContext::$exeChApprovedState);
           break;
           //case 'exeChVetoed':
         case '否决变更':
-          $this->_context->setState(new ExeChVetoedState());
+          $this->_context->setState(ExecuteContext::$exeChVetoedState);
           break;
           //case 'renewApproved':
         case '准予续费':
-          $this->_context->setState(new RenewApprovedState());
+          $this->_context->setState(MaintainContext::$renewApprovedState);
           break;
           //case 'executing':
         case '申报执行':
-          $this->_context->setState(new ExecutingState());
+          $this->_context->setState(ExecuteContext::$executingState);
           break;
           //case 'applyModifying':
         case '申报修改':
-          $this->_context->setState(new ApplyModifyingState());
+          $this->_context->setState(ExecuteContext::$applyModifyingState);
           break;
           //case 'applyReviewing':
         case '申报复核':
-          $this->_context->setState(new ApplyReviewingState());
+          $this->_context->setState(MaintainContext::$applyReviewingState);
           break;
           //case 'applySubmitting':
         case '申报提交':
-          $this->_context->setState(new ApplySubmittingState());
+          $this->_context->setState(MaintainContext::$applySubmittingState);
           break;
           //case 'applyAuthorized':
         case '专利授权':
-          $this->_context->setState(new ApplyAuthorizedState());
+          $this->_context->setState(MaintainContext::$applyAuthorizedState);
           break;
           //case 'applyRejected':
         case '专利驳回':
-          $this->_context->setState(new ApplyRejectedState());
+          $this->_context->setState(MaintainContext::$applyRejectedState);
           break;
           //case 'renewCreating':
         case '续费新增':
-          $this->_context->setState(new RenewCreatingState());
+          $this->_context->setState(MaintainContext::$renewCreatingState);
           break;
           //case 'renewSubmitting':
         case '续费提交':
-          $this->_context->setState(new RenewSubmittingState());
+          $this->_context->setState(MaintainContext::$renewSubmittingState);
           break;
           //case 'renewAuthoried':
         case '续费授权':
-          $this->_context->setState(new RenewAuthoriedState());
+          $this->_context->setState(MaintainContext::$renewAuthorizedState);
           break;
           //case 'renewVetoed':
         case '放弃续费':
-          $this->_context->setState(new RenewVetoedState());
+          $this->_context->setState(MaintainContext::$renewVetoedState);
           break;
           //case 'closed':
         case '完结':
           $this->_context->setState(new ClosedState());
           break;
-
       }
       $this->_msg.= '<br>status:'.$this->_status;
       //返回本对象，便于进行链式操作。

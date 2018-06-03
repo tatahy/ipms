@@ -3,7 +3,7 @@
 /**
  * @author tatahy
  * @copyright 2018
- * ¼Ì³Ğ¡¢ÊµÏÖ³éÏóÀà£ºMaintainState
+ * ç»§æ‰¿ã€å®ç°æŠ½è±¡ç±»ï¼šMaintainState
  */
 
 namespace isspatfsm\maintain;
@@ -13,34 +13,39 @@ use isspatfsm\maintain\MaintainContext;
 
 class RenewApprovedState extends MaintainState{
   
-  public function apply($data){  
-    $this->_updateStatus($data);
-    //×´Ì¬ĞŞ¸Ä
+  public function apply(){  
+    //å†™å…¥æ•°æ®åº“çš„ä¿¡æ¯
+    $this->_oprtData['iss']['info']['status'] = 'ç»­è´¹æäº¤';
+    //è°ƒç”¨IssPatModelçš„setMdlData()æ–¹æ³•ï¼Œè®¾å®šè¦è¿›è¡Œå¤„ç†çš„æ•°æ®ã€‚
+    $this->_mdl->setMdlData($this->_oprtData);
+    return '<br>apply:'.$this->_mdl->test();
+    
+    //çŠ¶æ€ä¿®æ”¹
     $this->_context->setState(MaintainContext::$renewSubmittingState);
-    return '<br>apply½á¹û£º';
+    return '<br>applyç»“æœï¼š';
     
   }
-  public function review($data){
-    return '<br>ÎŞĞ§review²Ù×÷';
+  public function review(){
+    return '<br>æ— reviewæ“ä½œ';
   }
-  public function improve($data){
-    return '<br>ÎŞĞ§improve²Ù×÷';
+  public function improve(){
+    return '<br>æ— improveæ“ä½œ';
   }
-  public function authorize($data){
+  public function authorize(){
     
-    return '<br>ÎŞĞ§authorize²Ù×÷';
+    return '<br>æ— authorizeæ“ä½œ';
   }
   
-  public function reject($data){  
-    return '<br>ÎŞĞ§reject²Ù×÷';
+  public function reject(){  
+    return '<br>æ— rejectæ“ä½œ';
   }
   
-  public function close($data){  
-    return '<br>ÎŞĞ§close²Ù×÷';
+  public function close(){  
+    return '<br>æ— closeæ“ä½œ';
   }
   
-  public function addRenew($data){  
-    return '<br>ÎŞĞ§addRenew²Ù×÷';
+  public function addRenew(){  
+    return '<br>æ— addRenewæ“ä½œ';
   }
   
   

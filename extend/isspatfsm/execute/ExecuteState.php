@@ -7,37 +7,38 @@
  */
 
 namespace isspatfsm\execute;
-//引入操作数据库的5个模型
-use isspatfsm\OprtModel as Mdl;
+//引入操作5个数据库的类
+use isspatfsm\IssPatModel;
 
 use isspatfsm\execute\ExecuteContext;
 
 abstract class ExecuteState{
   
-  //定义一个环境属性，继承的子类才有，属性值是ExecuteContext对象实例。
+  //定义一个环境属性，继承的子类才有，属性值是EditContext对象实例。
   protected $_context;
+  //
+  protected $_mdl;
+  //操作所需数据
+  protected $_oprtData;
   
   public function __construct(){
-    //访问本类中定义的静态属性
-    
+    //实例化IssPatModel类，便于使用其封装的方法。
+    $this->_mdl = new IssPatModel();
   }
-  
   //设定上下文环境
   public function setContext(ExecuteContext $context){
 	$this->_context = $context;
  }
+ //得到操作所需的数据
+  public function getData($data){
+    $this->_oprtData = $data;
+  }
   
   //_EXECUTE的4种操作
-  public abstract function accept($data);
-  public abstract function refuse($data);
-  public abstract function report($data);
-  public abstract function finish($data);
-  //使用Mdl中封装好的对数据库的操作方法。
-  protected function _updateStatus($data){
-    //patId!=0,issId!=0
-    Mdl::issPatStatusUpdate($data);
-    
-  }
+  abstract function accept();
+  abstract function refuse();
+  abstract function report();
+  abstract function finish();
   
 }
 

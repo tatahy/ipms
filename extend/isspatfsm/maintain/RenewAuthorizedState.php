@@ -3,7 +3,7 @@
 /**
  * @author tatahy
  * @copyright 2018
- * 继承、实现抽象类：MaintainState
+ * 缁ф壙銆佸疄鐜版娊璞＄被锛歁aintainState
  */
 
 namespace isspatfsm\maintain;
@@ -13,29 +13,28 @@ use isspatfsm\maintain\MaintainContext;
 
 class RenewAuthorizedState extends MaintainState{
   
-  public function apply($data){  
-    return '<br>无效apply操作';
+  public function apply(){  
+    return '<br>鏃燼pply鎿嶄綔';
   }
-  public function review($data){
+  public function review(){
   
-    return '<br>无效review操作';
+    return '<br>鏃爎eview鎿嶄綔';
   }
-  public function improve($data){
-    return '<br>无效improve操作';
+  public function improve(){
+    return '<br>鏃爄mprove鎿嶄綔';
   }
-  public function authorize($data){
+  public function authorize(){
     
-    return '<br>无效authorize操作';
+    return '<br>鏃燼uthorize鎿嶄綔';
   }
   
-  public function reject($data){  
-    return '<br>无效reject操作';
+  public function reject(){  
+    return '<br>鏃爎eject鎿嶄綔';
   }
   
-  public function addRenew($data){  
-    return '<br>无效addRenew操作';
+  public function addRenew(){  
+    return '<br>鏃燼ddRenew鎿嶄綔';
   }
-  
   
 }
 

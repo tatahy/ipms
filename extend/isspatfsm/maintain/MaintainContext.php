@@ -67,7 +67,6 @@ class MaintainContext{
     self::$renewAuthorizedState = new RenewAuthorizedState();
    
   }
-  
   //获取状态
   public function getState(){
     return $this->_currentState;
@@ -78,34 +77,40 @@ class MaintainContext{
     //把当前的环境通知到各个实现类中
     $this->_currentState->setContext($this);
   }
+  //中转state中要处理的数据
+  public function transferData($data)
+  {
+    //state接收要处理的数据
+    $this->_currentState->getData($data);
+  }  
   
   //_MAINTAIN的7种操作
-  public function apply($data){
-   return $this->_currentState->apply($data);
+  public function apply(){
+    return $this->_currentState->apply();
   }
   
-  public function review($data){
-    $this->_currentState->review($data);
+  public function review(){
+    return $this->_currentState->review();
   }
   
-  public function improve($data){
-    $this->_currentState->improve($data);
+  public function improve(){
+    return $this->_currentState->improve();
   }
   
-  public function authorize($data){
-    $this->_currentState->authorize($data);
+  public function authorize(){
+    return $this->_currentState->authorize();
   }
   
-  public function reject($data){
-    $this->_currentState->reject($data);
+  public function reject(){
+    return $this->_currentState->reject();
   }
   
-  public function addRenew($data){
-    $this->_currentState->addRenew($data);
+  public function addRenew(){
+    return $this->_currentState->addRenew();
   }
   
-  public function close($data){
-    $this->_currentState->close($data);
+  public function close(){
+    return $this->_currentState->close();
   }
 }
 

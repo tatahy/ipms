@@ -21,7 +21,7 @@ use isspatfsm\approve\ExeChangingState;
 use isspatfsm\execute\ApplyModifyingState;
 use isspatfsm\execute\ExecutingState;
 
-class ApproveContext{
+class ExecuteContext{
   //_EXECUTE的7种状态
   //static标识的类的静态属性只属于类，与对象实例和其他类无关。
   //类的静态属性类似于函数的全局变量，在类的外部使用类名直接访问类的静态属性“EditContext::$fillingState”
@@ -58,22 +58,25 @@ class ApproveContext{
     //把当前的环境通知到各个实现类中
     $this->_currentState->setContext($this);
   }
+  //中转state中要处理的数据
+  public function transferData($data)
+  {
+    //state接收要处理的数据
+    $this->_currentState->getData($data);
+  }  
   
   //_EXECUTE的4种操作
-  public function accept($data){
-   return $this->_currentState->accept($data);
+  public function accept(){
+   return $this->_currentState->accept();
   }
-  
-  public function refuse($data){
-    $this->_currentState->refuse($data);
+  public function refuse(){
+    return $this->_currentState->refuse();
   }
-  
-  public function report($data){
-    $this->_currentState->report($data);
+  public function report(){
+    return $this->_currentState->report();
   }
-  
-  public function finish($data){
-    $this->_currentState->finish($data);
+  public function finish(){
+    return $this->_currentState->finish();
   }
 }
 
