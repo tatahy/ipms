@@ -14,12 +14,15 @@ use app\dashboard\model\Patinfo as PatinfoModel;
 
 class Issinfo extends Model
 {   
-    protected $auto = ['issmap_type','issnum'];
+    //新增、更新时需要自动完成的字段列表
+    //protected $auto = ['issmap_type','issnum'];
+    //新增时需要自动完成的字段列表
     protected $insert = ['issmap_type','issnum'];  
+    //更新时需要自动完成的字段列表
     //protected $update = ['topic','abstract','addnewdate'];  
    
     //只读字段，这个字段的值一旦写入，就无法更改。
-    protected $readonly = ['issnum'];
+    protected $readonly = ['issnum','issmap_type'];
     
     //修改器，设置issnum字段的值为iss+yyyy+0000的形式，即是在当年进行流水编号
     protected function setIssnumAttr()
@@ -85,7 +88,7 @@ class Issinfo extends Model
       return $outPut;
     }
     
-    //修改器，获取数据表issinfo中issmap_type字段值，转换为中文输出
+    //修改器，设定数据表issinfo中issmap_type字段值，转换为类型编码
     protected function setIssmapTypeAttr($value)
     {
       $setVal='……';
@@ -95,35 +98,37 @@ class Issinfo extends Model
         break;
         
         case '专利授权到期续费':
-          $outPut='_ISST_PAT2';
+          $setVal='_ISST_PAT2';
         break;
         
         case '论文审查':
-          $outPut='_ISST_THE1';
+          $setVal='_ISST_THE1';
         break;
         
         case '论文发表':
-          $outPut='_ISST_THE2';
+          $setVal='_ISST_THE2';
         break;
         
         case '项目申报':
-          $outPut='_ISST_PRO1';
+          $setVal='_ISST_PRO1';
         break;
         
         case '项目立项':
-          $outPut='_ISST_PRO2';
+          $setVal='_ISST_PRO2';
         break;
         
         case '项目执行':
-          $outPut='_ISST_PRO3';
+          $setVal='_ISST_PRO3';
         break;
         
         case '项目验收':
-          $outPut='_ISST_PRO4';
+          $setVal='_ISST_PRO4';
         break;
         
         default:
-          $setVal=$value;
+          //得到
+          //$setVal=$this->getData('issmap_type');
+          //$setVal='_ISST_PAT1';
         break;
         
       }

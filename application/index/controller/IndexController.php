@@ -97,19 +97,20 @@ class IndexController extends Controller
       //$fsm=new IssPatFSM('','ling',0);
       $fsm = new IssPatFSM();
       $param = array(
-        'auth' => '_EDIT',
-        'status' => '修改完善',
-        'oprt' => '_DELETE');
+        'auth' => '_MAINTAIN',
+        'status' => '续费授权',
+        'oprt' => '_ADDRENEW');
       $data = array(
-        'pat' => array(
-          'id' => 3,
-          'info' => array('abstract' => '啊patinfo.abstract'),
-          'record' => array('act' => '哈patrecord.act')),
         'iss' => array(
           'id' => 1,
           'info' => array('abstract' => '也issinfo.abstract'),
           'record' => array('act' => '由patrecord.act')),
+        'pat' => array(
+          'id' => 3,
+          'info' => array('abstract' => '啊patinfo.abstract'),
+          'record' => array('act' => '哈patrecord.act')),
         'att' => array(
+          'info'=>array(),
           'arrId' => [0,3,1],
           'arrFileName' => ['0,1,2','kk'],
           'arrFileObjStr' => ['yy','99']));

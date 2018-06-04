@@ -18,8 +18,13 @@ class ApplyCreatingState extends EditState
   {
     $data = $this->_oprtData;
     //确保写入数据库的关键信息无误（前端无法准确给出??）
-        $data['iss']['info']['status']='填报';
-        $data['pat']['info']['status']='内审';
+        //$data['iss']['info']['status']='填报';
+//        $data['pat']['info']['status']='内审';
+        
+        $data['iss']['info']=array('status'=>'填报',
+                                    'addnewdate'=>date('Y-M-d H:i:s'),
+                                    );
+        
         //调用IssPatModel的setMdlData()方法，设定所需进行处理的数据。
         $this->_mdl->setMdlData($data);
     

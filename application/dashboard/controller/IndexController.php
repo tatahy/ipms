@@ -64,13 +64,16 @@ class IndexController extends \think\Controller
       }    
     }
     
-    public function index(Request $request,IssinfoModel $issMdl,$auth='done')
+    public function index(Request $request,IssinfoModel $issMdl,$auth='')
     {
         $this->_loginUser();
        
-        if(!empty($request->param('auth'))){
-           $auth=$request->param('auth');
-        }
+      //  if(!empty($request->param('auth'))){
+//           $auth=$request->param('auth');
+//        }
+        
+        // $auth接收前端页面传来的auth值,表示rolename（映射“用户组名”）
+        $auth = !empty($request->param('auth')) ? $request->param('auth') : 'done';
         
         //调用模型Issinfo中定义的issPatNum($useId[,$auth])方法得到对应的issPat数量
         $numIssPat=$issMdl->issPatNum($this->userId);
@@ -475,20 +478,20 @@ class IndexController extends \think\Controller
             $map['writer']=$this->username;
             //$tplFile='issPatEdit';
             $tplFile='edit';
-          break;
+            break;
           //audit
           case 'audit':
             $map['status'] ='待审核';
             $map['dept'] =$this->dept;
             //$tplFile='issPatAudit';
             $tplFile='audit';
-          break;
+            break;
           //approve
           case 'approve':
             $map['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
             //$tplFile='issPatApprove';
             $tplFile='approve';
-          break;
+            break;
           //execute
           case 'execute':
             $map['executer'] =$this->username;
@@ -497,14 +500,14 @@ class IndexController extends \think\Controller
             
             //$tplFile='issPatExecute';
             $tplFile='execute';
-          break;
+            break;
           //maintain
           case 'maintain':
             $map['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
                                       '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
             //$tplFile='issPatMaintain';
             $tplFile='maintain';
-          break;
+            break;
           ////_MAINTAIN_RENEW
 //          case '_MAINTAIN_RENEW':
 //            $mapPat['status'] =['in',['授权','续费授权']];
@@ -516,7 +519,7 @@ class IndexController extends \think\Controller
             $map['status'] ='完结';
             //$tplFile='issPatDone';
             $tplFile='done';
-          break;
+            break;
           
       }
       
@@ -860,6 +863,7 @@ class IndexController extends \think\Controller
           //issData
           $issData=array('topic'=>$request->param('issPatTopic'),
                           'abstract'=>$request->param('issPatAbstract'),
+                          'issmap_type'=>$request->param('issType'),
                           'submitdate'=>$this->now,
                           'status'=>'待审核'
                           );
@@ -1892,13 +1896,29 @@ class IndexController extends \think\Controller
       return view();
      
     }
-    //检查前端送来的topic是否已存在，返回前端检查结果（json格式）。
-    public function checkPatTopic(Request $request,PatinfoModel $patMdl)
+    //检查前端(_EDIT、_EXECUTE的权限都需要)送来的topic是否已存在，返回前端检查结果（json格式）。
+    public function checkPatTopic(Request $request,PatinfoModel $patMdl,$exist='')
     {
-        $exist=$patMdl::where('topic','like',$request->param('topic'))->count();
-      
-        return array('exist'=>$exist);  
+        // $auth接收前端页面传来的auth值
+        $auth = !empty($request->param('auth')) ? $request->param('auth') : 'done';
+        // $patId接收前端页面传来的patId值
+        $patId = !empty($request->param('patId')) ? $request->param('patId') : 0;
         
+        $pat=$patMdl::get(['topic' =>$request->param('topic')]);
+        
+        if($patId){
+            //非新增专利
+            if(count($pat)){
+                $exist=($patId==$pat['id'])?0:1;
+            }else{
+                $exist=0;
+            }
+        }else{
+            //oprt="_ADDNEW",新增专利
+            $exist=count($pat);
+        }
+    
+        return array('exist'=>$exist);  
     }
     
      public function test(Request $request,AttinfoModel $attMdl)

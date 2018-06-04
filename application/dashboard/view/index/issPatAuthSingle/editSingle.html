@@ -138,7 +138,7 @@ $(document).ready(function(){
 	$('#patTopic').focusout(function(){ 	
 		$(this).parent().removeClass('has-error');
 		$(this).next('.spTips').hide();
-		$.post('checkPatTopic',{'topic':$(this).val()},function(data){
+		$.post('checkPatTopic',{'topic':$(this).val(),'auth':'_EDIT','patId':$('#patId').val()},function(data){
 			if(data.exist){
 				$('#patTopic').next('.spTips').show();
 				$('#patTopic').focus().parent().addClass('has-error');;

@@ -53,6 +53,7 @@
 				<div class="form-group col-sm-6">
 					<label class="control-label" for="patTopic">专利名称<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 					<input class="empty-check form-control" id="patTopic" name="patTopic" value="{$pat.topic}" type="text" placeholder="xx专利" required>
+					<span style="color:red;display:none;" class="spTips">专利已存在，请重新填写。</span>
 			
 				</div>
 				
@@ -165,8 +166,8 @@
 				
 		<div class="row myRow">
 			<div class="form-group col-sm-6">
-				<label class="control-label" for="issPatTopic">事务标题<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<input class="empty-check form-control" id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" placeholder="关于XX专利的授权申报" required>
+				<label class="control-label" for="issPatTopic">事务标题</label>
+				<input class="form-control" id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" readonly>
 			</div>
 		
 			<div class="form-group col-sm-4">
@@ -236,6 +237,30 @@ $(document).ready(function(){
 	$('.resetHide').hide();
 	// select显示为模板变量值
 	$('#patType').val('{$patType}').attr('selected');
+	
+	//issPatTopic的内容自动跟随生成
+	$('#patTopic').change(function(){ 	
+		if($(this).val()==''){
+			$(this).focus();
+		}else{
+			$('#issPatTopic').val('关于“'+$(this).val()+'”的授权申报');
+		}
+	});
+	
+	//ajax检查是否重复，若有显示提示信息和获取焦点。
+	$('#patTopic').focusout(function(){ 	
+		$(this).parent().removeClass('has-error');
+		$(this).next('.spTips').hide();
+		$.post('checkPatTopic',{'topic':$(this).val(),'auth':'_EXECUTE','patId':$('#patId').val()},function(data){
+			if(data.exist){
+				$('#patTopic').next('.spTips').show();
+				$('#patTopic').focus().parent().addClass('has-error');;
+			}else{
+				$('#patTopic').next('.spTips').hide();
+				$('#patTopic').parent().removeClass('has-error');
+			}	
+		},'json');
+	});
 		
 	// 单选框executeResult的change事件，出现executeMsg输入框等。
 	$('#executeResult').change(function(){	

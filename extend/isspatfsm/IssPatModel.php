@@ -58,25 +58,24 @@ class IssPatModel
 
   public function setMdlData($data)
   {
-    $this->_mdltData = $data;
+    $this->_mdlData = $data;
 
   }
 
   //静态方法，封装对数据库的操作。iss新增
   static function issCreate()
   {
-    self::$issMdl->create($this->_mdltData['iss']['info'], true);
+    self::$issMdl->create($this->_mdlData['iss']['info'], true);
   }
   //静态方法，封装对数据库的操作。iss更新
   static function issUpdate()
   {
     //save方法返回受影响的对象数。
-    $id = self::$issMdl->save($this->_mdltData['iss']['info'], ['id' => $this->
-      _mdltData['iss']['id']], true);
+    $id = self::$issMdl->save($this->_mdlData['iss']['info'], ['id' => $this->_mdlData['iss']['id']], true);
     if ($id)
     {
       $msg = "updated.";
-      $msg .= self::$issMdl->get($this->_mdltData['iss']['id'])->topic;
+      $msg .= self::$issMdl->get($this->_mdlData['iss']['id'])->topic;
     } else
     {
       $msg = "no update.";
@@ -90,12 +89,12 @@ class IssPatModel
   //静态方法，封装对数据库的操作。iss删除
   static function issDelete()
   {
-    self::$issMdl->destroy($this->_mdltData['iss']['id']);
+    self::$issMdl->destroy($this->_mdlData['iss']['id']);
   }
   //静态方法，封装对数据库的操作。issRd新增
   static function issRdCreate()
   {
-    self::$issRdRdMdl->create($this->_mdltData['iss']['record'], true);
+    self::$issRdRdMdl->create($this->_mdlData['iss']['record'], true);
   }
 
   //静态方法，封装对数据库的操作。issRd更新
@@ -106,30 +105,29 @@ class IssPatModel
   //静态方法，封装对数据库的操作。issRd删除
   static function issRdDelete()
   {
-    self::$issRdMdl->destroy(['issinfo_id' => $this->_mdltData['iss']['id']]);
+    self::$issRdMdl->destroy(['issinfo_id' => $this->_mdlData['iss']['id']]);
   }
 
   //静态方法，封装对数据库的操作。pat新增
   static function patCreate()
   {
-    self::$patMdl->create($this->_mdltData['pat']['info'], true);
+    self::$patMdl->create($this->_mdlData['pat']['info'], true);
   }
   //静态方法，封装对数据库的操作。pat更新
   static function patUpdate()
   {
-    self::$patMdl->update($this->_mdltData['pat']['info'], ['id' => $this->
-      _mdltData['pat']['id']], true);
+    self::$patMdl->update($this->_mdlData['pat']['info'], ['id' => $this->_mdlData['pat']['id']], true);
   }
   //静态方法，封装对数据库的操作。pat删除
   static function patDelete()
   {
-    self::$patMdl->destroy($this->_mdltData['pat']['id']);
+    self::$patMdl->destroy($this->_mdlData['pat']['id']);
   }
 
   //静态方法，封装对数据库的操作。patRd新增
   static function patRdCreate()
   {
-    self::$patRdMdl->create($this->_mdltData['pat']['record'], true);
+    self::$patRdMdl->create($this->_mdlData['pat']['record'], true);
   }
   //静态方法，封装对数据库的操作。patRd更新
   static function patRdUpdate()
@@ -139,23 +137,23 @@ class IssPatModel
   //静态方法，封装对数据库的操作。patRd删除
   static function patRdDelete()
   {
-    self::$patRdMdl->destroy(['patinfo_id' => $this->_mdltData['pat']['id']]);
+    self::$patRdMdl->destroy(['patinfo_id' => $this->_mdlData['pat']['id']]);
   }
 
   //静态方法，封装对数据库的操作。att新增
   static function attCreate()
   {
-    self::$attMdl->create($this->_mdltData['att']['info'], true);
+    self::$attMdl->create($this->_mdlData['att']['info'], true);
   }
   //静态方法，封装对数据库的操作。att更新
   static function attUpdate()
   {
-    $issSet = self::$issMdl->get($this->_mdltData['iss']['id']);
+    $issSet = self::$issMdl->get($this->_mdlData['iss']['id']);
     //循环更新attMdl,将文件从现有的‘temp’目录移动到指定目录
-    for ($i = 0; $i < count($this->_mdltData['att']['arrId']); $i++)
+    for ($i = 0; $i < count($this->_mdlData['att']['arrId']); $i++)
     {
-      $fileStr = $this->_mdltData['att']['arrFileObjStr'][$i];
-      $name = $this->_mdltData['att']['arrFileName'][$i];
+      $fileStr = $this->_mdlData['att']['arrFileObjStr'][$i];
+      $name = $this->_mdlData['att']['arrFileName'][$i];
       //有‘temp’字符串才移动到指定目录
       if (substr_count($fileStr, 'temp'))
       {
@@ -170,7 +168,7 @@ class IssPatModel
             'attpath' => $newDir . DS . $name,
             );
           //更新att
-          self::$attMdl->update($attData, ['id' => $this->_mdltData['iss']['id'][$i]], true);
+          self::$attMdl->update($attData, ['id' => $this->_mdlData['iss']['id'][$i]], true);
 
           $msg .= "附件" . $name . "已上传。</br>";
         } else
@@ -184,7 +182,7 @@ class IssPatModel
   //静态方法，封装对数据库的操作。att删除
   static function attDelete()
   {
-    self::$attMdl->destroy(['attmap_id' => $this->_mdltData['iss']['id']]);
+    self::$attMdl->destroy(['attmap_id' => $this->_mdlData['iss']['id']]);
   }
 
 
@@ -199,7 +197,7 @@ class IssPatModel
     //$data = array('iss' => array('id' => 4, 'info' => array('abstract' => '林则徐',
 //            'num_id' => 2)));
 //    $msg = self::issUpdate($data);
-    $msg=json_encode($this->_mdltData,JSON_UNESCAPED_UNICODE);
+    $msg=json_encode($this->_mdlData,JSON_UNESCAPED_UNICODE);
     //$msg.=json_last_error();
     return '<br>'.$msg;
   }
