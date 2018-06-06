@@ -75,9 +75,8 @@ class IndexController extends Controller
       $numpataut = $pats->where('id', '>', 0)->where('status', 'in', ['授权', '续费授权',
         '续费中', '放弃续费'])->count();
 
-      $userA = new UserModel;
       //调用User模型层定义的refreshUserAuth()方法，刷新登录用户的各个模块权限
-      $authority = $userA->refreshUserAuth($username, $pwd);
+      $authority = $user->refreshUserAuth($username, $pwd);
 
       Session::set('userId', $user->id);
       Session::set('username', $username);
@@ -97,9 +96,9 @@ class IndexController extends Controller
       //$fsm=new IssPatFSM('','ling',0);
       $fsm = new IssPatFSM();
       $param = array(
-        'auth' => '_MAINTAIN',
-        'status' => '续费授权',
-        'oprt' => '_ADDRENEW');
+        'auth' => '_EDIT',
+        'status' => '申报新增',
+        'oprt' => '_DELETE');
       $data = array(
         'iss' => array(
           'id' => 1,

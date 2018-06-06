@@ -65,20 +65,20 @@ class IssPatModel
   //静态方法，封装对数据库的操作。iss新增
   static function issCreate()
   {
-    self::$issMdl->create($this->_mdlData['iss']['info'], true);
+    //模型的create方法，返回的是模型的对象实例
+    return self::$issMdl->create($this->_mdlData['iss']['info'], true);
   }
   //静态方法，封装对数据库的操作。iss更新
   static function issUpdate()
   {
     //save方法返回受影响的对象数。
-    $id = self::$issMdl->save($this->_mdlData['iss']['info'], ['id' => $this->_mdlData['iss']['id']], true);
-    if ($id)
+    $n = self::$issMdl->save($this->_mdlData['iss']['info'], ['id' => $this->_mdlData['iss']['id']], true);
+    if ($n)
     {
-      $msg = "updated.";
-      $msg .= self::$issMdl->get($this->_mdlData['iss']['id'])->topic;
+      $msg = '<br>《'.self::$issMdl->get($this->_mdlData['iss']['id'])->topic.'》updated.';
     } else
     {
-      $msg = "no update.";
+      $msg = "<br>no update.";
     }
     return $msg;
 
@@ -89,12 +89,14 @@ class IssPatModel
   //静态方法，封装对数据库的操作。iss删除
   static function issDelete()
   {
-    self::$issMdl->destroy($this->_mdlData['iss']['id']);
+    //模型的destroy方法，返回的值是影响的记录数
+    return self::$issMdl->destroy($this->_mdlData['iss']['id']);
   }
   //静态方法，封装对数据库的操作。issRd新增
   static function issRdCreate()
   {
-    self::$issRdRdMdl->create($this->_mdlData['iss']['record'], true);
+    //模型的create方法，返回的是模型的对象实例
+    return self::$issRdRdMdl->create($this->_mdlData['iss']['record'], true);
   }
 
   //静态方法，封装对数据库的操作。issRd更新
@@ -105,13 +107,15 @@ class IssPatModel
   //静态方法，封装对数据库的操作。issRd删除
   static function issRdDelete()
   {
-    self::$issRdMdl->destroy(['issinfo_id' => $this->_mdlData['iss']['id']]);
+    //模型的destroy方法，返回的值是影响的记录数
+    return self::$issRdMdl->destroy(['issinfo_id' => $this->_mdlData['iss']['id']]);
   }
 
   //静态方法，封装对数据库的操作。pat新增
   static function patCreate()
   {
-    self::$patMdl->create($this->_mdlData['pat']['info'], true);
+    //模型的create方法，返回的是模型的对象实例
+    return self::$patMdl->create($this->_mdlData['pat']['info'], true);
   }
   //静态方法，封装对数据库的操作。pat更新
   static function patUpdate()
@@ -121,13 +125,15 @@ class IssPatModel
   //静态方法，封装对数据库的操作。pat删除
   static function patDelete()
   {
-    self::$patMdl->destroy($this->_mdlData['pat']['id']);
+    //模型的destroy方法，返回的值是影响的记录数
+    return self::$patMdl->destroy($this->_mdlData['pat']['id']);
   }
 
   //静态方法，封装对数据库的操作。patRd新增
   static function patRdCreate()
   {
-    self::$patRdMdl->create($this->_mdlData['pat']['record'], true);
+    //模型的create方法，返回的是模型的对象实例
+    return self::$patRdMdl->create($this->_mdlData['pat']['record'], true);
   }
   //静态方法，封装对数据库的操作。patRd更新
   static function patRdUpdate()
@@ -137,13 +143,15 @@ class IssPatModel
   //静态方法，封装对数据库的操作。patRd删除
   static function patRdDelete()
   {
-    self::$patRdMdl->destroy(['patinfo_id' => $this->_mdlData['pat']['id']]);
+    //模型的destroy方法，返回的值是影响的记录数
+    return self::$patRdMdl->destroy(['patinfo_id' => $this->_mdlData['pat']['id']]);
   }
 
   //静态方法，封装对数据库的操作。att新增
   static function attCreate()
   {
-    self::$attMdl->create($this->_mdlData['att']['info'], true);
+    //模型的create方法，返回的是模型的对象实例
+    return self::$attMdl->create($this->_mdlData['att']['info'], true);
   }
   //静态方法，封装对数据库的操作。att更新
   static function attUpdate()
@@ -182,7 +190,8 @@ class IssPatModel
   //静态方法，封装对数据库的操作。att删除
   static function attDelete()
   {
-    self::$attMdl->destroy(['attmap_id' => $this->_mdlData['iss']['id']]);
+    //模型的destroy方法，返回的值是影响的记录数
+    return self::$attMdl->destroy(['attmap_id' => $this->_mdlData['iss']['id']]);
   }
 
 

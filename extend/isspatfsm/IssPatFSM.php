@@ -13,7 +13,7 @@ use isspatfsm\maintain\MaintainContext;
  */
 class IssPatFSM
 {
-
+    //25个status
   const ISSPATSTATUS = array(
     'applyCreating',
     'filling',
@@ -40,6 +40,7 @@ class IssPatFSM
     'renewAuthoried',
     'renewVetoed',
     'closed');
+  //25个status
   const ISSPATSTATUSCH = array(
     '申报新增',
     '填报',
@@ -66,6 +67,7 @@ class IssPatFSM
     '续费授权',
     '放弃续费',
     '完结');
+  //21个oprt
   const ISSPATOPRT = array(
     '_ADDNEW',
     '_SUBMIT',
@@ -88,6 +90,7 @@ class IssPatFSM
     '_REJECT',
     '_ADDRENEW',
     '_CLOSE');
+  //5个auth
   const ISSAUTH = array(
     '_EDIT',
     '_AUDIT',
@@ -318,7 +321,6 @@ class IssPatFSM
           break;
         case '_DELETE':
           $this->_msg.= $this->_context->delete();
-          
           break;
         case '_UPDATE':
           $this->_msg.= $this->_context->update();

@@ -145,8 +145,8 @@ class User extends Model
      */
      public function refreshUserAuth($username,$pwd)
     {
-      $user=$this->where('username',$username)->where('pwd',$pwd)->where('enable',1)->select();
-      $usergroup_id= explode(",", $user[0]['usergroup_id']);//$usergroup_id=array(8,9,10)
+      $user=$this->where('username',$username)->where('pwd',$pwd)->where('enable',1)->find();
+      $usergroup_id= explode(",", $user['usergroup_id']);//$usergroup_id由“,”分隔的字符串转换为array(8,9,10)
       
       //$iss=array("edit"=>0,"audit"=>0,"approve"=>0,"execute"=>0,"maintain"=>0);
 //      $pat=array("edit"=>0,"audit"=>0,"approve"=>0,"execute"=>0,"maintain"=>0);
@@ -181,9 +181,7 @@ class User extends Model
                         "pro"=>$pro,
                         "the"=>$the,
                         "admin"=>$admin
-                        );
-        
-        
+                        );        
       // 使用静态方法，向User表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
       $this::update([
           'authority'  => $authority,

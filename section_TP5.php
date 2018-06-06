@@ -1379,7 +1379,7 @@ Loader::import('first.second.Foo');
 $foo = new \Foo();
 ?>
 
-<!-- / HY 2018/5/24 -->
+<!-- // HY 2018/5/24 -->
 
 <!--  HY 2018/5/31 -->
 json_encode函数的第二参数“JSON_UNESCAPED_UNICODE”，保持数组的中文原样。默认是转为UTF-8编码(\u开头的4位16进制字符串)。
@@ -1390,4 +1390,262 @@ json_encode($data,JSON_UNESCAPED_UNICODE);
 json_last_error();//显示错误代码。
 ?>
 
-<!--  HY 2018/5/31 -->
+<!--//  HY 2018/5/31 -->
+
+
+<!--  HY 2018/6/6 -->
+// 自动时间字段（模型中的create_time字段,update_time字段）
+框架做了一些强化支持，无需定义获取器和修改器就能完成时间日期类型字段的自动处理。
+
+默认情况下自动写入时间戳字段功能是关闭的，可以在模型里面定义
+<?php
+
+namespace app\index\model;
+
+use think\Model;
+
+class User extends Model
+{
+	// 开启时间字段自动写入，默认字段类型为整形
+	protected $autoWriteTimestamp = true; 
+	
+	// 开启时间字段自动写入，并设置字段类型为datetime
+	protected $autoWriteTimestamp = 'datetime'; 
+}
+?>
+
+开启时间字段（这里的时间字段支持整型、时间戳和日期类型）自动写入后，会默认自动写入两个时间字段：create_time（创建时间，新增数据的时候自动写入）和update_time（更新时间，新增和更新的时候都会自动写入），并且以整型类型写入数据库。
+
+autoWriteTimestamp属性支持设置的时间字段类型包括：整型（设置为true的时候使用该类型）、时间（datetime）和时间戳（timestamp）。
+
+模型中设置好后，自动时间字段的写入如下：
+<?php
+// 新增用户数据
+$user       = new User;
+$user->name = 'thinkphp';
+// 会自动写入create_time和update_time字段
+$user->save();
+echo $user->create_time;
+echo $user->update_time;
+
+// 更新用户数据
+$user->name = 'topthink';
+// 会自动更新update_time字段
+$user->save();
+echo $user->create_time;
+echo $user->update_time;
+?>
+
+create_time 和update_time字段的值不需要进行设置，系统会自动写入。如果你手动进行设置的话，则不会触发自动写入机制（也就是说不会进行时间字段的格式转换），你需要按照实际的字段类型设置。
+
+如果时间字段类型为整型，自动写入的时间字段会在获取的时候自动转换为dateFormat属性设置的时间格式，所以不需要再次对时间字段进行格式化输出，以免出错。如果不希望自动格式化，可以设置数据库配置参数datetime_format 的值为false。（时间类型字段则无需更改设置）
+
+改变时间字段的输出格式示例：
+<?php
+
+namespace app\index\model;
+
+use think\Model;
+
+class User extends Model
+{
+	// 开启时间字段自动写入 并设置字段类型为datetime
+	protected $autoWriteTimestamp = 'datetime'; 
+    protected $dateFormat = 'Y/m/d H:i:s';
+}
+
+?>
+
+观察输出的值是否有变化
+<?php
+// 新增用户数据
+$user       = new User;
+$user->name = 'thinkphp';
+// 会自动写入create_time和update_time字段
+$user->save();
+echo $user->create_time;
+echo $user->update_time;
+
+// 更新用户数据
+$user->name = 'topthink';
+// 会自动更新update_time字段
+$user->save();
+echo $user->create_time;
+echo $user->update_time;
+
+?>
+
+上面的设置都是针对单个模型的，如果需要设置全局使用，可以在数据库配置文件中设置下面的参数：
+<?php
+// 开启自动写入时间字段 支持设置字段类型（同前）
+'auto_timestamp' => true,
+// 时间字段取出后的时间格式
+'datetime_format' => 'Y-m-d H:i:s',
+?>
+
+如果全局设置开启时间字段自动写入后，部分模型可以单独关闭，例如：
+
+<?php
+
+namespace app\index\model;
+
+use think\Model;
+
+class Data extends Model
+{
+	// 关闭时间字段自动写入
+	protected $autoWriteTimestamp = false; 
+}
+?>
+
+甚至说部分模型的时间字段名和类型可以单独设置
+
+<?php
+
+namespace app\index\model;
+
+use think\Model;
+
+class Data extends Model
+{
+	// 设置本模型时间字段的类型为“datetime”
+	protected $autoWriteTimestamp = 'datetime'; 
+    // 定义时间字段名
+    protected $createTime = 'create_at';
+    protected $updateTime = 'update_at';      
+}
+?>
+在系统自动时间字段之外的其它时间字段，如果需要自动格式输出，可以设置类型转换。
+
+//自动时间字段数据类型转换
+自动时间字段写入只支持创建时间和更新时间的自动写入和格式化读取，如果模型有其它时间字段的话，则可以通过设置类型转换来完成。
+
+例如User模型的birthday字段也使用了时间类型。可以通过定义修改器和读取器的方式来处理birthday字段，更简单的办法则是设置类型转换，免去定义修改器和读取器的麻烦。
+<?php
+namespace app\index\model;
+
+use think\Model;
+
+class User extends Model
+{
+    protected $type = [
+        'birthday'  =>  'datetime:Y/m/d',
+    ];   
+}
+?>
+type属性用于定义类型转换（支持的类型:integer,float,boolean,array,object,serialize,json,timestamp,datetime），'datetime:Y/m/d'表示使用datetime类型，输出格式为Y/m/d，下面是一段代码示例。
+<?php
+$user = User::get(1);
+// 输出 2009/02/14
+echo $user->birthday;
+
+$user->birthday = '2017-1-1';
+$user->save();
+// 输出 2017/1/1
+echo $user->birthday;
+?>
+
+类型转换支持的类型设置包括：
+"integer":设置为integer（整型）后，该字段写入和输出的时候都会自动转换为整型。
+
+"float":该字段的值写入和输出的时候自动转换为浮点型。
+
+"boolean":该字段的值写入和输出的时候自动转换为布尔型。
+
+"array":如果设置为强制转换为array类型，系统会自动把数组编码为json格式字符串写入数据库，取出来的时候会自动解码。
+
+"object":该字段的值在写入的时候会自动编码为json字符串，输出的时候会自动转换为stdclass对象。
+
+"serialize":指定为序列化类型的话，数据会自动序列化写入，并且在读取的时候自动反序列化。
+
+"json":指定为json类型的话，数据会自动json_encode写入，并且在读取的时候自动json_decode处理。
+
+"timestamp":指定为时间戳字段类型（注意并不是数据库的timestamp类型，事实上是int类型）的话，该字段的值在写入时候会自动使用strtotime生成对应的时间戳，输出的时候会自动转换为dateFormat属性定义的时间字符串格式，默认的格式为"Y-m-d H:i:s"。
+
+"datetime":和timestamp类似，区别在于写入和读取数据的时候都会自动处理成时间字符串Y-m-d H:i:s的格式。
+
+PHP5.6版本以下，数据库查询的字段返回数据类型都是字符串的，在做API开发的时候最好是使用类型转换强制处理下，PHP5.6版本开始，PDO查询的返回数据的字段类型都是实际的字段类型格式。
+
+
+// 软删除（模型中的delete_time字段）
+对数据频繁使用删除操作会导致性能问题，因此不推荐直接物理删除数据，而是用逻辑删除替代，也就是下面要讲的软删除。软删除的作用就是把数据加上删除标记，而不是真正的删除，同时也便于需要的时候进行数据的恢复。
+
+要使用软删除功能，需要引入“SoftDelete trait”，例如User模型按照下面的定义就可以使用软删除功能：
+<?php
+namespace app\index\model;
+
+use think\Model;
+use traits\model\SoftDelete;
+
+class User extends Model
+{
+    use SoftDelete;
+	protected $autoWriteTimestamp = 'datetime';
+}
+
+?>
+
+为了配合软删除功能，还需要在数据表中添加delete_time字段，ThinkPHP5的软删除功能使用时间戳类型（数据表默认值为Null），用于记录数据的删除时间。
+
+可以用类型转换指定软删除字段的类型，建议数据表的所有时间字段统一使用autoWriteTimestamp属性规范时间类型（支持datetime、date、timestamp以及integer）
+
+定义好模型后，我们就可以使用：
+<?php
+// 软删除
+User::destroy(1);
+// 真实删除
+User::destroy(1,true);
+
+$user = User::get(1);
+// 软删除
+$user->delete();
+// 真实删除
+$user->delete(true);
+?>
+
+默认情况下查询的数据不包含软删除数据，如果需要包含软删除的数据，可以使用下面的方式查询：
+<?php
+User::withTrashed()->find();
+User::withTrashed()->select();
+?>
+
+如果仅仅需要查询软删除的数据，可以使用：
+<?php
+User::onlyTrashed()->find();
+User::onlyTrashed()->select();
+?>
+
+如果你的查询条件比较复杂，尤其是某些特殊情况下使用OR查询条件会把软删除数据也查询出来，可以使用闭包查询的方式解决，如下：
+<?php
+User::where(function($query) {
+	$query->where('id', '>', 10)
+    	->whereOr('name', 'like', 'think');
+})->select();
+?>
+
+//获取模型数据
+<?php
+// 模型外部获取
+$model->name
+
+// 模型内部获取
+$this->getData('name');
+$this->getAttr('email');
+?>
+getData和getAttr方法的区别前者是原始数据，后者是经过读取器处理的数据，如果没有定义数据读取器的话，两个方法的结果是相同的。
+
+
+// 设置模型数据
+<?php
+// 模型外部设置
+$model->name='thinkphp'
+
+// 模型内部设置
+$this->data('name','thinkphp');
+$this->setAttr('email','thinkphp@qq.com');
+?>
+data和setAttr方法的区别前者是赋值最终数据，后者赋值的数据还会经过修改器处理，如果没有定义修改器的话，两个方法的结果是相同的。
+
+
+<!--//  HY 2018/6/6 -->
+

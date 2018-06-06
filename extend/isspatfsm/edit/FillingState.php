@@ -22,24 +22,25 @@ class FillingState extends EditState
 
   public function delete()
   {
-    $data = $this->_oprtData;
-    //delete操作代码
-    //1.删除pat，模型destroy()方法
-    $this->_mdl->patDelete($data);
+    //调用IssPatModel的setMdlData()方法，设定所需进行处理的数据。
+    $this->_mdl->setMdlData($this->_oprtData);
+    //1.删除pat
+    $n=$this->_mdl->patDelete();
 
-    //2.删除patRd，模型destroy()方法
-    $this->_mdl->patRdDelete($data);
+    //2.删除patRd
+    $n+=$this->_mdl->patRdDelete();
 
-    //3.删除iss，模型destroy()方法
-    $this->_mdl->issDelete($data);
+    //3.删除iss
+    $n+=$this->_mdl->issDelete();
 
-    //4.删除issRd，模型destroy()方法
-    $this->_mdl->issRdDelete($data);
+    //4.删除issRd
+    $n+=$this->_mdl->issRdDelete();
 
-    //5.删除att，模型destroy()方法
-    $this->_mdl->attDelete($data);
-
-    //return 'delete结果：';
+    //5.删除att
+    $n+=$this->_mdl->attDelete();
+    
+    $msg='<br>delete结果：删除'.$n.'条记录。';
+    return $msg;
   }
 
 }
