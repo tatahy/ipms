@@ -88,10 +88,10 @@ class Issinfo extends Model
       return $outPut;
     }
     
-    //修改器，设定数据表issinfo中issmap_type字段值，转换为类型编码
+    //修改器，设定数据表issinfo中issmap_type字段值，转换为类型编码写入数据库
     protected function setIssmapTypeAttr($value)
     {
-      $setVal='……';
+      $setVal=$value;
       switch($value){
         case '专利授权申报':
           $setVal='_ISST_PAT1';

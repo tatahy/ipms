@@ -1,0 +1,72 @@
+
+<html>
+<tbody id="tbattFileList_load">
+	<!-- 此处显示数据库查询后的数据集 -->
+	{volist name="att" id="vo" empty="暂无附件"}
+	<tr>
+		<td>{$i}
+			<input name="attId[]" value="{$vo.id}" type="text" class="sr-only">
+			<input name="attFileObjStr[]" value="{$vo.attpath}" type="text" class="sr-only">
+			<input name="attFileName[]" value="{$vo.attfilename}" type="text" class="sr-only">
+		</td>
+		<td>{$vo.atttype}</td>
+		<td>{$vo.name}</td>
+		<td>{$vo.uploaddate}</td>
+		<td>{$vo.uploader}</td>
+		<td>{$vo.rolename}</td>
+						
+		<td>							
+			<a href="{$home}/dashboard/index/attOprt/attId/{$vo.id}/oprt/_DOWNLOAD"><span class="glyphicon glyphicon-download-alt"></span>下载</a>&nbsp;
+			{in name="$vo.deldisplay" value="1"}
+			<a class="aAttOprt text-danger" href="#" data-attId="{$vo.id}" data-attOprt="_DELETE"><span class="glyphicon glyphicon-remove"></span>删除</a>&nbsp;
+			{/in}
+			</td>
+	</tr>
+								
+	{/volist}
+</tbody>
+				
+</html>
+
+<script>
+//自调用匿名函数
+;(function($){
+	
+})(jQuery);
+
+$(document).ready(function(){
+	
+	//已上传附件文件操作
+	$('.aAttOprt').click(function(){
+		//bootstrap框架下应用data属性简化取值，此处属性名称只认小写
+		var attId=$(this).data('attid');
+		var attOprt=$(this).data('attoprt');
+	
+		$.post('attOprt',{'attId':attId,'attOprt':attOprt},
+			function(data){
+				if(data.result){
+					$('.aAttOprt[data-attId="'+attId+'"]').closest('tr').remove();
+				}
+				$('#attOprtMsg').text(data.msg);
+			});
+	});
+
+
+});
+
+
+<!-- function -->
+
+//**函数名：ajaxOprt
+ 	//* 作用：本页面ajax操作
+	//* 参数btnObj，类型：对象。值：不为空。说明：btn对象。
+	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
+	//* 参数sendData，类型：json。值：不为空。sendData = {'oprt':oprt,'id':$(this).data('deptid'),'sId':window.location.hash}
+	//* 返回值：无
+	function ajaxOprt(btnObj,url,sendData){
+	
+	}
+<!--// function -->
+
+
+</script>

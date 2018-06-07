@@ -110,9 +110,10 @@ class IndexController extends Controller
           'record' => array('act' => '哈patrecord.act')),
         'att' => array(
           'info'=>array(),
-          'arrId' => [0,3,1],
-          'arrFileName' => ['0,1,2','kk'],
-          'arrFileObjStr' => ['yy','99']));
+          'arrId' => array(5,2),
+          'arrFileName' => array('name'=>'0-1,2','kk'),
+          'arrFileObjStr' => array('yy','99'))
+        );
       $liftFSM = new Client();
       //$fsm->setFSM('_EDIT');
       $this->assign([ //在index.html页面通过'destr'输出自定义的信息

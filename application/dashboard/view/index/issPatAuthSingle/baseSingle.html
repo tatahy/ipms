@@ -123,7 +123,7 @@
 		{else /}
 		<div id="divAttCollapse" class="myLegend" data-toggle="collapse" data-target="#fmAtt"><span class="label label-warning">附件隐藏<span class="glyphicon glyphicon-menu-up"></span></span></div>
 			<form id="fmAtt" class="collapse in row myRow-noform-group">
-		{/empty}				
+		{/empty}	
 			<div class="table-responsive" >	
 				<table class="table table-bordered table-responsive table-hover">
 				<thead>
@@ -138,7 +138,7 @@
 						<th class="text-center">操作</th>
 					</tr>
 				</thead>
-						
+									
 				<tbody id="tbattFileList">
 				<!-- 此处显示数据库查询后的数据集 -->
 					{volist name="att" id="vo" empty="暂无附件"}
@@ -155,10 +155,10 @@
 						<td>{$vo.uploader}</td>
 						<td>{$vo.rolename}</td>
 						
-						<td>
-							<a href="{$home}/attachment/index/download/id/{$vo.id}">下载</a>&nbsp;
+						<td>							
+							<a href="{$home}/dashboard/index/attOprt/attId/{$vo.id}/oprt/_DOWNLOAD"><span class="glyphicon glyphicon-download-alt"></span>下载</a>&nbsp;
 							{in name="$vo.deldisplay" value="1"}
-							<a href="{$home}/attachment/index/delete/id/{$vo.id}">删除</a>&nbsp;
+							<a class="aAttOprt text-danger" href="#" data-attId="{$vo.id}" data-attOprt="_DELETE"><span class="glyphicon glyphicon-remove"></span>删除</a>&nbsp;
 							{/in}
 						</td>
 						
@@ -166,7 +166,12 @@
 								
 					{/volist}
 				</tbody>
+				
+				<!-- <tfoot> -->
+					<!-- <tr><td id="attOprtMsg" colspan="7" style="text-align:left;border-bottom:0px;"></td></tr> -->
+				<!-- </tfoot> -->
 				</table>
+				<p id="attOprtMsg"></p>
 			</div>
 	
 			</form>	
@@ -199,7 +204,7 @@
 				<div class="row myRow" >			
 				<div class="form-group col-sm-6">
 					<label for="attFile">选择附件<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-					<input type="file" name="attFile" id="attFile" class="btn btn-sm" accept=".jpg,.jpeg,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.rar" required>
+					<input type="file" name="attFile" id="attFile" class="btn btn-sm empty-check" accept=".jpg,.jpeg,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.rar" required>
 					<blockquote>
 						<h5>附件大小：<span class="label label-danger">&le;&nbsp;10MB </span></h5>
 						<h5 >允许附件类型：
@@ -215,7 +220,7 @@
 				<div class="form-group col-sm-2">
 					
 					<label for="attType">附件类型<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-					<select class="form-control" id="attType" name="attType" required>
+					<select class="form-control empty-check" id="attType" name="attType" required>
 						<option value=""></option>
 						<option value="_ATTT1">申请</option>
 						<option value="_ATTT2">请示</option>
@@ -227,11 +232,11 @@
 		
 				<div class="form-group col-sm-4">
 					<label for="attName">附件名称<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-					<input class="form-control" id="attName" name="attName" value="" type="text" required>
+					<input class="form-control empty-check" id="attName" name="attName" value="" type="text" required>
 				</div>
 				
 				<div class="form-group col-sm-6">
-					<button id="btnAttFileUpload" class="btn btn-primary btn-sm" data-oprt="" data-btnLabel=""><span class="glyphicon glyphicon-upload"></span>附件上传</button>
+					<button id="btnAttFileUpload" class="btn btn-primary btn-sm" data-issId="{$iss.id}" data-oprt="" data-btnLabel=""><span class="glyphicon glyphicon-upload"></span>附件上传</button>
 					<br>
 					<label for="" class="attuploadbar" hidden>上传进度</label>	
 					<div class="progress attuploadbar" hidden>
@@ -437,7 +442,7 @@ $(document).ready(function(){
 								$('#divContent_load').load('tplFile',{'sId':'#issPat','auth':auth,'id':data.issId},function(){				
 									//成功，弹窗显示信息
 									<!-- $.alert('<p class="text-center"><span class="label label-info" style="font-size:14px;">《'+data.topic+'》</span></p>'+btnHtml+'<p class="text-center"><span">'+data.msg+'</span></p>'); -->
-									$.alert('<p class="text-left" style="font-size:16px;"><span class="label label-info"><span class="glyphicon glyphicon-wrench"></span></span>&nbsp;专利事务</p><p class="text-center"><span  style="font-size:16px;">《'+data1.topic+'》</span></p>'+btnHtml+'<p class="text-center"><span">'+data.msg+'</span></p>');
+									$.alert('<p class="text-left" style="font-size:16px;"><span class="label label-info"><span class="glyphicon glyphicon-wrench"></span></span>&nbsp;专利事务</p><p class="text-center"><span  style="font-size:16px;">《'+data.topic+'》</span></p>'+btnHtml+'<p class="text-center"><span">'+data.msg+'</span></p>');
 								});
 							});	
 							<!-- }); -->
@@ -455,38 +460,40 @@ $(document).ready(function(){
 	});
 	
 	//上传附件文件
-	$('#btnAttFileUpload').click(function(){
+	$('#btnAttFileUpload').click(function(evt){
 		
 		//防止触发#fmAttFileUpload的提交事件
-		$('#fmAttFileUpload').submit(function(evt){
-			evt.preventDefault();
+		evt.preventDefault();
+		
 		
 		var formData = new FormData($('#fmAttFileUpload')[0]);
+		
 		//显示上传进度条
 		$('.attuploadbar').show();
 		$.ajax({
 			type: 'post',
             url: 'uploadAttTemp',
             data: formData,
-			<!-- datatype: 'JSON', -->
+			datatype: 'html',
             contentType: false,// 当有文件要上传时，此项是必须的，否则后台无法识别文件流的起始位置
             processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)
 				
 			//显示上传进度
 			xhr:xhrFileUploadBar,
 			success: function(data){
-				<!-- $('#divUpLoadProcess1').text('【附件上传】成功') -->
-				//列表增加上传文件内容
-				$('tr:last').after('<tr class=""><td>'+($('#tbattFileList').children('tr').length+1)+'<input name="attId[]" value="'+data.id+'" type="text" class="sr-only"><input name="attFileObjStr[]" value="'+data.attpath+'" type="text" class="sr-only"><input name="attFileName[]" value="'+data.attfilename+'" type="text" class="sr-only"></td><td>'+data.atttype+'</td><td>'+data.name+'</td><td>'+data.uploaddate+'</td><td>'+data.uploader+'</td><td>'+data.rolename+'</td><td><a href="{$home}/attachment/index/download/id/'+data.id+'" target="_blank">下载</a>&nbsp;<a href="{$home}/attachment/index/delete/id/'+data.id+'" target="_blank">删除</a>&nbsp;</td></tr>');
-					
 				//所有的行去掉颜色
 				$('tr').removeClass('bg-warning');
 				
-				//给新加的行（最后一行）上色
-				$('tr:last').addClass('bg-warning');
+				$('#attOprtMsg').text('');
+				
+				<!-- $('#tbattFileList_load').load('attFileList',{'issId':$(this).data('issid')},function(){$('#attOprtMsg').text('');}); -->
+				
+				
+				$('#tbattFileList').append('<tr class="bg-warning"><td>'+($('#tbattFileList').children('tr').length+1)+'<input name="attId[]" value="'+data.id+'" type="text" class="sr-only"><input name="attFileObjStr[]" value="'+data.attpath+'" type="text" class="sr-only"><input name="attFileName[]" value="'+data.attfilename+'" type="text" class="sr-only"></td><td>'+data.atttype+'</td><td>'+data.name+'</td><td>'+data.uploaddate+'</td><td>'+data.uploader+'</td><td>'+data.rolename+'</td><td><a href="{$home}/dashboard/index/attOprt/attId/'+data.id+'/oprt/_DOWNLOAD"><span class="glyphicon glyphicon-download-alt"></span>下载</a>&nbsp;<a class="aAttOprt text-danger" href="#" data-attId="'+data.id+'" data-attOprt="_DELETE"><span class="glyphicon glyphicon-remove"></span>删除</a>&nbsp;</td></tr>');
+					
 				
 				//附件列表显示
-				$('#divAttFilelist').show();
+				$('#fmAtt').collapse('show');
 					
 				//上传form重置
 				$('#fmAttFileUpload')[0].reset();
@@ -513,10 +520,23 @@ $(document).ready(function(){
 				$.alert('【附件上传】失败');
 			}
 		
-		});	
-		
 		});
 	
+	});
+	
+	//已上传附件文件操作
+	$('.aAttOprt').click(function(){
+		//bootstrap框架下应用data属性简化取值，此处属性名称只认小写
+		var attId=$(this).data('attid');
+		var attOprt=$(this).data('attoprt');
+	
+		$.post('attOprt',{'attId':attId,'attOprt':attOprt},
+			function(data){
+				if(data.result){
+					$('.aAttOprt[data-attId="'+attId+'"]').closest('tr').remove();
+				}
+				$('#attOprtMsg').text(data.msg);
+			});
 	});
 	//检查form里的input（class="empty-check"）是否为空或0，为空或0做出'has-error'和tooltip提示，不为空去掉'has-error'和tooltip提示
 	$('.empty-check').each(function(){

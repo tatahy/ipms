@@ -48,6 +48,11 @@ class ApplyCreatingState extends EditState
         $this->_mdl->issRdCreate();
     
         //5.attinfo更新???
+        $data['iss']['info']['id']=$iss->id;
+        
+        //调用IssPatModel的setMdlData()方法，设定所需进行处理的数据。
+        $this->_mdl->setMdlData($data);
+        $this->_mdl->attUpdate();
     
         //状态修改
         $this->_context->setState(EditContext::$FillingState);
@@ -58,7 +63,9 @@ class ApplyCreatingState extends EditState
 
   public function delete()
   {
-    return '<br>无效delete操作';
+    $data = $this->_oprtData;
+    return '<br>delete操作结果：<br>'.json_encode($data, JSON_UNESCAPED_UNICODE) . json_last_error();
+    //return '<br>无效delete操作';
     //return false;
   }
 

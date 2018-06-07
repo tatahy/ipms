@@ -139,12 +139,12 @@ class IndexController extends \think\Controller
     //上传附件文件到temp目录
     public function uploadAttTemp(Request $request,AttinfoModel $attMdl)
     {
-      $attData=array('uploaddate'=>$this->now,
-                        'uploader'=>$request->param('uploader'),
+      $attData=array('name' =>$request->param('attName'),
                         'atttype' =>$request->param('attType'),
                         'attmap_id' =>$request->param('attmap_id'),
                         'attmap_type' =>$request->param('attmap_type'),
-                        'name' =>$request->param('attName'),
+                        'uploaddate'=>$this->now,
+                        'uploader'=>$request->param('uploader'),
                         'rolename' =>$request->param('attRoleName'),
                         'deldisplay' =>$request->param('deldisplay')
       );
@@ -914,10 +914,10 @@ class IndexController extends \think\Controller
           $issRdMdl::destroy(['issinfo_id'=>$issId]);
           
           //5.删除att，自定义attDelete()方法
-          //$attId_return=$attMdl->attDelete($issId);
+          $attId_return=$attMdl->attDelete($issId);
           //5.删除att，模型destroy()方法
-          $attMdl::destroy(['attmap_id'=>$issId]);
-          
+          //$attMdl::destroy(['attmap_id'=>$issId]);
+        
           $msg.='成功。<br>';  
           return json(array('msg'=>$msg,'topic'=>$request->param('issPatTopic'),'patId'=>$patId));
         break;
@@ -2226,5 +2226,55 @@ class IndexController extends \think\Controller
       return view();
       //return ':)<br> issthe 模块开发中……';
      
-    }   
+    }
+    
+    public function attOprt(Request $request,AttinfoModel $attMdl,$attOprt='',$attId='')
+    {
+        $this->_loginUser();
+        
+        $attOprt=empty($request->param('attOprt'))?0:$request->param('attOprt');
+        
+        $attId=empty($request->param('attId'))?0:$request->param('attId');
+        
+        switch($attOprt){
+            case '_DOWNLOAD':
+                $returnArr=$attMdl->singleDownload($attId);
+                break;
+            case '_DELETE':
+                $returnArr=$attMdl->singleDelete($attId);
+                break;
+            
+            
+        }
+        
+        
+        return $returnArr;//$returnArr=array('result'=>true/false,'msg'=>'string')
+    }
+    
+    public function attFileList(Request $request,IssinfoModel $issMdl,AttinfoModel $attMdl,$issId='')
+    {
+        $this->_loginUser();
+        
+        $issId=empty($request->param('issId'))?0:$request->param('issId');
+        
+        if($issId){
+             //得到模板文件中需显示的内容
+            $iss=$issMdl::get($request->param('issId'));
+            // 利用模型issinfo.php中定义的一对多方法“attachments”得到iss对应的attachments信息
+            $att=$iss->attachments;
+        
+        }else{
+           
+            //查询当前用户已上传的所有附件信息
+            $att= $attMdl::all(['attmap_id'=>0,'uploader'=>$this->username,'rolename'=>'edit','deldisplay'=>1]);
+            
+        }
+        
+        $this->assigh([
+            'att'=>$att
+        ]);
+        
+        
+        return view();//$returnArr=array('result'=>true/false,'msg'=>'string')
+    }
 }

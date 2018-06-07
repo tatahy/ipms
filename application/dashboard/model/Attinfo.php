@@ -20,6 +20,9 @@ class Attinfo extends Model
     //只读字段，这个字段的值一旦写入，就无法更改。
     //protected $readonly = ['issnum'];
     
+    // 开启时间字段自动写入
+	protected $autoWriteTimestamp = true; 
+    
     //获取器，获取数据表attinfo中atttype字段值，转换为中文输出，待考虑是否采用？？
     protected function getAtttypeAttr($value)
     {
@@ -89,7 +92,7 @@ class Attinfo extends Model
         case 'maintainer':
           $outPut='维护人';
         break;
-        
+        //…………………………………………
         case '_EDIT':
           $outPut='撰写人';
         break;
@@ -107,6 +110,26 @@ class Attinfo extends Model
         break;
         
         case '_MAINTAIN':
+          $outPut='维护人';
+        break;
+        //…………………………………………
+        case 'edit':
+          $outPut='撰写人';
+        break;
+        
+        case 'audit':
+          $outPut='审核人';
+        break;
+        
+        case 'approve':
+          $outPut='批准人';
+        break;
+        
+        case 'execute':
+          $outPut='执行人';
+        break;
+        
+        case 'maintain':
           $outPut='维护人';
         break;
         
@@ -171,7 +194,7 @@ class Attinfo extends Model
     
      /**
      * 删除attachment记录及其对应的附件文件和目录
-     * @param  integer $attId 删除attachment的id
+     * @param  integer $attId 删除att的id
      * @return integer|bool  删除成功返回true，未成功返回false
      *  考虑应用TP5的软删除进行改进，？？？2018/3/23
      */
@@ -180,18 +203,22 @@ class Attinfo extends Model
         $att=$this->where('attmap_id',$attMapId)->select();
         //默认查询出的所有记录对应的附件文件都在同一个目录下
         $fileDir=dirname($att[0]->attpath);
-        //引用本模型中定义的fileDelete方法删除记录和附件文件
+        //引用本模型中定义的singleDelete方法删除记录和附件文件
         for($i=0;$i<count($att);$i++){
-          $this->fileDelete($att[i]->id);
+          $this->singleDelete($att[$i]->id);
         }
         
-        //删除目录，若旧目录为空目录
-        if(count(scandir($fileDir)==2)){
+        //删除目录，若旧目录为空目录scandir()函数的值为“2”
+        if(count(scandir($fileDir))==2){
             rmdir($fileDir);
-            return true;
+            $result = true;
+            $msg='<br>附件删除完成。';
         }else {
-            return false;
+            $result = false;
+            $msg='<br>附件未删除干净，有残余附件。';
         }
+        
+        return array('result'=>$result,'msg'=>$msg);
     }
     
     
@@ -203,7 +230,7 @@ class Attinfo extends Model
      */
     public function fileUploadTemp($data=[],$fileSet)
     {
-
+       // return json_encode($fileSet);
         if(!empty($fileSet)){
             // 移动到框架根目录的uploads/temp/ 目录下,并且使用md5规则重新命名文件。
             //新命名文件所在目录类似temp/72/ef580909368d824e899f77c7c98388.jpg 
@@ -212,7 +239,8 @@ class Attinfo extends Model
                             ->move(ROOT_PATH.'uploads'.DS.'temp');
             
         }else{
-            $this->error('未选择文件，请选择需上传的文件。');
+            $info=0;
+            $result='未选择文件，请选择需上传的文件。';//
         }
         
         if($info){
@@ -230,13 +258,15 @@ class Attinfo extends Model
             
             $att = $this->get($attId); 
       
-            return $att;
+            $result= $att;
             
         }else{
             // 上传失败获取错误信息
             //echo $file->getError();
-            return $fileSet->getError();
+            $result = $info;
         }
+        
+        return $result;
       
     }
     
@@ -260,7 +290,7 @@ class Attinfo extends Model
           }
           
           //删除旧目录，若旧目录为空目录
-          if(count(scandir($fileDir)==2)){
+          if(count(scandir($fileDir))==2){
             rmdir($fileDir);
           }else{
             //旧目录不为空，返回true
@@ -276,23 +306,51 @@ class Attinfo extends Model
     }
     
      //删除单一文件及其记录
-    public function fileDelete($attId)
+    public function singleDelete($attId)
     {
         $att= $this->where('id',$attId)->find();
         $attpath=$att->attpath;
-        $name=$att->name;
-        //删除attachment表中的附件文件记录
-        $this->where('id',$attId)->delete();
+        $name=$att->getAttr('name');//$att->name得到的是模型名称："Attinfo"
+        $fileDir=dirname($attpath);
+        //return $name;
+        //删除attinfo表中的附件文件记录
+        $att->delete();
+        
         //删除文件，成功后返回
         if(file_exists($attpath)){
           unlink($attpath);
-          $this->success("删除文件'".$name."'成功。");	
+          $msg='文件"'.$name.'"删除成功。';
+          $result=true;	
         }else{
-          $this->error("未删除文件'".$name."'");	
+          $msg='未删除文件"'.$name.'"';
+          $result=false;
+     	    
+        }
+        
+        //若目录为空目录,删除目录
+        if(count(scandir($fileDir))==2){
+            rmdir($fileDir);
+        }   
+        return array('result'=>$result,'msg'=>$msg);
+
+    }
+    
+    //下载单个文件
+    public function singleDownload($attId)
+    {
+        $att= $this->where('id',$attId)->find();
+        $attpath=$att['attpath'];
+        
+        if(file_exists($attpath)){
+            header("Content-Type:application/octet-stream");
+            header("Content-Disposition:attachment;filename=".$att['attfilename']);
+            header('Content-Length:'.filesize($attpath));
+            readfile($attpath);
+            exit();
+        }else{
+            return array('result'=>false,'msg'=>'"'.$att['name'].'"文件不存在。');
         }
     }
-      
-    
 
 }
 

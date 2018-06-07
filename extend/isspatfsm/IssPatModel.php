@@ -37,9 +37,9 @@ class IssPatModel
    * 'record' => array('act' => '由patrecord.act',...)
    * ),
    * 'att' => array(
-   * 'arrId' => [0],
-   * 'arrFileName' => [0],
-   * 'arrFileObjStr' => [0]
+   * 'arrId' => [],
+   * 'arrFileName' => [],
+   * 'arrFileObjStr' => []
    * )
    * );
    */
