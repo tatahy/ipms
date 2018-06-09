@@ -137,7 +137,7 @@ class IndexController extends \think\Controller
     }
     
     //上传附件文件到temp目录
-    public function uploadAttTemp(Request $request,AttinfoModel $attMdl)
+    public function attUploadTemp(Request $request,AttinfoModel $attMdl)
     {
       $attData=array('name' =>$request->param('attName'),
                         'atttype' =>$request->param('attType'),
@@ -650,6 +650,7 @@ class IndexController extends \think\Controller
         'oprt'=>$oprt,
         'iss'=>$iss,
         'att'=>$att,
+        'numAtt'=>count($att),
         'pat'=>$pat,
         'patType'=>$patType,
         
@@ -2251,12 +2252,13 @@ class IndexController extends \think\Controller
         return $returnArr;//$returnArr=array('result'=>true/false,'msg'=>'string')
     }
     
-    public function attFileList(Request $request,IssinfoModel $issMdl,AttinfoModel $attMdl,$issId='')
+    public function attFileList(Request $request,IssinfoModel $issMdl,AttinfoModel $attMdl,$issId='',$resultSet='')
     {
         $this->_loginUser();
         
         $issId=empty($request->param('issId'))?0:$request->param('issId');
-        
+        $resultSet=($request->param('resultSet/a')==null)?array('result'=>0,'msg'=>0,'obj'=>0):$request->param('resultSet/a');//$resultSet=['result'=>true/false,'msg'=>string,'obj'=>Object]
+        //$resultSet=array_merge(array('result'=>0,'msg'=>0,'obj'=>22),$request->param('resultSet/a'));
         if($issId){
              //得到模板文件中需显示的内容
             $iss=$issMdl::get($request->param('issId'));
@@ -2270,11 +2272,16 @@ class IndexController extends \think\Controller
             
         }
         
-        $this->assigh([
+        $this->assign([
+            'home'=>$request->domain(),
+            'username'=>$this->username,
+           // 'resultSet'=>json_encode($request->param('resultSet/a'),JSON_UNESCAPED_UNICODE),
+            //'resultSet'=>$request->param('resultSet/a')['msg'],
+            'resultSet'=>$resultSet,
             'att'=>$att
         ]);
         
         
-        return view();//$returnArr=array('result'=>true/false,'msg'=>'string')
+        return view('index'.DS.'issPatAuthSingle'.DS.'attFileList');//$returnArr=array('result'=>true/false,'msg'=>'string')
     }
 }

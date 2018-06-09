@@ -224,13 +224,16 @@ class Attinfo extends Model
     
     /**
      * 上传附件文件到本服务器temp目录
+     * @param  $data array 数组，写入attinfo表的内容
      * @param  $fileSet Object 文件对象
-     * @return Object|string  成功：返回新建的att记录，未成功：返回未成功信息
-     *
+     * @return array(true|false,string,Object)  
      */
     public function fileUploadTemp($data=[],$fileSet)
     {
-       // return json_encode($fileSet);
+        $result=false;
+        $msg='';
+        $obj=array('id'=>0);
+        
         if(!empty($fileSet)){
             // 移动到框架根目录的uploads/temp/ 目录下,并且使用md5规则重新命名文件。
             //新命名文件所在目录类似temp/72/ef580909368d824e899f77c7c98388.jpg 
@@ -240,7 +243,7 @@ class Attinfo extends Model
             
         }else{
             $info=0;
-            $result='未选择文件，请选择需上传的文件。';//
+            //$msg='未选择文件，请选择需上传的文件。';
         }
         
         if($info){
@@ -253,21 +256,30 @@ class Attinfo extends Model
             $info->getFilename(); 
             
             $path= '..'.DS.'uploads'. DS.'temp'.DS.$info->getSaveName();
+            //查找是否有重名的记录：
+            $att=$this->getByAttfilename($info->getFilename());
             
-            $attId=$this->attCreate(array_merge($data,array('attpath'=>$path,'attfilename'=>$info->getFileName())));
-            
-            $att = $this->get($attId); 
-      
-            $result= $att;
+            if(count($att)){
+                $result=false;
+                $msg='附件已使用"'.$att['name'].'"于'.$att->create_time.'上传成功。';
+                $obj=$att;
+            }else{
+                $attId=$this->attCreate(array_merge($data,array('attpath'=>$path,'attfilename'=>$info->getFileName())));
+                $att = $this->get($attId); 
+                $result=true;
+                $msg='附件"'.$att['name'].'"上传成功。';
+                $obj=$att;
+            }  
             
         }else{
             // 上传失败获取错误信息
             //echo $file->getError();
-            $result = $info;
+            $result=false;
+            $msg = $info;
         }
         
-        return $result;
-      
+        return array('result'=>$result,'msg'=>$msg,'obj'=>$obj);
+
     }
     
     /**

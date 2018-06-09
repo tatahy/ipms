@@ -1,6 +1,20 @@
+<!-- // attFileList.html： -->
+<div class="table-responsive" >	
+<table class="table table-bordered table-responsive table-hover">
+				<thead>
+					<tr>
+						<!-- <th>选择</th> -->
+						<th class="text-center">序号</th>
+						<th class="text-center">附件类型</th>
+						<th class="text-center">附件名称</th>
+						<th class="text-center">上传日期</th>
+						<th class="text-center">上传人</th>
+						<th class="text-center">系统角色</th>
+						<th class="text-center">操作</th>
+					</tr>
+				</thead>
 
-<html>
-<tbody id="tbattFileList_load">
+<tbody id="tbAttFileList"> 
 	<!-- 此处显示数据库查询后的数据集 -->
 	{volist name="att" id="vo" empty="暂无附件"}
 	<tr>
@@ -25,18 +39,15 @@
 								
 	{/volist}
 </tbody>
-				
-</html>
+</table> 
+</div>
+
+<p id="attOprtMsg"></p>
 
 <script>
-//自调用匿名函数
-;(function($){
-	
-})(jQuery);
-
 $(document).ready(function(){
-	
-	//已上传附件文件操作
+
+	//已上传附件文件删除操作
 	$('.aAttOprt').click(function(){
 		//bootstrap框架下应用data属性简化取值，此处属性名称只认小写
 		var attId=$(this).data('attid');
@@ -47,7 +58,8 @@ $(document).ready(function(){
 				if(data.result){
 					$('.aAttOprt[data-attId="'+attId+'"]').closest('tr').remove();
 				}
-				$('#attOprtMsg').text(data.msg);
+				<!-- $('#attOprtMsg').text(data.msg); -->
+				$('#attOprtMsg').append('<div class="alert alert-danger fade in" style="padding:5px;"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'+data.msg+'</div>');
 			});
 	});
 
@@ -57,15 +69,6 @@ $(document).ready(function(){
 
 <!-- function -->
 
-//**函数名：ajaxOprt
- 	//* 作用：本页面ajax操作
-	//* 参数btnObj，类型：对象。值：不为空。说明：btn对象。
-	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
-	//* 参数sendData，类型：json。值：不为空。sendData = {'oprt':oprt,'id':$(this).data('deptid'),'sId':window.location.hash}
-	//* 返回值：无
-	function ajaxOprt(btnObj,url,sendData){
-	
-	}
 <!--// function -->
 
 

@@ -1384,18 +1384,6 @@ $foo = new \Foo();
 
 <!-- // HY 2018/5/24 -->
 
-<!--  HY 2018/5/31 -->
-json_encode函数的第二参数“JSON_UNESCAPED_UNICODE”，保持数组的中文原样。默认是转为UTF-8编码(\u开头的4位16进制字符串)。
-<?php
-$data=array('iss'=>array('id'=>4,'info'=>array('abstract'=>'哈哈','num_id'=>2)));
-json_encode($data,JSON_UNESCAPED_UNICODE);
-
-json_last_error();//显示错误代码。
-?>
-
-<!--//  HY 2018/5/31 -->
-
-
 <!--  HY 2018/6/6 -->
 // 自动时间字段（模型中的create_time字段,update_time字段）
 框架做了一些强化支持，无需定义获取器和修改器就能完成时间日期类型字段的自动处理。
