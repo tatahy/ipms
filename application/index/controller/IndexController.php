@@ -109,11 +109,12 @@ class IndexController extends Controller
           'info' => array('abstract' => '啊patinfo.abstract'),
           'record' => array('act' => '哈patrecord.act')),
         'att' => array(
-          'info'=>array(),
+          'info'=>array('date&time'=>date('Y-m-d H-i-s',strtotime('+10 day')),'timestamp'=>time()),
           'arrId' => array(5,2),
           'arrFileName' => array('name'=>'0-1,2','kk'),
           'arrFileObjStr' => array('yy','99'))
         );
+      
       $liftFSM = new Client();
       //$fsm->setFSM('_EDIT');
       $this->assign([ //在index.html页面通过'destr'输出自定义的信息
