@@ -1251,6 +1251,7 @@ Array
 
 
 <!--  HY 2018/3/22 -->
+//文件上传
 TP5内置的上传(\library\think\File.php)只是上传到本地服务器，上传到远程或者第三方平台的话需要自己扩展。
 
 上传成功后返回的仍然是一个File对象，除了File对象自身的方法外，并且可以使用PHP原生SplFileObject的属性和方法，便于进行后续的文件处理。
@@ -1261,7 +1262,11 @@ TP5内置的上传(\library\think\File.php)只是上传到本地服务器，上�
 date	根据日期和微秒数生成
 md5	    对文件使用md5_file散列生成
 sha1	对文件使用sha1_file散列生成
+uniqid   应用的php原生uniqid()函数（以微秒计的当前时间，生成一个唯一的13位ID）得到的文件名
 <?php
+//通过getInfo()方法得到上传文件对象的信息
+$request->file('attFile')->getInfo();
+
 // 获取表单上传文件 例如上传了001.jpg
 $fileSet = request()->file('image');
 
@@ -1285,7 +1290,7 @@ $file->move('/home/www/upload/',true,false);
 
 // 移动到服务器的上传目录 并且使用原文件名
 $upload = $file->move('/home/www/upload/');
-// 获取上传文件的hash散列值
+// 获取上传文件(不是文件的名称，是整个文件内容)的hash散列值
 echo $upload->hash('sha1');
 echo $upload->hash('md5');
 

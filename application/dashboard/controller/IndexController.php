@@ -148,7 +148,6 @@ class IndexController extends \think\Controller
                         'rolename' =>$request->param('attRoleName'),
                         'deldisplay' =>$request->param('deldisplay')
       );
-      
       //应用AttinfoModel中定义的fileUpdateTemp()方法上传附件文件到temp目录
       $att_return=$attMdl->fileUploadTemp($attData,$request->file('attFile'));
       

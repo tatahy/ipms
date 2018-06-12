@@ -288,6 +288,8 @@ $(document).ready(function(){
 		$('input:radio[name="attUpload"][value="1"]').next().addClass('label-warning');
 		//表单中所有输入框增加'empty-check'，列入非空检查
 		$(this).children('.form-control').addClass('empty-check');
+		//附件列表显示
+		$('#fmAtt').collapse('show');
   	});
 	
 	// 单选按钮change事件。
@@ -301,7 +303,6 @@ $(document).ready(function(){
 			$('#fmAttFileUpload').collapse('show');
 			//表单中所有输入框增加'empty-check'，列入非空检查
 			$('#fmAttFileUpload').children('.form-control').addClass('empty-check');
-			
 		}else{
 			//“上传”项褪色
 			$('input:radio[name="attUpload"][value="1"]').next().removeClass('label-warning');
@@ -433,6 +434,7 @@ $(document).ready(function(){
 		
 		//显示上传进度条
 		$('.attuploadbar').show();
+		
 		$.ajax({
 			type: 'post',
             url: 'attUploadTemp',
@@ -452,23 +454,17 @@ $(document).ready(function(){
 				$('#tbAttFileList_load').load('attFileList',
 					{'issId':$('#btnAttFileUpload').data('issid'),'resultSet':data},
 					function(){
-												
-						//显示上传结果信息
-						if(data.result){
+						//显示上传结果信息,附件列表#fmAtt已显示
+						if(data.result=='true'){						
 							$('#attOprtMsg').append('<div class="alert alert-info fade in" style="padding:5px;"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'+data.msg+'</div>');
 							//新增行上色'bg-info',
-							$('#tbAttFileList').find('a[data-attId="'+data.obj.id+'"]').closest('tr').addClass('bg-info');
-							
+							$('#tbAttFileList').find('a[data-attId="'+data.obj.id+'"]').closest('tr').addClass('bg-info');	
 						}else{
-							$('#attOprtMsg').append('<div class="alert alert-warning fade in" style="padding:5px;"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'+data.msg+'</div>');
+							$('#attOprtMsg').html('<div class="alert alert-warning fade in" style="padding:5px;"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'+data.msg+'</div>');
 							//已存在行上色'bg-info',
 							$('#tbAttFileList').find('a[data-attId="'+data.obj.id+'"]').closest('tr').addClass('bg-warning');
 						}
-						
-						
-						//附件列表显示
-						$('#fmAtt').collapse('show');
-					
+											
 						//上传form重置
 						$('#fmAttFileUpload')[0].reset();
 				

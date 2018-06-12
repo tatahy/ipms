@@ -74,6 +74,7 @@ echo "十年后:".date("Y-m-d",strtotime("+10 year"))."<br>";
 //得到此时此刻的Unix timestamp
 strtotime("now");
 time();
+
 //得到"10 September 2000"的Unix timestamp
 strtotime("10 September 2000");
 //得到"+1 week 2 days 4 hours 2 seconds"的Unix timestamp

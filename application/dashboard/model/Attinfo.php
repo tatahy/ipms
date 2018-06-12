@@ -142,23 +142,7 @@ class Attinfo extends Model
     }
     
     /**
-     * 新增一个att。
-     * @param  array $data 新增att的各项信息
-     * @return integer|bool  新增成功返回主键，新增失败返回false
-     * 要求：传入的数组下标名与模型属性名（数据表字段名）一模一样。
-     */
-    public function myCreate($data = [])
-    {
-        $result = $this->allowField(true)->save($data);
-        if ($result) {
-            return $this->getData('id');
-        } else {
-            return false;
-        }
-    }
-    
-    /**
-     * 新增一个attachment。
+     * 新增一个attachment
      * @param  array $data 新增att的各项信息
      * @return integer|bool  新增成功返回主键，新增失败返回false
      * 要求：传入的数组下标名与模型属性名（数据表字段名）一模一样。
@@ -201,21 +185,27 @@ class Attinfo extends Model
     public function attDelete($attMapId)
     {
         $att=$this->where('attmap_id',$attMapId)->select();
-        //默认查询出的所有记录对应的附件文件都在同一个目录下
-        $fileDir=dirname($att[0]->attpath);
-        //引用本模型中定义的singleDelete方法删除记录和附件文件
-        for($i=0;$i<count($att);$i++){
-          $this->singleDelete($att[$i]->id);
-        }
         
-        //删除目录，若旧目录为空目录scandir()函数的值为“2”
-        if(count(scandir($fileDir))==2){
-            rmdir($fileDir);
+        if(count($att)){
+            //默认查询出的所有记录对应的附件文件都在同一个目录下
+            $fileDir=dirname($att[0]->attpath);
+            //引用本模型中定义的singleDelete方法删除记录和附件文件
+            for($i=0;$i<count($att);$i++){
+              $this->singleDelete($att[$i]->id);
+            }
+            
+            //删除目录，若旧目录为空目录scandir()函数的值为“2”
+            if(count(scandir($fileDir))==2){
+                rmdir($fileDir);
+                $result = true;
+                $msg='<br>附件删除完成。';
+            }else {
+                $result = false;
+                $msg='<br>附件未删除干净，有残余附件。';
+            }
+        }else{
             $result = true;
-            $msg='<br>附件删除完成。';
-        }else {
-            $result = false;
-            $msg='<br>附件未删除干净，有残余附件。';
+            $msg='<br>无附件。';
         }
         
         return array('result'=>$result,'msg'=>$msg);
@@ -225,57 +215,71 @@ class Attinfo extends Model
     /**
      * 上传附件文件到本服务器temp目录
      * @param  $data array 数组，写入attinfo表的内容
-     * @param  $fileSet Object 文件对象
+     * @param  $fileObj Object TP5的文件对象
      * @return array(true|false,string,Object)  
      */
-    public function fileUploadTemp($data=[],$fileSet)
+    public function fileUploadTemp($data=[],$fileObj)
     {
         $result=false;
         $msg='';
         $obj=array('id'=>0);
+        $info=0;
         
-        if(!empty($fileSet)){
+        if(!empty($fileObj)){
             // 移动到框架根目录的uploads/temp/ 目录下,并且使用md5规则重新命名文件。
-            //新命名文件所在目录类似temp/72/ef580909368d824e899f77c7c98388.jpg 
-            $info = $fileSet->rule('md5')
+            //新命名文件所在目录及文件名类似temp/72/ef580909368d824e899f77c7c98388.jpg，若之前已上传过，会覆盖。 
+            $info = $fileObj->rule('md5')
                             ->validate(['size'=>10485760,'ext'=>'jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,rar'])
                             ->move(ROOT_PATH.'uploads'.DS.'temp');
             
-        }else{
-            $info=0;
-            //$msg='未选择文件，请选择需上传的文件。';
-        }
-        
-        if($info){
-            // 成功上传后 获取上传信息
-            // 文件的后缀名
-            $info->getExtension()."<br/>";
-            // 文件存放的文件夹路径：类似20160820/42a79759f284b767dfcb2a0197904287.jpg
-            $info->getSaveName()."<br/>";
-            // 完整的文件名
-            $info->getFilename(); 
-            
-            $path= '..'.DS.'uploads'. DS.'temp'.DS.$info->getSaveName();
-            //查找是否有重名的记录：
-            $att=$this->getByAttfilename($info->getFilename());
-            
-            if(count($att)){
-                $result=false;
-                $msg='附件已使用"'.$att['name'].'"于'.$att->create_time.'上传成功。';
-                $obj=$att;
+            if($info){
+                // 成功上传后 获取上传信息
+                // 文件的后缀名
+                $info->getExtension()."<br/>";
+                // 文件存放的文件夹路径：类似temp/42/a79759f284b767dfcb2a0197904287.jpg
+                $info->getSaveName()."<br/>";
+                // 完整的文件名
+                $fileName=$info->getFilename(); 
+                        
+                $path= '..'.DS.'uploads'. DS.'temp'.DS.$info->getSaveName();
+                
+                //查找是否有重名的记录：
+                $att=$this->getByAttfilename($fileName);
+                
+                if(count($att)){
+                    $msg='<strong>附件已存在。</strong>由【'.$att->uploader.'】('.$att->rolename.')使用文件名："'.$att['name'].'"于'.$att->create_time.'上传。';
+                    $obj=$att;
+                    //释放对象，否则后续的unlink无法进行，会报错
+                    $info='';
+                    //查出的发生重名的记录里文件路径信息匹配'temp'?判断上传的文件与查出的重名文件是否都在'temp'文件夹下
+                    if(!stripos($att->attpath,'temp')){
+                        $fileDir=dirname($path);   
+                        //删除本次已上传的文件及其所在目录
+                        if(file_exists($path)){
+                          unlink($path);
+                        }                                             
+                        //若目录为空目录,删除目录
+                        if(count(scandir($fileDir))==2){
+                            rmdir($fileDir);
+                        }     
+                    }
+                }else{
+                    //上传文件信息写入数据库
+                    $attId=$this->attCreate(array_merge($data,array('attpath'=>$path,'attfilename'=>$info->getFileName())));
+                    $att = $this->get($attId); 
+                    $result=true;
+                    $msg='附件"'.$att['name'].'"上传成功。';
+                    $obj=$att;
+                }   
             }else{
-                $attId=$this->attCreate(array_merge($data,array('attpath'=>$path,'attfilename'=>$info->getFileName())));
-                $att = $this->get($attId); 
-                $result=true;
-                $msg='附件"'.$att['name'].'"上传成功。';
-                $obj=$att;
-            }  
+                // 上传失败获取错误信息
+                //echo $file->getError();
+                $msg = '<br>附件上传错误。<br>错误信息：'.$info->getError();
+            }
             
         }else{
-            // 上传失败获取错误信息
-            //echo $file->getError();
-            $result=false;
-            $msg = $info;
+            
+            $msg ='<br>无附件上传。';
         }
         
         return array('result'=>$result,'msg'=>$msg,'obj'=>$obj);
