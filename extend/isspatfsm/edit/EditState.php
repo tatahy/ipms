@@ -3,7 +3,7 @@
 /**
  * @author tatahy
  * @copyright 2018
- * 定义一个isspat,_EDIT权限下的state抽象类“EditState”
+ * 定义一个isspat,_EDIT权限下的state抽象类“EditState”，便于5个状态下4种操作的不同实现。
  */
 
 namespace isspatfsm\edit;

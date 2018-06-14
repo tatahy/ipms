@@ -115,13 +115,11 @@ class IndexController extends Controller
           'arrFileObjStr' => array('yy','99'))
         );
       
-      $liftFSM = new Client();
-      //$fsm->setFSM('_EDIT');
       $this->assign([ //在index.html页面通过'destr'输出自定义的信息
         'destr' => $destr . "</br>", 'home' => $request->domain(), 'username' => $username,
         //patent数据
         'numpatadd' => $numpatadd, 'numpatapp' => $numpatapp, 'numpataut' => $numpataut,
-        'year' => date('Y'), 'liftFSM' => $liftFSM->display(),
+        'year' => date('Y'), 
         'fsm' => $fsm->setFSM($param)->result($data) . '<br>'
         //'fsm' => '<br>'. json_encode($data,JSON_UNESCAPED_UNICODE) . '<br>json_last_error:'. json_last_error()
         ]);

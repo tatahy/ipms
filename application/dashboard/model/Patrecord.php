@@ -18,6 +18,9 @@ class Patrecord extends Model
     //只读字段，这个字段的值一旦写入，就无法更改。
     protected $readonly = ['num'];
     
+    // 开启时间字段自动写入
+	protected $autoWriteTimestamp = true; 
+    
     /**
      * 获取patrecord所属的patent信息
      */

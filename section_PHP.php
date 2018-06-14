@@ -90,6 +90,16 @@ date("Y-m-d",$tomorrow);
 date("Y-m-d H:i:s");		     
 ?>
 
+<!--//  HY 2018/6/11 -->
+
+<!--  HY 2018/6/13 -->
+//json函数
+<?php
+json_encode($data, JSON_UNESCAPED_UNICODE) ;//第2个参数表示保持$data的现有显示，不进行unicode转码显示。
+json_last_error(); //显示最后的json错误码
+
+
+?>
 
 
 <!--//  HY 2018/6/11 -->

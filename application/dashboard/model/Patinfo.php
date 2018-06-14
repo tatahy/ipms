@@ -18,6 +18,9 @@ class Patinfo extends Model
     //只读字段，这个字段的值一旦写入，就无法更改。
     protected $readonly = ['patnum','issinfo_id'];
     
+    // 开启时间字段自动写入
+	protected $autoWriteTimestamp = true; 
+    
     //修改器，设置patnum字段的值为pat+yyyy+0000的形式，即是在当年进行流水编号
     protected function setPatnumAttr()
     {

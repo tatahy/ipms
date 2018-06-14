@@ -309,6 +309,15 @@ class Index
 }
 ?>
 
+//模型CURD
+用法		模型（动态，模型实例化后）		模型（静态）
+创建		save（返回值：影响的记录数）	create（返回值：模型对象实例）
+更新		save（返回值：影响的记录数）	update（返回值：模型对象实例）
+读取单个	find（返回值：模型对象实例）	get（返回值：模型对象实例）
+读取多个	select（返回值：包含模型对象实例的数组或者数据集）				all（返回值：包含模型对象实例的数组或者数据集）
+删除		delete（返回值：影响的记录数）	destroy（返回值：影响的记录数）
+
+//静态CURD
 模型类的静态CURD操作其实都是内部自动实例化而已，所以说白了提供的这些静态操作方法只是对动态CURD操作方法的静态封装罢了。查询时，模型方式返回的数据集包含符合查询条件的模型对象实例的数组。
 
 至于静态方法的场景，主要是不想实例化或者不方便实例化的需求，而且支持变量的静态调用。
@@ -1023,7 +1032,7 @@ request里前端可以明确：
 <html>
 
 <script>
-前端提交request的方式（我在jQuery常用）：
+//前端提交request的方式（我在jQuery常用）：
 	//1."load()":Loads data from a server and puts the returned data into the selected elementhtml中的某一个元素
 	$(selector).load(URL,[data],[function(responseTxt, statusTxt, xhr){}]); 
 	/* The optional 3rd parameter specifies a callback function to run when the load() method is completed. The callback function can have different parameters: */
@@ -1593,9 +1602,12 @@ User::where(function($query) {
 // 模型外部获取
 $model->name
 
-// 模型内部获取
+// 模型内部获取,避免数据表的字段名和模型的内部属性重名后发生冲突，
 $this->getData('name');
 $this->getAttr('email');
+
+//例如下面的代码得到的是模型的name属性值，而不是数据表name字段的值
+$this->name;
 ?>
 getData和getAttr方法的区别前者是原始数据，后者是经过读取器处理的数据，如果没有定义数据读取器的话，两个方法的结果是相同的。
 
@@ -1614,3 +1626,59 @@ data和setAttr方法的区别前者是赋值最终数据，后者赋值的数据
 
 <!--//  HY 2018/6/6 -->
 
+
+
+<!--  HY 2018/6/13 -->
+//事务处理
+
+//使用条件：
+1.需要数据库引擎支持事务处理。比如 MySQL 的 MyISAM 不支持事务处理，需要使用 InnoDB 引擎。
+2.确保数据库连接是相同的。
+
+//数据库事务,使用 transaction 方法操作数据库事务，当发生异常会自动回滚，例如：
+<?php
+//自动控制事务处理
+Db::transaction(function(){
+    Db::table('think_user')->find(1);
+    Db::table('think_user')->delete(1);
+});
+
+
+// 手动控制事务，
+
+// 启动事务
+Db::startTrans();
+try{
+    Db::table('think_user')->find(1);
+    Db::table('think_user')->delete(1);
+    // 提交事务
+    Db::commit();    
+} catch (\Exception $e) {
+    // 回滚事务
+    Db::rollback();
+}
+?>
+
+//模型事务,在模型中使用事务和数据库中使用事务一样。
+<?php
+//自动控制事务处理
+$this->transaction(function(){
+	// 添加实现代码
+});
+
+// 手动控制事务，
+$this->startTrans();
+try{
+	// 添加实现代码
+    // ...
+    // 提交事务
+    $this->commit();    
+} catch (\Exception $e) {
+    // 回滚事务
+    $this->rollback();
+}
+?>
+
+
+
+<!--//  HY 2018/6/13 -->

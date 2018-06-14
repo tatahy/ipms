@@ -18,6 +18,9 @@ class Issrecord extends Model
     //只读字段，这个字段的值一旦写入，就无法更改。
     protected $readonly = ['issinfo_id'];
     
+    // 开启时间字段自动写入
+	protected $autoWriteTimestamp = true; 
+    
      //获取器，获取数据表issrecord中rolename字段值，转换为中文输出
     protected function getRolenameAttr($value)
     {

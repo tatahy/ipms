@@ -2,16 +2,23 @@
 
 namespace isspatfsm;
 
-use isspatfsm\model\Issinfo as IssinfoModel;
-use isspatfsm\model\Issrecord as IssrecordModel;
-use isspatfsm\model\Patinfo as PatinfoModel;
-use isspatfsm\model\Patrecord as PatrecordModel;
-use isspatfsm\model\Attinfo as AttinfoModel;
+//use isspatfsm\model\Issinfo as IssinfoModel;
+//use isspatfsm\model\Issrecord as IssrecordModel;
+//use isspatfsm\model\Patinfo as PatinfoModel;
+//use isspatfsm\model\Patrecord as PatrecordModel;
+//use isspatfsm\model\Attinfo as AttinfoModel;
+
+//引入5个数据表对应的模型
+use app\dashboard\model\Issinfo as IssinfoModel;
+use app\dashboard\model\Issrecord as IssrecordModel;
+use app\dashboard\model\Patinfo as PatinfoModel;
+use app\dashboard\model\Patrecord as PatrecordModel;
+use app\dashboard\model\Attinfo as AttinfoModel;
 
 /**
  * @author tatahy
  * @copyright 2018
- * 定义一个IssPatModel类,封装isspat中对5个model的引用,封装isspat中对数据库的操作
+ * IssPatModel类,封装isspat中对5个model的引用,封装isspat中对数据库的操作
  */
 
 class IssPatModel
@@ -62,8 +69,8 @@ class IssPatModel
 
   }
 
-  //静态方法，封装对数据库的操作。iss新增
-  static function issCreate()
+  //封装对数据库的操作。iss新增
+  public function issCreate()
   {
     //模型的create方法，返回的是模型的对象实例
     return self::$issMdl->create($this->_mdlData['iss']['info'], true);
@@ -87,16 +94,16 @@ class IssPatModel
     //    return json_encode($id);
   }
   //静态方法，封装对数据库的操作。iss删除
-  static function issDelete()
-  {
-    //模型的destroy方法，返回的值是影响的记录数
-    return self::$issMdl->destroy($this->_mdlData['iss']['id']);
-  }
-  //静态方法，封装对数据库的操作。issRd新增
-  static function issRdCreate()
+ // static function issDelete()
+//  {
+//    //模型的destroy方法，返回的值是影响的记录数
+//    return self::$issMdl->destroy($this->_mdlData['iss']['id']);
+//  }
+  //封装对数据库的操作。issRd新增
+  public function issRdCreate()
   {
     //模型的create方法，返回的是模型的对象实例
-    return self::$issRdRdMdl->create($this->_mdlData['iss']['record'], true);
+    return self::$issRdMdl->create($this->_mdlData['iss']['record'], true);
   }
 
   //静态方法，封装对数据库的操作。issRd更新
@@ -105,17 +112,20 @@ class IssPatModel
     //??
   }
   //静态方法，封装对数据库的操作。issRd删除
-  static function issRdDelete()
-  {
-    //模型的destroy方法，返回的值是影响的记录数
-    return self::$issRdMdl->destroy(['issinfo_id' => $this->_mdlData['iss']['id']]);
-  }
+ // static function issRdDelete()
+//  {
+//    //模型的destroy方法，返回的值是影响的记录数
+//    return self::$issRdMdl->destroy(['issinfo_id' => $this->_mdlData['iss']['id']]);
+//  }
 
-  //静态方法，封装对数据库的操作。pat新增
-  static function patCreate()
+  //封装对数据库的操作。pat新增
+  public function patCreate()
   {
+    //return count($this->_mdlData['pat']['info']);
+    //return is_array($this->_mdlData['pat']['info']['pattype']);
+    
     //模型的create方法，返回的是模型的对象实例
-    return self::$patMdl->create($this->_mdlData['pat']['info'], true);
+    return self::$patMdl->create($this->_mdlData['pat']['info'],true);
   }
   //静态方法，封装对数据库的操作。pat更新
   static function patUpdate()
@@ -123,14 +133,14 @@ class IssPatModel
     self::$patMdl->update($this->_mdlData['pat']['info'], ['id' => $this->_mdlData['pat']['id']], true);
   }
   //静态方法，封装对数据库的操作。pat删除
-  static function patDelete()
-  {
-    //模型的destroy方法，返回的值是影响的记录数
-    return self::$patMdl->destroy($this->_mdlData['pat']['id']);
-  }
+ // static function patDelete()
+//  {
+//    //模型的destroy方法，返回的值是影响的记录数
+//    return self::$patMdl->destroy($this->_mdlData['pat']['id']);
+//  }
 
-  //静态方法，封装对数据库的操作。patRd新增
-  static function patRdCreate()
+  //封装对数据库的操作。patRd新增
+  public function patRdCreate()
   {
     //模型的create方法，返回的是模型的对象实例
     return self::$patRdMdl->create($this->_mdlData['pat']['record'], true);
@@ -141,11 +151,11 @@ class IssPatModel
     //？？
   }
   //静态方法，封装对数据库的操作。patRd删除
-  static function patRdDelete()
-  {
-    //模型的destroy方法，返回的值是影响的记录数
-    return self::$patRdMdl->destroy(['patinfo_id' => $this->_mdlData['pat']['id']]);
-  }
+  //static function patRdDelete()
+//  {
+//    //模型的destroy方法，返回的值是影响的记录数
+//    return self::$patRdMdl->destroy(['patinfo_id' => $this->_mdlData['pat']['id']]);
+//  }
 
   //静态方法，封装对数据库的操作。att新增
   static function attCreate()
@@ -153,48 +163,109 @@ class IssPatModel
     //模型的create方法，返回的是模型的对象实例
     return self::$attMdl->create($this->_mdlData['att']['info'], true);
   }
-  //静态方法，封装对数据库的操作。att更新
-  static function attUpdate()
+  //封装对数据库的操作。att更新
+  public function attUpdate()
   {
     $issSet = self::$issMdl->get($this->_mdlData['iss']['id']);
-    //循环更新attMdl,将文件从现有的‘temp’目录移动到指定目录
-    for ($i = 0; $i < count($this->_mdlData['att']['arrId']); $i++)
-    {
-      $fileStr = $this->_mdlData['att']['arrFileObjStr'][$i];
-      $name = $this->_mdlData['att']['arrFileName'][$i];
-      //有‘temp’字符串才移动到指定目录
-      if (substr_count($fileStr, 'temp'))
-      {
-        $newDir = '..' . DS . 'uploads' . DS . $issSet->issnum;
-        //调用AttinfoModel中定义的fileMove()方法，返回true后才更新Attinfo表
-        if (self::$attMdl->fileMove($fileStr, $name, $newDir))
+    $arrAttId=$this->_mdlData['att']['arrId'];
+    $msg = '附件上传结果：<br>';
+    if(count($arrAttId)){
+        //循环更新attMdl,将文件从现有的‘temp’目录移动到指定目录
+        for ($i = 0; $i < count($arrAttId); $i++)
         {
-          $attData = array(
-            'deldisplay' => 0,
-            'num_id' => $issSet->issnum,
-            'attmap_id' => $issSet->id,
-            'attpath' => $newDir . DS . $name,
-            );
-          //更新att
-          self::$attMdl->update($attData, ['id' => $this->_mdlData['iss']['id'][$i]], true);
-
-          $msg .= "附件" . $name . "已上传。</br>";
-        } else
-        {
-          $msg .= "附件" . $name . "上传失败。</br>";
+          $fileStr = $this->_mdlData['att']['arrFileObjStr'][$i];
+          $name = $this->_mdlData['att']['arrFileName'][$i];
+          //有‘temp’字符串才移动到指定目录
+          if (substr_count($fileStr, 'temp'))
+          {
+            $newDir = '..' . DS . 'uploads' . DS . $issSet->issnum;
+            //调用AttinfoModel中定义的fileMove()方法，返回true后才更新Attinfo表
+            if (self::$attMdl->fileMove($fileStr, $name, $newDir))
+            {
+              $attData = array(
+                'deldisplay' => 0,
+                'num_id' => $issSet->issnum,
+                'attmap_id' => $issSet->id,
+                'attpath' => $newDir . DS . $name,
+                );
+              //更新att
+              self::$attMdl->update($attData, ['id' => $arrAttId[$i]], true);
+    
+              $msg .= '附件' . $name . '已上传。</br>';
+            } else
+            {
+              $msg .= '附件' . $name . '上传失败。</br>';
+            }
+          }
         }
-      }
+    }else{
+        $msg .= '无附件上传。<br>';
     }
-
+    return $msg;
   }
-  //静态方法，封装对数据库的操作。att删除
-  static function attDelete()
+  //封装对att附件删除和数据表attinfo记录的删除，自己使用。
+  private function attDelete()
   {
-    //模型的destroy方法，返回的值是影响的记录数
-    return self::$attMdl->destroy(['attmap_id' => $this->_mdlData['iss']['id']]);
+    $att=self::$attMdl->all(['attmap_id' => $this->_mdlData['iss']['id']]);
+    $delFileNum=0;
+    //att文件的删除
+    if(count($att)){
+        for($i=0;$i<count($att);$i++){
+            $attpath=$att[$i]->attpath;
+            $fileDir=dirname($attpath);
+
+            //删除文件，成功后返回
+            if(file_exists($attpath)){
+              unlink($attpath);
+              //$msg='文件"'.$name.'"删除成功。';
+//              $result=true;
+                $delFileNum++;	
+            }
+            //若目录为空目录,删除目录
+            if(count(scandir($fileDir))==2){
+                rmdir($fileDir);
+            }   
+        }
+    }
+    ////att记录的删除，模型的destroy方法，返回的值是影响的记录数
+    $delAttNum=self::$attMdl->destroy(['attmap_id' => $this->_mdlData['iss']['id']]);
+    
+    if($delAttNum*$delFileNum){
+        $msg='<br>上传附件删除完成。删除['.$delAttNum.']条记录、['.$delFileNum.']个文件';
+    }else{
+        $msg='<br>无上传附件。';
+    }
+    return $msg;
+  }
+  
+  //对数据库的5个表的删除操作
+  public function mdlDelete()
+  {
+    $issId=$this->_mdlData['iss']['id'];
+    $patId=$this->_mdlData['pat']['id'];
+    $issTopic=self::$issMdl->get($issId)['topic'];
+    $patTopic=self::$patMdl->get($patId)['topic'];
+    return $issTopic;
+    //issinfo删除，模型的destroy方法，返回的值是影响的记录数
+    $issDelNum=self::$issMdl->destroy($issId);
+    //issrecord删除，模型的destroy方法，返回的值是影响的记录数
+    $issRdDelNum=self::$issRdMdl->destroy(['issinfo_id' => $issId]);
+    $msg='<br>《'.$issTopic.'》删除'.$issDelNum+$issRdDelNum.'条记录。';
+    
+    //patinfo删除，模型的destroy方法，返回的值是影响的记录数
+    $patDelNum=self::$patMdl->destroy($patId);
+    //patrecord删除，模型的destroy方法，返回的值是影响的记录数
+    $patRdDelNum=self::$patRdMdl->destroy(['patinfo_id' => $patId]);
+    $msg.='<br>《'.$patTopic.'》删除'.$patDelNum+$patRdDelNum.'条记录。';
+    
+    //att删除,调用私有$attDelete()，已封装对att附件删除和数据表attinfo记录的删除。返回的是删除结果
+    $msg.=$this->attDelete();
+    
+    return $msg;
+    
   }
 
-
+    
   //静态方法，测试。
   public function test()
   {

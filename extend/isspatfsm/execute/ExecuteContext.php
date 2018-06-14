@@ -3,7 +3,7 @@
 /**
  * @author tatahy
  * @copyright 2018
- * 定义一个控制类，实现_EXECUTE权限下对issPat的8种状态的转换，4种操作的执行。
+ * 定义一个控制类，实现_EXECUTE权限下对issPat的7种状态的转换，4种操作的执行。
  */
 
 namespace isspatfsm\execute;

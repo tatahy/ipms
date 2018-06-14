@@ -3,7 +3,7 @@
 /**
  * @author tatahy
  * @copyright 2018
- * 定义一个控制类，实现_EDIT权限下对issPat的5种状态的转换，4种操作的执行。
+ * 定义一个控制器类EditContext，实现_EDIT权限下对issPat的5种状态的转换，4种操作的执行。
  */
 
 namespace isspatfsm\edit;

@@ -10,6 +10,11 @@ use isspatfsm\maintain\MaintainContext;
 
 /**
  * isspat的FSM（Finite State Machine）
+ * 定义一个状态机控制台，作用：
+ * 1.检查、确保外界输入的控制参数、待处理数据符合要求；
+ * 2.设定状态机工作状态、工作流程；
+ * 3.启动状态机，输入待处理数据。
+ * 4.得到处理结果。
  */
 class IssPatFSM
 {
@@ -115,6 +120,7 @@ class IssPatFSM
         'info' => array(),
         'record' => array()),
       'att' => array(
+        'info'=>array(),
         'arrId' => [0],
         'arrFileName' => [0],
         'arrFileObjStr' => [0]));
@@ -420,7 +426,7 @@ class IssPatFSM
         $flag3 = 1;
       }
 
-      $this->_errFlag = $flag1 + $flag2 + $flag3;
+      $this->_errFlag = $flag1 * $flag2 * $flag3;
 
     } else
     {
@@ -452,7 +458,9 @@ class IssPatFSM
       return $this->_msg;
     } else
     {
+      //选定处理数据的模块处理输入的数据，得到处理结果。
       $this->authFSMContext()->statusFSMState()->oprtData();
+      //返回处理结果。
       return $this->_msg;
       //return '<br>'. json_encode($this->_data,JSON_UNESCAPED_UNICODE) . '<br>json_last_error:'. json_last_error();
     }

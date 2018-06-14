@@ -14,6 +14,9 @@ use app\dashboard\model\Patinfo as PatinfoModel;
 use app\dashboard\model\Patrecord as PatrecordModel;
 use app\dashboard\model\Attinfo as AttinfoModel;
 
+//引入issPatFSM
+use isspatfsm\IssPatFSM; 
+
 class IndexController extends \think\Controller
 {
     //用户名
@@ -660,7 +663,7 @@ class IndexController extends \think\Controller
     
     //根据前端传来的操作类型，对数据库进行操作
     //结构：1.变量赋初值  //结构2.21个oprt接收前端页面传来的数据，分别对变量赋值再进行数据库表的操作
-    public function issPatOprt(Request $request,IssinfoModel $issMdl,IssrecordModel $issRdMdl,
+    public function issPatOprtBK(Request $request,IssinfoModel $issMdl,IssrecordModel $issRdMdl,
                                 PatinfoModel $patMdl,PatrecordModel $patRdMdl,AttinfoModel $attMdl)
     {
       $this->_loginUser();
@@ -760,7 +763,7 @@ class IndexController extends \think\Controller
               //新增，自定义patCreate()方法    
              // $patReturn = $patMdl->patCreate($patData);
               //新增，模型create()方法，返回的是新建的对象
-              $patReturn = $patMdl::create($patData,true);
+              $patReturn = $patMdl->create($patData,true);
               $patId=$patReturn->id;
               $msg.='专利【新增】成功。<br>';
             }
@@ -1834,14 +1837,216 @@ class IndexController extends \think\Controller
         $msg.="无附件</br>"; 
       }
        
-//  </结构2.----------------------------------------------------------------------------------------->
-       
-      //return $msg;
-      //return json(array('msg'=>$msg,'btnHtml'=>$btnHtml,'topic'=>$request->param('issPatTopic')));
+//  </结构2.-----------------------------------------------------------------------------------------
+      //返回前端json数据
       return json(array('msg'=>$msg,'topic'=>$issMdl::get($issId)->topic,'patId'=>$patId,'issId'=>$issId));
-      //return $this->issPatAuth($request);//参数不够，不会产生分页。
+
     }
     
+    //应用fsm改写
+  //1.需要前端提供
+  //1.1启动fsm必须的参数：$param=array('auth'=>'_EDIT','status'=>'填报','oprt'=>'_ADDNEW');
+  //1.2fsm要处理的对象/数据：
+  //2.程序结构
+  //part1：变量赋初值  
+  //part2：配置状态机参数，组装状态机要处理的数据，
+  //part3：启动状态机处理数据，得到处理结果，返回前端处理结果
+  public function issPatOprt(Request $request,IssinfoModel $issMdl,PatinfoModel $patMdl,IssPatFSM $fsm)
+  {
+    $this->_loginUser();
+
+    //part：1.变量赋初值
+    // $auth接收前端页面传来的auth值,表示rolename（映射“用户组名”），确定状态机（IssPatFSM）的工作模式
+    $issAuth = !empty($request->param('auth')) ? $request->param('auth') : 'done';
+
+    // $status接收前端页面传来的status值,确定状态机当前的状态，issPat的初始状态为“申报新增”
+    $issStatus = !empty($request->param('status')) ? $request->param('status') : '申报新增';
+
+    // $oprt接收前端页面传来的oprt值，确定状态机所要进行的操作
+    $issOprt = !empty($request->param('oprt')) ? $request->param('oprt') : '_NONE';
+
+    // $patId接收前端页面传来的patId值
+    $patId = !empty($request->param('patId')) ? $request->param('patId') : 0;
+
+    // $issId接收前端页面传来的issId值
+    $issId = !empty($request->param('issId')) ? $request->param('issId') : 0;
+        
+    //涉及数据库5个数据表的数组赋值
+    if($issId){
+        $iss=$issMdl::get($issId);
+    }else{
+        $iss=array(
+                'issnum' => 0,
+                'topic' => 0,
+                'status' => $issStatus,
+                'issmap_id' => $patId ,
+                'issmap_type' => 0,
+                'num_id' => $patId,//待取消
+                'addnewdate' => $this->now,//待取消
+                'abstract' => 0,
+                'writer' => $this->username,
+                'dept' => $this->dept,
+                'current_username'=>$this->username,
+                'current_issauthtime'=>json_encode(array('_EDIT'=>$this->now,'_AUDIT'=>$this->now,'_APPROVE'=>$this->now,'_EXECUTE'=>$this->now,'_MAINTAIN'=>$this->now)),//FSM_add
+                );
+    }
+    $issInfo = array(
+                  'topic' => !empty($request->param('issPatTopic')) ? $request->param('issPatTopic') : $iss['topic'],
+                  'status' => $iss['status'],
+                  'issmap_id' =>$iss['issmap_id'] ,
+                  'issmap_type' => !empty($request->param('issType')) ? $request->param('issType') : $iss['issmap_type'],
+                  'num_id' => $iss['num_id'],//待取消
+                  'addnewdate' => $iss['addnewdate'],//待取消
+                  'abstract' => !empty($request->param('issPatAbstract')) ? $request->param('issPatAbstract') : $iss['abstract'],
+                  'writer' => $iss['writer'],
+                  'dept' => $iss['dept'],
+                  'current_username'=> $iss['current_username'],
+                  'current_issauthtime'=>$iss['current_issauthtime'],//FSM_add
+                  );
+
+    $issRecord = array(
+                    'num' => $iss['issnum'],
+                    'username' => $this->username,
+                    'rolename' => $issAuth,
+                    'act' => $issOprt,
+                    'actdetail' => '',//FSM_add
+                    'acttime' => $this->now, 
+                    'issinfo_id' => $issId,
+                    );
+      
+    if($patId){
+        $pat=$patMdl::get($patId);
+    }else{
+        $pat=array(
+                'patnum'=>0,
+                'topic'=>0,
+                'status'=>0,
+                'pattype'=>0,
+                'patapplynum'=>0,
+                'patauthnum'=>0,
+                'applyplace'=>0,
+                'patadmin'=>0,
+                'patagency'=>0,
+                'patrenewapplynum'=>0,
+                'patrenewauthnum'=>0,
+                'patowner'=>0,
+                'inventor'=>0,
+                'otherinventor'=>0,
+                'author'=>0,
+                'dept'=>0,
+                'keyword'=>0,
+                'summary'=>0,
+                'resource'=>0,//FSM_add??
+                'issinfo_id'=>$issId,
+                'issinfo_topic'=>$iss['topic'],
+                'statustime'=>json_encode(array('_PAT1'=>time(),'_PAT2'=>time())),//FSM_add
+                'milestonetime'=>json_encode(array('authorizetime'=>time(),'rejecttime'=>time())),//FSM_add
+                );
+    }
+    
+    $patInfo = array(
+                //'patnum'=>0,
+                'topic'=>!empty($request->param('patTopic')) ? $request->param('patTopic') : $pat['topic'],
+                'status'=>$pat['status'],
+                'pattype'=>!empty($request->param('patType')) ? $request->param('patType') : $pat['pattype'],
+                'patapplynum'=>!empty($request->param('patApplyNum')) ? $request->param('patApplyNum') : $pat['patapplynum'],
+                'patauthnum'=>!empty($request->param('patAuthNum')) ? $request->param('patAuthNum') : $pat['patauthnum'],
+                'applyplace'=>!empty($request->param('patApplyPlace')) ? $request->param('patApplyPlace') : $pat['applyplace'],
+                'patadmin'=>!empty($request->param('patAdmin')) ? $request->param('patAdmin') : $pat['patadmin'],
+                'patagency'=>!empty($request->param('patAgency')) ? $request->param('patAgency') : $pat['patagency'],
+                'patrenewapplynum'=>!empty($request->param('patRenewApplyNum')) ? $request->param('patRenewApplyNum') : $pat['patrenewapplynum'],
+                'patrenewauthnum'=>!empty($request->param('patRenewAuthNnum')) ? $request->param('patRenewAuthNum') : $pat['patrenewauthnum'],
+                'patowner'=>!empty($request->param('patOwner')) ? $request->param('patOwner') : $pat['owner'],
+                'inventor' => !empty($request->param('patInventor')) ? $request->param('patInventor') : $pat['inventor'],
+                'otherinventor' => !empty($request->param('patOtherInventor')) ? $request->param('patOtherInventor') : $pat['otherinventor'],
+                'author' => !empty($request->param('patAuthor')) ? $request->param('patAuthor') : $pat['author'],
+                'dept' => !empty($request->param('dept')) ? $request->param('dept') : $pat['dept'],
+                'keyword'=>!empty($request->param('patKeyword')) ? $request->param('patKeyword') : $pat['keyword'],
+                'summary'=>!empty($request->param('patSummary')) ? $request->param('patSummary') : $pat['summary'],
+                'resource'=>!empty($request->param('patResource/a')) ? $request->param('patResource/a') : $pat['resource'],//FSM_add??
+                'issinfo_id'=>$pat['issinfo_id'],
+                'issinfo_topic'=>$pat['issinfo_topic'],
+                'statustime'=>$pat['statustime'],//FSM_add
+                'milestonetime'=>$pat['milestonetime'],//FSM_add
+                'addnewdate' => time(),
+                );
+    
+    $patRecord = array(
+                    'num' => $pat['patnum'],
+                    'status'=>$pat['status'],
+                    'milestonetime'=>array(),//FSM_add
+                    'username' => $iss['current_username'],
+                    'rolename' => $issAuth,
+                    'note' => '',//FSM_add
+                    'patinfo_id' => $patId,
+                    );
+      
+    $attInfo = array(
+                  'num_id' => $iss['issnum'],
+                  'name'=>!empty($request->param('attName')) ? $request->param('attName') : '',
+                  'atttype'=>!empty($request->param('attType')) ? $request->param('attType') : '',
+                  'attmap_id' => $issId,
+                  'attmap_type' => !empty($request->param('attMapType')) ? $request->param('attMapType') : '',
+                  'uploadtime' => time(),
+                  'uploader' => $iss['current_username'],
+                  'rolename' => $issAuth,
+                  'deldisplay' => 0,
+                  'attpath' => '',
+                  'attflename' => '',
+                  );
+    //接收前端页面传来的附件文件信息
+    //如果要通过$request->param()获取的数据为数组，要加上 /a 修饰符才能正确获取。
+    if (!empty($request->param('attId/a')))
+    {
+      $arrAttId = $request->param('attId/a');
+      $arrAttFileName = $request->param('attFileName/a');
+      $arrAttFileObjStr = $request->param('attFileObjStr/a');
+    } else
+    {
+      $arrAttId = array();
+      $arrAttFileName = array();
+      $arrAttFileObjStr = array();
+      ;
+    }
+    //part2：配置状态机参数，组装状态机要处理的数据，
+    //组装状态机（IssPatFSM）要处理的数据
+    $data = array(
+      'pat' => array(
+        'id' => $patId,
+        'info' => $patInfo,
+        'record' => $patRecord),
+      'iss' => array(
+        'id' => $issId,
+        'info' => $issInfo,
+        'record' => $issRecord),
+      'att' => array(
+        'info' => $attInfo,
+        'arrId' => $arrAttId,
+        'arrFileName' => $arrAttFileName,
+        'arrFileObjStr' => $arrAttFileObjStr)
+    );
+    
+   //配置启动状态机（IssPatFSM）的参数
+    $param = array(
+      'auth' => $issAuth,
+      'status' => $issStatus,
+      'oprt' => $issOprt);
+    
+    //part3：启动状态机处理数据，得到处理结果，返回前端处理结果
+    //启动IssPatFSM处理$data，得到处理结果
+    $msg = $fsm->setFSM($param)->result($data);
+    
+    //返回前端处理结果
+    return json(array(
+      'msg' => $msg,
+      //'topic' => $issMdl::get($issId)->topic,
+      'topic' => 'kk',
+      'patId' => $patId,
+      'issId' => $issId)
+      );
+
+  }
+   
     //为前端显示PatRenew模板准备，1.数据库数据；2.向模板变量赋值；3.选择模板文件PatRenew.html返回前端
      public function patRenew(Request $request,PatinfoModel $patMdl,$patId='',$auth='maintain')
     {

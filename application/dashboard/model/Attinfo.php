@@ -358,11 +358,21 @@ class Attinfo extends Model
         $attpath=$att['attpath'];
         
         if(file_exists($attpath)){
+            header('Content-Description: File Transfer');
+            //1
             header("Content-Type:application/octet-stream");
+            //2
             header("Content-Disposition:attachment;filename=".$att['attfilename']);
+            header('Content-Transfer-Encoding: binary');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+            header('Pragma: public');
+            //3
             header('Content-Length:'.filesize($attpath));
+            ob_clean();
+            flush();
             readfile($attpath);
-            exit();
+            exit;
         }else{
             return array('result'=>false,'msg'=>'"'.$att['name'].'"文件不存在。');
         }

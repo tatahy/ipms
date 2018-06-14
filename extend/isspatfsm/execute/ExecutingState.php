@@ -20,6 +20,15 @@ class ExecutingState extends ExecuteState{
     return '<br>无refuse操作';
   }
   public function report(){
+    //写入数据库的信息
+    $this->_oprtData['iss']['info']['status'] = '';
+    $this->_oprtData['pat']['info']['status'] = '';
+    //调用IssPatModel的setMdlData()方法，设定要进行处理的数据。
+    $this->_mdl->setMdlData($this->_oprtData);
+    return '<br>permit:'.$this->_mdl->test();
+    
+    //状态修改
+    $this->_context->setState(ExecuteContext::$executingState);
     return '<br>report结果：';
   }
   public function finish(){
