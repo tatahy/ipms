@@ -81,22 +81,33 @@
 	<form action="" id="fmIssPat">
 	<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
 	<div class="row myRow">
-		<div class="form-group col-sm-8">
+		<div class="form-group col-sm-6">
 			<label class="control-label" for="issPatTopic">事务标题</label>
-			<input class="form-control" id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" readonly>
+			<input class="form-control" id="issPatTopic" name="issPatTopic" value="{$iss.topic}" placeholder="由“专利名称”自动生成" type="text" readonly>
 		</div>
 		
-		<div class="form-group col-sm-4">
+		<div class="form-group col-sm-3">
 			<label for="issType">事务类型</label>
 			<input class="empty-check form-control" id="issType" name="issType" value="专利授权申报" type="text" readonly>
 			<!-- <input class="sr-only" name="issType" value="_ISST_PAT1" type="text"> -->
 		</div>
+		<div class="form-group col-sm-3">
+			<label for="issStatus">事务状态</label>
+			<input class="empty-check form-control" id="issStatus" name="issStatus" value="{$iss.status}" type="text" readonly>
+		</div>
 	</div>
 	
 	<div class="row myRow">
+		{neq name="iss.statusdescription" value="0"}
 		<div class="form-group col-sm-12">
-			<label class="control-label" for="issPatAbstract">事务简介<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-			<textarea class="empty-check form-control" rows="5" id="issPatAbstract" name="issPatAbstract" placeholder="填写事务的主要内容，字数不超过100字。" required>{$iss.abstract}</textarea>
+			<label class="control-label">审核、审批要求</label>
+			<pre class="myedge-left-info" style="background-color:#eee;">{$iss.statusdescription}</pre>
+		</div>
+		{/neq}
+		
+		<div class="form-group col-sm-12">
+			<label class="control-label" for="statusDescription">更新/提交说明<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<textarea class="empty-check form-control" rows="5" id="statusDescription" name="statusDescription" placeholder="填写事务的更新/提交说明，字数不超过200字。" required></textarea>
 		</div>
 	</div>
 	</form>

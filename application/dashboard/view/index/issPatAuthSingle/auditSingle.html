@@ -29,10 +29,17 @@
 	<form action="" id="fmIssPat" >
 		<!-- // class="sr-only" 仅源代码文件中显示-->
 		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
+		<input name="issStatus" value="{$iss.status}" type="text" class="sr-only">
 		<input id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" class="sr-only">
 		
 		<div class="row myRow">
-		
+			{neq name="iss.statusdescription" value="0"}
+			<div class="form-group col-sm-6">
+				<label class="control-label">提交说明</label>
+				<pre class="myedge-left-info" style="padding:0px;border:none;">{$iss.statusdescription}</pre>
+			</div>
+			{/neq}
+			
 			<div class="form-group col-sm-4">
 				<label for="auditResult">结论<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 				<select id="auditResult" class="empty-check form-control" name="auditResult" style="font-size:100%;">
@@ -42,10 +49,12 @@
 					<option class="text-primary bg-info" value="_MODIFY">返回修改</option>
 				</select>
 			</div>
+			
+			
 		
 			<div id="divAuditMsg" class="resetHide form-group col-sm-8 ">
 				<label for="auditMsg">具体意见<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<textarea class="empty-check form-control" rows="5" id="auditMsg" name="auditMsg" type="text" placeholder="请填入具体的审核意见" required></textarea>
+				<textarea class="empty-check form-control" rows="5" id="auditMsg" name="statusDescription" type="text" placeholder="请填入具体的审核意见" required></textarea>
 			</div>
 			
 			

@@ -627,7 +627,7 @@ class IndexController extends \think\Controller
       }
       
       if($oprt=='_ADDNEW'){
-        $iss=array('id'=>0,'topic'=>'','abstract'=>'');
+        $iss=array('id'=>0,'topic'=>'','abstract'=>'','status'=>'申报新增','statusdescription'=>0);
         //查询当前用户已上传的所有附件信息
         $att= AttinfoModel::all(['attmap_id'=>0,'uploader'=>$this->username,'rolename'=>'edit','deldisplay'=>1]);
         $pat=array('id'=>0,'topic'=>'','patowner'=>'','otherinventor'=>'','inventor'=>'');
@@ -1860,7 +1860,7 @@ class IndexController extends \think\Controller
     $issAuth = !empty($request->param('auth')) ? $request->param('auth') : 'done';
 
     // $status接收前端页面传来的status值,确定状态机当前的状态，issPat的初始状态为“申报新增”
-    $issStatus = !empty($request->param('status')) ? $request->param('status') : '申报新增';
+    $issStatus = !empty($request->param('issStatus')) ? $request->param('issStatus') : '申报新增';
 
     // $oprt接收前端页面传来的oprt值，确定状态机所要进行的操作
     $issOprt = !empty($request->param('oprt')) ? $request->param('oprt') : '_NONE';
@@ -1879,6 +1879,7 @@ class IndexController extends \think\Controller
                 'issnum' => 0,
                 'topic' => 0,
                 'status' => $issStatus,
+                'statusdescription' => 0,
                 'issmap_id' => $patId ,
                 'issmap_type' => 0,
                 'num_id' => $patId,//待取消
@@ -1893,6 +1894,7 @@ class IndexController extends \think\Controller
     $issInfo = array(
                   'topic' => !empty($request->param('issPatTopic')) ? $request->param('issPatTopic') : $iss['topic'],
                   'status' => $iss['status'],
+                  'statusdescription' => !empty($request->param('statusDescription')) ? $request->param('statusDescription') : $iss['statusdescription'],
                   'issmap_id' =>$iss['issmap_id'] ,
                   'issmap_type' => !empty($request->param('issType')) ? $request->param('issType') : $iss['issmap_type'],
                   'num_id' => $iss['num_id'],//待取消
@@ -1956,7 +1958,7 @@ class IndexController extends \think\Controller
                 'patagency'=>!empty($request->param('patAgency')) ? $request->param('patAgency') : $pat['patagency'],
                 'patrenewapplynum'=>!empty($request->param('patRenewApplyNum')) ? $request->param('patRenewApplyNum') : $pat['patrenewapplynum'],
                 'patrenewauthnum'=>!empty($request->param('patRenewAuthNnum')) ? $request->param('patRenewAuthNum') : $pat['patrenewauthnum'],
-                'patowner'=>!empty($request->param('patOwner')) ? $request->param('patOwner') : $pat['owner'],
+                'patowner'=>!empty($request->param('patOwner')) ? $request->param('patOwner') : $pat['patowner'],
                 'inventor' => !empty($request->param('patInventor')) ? $request->param('patInventor') : $pat['inventor'],
                 'otherinventor' => !empty($request->param('patOtherInventor')) ? $request->param('patOtherInventor') : $pat['otherinventor'],
                 'author' => !empty($request->param('patAuthor')) ? $request->param('patAuthor') : $pat['author'],
@@ -2040,7 +2042,7 @@ class IndexController extends \think\Controller
     return json(array(
       'msg' => $msg,
       //'topic' => $issMdl::get($issId)->topic,
-      'topic' => 'kk',
+      'topic' => $issInfo['topic'],
       'patId' => $patId,
       'issId' => $issId)
       );

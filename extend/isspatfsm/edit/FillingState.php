@@ -23,24 +23,11 @@ class FillingState extends EditState
   public function delete()
   {
     //调用IssPatModel的setMdlData()方法，设定所需进行处理的数据。
-    $this->_mdl->setMdlData($this->_oprtData);
-    //1.删除pat
-    $n=$this->_mdl->patDelete();
-
-    //2.删除patRd
-    $n+=$this->_mdl->patRdDelete();
-
-    //3.删除iss
-    $n+=$this->_mdl->issDelete();
-
-    //4.删除issRd
-    $n+=$this->_mdl->issRdDelete();
-
-    //5.删除att
-    $n+=$this->_mdl->attDelete();
-    
-    $msg='<br>delete结果：删除'.$n.'条记录。';
-    return $msg;
+     $this->_mdl->setMdlData($this->_oprtData);
+     //return '<br>delete操作结果：<br>'.json_encode($this->_oprtData, JSON_UNESCAPED_UNICODE) . json_last_error();
+     //调用IssPatModel的mdlDelete()方法，进行删除操作，得到操作结果信息。
+     $msg=$this->_mdl->mdlDelete();
+     return '<br>delete操作结果：'. $msg;
   }
 
 }

@@ -32,8 +32,11 @@
 				<tr>
 					<th class="text-center">序号</th>
 					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_TOPIC" sort="{$sort}">标题</a></th>
-					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="_ABSTRACT" sort="{$sort}">简介</a></th>
+					
 					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_STATUS" sort="{$sort}">状态</a></th>
+					
+					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="_ABSTRACT" sort="{$sort}">状态说明</a></th>
+					
 					
 					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_PATNAME" sort="{$sort}">专利名称</a></th>
 					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="_PATSTATUS" sort="{$sort}">专利类型</a></th>
@@ -55,10 +58,12 @@
 				{volist name="issPatTotal" id="vo" empty="暂时没有数据"}
 				<tr>
 					<td>{$i+($pageTotalNum-1)*$issPatTableRows}</a></td>
+					
 					<td class="issInfo"><a href="{$home}/issue/index/issinfo/id/{$vo.id}" target="_blank" data-toggle="tooltip">{$vo.topic}</a></td>
-					<td>{$vo.abstract}</td>
+			
 					<td class="issPatStatus"><a href="{$home}/issue/index/issrecords/id/{$vo.id}" target="_blank" data-toggle="tooltip">{$vo.status}</a></td>
 					
+					<td><pre style="padding:0px;border:none;background-color:transparent;">{$vo.statusdescription}</pre></td>
 					{//应用TP5中模型的多态1对多关联得到专利事务对应的专利名称$vo.issmap.topic，关键是要在issinfo模型中定义morphTo的方法名"issmap"，就可"." 出$vo.issmap.topic}
 					<td class="patInfo"><a href="{$home}/patent/index/patinfo/id/{$vo.issmap_id}" target="_blank" data-toggle="tooltip">{$vo.issmap.topic}</a></td>
 					

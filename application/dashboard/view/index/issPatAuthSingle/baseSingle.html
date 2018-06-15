@@ -117,11 +117,7 @@
 {block name="attInput"}
 	<!-- //附件显示 -->
 	<div class="myFieldset">
-		{empty name="att"}
-		<div id="divAttCollapse" class="myLegend" data-toggle="collapse" data-target="#fmAtt"><span class="label label-warning">无附件</div>
-		{else /}
-		<div id="divAttCollapse" class="myLegend" data-toggle="collapse" data-target="#fmAtt"><span class="label label-warning">附件<span class="badge">{$numAtt}</span><span class="glyphicon glyphicon-menu-down"></span></div>
-		{/empty}
+		<div id="divAttCollapse" class="myLegend" data-toggle="collapse" data-target="#fmAtt"><span class="label label-warning">无附件</span></div>
 			<form id="fmAtt" class="collapse row myRow-noform-group">
 				<div id="tbAttFileList_load">						
 					加载中……
@@ -237,6 +233,17 @@ $(document).ready(function(){
 	//enable all tooltips in the document
 	$('[data-toggle="tooltip"]').tooltip(); 
 	$('.modal-footer').attr('hidden',true);
+	
+	if({$numAtt}){
+		$('#fmAtt').collapse('show');
+		$('#divAttCollapse').html('<span class="label label-warning">附件隐藏<span class="glyphicon glyphicon-menu-up"></span></span>');
+		//加载附件list
+		$('#tbAttFileList_load').load('attFileList',{'issId':$('#btnAttFileUpload').data('issid')}); 
+	}else{
+		$('#fmAtt').collapse('hide');
+		$('#divAttCollapse').html('<span class="label label-warning">无附件</span>');
+	}
+	
 	
 	//#divAbstractCollapse“概要显示”
 	$('#divAbstract').on('hide.bs.collapse', function(){
@@ -363,62 +370,24 @@ $(document).ready(function(){
 			if(v1==true && noAttFileChecked==true || oprt=='_DELETE'){
 				$('#modalIssPatAuthSingle').modal('hide');
 				var conHtml='<p class="text-left" style="font-size:16px;"><span class="label label-info"><span class="glyphicon glyphicon-wrench"></span></span>&nbsp;专利事务</p><hr><p class="text-center"><span style="font-size:16px;">《'+topic+'》</span></p>'+btnHtml;
+				
 				if(oprt=='_DELETE'){
-				btnHtml+='<p class="text-center text-danger">已上传的附件文件也会一并删除！</P>';
+				conHtml+='<p class="text-center text-danger">已上传的附件文件也会一并删除！</P>';
 				}
 				//是否开始ajax传3个form的数据
 				$.confirm(conHtml,function(e){
 					con=e;
 					if(true==con){
-						if(oprt=='_ADDNEW'){
-							//通过ajax嵌套完成新增
-							//1.提交#fmPat数据
-							$.extend(param,fmPatDataJson,{'oprt':'_ADDNEW','auth':authStr});
-							
-							var jqxhr=$.post(url,param,function(data){
-							<!-- var jqxhr=$.post(url,$('#fmPat').serialize(),function(data){ -->
-								//返回的data.patId不为0，说明已经新增pat成功
-								if(data.patId){
-									//2.提交#fmIssPat和#fmAtt的数据
-									param={};
-									$.extend(param,fmIssPatDataJson,fmAttDataJson,{'oprt':'_ADDNEW','auth':auth,'patId':data.patId});
-									$.post(url,param,function(data1){
-										//后端数据处理成功后，刷新内容
-										$('#divContent_load').empty().html('<p class="text-center" style="font-size:28px;">加载中……</p>');
-										$("#divContent_load").load('tplFile',{'sId':'#issPat','auth':authKey,'id':data1.issId},function(){
-											//成功，弹窗显示信息
-											$.alert('<p class="text-left" style="font-size:16px;"><span class="label label-info"><span class="glyphicon glyphicon-wrench"></span></span>&nbsp;专利事务</p><hr><p class="text-center"><span  style="font-size:16px;">《'+data1.topic+'》</span></p>'+btnHtml+'<p class="text-center"><span">'+data.msg+'</span></p>');
-										});	
-							
-									});
-									
-								}
-								//新增pat失败，
-								else{
-									$.alert(data.msg);
-								}
-							})
-							.fail(function(){
-								$.alert('与服务器连接失败，请重试');
-							});
-						
-						}else{
-							formData.append('fmPatDataJson',fmPatDataJson);
-							formData.append('fmIssPatDataJson',fmIssPatDataJson);
-							formData.append('fmAttDataJson',fmAttDataJson);
-							$.extend(param,fmPatDataJson,fmIssPatDataJson,fmAttDataJson,{'oprt':oprt,'auth':authStr});
-							$.post(url,param,function(data){
+						$.extend(param,fmPatDataJson,fmIssPatDataJson,fmAttDataJson,{'oprt':oprt,'auth':authStr});
+						var jqxhr=$.post(url,param,function(data){
 								$('#divContent_load').empty().html('<p class="text-center" style="font-size:28px;">加载中……</p>');
 								$('#divContent_load').load('tplFile',{'sId':'#issPat','auth':authKey,'id':data.issId},function(){				
 									//成功，弹窗显示信息
-									$.alert('<p class="text-left" style="font-size:16px;"><span class="label label-info"><span class="glyphicon glyphicon-wrench"></span></span>&nbsp;专利事务</p><hr><p class="text-center"><span  style="font-size:16px;">《'+data.topic+'》</span></p>'+btnHtml+'<p class="text-center"><span">'+data.msg+'</span></p>');
+									$.alert('<p class="text-left" style="font-size:16px;"><span class="label label-info"><span class="glyphicon glyphicon-wrench"></span></span>&nbsp;专利事务</p><hr><p class="text-center"><span  style="font-size:16px;">《'+data.topic+'》</span></p>'+btnHtml+'<p class="text-left"><span">'+data.msg+'</span></p>');
 								});
+							}).fail(function(){
+								$.alert('与服务器连接失败，请重试');
 							});	
-							<!-- }); -->
-							<!-- console.log('backData='); -->
-							<!-- console.dir(backData); -->
-							<!-- console.dir('data.fileName='+data.fileName); -->
-						}
 					}else{
 						$('#modalIssPatAuthSingle').modal('show');
 					}

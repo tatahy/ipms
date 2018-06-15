@@ -17,12 +17,12 @@ class Issinfo extends Model
     //新增、更新时需要自动完成的字段列表
     //protected $auto = ['issmap_type','issnum'];
     //新增时需要自动完成的字段列表
-    protected $insert = ['issmap_type','issnum'];  
+    protected $insert = ['issnum'];  
     //更新时需要自动完成的字段列表
     //protected $update = ['topic','abstract','addnewdate'];  
    
     //只读字段，这个字段的值一旦写入，就无法更改。
-    protected $readonly = ['issnum','issmap_type'];
+    protected $readonly = ['issnum'];
     
     // 开启时间字段自动写入
 	protected $autoWriteTimestamp = true; 
