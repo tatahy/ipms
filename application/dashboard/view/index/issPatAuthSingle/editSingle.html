@@ -63,6 +63,20 @@
 			<input class="empty-check form-control" id="patOtherInventor" name="patOtherInventor" value="{$pat.otherinventor}" type="text" placeholder="无" required>
 		</div>
 	</div>
+	
+	<div class="row myRow">
+		<div class="form-group col-sm-4">
+			<label class="control-label" for="patKeyword">专利关键词<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<textarea class="empty-check form-control" rows="3" id="patKeyword" name="patKeyword" type="text" placeholder="专利关键词，以逗号分隔，字数不超过50字。" required>{$pat.keyword}</textarea>
+		</div>
+		
+		<div class="form-group col-sm-8">
+			<label class="control-label" for="patSummary">专利简介<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+			<textarea class="empty-check form-control" rows="3" id="patSummary" name="patSummary" type="text" placeholder="专利简介说明，字数不超过200字。" required>{$pat.summary}</textarea>
+		</div>
+		
+	</div>
+	
 	</form>
 	</div>
 {/block}
@@ -80,6 +94,7 @@
 	
 	<form action="" id="fmIssPat">
 	<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
+	<input name="issStatus" value="{$iss.status}" type="text" class="sr-only">
 	<div class="row myRow">
 		<div class="form-group col-sm-6">
 			<label class="control-label" for="issPatTopic">事务标题</label>
@@ -93,22 +108,33 @@
 		</div>
 		<div class="form-group col-sm-3">
 			<label for="issStatus">事务状态</label>
-			<input class="empty-check form-control" id="issStatus" name="issStatus" value="{$iss.status}" type="text" readonly>
+			<!-- <input class="empty-check form-control bg-info" id="issStatus" name="issStatus" value="{$iss.status}" type="text" readonly> -->
+			
+			<p>
+			{in name="iss.status" value="申报新增"}
+			<span class="label label-primary">{$iss.status}</span>
+			{else/}
+			<a href="{$home}/issue/index/issrecords/id/{$iss.id}" target="_blank" class="label label-primary" data-toggle="tooltip" data-placement="bottom" data-title="事务过程记录">{$iss.status}</a>
+			{/in}
+			</p>
+			
 		</div>
 	</div>
 	
 	<div class="row myRow">
-		{neq name="iss.statusdescription" value="0"}
+		{notin name="iss.status" value="填报,申报新增"}
 		<div class="form-group col-sm-12">
-			<label class="control-label">审核、审批要求</label>
-			<pre class="myedge-left-info" style="background-color:#eee;">{$iss.statusdescription}</pre>
+			<label class="control-label">修改完善要求</label>
+			<pre class="myedge-left-info" style="background-color:#eee;">{$issChRd}</pre>
 		</div>
-		{/neq}
+		{/notin}
 		
+		{notin name="iss.status" value="申报新增"}
 		<div class="form-group col-sm-12">
 			<label class="control-label" for="statusDescription">更新/提交说明<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-			<textarea class="empty-check form-control" rows="5" id="statusDescription" name="statusDescription" placeholder="填写事务的更新/提交说明，字数不超过200字。" required></textarea>
+			<textarea class="empty-check form-control" rows="3" id="statusDescription" name="statusDescription" placeholder="填写事务的更新/提交说明，字数不超过200字。" required>{$iss.statusdescription}</textarea>
 		</div>
+		{/notin}
 	</div>
 	</form>
 	</div>
@@ -116,7 +142,7 @@
 
 {block name="btn"}
 
-{eq name="$oprt" value="_ADDNEW"}
+{eq name="oprt" value="_ADDNEW"}
 	<button type="submit" id="btnAddNew" class="btn btn-primary btn-sm" data-oprt="_ADDNEW" data-topic="" data-btnLabel="label-primary"><span class="glyphicon glyphicon-tag"></span>新增</button>
 
 {else/}
@@ -135,6 +161,14 @@
 $(document).ready(function(){	
 	// select显示为模板变量值
 	$('#patType').val('{$patType}').attr('selected');
+	
+	//后端patinfo模型中对pattpye字段有定义获取器，所以$pat.pattype的值不是数据库中的值，$pat->getData('pattype')才是。同理$iss->getData('issmap_type')
+	<!-- $('#patType').val('{ $pat->getData('pattype')}').attr('selected'); -->
+	<!-- $('#patType option').each(function(){ -->
+		<!-- if($(this).text()=='{$pat.pattype}'){ -->
+			<!-- $(this).attr('selected',true); -->
+		<!-- } -->
+	<!-- }); -->
 	
 	//issPatTopic的内容自动跟随生成
 	$('#patTopic').change(function(){ 	
@@ -162,13 +196,3 @@ $(document).ready(function(){
 });
 </script>
 {/block}
-
-
-	
-		
-
-	
-	
-	
-
-

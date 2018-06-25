@@ -40,7 +40,7 @@ abstract class ApproveState{
   abstract function complete();
   
   //数据库模型操作
-  protected function oprtMdl(){
+  protected function _oprtMdl(){
     //1.patinfo更新
     $this->_mdl->patUpdate();
 

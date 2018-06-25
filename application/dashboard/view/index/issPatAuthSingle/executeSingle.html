@@ -60,7 +60,7 @@
 				<div class="form-group col-sm-4">
 					<label class="control-label" for="patType">专利类型<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 					<select class="empty-check form-control" id="patType" name="patType">
-						<option value="">……</option>
+						<option value="0">……</option>
 						<option value="_PATT1">发明专利</option>
 						<option value="_PATT2">实用新型专利</option>
                 		<option value="_PATT3">外观设计专利</option>
@@ -94,6 +94,19 @@
 					<input class="empty-check form-control" id="patOtherInventor" name="patOtherInventor" value="{$pat.otherinventor}" type="text" placeholder="无" required>
 				</div>
 			</div>
+			
+			<div class="row myRow">
+				<div class="form-group col-sm-4">
+					<label class="control-label" for="patKeyword">专利关键词<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<textarea class="empty-check form-control" rows="3" id="patKeyword" name="patKeyword" type="text" placeholder="专利关键词，以逗号分隔，字数不超过50字。" required>{$pat.keyword}</textarea>
+				</div>
+		
+				<div class="form-group col-sm-8">
+					<label class="control-label" for="patSummary">专利简介<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<textarea class="empty-check form-control" rows="3" id="patSummary" name="patSummary" type="text" placeholder="专利简介说明，字数不超过200字。" required>{$pat.summary}</textarea>
+				</div>
+		
+			</div>
 		</form>
 	</div>
 	{/case}
@@ -111,12 +124,12 @@
 <div class="myFieldset">
 	
 	<div class="myLegend"><span class="label label-warning">执行事务</span></div>
-	{switch name="$iss.status"}
-    {case value="批准申报|准予变更"}	
+	
 	<form action="" id="fmIssPat" >
 		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
-		<input id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" class="sr-only">
-		
+		<input name="issStatus" value="{$iss.status}" type="text" class="sr-only">
+	{switch name="$iss.status"}
+    {case value="批准申报|准予变更"}		
 		<div class="row myRow">
 			<div class="form-group col-sm-4">
 				<label for="executeResult">情况<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
@@ -152,18 +165,15 @@
 		
 		<div class="row myRow">		
 			<div id="divExecuteMsg" class="resetHide form-group col-sm-8 ">
-				<label for="executeMsg">具体原因/内容<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<textarea class="empty-check form-control" rows="5" id="executeMsg" name="executeMsg" type="text" placeholder="请填入具体的原因/内容" required></textarea>
+				<label for="statusDescription">具体原因/内容<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<textarea class="empty-check form-control" rows="5" id="statusDescription" name="statusDescription" type="text" placeholder="请填入具体的原因/内容" required></textarea>
 			</div>
 		
 		</div>
-	</form>		
 	{/case}
 		
 	{case value="申报执行|申报修改|否决变更"}
-	<form action="" id="fmIssPat" >	
-		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">		
-				
+	
 		<div class="row myRow">
 			<div class="form-group col-sm-6">
 				<label class="control-label" for="issPatTopic">事务标题</label>
@@ -180,34 +190,28 @@
 				<a href="{$home}/issue/index/issrecords/id/{$iss.id}" target="_blank" data-toggle="tooltip" title="过程记录"><span class="btn btn-sm btn-primary">{$iss.status}</span></a>
 			
 			</div>
-			
-			{notin name="$iss.statussummary" value="0"}
+			{in name="iss.status" value="申报修改,否决变更"}
+			<!-- {notin name="$iss.statusdescription" value="0"} -->
 			<div class="form-group col-sm-6">
-				<label class="control-label" for="">事务反馈意见</label>
-				<p class="myedge-left-info">{$iss.statussummary}</p>
+				<label class="control-label" for="">事务审批/复核意见</label>
+				<p class="myedge-left-info">{$issChRd}</p>
 			
 			</div>
-			{/notin}
-		</div>
-
-		<div class="row myRow">
-			<div class="form-group col-sm-12">
-				<label class="control-label" for="issPatAbstract">事务简介<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<textarea class="empty-check form-control" rows="5" id="issPatAbstract" name="issPatAbstract" placeholder="填写事务的主要内容，字数不超过100字。" required>{$iss.abstract}</textarea>
-			</div>
+			{/in}
 		</div>
 		
 		<div class="row myRow">		
 			<div id="divExecuteMsg" class="form-group col-sm-8 ">
-				<label for="executeMsg">报告/完成说明<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<textarea class="empty-check form-control" rows="5" id="executeMsg" name="executeMsg" type="text" placeholder="请填入简短报告/完成说明" required></textarea>
+				<label for="statusDescription">报告/完成说明<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<textarea class="empty-check form-control" rows="5" id="statusDescription" name="statusDescription" type="text" placeholder="请填入简短报告/完成说明" required>{$iss.statusdescription}</textarea>
 			</div>
 		
-		</div>		
-	</form>	
+		</div>	
 	{/case}
     
-{/switch}
+{/switch}	
+	</form>	
+	
 	
 	
 	
@@ -262,13 +266,13 @@ $(document).ready(function(){
 		},'json');
 	});
 		
-	// 单选框executeResult的change事件，出现executeMsg输入框等。
+	// 单选框executeResult的change事件，出现statusDescription输入框等。
 	$('#executeResult').change(function(){	
 		//恢复到default状态
 		$('.resetHide').hide();
 		$(this).removeClass('label label-danger label-primary label-success');
-		//#executeMsg去掉'empty-check'，不列入非空检查
-		$('#executeMsg').removeClass('empty-check');
+		//#statusDescription去掉'empty-check'，不列入非空检查
+		$('#statusDescription').removeClass('empty-check');
 		
 		switch($(this).val()){
 			case '_REFUSE':
@@ -277,7 +281,7 @@ $(document).ready(function(){
 				$('#divChangeExecuter').show();
 				$(this).addClass('label label-danger');
 				//增加'empty-check'，列入非空检查
-				$('#executeMsg').addClass('empty-check');
+				$('#statusDescription').addClass('empty-check');
 				
 			break;
 			
@@ -285,24 +289,24 @@ $(document).ready(function(){
 				$('#divExecuteMsg').show();
 				$('#btnFinish').show();
 				$(this).addClass('label label-danger');
-				//#executeMsg增加'empty-check'，列入非空检查
-				$('#executeMsg').addClass('empty-check');
+				//#statusDescription增加'empty-check'，列入非空检查
+				$('#statusDescription').addClass('empty-check');
 			break;
 						 
 			case '_ACCEPT':
 				$('#divExecuteMsg').hide();
 				$('#btnAccept').show();
 				$(this).addClass('label label-primary');
-				//#executeMsg去掉'empty-check'，不列入非空检查
-				$('#executeMsg').removeClass('empty-check');
+				//#statusDescription去掉'empty-check'，不列入非空检查
+				$('#statusDescription').removeClass('empty-check');
 			break;
 			
 			case '_REPORT':
 				$('#divExecuteMsg').show();
 				$('#btnReport').show();
 				$(this).addClass('label label-primary');
-				//#executeMsg增加'empty-check'，列入非空检查
-				$('#executeMsg').addClass('empty-check');
+				//#statusDescription增加'empty-check'，列入非空检查
+				$('#statusDescription').addClass('empty-check');
 			break;
 			
 			case '0':
@@ -314,8 +318,8 @@ $(document).ready(function(){
 				$('input:radio[name="changeExecuter"][value="0"]').prop('checked',true);
 				//#executer去掉'empty-check'，退出非空检查
 				$('#executer').removeClass('empty-check');
-				//#executeMsg去掉'empty-check'，不列入非空检查
-				$('#executeMsg').removeClass('empty-check');
+				//#statusDescription去掉'empty-check'，不列入非空检查
+				$('#statusDescription').removeClass('empty-check');
 			break;
 		}
 	

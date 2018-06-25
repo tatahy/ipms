@@ -705,7 +705,7 @@ class Index extends Controller
 <!--HY 2018/2/6 -->
 
 <?php
-// 查询JSON类型字段 （info字段为json类型）（mysql V5.0.1）
+// 查询JSON类型字段 （info字段为json类型,mysql V5.0.1）
 Db::table('think_user')->where('info$.email','thinkphp@qq.com')->find();
 ?>
 
@@ -1139,16 +1139,45 @@ $s2=implode(',',$days_array);
 
 
 ?>
-
-字段排除
-注意的是，字段排除功能不支持跨表和join操作。
+//字段指定,字段排除,field方法
 <?php
-//要排除更多的字段
+//字段指定
+Db::table('think_user')->field('id,title,content')->select();
+
+//字段设置别名
+Db::table('think_user')->field('id,nickname as name')->select();
+
+//field方法中直接使用函数
+Db::table('think_user')->field('id,SUM(score)')->select();
+
+//field方法的参数可以支持数组
+Db::table('think_user')->field(['id','title','content'])->select();
+Db::table('think_user')->field(['id','nickname'=>'name'])->select();
+Db::table('think_user')->field(['id','concat(name,"-",id)'=>'truename','LEFT(title,7)'=>'sub_title'])->select();
+
+//显式的调用所有字段，获取数据表的所有字段列表，哪怕数据表有100个字段。
+Db::table('think_user')->field(true)->select();
+
+//字段合法性检测。field方法结合数据库的写入方法使用就可以完成表单提交的字段合法性检测
+Db::table('think_user')->field('title,email,content')->insert($data);
+//即表示表单中的合法字段只有title,email和content字段，无论用户通过什么手段更改或者添加了浏览器的提交字段，都会直接屏蔽。因为，其他字段我们都不希望由用户提交来决定，可以通过自动完成功能定义额外的字段写入。
+
+//V5.0.17+版本开始，系统还提供了fieldRaw方法，用于更安全的指定字段，尤其是使用了SQL函数的情况。
+Db::table('think_user')->fieldRaw('title,email,content,max(score) as max_score')->insert($data);
+
+//在开启数据表字段严格检查的情况下，提交了非法字段会抛出异常，可以在数据库设置文件中设置：
+// 关闭严格字段检查
+'fields_strict'	=>	false,
+
+//字段排除
 Db::table('think_user')->field('user_id,content',true)->select();
 //或者用
 Db::table('think_user')->field(['user_id','content'],true)->select();
 
 ?>
+
+//注意的是，字段排除功能不支持跨表和join操作。
+
 
 <!--/  HY 2018/2/22 -->
 
@@ -1369,6 +1398,7 @@ $foo = new \Foo();
 
 <!--  HY 2018/6/6 -->
 // 自动时间字段（模型中的create_time字段,update_time字段）
+
 框架做了一些强化支持，无需定义获取器和修改器就能完成时间日期类型字段的自动处理。
 
 默认情况下自动写入时间戳字段功能是关闭的，可以在模型里面定义
@@ -1632,7 +1662,7 @@ data和setAttr方法的区别前者是赋值最终数据，后者赋值的数据
 //事务处理
 
 //使用条件：
-1.需要数据库引擎支持事务处理。比如 MySQL 的 MyISAM 不支持事务处理，需要使用 InnoDB 引擎。
+1.需要数据库引擎支持事务处理。比如MySQL的 MyISAM不支持事务处理，需要使用InnoDB引擎。
 2.确保数据库连接是相同的。
 
 //数据库事务,使用 transaction 方法操作数据库事务，当发生异常会自动回滚，例如：
@@ -1679,6 +1709,185 @@ try{
 }
 ?>
 
-
-
 <!--//  HY 2018/6/13 -->
+
+
+<!--  HY 2018/6/21 -->
+//模型数据集
+
+数据集的优势：
+    - 数据更对象化；
+    - 关联操作更方便；
+    - 数据集本身可以单独定义独立的业务方法；
+
+<?php
+//前提条件：应用的设置文件“database.php”中已设置模型的数据集返回类型为数组
+
+//查询要求：得到所有未禁用的用户的指定字段信息数据集
+//方式1：模型类静态调用链式查询使用field方法设置可见字段。
+$user=UserModel::where('enable','1')->field('username,dept,usergroup_id')->order('dept', 'asc')->select();
+
+//方式2：模型闭包查询使用field方法设置可见字段。
+$user=UserModel::all(function($query){
+                       $query->where('enable','1')->field('username,dept,usergroup_id')->order('dept', 'asc');
+                        }); 
+						
+//方式3：模型闭包查询后转换为数据集对象，数据集对象的visual方法设置可见字段
+$user=UserModel::all(function($query){
+                        $query->where('enable','1')->order('dept', 'asc');
+                    });
+//应用tp5助手函数collection将$user转换为数据集对象后设置可见字段。
+$user = collection($user)->visible(['username','dept','usergroup_id']);
+
+?>
+
+模型的单个数据查询返回的都是模型对象实例，但查询多个数据的时候默认返回的是一个包含模型对象实例的数组。框架提供了一个Collection数据集对象来进行统一的模型的对象化操作，替代默认的数组数据集更好的封装自己的数据处理和业务逻辑。
+
+设置数据集对象后，查询多个数据的方法（包括Db类的select和模型类的all方法）返回的结果类型就会变成think\model\Collection对象实例。
+
+有两种方式可以设置
+<?php
+
+//方式1：是全局设置数据库的配置参数（默认设置为array）。该设置会影响所有的查询（包括Db类和模型类）。
+'resultset_type'  => 'collection',
+
+//方式2：是在模型类中添加属性设置。该设置仅仅影响设置的模型中的查询结果，
+protected $resultSetType = 'collection';
+
+?>
+如果需要多个模型或者全部模型支持，可以使用继承或者使用第一种数据库配置方式。
+
+//数据集对象和普通的二维数组
+
+数据集对象和普通的二维数组在使用上的一个最大的区别就是数据是否为空的判断，
+<?php
+//二维数组的数据集，直接使用empty()函数
+$resultSet = User::all();
+if (empty($resultSet)) {
+    echo '数据集为空';
+}
+
+//数据集对象，使用isEmpty()函数
+$resultSet = User::all();
+if ($resultSet->isEmpty()) {
+    echo '数据集为空';
+}
+
+//通用的判断数据是否为空的方式，用count()函数
+$resultSet = User::all();
+if (0 == count($resultSet)) {
+    echo '数据集为空';
+}
+?>
+
+//数据集对象的方法和数组函数的对应关系
+
+作用				数据集方法			数组函数
+合并数据			merge				array_merge
+比较数据差集		diff				array_diff
+交换数组中的键和值	flip				array_flip
+比较数组交集		intersect			array_intersect
+返回键名			keys				array_keys
+最后元素出栈		pop					array_pop
+数组迭代简化		reduce				array_reduce
+数据反序			reverse				array_reverse
+首个元素出栈		shift				array_shift
+开头插入元素		unshift				array_unshift
+元素回调			each				---
+过滤元素			filter				array_filter
+返回指定列			column				array_column
+元素排序			sort				array_sort
+打乱元素			shuffle				shuffle
+截取部分元素		slice				array_slice
+元素分割			chunk				array_chunk
+转换数组			toArray				---
+
+
+//自定义的数据集对象：
+
+一般自定义的数据集对象建议继承think\model\Collection，然后在模型中设置resultSetType属性值为自定义查询类的类名。
+<? php
+protected $resultSetType = 'app\common\Collection';
+?>
+
+//获取器
+
+获取器的作用是在获取数据的字段值后自动进行处理，
+
+<?php
+//用处1：对状态值进行转换。利用了索引数组（key-value/键值对）引用数组索引输出数组值的特性。
+class User extends Model 
+{
+    public function getStatusAttr($value)
+    {
+        $status = [-1=>'删除',0=>'禁用',1=>'正常',2=>'待审核'];
+        return $status[$value];
+    }
+}
+
+?>
+<!--//  HY 2018/6/21 -->
+
+
+<!--//  HY 2018/6/21 -->
+//模型关联
+
+//关联关系
+关联关系通常有一个参照模型，即是主模型（或者当前模型），关联关系对应的模型就是关联模型，关联关系是指定义在主模型中的关联，有些关联关系还会涉及到一个中间表的概念，但中间表不一定需要存在具体的模型。
+
+主模型和关联模型之间通常是通过某个外键进行关联，而这个外键的命名系统会有一个约定规则，通常是主模型名称+_id，尽量遵循这个约定会给关联定义带来很大简化。
+
+从面向对象的角度来看关联的话，模型的关联其实应该是模型的某个属性。框架选择了方法定义而不是属性定义的方式，每个关联属性其实是对应了一个模型的关联方法，这个关联属性和模型的数据一样是动态的，并非模型类的实际属性。
+
+//定义关联
+关联方法的定义最关键是要搞清楚具体应该使用何种关联关系，其次是掌握不同的关联关系的定义方法和参数。
+5.0版本支持的关联关系包括下面七种，
+模型方法		关联类型
+hasOne			一对一HAS ONE
+belongsTo		一对一BELONGS TO
+hasMany			一对多 HAS MANY
+hasManyThrough	远程一对多 HAS MANY THROUTH
+belongsToMany	多对多 BELONGS TO MANY
+morphMany		多态一对多 MORPH MANY
+morphTo			多态 MORPH TO
+关联方法的第一个参数就是要关联的模型名称，也就是说当前模型的关联模型必须也是已经定义的一个模型。
+
+//hasOne关联
+用法：hasOne('关联模型','外键','主键');除了关联模型外，其它参数都是可选。
+	- 关联模型（必须）：模型名或者模型类名
+	- 外键：在关联模型中的字段名，默认的外键规则是当前模型名（不含命名空间，下同）+_id ，例如user_id
+    - 主键：当前模型主键，一般会自动获取也可以指定传入
+	
+//belongsTo关联
+用法：belongsTo('关联模型','外键','关联表主键');除了关联模型外，其它参数都是可选。
+
+    - 关联模型（必须）：模型名或者模型类名
+    - 外键：当前模型外键，默认的外键名规则是关联模型名+_id
+    - 关联主键：关联模型主键，一般会自动获取也可以指定传入
+
+<?php
+//定义关联，一般不需要使用命名空间，会自动使用当前模型的命名空间，如果不同请使用完整命名空间定义，例如：
+namespace app\index\model;
+
+use think\Model;
+
+class User extends Model
+{
+	public function profile()
+    {
+    	// Profile模型和当前模型的命名空间不一致
+    	return $this->hasOne('app\model\Profile');
+    }
+}
+
+
+?>
+
+
+<?php
+//关联查询
+
+?>
+
+
+<!--//  HY 2018/6/21 -->

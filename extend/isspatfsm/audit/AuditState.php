@@ -39,6 +39,21 @@ abstract class AuditState
   abstract function fail();
   abstract function modify();
   
+  //数据库模型操作
+  protected function _oprtMdl(){
+    //1.patinfo更新
+    $this->_mdl->patUpdate();
+
+    //2.issinfo更新
+    $this->_mdl->issUpdate();
+
+    //3.issrecord新增
+    $this->_mdl->issRdCreate();
+
+    //4.attinfo更新
+    $this->_mdl->attUpdate();
+  }
+  
 
 }
 

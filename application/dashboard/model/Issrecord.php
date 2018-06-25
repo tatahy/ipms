@@ -21,67 +21,68 @@ class Issrecord extends Model
     // 开启时间字段自动写入
 	protected $autoWriteTimestamp = true; 
     
+    //指定字段类型
+    protected $type = [
+        'actdetailhtml'    =>  'json',
+        
+    ];
+    
      //获取器，获取数据表issrecord中rolename字段值，转换为中文输出
-    protected function getRolenameAttr($value)
+    protected function getRolenameAttr($key)
     {
-      $outPut='……';
-      switch($value){
-        case 'writer':
-          $outPut='撰写人';
-        break;
-        
-        case 'reviewer':
-          $outPut='审核人';
-        break;
-        
-        case 'approver':
-          $outPut='批准人';
-        break;
-        
-        case 'operator':
-          $outPut='执行人';
-        break;
-        
-        case 'maintainer':
-          $outPut='维护人';
-        break;
-        
-         case '_EDIT':
-          $outPut='撰写人';
-        break;
-        
-        case '_AUDIT':
-          $outPut='审核人';
-        break;
-        
-        case '_APPROVE':
-          $outPut='批准人';
-        break;
-        
-        case '_EXECUTE':
-          $outPut='执行人';
-        break;
-        
-        case '_MAINTAIN':
-          $outPut='维护人';
-        break;
-                
-        default:
-          $outPut=$value;
-        break;
-        
+      $value=$key;
+      $roleName = [
+                'writer'=>'撰写人','reviewer'=>'审核人','approver'=>'批准人','operator'=>'执行人','maintainer'=>'维护人',
+                '_EDIT'=>'撰写人','_AUDIT'=>'审核人','_APPROVE'=>'批准人','_EXECUTE'=>'执行人','_MAINTAIN'=>'维护人',
+                ];
+      if(array_key_exists($key,$roleName)){
+        $value = $roleName[$key];
       }
-      return $outPut;
+      return $value;
+    }
+    
+    //获取器，获取数据表issrecord中act字段值，转换为中文输出
+    protected function getActAttr($key)
+    {
+      $value=$key;
+      $act = [
+                '_ADDNEW'=>'新增','_UPDATE'=>'更新','_SUBMIT'=>'提交','_DELETE'=>'删除',
+                '_PASS'=>'审核通过','_FAIL'=>'审核未通过','_MODIFY'=>'返回修改',
+                '_PERMIT'=>'批准','_VETO'=>'否决','_COMPLETE'=>'修改完善',
+                '_ACCETP'=>'领受','_REFUSE'=>'申诉','_REPORT'=>'报告','_FINISH'=>'完成',
+                '_APPLY'=>'申报提交','_REVIEW'=>'申报复核','_IMPROVE'=>'申报修改','_AUTHORIZE'=>'授权','_REJECT'=>'驳回','_ADDRENEW'=>'续费申请','_CLOSE'=>'完结'
+            ];
+      if(array_key_exists($key,$act)){
+        $value = $act[$key];
+      }
+      return $value;
     }
     
     /**
-     * 获取issrecord所属的issue信息
+     * 获取issrecord所属的issue信息，与Issinfo模型关联，是多对一的关联关系？？
      */
     public function issrecords()
     {   
-        return $this->belongsTo('Issinfo');
+        return $this->belongsTo('Issinfo','issinfo_id');
+
     }
     
+    /**
+     * 获取特定issue的最新审核、审批、修改意见
+     * @param  intger $issId 待查询issue的id
+     * @return char $issChRd
+     */
+    public function issChRdRecent($issId)
+    {   
+        $idMax=$this->where('issinfo_id',$issId)->where('act','in',['_COMPLETE','_MODIFY','_IMPROVE'])->max('id');
+        if($idMax){
+            $issChRd=$this->where('id',$idMax)->find()['actdetailhtml']['pre']['text'];
+        }else{
+            $issChRd='';
+        }
+        
+        return $issChRd;
+    }
      /**
      * 新增一个issureRecord。
      * @param  array $data 新增issure的各项信息

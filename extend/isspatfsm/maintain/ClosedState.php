@@ -14,7 +14,7 @@ use isspatfsm\maintain\MaintainContext;
 class ClosedState extends MaintainState{
   
   public function apply(){  
-    return '<br>apply';
+    return '<br>无效apply操作';
   }
   public function review(){
   

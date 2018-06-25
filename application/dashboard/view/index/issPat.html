@@ -142,6 +142,9 @@ $(document).ready(function(){
 	//* 参数issId，类型：s数值。值：可为空。说明：要上色的行信息。
 	//* 返回值：无
 function showIssPatList(url,auth,issId){
+	
+	$('#divIssPatAuth_load').html('<h4 style="margin:50px;">加载中……</h4>');
+	
 	$('#divIssPatAuth_load').load(url,{'auth':auth,'issId':issId},function(){
 		var obj='';
 		

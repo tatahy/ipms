@@ -9,29 +9,82 @@
 	<h4 class="label label-info" style="font-size:16px;">事务过程</h4>
 	
 	<div class="table-responsive" style="margin-top:10px;">	
-			<table id="" class="table table-bordered table-striped table-condensed">
+			<table id="" class="table table-hover table-condensed">
 				<thead>
 					<tr>
-						<!-- <th>选择</th> -->
 						<th class="text-center">序号</th>
 						<th class="text-center">用户</th>
 						<th class="text-center">系统角色</th>
 						<th class="text-center">操作</th>
-						<th class="text-center">操作说明</th>
+						<th>操作说明</th>
 						<th class="text-center">操作时间</th>
 					</tr>
 				</thead>
 				<tbody><!-- 此处显示数据库查询后的数据集 -->
 					{volist name="issrecords" id="vo" empty="暂无信息"}
-					<tr >
-						<!-- <td><input type="checkbox" check=""></td> -->
+					<tr class="text-center">
 						<td>{$i}</td>
 						<td>{$vo.username}</a></td>
 						<td>{$vo.rolename}</a></td>
 						<td>{$vo.act}</td>
-						<td><pre style="padding:0px;border:none;background-color:transparent;">{$vo.actdetail}</pre></td>
+						<td class="text-left">
+						{notempty name="vo.actdetailhtml"}
+							<p>{$vo.actdetailhtml.p.prefix}
+							
+							{switch name="vo.actdetailhtml.p.spanclass"}
+							{case value="info"}
+							<span class="label label-info">
+							{/case}
+							{case value="primary"}
+							<span class="label label-primary">
+							{/case}
+							{case value="warning"}
+							<span class="label label-warning">
+							{/case}
+    						{case value="danger"}
+							<span class="label label-danger">
+							{/case}
+							{case value="success"}
+							<span class="label label-success">
+							{/case}
+							{case value="default"}
+							<span class="label label-default">
+							{/case}
+    						{default /}<span>
+							{/switch}
+							{$vo.actdetailhtml.p.spantext}</span>
+							{$vo.actdetailhtml.p.nextstage}</p>
+							
+							{switch name="vo.actdetailhtml.span.class"}
+							{case value="info"}
+							<span class="text-info">
+							{/case}
+							{case value="primary"}
+							<span class="text-primary">
+							{/case}
+							{case value="warning"}
+							<span class="text-warning">
+							{/case}
+    						{case value="danger"}
+							<span class="text-danger">
+							{/case}
+							{case value="success"}
+							<span class="text-success">
+							{/case}
+    						{default /}<span>
+							{/switch}
+							<strong>{$vo.actdetailhtml.span.text}</strong></span>
+							
+							{notempty name="vo.actdetailhtml.pre.text"}
+							<!-- <pre class="">{$vo.actdetailhtml.pre.text}</pre> -->
+							<pre style="background-color:transparent;">{$vo.actdetailhtml.pre.text}</pre>
+							{/notempty}
+							
+						{else /}
+							{$vo.actdetail}
+						{/notempty}
+						</td>
 						<td>{$vo.acttime}</td>
-						
 					</tr>
 					{/volist}
 				
@@ -56,6 +109,7 @@ $(document).ready(function(){
 	$(".btnClose").click(function(){
 		window.close();
 	});
+	console.log()
 	
 });
 </script>

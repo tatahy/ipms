@@ -178,7 +178,7 @@ class IssPatFSM
           $this->_context = new MaintainContext();
           break;
       }
-      $this->_msg.= '<br>auth:'.$this->_auth;
+      //$this->_msg.= '<br>auth:'.$this->_auth;
       //返回本对象，便于进行链式操作。
       return $this;
     }
@@ -293,10 +293,10 @@ class IssPatFSM
           break;
           //case 'closed':
         case '完结':
-          $this->_context->setState(new ClosedState());
+          $this->_context->setState(MaintainContext::$closedState);
           break;
       }
-      $this->_msg.= '<br>status:'.$this->_status;
+      //$this->_msg.= '<br>status:'.$this->_status;
       //返回本对象，便于进行链式操作。
       return $this;
     }
@@ -316,7 +316,7 @@ class IssPatFSM
       //中转oprt中要处理的数据
       $this->_context->transferData($this->_data);
       //21个oprt
-      $this->_msg.= '<br>oprt:'.$this->_oprt;
+      //$this->_msg.= '<br>oprt:'.$this->_oprt;
       switch ($this->_oprt)
       {
         case '_ADDNEW':

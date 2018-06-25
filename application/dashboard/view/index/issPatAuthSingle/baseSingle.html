@@ -54,7 +54,7 @@
 					<div class="col-sm-3">
 						<a href="{$home}/issue/index/issinfo/id/{$iss.id}" target="_blank" data-toggle="tooltip" title="事务详情">查看详情</a>
 					</div>
-					<div id="divAddNewDate" class="col-sm-3">填报时间：{$iss.addnewdate}</div>
+					<div id="divAddNewDate" class="col-sm-3">填报时间：{$iss.create_time}</div>
 				</div>
 			</footer>
 			</div>
@@ -64,7 +64,8 @@
 			<ul>
 				<li>发明人：{$pat.inventor}；&nbsp;&nbsp;其他发明人：{$pat.otherinventor}；</li>
 				<li>专利类型：{$pat.pattype}；</li>
-				<li>简介：{$pat.summary}</li>
+				<li>专利关键词：{$pat.keyword}；</li>
+				<li>专利简介：<pre>{$pat.summary}</pre></li>
 				<li>状态：
 					<a href="{$home}/patent/index/patrecords/id/{$pat.id}" target="_blank" data-toggle="tooltip" title="过程记录">
 				{switch name="$pat.status"}
@@ -93,7 +94,7 @@
 					<div class="col-sm-3">
 						<a href="{$home}/patent/index/patinfo/id/{$pat.id}" target="_blank" data-toggle="tooltip" title="专利详情">查看详情</a>
 					</div>
-					<div id="" class="col-sm-3">填报时间：{$pat.addnewdate}</div>
+					<div id="" class="col-sm-3">填报时间：{$pat.create_time}</div>
 					<div id="" class="col-sm-3">专利所有人：{$pat.patowner}</div>
 					<div id="" class="col-sm-3">专利撰写人：{$pat.author}</div>				
 				</div>
@@ -337,7 +338,7 @@ $(document).ready(function(){
 			<!-- auth='_'+auth.toUpperCase(); -->
 			
 			<!-- var btnHtml='<span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:14px;">'+$(this).html()+'</span>《'+topic+'》'; -->
-			var btnHtml='<p class="text-center"><span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:14px;">'+$(this).html()+'</spam></p>';
+			var btnHtml='<p class="text-center"><span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:14px;">'+$(this).html()+'</span></p>';
 
 			var url='issPatOprt';
 			<!-- var url='test'; -->
@@ -374,6 +375,8 @@ $(document).ready(function(){
 				if(oprt=='_DELETE'){
 				conHtml+='<p class="text-center text-danger">已上传的附件文件也会一并删除！</P>';
 				}
+				
+				
 				//是否开始ajax传3个form的数据
 				$.confirm(conHtml,function(e){
 					con=e;
@@ -383,7 +386,8 @@ $(document).ready(function(){
 								$('#divContent_load').empty().html('<p class="text-center" style="font-size:28px;">加载中……</p>');
 								$('#divContent_load').load('tplFile',{'sId':'#issPat','auth':authKey,'id':data.issId},function(){				
 									//成功，弹窗显示信息
-									$.alert('<p class="text-left" style="font-size:16px;"><span class="label label-info"><span class="glyphicon glyphicon-wrench"></span></span>&nbsp;专利事务</p><hr><p class="text-center"><span  style="font-size:16px;">《'+data.topic+'》</span></p>'+btnHtml+'<p class="text-left"><span">'+data.msg+'</span></p>');
+									$.alert('<p class="text-left" style="font-size:16px;"><span class="label label-info"><span class="glyphicon glyphicon-wrench"></span></span>&nbsp;专利事务</p><hr><p class="text-center"><span  style="font-size:16px;">《'+data.topic+'》</span></p>'+btnHtml+'<p>'+data.msg+'</p>');
+									<!-- $.alert('<p class="text-left" style="font-size:16px;"><span class="label label-info"><span class="glyphicon glyphicon-wrench"></span></span>&nbsp;专利事务</p><hr><p class="text-center"><span  style="font-size:16px;">《'+data.topic+'》</span></p><p class="text-left"><span">'+data.msg+'</span></p>'); -->
 								});
 							}).fail(function(){
 								$.alert('与服务器连接失败，请重试');

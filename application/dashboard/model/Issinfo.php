@@ -31,8 +31,10 @@ class Issinfo extends Model
     protected function setIssnumAttr()
     {
         
-        $idmax = Issinfo::max('id');
-        $value = Issinfo::where('id',$idmax)->value('issnum');
+        //$idmax = Issinfo::max('id');
+//        $value = Issinfo::where('id',$idmax)->value('issnum');
+        $idmax = $this->max('id');
+        $value = $this->where('id',$idmax)->value('issnum');
         
         $year=substr($value,3,4);
         $num=substr($value,3)+1;
@@ -235,7 +237,7 @@ class Issinfo extends Model
     }    
     
     /**
-     * 获取issue的过程记录
+     * 获取issue的过程记录，与Issrecord模型关联，是一对多的关联关系
      */
     public function issrecords()
     {   
@@ -252,7 +254,7 @@ class Issinfo extends Model
 //        ]);
 //    }
     
-    //获取issinfo的多态模型,涉及issinfo表中的issmap_id和issmap_type两个字段内容。
+    //定义issinfo的多态模型,涉及issinfo表中的issmap_id和issmap_type两个字段内容。可得到对应关联模型的所有字段内容。
      public function issmap()
     {
         $this->getData('issmap_type');
@@ -270,7 +272,7 @@ class Issinfo extends Model
     }
     
     /**
-     * 获取issue的附件
+     * 获取issue的附件，与Attinfo模型关联
      */
     public function attachments()
     {

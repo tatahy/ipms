@@ -23,7 +23,7 @@ use app\dashboard\model\Attinfo as AttinfoModel;
 
 class IssPatModel
 {
-  //静态属性，封装数据库模型对象的实例
+  //静态属性，数据库模型对象的实例
   static $issMdl = null;
   static $issRdMdl = null;
   static $patMdl = null;
@@ -44,6 +44,7 @@ class IssPatModel
    * 'record' => array('act' => '由patrecord.act',...)
    * ),
    * 'att' => array(
+   * 'info' => array('id'=>,...)
    * 'arrId' => [],
    * 'arrFileName' => [],
    * 'arrFileObjStr' => []
@@ -79,12 +80,19 @@ class IssPatModel
   public function issUpdate()
   {
     //update方法返回模型对象实例
-    $iss = self::$issMdl->update($this->_mdlData['iss']['info'], ['id' =>$this->_mdlData['iss']['id']], true);
-    if (count($iss)){
-     // $iss['topic']
-      $msg = '<br>*《'.$iss->topic.'》已更新。';
-    } else{
-      $msg = '<br>*《'.$iss->topic.'》无更新。';
+    //$iss = self::$issMdl->update($this->_mdlData['iss']['info'], ['id' =>$this->_mdlData['iss']['id']], true);
+    
+    //模型的save方法，返回的是受影响的记录数。
+    $iss = self::$issMdl->get($this->_mdlData['iss']['id']);
+    $n=$iss->allowField(true)
+	   //->data($this->_mdlData['iss']['info'], true)
+        ->save($this->_mdlData['iss']['info']);
+    
+    //if (count($iss)){
+    if ($n){
+      $msg = '<br>- 系统专利事务记录：已更新。';
+    } else {
+      $msg = '<br>- 系统专利事务记录：无需更新。';
     }
     return $msg;
 
@@ -130,12 +138,19 @@ class IssPatModel
   public function patUpdate()
   {
     //模型的update方法，返回的是模型的对象实例
-    $pat= self::$patMdl->update($this->_mdlData['pat']['info'], ['id' => $this->_mdlData['pat']['id']], true);
+    //$pat= self::$patMdl->update($this->_mdlData['pat']['info'], ['id' => $this->_mdlData['pat']['id']], true);
     
-    if (count($pat)){
-      $msg = '<br>*《'.$pat->topic.'》已更新。';
+    //模型的save方法，返回的是受影响的记录数。
+    $pat = self::$patMdl->get($this->_mdlData['pat']['id']);
+    $n=$pat->allowField(true)
+	   //->data($this->_mdlData['pat']['info'], true)
+        ->save($this->_mdlData['pat']['info']);
+    
+     //if (count($pat)){
+    if ($n){
+      $msg = '<br>- 系统专利记录：已更新。';
     } else {
-      $msg = '<br>*《'.$pat->topic.'》无更新。';
+      $msg = '<br>- 系统专利记录：无需更新。';
     }
     return $msg;
   }
@@ -176,7 +191,7 @@ class IssPatModel
     $issSet = self::$issMdl->get($this->_mdlData['iss']['id']);
     $arrAttId=$this->_mdlData['att']['arrId'];
     $delDisplay=$this->_mdlData['att']['info']['deldisplay'];
-    $msg = '<br>* 附件处理结果：';
+    $msg = '<br>- 系统附件：';
     if(count($arrAttId)){
         //循环更新attMdl
         for ($i = 0; $i < count($arrAttId); $i++)
@@ -203,6 +218,7 @@ class IssPatModel
             }
           }else{
             $msg .= '<br>附件' . ($i+1) . '已处理过。';
+            $delDisplay=0;
           }
           
           //更新att的“deldisplay”字段值
@@ -243,7 +259,7 @@ class IssPatModel
     $delAttNum=self::$attMdl->destroy(['attmap_id' => $this->_mdlData['iss']['id']]);
     
     if($delAttNum*$delFileNum){
-        $msg='<br>上传附件删除完成。删除['.$delAttNum.']条记录、['.$delFileNum.']个文件';
+        $msg='<br>上传附件删除完成。系统删除['.$delAttNum.']条附件记录、['.$delFileNum.']个文件';
     }else{
         $msg='<br>无上传附件。';
     }
@@ -268,13 +284,13 @@ class IssPatModel
     $issDelNum=self::$issMdl->destroy($issId);
     //issrecord删除，模型的destroy方法，返回的值是影响的记录数
     $issRdDelNum=self::$issRdMdl->destroy(['issinfo_id' => $issId]);
-    $msg='<br>《'.$issTopic.'》删除'.($issDelNum+$issRdDelNum).'条记录。';
+    $msg='<br>系统删除'.($issDelNum+$issRdDelNum).'条事务记录。';
     
     //patinfo删除，模型的destroy方法，返回的值是影响的记录数
     $patDelNum=self::$patMdl->destroy($patId);
     //patrecord删除，模型的destroy方法，返回的值是影响的记录数
     $patRdDelNum=self::$patRdMdl->destroy(['patinfo_id' => $patId]);
-    $msg.='<br>《'.$patTopic.'》删除'.($patDelNum+$patRdDelNum).'条记录。';
+    $msg.='<br>系统删除'.($patDelNum+$patRdDelNum).'条专利记录。';
     
     //att删除,调用私有$attDelete()，已封装对att附件删除和数据表attinfo记录的删除。返回的是删除结果
     $msg.=$this->attDelete();

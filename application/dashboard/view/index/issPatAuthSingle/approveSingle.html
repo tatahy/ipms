@@ -30,28 +30,48 @@
 	<form action="" id="fmIssPat" >
 		<!-- // class="sr-only" 仅源代码文件中显示-->
 		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
+		<input name="issStatus" value="{$iss.status}" type="text" class="sr-only">
 		<input id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" class="sr-only">
 	
 	{eq name="$iss.status" value="变更申请"}
-	
 	<div class="row myRow ">
 	{if condition="$iss.executer != $iss.executerchangeto"}
-		<div id="divExecuterChange" class="form-group col-sm-6" >
-			<p class="myedge-left-info">执行人【<span class="text-primary"><strong>{$iss.executer}</strong></span>】申请变更"执行人"为【<span class="text-danger"><strong>{$iss.executerchangeto}</strong></span>】</p>
-			<p class="myedge-left-info">申请变更原因：</br><span class="text-primary">{$iss.executerchangemsg}</span></p>	
+		<div id="divExecuterChange" class="form-group col-sm-12 myedge-left-info" >
+			<p>执行人【<span class="text-primary"><strong>{$iss.executer}</strong></span>】申请变更"执行人"为【<span class="text-danger"><strong>{$iss.executerchangeto}</strong></span>】</p>
+			<span class="text-primary">申请变更原因：</span>
+			<pre>{$iss.executerchangemsg}</pre>
 		</div>
 	{else /}
-		<div id="divElseChange" class="form-group col-sm-6" >
-			<p class="myedge-left-info">执行人【<span class="text-primary">{$iss.executer}</span>】申请变更原因：</br><span class="text-primary">{$iss.executerchangemsg}</span></p>	
+		<div id="divElseChange" class="form-group col-sm-12 myedge-left-info" >
+			<p>执行人【<span class="text-primary"><strong>{$iss.executer}</strong></span>】申请变更"</p>
+			<span class="text-primary">申请变更原因：</span>
+			<pre>{$iss.executerchangemsg}</pre>	
 		</div>
 	{/if}
 	</div>
 	{/eq}
-		
+	
+	
 	<div class="row myRow">
+		{neq name="$iss.status" value="变更申请"}	
+		{notempty name="issChRd"}
+			<div class="form-group col-sm-6">
+				<label class="control-label">修改完善意见</label>
+				<pre class="myedge-left-info" style="padding:0px;border:none;">{$issChRd}</pre>
+			</div>
+		{/notempty}
+		
+		{neq name="iss.statusdescription" value="0"}
+		<div class="form-group col-sm-6">
+			<label class="control-label">审核意见</label>
+			<pre class="myedge-left-info" style="padding:0px;border:none;">{$iss.statusdescription}</pre>
+		</div>
+		{/neq}
+		{/neq}
+	
 		<div class="form-group col-sm-4">
 		<label for="approveResult">结果<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-		<select id="approveResult" class="empty-check form-control" name="auditResult" style="font-size:100%;">
+		<select id="approveResult" class="empty-check form-control" name="approveResult" style="font-size:100%;">
 			<option value="0" class="text-warning bg-warning" >……</option>
 		{in name="$iss.status" value="拟续费,变更申请"}
 			<option class="text-success bg-success" value="_PERMIT">批准</option>
@@ -81,10 +101,11 @@
 		
 		<div id="divApproveMsg" class="resetHide form-group col-sm-8 ">
 			<label for="attName">具体意见<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-			<textarea class="empty-check form-control" rows="5" id="approveMsg" name="approveMsg" type="text" placeholder="请填入具体的审批意见" required></textarea>
+			<textarea class="empty-check form-control" rows="5" id="approveMsg" name="statusDescription" type="text" placeholder="请填入具体的审批意见" required></textarea>
 		</div>
 
 	</div>
+	
 		
 	</form>
 </div>

@@ -756,6 +756,7 @@ class IndexController extends \think\Controller
             'iss_id'=>$iss_id,
             
             'addnewdate'=>$pat->addnewdate, 
+            'update_time'=>$pat->update_time, 
             'submitdate'=>$pat->submitdate,
             'applydate'=>$pat->applydate, 
             'nextrenewdate'=>$pat->nextrenewdate, 

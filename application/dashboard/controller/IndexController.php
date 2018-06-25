@@ -240,17 +240,20 @@ class IndexController extends \think\Controller
      public function selectExecuter()
     {
       $this->_loginUser();
-      //查出所有未禁用的用户
-      $user=UserModel::where('enable','1')->order('dept', 'asc')->select();
+      
+      //查出所有未禁用的用户的指定字段信息
+      $user=UserModel::where('enable','1')->field('username,dept,usergroup_id')->order('dept', 'asc')->select();
       $executer=array();
       foreach($user as $v){
         //用户在operator用户组(usergroupid=4)中：即是usergroup_id字段含有'4'
         if(strstr($v->usergroup_id,'4')){
+            unset($v->usergroup_id);
             array_push($executer,$v);
         }
       }
       // 将数组转化为json
-      return json($executer);
+      //return json($executer);
+      return $executer;
       
     }
     
@@ -416,6 +419,13 @@ class IndexController extends \think\Controller
           $searchWriter='';
       }
       
+       // 查询词6，'searchPatStatus'
+      if(!empty($request->param('searchPatStatus'))){
+          $searchPatStatus=$request->param('searchPatStatus');
+      }else{
+          $searchPatStatus='';
+      }
+      
       // 选择排序字段
       switch($sortName){
       
@@ -471,6 +481,8 @@ class IndexController extends \think\Controller
           $strOrder=$strOrder.' desc';
           
       }
+      //确保查询的是isspat
+      $map['issmap_type'] =['like','%'.'_ISST_PAT'.'%'];
       //选择模板文件名,组合查询条件
       switch($auth){
           //edit
@@ -528,6 +540,7 @@ class IndexController extends \think\Controller
       //得到模板文件中需显示的内容
       //使用模型Issinfo
      $issSet = new IssinfoModel; 
+     //$issSet->patinfo;
           
      // 记录总数
      $numTotal = $issSet->where($map)->count();
@@ -535,9 +548,11 @@ class IndexController extends \think\Controller
      // 查出所有的用户并分页，根据“strOrder”排序，前端页面显示的锚点（hash值）为$fragment，设定分页页数变量：“pageTotalNum”
      // 带上每页显示记录行数$totalTableRows，实现查询结果分页显示。
      $issPatTotal = $issSet->where($map)
+                            //->patinfo
                             ->order($strOrder)
                             ->paginate($issPatTableRows,false,['type'=>'bootstrap','var_page' => 'pageTotalNum',
                             'query'=>['issPatTableRows'=>$issPatTableRows]]);
+     
      // 获取分页显示
      $pageTotal = $issPatTotal->render();
      
@@ -567,6 +582,7 @@ class IndexController extends \think\Controller
               'searchPatStatus'=>$searchPatStatus,
               'searchPatType'=>$searchPatType,
               'searchWriter'=>$searchWriter,
+              'searchPatStatus'=>$searchPatStatus,
         
               // 表格排序信息
               'sortName'=>$sortName,
@@ -630,10 +646,11 @@ class IndexController extends \think\Controller
         $iss=array('id'=>0,'topic'=>'','abstract'=>'','status'=>'申报新增','statusdescription'=>0);
         //查询当前用户已上传的所有附件信息
         $att= AttinfoModel::all(['attmap_id'=>0,'uploader'=>$this->username,'rolename'=>'edit','deldisplay'=>1]);
-        $pat=array('id'=>0,'topic'=>'','patowner'=>'','otherinventor'=>'','inventor'=>'');
+        $pat=array('id'=>0,'topic'=>'','patowner'=>'','otherinventor'=>'','inventor'=>'','summary'=>'','keyword'=>'','pattype'=>'',);
         $patType=0;
+        $issRd=0;
       }else{
-        //得到模板文件中需显示的内容
+        //得到模板文件中需显示的iss信息
         $iss=IssinfoModel::get($request->param('issId'));
         // 利用模型issinfo.php中定义的一对多方法“attachments”得到iss对应的attachments信息
         $att=$iss->attachments;
@@ -641,6 +658,13 @@ class IndexController extends \think\Controller
         $pat=$iss->issmap;
         // 得到iss对应的pat的'pattype'数据库字段值
         $patType=$iss->issmap->getData('pattype');
+        
+        //利用模型issinfo.php中定义的一对多方法“issrecords”得到iss对应的issrecord信息,找出‘审核、审批、修改’意见
+        //$issRd=collection($iss->issrecords)->visible(['id','rolename','act']);
+        
+        //利用模型issrecord.php中定义的issChRdRecent()方法，得到issId对应issue的最新‘审核、审批、修改’意见
+        $issRdMdl=new IssrecordModel;
+        $issChRd=$issRdMdl->issChRdRecent($request->param('issId'));
       }
       
       //向前端模板中的变量赋值
@@ -655,7 +679,7 @@ class IndexController extends \think\Controller
         'numAtt'=>count($att),
         'pat'=>$pat,
         'patType'=>$patType,
-        
+        'issChRd'=>$issChRd
       ]);
       //return $this->fetch($tplFile);
       return view('index'.DS.'issPatAuthSingle'.DS.$tplFile);
@@ -1886,9 +1910,12 @@ class IndexController extends \think\Controller
                 'addnewdate' => $this->now,//待取消
                 'abstract' => 0,
                 'writer' => $this->username,
+                'executer' => $this->username,
+                'executerchangeto' => '',
+                'executerchangemsg' => '',
                 'dept' => $this->dept,
                 'current_username'=>$this->username,
-                'current_issauthtime'=>json_encode(array('_EDIT'=>$this->now,'_AUDIT'=>$this->now,'_APPROVE'=>$this->now,'_EXECUTE'=>$this->now,'_MAINTAIN'=>$this->now)),//FSM_add
+                'current_issauthtime'=>json_encode(array('_EDIT'=>$this->now)),//FSM_add
                 );
     }
     $issInfo = array(
@@ -1901,6 +1928,9 @@ class IndexController extends \think\Controller
                   'addnewdate' => $iss['addnewdate'],//待取消
                   'abstract' => !empty($request->param('issPatAbstract')) ? $request->param('issPatAbstract') : $iss['abstract'],
                   'writer' => $iss['writer'],
+                  'executer' =>  $iss['executer'],
+                  'executerchangeto' => !empty($request->param('executer')) ? $request->param('executer') : $iss['executerchangeto'],
+                  'executerchangemsg' => !empty($request->param('executeMsg')) ? $request->param('executeMsg') : $iss['executerchangemsg'],
                   'dept' => $iss['dept'],
                   'current_username'=> $iss['current_username'],
                   'current_issauthtime'=>$iss['current_issauthtime'],//FSM_add
@@ -1912,12 +1942,15 @@ class IndexController extends \think\Controller
                     'rolename' => $issAuth,
                     'act' => $issOprt,
                     'actdetail' => '',//FSM_add
+                    'actdetailhtml' => '',//FSM_add
                     'acttime' => $this->now, 
                     'issinfo_id' => $issId,
                     );
       
     if($patId){
         $pat=$patMdl::get($patId);
+        //$patMdl中已定义修改器，此处需要数据表中的原始值。
+        $pat['pattype']=$pat->getData('pattype');
     }else{
         $pat=array(
                 'patnum'=>0,
@@ -1941,8 +1974,9 @@ class IndexController extends \think\Controller
                 'resource'=>0,//FSM_add??
                 'issinfo_id'=>$issId,
                 'issinfo_topic'=>$iss['topic'],
-                'statustime'=>json_encode(array('_PAT1'=>time(),'_PAT2'=>time())),//FSM_add
+                'statustime'=>json_encode(array('_PATS1'=>time(),'_PATS2'=>time())),//FSM_add
                 'milestonetime'=>json_encode(array('authorizetime'=>time(),'rejecttime'=>time())),//FSM_add
+                'addnewdate' => time(),
                 );
     }
     
@@ -1970,7 +2004,7 @@ class IndexController extends \think\Controller
                 'issinfo_topic'=>$pat['issinfo_topic'],
                 'statustime'=>$pat['statustime'],//FSM_add
                 'milestonetime'=>$pat['milestonetime'],//FSM_add
-                'addnewdate' => time(),
+                'addnewdate' => $pat['addnewdate'],
                 );
     
     $patRecord = array(

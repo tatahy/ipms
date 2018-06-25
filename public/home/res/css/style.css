@@ -159,7 +159,7 @@
 
 /* 自定义左边浅蓝色色条，颜色取自bootstrap3的label-info */
 .myedge-left-info{
-	border-left: 3px solid #5bc0de !important;
+	border-left: 5px solid #5bc0de !important;
 	padding:5px 5px 5px 15px !important;
 }
 

@@ -47,12 +47,30 @@ abstract class EditState
   //abstract function submit();
   public function submit()
   {
-    
     $data = $this->_oprtData;
     $issStatus=$data['iss']['info']['status'];
     //确保写入数据库的关键信息无误（前端无法准确给出??）
     $data['iss']['info']['status'] = '待审核';
-    $data['iss']['record']['actdetail']='<p>提交《'.$data['iss']['info']['topic'].'》。等待【审核】。</p><span class="text-info">提交说明：</span><pre>'.$data['iss']['info']['statusdescription'].'</pre>';
+    //$data['iss']['record']['actdetail']='<p>提交《'.$data['iss']['info']['topic'].'》。待【审核】。</p><span class="text-info">提交说明：</span><pre>'.$data['iss']['info']['statusdescription'].'</pre>';
+    $data['iss']['record']['actdetail']='0';
+    //数据表“issrecord”的“actdetailhtml”字段存储结构化的信息（模型“issrecord”设置自动转换为json类型），便于前端组装HTML进行显示。
+    $data['iss']['record']['actdetailhtml']=array(
+                                                'p'=>array(
+                                                        'prefix'=>'提交《'.$data['iss']['info']['topic'].'》',
+                                                        'spanclass'=>'',
+                                                        'spantext'=>'',
+                                                        'nextstage'=>'待【审核】'
+                                                        ),
+                                                'span'=>array(
+                                                        'class'=>'primary',
+                                                        'text'=>'提交说明：',
+                                                        ),
+                                                'pre'=>array(
+                                                        'class'=>'',
+                                                        'text'=>$data['iss']['info']['statusdescription'],
+                                                        )
+                                            );
+    
     $data['pat']['info']['status'] = '内审';
     $data['pat']['record']['actdetail']='《'.$data['pat']['info']['topic'].'》提交内部审查。';
     //已上传附件不可删除
@@ -82,7 +100,7 @@ abstract class EditState
     //状态修改
     //$this->_context->setState(AuditContext::$checkingState);
 
-    return '<br>submit结果：<br>提交成功。等待【审核】。';
+    return $data['iss']['record']['actdetailhtml']['p']['nextstage'];
     //动作委托为submit
     //$this->_context->getState()->submit();
   }
@@ -90,8 +108,10 @@ abstract class EditState
   //abstract function update();
   public function update()
   {
-    //已上传附件仍然可删除
+    //有“_EDIT”权限用户已上传附件仍然可删除
     $this->_oprtData['att']['info']['deldisplay']=1;
+    //不更新['iss']['info']['statusdescription']，去掉该字段
+    //unset($this->_oprtData['iss']['info']['statusdescription']);
     //调用IssPatModel的setMdlData()方法，设定所需进行处理的数据。
     $this->_mdl->setMdlData($this->_oprtData);
     //issinfo更新
@@ -106,7 +126,7 @@ abstract class EditState
     //5.attinfo更新
     $msg.=$this->_mdl->attUpdate();
 
-    return '<br>update结果：'.$msg;
+    return '成功。'.$msg;
   }
 
 }

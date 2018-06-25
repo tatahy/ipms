@@ -16,7 +16,7 @@ class FillingState extends EditState
   public function addNew()
   {
     //return '<br>data:'. json_encode($this->_oprtData,JSON_UNESCAPED_UNICODE) . '<br>json_last_error:'. json_last_error();
-    return '<br>无效addNew操作';
+    return '无效操作';
 
   }
 
@@ -27,7 +27,7 @@ class FillingState extends EditState
      //return '<br>delete操作结果：<br>'.json_encode($this->_oprtData, JSON_UNESCAPED_UNICODE) . json_last_error();
      //调用IssPatModel的mdlDelete()方法，进行删除操作，得到操作结果信息。
      $msg=$this->_mdl->mdlDelete();
-     return '<br>delete操作结果：'. $msg;
+     return '成功！'. $msg;
   }
 
 }

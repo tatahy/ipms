@@ -60,40 +60,32 @@ class Patinfo extends Model
     }
     
     //获取器，获取数据表patinfo中pattype字段值，转换为中文输出
-    protected function getPattypeAttr($value)
+    protected function getPattypeAttr($key)
     {
-      $outPut='……';
-      switch($value){
-        case '_PATT1':
-          $outPut='发明专利';
-        break;
-        
-        case '_PATT2':
-          $outPut='实用新型专利';
-        break;
-          
-        case '_PATT3':
-          $outPut='外观设计专利';
-        break;
-        
-        case '_PATT4':
-          $outPut='软件版权';
-        break;
-        
-        case '_PATT5':
-          $outPut='著作权';
-        break;
-        
-        case '_PATT6':
-          $outPut='集成电路图';
-        break;
-        
-        default:
-          $outPut=$value;
-        break;
-        
+      $value=$key;
+      $patType = array(
+                '_PATT1'=>'发明专利','_PATT2'=>'实用新型专利','_PATT3'=>'外观设计专利','_PATT4'=>'软件版权',
+                '_PATT5'=>'著作权','_PATT6'=>'集成电路图','0'=>'……'
+                );
+      if(array_key_exists($key,$patType)){
+        $value = $patType[$key];
       }
-      return $outPut;
+      return $value;
+    }
+    
+    //修改器，修改存入数据表patinfo中pattype字段值，转换为类型编码
+    protected function setPattypeAttr($key)
+    {
+      $value=$key;
+      $patType = [
+                '发明专利'=>'_PATT1','实用新型专利'=>'_PATT2','外观设计专利'=>'_PATT3','软件版权'=>'_PATT4',
+                '著作权'=>'_PATT5','集成电路图'=>'_PATT6','……'=>'0',
+                ];
+      if(array_key_exists($key,$patType)){
+        $value = $patType[$key];
+      }
+      return $value;
+      
     }
     
     //获取器，获取数据表patinfo中status字段值，转换为中文输出，待考虑是否采用？？

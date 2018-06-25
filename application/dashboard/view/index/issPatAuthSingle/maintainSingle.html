@@ -10,7 +10,16 @@
 	<div id="divPatInfo" class="resetHide myFieldset">	
 	
 	{switch name="$iss.status"}
-    	{case value="准予续费"}
+    	{case value="否决申报|专利授权|专利驳回|放弃续费|续费授权"}
+		<!-- //无 -->
+		<div ></div>
+		<form action="" id="fmPat">
+			<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
+			<input id="patTopic" name="patTopic" value="{$pat.topic}" type="text" class="sr-only">	
+		</form>
+		{/case}
+		
+		{case value="准予续费"}
 		<div class="myLegend"><span class="label label-warning">专利续费信息</span></div>		
 		<form action="" id="fmPat">
 			<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
@@ -115,7 +124,7 @@
 		</form>
 		{/case}
 		
-    	{default /}
+    	{case value="申报复核"}
 		<div class="myLegend"><span class="label label-warning">专利申报信息</span></div>		
 		<form action="" id="fmPat">
 			<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
@@ -171,6 +180,7 @@
 			</div>
 			</div>
 		</form>
+		{/case}
 	{/switch}	
 	</div>	
 {/block}
@@ -184,26 +194,41 @@
 
 <div class="myFieldset">
 
-{switch name="$iss.status"}
+{switch name="iss.status"}
     {case value="否决申报|专利授权|专利驳回|放弃续费|续费授权"}
 	<!-- //无 -->
-	<form action="" id="fmIssPat">
-		<!-- // class="sr-only" 仅源代码文件中显示-->
-		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
-		<input id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" class="sr-only">
-			
-	</form>
+	<div ></div>
 	{/case}
 	
 	{case value="申报提交"}
 		<!-- //授权、驳回、修改 -->
-	
 	<div class="myLegend"><span class="label label-warning">申报维护</span></div>
-	<form action="" id="fmIssPat" >
-		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
-		<input id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" class="sr-only">		
 	
+	{/case}
+	
+	{case value="续费提交"}
+		<!-- //授权、驳回 -->
+	
+	<div class="myLegend"><span class="label label-warning">续费维护</span></div>
+	{/case}
+	
+	{case value="申报复核|准予续费"}
+	<div class="myLegend"><span class="label label-warning">申报维护</span></div>
+	{/case}
+    
+{/switch}
+
+	<form action="" id="fmIssPat">
+		<!-- // class="sr-only" 仅源代码文件中显示-->
+		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
+		<input name="issStatus" value="{$iss.status}" type="text" class="sr-only">
+		<input id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" class="sr-only">
+
+
+		<!-- //授权、驳回、修改 -->
 		<div class="row myRow">
+		{switch name="iss.status"}
+			{case value="申报提交"}
 			<div class="form-group col-sm-4">
 				<label for="maintainResult">申报结果<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 				<select id="maintainResult" class="empty-check form-control" name="maintainResult" style="font-size:100%;">
@@ -213,24 +238,8 @@
 					<option class="text-primary bg-info" value="_IMPROVE">修改</option>
 				</select>
 			</div>
-		
-			<div id="divMaintainMsg" class="resetHide form-group col-sm-8 ">
-				<label for="maintainMsg">具体原因/内容<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<textarea class="empty-check form-control" rows="5" id="maintainMsg" name="maintainMsg" type="text" placeholder="请填入具体的原因/内容" required></textarea>
-			</div>
-		</div>		
-		
-	</form>
-	{/case}
-	
-	{case value="续费提交"}
-		<!-- //授权、驳回 -->
-	
-	<div class="myLegend"><span class="label label-warning">续费维护</span></div>
-	<form action="" id="fmIssPat" >	
-		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
-		<input id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" class="sr-only">		
-		<div class="row myRow">
+			{/case}
+			{case value="续费提交"}
 			<div class="form-group col-sm-4">
 				<label for="maintainResult">续费结果<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 				<select id="maintainResult" class="empty-check form-control" name="maintainResult" style="font-size:100%;">
@@ -239,21 +248,15 @@
 					<option class="text-danger bg-danger" value="_REJECT">驳回</option>
 				</select>
 			</div>
-		
-			<div id="divMaintainMsg" class="resetHide form-group col-sm-8 ">
-				<label for="maintainMsg">具体原因/内容<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<textarea class="empty-check form-control" rows="5" id="maintainMsg" name="maintainMsg" type="text" placeholder="请填入具体的原因/内容" required></textarea>
+			
+			{/case}
+			{case value="申报复核"}
+			<div class="form-group col-sm-6 myedge-left-info">
+				<label class="control-label" for="">事务审批/修改意见</label>
+				<pre>{$issChRd}</pre>
+			
 			</div>
-		</div>
-	</form>
-	{/case}
-	
-	{case value="申报复核|准予续费"}
-	<div class="myLegend"><span class="label label-warning">申报维护</span></div>
-	<form action="" id="fmIssPat" >
-		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
-		<input id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" class="sr-only">		
-		<div class="row myRow">
+			
 			<div class="form-group col-sm-4">
 				<label for="maintainResult">选择<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 				<select id="maintainResult" class="empty-check form-control" name="maintainResult" style="font-size:100%;">
@@ -262,37 +265,35 @@
 					<option class="text-primary bg-info" value="_REVIEW">复核修改</option>
 				</select>
 			</div>
-		
-			<div id="divMaintainMsg" class="resetHide form-group col-sm-8 ">
-				<label for="maintainMsg">简要说明<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-				<textarea class="empty-check form-control" rows="5" id="maintainMsg" name="maintainMsg" type="text" placeholder="请填入简要的原因/内容" required></textarea>
+			{/case}
+			{case value="准予续费"}
+			<div class="form-group col-sm-4">
+				<label for="maintainResult">选择<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<select id="maintainResult" class="empty-check form-control" name="maintainResult" style="font-size:100%;">
+					<option value="0" class="text-warning bg-warning" >……</option>
+					<option class="text-danger bg-danger" value="_APPLY">提交申报</option>
+					<option class="text-primary bg-info" value="_REVIEW">复核修改</option>
+				</select>
 			</div>
-		</div>
-		
-		
-	</form>
-
-	{/case}
-	
-	{case value="准予续费"}
-		<!-- //无 -->
-	<form action="" id="fmIssPat">
-		<!-- // class="sr-only" 仅源代码文件中显示-->
-		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
-		<input id="issTopic" name="issTopic" value="{$iss.topic}" type="text" class="sr-only">
+			{/case}
+		{/switch}
 			
-	</form>
-	{/case}
+			{notin name="iss.status" value="否决申报,专利授权,专利驳回,放弃续费,续费授权"}
+			<div id="divMaintainMsg" class="resetHide form-group col-sm-8 ">
+				<label for="statusDescription">原因/说明<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<textarea class="empty-check form-control" rows="5" id="statusDescription" name="statusDescription" type="text" placeholder="请填入简要的原因/说明" required></textarea>
+			</div>
+			{/notin}
+		</div>
 	
-    
-{/switch}
+	</form>
 	
 </div>
 {/block}
 
 {block name="btn"}
 
-{switch name="$iss.status"}
+{switch name="iss.status"}
     {case value="否决申报|专利授权|专利驳回|放弃续费|续费授权"}
 		<button type="submit" id="btnClose" class="btn btn-primary  btn-sm" data-oprt="_CLOSE" data-topic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-off"></span>完结</button>
 		
@@ -329,13 +330,13 @@
 $(document).ready(function(){	
 	$('.resetHide').hide();
 	
-	// 单选框maintainResult的change事件，出现maintainMsg输入框等。
+	// 单选框maintainResult的change事件，出现statusDescription输入框等。
 	$('#maintainResult').change(function(){	
 		//恢复到default状态
 		$('.resetHide').hide();
 		$(this).removeClass('label label-danger label-primary label-success');
 		//去掉'empty-check'，取消非空检查
-		$('#maintainMsg').removeClass('empty-check');
+		$('#statusDescription').removeClass('empty-check');
 		$('#divPatAuthInfo').children().find('.form-control').removeClass('empty-check');
 		$('#divPatInfo').show();		
 		
@@ -344,8 +345,8 @@ $(document).ready(function(){
 				$('#divMaintainMsg').show();
 				$('#btnImprove').show();
 				$(this).addClass('label label-primary');
-				//#maintainMsg增加'empty-check'，列入非空检查
-				$('#maintainMsg').addClass('empty-check');
+				//#statusDescription增加'empty-check'，列入非空检查
+				$('#statusDescription').addClass('empty-check');
 				$('#divPatInfo').hide();
 			break;
 			
@@ -354,7 +355,7 @@ $(document).ready(function(){
 				$('#btnReview').show();
 				$(this).addClass('label label-primary');
 				//隐藏并取消非空检查
-				$('#maintainMsg').removeClass('empty-check').parent().hide();
+				$('#statusDescription').removeClass('empty-check').parent().hide();
 				//增加'empty-check'，列入非空检查
 				$('#divPatAuthInfo').show().children().find('.form-control').addClass('empty-check').prop('readonly',false);
 			break;
@@ -365,7 +366,7 @@ $(document).ready(function(){
 				$('#btnApply').show();
 				$(this).addClass('label label-danger');
 				//出现，增加'empty-check'，列入非空检查，只读
-				$('#maintainMsg').addClass('empty-check');
+				$('#statusDescription').addClass('empty-check');
 				$('#divPatAuthInfo').show().children().find('.form-control').addClass('empty-check').prop('readonly',true);
 			break;
 			
@@ -377,7 +378,7 @@ $(document).ready(function(){
 				$('#divPatAuthInfo').show().children().find('.form-control').addClass('empty-check');
 				$('#divPatRenewAuthInfo').show().children().find('.form-control').addClass('empty-check');
 				//隐藏并取消非空检查
-				$('#maintainMsg').removeClass('empty-check');
+				$('#statusDescription').removeClass('empty-check');
 				$('#divPatRejectInfo').hide().children().find('.form-control').removeClass('empty-check');
 				$('#divPatRenewRejectInfo').hide().children().find('.form-control').removeClass('empty-check');
 				//以yyyy-mm-dd格式显示系统当前日期
@@ -391,7 +392,7 @@ $(document).ready(function(){
 				$('#btnReject').show();
 				$(this).addClass('label label-danger');
 				//出现，增加'empty-check'，列入非空检查
-				$('#maintainMsg').addClass('empty-check');
+				$('#statusDescription').addClass('empty-check');
 				$('#divPatRejectInfo').show().children().find('.form-control').addClass('empty-check');
 				$('#divPatRenewRejectInfo').show().children().find('.form-control').addClass('empty-check');
 				//隐藏并取消非空检查
@@ -406,8 +407,8 @@ $(document).ready(function(){
 			case '_CLOSE':
 				$('.resetHide').hide();
 				$(this).removeClass('label label-danger label-primary label-success');
-				//#maintainMsg去掉'empty-check'，取消非空检查
-				$('#maintainMsg').removeClass('empty-check');
+				//#statusDescription去掉'empty-check'，取消非空检查
+				$('#statusDescription').removeClass('empty-check');
 			break;
 			
 			default:

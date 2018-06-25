@@ -44,14 +44,59 @@ abstract class MaintainState{
   abstract function reject();
   abstract function addRenew();
   public function close(){
+    $data=$this->_oprtData;
     //写入数据库的信息
-    $this->_oprtData['iss']['info']['status'] = '完结';
+    $data['iss']['info']['status'] = '完结';
+    $data['iss']['info']['statusdescription'] = '专利事务完结。';
+    //$data['iss']['record']['actdetail']='<p>《'.$data['iss']['info']['topic'].'》<span class="label label-default">完结</span></p>';
+    $data['iss']['record']['actdetail']='0';
+    //数据表“issrecord”的“actdetailhtml”字段存储结构化的信息（模型“issrecord”设置自动转换为json类型），便于前端组装HTML进行显示。
+    $data['iss']['record']['actdetailhtml']=array(
+                                                'p'=>array(
+                                                        'prefix'=>'《'.$data['iss']['info']['topic'].'》',
+                                                        'spanclass'=>'default',
+                                                        'spantext'=>'完结',
+                                                        'nextstage'=>''
+                                                        ),
+                                                'span'=>array(
+                                                        'class'=>'',
+                                                        'text'=>'',
+                                                        ),
+                                                'pre'=>array(
+                                                        'class'=>'',
+                                                        'text'=>'',
+                                                        )
+                                            );
     //调用IssPatModel的setMdlData()方法，设定要进行处理的数据。
-    $this->_mdl->setMdlData($this->_oprtData);
-    return '<br>close:'.$this->_mdl->test();
+    $this->_mdl->setMdlData($data);
+    
+    //数据库模型操作方法
+    //iss更新
+    $this->_mdl->issUpdate();
+    //iss新增
+    $this->_mdl->issRdCreate();
+     
     //状态修改
-    $this->_context->setState(MaintainContext::$closedState);
-    return '<br>close结果：';
+    //$this->_context->setState(MaintainContext::$closedState);
+    return '完结关闭';
+  }
+  
+  //数据库模型操作
+  protected function _oprtMdl(){
+    //1.patinfo更新
+    $this->_mdl->patUpdate();
+
+    //2.patrecord新增
+    $this->_mdl->patRdCreate();
+
+    //3.issinfo更新
+    $this->_mdl->issUpdate();
+
+    //4.issrecord新增
+    $this->_mdl->issRdCreate();
+
+    //5.attinfo更新
+    $this->_mdl->attUpdate();
   }
   
 }
