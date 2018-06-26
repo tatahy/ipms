@@ -53,32 +53,41 @@
 	
 	
 	<div class="row myRow">
-		{neq name="$iss.status" value="变更申请"}	
-		{notempty name="issChRd"}
-			<div class="form-group col-sm-6">
-				<label class="control-label">修改完善意见</label>
-				<pre class="myedge-left-info" style="padding:0px;border:none;">{$issChRd}</pre>
-			</div>
-		{/notempty}
-		
-		{neq name="iss.statusdescription" value="0"}
 		<div class="form-group col-sm-6">
+		{switch name="iss.status"}
+		{case value="拟续费"}
+			<label class="control-label">续费说明</label>
+			<pre class="myedge-left-info" style="padding:0px;border:none;">{$iss.statusdescription}</pre>
+		{/case}
+		{case value="变更申请"}
+			<label class="control-label">修改完善意见</label>
+			<pre class="myedge-left-info" style="padding:0px;border:none;">{$issChRd}</pre>
+		{/case}
+		{case value="审核通过|审核未通过"}
 			<label class="control-label">审核意见</label>
 			<pre class="myedge-left-info" style="padding:0px;border:none;">{$iss.statusdescription}</pre>
+		{/case}
+			
+		{default /}
+		
+		{/switch}
 		</div>
-		{/neq}
-		{/neq}
+		
+		{eq name="iss.status" value="拟续费"}
+		<div class="form-group col-sm-3">
+			<label for="issMapType">续费截止时间</label>
+			<span class="label label-danger">{$pat.renewdeadlinedate}</span>
+        </div>
+		{/eq}
 	
-		<div class="form-group col-sm-4">
-		<label for="approveResult">结果<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+		<div class="form-group col-sm-3">
+		<label for="approveResult">审批结果<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 		<select id="approveResult" class="empty-check form-control" name="approveResult" style="font-size:100%;">
 			<option value="0" class="text-warning bg-warning" >……</option>
 		{in name="$iss.status" value="拟续费,变更申请"}
 			<option class="text-success bg-success" value="_PERMIT">批准</option>
 			<option class="text-danger bg-danger" value="_VETO">否决</option>
 			
-					
-					
 		{else/}
 			<option class="text-success bg-success" value="_PERMIT">批准</option>
 			<option class="text-danger bg-danger" value="_VETO">否决</option>
@@ -88,6 +97,7 @@
 		</select>
 		</div>
 		
+		{neq name="iss.status" value="拟续费"}
 		<div id="divExecuter" class="resetHide form-group col-sm-8">
 			<label for="executer">选定执行人<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
 				<!-- <input class="form-control" id="operator" name="operator" value="" type="text" required="true"> -->
@@ -96,8 +106,8 @@
 				<option value="1">1</option>
 					
 			</select>
-			
 		</div>
+		{/neq}
 		
 		<div id="divApproveMsg" class="resetHide form-group col-sm-8 ">
 			<label for="attName">具体意见<span class="glyphicon glyphicon-asterisk text-danger"></span></label>

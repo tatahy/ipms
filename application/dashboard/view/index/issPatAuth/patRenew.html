@@ -32,7 +32,7 @@
 						<td>{$vo.authrejectdate}</td>
 						<td>{$vo.renewdeadlinedate}</td>
 						<td class="btnOprt">			
-								<a href="#modalPatRenew" data-toggle="modal" data-oprt="_ADDRENEW" data-patId="{$vo.id}" data-patTopic="{$vo.topic}"><span class="glyphicon glyphicon-edit text-info"></span>_续费报告</a>
+								<a href="##modalIssPatAuthSingle" data-toggle="modal" data-oprt="_ADDRENEW" data-patId="{$vo.id}" data-issue-authority="maintain" data-patTopic="{$vo.topic}"><span class="glyphicon glyphicon-edit text-info"></span>_续费报告</a>
 						</td>
 					</tr>
 					{/volist}					
@@ -58,8 +58,8 @@
 
 </div>
 
-<!-- Modal "modalPatRenew" -->
-<div class="modal fade" id="modalPatRenew" role="dialog">
+<!-- Modal "#modalIssPatAuthSingle" -->
+<div class="modal fade" id="modalIssPatAuthSingle" role="dialog">
     <div class="modal-dialog modal-lg">
       <!-- Modal content-->
       	<div class="modal-content">
@@ -70,69 +70,23 @@
         </div>
 		
         <div class="modal-body">
-			<div class="myFieldset">
-				<div class="myLegend" ><span class="label label-warning">续费专利概要</span></div>
-				<div class="row myRow-noform-group">
-					<div class="bs-callout bs-callout-default">
-						<h4 id="h4Topic">名称：</h4>
-						<p id="pPatInfo">//</p>
-						<footer>
-							<div class="row">
-								<div class="col-sm-4">
-									<a id="aDetail" href="#" target="_blank" data-toggle="tooltip" title="专利信息">查看详情</a>;&nbsp;状态：
-									<a id="aProcess" href="#" target="_blank" data-toggle="tooltip" title="过程记录"></a>
-								</div>
-								<div id="divPatAuthNum" class="col-sm-4">授权编号：</div>
-								<div id="divSubmitDate" class="col-sm-4">提交时间：</div>
-							</div>
-						</footer>
-					</div>
-				</div>
-			</div>	
-			
-			<div class="myFieldset">
-				<div class="myLegend" ><span class="label label-warning">续费事务信息</span></div>
-					
-				<form id="fmIssPatRenew" action="" method="" role="form" enctype="multipart/form-data">
-					<input id="patId" name="patId" value="" type="text" class="sr-only">
-					<div class="row myRow">
-						<div class="form-group col-sm-4">
-							<label class="control-label" for="issPatTopic">事务标题<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-							<input class="form-control empty-check" id="issPatTopic" name="issPatTopic" value="" type="text" placeholder="关于XX专利的YY申请" required>
-							<!-- <textarea class="form-control" rows="2" id="issPatTopic" name="issPatTopic" placeholder="填写事务的主要内容，字数不超过100字。" required></textarea> -->
-						</div>
-					
-						<div class="form-group col-sm-3">
-							<label for="issMapType">事务类型issMapType</label>
-							<select class="form-control" id="issMapType" name="issMapType" readonly="true">
-								<option value="_ISST_PAT2">专利授权到期续费</option>
-							</select>
-            </div>
-					</div>
-				
-					<div class="row myRow">
-						<div class="form-group col-sm-8">
-							<label class="control-label" for="issPatAbstract">事务简介abstract<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
-							<textarea class="form-control empty-check" rows="5" id="issPatAbstract" name="issPatAbstract" placeholder="填写事务的主要内容，字数不超过100字。" required></textarea>
-						</div>
-					</div>
-				</form>
-			</div>
+			<!-- // 单个issPatRenew增删改查页面显示位置，需load其他模板文件的div-->
+			<div id="divIssPatRenewSingle_load"><h4 style="margin:50px;">加载中……</h4></div>
 		</div>
-		<div class="modal-footer">
-        	<div class="pull-left">
-				<button id="btnAddRenew" class="btn btn-primary btn-sm" data-oprt="_ADDRENEW" data-btnLabel="label-primary"><span class="glyphicon glyphicon-info-sign"></span>新增续费事务</button>
-			</div>
-			<div  class="pull-right">
-				<input id="btnReset" type="button" class="btn btn-primary btn-sm" value="重置">
-				<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
-			</div>
+		<!-- <div class="modal-footer"> -->
+        	<!-- <div class="pull-left"> -->
+				<!-- <button id="btnAddRenew" class="btn btn-primary btn-sm" data-oprt="_ADDRENEW" data-btnLabel="label-primary"><span class="glyphicon glyphicon-info-sign"></span>新增续费事务</button> -->
+			<!-- </div> -->
+			<!-- <div  class="pull-right"> -->
+				<!-- <input id="btnReset" type="button" class="btn btn-primary btn-sm" value="重置"> -->
+				<!-- <input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消"> -->
+			<!-- </div> -->
           
-        </div>
+        <!-- </div> -->
 		</div>
 	</div>
 </div>
-<!--/ Modal "modalPatRenew" -->
+<!--/ Modal "#modalIssPatAuthSingle" -->
 
 <script>
 $(document).ready(function(){
@@ -161,37 +115,23 @@ $(document).ready(function(){
 	// 表格中<td class="btnOprt">里a标签的click事件,Ajax处理数据引入内容
 	$(".btnOprt a").click(function(){
 		
-		var patId=$(this).attr('data-patId');
-		var topic=$(this).attr('data-patTopic');
-		var str=$(this).html();
+		var patId=$(this).data('patid');
+		var topic='关于“'+$(this).data('pattopic')+'”的授权续费申报';
+		var auth=$(this).data('issue-authority');
+		var aHtml=$(this).html();
 		
-		$.post('issPatOprt',
+		$.post('issPatAuthSingle',
 			{
-				'oprt':'_ADDRENEW',
+				'issId':0,
 				'patId':patId,
-				'returnType':'_JSON',
+				'auth':auth,
+				'oprt':'_ADDRENEW',
 			},
+			//得到后端返回的data(模板文件)
 			function(data){
-			// 后端返回的data为json格式
-				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务</span>：<strong>【'+str+'】</strong>《关于专利“'+data.topic+'”的续费申请》');
-			
-				$('#patId').val(patId);
-				$('#issPatTopic').val('关于专利“'+data.topic+'”的续费申请');
-				$('#issMapId').val(data.id);
-				$('#numId').val(data.id);
-				$('#addNewDate').val(data.today);
-				$('#writer').val(data.username);
-				$('#dept').val(data.deptMaintainer);
-				$('#executer').val('维护人');
-				
-				//bs-callout内容赋值
-				$('#h4Topic').html('专利名称：<strong>'+data.topic+'</strong>');
-				$('#pPatInfo').html('撰写人：'+data.author+'；发明人：'+data.inventor+'；所属部门：'+data.dept+'；<br>专利类型：'+data.pattype+'<br>授权时间：'+data.authrejectdate+'；<br>到期时间：'+data.renewdeadlinedate+'；<br>简介：'+data.summary);
-				$('#aDetail').attr('href','{$home}/patent/index/patinfo/id/'+data.id);
-				$('#aProcess').html(data.status).attr('href','{$home}/patent/index/patrecords/id/'+data.id);
-				$('#divPatAuthNum').html('授权编号：'+data.patauthnum);
-				$('#divSubmitDate').html('提交时间：'+data.submitdate);
-				
+				//在本文件#divIssPatRenewSingle_load处渲染显示data
+				$('#divIssPatRenewSingle_load').html(data);
+				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务：</span>【<strong>'+aHtml+'</strong>】《'+topic+'》');
 				
 			}
 		);

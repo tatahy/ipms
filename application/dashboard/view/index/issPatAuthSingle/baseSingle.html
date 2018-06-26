@@ -29,7 +29,7 @@
 				<li>简介：{$iss.abstract}</li>
 				<li>状态：
 					<a href="{$home}/issue/index/issrecords/id/{$iss.id}" target="_blank" data-toggle="tooltip" title="过程记录">
-				{switch name="$iss.status"}
+				{switch name="iss.status"}
     				{case value="专利授权|续费授权"}
 					<span class="label label-success">{$iss.status}</span>
 					{/case}
@@ -217,15 +217,14 @@
 			
 		<!-- // 按钮-->
 		<div class="pull-left">
-		
-{block name="btn"}{/block}
+		{block name="btn"}{/block}
 		</div>
 		<div  class="pull-right">
 			<input id="btnReset" type="button" class="btn btn-primary btn-sm" value="重置">
 			<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
 		</div>
 	</div>
-</div>
+	</div>
 </div>
 
 
@@ -329,7 +328,7 @@ $(document).ready(function(){
 			//bootstap下用.data('*')获得data-*属性值,必须全小写
 			var oprt=$(this).data('oprt');
 			var topic=$(this).data('topic');
-		
+		console.log(topic);
 			if(oprt=='_ADDNEW'){
 				topic=$('#issPatTopic').val();
 			}

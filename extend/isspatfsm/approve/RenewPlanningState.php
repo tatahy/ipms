@@ -25,7 +25,7 @@ class RenewPlanningState extends ApproveState{
                                                         'prefix'=>'《'.$data['iss']['info']['topic'].'》【审批】结果：',
                                                         'spanclass'=>'success',
                                                         'spantext'=>'准予续费',
-                                                        'nextstage'=>'待【执行】'
+                                                        'nextstage'=>'待【续费提交】'
                                                         ),
                                                 'span'=>array(
                                                         'class'=>'',

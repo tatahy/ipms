@@ -66,25 +66,25 @@ class ApplyCreatingState extends EditState
                                                             'text'=>'',
                                                             )
                                                 );
-        //调用IssPatModel的setMdlData()方法，设定所需进行处理的数据。
-        $this->_mdl->setMdlData($data);
-        $this->_mdl->issRdCreate();
+    //调用IssPatModel的setMdlData()方法，设定所需进行处理的数据。
+    $this->_mdl->setMdlData($data);
+    $this->_mdl->issRdCreate();
     
-        //5.attinfo更新
-        //确保使用的是create的issId
-        $data['iss']['id']=$iss->id;
-        //附件可删除
-        $data['att']['info']['deldisplay']=1;
+    //5.attinfo更新
+    //确保使用的是create的issId
+    $data['iss']['id']=$iss->id;
+    //附件可删除
+    $data['att']['info']['deldisplay']=1;
         
         
-        //调用IssPatModel的setMdlData()方法，设定所需进行处理的数据。
-        $this->_mdl->setMdlData($data);
-        $this->_mdl->attUpdate();
+    //调用IssPatModel的setMdlData()方法，设定所需进行处理的数据。
+    $this->_mdl->setMdlData($data);
+    $this->_mdl->attUpdate();
     
-        //状态修改
-        //$this->_context->setState(EditContext::$fillingState);
+    //状态修改
+    //$this->_context->setState(EditContext::$fillingState);
     
-        return '成功！'.$data['iss']['record']['actdetailhtml']['p']['nextstage'];
+    return '成功！'.$data['iss']['record']['actdetailhtml']['p']['nextstage'];
         //return array('msg'=>$msg,'topic'=>$iss->topic,'patId'=>$pat->id,'issId'=>$iss->id));
   }
 

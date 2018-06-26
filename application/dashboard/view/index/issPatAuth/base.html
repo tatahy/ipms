@@ -291,7 +291,7 @@ $(document).ready(function(){
 		var topic=$(this).attr('data-issTopic');
 		var auth=$(this).attr('data-issue-authority');
 		var aHtml=$(this).html();
-		//向后端“issPatSingle”(TP5中 'issPatSingle'='{$home}/dashboard/index/issPatSingle' )发送数据(后端用于选择返回的模板文件)		
+		//向后端“issPatAuthSingle”(TP5中 'issPatAuthSingle'='{$home}/dashboard/index/issPatAuthSingle' )发送数据(后端用于选择返回的模板文件)		
 		$.post('issPatAuthSingle',
 			{
 				'issId':issId,

@@ -598,20 +598,15 @@ class IndexController extends \think\Controller
     }
     
     //根据前端传来的权限，选择返回前端的模板文件及内容
-    public function issPatAuthSingle(Request $request,$auth='done')
+    public function issPatAuthSingle(Request $request,$oprt='_NONE',$auth='done',$issId=0,$patId=0)
     {
       $this->_loginUser();
       
-      // $oprt接收前端页面传来的oprt值
-      if(!empty($request->param('oprt'))){
-        $oprt=$request->param('oprt');
-      }else{
-        $oprt='_NONE';
-      }
-      
-      if(!empty($request->param('auth'))){
-        $auth=$request->param('auth');
-      }
+      // 接收前端页面传来的值      
+      $oprt=!empty($request->param('oprt'))?$request->param('oprt'):'_NONE';
+      $auth=!empty($request->param('auth'))?$request->param('auth'):'done';
+      $issId=!empty($request->param('issId'))?$request->param('issId'):0;
+      $patId=!empty($request->param('patId'))?$request->param('patId'):0;
       
       //选择模板文件名
       switch($auth){
@@ -642,16 +637,31 @@ class IndexController extends \think\Controller
         
       }
       
-      if($oprt=='_ADDNEW'){
+      
+      
+      if($oprt=='_ADDNEW')
+      {
         $iss=array('id'=>0,'topic'=>'','abstract'=>'','status'=>'申报新增','statusdescription'=>0);
         //查询当前用户已上传的所有附件信息
         $att= AttinfoModel::all(['attmap_id'=>0,'uploader'=>$this->username,'rolename'=>'edit','deldisplay'=>1]);
         $pat=array('id'=>0,'topic'=>'','patowner'=>'','otherinventor'=>'','inventor'=>'','summary'=>'','keyword'=>'','pattype'=>'',);
         $patType=0;
-        $issRd=0;
-      }else{
+        $issChRd=0;
+      }
+      else if($oprt=='_ADDRENEW')
+      {
+        $tplFile='renewSingle';
+        //查询当前用户已上传的所有附件信息
+        $att= AttinfoModel::all(['attmap_id'=>0,'uploader'=>$this->username,'rolename'=>'maintain','deldisplay'=>1]);
+        $pat= PatinfoModel::get($patId);
+        $iss=array('id'=>0,'topic'=>'关于“'.$pat->topic.'”的授权续费申报','abstract'=>'','status'=>'续费新增','statusdescription'=>0);
+        $patType=$pat->getData('pattype');
+        $issChRd=0;
+      }
+      else
+      {
         //得到模板文件中需显示的iss信息
-        $iss=IssinfoModel::get($request->param('issId'));
+        $iss=IssinfoModel::get($issId);
         // 利用模型issinfo.php中定义的一对多方法“attachments”得到iss对应的attachments信息
         $att=$iss->attachments;
         // 利用模型issinfo.php中定义的多态方法“issmap”得到iss对应的pat信息
@@ -1867,7 +1877,7 @@ class IndexController extends \think\Controller
 
     }
     
-    //应用fsm改写
+    //应用fsm实现
   //1.需要前端提供
   //1.1启动fsm必须的参数：$param=array('auth'=>'_EDIT','status'=>'填报','oprt'=>'_ADDNEW');
   //1.2fsm要处理的对象/数据：
@@ -1918,6 +1928,7 @@ class IndexController extends \think\Controller
                 'current_issauthtime'=>json_encode(array('_EDIT'=>$this->now)),//FSM_add
                 );
     }
+    //数据表1：issinfo。各个字段赋值
     $issInfo = array(
                   'topic' => !empty($request->param('issPatTopic')) ? $request->param('issPatTopic') : $iss['topic'],
                   'status' => $iss['status'],
@@ -1935,7 +1946,7 @@ class IndexController extends \think\Controller
                   'current_username'=> $iss['current_username'],
                   'current_issauthtime'=>$iss['current_issauthtime'],//FSM_add
                   );
-
+    //数据表2：issrecord。各个字段赋值
     $issRecord = array(
                     'num' => $iss['issnum'],
                     'username' => $this->username,
@@ -1962,6 +1973,7 @@ class IndexController extends \think\Controller
                 'applyplace'=>0,
                 'patadmin'=>0,
                 'patagency'=>0,
+                'patrenewagency'=>0,
                 'patrenewapplynum'=>0,
                 'patrenewauthnum'=>0,
                 'patowner'=>0,
@@ -1979,7 +1991,7 @@ class IndexController extends \think\Controller
                 'addnewdate' => time(),
                 );
     }
-    
+    //数据表3：patinfo。各个字段赋值
     $patInfo = array(
                 //'patnum'=>0,
                 'topic'=>!empty($request->param('patTopic')) ? $request->param('patTopic') : $pat['topic'],
@@ -1990,6 +2002,7 @@ class IndexController extends \think\Controller
                 'applyplace'=>!empty($request->param('patApplyPlace')) ? $request->param('patApplyPlace') : $pat['applyplace'],
                 'patadmin'=>!empty($request->param('patAdmin')) ? $request->param('patAdmin') : $pat['patadmin'],
                 'patagency'=>!empty($request->param('patAgency')) ? $request->param('patAgency') : $pat['patagency'],
+                'patrenewagency'=>!empty($request->param('patRenewAgency')) ? $request->param('patRenewAgency') : $pat['patrenewagency'],
                 'patrenewapplynum'=>!empty($request->param('patRenewApplyNum')) ? $request->param('patRenewApplyNum') : $pat['patrenewapplynum'],
                 'patrenewauthnum'=>!empty($request->param('patRenewAuthNnum')) ? $request->param('patRenewAuthNum') : $pat['patrenewauthnum'],
                 'patowner'=>!empty($request->param('patOwner')) ? $request->param('patOwner') : $pat['patowner'],
@@ -2006,7 +2019,7 @@ class IndexController extends \think\Controller
                 'milestonetime'=>$pat['milestonetime'],//FSM_add
                 'addnewdate' => $pat['addnewdate'],
                 );
-    
+    //数据表4：patrecord。各个字段赋值
     $patRecord = array(
                     'num' => $pat['patnum'],
                     'status'=>$pat['status'],
@@ -2016,7 +2029,7 @@ class IndexController extends \think\Controller
                     'note' => '',//FSM_add
                     'patinfo_id' => $patId,
                     );
-      
+    //数据表5：attinfo。各个字段赋值  
     $attInfo = array(
                   'num_id' => $iss['issnum'],
                   'name'=>!empty($request->param('attName')) ? $request->param('attName') : '',
@@ -2044,7 +2057,7 @@ class IndexController extends \think\Controller
       $arrAttFileObjStr = array();
       ;
     }
-    //part2：配置状态机参数，组装状态机要处理的数据，
+    //part2：组装状态机要处理的数据，配置状态机参数
     //组装状态机（IssPatFSM）要处理的数据
     $data = array(
       'pat' => array(

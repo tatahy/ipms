@@ -22,10 +22,10 @@ class RenewApprovedState extends MaintainState{
     //数据表“issrecord”的“actdetailhtml”字段存储结构化的信息（模型“issrecord”设置自动转换为json类型），便于前端组装HTML进行显示。
     $data['iss']['record']['actdetailhtml']=array(
                                                 'p'=>array(
-                                                        'prefix'=>'《'.$data['iss']['info']['topic'].'》续费提交',
+                                                        'prefix'=>'《'.$data['iss']['info']['topic'].'》续费提交。',
                                                         'spanclass'=>'',
                                                         'spantext'=>'',
-                                                        'nextstage'=>'。待【续费结果】。'
+                                                        'nextstage'=>'待【续费结果】'
                                                         ),
                                                 'span'=>array(
                                                         'class'=>'',
@@ -57,7 +57,17 @@ class RenewApprovedState extends MaintainState{
     
   }
   public function review(){
-    return '无效操作';
+    //有“_MAINTAIN”权限用户已上传附件仍然可删除
+    $this->_oprtData['att']['info']['deldisplay']=1;
+    $this->_mdl->setMdlData($this->_oprtData);
+    //issinfo更新
+    $msg=$this->_mdl->issUpdate();
+    //patinfo更新
+    $msg.=$this->_mdl->patUpdate();
+    //attinfo更新
+    $msg.=$this->_mdl->attUpdate();
+
+    return '成功。'.$msg;
   }
   public function improve(){
     return '无效操作';
