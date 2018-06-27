@@ -10,9 +10,6 @@ use app\common\validate\Ipvalidate;
 use app\index\model\User as UserModel;
 use app\patent\model\Patinfo as PatinfoModel;
 
-use isspatfsm\IssPatFSM;
-use liftfsm\Client;
-
 class IndexController extends Controller
 {
   public function index(Request $request)
@@ -93,39 +90,15 @@ class IndexController extends Controller
         "</br>";
       //"session:".dump($request->session());
       //--!
-      //$fsm=new IssPatFSM('','ling',0);
-      $fsm = new IssPatFSM();
-      $param = array(
-        'auth' => '_EDIT',
-        'status' => '申报新增',
-        'oprt' => '_DELETE');
-      $data = array(
-        'iss' => array(
-          'id' => 1,
-          'info' => array('abstract' => '也issinfo.abstract'),
-          'record' => array('act' => '由patrecord.act')),
-        'pat' => array(
-          'id' => 3,
-          'info' => array('abstract' => '啊patinfo.abstract'),
-          'record' => array('act' => '哈patrecord.act')),
-        'att' => array(
-          'info'=>array('date&time'=>date('Y-m-d H-i-s',strtotime('+10 day')),'timestamp'=>time()),
-          'arrId' => array(5,2),
-          'arrFileName' => array('name'=>'0-1,2','kk'),
-          'arrFileObjStr' => array('yy','99'))
-        );
-      
+            
       $this->assign([ //在index.html页面通过'destr'输出自定义的信息
         'destr' => $destr . "</br>", 'home' => $request->domain(), 'username' => $username,
         //patent数据
         'numpatadd' => $numpatadd, 'numpatapp' => $numpatapp, 'numpataut' => $numpataut,
         'year' => date('Y'), 
-        'fsm' => $fsm->setFSM($param)->result($data) . '<br>'
-        //'fsm' => '<br>'. json_encode($data,JSON_UNESCAPED_UNICODE) . '<br>json_last_error:'. json_last_error()
         ]);
       //return view();
       return $this->fetch();
-
     }
 
   }
