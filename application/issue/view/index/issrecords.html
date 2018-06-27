@@ -14,7 +14,7 @@
 					<tr>
 						<th class="text-center">序号</th>
 						<th class="text-center">用户</th>
-						<th class="text-center">系统角色</th>
+						<th class="text-center">事务权限</th>
 						<th class="text-center">操作</th>
 						<th>操作说明</th>
 						<th class="text-center">操作时间</th>
@@ -25,7 +25,7 @@
 					<tr class="text-center">
 						<td>{$i}</td>
 						<td>{$vo.username}</a></td>
-						<td>{$vo.rolename}</a></td>
+						<td>【{$vo.rolename}】</a></td>
 						<td>{$vo.act}</td>
 						<td class="text-left">
 						{notempty name="vo.actdetailhtml"}
