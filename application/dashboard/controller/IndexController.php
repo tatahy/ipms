@@ -6,6 +6,7 @@ use think\Request;
 use think\Session;
 use think\View;
 use think\File as FileObj;
+use think\paginator\driver\Bootstrap;
 
 use app\dashboard\model\User as UserModel;
 use app\dashboard\model\Rolety as RoletyModel;
@@ -36,6 +37,8 @@ class IndexController extends \think\Controller
     private $dept = null;
     //用户权限
     private $authArr = array();
+    //登录用户主要信息
+    private $logUser = array();
 
     private $today = null;
 
@@ -49,25 +52,31 @@ class IndexController extends \think\Controller
         $this->log = Session::get('log');
         $this->roles = Session::get('role');
         $this->dept = Session::get('dept');
-        $this->authArr = Session::get('authArr');
+        //$this->authArr = Session::get('authArr');
         $this->today = date('Y-m-d');
         $this->now = date("Y-m-d H:i:s");
+        
+        //取出user的authority字段值
+        $this->authArr = UserModel::get($this->userId)->authority;
+        
+        $this->logUser=array('auth'=>$this->authArr,'username'=>$this->userName,'dept'=>$this->dept);
     }
 
-    // 判断是否为登录用户
+    // 判断是否为登录用户，私有方法
     private function _loginUser()
     {
         //通过$this->log判断是否是登录用户，非登录用户退回到登录页面
-        $this->log = Session::get('log');
+        //$this->log = Session::get('log');
 
         if (1 != $this->log) {
             return $this->error('无用户名或密码，请先登录系统');
-        } else {
-            //取出user的authority字段值
-            $user = new UserModel;
-            $userlg = $user->where('username', $this->userName)->where('pwd', $this->pwd)->find();
-            $this->authArr = $userlg->authority;
-        }
+        } 
+        //else {
+//            //取出user的authority字段值
+//            $user = new UserModel;
+//            $userlg = $user->where('username', $this->userName)->where('pwd', $this->pwd)->find();
+//            $this->authArr = $userlg->authority;
+//        }
     }
 
     public function index(Request $request, IssinfoModel $issMdl, $auth = '')
@@ -80,51 +89,25 @@ class IndexController extends \think\Controller
 
         // $auth接收前端页面传来的auth值,表示rolename（映射“用户组名”）
         $auth = !empty($request->param('auth'))?$request->param('auth'):'done';
+        
+        //调用issinfo模型定义查询方法issPatProcess()得到查询结果数据集
+        $num=$issMdl->issPatProcess($this->logUser,'_NUM');
 
-        //调用模型Issinfo中定义的issPatNum($useId[,$auth])方法得到对应的issPat数量
-        $numIssPat = $issMdl->issPatNum($this->userId);
-
-        $numIssPro = $issMdl::where('issmap_type', 'like', '%_ISST_PRO%')->count();
-        $numIssThe = $issMdl::where('issmap_type', 'like', '%_ISST_THE%')->count();
+        $numIssPro = $issMdl::where('issmap_type', 'like', '%'.'_PRO'.'%')->count();
+        $numIssThe = $issMdl::where('issmap_type', 'like', '%'.'_THE'.'%')->count();
 
         // 模板变量赋值
-        $this->assign(['home' => $request->domain(), 'username' => $this->userName, 'numIssPat' => $numIssPat, 'numIssPro' => $numIssPro,
-            'numIssThe' => $numIssThe, 'year' => date('Y')]);
-        //return view();
+        $this->assign([
+            'home' => $request->domain(), 
+            'username' => $this->userName, 
+            'numIssPat' => $num['todo'], 
+            'numIssPro' => $numIssPro,
+            'numIssThe' => $numIssThe, 
+            'year' => date('Y')
+            ]);
+
         // 模板输出
         return $this->fetch();
-    }
-
-    // 根据前端post的role返回对应的模板文件，role的可能值：“#writer”，“#reviewer”,“#approver”,“#operator”……
-    // 对应的模板文件名：writer.html reviewer.html approver.html operator.html
-    public function role(Request $request)
-    {
-        $this->_loginUser();
-        //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
-
-        // $role接收前端页面传来的role值，第一位是“#”，需去除
-        if (!empty($request->param('role'))) {
-            $role = substr($request->param('role'), 1);
-        } else {
-            $role = $this->roles[0];
-        }
-
-        // $issType接收前端页面传来的issType值
-        //if(!empty($request->param('issType'))){
-        //        $issType=$request->param('issType');
-        //      }else{
-        //          $issType='_PATENT';
-        //      }
-
-        $destr = "请求方法:".$request->method()."</br>";
-
-        $this->assign([ //在usercenter.html页面输出自定义的信息
-            //在index.html页面通过destr输出自定义的信息
-        'destr' => $destr."</br>", 'home' => $request->domain(), 'role' => $role, ]);
-        //return $this->fetch()与view()，有区别？？view()能正常显示html文件内容，$this->fetch()显示的是添加转义字符后的html文件。？？
-        //return $this->fetch('dashboard'.DS.'pat'.DS.$role);
-        //return view('dashboard'.DS.'pat'.DS.$role);
-        return view($role);
     }
 
     //上传附件文件到temp目录
@@ -313,6 +296,165 @@ class IndexController extends \think\Controller
         //return ':)<br> issthe 模块开发中……';
 
     }
+    
+    public function issPat2(Request $request, IssinfoModel $issMdl, $auth = 'done', $issId = '')
+    {
+        $this->_loginUser();
+
+        // $issId接收前端页面传来issId值
+        if (!empty($request->param('id'))) {
+            $issId = $request->param('id');
+        }
+        
+        //调用issinfo模型定义查询方法issPatProcess()得到查询结果数据集
+        $num=$issMdl->issPatProcess($this->logUser,'_NUM');
+        $numToDo=$num['todo'];
+        $numInProcess=$num['inprocess'];
+        $numPatRenew=$num['patrenew'];
+        $numDone=$num['done']; 
+
+        // 模板变量赋值
+        $this->assign([
+                    'home' => $request->domain(), 
+                    'username' => $this->userName, //向前端权限变量赋值
+                    //iss权限
+                    'authIss' => $this->authArr['iss'], 
+                    'numToDo'=>$numToDo,
+                    'numPatRenew' => $numPatRenew,
+                    'numInProcess' => $numInProcess,
+                    'numDone' => $numDone, 
+                    
+                    'issId' => $issId, 
+                    ]);
+        return view();
+        //return ':)<br> issthe 模块开发中……';
+
+    }
+    
+    //根据登录用户Id，选择返回前端issPat的list
+    public function issPatList(Request $request,IssinfoModel $issMdl,$data=[])
+    {
+        $this->_loginUser();
+        
+        $defaults=array('listRows'=>10,'sortName'=>'_TOPIC','sortOrder'=>'_ASC','pageNum'=>1,'process'=>'_TODO',
+                        'searchWord'=>array());
+        
+        // 接收前端的数组
+        $data=!empty($request->param('data/a'))?$request->param('data/a'):array();
+        
+        $data=array_merge($defaults,$data);
+        
+       /**
+ *  // $role接收前端页面传来的process值:_TODO/_INPROCESS/_DONE
+ *         $process = !empty($request->param('process'))?$request->param('process'):'_TODO';  
+ *         // 接收前端当前页数
+ *         $pageNum = !empty($request->param('pageNum'))?$request->param('pageNum'):1;     
+ *         // 接收前端列表行数
+ *         $listRows= !empty($request->param('listRows'))?$request->param('listRows'):50; 
+ *         // 接收前端排序字段名称
+ *         $sortName= !empty($request->param('sortName'))?$request->param('sortName'):'_TOPIC'; 
+ *         // 接收前端排序方式
+ *         $sortOrder= !empty($request->param('sortOrder'))?$request->param('sortOrder'):'_ASC';
+ */  
+        $process = $data['process'];  
+        // 接收前端当前页数
+        $pageNum = $data['pageNum'];     
+        // 接收前端列表行数
+        $listRows= $data['listRows']; 
+        // 接收前端排序字段名称
+        $sortName= $data['sortName']; 
+        // 接收前端排序方式
+        $sortOrder= $data['sortOrder'];
+        // 接收前端查询关键词
+        $searchWord= $data['searchWord'];
+
+        //将前端传来的排序字段转换为数据库issinfo表对应字段
+        $issField = array(
+            '_TOPIC' => 'topic',
+            '_STATUS' => 'status',
+            '_TIME' => 'update_time',
+            '_PATNAME' => 'issmap.topic',
+            '_PATTYPE' => 'issmap.pattype',
+            '_PATSTATUS' => 'issmap.status',
+            '_DEPT' => 'dept',
+            '_WRITER' => 'writer',
+            '_EXECUTER' => 'executer',
+            );
+        if (array_key_exists($sortName, $issField)) {
+            $sortName = $issField[$sortName];
+        }else{
+            $sortName ='topic';
+        }   
+        
+        //调用issinfo模型定义查询方法issPatProcess()得到查询结果数据集
+        $iss=$issMdl->issPatProcess($this->logUser,$process);
+       
+        $total=count($iss);
+        //将查询结果集装入Bootstrap对象，使用其render()方法获取前端分页显示的html代码。Bootstrap($iss,$listRows,$curretPage,$total);
+        $objPg = new Bootstrap($iss,$listRows,$pageNum,$total);
+        $pageRender = $objPg->render();
+        //当前页显示所需的内容
+        $showList=array_slice($iss,($pageNum-1)*$listRows,$listRows);
+        
+        $this->assign(['home' => $request->domain(), //"destr".$this->authArr['isspro']['edit'],
+                // 分页显示所需参数
+                'iss' => $showList,
+                'pageRender' => $pageRender, 
+                'listRows' => $listRows,
+                'process' => $process,
+                
+                //'x' => json_encode($map,JSON_UNESCAPED_UNICODE),
+//                'y' => json_encode($listToDo),
+                'x' => json_encode($iss,JSON_UNESCAPED_UNICODE),
+                'y' => count($iss),
+                
+                'pageNum'=>$pageNum,
+                // 表格搜索字段
+                //'searchPatName' => $searchPatName, 
+//                'searchDept' => $searchDept, 
+//                'searchPatStatus' => $searchPatStatus, 
+//                'searchPatType' =>$searchPatType, 
+//                'searchWriter' => $searchWriter, 
+//                'searchPatStatus' => $searchPatStatus, 
+//                
+//                'sortName' => $sortName, 
+//                'sort' => $sort, 
+                //'auth' => $auth, 
+                //前端判断权限用数组（权限/状态数组），
+                'edit'=>json_encode(_commonIssAuthStatus('_PAT','edit')),
+                'audit'=>json_encode(_commonIssAuthStatus('_PAT','audit')),
+                'approve'=>json_encode(_commonIssAuthStatus('_PAT','approve')),
+                'execute'=>json_encode(_commonIssAuthStatus('_PAT','execute')),
+                'maintain'=>json_encode(_commonIssAuthStatus('_PAT','maintain')),
+                'issId'=>0
+                ]);
+            
+        //return view();  
+        return view('index'.DS.'issPatList'.DS.'issPatList');   
+    }
+    
+    //为前端显示PatRenew模板准备，1.数据库数据；2.向模板变量赋值；3.选择模板文件PatRenew.html返回前端
+    public function patRenewList(Request $request, PatinfoModel $patMdl, $patId = '', $auth = 'maintain')
+    {
+        $this->_loginUser();
+
+        //调用模型文件Patinfo.php中定义的patRenew方法找出合适的pat。
+        $pat = $patMdl->patRenewList();
+
+        // 获取分页显示
+        $pageTotal = $pat->render();
+
+        if ($patId == '' && !empty($pat[0])) {
+            $patId = $pat[0]->id;
+        }
+
+        $this->assign(['home' => $request->domain(), //
+            'maintainer' => $this->userName, 'dept' => $this->dept, 'pat' => $pat, 'patRenewTotal' => count($pat), 'pageTotal' => $pageTotal,
+            'auth' => $auth, 'patId' => $patId]);
+
+        return view('index'.DS.'issPatList'.DS.'patRenewList');
+    }
+    
 
     //根据前端传来的权限，选择返回前端的模板文件及内容
     public function issPatAuth(Request $request, $auth = 'done', $issId = '')

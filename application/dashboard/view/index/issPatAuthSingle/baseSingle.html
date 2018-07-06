@@ -328,7 +328,7 @@ $(document).ready(function(){
 			//bootstap下用.data('*')获得data-*属性值,必须全小写
 			var oprt=$(this).data('oprt');
 			var topic=$(this).data('topic');
-		console.log(topic);
+		<!-- //console.log(topic); -->
 			if(oprt=='_ADDNEW'){
 				topic=$('#issPatTopic').val();
 			}
@@ -523,7 +523,7 @@ $(document).ready(function(){
 			//显示上传进度
 			xhr.upload.onprogress=function(progress){
 				if(progress.lengthComputable){
-					//计算百分比并取整
+					//计算百分比后取整
 					var percent=Math.round(progress.loaded/progress.total*100);
 					//在浏览器控制台显示的内容
 					console.log(percent);

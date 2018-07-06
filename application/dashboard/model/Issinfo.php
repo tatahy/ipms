@@ -8,6 +8,7 @@
 namespace app\dashboard\model;
 
 use think\Model;
+use think\Collection;
 
 use app\dashboard\model\User as UserModel;
 use app\dashboard\model\Patinfo as PatinfoModel;
@@ -90,96 +91,114 @@ class Issinfo extends Model
         }
         return $value;
     }
+    
+    // iss基础查询
+    protected function scopeIssmapType($query, $issType = '')
+    {
+        //$issType='_ISST_PAT'确保查询的是isspat
+        $query->where('issmap_type', 'like', '%'.$issType.'%');
+    }
 
     /**
-     * 获取登录用户所有权限下isspat的各类总数
-     * 参数$userId，类型：数值。值：不为空。说明：登录用户的id。默认为空。
-     * 参数$auth，类型：字符串。值：可为空。说明：登录用户的iss权限。默认为空。
+     * 获取登录用户各类isspat的总数和数据集
+     * @param  Array $logUser 登录用户信息数组
+     * @param  String $type 决定返回数据('_NUM','_TODO',_INPROCESS','_PATRENEW','_DONE') 
+     * @return Array $result 返回的数组
      */
-    public function issPatNum($userId = '', $authName = '')
+    public function issPatProcess($logUser= [], $type = '')
     {
-        if ($userId == '') {
-            return false;
-        } else {
-            $user = UserModel::get($userId);
-        }
-        $authNameArr = array_keys(_commonModuleAuth('_ISS'));
-        //$authName允许的值，共有9个
-        array_push($authNameArr, 'patrenew', 'done', 'total', '');
+        //存放各类isspat的procss类别名称及其对应记录数的数组$num 
+        $num = array('todo'=>0,'inprocess'=>0,'done'=>0,'patrenew'=>0);
+        $listToDo= array();
+        $listInProcess= array();
+        $listPatRenew= array();
+        $listDone= array();
+        
+        //基础查询，在isspat中进行查询
+        $iss=$this->scope('issmap_type','_PAT');
+        
+        foreach ($logUser['auth']['iss'] as $key => $value) {
+            $map['status'] = ['in', _commonIssAuthStatus('_PAT', $key)];
+            switch ($key) {
+                case 'maintain':
+                    //$map['status'] =['in',['申报复核','申报提交','续费提交','准予续费','否决申报','专利授权','专利驳回','放弃续费','续费授权']];
+                    break;
 
-        //判断$authName的取值是否在规定的数组范围内
-        if (in_array($authName, $authNameArr)) {
-            if (empty($authName))
-                $authName = 'total';
-        } else {
-            return 'Wrong parameter for function.The parameter should be a string in:'.json_encode($authNameArr).'or empty.';
-        }
+                case 'edit':
+                    //$map['status'] =['in',['填报','返回修改','修改完善']];
+                    $map['dept'] = $logUser['dept'];
+                    $map['writer'] = $logUser['username'];
+                    break;
 
-        //存放iss各个权限名称及其对应iss记录数的数组
-        $numIssPatArr = array();
-        //登录用户的iss权限数组
-        $authIssArr = $user['authority']['iss'];
+                case 'audit':
+                    //$map['status'] ='待审核';
+                    $map['dept'] = $logUser['dept'];
+                    break;
 
-        foreach ($authIssArr as $key => $value) {
-            //查询issPat
-            $map['issmap_type'] = ['like', '%_ISST_PAT%'];
-            //权限为1写查询条件
-            if ($value) {
-                $map['status'] = ['in', _commonIssAuthStatus('_PAT', $key)];
-                switch ($key) {
-                    case 'maintain':
-                        //$map['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
-                        //                        '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
-                        break;
+                case 'approve':
+                    //$map['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
+                    break;
 
-                    case 'edit':
-                        //$map['status'] =['in',['填报','返回修改','修改完善']];
-                        $map['dept'] = $user->dept;
-                        $map['writer'] = $user->username;
-                        break;
+                case 'execute':
+                    //$map['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
+                    $map['executer'] = $logUser['username'];
+                    break;
 
-                    case 'audit':
-                        //$map['status'] ='待审核';
-                        $map['dept'] = $user->dept;
-                        break;
-
-                    case 'approve':
-                        //$map['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
-                        break;
-
-                    case 'execute':
-                        //$map['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
-                        $map['executer'] = $user->username;
-                        break;
-
-                }
-                $numIssPatArr[$key] = $this->where($map)->count();
-                //清空查询条件数组
-                $map = array();
-            } else {
-                $numIssPatArr[$key] = 0;
             }
+            //$num[$key] = $iss->where($map)->count();
+            
+            if($value){
+                $listToDo=array_merge($listToDo,$iss->where($map)->select());
+                $num['todo']+=$iss->where($map)->count();
+            }else{
+                $listInProcess=array_merge($listInProcess,$iss->where($map)->select());
+                $num['inprocess']+=$iss->where($map)->count();
+            }
+            //清空查询条件数组
+            $map = array();
         }
+        //
+        $num['done'] = $iss->where('status','完结')->count();
+        //$listDone=$iss->where('status','完结')->select();
+        
         //得到满足续费条件的专利数
         $deadline = date('Y-m-d', strtotime("+6 month"));
         $mapRenew['status'] = ['in', ['授权', '续费授权']];
         // 查出满足条件的patent
-        $numIssPatArr['patrenew'] = PatinfoModel::where($mapRenew)->where('renewdeadlinedate', 'between time', [date('Y-m-d'), $deadline])->
-            count();
-        //done
-        $map['status'] = '完结';
-        $numIssPatArr['done'] = $this->where($map)->count();
-        //total
-        $numTotal = 0;
-        foreach ($numIssPatArr as $key => $value) {
-            if ($key != 'done')
-                $numTotal += $value;
-        }
-        $numIssPatArr['total'] = $numTotal;
+        $num['patrenew']  = PatinfoModel::where($mapRenew)->where('renewdeadlinedate', 'between time', [date('Y-m-d'), $deadline])->count();
+//        $listPatRenew=PatinfoModel::where($mapRenew)->where('renewdeadlinedate', 'between time', [date('Y-m-d'), $deadline])
+//                                    ->order('renewdeadlinedate','asc')
+//                                    ->select();
+        switch ($type) {
+            case '_NUM':
+                $result=$num;
+                break;
 
-        //根据$authName的值返回值不同
-        return $numIssPatArr[$authName];
+            case '_TODO':
+                $result=$listToDo;
+                break;
+
+            case '_INPROCESS':
+                $result=$listInProcess;
+                break;
+
+            case '_PATRENEW':
+                $result=array_merge($listPatRenew,PatinfoModel::where($mapRenew)->where('renewdeadlinedate', 'between time', [date('Y-m-d'), $deadline])
+                                    ->order('renewdeadlinedate','asc')
+                                    ->select());
+                break;
+
+            case '_DONE':
+                $result=array_merge($listDone,$iss->where('status','完结')->select());
+                break;
+
+        }
+
+        return $result;
     }
+     
+    
+   
 
     /**
      * 获取对应patent的内容

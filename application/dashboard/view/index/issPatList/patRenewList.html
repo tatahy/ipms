@@ -1,0 +1,269 @@
+<!-- //issPat: patRenew.html -->
+
+<div class="">
+		<h4><span class="label label-warning">近6个月内授权到期专利
+		{eq name="$patRenewTotal" value="0"}
+			<span class="badge">{$patRenewTotal}</span>
+		{else/}
+			<span class="badge" style="color: red;background-color:#fff">{$patRenewTotal}</span>
+		{/eq}
+		</span></h4>
+		
+		<div class="table-responsive ">
+			<table class="table table-bordered table-hover">
+				<thead>
+					<tr>
+						<th>序号</th>
+						<th>名称</th>
+						<th>类型</th>
+						<th>状态</th>
+						<th>授权时间</th>
+						<th>授权到期时间</th>
+						<th>续费操作</th>
+					</tr>
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集 -->
+					{volist name="pat" id="vo" empty="暂无专利授权到期"}
+					<tr id="tr{$vo.id}">
+						<td>{$i}</td>
+						<td><a href="{$home}/patent/index/patinfo/id/{$vo.id}" target="_blank" data-toggle="tooltip">{$vo.topic}</a></td>
+						<td>{$vo.pattype}</td>
+						<td><a href="{$home}/patent/index/patrecords/id/{$vo.id}" target="_blank" data-toggle="tooltip">{$vo.status}</a></td>
+						<td>{$vo.authrejectdate}</td>
+						<td>{$vo.renewdeadlinedate}</td>
+						<td class="btnOprt">			
+								<a href="##modalIssPatAuthSingle" data-toggle="modal" data-oprt="_ADDRENEW" data-patId="{$vo.id}" data-issue-authority="maintain" data-patTopic="{$vo.topic}"><span class="glyphicon glyphicon-edit text-info"></span>_续费报告</a>
+						</td>
+					</tr>
+					{/volist}					
+				</tbody>
+			</table>
+		</div>
+		
+		<div id="divIssPatTableRows" class="col-sm-12 text-right search">
+		<!-- // 分页变量 -->
+		<div class="col-sm-10 text-right">{$pageTotal}</div>
+						
+		<div class="form-group form-group-sm col-sm-2">
+			<span class="">每页记录行数：</span>
+				<select class="form-control" id="issPatTableRows">
+					<option value="5">5</option>
+					<option value="10">10</option>
+					<option value="20">20</option>
+					<option value="50">50</option>
+				</select>
+						
+		</div>
+		</div>
+
+</div>
+
+<!-- Modal "#modalIssPatAuthSingle" -->
+<div class="modal fade" id="modalIssPatAuthSingle" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <!-- Modal content-->
+      	<div class="modal-content">
+        <div class="modal-header bg-warning" style="border-radius:5px;">
+          	<button type="button" class="close" data-dismiss="modal">&times;</button>
+		  
+          	<h4><span class="glyphicon glyphicon-wrench">专利续费事务</span></h4>
+        </div>
+		
+        <div class="modal-body">
+			<!-- // 单个issPatRenew增删改查页面显示位置，需load其他模板文件的div-->
+			<div id="divIssPatRenewSingle_load"><h4 style="margin:50px;">加载中……</h4></div>
+		</div>
+		<!-- <div class="modal-footer"> -->
+        	<!-- <div class="pull-left"> -->
+				<!-- <button id="btnAddRenew" class="btn btn-primary btn-sm" data-oprt="_ADDRENEW" data-btnLabel="label-primary"><span class="glyphicon glyphicon-info-sign"></span>新增续费事务</button> -->
+			<!-- </div> -->
+			<!-- <div  class="pull-right"> -->
+				<!-- <input id="btnReset" type="button" class="btn btn-primary btn-sm" value="重置"> -->
+				<!-- <input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消"> -->
+			<!-- </div> -->
+          
+        <!-- </div> -->
+		</div>
+	</div>
+</div>
+<!--/ Modal "#modalIssPatAuthSingle" -->
+
+<script>
+$(document).ready(function(){
+	// 添加bootstrap的tooltip属性
+	$('a').tooltip({placement: 'bottom'});
+	
+	//调整span里的.label
+	$('span.label').css({'padding-bottom':'2px','margin-bottom':'2px'});
+	//调整span里的.badge
+	$('span.badge').css({'margin-bottom':'1px'});
+	//
+	$('#aPatRenew').find('.numSingle').addClass('mycolorred-bgwhite');
+	
+	//为指定行上色
+	$('table').find('a[data-patId="{$patId}"]').closest('tr').addClass('bg-warning');
+	
+	// 表格中<td>里<a>标签的click事件,给标签所在行上色
+	$("td a").click(function(){
+		
+		// 所有行去掉附加的bg-warning
+		$('tr').removeClass('bg-warning');
+		// 本<a>标签所在行上色bg-warning
+		$(this).parent().parent().addClass('bg-warning');
+	});
+	
+	// 表格中<td class="btnOprt">里a标签的click事件,Ajax处理数据引入内容
+	$(".btnOprt a").click(function(){
+		
+		var patId=$(this).data('patid');
+		var topic='关于“'+$(this).data('pattopic')+'”的授权续费申报';
+		var auth=$(this).data('issue-authority');
+		var aHtml=$(this).html();
+		
+		$.post('issPatAuthSingle',
+			{
+				'issId':0,
+				'patId':patId,
+				'auth':auth,
+				'oprt':'_ADDRENEW',
+			},
+			//得到后端返回的data(模板文件)
+			function(data){
+				//在本文件#divIssPatRenewSingle_load处渲染显示data
+				$('#divIssPatRenewSingle_load').html(data);
+				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务：</span>【<strong>'+aHtml+'</strong>】《'+topic+'》');
+				
+			}
+		);
+	
+	});
+	
+	
+	//参照baseSingel.html中的$('button[type="submit"]').click修改$('#fmIssPatRenew').submit，保持一致 HY??? 2018/3/12
+	$('#btnAddRenew').click(function(){
+		var oprt=$(this).attr('data-oprt');
+		var topic=$('#issPatTopic').val();
+		var auth='{$auth}';
+		
+		var btnHtml='<span class="label '+$(this).attr('data-btnLabel')+'" style="font-size:14px;">'+$(this).html()+'</span>';
+		var aHtml=$('.modal-header').find('strong').html();
+		var url='issPatOprt';
+		
+		//预处理表单的数据,利用自定义的serializeJson()函数
+		var fmIssPatRenewJson=serializeJson($('#fmIssPatRenew'));
+		//声明对象变量
+		var param={};
+		var formData= new FormData;
+		
+		if(inputsNotEmpty()==true){
+			$('#modalPatRenew').modal('hide');
+			//是否开始ajax传form的数据
+			$.confirm('《'+topic+'》'+btnHtml,function(e){
+				con=e;
+				if(true==con){
+					formData.append('fmIssPatRenewJson',fmIssPatRenewJson);
+					$.extend(param,fmIssPatRenewJson,{'oprt':oprt,'auth':auth});
+					$.post(url,param,function(data){
+						//后端数据处理成功后，刷新#divIssPat_load和#divIssPatAuth_load的内容
+						$("#divIssPat_load").load('issPat',{'auth':'{$auth}'},function(){
+							//弹窗显示信息
+							$.alert('《'+data.topic+'》'+btnHtml+data.msg);
+						});
+					});
+				}else{
+					$('#modalPatRenew').modal('show');
+				}
+			}).cancel('否(N)').ok('是(Y)');
+			
+		}else{
+			//防止触发#fmIssPatRenew的提交事件
+			$('#fmIssPatRenew').submit(function(evt){
+				evt.preventDefault();
+			});
+			
+		}
+	});
+	
+	//检查form里的input（class="empty-check"）是否为空或0，为空或0做出'has-error'和tooltip提示，不为空去掉'has-error'和tooltip提示
+	$('.empty-check').each(function(){
+		$(this).focusout(function(){
+			if($(this).val()!=0){
+				$(this).parent().removeClass('has-error');
+				$(this).tooltip('destroy');
+			}else{
+				$(this).parent().addClass('has-error');
+				$(this).tooltip({title: '请填写此项', placement: 'bottom'}).tooltip('show');
+			}
+		});
+	});
+	
+	//本页内的所有form重置，同时去掉'.form-control'的tooltip和'has-error'
+	$('#btnReset').click(function(){	
+		//本页内的所有form重置
+		$('#fmIssPatRenew')[0].reset();
+			
+		//去掉'.form-control'的tooltip和'has-error'
+		$('.form-control').tooltip('destroy').parent().removeClass('has-error');
+	});
+	
+<!-- function -->
+	//**函数名：serializeJson
+ 	//* 作用：对表单内容进行JSON对象序列化
+	//* 参数fmObj，类型：对象。值：不为空。说明：表单对象。
+	//* 返回值：JSON对象
+	function serializeJson(fmObj){
+		var serializeObj={};
+		var arr=fmObj.serializeArray();
+		var str=fmObj.serialize();
+		$.each(arr,function(){
+			if(serializeObj[this.name]){
+				if($.isArray(serializeObj[this.name])){
+					serializeObj[this.name].push(this.value);
+				}else{
+					serializeObj[this.name]=[serializeObj[this.name],this.value];
+				}
+			
+			}else{
+				serializeObj[this.name]=this.value;
+			}
+		});
+		return serializeObj;
+	}
+	
+	//**函数名：inputsNotEmpty
+ 	//* 作用：检查所有的input(class="form-control empty-check")是否都填入内容，作用：无内容的加'has-error'和tooltip，在第一个无内容的input显示tooltip提示返回一个结果（true/false）
+	//* 参数，类型：对象。值：不为空。说明：。
+	function inputsNotEmpty(){
+		
+		var obj=$('.empty-check');
+		var arr=[];
+		var i=0;
+		//检查所有的input(class="form-control")是否都填入内容并不为0，无内容的加'has-error'和tooltip
+		for (i;i<obj.length;i++){
+			if(obj.eq(i).val()!=0){
+				<!-- obj.eq(i).removeClass('bg-danger'); -->
+				<!-- obj.eq(i).next().hide(); -->
+				obj.eq(i).parent().removeClass('has-error');
+			}else{
+				<!-- obj.eq(i).addClass('bg-danger'); -->
+				<!-- obj.eq(i).next().show(); -->
+				obj.eq(i).tooltip({title: '请填写此项', placement: 'bottom'}).parent().addClass('has-error');
+				arr.push(i);				
+			}	
+		}
+		//在第一个无内容的input显示tooltip提示。
+		if(arr.length){
+			<!-- obj.eq(Math.min(arr)).focus(); -->
+			return obj.eq(Math.min.apply(null, arr)).focus().tooltip('show');
+		}else{
+			return true;
+		}
+	}	
+
+<!-- function -->
+	
+});
+
+
+</script>
+

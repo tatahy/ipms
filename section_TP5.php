@@ -1826,6 +1826,7 @@ class User extends Model
 }
 
 ?>
+
 <!--//  HY 2018/6/21 -->
 
 
@@ -1891,3 +1892,56 @@ class User extends Model
 
 
 <!--//  HY 2018/6/21 -->
+
+
+<!--  HY 2018/7/5 -->
+//查询范围scope，模型高级用法
+对于一些常用的查询条件，我们可以事先定义好，以便快速调用，这个事先定义的查询条件方法有一个统一的前缀scope，我们称之为查询范围
+
+<?php
+//查询范围
+namespace app\index\model;
+
+use think\Model;
+
+class User extends Model
+{
+
+    // email查询
+    protected function scopeEmail($query)
+    {
+        $query->where('email', 'thinkphp@qq.com');
+    }
+
+    // status查询
+    protected function scopeStatus($query)
+    {
+        $query->where('status', 1);
+    }
+}
+
+//直接使用
+
+$users = User::scope('email,status')->select();
+
+//或者使用
+
+$users = User::scope('email')->scope('status')->select();
+
+?>
+
+查询范围方法支持额外的参数。查询范围的方法的第一个参数必须是查询对象，并且支持多个额外参数。
+<? php
+//例如scopeEmail方法改为：
+
+    // email查询
+    protected function scopeEmail($query, $email = '')
+    {
+        $query->where('email', $email);
+    }
+?>
+
+//全局查询范围base，
+    
+
+<!--//  HY 2018/7/5 -->
