@@ -1,16 +1,12 @@
 <!-- // issPat2.html： -->
 <div>
 <!-- <h4 class="label label-default" style="font-size:16px;"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利事务 -->
-<h4><span class="label label-info"><span class="glyphicon glyphicon-wrench"></span></span>&nbsp;专利事务
-   	{eq name="authIss.edit" value="1"}		
-		<a class="" href="#modalIssPatSingle" data-issId="0" data-issTopic="" data-issue-status="" data-issue-authority="_EDIT" data-toggle="modal" style="font-size:14px;"><span class="glyphicon glyphicon-tag text-primary"></span>_新增</a>
-	{/eq}
-</h4>
+<h4><span class="label label-info"><span class="glyphicon glyphicon-wrench"></span></span>&nbsp;专利事务</h4>
 
 	<ul class="nav nav-pills" style="margin-top:10px;border-bottom: 1px solid #faebcc;">
 	<!-- <ul class="nav nav-tabs" > -->
 		<li class="" >
-			<a class="aPill" href="#" data-issue-type="_PATENT" data-issue-process="_TODO"><span class="glyphicon glyphicon-pencil"></span>待处理
+			<a class="aPill" href="#" data-issue-type="_PATENT" data-issue-process="_TODO"><span class="glyphicon glyphicon-blackboard"></span>待处理
 			{eq name="numToDo" value="0"}
 			<span class="badge">0</span>
 			{else/}
@@ -33,7 +29,7 @@
 		{/eq}
 		
 		<li class="" >
-			<a class="aPill" href="#" data-issue-type="_PATENT" data-issue-process="_INPROCESS"><span class="glyphicon glyphicon-pencil"></span>流程中
+			<a class="aPill" href="#" data-issue-type="_PATENT" data-issue-process="_INPROCESS"><span class="glyphicon glyphicon-road"></span>&nbsp;流程中
 			{eq name="numInProcess" value="0"}
 			<span class="badge">0</span>
 			{else/}

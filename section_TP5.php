@@ -1840,6 +1840,41 @@ class User extends Model
 
 从面向对象的角度来看关联的话，模型的关联其实应该是模型的某个属性。框架选择了方法定义而不是属性定义的方式，每个关联属性其实是对应了一个模型的关联方法，这个关联属性和模型的数据一样是动态的，并非模型类的实际属性。
 
+例如
+<?php
+namespace app\index\model;
+
+use think\Model;
+
+class User extends Model
+{
+	public function profile()
+    {
+    	return $this->hasOne('Profile');
+    }
+}
+?>
+
+上述代码中的关联属性就是在User模型类中定义了一个profile方法。
+
+关联的使用：
+<?php
+// 用户的档案
+$user->profile;
+// 用户的档案属性中的手机资料
+$user->profile->mobile;
+?>
+$user本身是一个`User`模型的对象实例，而`$user->profile`则是一个`Profile`模型的对象实例，所以具备模型的所有特性而不是一个数组，包括进行`Profile`模型的CURD操作和业务逻辑执行，`$user->profile->mobile`则表示获取Profile模型对象实例的mobile数据，包括下面的操作也是有效的。
+<?php
+// 对查询出来的关联模型进行数据更新
+$user->profile->email = 'thinkphp@qq.com'
+$user->profile->save();
+?>
+这种关联关系使用Db类是无法完成的，所以这个使命是由模型来完成的，模型的关联用法很好的解决了关联的对象化，支持大部分的关联场景和需求。
+
+当我们访问`User`模型对象实例的`profile`属性的时候，其实就是调用了`profile`方法来完成关联查询。当获取一个模型的属性的时候会触发模型的获取器，而当获取器在没有检测到模型有对应属性的时候就会检查是否存在关联方法定义（对于关联方法的判断很简单，关联方法返回的是一个`think\model\Relation`对象），如果存在则调用对应关联类的`getRelation`方法。
+
+
 //定义关联
 关联方法的定义最关键是要搞清楚具体应该使用何种关联关系，其次是掌握不同的关联关系的定义方法和参数。
 5.0版本支持的关联关系包括下面七种，
@@ -1861,10 +1896,62 @@ morphTo			多态 MORPH TO
 	
 //belongsTo关联
 用法：belongsTo('关联模型','外键','关联表主键');除了关联模型外，其它参数都是可选。
-
     - 关联模型（必须）：模型名或者模型类名
     - 外键：当前模型外键，默认的外键名规则是关联模型名+_id
     - 关联主键：关联模型主键，一般会自动获取也可以指定传入
+	
+//hasMany关联
+用法：hasMany('关联模型','外键','主键');除了关联模型外，其它参数都是可选。
+    - 关联模型（必须）：模型名或者模型类名
+    - 外键：关联模型外键，默认的外键名规则是当前模型名+_id
+    - 主键：当前模型主键，一般会自动获取也可以指定传入
+	
+//hasManyThrough
+用法：hasManyThrough('关联模型','中间模型','外键','中间表关联键','主键');
+    - 关联模型（必须）：模型名或者模型类名
+    - 中间模型（必须）：模型名或者模型类名
+    - 外键：默认的外键名规则是当前模型名+_id
+    - 中间表关联键：默认的中间表关联键名的规则是中间模型名+`_id`
+    - 主键：当前模型主键，一般会自动获取也可以指定传入
+
+//belongsToMany关联
+用法：belongsToMany('关联模型','中间表','外键','关联键');
+    - 关联模型（必须）：模型名或者模型类名
+    - 中间表：默认规则是当前模型名+_+关联模型名 （注意，在V5.0.8版本之前需要添加表前缀）
+    - 外键：中间表的当前模型外键，默认的外键名规则是关联模型名+`_id`
+    - 关联键：中间表的当前模型关联键名，默认规则是当前模型名+`_id`
+
+//morphMany关联
+用法：morphMany('关联模型','多态字段','多态类型');
+    - 关联模型（必须）：模型名或者模型类名
+    - 多态字段：多态字段信息定义包含两种方式，字符串的话表示多态字段的前缀，数组则表示实际的多态字段
+    - 多态类型：默认是当前模型名
+数据表的多态字段一般包含两个字段：多态类型和多态主键。
+如果多态字段使用字符串例如morph，那么多态类型和多态主键字段分别对应morph_type和morph_id，如果用数组方式定义的话，就改为['morph_type','morph_id']即可。
+
+//morphTo关联
+用法：morphTo('多态字段','多态类型别名（数组）');
+    - 多态字段：定义和`morphMany`一致
+    - 多态类型别名：用于设置特殊的多态类型（比如用数字标识的多态类型）
+
+
+//相对关联关系	
+两个模型之间因为参照模型的不同就会产生相对的但不一定相同的关联关系，并且相对的关联关系只有在需要调用的时候才需要定义，下面是每个关联类型的相对关联关系对照：
+类型		关联关系		相对的关联关系
+一对一		hasOne			belongsTo
+一对多		hasMany			belongsTo
+多对多		belongsToMany	belongsToMany
+远程一对多	hasManyThrough	不支持
+多态一对多	morphMany		morphTo
+
+除此之外，关联定义的几个要点必须了解：
+
+    * 关联方法必须使用驼峰法命名；
+    * 关联方法一般无需定义任何参数；
+    * 关联调用的时候驼峰法和小写+下划线都支持(推荐使用后者)；
+    * 关联字段设计尽可能按照规范可以简化关联定义；
+    * 关联方法定义可以添加额外查询条件；
+	
 
 <?php
 //定义关联，一般不需要使用命名空间，会自动使用当前模型的命名空间，如果不同请使用完整命名空间定义，例如：
@@ -1884,6 +1971,415 @@ class User extends Model
 
 ?>
 
+//关联操作，关联方法
+关联操作经常会涉及到几个重要的方法，也是关联操作的基础，掌握了这几个方法对于掌握关联（尤其是关联查询）有很大的帮助，包括：
+方法名			作用							所属类/对象
+`relation`		关联查询						Query类(链式方法，在查询方法之前调用)
+`with`			关联预载入						Query类(链式方法，在查询方法之前调用)
+`withCount`		关联统计（`V5.0.5+`）			Query类(链式方法，在查询方法之前调用)
+`load`			关联延迟预载入（`V5.0.5+`）		数据集对象
+`together`		关联自动写入（`V5.0.5+`）		模型类
+
+`relation`和`with`方法的主要区别:`relation`是单纯的关联查询。
+比如：查询一个用户列表，然后需要关联查询用户的档案数据。
+1. 使用`relation`方法：先查询用户列表数据，每个用户再单纯查询档案数据。如果用户列表数据有10个，那么就会产生11次查询。
+
+2. 使用`with`方法:最终查询出来的关联数据是一样的，但由于with查询使用的是预载入查询，因此实际只会产生2次查询。
+
+3.使用`load`方法则更先进，先查询出用户列表，然后在需要关联数据的时候使用load方法获取关联数据，尤其适合动态关联的情况，最终也是两次查询，因此称为延迟预载入。
+
+由于模型关联的对象化封装机制的优势，其实`relation`方法基本上很少被用到，而是使用关联惰性查询及关联方法的自定义查询来替代。
+最常用的莫过于`with`方法，因为最常用因此被内置到模型类的`get`和`all`方法的第二个参数了，我们后面对with方法的用法说明也均适用于get和all方法的第二个参数。
+
+`withCount`用于在不获取关联数据的情况下提供关联数据的统计，在查询一对多或者多对多关联的时候才需要使用。
+
+`load`方法则适用于在数据集的延迟预载入关联查询（对于默认的数据集查询类型，系统提供了一个`load_relation`助手函数，作用是等效的）。
+
+`together`方法用于一对一的关联自动写入操作（包括新增、更新和删除），提供了更简单的关联写入机制。
+
+虽然作用不尽相同，但这几个方法的使用方法都是类似的，这四个方法都只有一个参数，参数类型包括字符串和数组，并且数组方式还支持索引数组以方便完成关联的自定义查询。
+
+
+//关联方法，
+例如：
+<?php
+// 查询用户的Profile关联数据
+$users = $user->relation('profile')->select();
+// 查询用户的Book关联数据
+$users = $user->relation('books')->select();
+?>
+关联查询的方法返回的依然是包含User对象实例的数据集，`relation`方法设定的关联查询结果只是数据集中的User模型对象实例的某个关联属性。
+
+`relation`方法传入的字符串就是关联定义的方法名而不是关联模型的名称，由于模型方法名使用的都是驼峰法规范，假设定义了一个名为`userBooks`的关联方法的话，`relation`方法可以使用两种方式的关联查询：
+<?php
+//方式1: 驼峰法的关联方法定义
+$users = $user->relation('userBooks')->select();
+
+//方式2: 下划线的关联方法定义
+$users = $user->relation('user_books')->select();
+
+?>
+第一种传入的是实际的驼峰法关联方法名`userBooks`，第二种是传入小写和下划线的转化名称`user_books`，两种关联查询用法都会实际定位到关联方法名称userBooks，所以**关联方法定义必须使用驼峰法**。
+
+在获取关联查询数据的时候，同样可以支持两种方式：
+<?php
+//方式1
+foreach ($users as $user) {
+    dump($user->userBooks);
+}
+
+//方式2
+foreach ($users as $user) {
+	dump($user->user_books);
+}
+?>
+
+//关联查询条件，定义关联查询条件
+默认情况下，关联方法获取的是满足关联条件的所有数据，如果需要自定义关联查询条件的话，可以使用
+<?php
+// 使用自定义关联查询
+$user->relation(['books' => function ($query) {
+    $query->where('title', 'like', '%thinkphp%');
+}])->select();
+?>
+
+表示查询该用户写的标题中包含`thinkphp`的书籍，闭包中不仅仅可以使用查询条件，还可以支持其它的链式方法，比如对关联数据进行排序和指定字段：
+<?php
+// 使用自定义关联查询
+$user->relation(['books' => function ($query) {
+    $query
+        ->field('id,name,title,pub_time,user_id')
+        ->order('pub_time desc')
+        ->whereTime('pub_time', 'year');
+}])->select();
+?>
+
+如果使用field方法指定查询字段，务必包含你的当前模型的主键以及关联模型的关键键，否则会导致关联查询失败。
+
+关联方法可以同时指定多个关联，即使是不同的关联类型，使用：
+<?php
+//方式1：查询用户的Profile和Book关联数据
+$users = $user->relation('profile,books')->select();
+
+//方式2：数组方式查询用户的Profile和Book关联数据
+$users = $user->relation(['profile','books'])->select();
+?>
+一般使用数组的话，主要需要使用闭包进行自定义关联查询的情况，否则用逗号分割的字符串就可以了。
+
+//关联查询
+
+有两种方式进行关联的数据获取：
+1.关联预查询：`relation`方法
+<?php
+// 指定User模型的profile关联
+$user = User::relation('profile')->find(1);
+// profile关联属性也是一个模型对象实例
+dump($user->profile);
+?>
+`relation`方法中传入关联（方法）名称即可（多个可以使用逗号分割的字符串或者数组）。这种方式，无论是否最终获取`profile`属性，都会事先进行关联查询，因此称为关联预查询。
+
+如果关联数据不存在，一对一关联返回的是null，一对多关联的话返回的是空数组或空数据集对象。
+
+2.关联延迟查询
+出于性能考虑，通常我们选择关联延迟查询的方式。
+<?php
+// 不需要指定关联
+$user = User::get(1);
+// 获取profile属性的时候自动进行关联查询
+dump($user->profile);
+
+?>
+这种方式下的关联查询是惰性的，只有在获取关联属性的时候才会实际进行关联查询，因此称之为关联延迟查询。
+
+关联属性的名称一般就是关联（定义）方法的名称，但同时也支持驼峰关联方法的小写+下划线转化名称。
+
+
+//定义关联查询条件
+模型的关联方法除了会自动在关联获取的时候自动调用外，仍然可以作为查询构造器的链式操作来对待，以完成额外的附加条件或者其它自定义查询（一对多的关联关系时候比较多见类似场景），例如`User`模型定义了一个`articles`的`hasMany`关联：
+<?php
+namespace app\index\model;
+
+use think\Model;
+
+class User extends Model
+{
+	public function articles()
+    {
+    	return $this->hasMany('Article');
+    }
+}
+?>
+
+普通的关联查询，获取的是全部的关联数据：
+<?php
+$user = User::get(1);
+$articles = $user->articles;
+?>
+
+对关联数据进行筛选，例如需要查询用户发表的标题里面包含`think`的文章，并且按照`create_time`倒序排序：
+<?php
+$user     = User::get(1);
+$articles = $user->articles()
+    ->where('title', 'like', '%think%')
+    ->order('create_time desc')
+    ->select();
+
+?>
+调用`articles()`关联方法的动作有下面几个：
+1. 相当于切换当前模型到关联模型对象（Article）；
+2. 并且会自动传入关联条件（user_id = 1）；
+
+如果是一对多或者多对多关联，并且希望自主条件查询关联数据的话请参考该方式。
+
+可以直接在定义关联的时候添加额外条件，而不是在外部查询的时候指定：
+<?php
+namespace app\index\model;
+
+use think\Model;
+
+class User extends Model
+{
+	public function articles()
+    {
+    	return $this->hasMany('Article')
+          ->where('title', 'like', '%think%')
+          ->order('create_time desc');
+    }
+}
+?>
+
+如果还需要在外部调用的时候追加额外条件，
+<?php
+//包含了关联方法里面定义的和额外追加条件的关联查询
+$user     = User::get(1);
+$articles = $user->articles()
+    ->where('name', 'thinkphp')
+    ->field('id,name,title')
+    ->select();
+
+?>
+
+可以单独定义多个关联关系，各自独立使用互不影响。
+<?php
+namespace app\index\model;
+
+use think\Model;
+
+class User extends Model
+{
+	public function articles()
+    {
+    	return $this->hasMany('Article');
+    }
+    
+	public function articlesLike($title)
+    {
+        return $this->hasMany('Article')
+                    ->where('title', 'like', '%' . $title . '%')
+                    ->field('id,name,title')
+                    ->order('create_time desc');
+    }    
+}
+?>
+`articlesLike`方法就作为自定义关联查询专用，并且需要传入`title`参数，用法如下：
+<?php
+//正确用法
+$user = User::get(1);
+$articles = $user->articlesLike('think')
+    ->select();
+
+//错误用法	
+$user = User::get(1);
+$articles = $user->articlesLike;	
+?>
+带有参数的关联定义方法不能直接用于关联属性获取，只能用于链式关联自定义查询。
+
+//关联约束
+对于`hasMany`关联关系，系统提供了根据关联数据条件来查询当前模型数据的关联约束方法，包括`has`和`hasWhere`两个方法。
+
+`has`方法主要用于查询关联数据的记录数来作为当前模型的查询依据，默认是存在一条数据即可。
+<?php
+// 查询有评论数据的文章
+$list = Article::has('comments')->select();
+
+// 查询评论超过3个的文章
+$list = Article::has('comments', '>', 3)->select();
+?>
+//`has`方法的第二个参数支持`>`、`=`、`<=`、`<`、`>=`、第三个参数是一个整数。
+
+
+`hasWhere`方法，用于需要复杂的关联查询约束条件：
+<?php
+// 查询评论状态正常的文章
+$list = Article::hasWhere('comments', ['status' => 1])->select();
+
+// 查询最近一周包含think字符的评论的文章(使用闭包查询，在闭包里面使用链式方法查询：)
+$list = Article::hasWhere('comments', function ($query) {
+    $query
+        ->whereTime('create_time', 'week')
+        ->where('content', 'like', '%think%');
+})->select();
+
+// 查询最近一周包含think字符的评论的文章,查询的关联模型字段同时存在当前模型和关联模型，需要加上关联模型的名称作为别名。
+$list = Article::hasWhere('comments', function ($query) {
+    $query
+        ->whereTime('Comment.create_time', 'week')
+        ->where('content', 'like', '%think%');
+})->select();
+?>
+V5.0.5+版本开始，has也支持hasWhere的所有用法。
+
+
+//关联预载入
+关联查询的预查询载入功能，主要解决了N+1次查询的问题
+<?php
+//查询如果有3个记录，会执行4次查询
+$list = User::all([1, 2, 3]);
+foreach ($list as $user) {
+    // 获取用户关联的profile模型数据
+    dump($user->profile);
+}
+
+//使用with方法指定需要预载入的关联（方法），用法和relation方法类似。
+$list = User::with('profile')->select([1, 2, 3]);
+foreach ($list as $user) {
+    // 获取用户关联的profile模型数据
+    dump($user->profile);
+}
+
+//模型的get和all方法的第二个参数可以直接传入预载入参数
+$list = User::all([1, 2, 3], 'profile');
+foreach ($list as $user) {
+    // 获取用户关联的profile模型数据
+    dump($user->profile);
+}
+?>
+使用关联预查询功能，对于一对一关联来说，默认只有一次查询，对于一对多关联的话，就变成2次查询，有效提高性能。关联的预载入查询不是惰性的，是连同数据查询一起完成的，但由于封装的合并查询，性能方面远远优于普通的关联惰性查询，所以整体的查询性能是非常乐观的。
+
+
+//嵌套预载入
+嵌套预载入指的是如果关联模型本身还需要进行关联预载入的话，可以在当前模型预载入查询的时候直接指定，理论上嵌套是可以任意级别的（但实际上估计不会有这么复杂的关联设计）。
+<?php
+//Profile模型还关联了一个名片模型（cards关联方法）
+$list = User::all([1, 2, 3], 'profile.cards');
+foreach ($list as $user) {
+    // 获取用户关联数据
+    dump($user->profile->cards);
+}
+?>
+一对一关联的JOIN方式不支持嵌套预载入
+
+//预载入条件限制
+在预载入的时候通过闭包指定额外的条件限制，但不要在闭包里面执行任何的查询。
+<?php
+$list = User::with(['articles' => function ($query) {
+    $query->where('title', 'like', '%think%')
+        ->field('id,name,title')
+        ->order('create_time desc');
+}])->select([1, 2, 3]);
+
+foreach ($list as $user) {
+    // 获取用户关联的profile模型数据
+    dump($user->profile);
+}
+?>
+如果是一对一预载入查询的条件限制，注意`field`方法要改为`withField`方法，否则会产生字段混淆。
+
+//延迟预载入
+延迟预载入仅针对多个数据的查询，因为单个数据的查询用延迟预载入和关联惰性查询没有任何区别，所以不需要使用延迟预载入。
+如果数据集查询返回的是数据集对象，可以调用数据集对象的`load`实现延迟预载入。
+
+需要根据查询出来的数据来决定是否需要使用关联预载入，当然关联查询本身就能解决这个问题，因为关联查询是惰性的，不过用预载入的理由也很明显，性能具有优势。
+
+<?php
+// 查询数据集
+$list = User::all([1, 2, 3]);
+
+// 数据集对象的`load`方法实现延迟预载入
+$list->load('cards');	
+
+// 数据集查询返回的是数组，系统提供了一个load_relation助手函数实现延迟预载入
+$list = load_relation($list, 'cards');
+
+foreach ($list as $user) {
+    // 获取用户关联的card模型数据
+    dump($user->cards);
+}
+
+?>
+
+//关联统计
+
+使用`withCount`方法进行指定关联的统计。不需要获取关联数据，而只是希望获取关联数据的统计（关联统计仅针对一对多或者多对多的关联关系）。
+<?php
+$list = User::withCount('cards')->select([1, 2, 3]);
+foreach ($list as $user) {
+    // 获取用户关联的card关联统计
+    echo $user->cards_count;
+}
+
+//关联统计进行条件过滤，可以使用闭包
+$list = User::withCount(['cards' => function ($query) {
+    $query->where('status', 1);
+}])->select([1, 2, 3]);
+foreach ($list as $user) {
+    // 获取用户关联的card关联统计
+    echo $user->cards_count;
+}
+?>
+
+关联统计功能会在模型的对象属性中自动添加一个以“关联方法名+`_count`”为名称的动态属性来保存相关的关联统计数据。
+
+一对一关联关系使用关联统计是无效的，一般可以用exists查询来判断是否存在关联数据。
+
+//关联输出
+关联属性的输出和模型的输出转换一样，使用模型的toArray方法可以同时输出关联属性（对象），
+<?php
+$user = User::get(1,'profile');
+$data = $user->toArray();
+dump($data);
+$data = $user->toJson();
+dump($data);
+?>
+对于使用了关联预载入查询和手动获取了关联属性（延迟关联查询）的情况，toArray和toJson方法都会包含关联数据。
+
+还可以调用`visible`和`hidden`方法对当前模型以及关联模型的属性进行输出控制，
+<?php
+$user = User::get(1, 'profile');
+$data = $user->hidden(['name', 'profile.email'])->toArray();
+?>
+上面的代码返回的`data`数据中不会包含用户模型的`name`属性以及关联`profile`模型的`email`属性。
+
+<?php
+$user = User::get(1, 'profile');
+//隐藏多个关联属性：
+$data = $user->hidden(['name', 'profile' => ['email', 'address']])->toArray();
+?>
+模型的`visible`方法（用于设置需要输出的属性）的使用和`hidden`一致。同时调用`visible`和`hidden`方法，`visible`优先。
+
+<?php
+$user = User::get(1, 'profile');
+//同时调用`visible`和`hidden`方法，`visible`优先
+$data = $user->visible(['profile' => ['email', 'sex']])->hidden(['name', 'profile' => ['email', 'address']])->toArray();
+?>
+上述代码中`profile`关联属性输出会包含`email`和`sex`。
+
+可以在输出的时候追加关联属性，即使之前没有进行任何的关联查询。
+<?php
+$user = User::get(1);
+$user->append(['profile'])->toArray();
+?>
+该例子在调用`toArray`方法的时候才会进行`profile`关联数据获取并转换输出。
+
+对于数据集查询，如果返回类型是数据集对象仍然支持调用`visible`、`hidden`和`append`方法，如果不是数据集对象的话可以先用`collection`助手函数转换为数据集对象。
+<?php
+$users = User::all();
+//数据集对象调用`hidden`方法
+$data  = $users->hidden(['name', 'profile' => ['email', 'address']])
+    ->toArray();
+
+?>
+
 
 <?php
 //关联查询
@@ -1896,7 +2392,8 @@ class User extends Model
 
 <!--  HY 2018/7/5 -->
 //查询范围scope，模型高级用法
-对于一些常用的查询条件，我们可以事先定义好，以便快速调用，这个事先定义的查询条件方法有一个统一的前缀scope，我们称之为查询范围
+对于一些常用的查询条件，我们可以事先定义好，以便快速调用，这个事先定义的查询条件方法有一个统一的前缀scope，我们称之为查询范围。
+模型的scope方法之后只能使用数据库查询方法而不能使用模型的方法。
 
 <?php
 //查询范围

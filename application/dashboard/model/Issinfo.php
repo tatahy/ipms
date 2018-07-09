@@ -115,7 +115,7 @@ class Issinfo extends Model
         $listDone= array();
         
         //基础查询，在isspat中进行查询
-        $iss=$this->scope('issmap_type','_PAT');
+        $iss=$this::scope('issmap_type','_PAT');
         
         foreach ($logUser['auth']['iss'] as $key => $value) {
             $map['status'] = ['in', _commonIssAuthStatus('_PAT', $key)];
@@ -145,30 +145,44 @@ class Issinfo extends Model
                     break;
 
             }
-            //$num[$key] = $iss->where($map)->count();
+            $visibleField=['id','topic','status','statusdescription','create_time','update_time','dept','writer','executer','issmap_id','issmap_type',
+                            'issmap' => ['id','patnum','topic','pattype','status']]; 
+            
+            //方式1：模型的get和all方法的第二个参数直接传入关联预载入参数                          
+            //$arr=$this::all(function($query) use ($map){
+//	                   $query->where('issmap_type','like','%_PAT%')->where($map);
+//                    },'issmap');
+//            $arr = collection($arr)->visible($visibleField)->toArray();
+            
+            //方式2：使用with方法指定需要预载入的关联（方法）
+            //$arr = $iss->with('issmap')->where($map)->select();
+//            $arr = collection($arr)->visible($visibleField)->toArray();  
+             
+            //方式3：数据集对象的`load`方法实现延迟预载入
+            $arr= $iss->where($map)->select();
+            //应用助手函数转换为数据集对象，使用load方法获取关联数据
+            $arr = collection($arr)->load('issmap')->visible($visibleField)->toArray(); 
+            
+            $num[$key]=count($arr);         
             
             if($value){
-                $listToDo=array_merge($listToDo,$iss->where($map)->select());
-                $num['todo']+=$iss->where($map)->count();
-            }else{
-                $listInProcess=array_merge($listInProcess,$iss->where($map)->select());
-                $num['inprocess']+=$iss->where($map)->count();
+                $listToDo=array_merge($listToDo,$arr);
+                $num['todo']+=$num[$key];
+            }else{                
+                $listInProcess=array_merge($listInProcess,$arr);
+                $num['inprocess']+=$num[$key];
             }
             //清空查询条件数组
             $map = array();
         }
-        //
-        $num['done'] = $iss->where('status','完结')->count();
-        //$listDone=$iss->where('status','完结')->select();
+        $num['done'] = $iss->where('status','完结')->count();        
         
         //得到满足续费条件的专利数
         $deadline = date('Y-m-d', strtotime("+6 month"));
         $mapRenew['status'] = ['in', ['授权', '续费授权']];
         // 查出满足条件的patent
         $num['patrenew']  = PatinfoModel::where($mapRenew)->where('renewdeadlinedate', 'between time', [date('Y-m-d'), $deadline])->count();
-//        $listPatRenew=PatinfoModel::where($mapRenew)->where('renewdeadlinedate', 'between time', [date('Y-m-d'), $deadline])
-//                                    ->order('renewdeadlinedate','asc')
-//                                    ->select();
+
         switch ($type) {
             case '_NUM':
                 $result=$num;
@@ -189,7 +203,11 @@ class Issinfo extends Model
                 break;
 
             case '_DONE':
-                $result=array_merge($listDone,$iss->where('status','完结')->select());
+                $listDone=$iss->where('status','完结')->select();
+                //$listDone= collection($listDone)->append(['issmap'])->visible(['issmap' => ['id', 'patnum','topic','pattype','status']])->toArray();
+                $listDone = collection($listDone)->load('issmap')->toArray();  
+                $result=$listDone;
+                
                 break;
 
         }
@@ -197,7 +215,44 @@ class Issinfo extends Model
         return $result;
     }
      
-    
+     /**
+     * 将查询结果数据集(数组)根据排序参数转换为排序后的数组
+     * @param  Array $issArr 待排序的数组
+     * @param  String $field 排序字段 
+     * @param  String $order “asc”/"desc"
+     * @return Array $result 返回的索引数组
+     */
+    public function issPatSort($issArr=[],$field = '',$order='_ASC') 
+    {
+        $arr=array();
+        $result=array();
+        $field=('oprt'==$field)?'status':$field;
+        
+        //1.生成一个仅含排序字段值的索引数组        
+        for($i=0;$i<count($issArr);$i++){
+            if(is_array($field)){
+                $arr[$i]=$issArr[$i][$field[0]][$field[1]];
+            }else{
+                $arr[$i]=$issArr[$i][$field];
+            }
+        }
+        
+        //2.按照$order的值对上述新生成的索引数组进行自然排序
+        if($order=='_ASC'){
+            asort($arr,SORT_NATURAL);
+        }else{
+            arsort($arr,SORT_NATURAL);
+        }
+        
+        //3. 按$arr的顺序将$issArr拷贝到新数组$result
+        $i=0;
+        foreach($arr as $key=>$value){
+            $result[$i]=$issArr[$key];
+            $i++;
+        }
+        
+        return $result;
+    }
    
 
     /**
@@ -229,18 +284,11 @@ class Issinfo extends Model
     //定义issinfo的多态模型,涉及issinfo表中的issmap_id和issmap_type两个字段内容。可得到对应关联模型的所有字段内容。
     public function issmap()
     {
-        $this->getData('issmap_type');
         //本模型内已定义获取器getIssmapTypeAttr,本属性读取的是获取器输出的issmap_type字段值（中文），所以要以获取器的输出值来对应模型
-        $data = ['专利授权申报' => 'Patinfo', '专利授权到期续费' => 'Patinfo', '项目申报' => 'Proinfo', '论文审查' => 'Theinfo'];
-        return $this->morphTo(null, $data);
-
-        //return $this->morphTo(null, [
-        //            //已定义获取器getIssmapTypeAttr,本属性读取的是获取器输出的issmap_type字段值，所以要以获取器的输出值来对应模型
-        //            '专利授权申报' => 'Patinfo',
-        //            '专利授权到期续费' => 'Patinfo',
-        //            '项目申报' => 'Proinfo',
-        //            '论文审查' => 'Theinfo',
-        //        ]);
+        $data = ['专利授权申报' => 'Patinfo', '专利授权到期续费' => 'Patinfo', '项目申报' => 'Proinfo', '论文审查' => 'Theinfo',
+                    '_ISST_PAT1'=> 'Patinfo','_ISST_PAT2'=> 'Patinfo'
+                ];
+        return $this->morphTo('issmap', $data);
     }
 
     /**

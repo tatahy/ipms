@@ -7,6 +7,7 @@ use think\Session;
 use think\View;
 use think\File as FileObj;
 use think\paginator\driver\Bootstrap;
+use think\Collection;
 
 use app\dashboard\model\User as UserModel;
 use app\dashboard\model\Rolety as RoletyModel;
@@ -52,12 +53,12 @@ class IndexController extends \think\Controller
         $this->log = Session::get('log');
         $this->roles = Session::get('role');
         $this->dept = Session::get('dept');
-        //$this->authArr = Session::get('authArr');
+        $this->authArr = Session::get('authArr');
         $this->today = date('Y-m-d');
         $this->now = date("Y-m-d H:i:s");
         
         //取出user的authority字段值
-        $this->authArr = UserModel::get($this->userId)->authority;
+        //$this->authArr = UserModel::get($this->userId)->authority;
         
         $this->logUser=array('auth'=>$this->authArr,'username'=>$this->userName,'dept'=>$this->dept);
     }
@@ -71,12 +72,13 @@ class IndexController extends \think\Controller
         if (1 != $this->log) {
             return $this->error('无用户名或密码，请先登录系统');
         } 
-        //else {
-//            //取出user的authority字段值
+        
+        //if(empty($this->logUser)){
 //            $user = new UserModel;
 //            $userlg = $user->where('username', $this->userName)->where('pwd', $this->pwd)->find();
-//            $this->authArr = $userlg->authority;
+//            $this->logUser=array('auth'=>$userlg->authority,'username'=>$userlg->username,'dept'=>$userlg->dept);
 //        }
+        
     }
 
     public function index(Request $request, IssinfoModel $issMdl, $auth = '')
@@ -274,6 +276,9 @@ class IndexController extends \think\Controller
         if (!empty($request->param('id'))) {
             $issId = $request->param('id');
         }
+        
+         //调用issinfo模型定义查询方法issPatProcess()得到查询结果数据集
+        $num=$issMdl->issPatProcess($this->logUser,'_NUM');
 
         // 模板变量赋值
         $this->assign([
@@ -282,14 +287,14 @@ class IndexController extends \think\Controller
                     //所有权限
                     'authArray' => $this->authArr, 
                     'auth' => $auth, //当前权限
-                    'numIssPatEdit' => $issMdl->issPatNum($this->userId, 'edit'), 
-                    'numIssPatAudit' => $issMdl->issPatNum($this->userId, 'audit'), 
-                    'numIssPatApprove' => $issMdl->issPatNum($this->userId, 'approve'), 
-                    'numIssPatExecute' => $issMdl->issPatNum($this->userId, 'execute'), 
-                    'numIssPatMaintain' => $issMdl->issPatNum($this->userId, 'maintain'),
-                    'numIssPatDone' => $issMdl->issPatNum($this->userId, 'done'), 
-                    'numTotal' => $issMdl->issPatNum($this->userId, 'total'),
-                    'numPatRenewTotal' => $issMdl->issPatNum($this->userId, 'patrenew'), 
+                    'numIssPatEdit' => $num['edit'], 
+                    'numIssPatAudit' => $num['audit'], 
+                    'numIssPatApprove' => $num['approve'], 
+                    'numIssPatExecute' => $num['execute'], 
+                    'numIssPatMaintain' => $num['maintain'],
+                    'numIssPatDone' => $num['done'], 
+                    'numTotal' => $num['todo'],
+                    'numPatRenewTotal' => $num['patrenew'], 
                     'issId' => $issId, 
                     ]);
         return view();
@@ -323,7 +328,6 @@ class IndexController extends \think\Controller
                     'numPatRenew' => $numPatRenew,
                     'numInProcess' => $numInProcess,
                     'numDone' => $numDone, 
-                    
                     'issId' => $issId, 
                     ]);
         return view();
@@ -362,40 +366,53 @@ class IndexController extends \think\Controller
         // 接收前端列表行数
         $listRows= $data['listRows']; 
         // 接收前端排序字段名称
-        $sortName= $data['sortName']; 
-        // 接收前端排序方式
+        $sortName= $data['sortName'];
+        // 接收前端排序方式"_ASC"/"_DESC"
         $sortOrder= $data['sortOrder'];
         // 接收前端查询关键词
         $searchWord= $data['searchWord'];
+        
+         //调用issinfo模型的查询方法issPatProcess()得到查询结果数据集(数组)
+        $issArr=$issMdl->issPatProcess($this->logUser,$process);
 
-        //将前端传来的排序字段转换为数据库issinfo表对应字段
         $issField = array(
             '_TOPIC' => 'topic',
             '_STATUS' => 'status',
-            '_TIME' => 'update_time',
-            '_PATNAME' => 'issmap.topic',
-            '_PATTYPE' => 'issmap.pattype',
-            '_PATSTATUS' => 'issmap.status',
+            '_CREATETIME' => 'create_time',
+            '_UPDATETIME' => 'update_time',
+            '_PATNAME' => ['issmap','topic'],//'issmap.topic'
+            '_PATTYPE' => ['issmap','pattype'],
+            '_PATSTATUS' => ['issmap','status'],
             '_DEPT' => 'dept',
             '_WRITER' => 'writer',
             '_EXECUTER' => 'executer',
+            '_OPRT' => 'oprt',
             );
+        
+        //将前端传来的排序字段转换为数据集对应键名
         if (array_key_exists($sortName, $issField)) {
             $sortName = $issField[$sortName];
         }else{
             $sortName ='topic';
         }   
         
-        //调用issinfo模型定义查询方法issPatProcess()得到查询结果数据集
-        $iss=$issMdl->issPatProcess($this->logUser,$process);
-       
-        $total=count($iss);
-        //将查询结果集装入Bootstrap对象，使用其render()方法获取前端分页显示的html代码。Bootstrap($iss,$listRows,$curretPage,$total);
-        $objPg = new Bootstrap($iss,$listRows,$pageNum,$total);
+        //调用issinfo模型定义查询结果数据集(数组)排序方法issPatSort($issArr,$sortName,$sortOrder)得到排序后的数组
+        $issArr=$issMdl->issPatSort($issArr,$sortName,$sortOrder);
+              
+        $total=count($issArr);
+        //将查询结果集数组装入Bootstrap对象，使用其render()方法获取前端分页显示的html代码。Bootstrap($iss,$listRows,$curretPage,$total);
+        $objPg = new Bootstrap($issArr,$listRows,$pageNum,$total);
         $pageRender = $objPg->render();
         //当前页显示所需的内容
-        $showList=array_slice($iss,($pageNum-1)*$listRows,$listRows);
+        $showList=array_slice($issArr,($pageNum-1)*$listRows,$listRows);
         
+        //将数据库issinfo表对应字段转换为前端的排序字段
+        foreach($issField as $key=>$value){
+           if($value==$sortName){
+                $sortName=$key;
+           }
+        }
+
         $this->assign(['home' => $request->domain(), //"destr".$this->authArr['isspro']['edit'],
                 // 分页显示所需参数
                 'iss' => $showList,
@@ -405,8 +422,8 @@ class IndexController extends \think\Controller
                 
                 //'x' => json_encode($map,JSON_UNESCAPED_UNICODE),
 //                'y' => json_encode($listToDo),
-                'x' => json_encode($iss,JSON_UNESCAPED_UNICODE),
-                'y' => count($iss),
+                'x' => json_encode($issArr,JSON_UNESCAPED_UNICODE),
+                'y' => count($issArr),
                 
                 'pageNum'=>$pageNum,
                 // 表格搜索字段
@@ -417,20 +434,131 @@ class IndexController extends \think\Controller
 //                'searchWriter' => $searchWriter, 
 //                'searchPatStatus' => $searchPatStatus, 
 //                
-//                'sortName' => $sortName, 
-//                'sort' => $sort, 
+                'sortName' => $sortName, 
+                'sortOrder' => $sortOrder, 
                 //'auth' => $auth, 
-                //前端判断权限用数组（权限/状态数组），
-                'edit'=>json_encode(_commonIssAuthStatus('_PAT','edit')),
-                'audit'=>json_encode(_commonIssAuthStatus('_PAT','audit')),
-                'approve'=>json_encode(_commonIssAuthStatus('_PAT','approve')),
-                'execute'=>json_encode(_commonIssAuthStatus('_PAT','execute')),
-                'maintain'=>json_encode(_commonIssAuthStatus('_PAT','maintain')),
+                //前端判断权限用数组（权限/状态数组），保持中文
+                'edit'=>json_encode(_commonIssAuthStatus('_PAT','edit'),JSON_UNESCAPED_UNICODE),
+                'audit'=>json_encode(_commonIssAuthStatus('_PAT','audit'),JSON_UNESCAPED_UNICODE),
+                'approve'=>json_encode(_commonIssAuthStatus('_PAT','approve'),JSON_UNESCAPED_UNICODE),
+                'execute'=>json_encode(_commonIssAuthStatus('_PAT','execute'),JSON_UNESCAPED_UNICODE),
+                'maintain'=>json_encode(_commonIssAuthStatus('_PAT','maintain'),JSON_UNESCAPED_UNICODE),
                 'issId'=>0
                 ]);
             
         //return view();  
         return view('index'.DS.'issPatList'.DS.'issPatList');   
+    }
+    
+    //根据前端传来的权限，选择返回前端的模板文件及内容
+    public function issPatSingle(Request $request, $oprt = '_NONE', $auth = '_NONE', $issId = 0, $patId = 0)
+    {
+        $this->_loginUser();
+
+        // 接收前端页面传来的值
+        $oprt = !empty($request->param('oprt'))?$request->param('oprt'):'_NONE';
+        $auth = !empty($request->param('auth'))?$request->param('auth'):'_NONE';
+        $issId = !empty($request->param('issId'))?$request->param('issId'):0;
+        $patId = !empty($request->param('patId'))?$request->param('patId'):0;
+
+        //选择模板文件名
+        switch ($auth) {
+                //edit
+            case '_EDIT':
+                $tplFile = 'editSingle';
+                break;
+                //audit
+            case '_AUDIT':
+                $tplFile = 'auditSingle';
+                break;
+                //approve
+            case '_APPROVE':
+                $tplFile = 'approveSingle';
+                break;
+                //execute
+            case '_EXECUTE':
+                $tplFile = 'executeSingle';
+                break;
+                //maintain
+            case '_MAINTAIN':
+                $tplFile = 'maintainSingle';
+                break;
+                //done
+            default:
+                $tplFile = 'doneSingle';
+                break;
+
+        }
+
+        if ($oprt == '_ADDNEW') {
+            $iss = array(
+                'id' => 0,
+                'topic' => '',
+                'abstract' => '',
+                'status' => '申报新增',
+                'statusdescription' => 0);
+            //查询当前用户已上传的所有附件信息
+            $att = AttinfoModel::all(['attmap_id' => 0, 'uploader' => $this->userName, 'rolename' => 'edit', 'deldisplay' => 1]);
+            $pat = array(
+                'id' => 0,
+                'topic' => '',
+                'patowner' => '',
+                'otherinventor' => '',
+                'inventor' => '',
+                'summary' => '',
+                'keyword' => '',
+                'pattype' => '',
+                );
+            $patType = 0;
+            $issChRd = 0;
+        } else
+            if ($oprt == '_ADDRENEW') {
+                $tplFile = 'renewSingle';
+                //查询当前用户已上传的所有附件信息
+                $att = AttinfoModel::all(['attmap_id' => 0, 'uploader' => $this->userName, 'rolename' => 'maintain', 'deldisplay' => 1]);
+                $pat = PatinfoModel::get($patId);
+                $iss = array(
+                    'id' => 0,
+                    'topic' => '关于“'.$pat->topic.'”的授权续费申报',
+                    'abstract' => '',
+                    'status' => '续费新增',
+                    'statusdescription' => 0);
+                $patType = $pat->getData('pattype');
+                $issChRd = 0;
+            } else {
+                //得到模板文件中需显示的iss信息
+                $iss = IssinfoModel::get($issId);
+                // 利用模型issinfo.php中定义的一对多方法“attachments”得到iss对应的attachments信息
+                $att = $iss->attachments;
+                // 利用模型issinfo.php中定义的多态方法“issmap”得到iss对应的pat信息
+                $pat = $iss->issmap;
+                // 得到iss对应的pat的'pattype'数据库字段值
+                $patType = $iss->issmap->getData('pattype');
+
+                //利用模型issinfo.php中定义的一对多方法“issrecords”得到iss对应的issrecord信息,找出‘审核、审批、修改’意见
+                //$issRd=collection($iss->issrecords)->visible(['id','rolename','act']);
+
+                //利用模型issrecord.php中定义的issChRdRecent()方法，得到issId对应issue的最新‘审核、审批、修改’意见
+                $issRdMdl = new IssrecordModel;
+                $issChRd = $issRdMdl->issChRdRecent($issId);
+            }
+
+            //向前端模板中的变量赋值
+            $this->assign([
+                        'home' => $request->domain(), 
+                        'username' => $this->userName, 
+                        'dept' => $this->dept, 
+                        'auth' => $auth, 
+                        'oprt' => $oprt, 
+                        'iss' => $iss, 
+                        'att' => $att, 
+                        'numAtt' => count($att), 
+                        'pat' => $pat, 
+                        'patType' => $patType,
+                        'issChRd' => $issChRd
+                        ]);
+        //return $this->fetch($tplFile);
+        return view('index'.DS.'issPatSingle'.DS.$tplFile);
     }
     
     //为前端显示PatRenew模板准备，1.数据库数据；2.向模板变量赋值；3.选择模板文件PatRenew.html返回前端

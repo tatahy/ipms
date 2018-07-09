@@ -1,38 +1,112 @@
 <!-- // issPatList.html -->
-{/*  总共有4处block用于子模板修改，
-	name="titleSpan"，
+{/*  
+
 */}
 	
 <div id="divIssPatList">		
+	
+	<p style="margin-top:5px;">
+		<span id="spTitle"></span>
+		
+		<button id="btnSearchInfo" type="button" class="btn-link" data-toggle="collapse" data-target="#divCollapse"><span class="glyphicon glyphicon-collapse-down"></span>搜索</button>
+				
+		<button id="btnReset" type="button" class="btn-link"><span class="glyphicon glyphicon-refresh"></span>重置</button>
+	</p>
+	
+	<div id="divCollapse" class="collapse">
+		<!-- <form id="userSearch" class="form-inline"> -->
+		<form id="userSearch">
+			<div class="row myRow">
+			<div class="form-group col-sm-6">
+				<label class="" for="searchTopic">事务标题</label>
+				<input class="form-control" id="searchTopic" name="searchTopic" type="text" value="" placeholder="...不限">
+										
+			</div>
+			
+			<div class="form-group col-sm-2">
+				<label class="control-label" for="searchStatus">事务状态</label>
+				<select class="form-control" id="searchStatus" name="searchStatus">
+					<option value="0">...不限</option>
+											
+				</select>
+			</div>
+			
+			<div class="form-group col-sm-4">
+				<label class="control-label" for="searchDept">部门</label>
+				<select class="form-control" id="searchDept" name="searchDept">
+					<option value="0">...不限</option>
+											
+				</select>
+			</div>
+			</div>
+			
+			<div class="row myRow">
+			<div class="form-group col-sm-2">
+				<label class="" for="searchWriter">事务撰写人</label>
+				<input class="form-control" id="searchWriter" name="searchWriter" type="text" value="" placeholder="...不限">
+										
+			</div>	
 
-	<h4 ><span id="spTitle" class="label"></span></h4>
+			<div class="form-group col-sm-2">
+				<label class="" for="searchExecuter">事务执行人</label>
+				<input class="form-control" id="searchExecuter" name="searchExecuter" type="text" value="" placeholder="...不限">
+										
+			</div>
+			</div>			
+			
+			<div class="row myRow">
+			<div class="form-group col-sm-4">
+				<label class="" for="searchCreateTime">事务创建时间</label>
+				<input class="form-control" id="searchCreateTime" name="searchCreateTime" type="text" value="" placeholder="...不限">
+										
+			</div>
+			
+			<div class="form-group col-sm-4">
+				<label class="" for="searchUpdateTime">事务更新时间</label>
+				<input class="form-control" id="searchUpdateTime" name="searchUpdateTime" type="text" value="" placeholder="...不限">
+										
+			</div>
+			</div>
+		
+			<!-- <input type="submit" class="btn btn-primary btn-sm" value="搜索 >>"> -->
+				
+			<button id="btnSearchUser" type="button" class="btn-link"><span class="glyphicon glyphicon-search"></span>搜索</button>
+				
+			<!-- <input type="reset" class="btn btn-primary btn-sm" value="重置" id=""><span class="glyphicon glyphicon-refresh"></span> -->
+				
+		</form>
+		<hr>
+	</div>
 	
 	<div class="table-responsive">
-		<table class="table table-bordered table-hover">
+		<table id="tblIssPat" class="table table-bordered table-hover" data-sort-name="{$sortName}" data-sort-order="{$sortOrder}" data-list-rows="{$listRows}" data-process="{$process}" data-pagenum="{$pageNum}">
 			<thead>
 				<tr>
 					<th class="text-center">序号</th>
-					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_TOPIC" sort="{ $sort}">专利事务标题</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_TOPIC" sortOrder="{$sortOrder}">专利事务标题</a></th>
 					
-					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_STATUS" sort="{ $sort}">状态</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_STATUS" sortOrder="{$sortOrder}">状态</a></th>
 					
-					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="_ABSTRACT" sort="{ $sort}">状态说明</a></th>
+					<th class="text-center">状态说明</th>
 					
-					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_TIME" sort="{ $sort}">状态时间</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_CREATETIME" sortOrder="{$sortOrder}">创建时间</a></th>
 					
-					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_PATNAME" sort="{ $sort}">专利名称</a></th>
-					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="_PATTYPE" sort="{ $sort}">专利类型</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_UPDATETIME" sortOrder="{$sortOrder}">更新时间</a></th>
 					
-					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_DEPT" sort="{ $sort}">所属部门</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_PATNAME" sortOrder="{$sortOrder}">专利名称</a></th>
 					
-					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_WRITER" sort="{ $sort}">事务撰写人</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="_PATTYPE" sortOrder="{$sortOrder}">专利类型</a></th>
 					
-					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_EXECUTER" sort="{ $sort}">事务执行人</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_DEPT" sortOrder="{$sortOrder}">所属部门</a></th>
+					
+					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_WRITER" sortOrder="{$sortOrder}">事务撰写人</a></th>
+					
+					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_EXECUTER" sortOrder="{$sortOrder}">事务执行人</a></th>
 					
 				{in name="process" value="_INPROCESS,_DONE"}
-					<th class="tpl text-center"><a data-toggle="tooltip" href="#" sortName="_PATSTATUS" sort="{ $sort}">专利状态</a></th>
+					<th class="tpl text-center"><a data-toggle="tooltip" href="#" sortName="_PATSTATUS" sortOrder="{$sortOrder}">专利状态</a></th>
 				{else/}					
-					<th class="tpl text-center"><a data-toggle="tooltip" href="#" sortName="_OPERATION" sort="{ $sort}">操作</a></th>
+					<th class="tpl text-center"><a data-toggle="tooltip" href="#" sortName="_OPRT" sortOrder="{$sortOrder}">操作</a></th>
 				
 				{/in}
 
@@ -48,6 +122,8 @@
 					<td class="issPatStatus"><a href="{$home}/issue/index/issrecords/id/{$vo.id}" target="_blank" data-toggle="tooltip">{$vo.status}</a></td>
 					
 					<td><pre style="padding:0px;border:none;background-color:transparent;">{$vo.statusdescription}</pre></td>
+					
+					<td>{$vo.create_time}</td>
 					
 					<td>{$vo.update_time}</td>
 					{//应用TP5中模型的多态1对多关联得到专利事务对应的专利名称$vo.issmap.topic，关键是要在issinfo模型中定义morphTo的方法名"issmap"，就可"." 出$vo.issmap.topic}
@@ -84,7 +160,7 @@
 					</td>
 					{else/}
 					<td class="btnTpl">
-						<a class="" href="#modalIssPatSingle" data-issId="{$vo.id}" data-issTopic="{$vo.topic}" data-issue-status="{$vo.status}" data-issue-authority="" data-toggle="modal" ></a>
+						<a class="aAuth" href="#modalIssPatSingle" data-issId="{$vo.id}" data-issTopic="{$vo.topic}" data-issue-status="{$vo.status}"  data-issue-authority="" data-issue-oprt="_NONE" data-toggle="modal" ></a>
 				
 					</td>
 					{/in}
@@ -101,7 +177,7 @@
 						
 		<div class="form-group form-group-sm col-sm-2">
 			<span class="">每页记录行数：</span>
-				<select class="form-control" id="listRows" data-process="{$process}">
+				<select class="form-control" id="listRows">
 					<option value="5">5</option>
 					<option value="10">10</option>
 					<option value="20">20</option>
@@ -143,77 +219,137 @@
 {block name="script"}
 <script>
 
-var aHtml=function(auth){
+var aHtml=function(auth,oprt){
 	var aSpanClass='';
 	var aText='';
 	switch(auth){
 		case'_EDIT':
 			aSpanClass='glyphicon glyphicon-pencil text-primary';
 			aText='_编辑';
-		break;
+			if(oprt=='_ADDNEW'){
+				aSpanClass='glyphicon glyphicon-modal-window text-primary';
+				aText='_新增';	
+			}
+			break;
 		case'_AUDIT':
 			aSpanClass='glyphicon glyphicon-check text-warning';
 			aText='_审核';
-		break;
+			break;
 		case'_APPROVE':
 			aSpanClass='glyphicon glyphicon-ok text-danger';
 			aText='_审批';
-		break;
+			break;
 		case'_EXECUTE':
 			aSpanClass='glyphicon glyphicon-random text-primary';
 			aText='_执行';
-		break;
+			break;
 		case'_MAINTAIN':
 			aSpanClass='glyphicon glyphicon-calendar text-primary';
 			aText='_管理/维护';
 		break;
+		default:
+			
+			break;
+		
 	}
+	
 	return '<span class="'+aSpanClass+'"></span>'+aText;
+};
+
+//**函数名：loadMe
+ 	//* 作用：加载本页面内容到指定div中<div id="divIssPatList_load"></div>
+	//* 参数1：listRows，Int。值：可为空，每页显示的记录行数。默认为10。
+	//* 参数2：sortName，String。值：可为空，排序字段名称。默认为‘_TOPIC’。
+	//* 参数3：sortOrder，String。值：可为空，排序方式。默认为'_ASC'。
+	//* 参数4：pageNum，Int。值：可为空，当前页数。默认为1。
+	//* 参数5：process，String。值：可为空，所处进程。默认为'_TODO'。
+	//* 参数6：serchWord，Array。值：可为空，查询关键词键值对。默认为空。	
+var loadMe=function(options){
+	//排序有关的参数都从$('#tblIssPat')获取
+	var obj=$('#tblIssPat');
+	var defaults={
+		'listRows':obj.data('list-rows'),
+		'sortName':obj.data('sort-name'),
+		'sortOrder':obj.data('sort-order'),
+		'process':obj.data('process'),
+		'pageNum':obj.data('pagenum'),
+		'searchWord':{}
+	};
+	var data = $.extend({},defaults, options);
+	
+	// 本页的搜索区输入框的查询词
+<!-- var searchWord={ -->
+	<!-- 'dept':$('#searchDept').val(), -->
+	<!-- 'name':$('#searchPatName').val(), -->
+	<!-- 'status':$('#searchPatStatus').val(), -->
+	<!-- 'type':$('#searchPatType').val(), -->
+	<!-- 'writer':$('#searchWriter').val() -->
+<!-- }; -->
+	<!-- $.extend(settings.searchWord, searchWord); -->
+	$('#divIssPatList_load').html('<h4 style="margin:50px;">加载中……</h4>');
+	
+	// jquery load()方法，本文件加载到index.html的指定区域<div id="divIssPatList_load"></div>
+	$('#divIssPatList_load').load('issPatList',{'data':data});
 };
 
 //利用自调用匿名函数立即执行的特点，设定$('#spTitle')和$('a[data-issue-process="'+process+'"]')的显示格式。
 (function($){
-    var process=$('#listRows').data('process');
+    var process=$('#tblIssPat').data('process');
 	var obj=$('a[data-issue-process="'+process+'"]');
 		
-		//恢复数字显示的初始格式
-		$('.num').removeClass('badge').removeClass('mycolorred-bgwhite').addClass('mycolorwhite-bgtransparent');
-		//设置a所在li为“active”
-		obj.closest('li').addClass('active');
-		//设置a所含数字的显示格式
-		obj.find('.num').addClass('badge mycolorred-bgwhite');
+	//恢复数字显示的初始格式
+	$('.num').removeClass('badge').removeClass('mycolorred-bgwhite').addClass('mycolorwhite-bgtransparent');
+	//设置a所在li为“active”
+	obj.closest('li').addClass('active');
+	//设置a所含数字的显示格式
+	obj.find('.num').addClass('badge mycolorred-bgwhite');
 		
-		//load的文件中根据process的不同对#spTitle添加class和text
-		switch(process){
-			case'_TODO':
-				spClass='label-warning';
-				spText='待处理';
-				break;
-			case'_INPROCESS':
-				spClass='label-info';
-				spText='流程中';
-				break;
-			case'_RENEW':
-				spClass='label-warning';
-				spText='待续费';
-				break;
-			case'_DONE':
-				spClass='label-default';
-				spText='完结';
-				break;
-		}
-		$('#spTitle').remove('label-warning label-default label-info');
-		$('#spTitle').addClass(spClass).text(spText);
-	
+	//load的文件中根据process的不同对#spTitle添加class和text
+	switch(process){
+		case'_TODO':
+			<!-- spClass=''; -->
+			spText='<a class="aAuth" href="#modalIssPatSingle" style="font-size:14px;" data-issId="0" data-issTopic="" data-issue-status="" data-issue-authority="_EDIT" data-issue-oprt="_ADDNEW" data-toggle="modal"><span class="glyphicon glyphicon-modal-window text-primary"></span>_新增</a>';
+			break;
+		case'_INPROCESS':
+			<!-- spClass='label-info'; -->
+			spText='';
+			break;
+		case'_RENEW':
+			<!-- spClass='label-warning'; -->
+			spText='';
+			break;
+		case'_DONE':
+			<!-- spClass='label-default'; -->
+			spText='';
+			break;
+	}
+	$('#spTitle').html(spText);	
 })(jQuery);
 
 $(document).ready(function(){	
 	<!-- console.log('x:'+'{$x}'); -->
-	
 	<!-- console.log('y:'+'{$y}'); -->
+	
 	<!-- var str='{$x}'; -->
 	<!-- var obj = JSON.parse(str); -->
 	<!-- console.dir(obj.total); -->
+	
+	<!-- // 显示搜索条件的div，修改触发"显示"的btn内容-->
+	$('#divCollapse').on('hide.bs.collapse', function(){
+    	$('#btnSearchInfo').html('<span class="glyphicon glyphicon-collapse-down">搜索</span>');
+  	});
+	
+	<!-- // 隐藏搜索条件的div，修改触发"隐藏"的btn内容-->
+  	$('#divCollapse').on('show.bs.collapse', function(){
+    	$('#btnSearchInfo').html('<span class="glyphicon glyphicon-collapse-up">隐藏搜索</span>');
+		
+  	});
+	
+	<!-- // 页面重新加载 -->
+	$('#btnReset').click(function(){
+		
+		loadMe();
+	});
 	
 	<!-- //表格每页显示记录行数 -->
 	$('#listRows').val('{$listRows}');
@@ -225,11 +361,12 @@ $(document).ready(function(){
 	
 	//为指定行上色
 	$('table').find('a[data-issid="{$issId}"]').closest('tr').addClass('bg-warning');
-
-	//完善.btnTpl中的a，各个权限的操作
-	$('.btnTpl a').each(function(){
-		var status=$(this).data('issue-status');
-		var auth='';
+	
+	//完善.aAuth中a的data属性和HTML内容
+	$('.aAuth').each(function(){
+		var status=$(this).attr('data-issue-status');
+		var oprt=$(this).attr('data-issue-oprt');
+		var auth='_EDIT';
 		if($.inArray(status,{$edit})>=0){
 			auth='_EDIT';
 		}
@@ -250,68 +387,70 @@ $(document).ready(function(){
 			auth='_MAINTAIN';
 		}
 		
-		$(this).data('issue-authority',auth);
-		$(this).html(aHtml(auth));
-		//console.dir(auth);
+		$(this).attr('data-issue-authority',auth);
+		$(this).html(aHtml(auth,oprt));
 	
 	});
 		
 	
-	// 根据后端控制器给出的排序字段{ $sortName},排序方式{ $sort}，修改th中a的显示形式
-	$('#divIssPatAuth thead a').each(function(){
+	// 根据后端控制器给出的排序字段{$sortName},排序方式{ $sortOrder}，修改th中a的显示形式
+	$('#divIssPatList thead a').each(function(){
 	
-		var glyAsc='<span class="small glyphicon glyphicon-sort-by-attributes text-muted"></span>';
-		var glyDesc='<span class="small glyphicon glyphicon-sort-by-attributes-alt text-warning"></span>';
+		var glyAsc='&nbsp;<span class="small glyphicon glyphicon-sort-by-attributes"></span>';
+		var glyDesc='&nbsp;<span class="small glyphicon glyphicon-sort-by-order-alt"></span>';
 		
-		//排序字段{ $sortName}已赋值在a的“sortName”属性中
+		//排序字段{$sortName}已赋值在a的“sortName”属性中
 		var sortName=$(this).attr('sortName');
-		// 排序方式{ $sort}已赋值在a的“sort”属性中
-		var sort=$(this).attr('sort');
+		// 排序方式{$sortOrder}已赋值在a的“sortOrder”属性中
+		var sortOrder=$(this).attr('sortOrder');
 		
-		<!-- // 后端控制器给出的排序字段{ $sortName}, -->
-		<!-- if (sortName=='{ $sortName}'){ -->
-			<!-- if(sort=='_ASC'){ -->
-				<!-- $(this).append(glyAsc); -->
-				<!-- $(this).attr('sort','_DESC'); -->
-				<!-- $(this).attr('data-original-title','点击后降序'); -->
-				<!-- // bootstap3中修改tooltip的options属性值 -->
-				//$(this).data("bs.tooltip").options.title="点击后降序";
-				//$(this).data("bs.tooltip").options.placement="top";
-				<!-- $(this).tooltip({placement: 'top'}); -->
-			<!-- }else{ -->
-				<!-- $(this).append(glyDesc); -->
-				<!-- $(this).attr('sort','_ASC'); -->
-				<!-- $(this).attr('data-original-title','点击后升序'); -->
-				<!-- // bootstap3中修改tooltip的options属性值 -->
-				//$(this).data("bs.tooltip").options.title="点击后降序";
-				//$(this).data("bs.tooltip").options.placement="top";
-				<!-- $(this).tooltip({placement: 'top'}); -->
-			<!-- } -->
-		<!-- } -->
+		// 后端控制器给出的排序字段{$sortName},
+		if (sortName=='{$sortName}'){
+			$(this).addClass('label label-primary');
+			<!-- $(this).data('selected',1); -->
+			//排序有关的参数都向$('#tblIssPat')汇集(更新有变化的)
+			$('#tblIssPat').data('sort-order',sortOrder)
+			
+			if(sortOrder=='_ASC'){
+				$(this).append(glyAsc);
+				$(this).attr('sortOrder','_DESC');
+				// bootstap3中修改tooltip的options属性值
+				<!-- $(this).data("bs.tooltip").options.title="点击后降序"; -->
+				<!-- $(this).data("bs.tooltip").options.placement="top"; -->
+				$(this).attr('data-original-title','当前为升序。点击后降序');
+				$(this).tooltip({placement: 'top'});
+			}else{
+				$(this).append(glyDesc);
+				$(this).attr('sortOrder','_ASC');
+				// bootstap3中修改tooltip的options属性值
+				<!-- $(this).data("bs.tooltip").options.title="点击后降序"; -->
+				<!-- $(this).data("bs.tooltip").options.placement="top"; -->
+				$(this).attr('data-original-title','当前为降序。点击后升序');
+				$(this).tooltip({placement: 'top'});
+			}
+		}
 	});	
 	
+	// 点击th中的a，表格中的内容根据a中的属性值进行排序
+	$('#divIssPatList thead a').click(function(){
+		//排序有关的参数都向$('#tblIssPat')汇集(更新有变化的)
+		var objSort=$('#tblIssPat');
+		objSort.data('sort-order',$(this).attr('sortOrder'));
+		objSort.data('sort-name',$(this).attr('sortName'));
+		objSort.data('pagenum',1);
+		
+		loadMe();
+		
+	});
+	
 	// 添加bootstrap的tooltip属性
-	$('#divIssPatAuth thead th a').tooltip({title: '点击排序', placement: 'bottom'});
+	$('#divIssPatList thead th a').tooltip({title: '点击排序', placement: 'bottom'});
 	
 	$('.patInfo a').tooltip({title: '专利信息', placement: 'bottom'});
 	$('.patStatus a').tooltip({title: '专利过程记录', placement: 'bottom'});
 	
 	$('.issInfo a').tooltip({title: '事务信息', placement: 'bottom'});
 	$('.issPatStatus a').tooltip({title: '事务过程记录', placement: 'bottom'});
-	
-	// 点击th中的a，表格中的内容根据a中的属性值进行排序
-	$('#divIssPatAuth thead a').click(function(){
-		
-		var sort=$(this).attr("sort");
-		var sortName=$(this).attr("sortName");
-		
-		// 得到页面锚点值
-		<!-- var fragment = window.location.hash;	 -->
-		
-		<!-- //根据每页显示记录行数，pat状态，排序字段，排序方式加载页面 -->
-		<!-- loadMe($('#patIssTableRows').val(),sortName,sort); -->
-		
-	});
 	
 	// <td>里<a>标签的click事件,给标签所在行上色
 	$('td a').click(function(){
@@ -321,10 +460,15 @@ $(document).ready(function(){
 		$(this).parent().parent().addClass('bg-warning');
 	});
 	
-	<!-- //根据每页显示记录行数和issStatus加载页面 -->
+	<!-- //根据listRows和process加载页面 -->
 	$('#listRows').change(function(){
-		console.log($(this).data('process'));
-		loadMe({'process':$(this).data('process'),'listRows':$(this).val()});
+		<!-- var obj=$('#tblIssPat th').find('.label'); -->
+		var objSort=$('#tblIssPat');
+		//排序有关的参数都向$('#tblIssPat')汇集(更新有变化的)
+		objSort.data('list-rows',$(this).val());
+		objSort.data('pagenum',1);
+		
+		loadMe();
 	
 	});	
 	
@@ -335,7 +479,6 @@ $(document).ready(function(){
 		var pageNum;
 		//(li.active)所代表的页数
 		var pageNumActive=$('#divListRows li.active').children('span').text();
-		
 		// jQuery的preventDefault()方法阻止元素发生默认的行为。阻止访问a的URL
         event.preventDefault();
 		<!-- alert("pageStr:"+pageStr+" active:"+pageNumActive); -->
@@ -356,24 +499,27 @@ $(document).ready(function(){
 		
 		}
 		<!-- alert("pageNum:"+pageNum); -->
+		//排序有关的参数都向$('#tblIssPat')汇集(更新有变化的)
+		var objSort=$('#tblIssPat');
+		objSort.data('pagenum',pageNum);
 		
-		<!-- //根据每页显示记录行数，排序字段，排序方式，分页页数加载页面 -->
-		loadMe({'process':$('#listRows').data('process'),'listRows':$('#listRows').val(),'pageNum':pageNum});
+		loadMe();
 	
 	});
 	
-	// patIss表格中<td>里<a>标签的click事件,Ajax处理数据引入#modalIssPatSingle所需内容
-	$(".btnTpl a").click(function(){
+	// 表格中<td>里<a class="aAuth">标签的click事件,Ajax处理数据引入#modalIssPatSingle所需内容
+	$('.aAuth').click(function(){
 		var issId=$(this).attr('data-issId');
 		var topic=$(this).attr('data-issTopic');
 		var auth=$(this).attr('data-issue-authority');
+		var oprt=$(this).attr('data-issue-oprt');
 		var aHtml=$(this).html();
-		//向后端“issPatAuthSingle”(TP5中 'issPatAuthSingle'='{$home}/dashboard/index/issPatAuthSingle' )发送数据(后端用于选择返回的模板文件)		
-		$.post('issPatAuthSingle',
+		//向后端“issPatSingle”(TP5中 'issPatSingle'='{$home}/dashboard/index/issPatSingle' )发送数据(后端用于选择返回的模板文件)		
+		$.post('issPatSingle',
 			{
 				'issId':issId,
 				'auth':auth,
-				'returnType':0,
+				'oprt':oprt,
 			},
 			//得到后端返回的data(模板文件)
 			function(data){
@@ -385,50 +531,7 @@ $(document).ready(function(){
 		
 	});
 	
-	// 在modalIssPatSingle出现前应用jQuery的load方法加载对应文件。
-	<!-- $('#modalIssPatSingle').on('bs.show', function(){ -->
-    	<!-- var sendData={"issId":}; -->
-		
-		<!-- $("#divIssPatSingle_load").load('divIssPatSingle_load',sendData); -->
-  	<!-- }); -->
-
 <!-- function -->
-	
-	//**函数名：loadMe
- 	//* 作用：加载本页面内容到指定div中<div id="divIssPatList_load"></div>
-	//* 参数1：rows，Int。值：可为空，每页显示的记录行数。默认为10。
-	//* 参数2：sortName，String。值：可为空，排序字段名称。默认为‘_TOPIC’。
-	//* 参数3：sortOrder，String。值：可为空，排序方式。默认为'_ASC'。
-	//* 参数4：pageNum，Int。值：可为空，当前页数。默认为1。
-	//* 参数5：process，String。值：可为空，所处进程。默认为'_TODO'。
-	//* 参数6：serchWord，Array。值：可为空，查询关键词键值对。默认为空。
-	
-	function loadMe(options){
-		var defaults={
-			'listRows':10,
-			'sortName':'_TOPIC',
-			'sortOrder':'_ASC',
-			'pageNum':1,
-			'process':'_TODO',
-			'serchWord':{}
-		};
-		var data = $.extend({},defaults, options);
-		
-		var process=data.process;
-		
-		// 本页的搜索区输入框的查询词
-		<!-- var searchWord={ -->
-			<!-- 'dept':$('#searchDept').val(), -->
-			<!-- 'name':$('#searchPatName').val(), -->
-			<!-- 'status':$('#searchPatStatus').val(), -->
-			<!-- 'type':$('#searchPatType').val(), -->
-			<!-- 'writer':$('#searchWriter').val() -->
-		<!-- }; -->
-		<!-- $.extend(settings.searchWord, searchWord); -->
-		$('#divIssPatList_load').html('<h4 style="margin:50px;">加载中……</h4>');
-		// jquery load()方法，本文件加载到index.html的指定区域<div id="divIssPatList_load"></div>
-		$('#divIssPatList_load').load('issPatList',{'data':data});
-	}
 
 <!-- function -->
 });

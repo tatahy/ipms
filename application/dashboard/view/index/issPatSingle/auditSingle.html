@@ -1,0 +1,139 @@
+<!-- // issPat:auditSingle.html： -->
+{extend name="../application/dashboard/view/index/issPatSingle/baseSingle.html" /}
+
+
+{block name="abstract"}
+{__block__}
+
+{/block}
+
+{block name="patInput"}
+
+			<form action="" id="fmPat">
+<!-- // class="sr-only" 仅源代码文件中显示-->
+				<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
+				<input id="patTopic" name="patTopic" value="{$pat.topic}" type="text" class="sr-only">
+			
+			</form>
+{/block}
+
+{block name="attInput"}
+{__block__}
+
+{/block}
+
+{block name="issPatInput"}
+<div class="myFieldset">
+	
+	<div class="myLegend"><span class="label label-warning">审核</span></div>
+	<form action="" id="fmIssPat" >
+		<!-- // class="sr-only" 仅源代码文件中显示-->
+		<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
+		<input name="issStatus" value="{$iss.status}" type="text" class="sr-only">
+		<input id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" class="sr-only">
+		
+		<div class="row myRow">
+			{notempty name="issChRd"}
+			<div class="form-group col-sm-6">
+				<label class="control-label">修改完善意见</label>
+				<pre class="myedge-left-info" style="padding:0px;border:none;">{$issChRd}</pre>
+			</div>
+			{/notempty}
+			
+			{neq name="iss.statusdescription" value="0"}
+			<div class="form-group col-sm-6">
+				<label class="control-label">提交说明</label>
+				<pre class="myedge-left-info" style="padding:0px;border:none;">{$iss.statusdescription}</pre>
+			</div>
+			{/neq}
+			
+			<div class="form-group col-sm-4">
+				<label for="auditResult">结论<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<select id="auditResult" class="empty-check form-control" name="auditResult" style="font-size:100%;">
+					<option value="0" class="text-warning bg-warning" >……</option>
+					<option class="text-success bg-success" value="_PASS">审核通过</option>
+					<option class="text-danger bg-danger" value="_FAIL">审核未通过</option>
+					<option class="text-primary bg-info" value="_MODIFY">返回修改</option>
+				</select>
+			</div>
+		
+			<div id="divAuditMsg" class="resetHide form-group col-sm-8 ">
+				<label for="auditMsg">具体意见<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+				<textarea class="empty-check form-control" rows="5" id="auditMsg" name="statusDescription" type="text" placeholder="请填入具体的审核意见" required></textarea>
+			</div>
+			
+		</div>
+		</form>
+</div>		
+
+{/block}
+
+{block name="btn"}
+
+	<button type="submit" id="btnPass" class="resetHide btn btn-success btn-sm" data-oprt="_PASS" data-topic="{$iss.topic}" data-btnLabel="label-success"><span class="glyphicon glyphicon-ok-sign"></span>审核通过</button>
+	<button type="submit" id="btnFail" class="resetHide btn btn-danger btn-sm" data-oprt="_FAIL" data-topic="{$iss.topic}" data-btnLabel="label-danger"><span class="glyphicon glyphicon-remove-sign"></span>审核未通过</button>
+	
+	<button type="submit" id="btnModify" class="resetHide btn btn-primary btn-sm" data-oprt="_MODIFY" data-topic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-info-sign"></span>返回修改</button>
+	
+{/block}
+
+{block name="script"}
+{__block__}
+<script>
+$(document).ready(function(){	
+	//
+	$('.resetHide').hide();
+	
+	
+	// 单选框auditResult的change事件，出现auditMsg输入框等。
+	$('#auditResult').change(function(){	
+		//恢复到default状态
+		$('.resetHide').hide();
+		$(this).removeClass('label label-danger label-primary label-success');
+		//#auditMsg去掉'empty-check'，不列入非空检查
+		$('#auditMsg').removeClass('empty-check');	
+		
+		switch($(this).val()){
+			case '_FAIL':
+				$('#divAuditMsg').show();
+				$('#btnFail').show();
+				$(this).addClass('label label-danger');
+				//#auditMsg增加'empty-check'，列入非空检查
+				$('#auditMsg').addClass('empty-check');
+			break;
+			
+			case '_MODIFY':
+				$('#divAuditMsg').show();
+				$('#btnModify').show();
+				$(this).addClass('label label-primary');
+				//#auditMsg增加'empty-check'，列入非空检查
+				$('#auditMsg').addClass('empty-check');
+			break;
+			
+			case '_PASS':
+				$('#divAuditMsg').hide();
+				$('#btnPass').show();
+				$(this).addClass('label label-success');
+				//#auditMsg去掉'empty-check'，不列入非空检查
+				$('#auditMsg').removeClass('empty-check');
+			break;
+			
+			case '0':
+				$('.resetHide').hide();
+				$(this).removeClass('label label-danger label-primary label-success');
+				//#auditMsg去掉'empty-check'，不列入非空检查
+				$('#auditMsg').removeClass('empty-check');
+			break;
+		}	
+	});
+	
+	//附加#btnReset 的click事件
+	$('#btnReset').click(function(){	
+	
+		$('#auditResult').removeClass('label label-danger label-primary label-success');
+		
+	});
+	
+});
+</script>
+{/block}
