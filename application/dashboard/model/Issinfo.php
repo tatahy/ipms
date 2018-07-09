@@ -114,12 +114,22 @@ class Issinfo extends Model
         $listPatRenew= array();
         $listDone= array();
         
+        $mapToDo= array();
+        $mapInProcess= array();
+        
+        $arrToDo= array();
+        $arrInProcess= array();
+        
         //基础查询，在isspat中进行查询
         $iss=$this::scope('issmap_type','_PAT');
         
         foreach ($logUser['auth']['iss'] as $key => $value) {
+            //清空查询条件数组
+            $mapToDo = array();
+            $mapInProcess = array();
             
-            $map['status'] = ['in', _commonIssAuthStatus('_PAT', $key)];
+            $mapToDo['status'] = ['in', _commonIssAuthStatus('_PAT', $key)];
+            $mapInProcess['status']=$mapToDo['status'];
             switch ($key) {
                 case 'maintain':
                     //$map['status'] =['in',['申报复核','申报提交','续费提交','准予续费','否决申报','专利授权','专利驳回','放弃续费','续费授权']];
@@ -127,13 +137,13 @@ class Issinfo extends Model
 
                 case 'edit':
                     //$map['status'] =['in',['填报','返回修改','修改完善']];
-                    $map['dept'] = $logUser['dept'];
-                    $map['writer'] = $logUser['username'];
+                    $mapToDo['dept'] = $logUser['dept'];
+                    $mapToDo['writer'] = $logUser['username'];
                     break;
 
                 case 'audit':
                     //$map['status'] ='待审核';
-                    $map['dept'] = $logUser['dept'];
+                    $mapToDo['dept'] = $logUser['dept'];
                     break;
 
                 case 'approve':
@@ -142,44 +152,40 @@ class Issinfo extends Model
 
                 case 'execute':
                     //$map['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
-                    $map['executer'] = $logUser['username'];
+                    $mapToDo['executer'] = $logUser['username'];
                     break;
 
             }
             $visibleField=['id','topic','status','statusdescription','create_time','update_time','dept','writer','executer','issmap_id','issmap_type',
                             'issmap' => ['id','patnum','topic','pattype','status']]; 
              
-            $arr= $iss->where($map)->select();
-            
-            if(count($arr)){
-                $num[$key]=count($arr);
-                //方式1：模型的get和all方法的第二个参数直接传入关联预载入参数                          
-                //$arr=$this::all(function($query) use ($map){
-    //	                   $query->where('issmap_type','like','%_PAT%')->where($map);
-    //                    },'issmap');
-    //            $arr = collection($arr)->visible($visibleField)->toArray();
-                
-                //方式2：使用with方法指定需要预载入的关联（方法）
-                //$arr = $iss->with('issmap')->where($map)->select();
-    //            $arr = collection($arr)->visible($visibleField)->toArray();  
-                
-                //方式3：数据集对象的`load`方法实现延迟预载入
-                //应用助手函数转换为数据集对象，使用load方法获取关联数据
-                $arr = collection($arr)->load('issmap')->visible($visibleField)->toArray(); 
+            $arrToDo= $iss->where($mapToDo)->select();
+
+            if(count($arrToDo)){
+                $arrToDo = collection($arrToDo)->load('issmap')->visible($visibleField)->toArray();
             }else{
-                $num[$key]=0;
-            }
+                $arrToDo = array();
+            } 
+            
+            $arrInProcess= $iss->where($mapInProcess)->select();
+            if(count($arrInProcess)){
+                $arrInProcess = collection($arrInProcess)->load('issmap')->visible($visibleField)->toArray(); 
+            }else{
+                $arrInProcess = array();
+            } 
             
             if($value){
-                $listToDo=array_merge($listToDo,$arr);
+                $listToDo=array_merge($listToDo,$arrToDo);
+                $num[$key]=count($arrToDo);
                 $num['todo']+=$num[$key];
             }else{                
-                $listInProcess=array_merge($listInProcess,$arr);
+                $listInProcess=array_merge($listInProcess,$arrInProcess);
+                $num[$key]=count($arrInProcess);
                 $num['inprocess']+=$num[$key];
             }
-            //清空查询条件数组
-            $map = array();
+            
         }
+        
         $num['done'] = $iss->where('status','完结')->count();        
         
         //得到满足续费条件的专利数

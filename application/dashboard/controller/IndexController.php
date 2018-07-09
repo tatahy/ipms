@@ -302,21 +302,15 @@ class IndexController extends \think\Controller
 
     }
     
-    public function issPat2(Request $request, IssinfoModel $issMdl, $auth = 'done', $issId = '')
+    public function issPat2(Request $request, IssinfoModel $issMdl, $issId = '')
     {
         $this->_loginUser();
 
         // $issId接收前端页面传来issId值
-        if (!empty($request->param('id'))) {
-            $issId = $request->param('id');
-        }
+        $issId=!empty($request->param('id'))?$request->param('id'):0;
         
         //调用issinfo模型定义查询方法issPatProcess()得到查询结果数据集
         $num=$issMdl->issPatProcess($this->logUser,'_NUM');
-        $numToDo=$num['todo'];
-        $numInProcess=$num['inprocess'];
-        $numPatRenew=$num['patrenew'];
-        $numDone=$num['done']; 
 
         // 模板变量赋值
         $this->assign([
@@ -324,10 +318,10 @@ class IndexController extends \think\Controller
                     'username' => $this->userName, //向前端权限变量赋值
                     //iss权限
                     'authIss' => $this->authArr['iss'], 
-                    'numToDo'=>$numToDo,
-                    'numPatRenew' => $numPatRenew,
-                    'numInProcess' => $numInProcess,
-                    'numDone' => $numDone, 
+                    'numToDo'=>$num['todo'],
+                    'numPatRenew' => $num['patrenew'],
+                    'numInProcess' => $num['inprocess'],
+                    'numDone' => $num['done'], 
                     'issId' => $issId, 
                     ]);
         return view();
@@ -374,7 +368,7 @@ class IndexController extends \think\Controller
         
          //调用issinfo模型的查询方法issPatProcess()得到查询结果数据集(数组)
         $issArr=$issMdl->issPatProcess($this->logUser,$process);
-
+        //前端排序字段与数据集字段对应关系
         $issField = array(
             '_TOPIC' => 'topic',
             '_STATUS' => 'status',
@@ -412,7 +406,12 @@ class IndexController extends \think\Controller
                 $sortName=$key;
            }
         }
-
+        //组装状态权限数组
+        $statusArr=array();
+        foreach($this->authArr['iss'] as $key=>$val){
+            $statusArr[$key] =_commonIssAuthStatus('_PAT',$key);
+        }
+ 
         $this->assign(['home' => $request->domain(), //"destr".$this->authArr['isspro']['edit'],
                 // 分页显示所需参数
                 'iss' => $showList,
@@ -433,16 +432,13 @@ class IndexController extends \think\Controller
 //                'searchPatType' =>$searchPatType, 
 //                'searchWriter' => $searchWriter, 
 //                'searchPatStatus' => $searchPatStatus, 
-//                
+                'authEdit'=>  $this->authArr['iss']['edit'],
                 'sortName' => $sortName, 
                 'sortOrder' => $sortOrder, 
                 //'auth' => $auth, 
                 //前端判断权限用数组（权限/状态数组），保持中文
-                'edit'=>json_encode(_commonIssAuthStatus('_PAT','edit'),JSON_UNESCAPED_UNICODE),
-                'audit'=>json_encode(_commonIssAuthStatus('_PAT','audit'),JSON_UNESCAPED_UNICODE),
-                'approve'=>json_encode(_commonIssAuthStatus('_PAT','approve'),JSON_UNESCAPED_UNICODE),
-                'execute'=>json_encode(_commonIssAuthStatus('_PAT','execute'),JSON_UNESCAPED_UNICODE),
-                'maintain'=>json_encode(_commonIssAuthStatus('_PAT','maintain'),JSON_UNESCAPED_UNICODE),
+                'statusArr' => json_encode($statusArr,JSON_UNESCAPED_UNICODE),
+                
                 'issId'=>0
                 ]);
             

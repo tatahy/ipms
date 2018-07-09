@@ -293,7 +293,7 @@ var loadMe=function(options){
 };
 
 //利用自调用匿名函数立即执行的特点，设定$('#spTitle')和$('a[data-issue-process="'+process+'"]')的显示格式。
-(function($){
+(function($,authEdit){
     var process=$('#tblIssPat').data('process');
 	var obj=$('a[data-issue-process="'+process+'"]');
 		
@@ -308,7 +308,11 @@ var loadMe=function(options){
 	switch(process){
 		case'_TODO':
 			<!-- spClass=''; -->
-			spText='<a class="aAuth" href="#modalIssPatSingle" style="font-size:14px;" data-issId="0" data-issTopic="" data-issue-status="" data-issue-authority="_EDIT" data-issue-oprt="_ADDNEW" data-toggle="modal"><span class="glyphicon glyphicon-modal-window text-primary"></span>_新增</a>';
+			if(authEdit){
+				spText='<a class="aAuth" href="#modalIssPatSingle" style="font-size:14px;" data-issId="0" data-issTopic="" data-issue-status="" data-issue-authority="_EDIT" data-issue-oprt="_ADDNEW" data-toggle="modal"><span class="glyphicon glyphicon-modal-window text-primary"></span>_新增</a>';
+			}else{
+				spText='';
+			}
 			break;
 		case'_INPROCESS':
 			<!-- spClass='label-info'; -->
@@ -324,7 +328,7 @@ var loadMe=function(options){
 			break;
 	}
 	$('#spTitle').html(spText);	
-})(jQuery);
+})(jQuery,{$authEdit});
 
 $(document).ready(function(){	
 	<!-- console.log('x:'+'{$x}'); -->
@@ -347,7 +351,6 @@ $(document).ready(function(){
 	
 	<!-- // 页面重新加载 -->
 	$('#btnReset').click(function(){
-		
 		loadMe();
 	});
 	
@@ -367,23 +370,24 @@ $(document).ready(function(){
 		var status=$(this).attr('data-issue-status');
 		var oprt=$(this).attr('data-issue-oprt');
 		var auth='_EDIT';
-		if($.inArray(status,{$edit})>=0){
+		
+		if($.inArray(status,{$statusArr}.edit)>=0){
 			auth='_EDIT';
 		}
 		
-		if($.inArray(status,{$audit})>=0){
+		if($.inArray(status,{$statusArr}.audit)>=0){
 			auth='_AUDIT';
 		}
 		
-		if($.inArray(status,{$approve})>=0){
+		if($.inArray(status,{$statusArr}.approve)>=0){
 			auth='_APPROVE';
 		}
 		
-		if($.inArray(status,{$execute})>=0){
+		if($.inArray(status,{$statusArr}.execute)>=0){
 			auth='_EXECUTE';
 		}
 		
-		if($.inArray(status,{$maintain})>=0){
+		if($.inArray(status,{$statusArr}.maintain)>=0){
 			auth='_MAINTAIN';
 		}
 		
