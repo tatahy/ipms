@@ -2256,6 +2256,27 @@ foreach ($list as $user) {
 ?>
 使用关联预查询功能，对于一对一关联来说，默认只有一次查询，对于一对多关联的话，就变成2次查询，有效提高性能。关联的预载入查询不是惰性的，是连同数据查询一起完成的，但由于封装的合并查询，性能方面远远优于普通的关联惰性查询，所以整体的查询性能是非常乐观的。
 
+应用代码：（查询得到的数据结果集为数组）
+<?php
+$visibleField=['id','topic','issmap_type',
+               'issmap' => ['id','patnum','topic','pattype','status']]; 
+
+//方式1：模型的get和all方法的第二个参数直接传入关联预载入参数           
+$arr=Model::all(function($query) use ($map){
+               $query->where('issmap_type','like','%_PAT%')->where($map);
+               },'issmap');
+$arr = collection($arr)->visible($visibleField)->toArray();
+                
+//方式2：使用with方法指定需要预载入的关联（方法）
+$arr = Model->with('issmap')->where($map)->select();
+$arr = collection($arr)->visible($visibleField)->toArray();  
+                
+//方式3：数据集对象的`load`方法实现延迟预载入
+$arr= Model->where($map)->select();
+//应用助手函数转换为数据集对象，使用load方法获取关联数据
+$arr = collection($arr)->load('issmap')->visible($visibleField)->toArray(); 
+
+?>
 
 //嵌套预载入
 嵌套预载入指的是如果关联模型本身还需要进行关联预载入的话，可以在当前模型预载入查询的时候直接指定，理论上嵌套是可以任意级别的（但实际上估计不会有这么复杂的关联设计）。

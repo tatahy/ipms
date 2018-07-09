@@ -118,6 +118,7 @@ class Issinfo extends Model
         $iss=$this::scope('issmap_type','_PAT');
         
         foreach ($logUser['auth']['iss'] as $key => $value) {
+            
             $map['status'] = ['in', _commonIssAuthStatus('_PAT', $key)];
             switch ($key) {
                 case 'maintain':
@@ -147,23 +148,27 @@ class Issinfo extends Model
             }
             $visibleField=['id','topic','status','statusdescription','create_time','update_time','dept','writer','executer','issmap_id','issmap_type',
                             'issmap' => ['id','patnum','topic','pattype','status']]; 
-            
-            //方式1：模型的get和all方法的第二个参数直接传入关联预载入参数                          
-            //$arr=$this::all(function($query) use ($map){
-//	                   $query->where('issmap_type','like','%_PAT%')->where($map);
-//                    },'issmap');
-//            $arr = collection($arr)->visible($visibleField)->toArray();
-            
-            //方式2：使用with方法指定需要预载入的关联（方法）
-            //$arr = $iss->with('issmap')->where($map)->select();
-//            $arr = collection($arr)->visible($visibleField)->toArray();  
              
-            //方式3：数据集对象的`load`方法实现延迟预载入
             $arr= $iss->where($map)->select();
-            //应用助手函数转换为数据集对象，使用load方法获取关联数据
-            $arr = collection($arr)->load('issmap')->visible($visibleField)->toArray(); 
             
-            $num[$key]=count($arr);         
+            if(count($arr)){
+                $num[$key]=count($arr);
+                //方式1：模型的get和all方法的第二个参数直接传入关联预载入参数                          
+                //$arr=$this::all(function($query) use ($map){
+    //	                   $query->where('issmap_type','like','%_PAT%')->where($map);
+    //                    },'issmap');
+    //            $arr = collection($arr)->visible($visibleField)->toArray();
+                
+                //方式2：使用with方法指定需要预载入的关联（方法）
+                //$arr = $iss->with('issmap')->where($map)->select();
+    //            $arr = collection($arr)->visible($visibleField)->toArray();  
+                
+                //方式3：数据集对象的`load`方法实现延迟预载入
+                //应用助手函数转换为数据集对象，使用load方法获取关联数据
+                $arr = collection($arr)->load('issmap')->visible($visibleField)->toArray(); 
+            }else{
+                $num[$key]=0;
+            }
             
             if($value){
                 $listToDo=array_merge($listToDo,$arr);
