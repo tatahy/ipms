@@ -13,10 +13,6 @@
 		<button id="btnRefresh" type="button" class="btn-link"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 	</p>
 	
-	<p>queryArrID:{$queryArr}</p>
-	<p>sortArrID:{$sortArr}</p>
-	<p>{$check}</p>
-	
 	<div id="divCollapse" class="collapse" >
 		<div class="label label-info" style="font-size:14px;">搜索条件</div>
 		<form id="fmIssPatSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;">
@@ -497,12 +493,6 @@ function ajaxShowSelect(options){
 })(jQuery,{$authEdit});
 
 $(document).ready(function(){	
-	<!-- console.log('x:'+'{$x}'); -->
-	<!-- console.log('y:'+'{$y}'); -->
-	
-	<!-- var str='{$x}'; -->
-	<!-- var obj = JSON.parse(str); -->
-	<!-- console.dir(obj.total); -->
 	
 	<!-- // 显示搜索条件的div，修改触发"显示"的btn内容-->
 	$('#divCollapse').on('hide.bs.collapse', function(){

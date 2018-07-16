@@ -34,7 +34,6 @@ class Issinfo extends Model
     //修改器，设置issnum字段的值为iss+yyyy+0000的形式，即是在当年进行流水编号
     protected function setIssnumAttr()
     {
-
         //$idmax = Issinfo::max('id');
         //        $value = Issinfo::where('id',$idmax)->value('issnum');
         $idmax = $this->max('id');
@@ -48,7 +47,6 @@ class Issinfo extends Model
         } else {
             $result = "iss".date('Y')."0001";
         }
-
         return ($result);
     }
 
@@ -245,7 +243,25 @@ class Issinfo extends Model
         //排序字段名称
         $field=('oprt'==$field)?'status':$field;
         
-        //排序过程
+        //取排序数组id索引数组
+        $idSortArr=collection($issArr)->column('id');        
+        if(count($idSearchArr)){
+            //id索引数组交集
+            $idArr=array_intersect($idSortArr,$idSearchArr);
+        }else{
+            $idArr=$idSortArr;
+        }
+        //重组$idArr下标，保证$idArr的下标是连续
+        $idArr=array_values($idArr);
+        
+        //根据交集得到数据集
+        //$issArr=$this->all($idArr,'issmap'); 
+        $issArr=$this->all($idArr); 
+        $visibleField=['id','topic','status','statusdescription','create_time','update_time','dept','writer','executer','issmap_id','issmap_type',
+                            'issmap' => ['id','patnum','topic','pattype','status']]; 
+        $issArr = collection($issArr)->load('issmap')->visible($visibleField)->toArray();
+        
+        //对数据集进行排序
         //1.生成一个仅含排序字段值的索引数组  
         //方法一：使用for循环    
         for($i=0;$i<count($issArr);$i++){
@@ -255,33 +271,19 @@ class Issinfo extends Model
                 $arr[$i]=$issArr[$i][$field];
             }
         }
-        
         //2.按照$order的值对上述新生成的索引数组进行自然排序
         if($order=='_ASC'){
             asort($arr,SORT_NATURAL);
         }else{
             arsort($arr,SORT_NATURAL);
         }        
-        
-        //3.得到排序好的id值数组
-        //方法：按$arr的顺序将$issArr的‘id’字段值拷贝到新数组$idSortArr
+        //3.得到排序好的id值数组        
+        //方法：按$arr的顺序将$issArr的‘id’字段值拷贝到新数组$idSortArr        
         $i=0;
         foreach($arr as $key=>$value){
-            $idSortArr[$i]=$issArr[$key]['id'];
+            $result[$i]=$issArr[$key];
             $i++;
         }
-        
-        //4.$idSearchArr不为空，取排序id数组和查询id数组的交集$idArr
-        if(count($idSearchArr)){
-            $idArr=array_intersect($idSortArr,$idSearchArr);
-        }else{
-            $idArr=$idSortArr;
-        }
-        //重组$idArr下标，保证$idArr的下标是连续
-        $idArr=array_values($idArr);
-                
-        //5.由$idArr查出数据，同时带上关联数据
-        $result=$this->all($idArr,'issmap'); 
         
         return $result;
     }

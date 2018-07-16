@@ -446,13 +446,6 @@ class IndexController extends \think\Controller
         
         $showList=array_slice($issArr,($pageNum-1)*$listRows,$listRows);
         
-        //当前页显示所需的内容
-        //if(count($searchData)){
-//            $showList=$issArr;
-//        }else{
-//            $showList=array_slice($issArr,($pageNum-1)*$listRows,$listRows);
-//        }
-        
         //将数据库issinfo表对应字段转换为前端的排序字段
         foreach($sortField as $key=>$value){
            if($value==$sortName){
@@ -464,38 +457,19 @@ class IndexController extends \think\Controller
         foreach($this->authArr['iss'] as $key=>$val){
             $statusArr[$key] =_commonIssAuthStatus('_PAT',$key);
         }
- 
-        $check=array_intersect([100,101,129,128,4],[4,100,128]); 
-        //重组$check下标，保证$check的下标是连续
-        $check=array_values($check);
         
-        $this->assign(['home' => $request->domain(), //"destr".$this->authArr['isspro']['edit'],
+        $this->assign(['home' => $request->domain(), 
                 // 分页显示所需参数
                 'iss' => $showList,
                 'pageRender' => $pageRender, 
                 'listRows' => $listRows,
                 'process' => $process,
-                
-                //'x' => json_encode($map,JSON_UNESCAPED_UNICODE),
-//                'y' => json_encode($listToDo),
-                'x' => json_encode($issArr,JSON_UNESCAPED_UNICODE),
-                'y' => count($issArr),
-                
                 'pageNum'=>$pageNum,
-                // 表格搜索字段
-                //'searchPatName' => $searchPatName, 
-//                'searchDept' => $searchDept, 
-//                'searchPatStatus' => $searchPatStatus, 
-//                'searchPatType' =>$searchPatType, 
-//                'searchWriter' => $searchWriter, 
-//                'searchPatStatus' => $searchPatStatus, 
+                
                 'authEdit'=>  $this->authArr['iss']['edit'],
                 'sortName' => $sortName, 
                 'sortOrder' => $sortOrder,
-                
-                'queryArr' => json_encode(array_values($searchResultArr),JSON_UNESCAPED_UNICODE),
-                'sortArr' => json_encode(array_keys($showList),JSON_UNESCAPED_UNICODE),
-
+        
                 //'auth' => $auth, 
                 //前端判断权限用数组（权限/状态数组），保持中文
                 'statusArr' => json_encode($statusArr,JSON_UNESCAPED_UNICODE),
@@ -503,7 +477,7 @@ class IndexController extends \think\Controller
                 'searchResultNum'=>count($issArr),
                 'issId'=>0,
                 
-                'check'=>json_encode($check)
+                'check'=>$sortName.'|'.$sortOrder
                 ]);
             
         //return view();  
