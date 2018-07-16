@@ -231,15 +231,23 @@ class Issinfo extends Model
      * @param  Array $issArr 待排序的数组
      * @param  String $field 排序字段 
      * @param  String $order “asc”/"desc"
-     * @return Array $result 返回的索引数组
+     * @param  Array $idSearchArr 搜索id值索引数组
+     * @return Array $result 返回值，已排好序的索引数组
      */
-    public function issPatSort($issArr=[],$field = '',$order='_ASC') 
+    public function issPatSort($issArr=[],$field = '',$order='_ASC',$idSearchArr=[]) 
     {
+        //含排序字段值的索引数组   
         $arr=array();
+        //排序id值索引数组，由$issArr的"id"字段值得到   
+        $idSortArr=array();
+        //需返回的已排好序的索引数组
         $result=array();
+        //排序字段名称
         $field=('oprt'==$field)?'status':$field;
         
-        //1.生成一个仅含排序字段值的索引数组        
+        //排序过程
+        //1.生成一个仅含排序字段值的索引数组  
+        //方法一：使用for循环    
         for($i=0;$i<count($issArr);$i++){
             if(is_array($field)){
                 $arr[$i]=$issArr[$i][$field[0]][$field[1]];
@@ -253,18 +261,134 @@ class Issinfo extends Model
             asort($arr,SORT_NATURAL);
         }else{
             arsort($arr,SORT_NATURAL);
-        }
+        }        
         
-        //3. 按$arr的顺序将$issArr拷贝到新数组$result
+        //3.得到排序好的id值数组
+        //方法：按$arr的顺序将$issArr的‘id’字段值拷贝到新数组$idSortArr
         $i=0;
         foreach($arr as $key=>$value){
-            $result[$i]=$issArr[$key];
+            $idSortArr[$i]=$issArr[$key]['id'];
             $i++;
         }
         
+        //4.$idSearchArr不为空，取排序id数组和查询id数组的交集$idArr
+        if(count($idSearchArr)){
+            $idArr=array_intersect($idSortArr,$idSearchArr);
+        }else{
+            $idArr=$idSortArr;
+        }
+        //重组$idArr下标，保证$idArr的下标是连续
+        $idArr=array_values($idArr);
+                
+        //5.由$idArr查出数据，同时带上关联数据
+        $result=$this->all($idArr,'issmap'); 
+        
         return $result;
     }
-   
+    
+    /**
+     * 根据搜索条件查询结果数据集(数组)
+     * @param  Array $queryParam 搜索条件数组
+     * @param  Array $field 查询结果数据集所包含的字段名数组
+     * @return Array $result 返回的索引数组
+     */
+    public function issPatSearch($queryParam=[],$field=[]) 
+    {
+        //需返回的索引数组
+        $result=array();
+        //时间查询参数数组
+        $time=array();
+        //查询条件数组
+        $map=array();
+        $strRange='';
+        
+        /**
+ *      $queryParam = array(
+ *             'topic' => '',
+ *             'status' => '',
+ *             'dept' => '',
+ *             'writer' => '',
+ *             'executer' => '',
+ *             'timeName' => 'create_time'/'update_time',
+ *             'timeRange' => '_LE/_GE/_BT',
+ *             'startTime' => '2018-7-2',
+ *             'endTime' => '2018-7-12',
+ *             );
+ */
+        //搜索过程，$queryParam有内容就开始从Issinfo表中查询
+        if(count($queryParam)){
+            //1. 根据$queryParam内容组织查询数组
+            foreach($queryParam as $key=>$val){
+                //提取时间有关搜索数据,
+                //strpos对大小写敏感，返回值可能包含0，所以要用严格比较符“!==”
+                //stristr()对大小写不敏感，返回值为找到的字符串或false。性能应该比不上strpos
+                if(strpos($key, 'ime')!== false){
+                    //时间字段名
+                    if(strpos($key, 'Name')!== false){
+                        $time['name']=$val;
+                    }
+                    //时间范围
+                    if(strpos($key, 'Range')!== false){
+                        switch($val){
+                            case'_BT':
+                                $strRange='between time';
+                                break;
+                            case'_LE':
+                                $strRange='<= time';
+                                break;
+                            case'_GE':
+                                $strRange='>= time';
+                                break;
+                        }
+                        $time['range']=array('type'=>$val,'value'=>$strRange);
+                    }
+                    
+                    //时间值
+                    if(strpos($key, 'start')!== false){
+                        $time['start']=$val;
+                    }
+                    
+                    if(strpos($key, 'end')!== false){
+                        $time['end']=$val;
+                    }
+                }else{
+                     //其他搜索字段名和条件
+                     $map[$key]=['like','%'.$val.'%'];
+                     //$map[$key]=['like',$val];
+                }
+            }
+            
+            //时间搜索字段名和条件
+            if(count($time)) {
+                switch($time['range']['type']){
+                    case'_BT':
+                        $map[$time['name']]=[$time['range']['value'],[$time['start'],$time['end']]];
+                        break;
+                    case'_LE':
+                        $map[$time['name']]=[$time['range']['value'],$time['end']];
+                        break;
+                    case'_GE':
+                        $map[$time['name']]=[$time['range']['value'],$time['start']];
+                        break;
+                }
+            }   
+            //搜索结果数据集
+            $result=$this->where($map)->field($field)->select();
+        }
+        return $result;
+    }
+   //issPatIntersect()得到查询结果数据集(数组）与搜索结果数据集(数组)的交集
+   /**
+     * 根据搜索条件查询结果数据集(数组)
+     * @param  Array $issArr 查询结果数据集(数组）
+     * @param  Array $queryArr 搜索结果数据集(数组)
+     * @return Array $result 返回的索引数组
+     */
+    public function issPatIntersect($issArr=[],$queryArr=[]) 
+    {
+        //比对2个数组的id
+        $issArr=array_intersect($issArr,$queryArr);
+    }
 
     /**
      * 获取对应patent的内容

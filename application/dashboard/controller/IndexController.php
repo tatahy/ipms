@@ -330,88 +330,145 @@ class IndexController extends \think\Controller
     }
     
     //根据登录用户Id，选择返回前端issPat的list
-    public function issPatList(Request $request,IssinfoModel $issMdl,$data=[])
+    public function issPatList(Request $request,IssinfoModel $issMdl,$sortData=[],$searchData=[])
     {
         $this->_loginUser();
+        $sortDefaults=array('listRows'=>10,'sortName'=>'_TOPIC','sortOrder'=>'_ASC','pageNum'=>1,'process'=>'_TODO');
+        // 接收前端的排序参数数组
+        $sortData=!empty($request->param('sortData/a'))?$request->param('sortData/a'):$sortDefaults;
+        $sortData=array_merge($sortDefaults,$sortData);
         
-        $defaults=array('listRows'=>10,'sortName'=>'_TOPIC','sortOrder'=>'_ASC','pageNum'=>1,'process'=>'_TODO',
-                        'searchWord'=>array());
+        $searchDefaults=array();
+        // 接收前端的搜索参数数组，由前端保证传来的搜索参数值非0，非空。
+        $searchData=!empty($request->param('searchData/a'))?$request->param('searchData/a'):$searchDefaults;
+        $searchData=array_merge($searchDefaults,$searchData);
         
-        // 接收前端的数组
-        $data=!empty($request->param('data/a'))?$request->param('data/a'):array();
+        $searchParamArr=array();
+        $searchResultArr=array();
         
-        $data=array_merge($defaults,$data);
-        
-       /**
- *  // $role接收前端页面传来的process值:_TODO/_INPROCESS/_DONE
- *         $process = !empty($request->param('process'))?$request->param('process'):'_TODO';  
- *         // 接收前端当前页数
- *         $pageNum = !empty($request->param('pageNum'))?$request->param('pageNum'):1;     
- *         // 接收前端列表行数
- *         $listRows= !empty($request->param('listRows'))?$request->param('listRows'):50; 
- *         // 接收前端排序字段名称
- *         $sortName= !empty($request->param('sortName'))?$request->param('sortName'):'_TOPIC'; 
- *         // 接收前端排序方式
- *         $sortOrder= !empty($request->param('sortOrder'))?$request->param('sortOrder'):'_ASC';
- */  
-        $process = $data['process'];  
+        // 接收前端页面传来的process值:_TODO/_INPROCESS/_DONE
+        $process = $sortData['process'];  
         // 接收前端当前页数
-        $pageNum = $data['pageNum'];     
+        $pageNum = $sortData['pageNum'];     
         // 接收前端列表行数
-        $listRows= $data['listRows']; 
+        $listRows= $sortData['listRows']; 
         // 接收前端排序字段名称
-        $sortName= $data['sortName'];
+        $sortName= $sortData['sortName'];
         // 接收前端排序方式"_ASC"/"_DESC"
-        $sortOrder= $data['sortOrder'];
-        // 接收前端查询关键词
-        $searchWord= $data['searchWord'];
+        $sortOrder= $sortData['sortOrder'];
         
-         //调用issinfo模型的查询方法issPatProcess()得到查询结果数据集(数组)
+        //调用issinfo模型的查询方法issPatProcess()得到查询结果数据集(数组)
         $issArr=$issMdl->issPatProcess($this->logUser,$process);
-        //前端排序字段与数据集字段对应关系
-        $issField = array(
+    
+        //前端排序字段名与数据表字段名对应关系
+        $sortField = array(
             '_TOPIC' => 'topic',
             '_STATUS' => 'status',
             '_CREATETIME' => 'create_time',
             '_UPDATETIME' => 'update_time',
             '_PATNAME' => ['issmap','topic'],//'issmap.topic'
-            '_PATTYPE' => ['issmap','pattype'],
-            '_PATSTATUS' => ['issmap','status'],
+            '_PATTYPE' => ['issmap','pattype'],//'issmap.pattype'
+            '_PATSTATUS' => ['issmap','status'],//'issmap.status'
             '_DEPT' => 'dept',
             '_WRITER' => 'writer',
             '_EXECUTER' => 'executer',
             '_OPRT' => 'oprt',
             );
         
-        //将前端传来的排序字段转换为数据集对应键名
-        if (array_key_exists($sortName, $issField)) {
-            $sortName = $issField[$sortName];
+        //将前端传来的排序字段名转换为数据表字段名
+        if (array_key_exists($sortName, $sortField)) {
+            $sortName = $sortField[$sortName];
         }else{
             $sortName ='topic';
-        }   
+        }
         
-        //调用issinfo模型定义查询结果数据集(数组)排序方法issPatSort($issArr,$sortName,$sortOrder)得到排序后的数组
-        $issArr=$issMdl->issPatSort($issArr,$sortName,$sortOrder);
-              
-        $total=count($issArr);
+        //转换前端搜索字段名
+        $searchField = array(
+            //前端搜索字段名与数据表字段名对应关系
+            'searchTopic' => 'topic',
+            'searchStatus' => 'status',
+            'searchDept' => 'dept',
+            'searchWriter' => 'writer',
+            'searchExecuter' => 'executer',
+            //前端时间搜索字段名转换
+            'searchTime' => 'timeName',
+            //'_CREATETIME' => 'create_time',
+//            '_UPDATETIME' => 'update_time',
+            'searchTimeRange' => 'timeRange',
+            'searchStartTime' => 'startTime',
+            'searchEndTime' => 'endTime',
+            );
+        
+        //将前端传来的搜索关联数组转换为模型查询用的关联数组
+        foreach($searchData as $key=>$val){
+            //非0，非空值才进行操作
+            if($val){
+                if (array_key_exists($key,$searchField)){
+                    $searchParamArr[$searchField[$key]]=$val;
+                }
+                //针对$searchData['searchTime']='_CREATETIME'或'_UPDATETIME'
+                if ($val=='_CREATETIME'){
+                    $searchParamArr[$searchField[$key]]='create_time';
+                }
+                
+                if ($val=='_UPDATETIME'){
+                    $searchParamArr[$searchField[$key]]='update_time';
+                }
+            }
+        }
+        
+        //要进行搜索
+        if(count($searchData)){
+            //调用issinfo模型的查询方法issPatSearch()得到仅含‘id’字段的搜索结果数据集(数组)
+            $searchResultArr=$issMdl->issPatSearch($searchParamArr,['id']);
+            //有搜索结果
+            if(count($searchResultArr)){
+                //利用框架的数据集类的column方法简化为索引数组
+                if(is_array($searchResultArr)){
+                    $searchResultArr=collection($searchResultArr)->column('id');
+                }else{
+                    $searchResultArr=$searchResultArr->column('id');
+                }
+                //调用issinfo模型的用户搜索结果数据集(数组)排序方法issPatSort()得到排序后的数组
+                $issArr=$issMdl->issPatSort($issArr,$sortName,$sortOrder,$searchResultArr);
+            }else{
+                //搜索结果为空
+                $issArr=array();  
+            }
+        }else{
+        //无需进行搜索
+            $issArr=$issMdl->issPatSort($issArr,$sortName,$sortOrder);      
+        }
+        
         //将查询结果集数组装入Bootstrap对象，使用其render()方法获取前端分页显示的html代码。Bootstrap($iss,$listRows,$curretPage,$total);
-        $objPg = new Bootstrap($issArr,$listRows,$pageNum,$total);
+        $objPg = new Bootstrap($issArr,$listRows,$pageNum,count($issArr));
         $pageRender = $objPg->render();
-        //当前页显示所需的内容
+        
         $showList=array_slice($issArr,($pageNum-1)*$listRows,$listRows);
         
+        //当前页显示所需的内容
+        //if(count($searchData)){
+//            $showList=$issArr;
+//        }else{
+//            $showList=array_slice($issArr,($pageNum-1)*$listRows,$listRows);
+//        }
+        
         //将数据库issinfo表对应字段转换为前端的排序字段
-        foreach($issField as $key=>$value){
+        foreach($sortField as $key=>$value){
            if($value==$sortName){
                 $sortName=$key;
            }
         }
-        //组装状态权限数组
+        //组装权限/状态数组
         $statusArr=array();
         foreach($this->authArr['iss'] as $key=>$val){
             $statusArr[$key] =_commonIssAuthStatus('_PAT',$key);
         }
  
+        $check=array_intersect([100,101,129,128,4],[4,100,128]); 
+        //重组$check下标，保证$check的下标是连续
+        $check=array_values($check);
+        
         $this->assign(['home' => $request->domain(), //"destr".$this->authArr['isspro']['edit'],
                 // 分页显示所需参数
                 'iss' => $showList,
@@ -434,12 +491,19 @@ class IndexController extends \think\Controller
 //                'searchPatStatus' => $searchPatStatus, 
                 'authEdit'=>  $this->authArr['iss']['edit'],
                 'sortName' => $sortName, 
-                'sortOrder' => $sortOrder, 
+                'sortOrder' => $sortOrder,
+                
+                'queryArr' => json_encode(array_values($searchResultArr),JSON_UNESCAPED_UNICODE),
+                'sortArr' => json_encode(array_keys($showList),JSON_UNESCAPED_UNICODE),
+
                 //'auth' => $auth, 
                 //前端判断权限用数组（权限/状态数组），保持中文
                 'statusArr' => json_encode($statusArr,JSON_UNESCAPED_UNICODE),
+                'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
+                'searchResultNum'=>count($issArr),
+                'issId'=>0,
                 
-                'issId'=>0
+                'check'=>json_encode($check)
                 ]);
             
         //return view();  
@@ -1502,5 +1566,23 @@ class IndexController extends \think\Controller
 
 
         return view('index'.DS.'issPatAuthSingle'.DS.'attFileList'); //$returnArr=array('result'=>true/false,'msg'=>'string')
+    }
+    //响应前端请求，返回信息
+    public function selectResponse(Request $request,IssinfoModel $issMdl)
+    {
+      $this->_loginUser();
+      $req=$request->param('req');
+           
+      switch($req){
+        case '_DEPT':
+          $res=$issMdl->where('id','>',0)->field('dept')->group('dept')->select();
+        break;
+        
+        case '_STATUS':
+          $res=$issMdl->where('id','>',0)->field('status')->group('status')->select();
+        break;
+      }
+      //返回前端的是数据集（索引数组）  
+      return $res;
     }
 }

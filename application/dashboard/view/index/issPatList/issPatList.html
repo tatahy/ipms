@@ -10,12 +10,17 @@
 		
 		<button id="btnSearchInfo" type="button" class="btn-link" data-toggle="collapse" data-target="#divCollapse"><span class="glyphicon glyphicon-collapse-down"></span>搜索</button>
 				
-		<button id="btnReset" type="button" class="btn-link"><span class="glyphicon glyphicon-refresh"></span>重置</button>
+		<button id="btnRefresh" type="button" class="btn-link"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 	</p>
 	
-	<div id="divCollapse" class="collapse">
-		<!-- <form id="userSearch" class="form-inline"> -->
-		<form id="userSearch">
+	<p>queryArrID:{$queryArr}</p>
+	<p>sortArrID:{$sortArr}</p>
+	<p>{$check}</p>
+	
+	<div id="divCollapse" class="collapse" >
+		<div class="label label-info" style="font-size:14px;">搜索条件</div>
+		<form id="fmIssPatSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;">
+			
 			<div class="row myRow">
 			<div class="form-group col-sm-6">
 				<label class="" for="searchTopic">事务标题</label>
@@ -41,44 +46,65 @@
 			</div>
 			
 			<div class="row myRow">
-			<div class="form-group col-sm-2">
+			<div class="form-group col-sm-3">
 				<label class="" for="searchWriter">事务撰写人</label>
 				<input class="form-control" id="searchWriter" name="searchWriter" type="text" value="" placeholder="...不限">
 										
 			</div>	
 
-			<div class="form-group col-sm-2">
+			<div class="form-group col-sm-3">
 				<label class="" for="searchExecuter">事务执行人</label>
 				<input class="form-control" id="searchExecuter" name="searchExecuter" type="text" value="" placeholder="...不限">
 										
-			</div>
+			</div>			
 			</div>			
 			
 			<div class="row myRow">
-			<div class="form-group col-sm-4">
-				<label class="" for="searchCreateTime">事务创建时间</label>
-				<input class="form-control" id="searchCreateTime" name="searchCreateTime" type="text" value="" placeholder="...不限">
-										
+			<div class="form-group col-sm-2">
+				<label class="" for="searchTime">日期</label>
+				<select class="form-control" id="searchTime" name="searchTime">
+					<option value="0">...无</option>	
+					<option value="_CREATETIME">创建日期</option>
+					<option value="_UPDATETIME">更新日期</option>
+				</select>						
 			</div>
 			
-			<div class="form-group col-sm-4">
-				<label class="" for="searchUpdateTime">事务更新时间</label>
-				<input class="form-control" id="searchUpdateTime" name="searchUpdateTime" type="text" value="" placeholder="...不限">
-										
+			<div class="timeGroup form-group col-sm-2">
+				<label class="" for="searchTimeRange">查询日期</label>
+				<select class="form-control" id="searchTimeRange" name="searchTimeRange">
+					<option value="0" selected>...无</option>
+					<option value="_LE">…小于&nbsp;&le;</option>
+					<option value="_GE">&le;&nbsp;大于…</option>
+					<option value="_BT">&le;&nbsp;大于…小于&nbsp;&le;</option>
+				</select>
+			</div>
+			
+			<div class="timeGroup form-group col-sm-3 text-right">
+				<label class="" for="searchStartTime"><span class="label label-info text-right">&le;</span>&nbsp;大于…</label>
+				<input class="form-control" id="searchStartTime" name="searchStartTime" type="text" value="" placeholder="...不限">
+			</div>
+			
+			<div class="timeGroup form-group col-sm-3">
+				<label class="" for="searchEndTime">…小于&nbsp;<span class="label label-warning">&le;</span></label>
+				<input class="form-control text-right" id="searchEndTime" name="searchEndTime" type="text" value="" placeholder="...不限">
 			</div>
 			</div>
-		
-			<!-- <input type="submit" class="btn btn-primary btn-sm" value="搜索 >>"> -->
-				
-			<button id="btnSearchUser" type="button" class="btn-link"><span class="glyphicon glyphicon-search"></span>搜索</button>
-				
-			<!-- <input type="reset" class="btn btn-primary btn-sm" value="重置" id=""><span class="glyphicon glyphicon-refresh"></span> -->
-				
+			
+			<div class="row myRow">
+			<div class="col-sm-6">
+				<button id="btnSearch" type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>搜索</button>
+			
+				<button id="btnSearchReset" type="button" class="btn btn-primary btn-sm">条件重置</button>
+			</div>
+			</div>
 		</form>
-		<hr>
+		<br>
 	</div>
 	
+	<p id="pSearchResultNum" hidden="true"><strong>搜索结果</strong>:&nbsp;<span class="label label-info">{$searchResultNum}</span>条</p>
+		
 	<div class="table-responsive">
+	
 		<table id="tblIssPat" class="table table-bordered table-hover" data-sort-name="{$sortName}" data-sort-order="{$sortOrder}" data-list-rows="{$listRows}" data-process="{$process}" data-pagenum="{$pageNum}">
 			<thead>
 				<tr>
@@ -219,7 +245,37 @@
 {block name="script"}
 <script>
 
-var aHtml=function(auth,oprt){
+//**函数名：dateBeforeToday
+ 	//* 作用：得到距离今天n天的日期(以“2018-7-2”的格式返回)
+function dateBeforeToday(n){
+	var today=new Date();
+	var targetTime=new Date();
+	var targetDate='';
+	if(n>0){
+		//距离现在时间n天前的毫秒数
+		targetTime.setTime(today.getTime()-n*24*60*60*1000);
+	}else{
+		targetTime.setTime(today.getTime());
+	}
+	targetDate=targetTime.getFullYear()+'-'+(targetTime.getMonth()+1)+'-'+targetTime.getDate();
+ 	return targetDate;
+}
+
+//**函数名：getJsonLength
+ 	//* 作用：得到jsonData的长度
+function getJsonLength(jsonData){
+	var jsonLength = 0;
+	for(var item in jsonData){
+		jsonLength++;
+	}
+ 	return jsonLength;
+}
+
+//**函数名：aHtml
+ 	//* 作用：初始化$('#fmIssPatSearch')
+	//* 参数1：auth，String。值：必须，登录用户的iss权限。
+	//* 参数2：oprt，String。值：必须，登录用户要进行的操作。
+function aHtml(auth,oprt){
 	var aSpanClass='';
 	var aText='';
 	switch(auth){
@@ -250,9 +306,7 @@ var aHtml=function(auth,oprt){
 		default:
 			
 			break;
-		
 	}
-	
 	return '<span class="'+aSpanClass+'"></span>'+aText;
 };
 
@@ -263,40 +317,152 @@ var aHtml=function(auth,oprt){
 	//* 参数3：sortOrder，String。值：可为空，排序方式。默认为'_ASC'。
 	//* 参数4：pageNum，Int。值：可为空，当前页数。默认为1。
 	//* 参数5：process，String。值：可为空，所处进程。默认为'_TODO'。
-	//* 参数6：serchWord，Array。值：可为空，查询关键词键值对。默认为空。	
-var loadMe=function(options){
+	//* 参数6：serchWord，Array。值：可为空，用户搜索关键词键值对。默认为空。	
+function loadMe(){
+	var searchNum=$('#pSearchResultNum');
 	//排序有关的参数都从$('#tblIssPat')获取
 	var obj=$('#tblIssPat');
-	var defaults={
+	var sortData={
 		'listRows':obj.data('list-rows'),
 		'sortName':obj.data('sort-name'),
 		'sortOrder':obj.data('sort-order'),
 		'process':obj.data('process'),
 		'pageNum':obj.data('pagenum'),
-		'searchWord':{}
 	};
-	var data = $.extend({},defaults, options);
+	//用户搜索有关键值对从表单$('#fmIssPatSearch')获取
+	var formData=new FormData($('#fmIssPatSearch')[0]);
 	
-	// 本页的搜索区输入框的查询词
-<!-- var searchWord={ -->
-	<!-- 'dept':$('#searchDept').val(), -->
-	<!-- 'name':$('#searchPatName').val(), -->
-	<!-- 'status':$('#searchPatStatus').val(), -->
-	<!-- 'type':$('#searchPatType').val(), -->
-	<!-- 'writer':$('#searchWriter').val() -->
-<!-- }; -->
-	<!-- $.extend(settings.searchWord, searchWord); -->
+	//引入外部参数的方式：
+	<!-- var sortData=$.extend({},sortDefaults,sortOptions); -->
+	<!-- var searchData=$.extend({},searchDefaults, searchOptions); -->
+	
+	var searchData={};
+	//使用Map对象的forEach方法组装键值对
+	formData.forEach(function(val,key,){
+		//非0非空的值才进行组装
+		if(val!='' && val!=0){
+			searchData[key]=val;
+		}
+	});
+	JSON.stringify(searchData);
+	console.dir(searchData);
+	
+	searchNum.hide();	
 	$('#divIssPatList_load').html('<h4 style="margin:50px;">加载中……</h4>');
 	
 	// jquery load()方法，本文件加载到index.html的指定区域<div id="divIssPatList_load"></div>
-	$('#divIssPatList_load').load('issPatList',{'data':data});
+	$('#divIssPatList_load').load('issPatList',{'sortData':sortData,'searchData':searchData},function(){
+		if(getJsonLength(searchData)){
+			searchNum.show();
+			<!-- fmIssPatSearchShow(searchData); -->
+			$('#divCollapse').collapse('show');
+			
+		}else{
+			searchNum.hide();
+			fmIssPatSearchInit();
+		}
+	});
 };
 
-//利用自调用匿名函数立即执行的特点，设定$('#spTitle')和$('a[data-issue-process="'+process+'"]')的显示格式。
+//**函数名：fmIssPatSearchInit
+ 	//* 作用：$('#fmIssPatSearch')根据参数显示
+function fmIssPatSearchInit(options){
+	var defaults={
+		'searchTopic':'',
+		'searchStatus':'',
+		'searchDept':'',
+		'searchWriter':'',
+		'searchExecuter':'',
+		'searchTime':'',
+		'searchTimeRange':'',
+		'searchStartTime':'',
+		'searchEndTime':'',
+	};
+	var searchData = $.extend({},defaults, options);	
+	
+	var fm=$('#fmIssPatSearch');
+	var timeGroup=fm.find('div .timeGroup');
+	timeGroup.hide();
+	var searchDeptOptions={'sendData':{'req':'_DEPT'},'obj':$('#searchDept'),'selected':searchData.searchDept};
+	var searchStatusOptions={'sendData':{'req':'_STATUS'},'obj':$('#searchStatus'),'selected':searchData.searchStatus};
+	//表单reset
+	fm[0].reset();
+	//2个selection的option数量<=1，ajax赋值	
+	if($('#searchDept option').length<=1 && $('#searchStatus option').length<=1){
+		$.when(
+			ajaxShowSelect(searchDeptOptions),
+			ajaxShowSelect(searchStatusOptions) 
+		).then(
+			function(data, textStatus, jqXHR){
+     			<!-- $('#searchTopic').focus(); // ajax成功 -->
+				for(var key in searchData){
+					if(searchData[key]!=0 && searchData[key]!=''){
+						$('#'+key).val(searchData[key]).closest('div').show();
+					}
+				}
+				<!-- $('#searchTopic').focus(); -->
+			},
+			function(){
+				alert("失败Group，请稍后再试！");//ajax失败
+			}
+		);
+	}
+	$('#searchTopic').focus();
+};
+
+//**函数名：ajaxShowSelect
+ 	//* 作用：本页面ajax过程向服务器请求特定单选框内容所需数据，并组装好HTML语句
+	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
+	//* 参数sendData，类型：数值。值：传送给后端的键值对数据。
+	//* 参数obj，类型：对象。值：必须，单选框的对象名称
+	//*参数attach，类型：json数组。值：可为空，需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
+	//*参数selected，类型：字符。值：字符，可为空。
+	//* 返回值：无
+function ajaxShowSelect(options){
+	var defaults={
+		'url':'selectResponse',
+		'attach':[{"text":"...不限","val":"0"}],
+		'sendData':'',
+		'obj':'',
+		'selected':'',
+	};
+	var data = $.extend({},defaults, options);
+	var arrJson=data.attach;
+	var req=data.sendData.req;
+	var obj=data.obj;
+	var selected=data.selected;
+	var str='';
+	
+	$.post(data.url,data.sendData,function(result){
+		if(arrJson.length){
+			for(i=0;i<arrJson.length;i++){
+				str+='<option value="'+arrJson[i].val+'">'+arrJson[i].text+'</option>';
+			}
+		}
+		<!-- // 遍历backData数组组装HTML语句 -->
+		<!-- // result的结构是数组类的：[{key:value1},{key:value2}],所以要进行嵌套取出value值组装HTML语句-->
+		$.each(result,function(n1,v1){
+			$.each(v1,function(n2,v2){
+				str+='<option value="'+v2+'">'+v2+'</option>';	
+			});
+		});
+			
+		<!--// 清空单选框Obj的所有选项-->
+		obj.empty();
+		<!--// 添加单选框Obj的新选项-->
+		obj.append(str);
+		<!-- // value=selected 的项为选定项-->
+		if (selected){
+			obj.val(selected);
+		}
+	});
+};
+
+//利用自调用匿名函数立即执行的特点，设定$('#spTitle')、$('a[data-issue-process="'+process+'"]')。
 (function($,authEdit){
     var process=$('#tblIssPat').data('process');
 	var obj=$('a[data-issue-process="'+process+'"]');
-		
+	
 	//恢复数字显示的初始格式
 	$('.num').removeClass('badge').removeClass('mycolorred-bgwhite').addClass('mycolorwhite-bgtransparent');
 	//设置a所在li为“active”
@@ -346,11 +512,25 @@ $(document).ready(function(){
 	<!-- // 隐藏搜索条件的div，修改触发"隐藏"的btn内容-->
   	$('#divCollapse').on('show.bs.collapse', function(){
     	$('#btnSearchInfo').html('<span class="glyphicon glyphicon-collapse-up">隐藏搜索</span>');
+		var jsonLength=getJsonLength({$searchData});
+		var showSearchNum=$('#pSearchResultNum');
+		<!-- console.log(jsonLength); -->
 		
+		fmIssPatSearchInit({$searchData});
+		
+		if(jsonLength){
+			showSearchNum.show();
+		}else{
+			showSearchNum.hide();
+		}
+		
+		$('#searchTopic').focus();
   	});
-	
-	<!-- // 页面重新加载 -->
-	$('#btnReset').click(function(){
+		
+	<!-- // 页面刷新 -->
+	$('#btnRefresh').click(function(){
+		//搜索表单重置
+		$('#fmIssPatSearch')[0].reset();
 		loadMe();
 	});
 	
@@ -534,6 +714,65 @@ $(document).ready(function(){
 		);
 		
 	});
+	
+<!-- //$('#fmIssPatSearch')有关的代码块 -->
+	$('#searchTime').change(function(){
+		var timeGroup=$('#fmIssPatSearch').find('div .timeGroup');
+		if($(this).val()!=0){
+			timeGroup.show();
+			$('#searchTimeRange').val('_BT');
+			$('#searchStartTime').val(dateBeforeToday(10))
+			$('#searchEndTime').val(dateBeforeToday())
+		}else{
+			timeGroup.hide().children('.form-control').val(0);
+		}
+	});
+	
+	$('#searchTimeRange').change(function(){
+		var startDate=dateBeforeToday(10);
+		var endDate=dateBeforeToday();
+		var timeGroup=$('#fmIssPatSearch').find('div .timeGroup');
+		timeGroup.hide();
+		$('#searchEndTime').val(0);
+		$('#searchStartTime').val(0);
+		$(this).closest('div').show();
+		
+		switch($(this).val()){
+			case '_LE':
+				$('#searchEndTime').val(endDate).closest('div').show();
+				break;
+			case '_GE':
+				$('#searchStartTime').val(startDate).closest('div').show();
+				break;
+			case '_BT':
+				$('#fmIssPatSearch').find('div .timeGroup').show();
+				$('#searchEndTime').val(endDate);
+				$('#searchStartTime').val(startDate)
+				break;
+			//'0'
+			default:
+				timeGroup.hide();
+				$('#searchTime').val(0);
+				break;
+		}
+	});
+	
+	//表单提交，开始用户搜索
+	$('#btnSearch').click(function(){
+		//排序有关的参数都向$('#tblIssPat')汇集(更新有变化的)
+		var objSort=$('#tblIssPat');
+		objSort.data('list-rows',10);
+		objSort.data('pagenum',1);
+		
+		loadMe();
+	});
+	
+	//表单重置
+	$('#btnSearchReset').click(function(){
+		fmIssPatSearchInit()
+	});
+<!-- //$('#fmIssPatSearch')有关的代码块 -->
+	
 	
 <!-- function -->
 
