@@ -1,0 +1,115 @@
+<!-- // issPat2.html： -->
+<div>
+<!-- <h4 class="label label-default" style="font-size:16px;"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利事务 -->
+<h4><span class="label label-info"><span class="glyphicon glyphicon-wrench"></span></span>&nbsp;专利事务</h4>
+
+	<ul class="nav nav-pills" style="margin-top:10px;border-bottom: 1px solid #faebcc;">
+	<!-- <ul class="nav nav-tabs" > -->
+		<li class="" >
+			<a class="aPill" href="#" data-issue-type="_PATENT" data-issue-process="_TODO"><span class="glyphicon glyphicon-blackboard"></span>待处理
+			{eq name="numToDo" value="0"}
+			<span class="badge">0</span>
+			{else/}
+			<span class="label label-warning"><span class="num">{$numToDo}</span>&nbsp;</span>
+			{/eq}
+			
+			</a>
+		</li>
+		
+		{eq name="authIss.maintain" value="1"}
+		<li>
+			<a id="aPatRenew" class="aPill" href="#" data-issue-type="_PATENT" data-issue-process="_RENEW"><span class="glyphicon glyphicon-repeat"></span>待续费
+			{eq name="$numPatRenew" value="0"}
+			<span class="badge">0</span>
+			{else/}
+			<span class="label label-warning"><span class="num">{$numPatRenew}</span>&nbsp;</span>
+			{/eq}
+			</a>
+		</li>
+		{/eq}
+		
+		<li class="" >
+			<a class="aPill" href="#" data-issue-type="_PATENT" data-issue-process="_INPROCESS"><span class="glyphicon glyphicon-road"></span>&nbsp;流程中
+			{eq name="numInProcess" value="0"}
+			<span class="badge">0</span>
+			{else/}
+			<span class="label label-info">{$numInProcess}</span>
+			{/eq}
+			
+			</a>
+		</li>
+
+		<li><a class="aPill" href="#" data-issue-type="_PATENT" data-issue-process="_DONE"><span class="glyphicon glyphicon-off"></span>完结
+			{eq name="numDone" value="0"}
+			<span class="badge">0</span>
+			{else/}
+			<span class="label label-default">{$numDone}</span>
+			{/eq}
+		</a></li>
+		
+	</ul>
+			
+	<div class="tab-content">
+		<div>
+			<!-- <P>前端模板变量$userlg={ $userlg}<br> -->
+			<!-- $userlg.0={ $userlg.0},&nbsp;$userlg.id={ $userlg.id}<br> -->
+			<!-- 后端赋值语句'userlg'=>$userlg -->
+			<!-- </P> -->
+					
+		</div>
+		<!-- //需load其他模板文件的div -->
+		<div id="divIssPatList_load"><h4 style="margin:50px;">加载中……</h4>
+		</div>
+	</div>
+</div>
+
+<script>
+
+$(document).ready(function(){
+	
+	$('.span0').addClass('mycolorred-bgwhite');
+	
+	showIssPatList('_TODO');
+		
+	//ul.nav-tabs调整.aPill
+	//1.缩小padding
+	$('.aPill').each(function(){
+		$(this).css('padding','5px 10px');
+		
+		//去掉底部边框圆角
+		<!-- $(this).css({'border-bottom-right-radius':'0px','border-bottom-left-radius':'0px'}); -->
+
+	});
+	
+	//调整span.label
+	$('span.label').css({'padding-bottom':'1px','margin-bottom':'2px'});	
+	
+	<!-- //点击.aPill中的各个按钮后，改变显示格式，默认显示相应状态的issPat内容-->
+	$('.aPill').click(function(){
+		$(this).tab('show');
+		showIssPatList($(this).data('issue-process'));
+		
+    });
+
+<!-- function  -->
+//**函数名：showIssPatList
+ 	//* 作用：本页面加载issPatList；设置各个‘aPill’中数字的显示格式，并设置其所在li为“active”。
+	//* 参数process，类型：字符串。值：不为空。说明：load操作的issPat所处process。
+	//* 返回值：无
+function showIssPatList(process){
+	var url='issPatList';
+	
+	$('#divIssPatList_load').html('<h4 style="margin:50px;">加载中……</h4>');
+	
+	if(process=='_RENEW'){
+		url='patRenewList';
+	}
+	
+	$('#divIssPatList_load').load(url,{'sortData':{'process':process}});
+}
+});
+<!--/ function -->
+
+
+
+</script>

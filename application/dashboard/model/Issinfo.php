@@ -8,6 +8,7 @@
 namespace app\dashboard\model;
 
 use think\Model;
+use think\Collection;
 
 use app\dashboard\model\User as UserModel;
 use app\dashboard\model\Patinfo as PatinfoModel;
@@ -33,7 +34,6 @@ class Issinfo extends Model
     //修改器，设置issnum字段的值为iss+yyyy+0000的形式，即是在当年进行流水编号
     protected function setIssnumAttr()
     {
-
         //$idmax = Issinfo::max('id');
         //        $value = Issinfo::where('id',$idmax)->value('issnum');
         $idmax = $this->max('id');
@@ -47,7 +47,6 @@ class Issinfo extends Model
         } else {
             $result = "iss".date('Y')."0001";
         }
-
         return ($result);
     }
 
@@ -90,95 +89,307 @@ class Issinfo extends Model
         }
         return $value;
     }
+    
+    // iss基础查询
+    protected function scopeIssmapType($query, $issType = '')
+    {
+        //$issType='_ISST_PAT'确保查询的是isspat
+        $query->where('issmap_type', 'like', '%'.$issType.'%');
+    }
 
     /**
-     * 获取登录用户所有权限下isspat的各类总数
-     * 参数$userId，类型：数值。值：不为空。说明：登录用户的id。默认为空。
-     * 参数$auth，类型：字符串。值：可为空。说明：登录用户的iss权限。默认为空。
+     * 获取登录用户各类isspat的总数和数据集
+     * @param  Array $logUser 登录用户信息数组
+     * @param  String $type 决定返回数据('_NUM','_TODO',_INPROCESS','_PATRENEW','_DONE') 
+     * @return Array $result 返回的数组
      */
-    public function issPatNum($userId = '', $authName = '')
+    public function issPatProcess($logUser= [], $type = '')
     {
-        if ($userId == '') {
-            return false;
-        } else {
-            $user = UserModel::get($userId);
-        }
-        $authNameArr = array_keys(_commonModuleAuth('_ISS'));
-        //$authName允许的值，共有9个
-        array_push($authNameArr, 'patrenew', 'done', 'total', '');
+        //存放各类isspat的procss类别名称及其对应记录数的数组$num 
+        $num = array('todo'=>0,'inprocess'=>0,'done'=>0,'patrenew'=>0);
+        $listToDo= array();
+        $listInProcess= array();
+        $listPatRenew= array();
+        $listDone= array();
+        
+        $mapToDo= array();
+        $mapInProcess= array();
+        
+        $arrToDo= array();
+        $arrInProcess= array();
+        
+        //基础查询，在isspat中进行查询
+        $iss=$this::scope('issmap_type','_PAT');
+        
+        foreach ($logUser['auth']['iss'] as $key => $value) {
+            //清空查询条件数组
+            $mapToDo = array();
+            $mapInProcess = array();
+            
+            $mapToDo['status'] = ['in', _commonIssAuthStatus('_PAT', $key)];
+            $mapInProcess['status']=$mapToDo['status'];
+            switch ($key) {
+                case 'maintain':
+                    //$map['status'] =['in',['申报复核','申报提交','续费提交','准予续费','否决申报','专利授权','专利驳回','放弃续费','续费授权']];
+                    break;
 
-        //判断$authName的取值是否在规定的数组范围内
-        if (in_array($authName, $authNameArr)) {
-            if (empty($authName))
-                $authName = 'total';
-        } else {
-            return 'Wrong parameter for function.The parameter should be a string in:'.json_encode($authNameArr).'or empty.';
-        }
+                case 'edit':
+                    //$map['status'] =['in',['填报','返回修改','修改完善']];
+                    $mapToDo['dept'] = $logUser['dept'];
+                    $mapToDo['writer'] = $logUser['username'];
+                    break;
 
-        //存放iss各个权限名称及其对应iss记录数的数组
-        $numIssPatArr = array();
-        //登录用户的iss权限数组
-        $authIssArr = $user['authority']['iss'];
+                case 'audit':
+                    //$map['status'] ='待审核';
+                    $mapToDo['dept'] = $logUser['dept'];
+                    break;
 
-        foreach ($authIssArr as $key => $value) {
-            //查询issPat
-            $map['issmap_type'] = ['like', '%_ISST_PAT%'];
-            //权限为1写查询条件
-            if ($value) {
-                $map['status'] = ['in', _commonIssAuthStatus('_PAT', $key)];
-                switch ($key) {
-                    case 'maintain':
-                        //$map['status'] =['in',['申报复核','申报提交','续费提交','准予续费',
-                        //                        '否决申报','专利授权','专利驳回','放弃续费','续费授权']];
-                        break;
+                case 'approve':
+                    //$map['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
+                    break;
 
-                    case 'edit':
-                        //$map['status'] =['in',['填报','返回修改','修改完善']];
-                        $map['dept'] = $user->dept;
-                        $map['writer'] = $user->username;
-                        break;
+                case 'execute':
+                    //$map['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
+                    $mapToDo['executer'] = $logUser['username'];
+                    break;
 
-                    case 'audit':
-                        //$map['status'] ='待审核';
-                        $map['dept'] = $user->dept;
-                        break;
-
-                    case 'approve':
-                        //$map['status'] =['in',['审核未通过','审核通过','变更申请','拟续费']];
-                        break;
-
-                    case 'execute':
-                        //$map['status'] =['in',['批准申报','申报执行','申报修改','准予变更','否决变更']];
-                        $map['executer'] = $user->username;
-                        break;
-
-                }
-                $numIssPatArr[$key] = $this->where($map)->count();
-                //清空查询条件数组
-                $map = array();
-            } else {
-                $numIssPatArr[$key] = 0;
             }
+            $visibleField=['id','topic','status','statusdescription','create_time','update_time','dept','writer','executer','issmap_id','issmap_type',
+                            'issmap' => ['id','patnum','topic','pattype','status']]; 
+             
+            $arrToDo= $iss->where($mapToDo)->select();
+
+            if(count($arrToDo)){
+                $arrToDo = collection($arrToDo)->load('issmap')->visible($visibleField)->toArray();
+            }else{
+                $arrToDo = array();
+            } 
+            
+            $arrInProcess= $iss->where($mapInProcess)->select();
+            if(count($arrInProcess)){
+                $arrInProcess = collection($arrInProcess)->load('issmap')->visible($visibleField)->toArray(); 
+            }else{
+                $arrInProcess = array();
+            } 
+            
+            if($value){
+                $listToDo=array_merge($listToDo,$arrToDo);
+                $num[$key]=count($arrToDo);
+                $num['todo']+=$num[$key];
+            }else{                
+                $listInProcess=array_merge($listInProcess,$arrInProcess);
+                $num[$key]=count($arrInProcess);
+                $num['inprocess']+=$num[$key];
+            }
+            
         }
+        
+        $num['done'] = $iss->where('status','完结')->count();        
+        
         //得到满足续费条件的专利数
         $deadline = date('Y-m-d', strtotime("+6 month"));
         $mapRenew['status'] = ['in', ['授权', '续费授权']];
         // 查出满足条件的patent
-        $numIssPatArr['patrenew'] = PatinfoModel::where($mapRenew)->where('renewdeadlinedate', 'between time', [date('Y-m-d'), $deadline])->
-            count();
-        //done
-        $map['status'] = '完结';
-        $numIssPatArr['done'] = $this->where($map)->count();
-        //total
-        $numTotal = 0;
-        foreach ($numIssPatArr as $key => $value) {
-            if ($key != 'done')
-                $numTotal += $value;
-        }
-        $numIssPatArr['total'] = $numTotal;
+        $num['patrenew']  = PatinfoModel::where($mapRenew)->where('renewdeadlinedate', 'between time', [date('Y-m-d'), $deadline])->count();
 
-        //根据$authName的值返回值不同
-        return $numIssPatArr[$authName];
+        switch ($type) {
+            case '_NUM':
+                $result=$num;
+                break;
+
+            case '_TODO':
+                $result=$listToDo;
+                break;
+
+            case '_INPROCESS':
+                $result=$listInProcess;
+                break;
+
+            case '_PATRENEW':
+                $result=array_merge($listPatRenew,PatinfoModel::where($mapRenew)->where('renewdeadlinedate', 'between time', [date('Y-m-d'), $deadline])
+                                    ->order('renewdeadlinedate','asc')
+                                    ->select());
+                break;
+
+            case '_DONE':
+                $listDone=$iss->where('status','完结')->select();
+                //$listDone= collection($listDone)->append(['issmap'])->visible(['issmap' => ['id', 'patnum','topic','pattype','status']])->toArray();
+                $listDone = collection($listDone)->load('issmap')->toArray();  
+                $result=$listDone;
+                
+                break;
+
+        }
+
+        return $result;
+    }
+     
+     /**
+     * 将查询结果数据集(数组)根据排序参数转换为排序后的数组
+     * @param  Array $issArr 待排序的数组
+     * @param  String $field 排序字段 
+     * @param  String $order “asc”/"desc"
+     * @param  Array $idSearchArr 搜索id值索引数组
+     * @return Array $result 返回值，已排好序的索引数组
+     */
+    public function issPatSort($issArr=[],$field = '',$order='_ASC',$idSearchArr=[]) 
+    {
+        //含排序字段值的索引数组   
+        $arr=array();
+        //排序id值索引数组，由$issArr的"id"字段值得到   
+        $idSortArr=array();
+        //需返回的已排好序的索引数组
+        $result=array();
+        //排序字段名称
+        $field=('oprt'==$field)?'status':$field;
+        
+        //取排序数组id索引数组
+        $idSortArr=collection($issArr)->column('id');        
+        if(count($idSearchArr)){
+            //id索引数组交集
+            $idArr=array_intersect($idSortArr,$idSearchArr);
+        }else{
+            $idArr=$idSortArr;
+        }
+        //重组$idArr下标，保证$idArr的下标是连续
+        $idArr=array_values($idArr);
+        
+        //根据交集得到数据集
+        //$issArr=$this->all($idArr,'issmap'); 
+        $issArr=$this->all($idArr); 
+        $visibleField=['id','topic','status','statusdescription','create_time','update_time','dept','writer','executer','issmap_id','issmap_type',
+                            'issmap' => ['id','patnum','topic','pattype','status']]; 
+        $issArr = collection($issArr)->load('issmap')->visible($visibleField)->toArray();
+        
+        //对数据集进行排序
+        //1.生成一个仅含排序字段值的索引数组  
+        //方法一：使用for循环    
+        for($i=0;$i<count($issArr);$i++){
+            if(is_array($field)){
+                $arr[$i]=$issArr[$i][$field[0]][$field[1]];
+            }else{
+                $arr[$i]=$issArr[$i][$field];
+            }
+        }
+        //2.按照$order的值对上述新生成的索引数组进行自然排序
+        if($order=='_ASC'){
+            asort($arr,SORT_NATURAL);
+        }else{
+            arsort($arr,SORT_NATURAL);
+        }        
+        //3.得到排序好的id值数组        
+        //方法：按$arr的顺序将$issArr的‘id’字段值拷贝到新数组$idSortArr        
+        $i=0;
+        foreach($arr as $key=>$value){
+            $result[$i]=$issArr[$key];
+            $i++;
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * 根据搜索条件查询结果数据集(数组)
+     * @param  Array $queryParam 搜索条件数组
+     * @param  Array $field 查询结果数据集所包含的字段名数组
+     * @return Array $result 返回的索引数组
+     */
+    public function issPatSearch($queryParam=[],$field=[]) 
+    {
+        //需返回的索引数组
+        $result=array();
+        //时间查询参数数组
+        $time=array();
+        //查询条件数组
+        $map=array();
+        $strRange='';
+        
+        /**
+ *      $queryParam = array(
+ *             'topic' => '',
+ *             'status' => '',
+ *             'dept' => '',
+ *             'writer' => '',
+ *             'executer' => '',
+ *             'timeName' => 'create_time'/'update_time',
+ *             'timeRange' => '_LE/_GE/_BT',
+ *             'startTime' => '2018-7-2',
+ *             'endTime' => '2018-7-12',
+ *             );
+ */
+        //搜索过程，$queryParam有内容就开始从Issinfo表中查询
+        if(count($queryParam)){
+            //1. 根据$queryParam内容组织查询数组
+            foreach($queryParam as $key=>$val){
+                //提取时间有关搜索数据,
+                //strpos对大小写敏感，返回值可能包含0，所以要用严格比较符“!==”
+                //stristr()对大小写不敏感，返回值为找到的字符串或false。性能应该比不上strpos
+                if(strpos($key, 'ime')!== false){
+                    //时间字段名
+                    if(strpos($key, 'Name')!== false){
+                        $time['name']=$val;
+                    }
+                    //时间范围
+                    if(strpos($key, 'Range')!== false){
+                        switch($val){
+                            case'_BT':
+                                $strRange='between time';
+                                break;
+                            case'_LE':
+                                $strRange='<= time';
+                                break;
+                            case'_GE':
+                                $strRange='>= time';
+                                break;
+                        }
+                        $time['range']=array('type'=>$val,'value'=>$strRange);
+                    }
+                    
+                    //时间值
+                    if(strpos($key, 'start')!== false){
+                        $time['start']=$val;
+                    }
+                    
+                    if(strpos($key, 'end')!== false){
+                        $time['end']=$val;
+                    }
+                }else{
+                     //其他搜索字段名和条件
+                     $map[$key]=['like','%'.$val.'%'];
+                     //$map[$key]=['like',$val];
+                }
+            }
+            
+            //时间搜索字段名和条件
+            if(count($time)) {
+                switch($time['range']['type']){
+                    case'_BT':
+                        $map[$time['name']]=[$time['range']['value'],[$time['start'],$time['end']]];
+                        break;
+                    case'_LE':
+                        $map[$time['name']]=[$time['range']['value'],$time['end']];
+                        break;
+                    case'_GE':
+                        $map[$time['name']]=[$time['range']['value'],$time['start']];
+                        break;
+                }
+            }   
+            //搜索结果数据集
+            $result=$this->where($map)->field($field)->select();
+        }
+        return $result;
+    }
+   //issPatIntersect()得到查询结果数据集(数组）与搜索结果数据集(数组)的交集
+   /**
+     * 根据搜索条件查询结果数据集(数组)
+     * @param  Array $issArr 查询结果数据集(数组）
+     * @param  Array $queryArr 搜索结果数据集(数组)
+     * @return Array $result 返回的索引数组
+     */
+    public function issPatIntersect($issArr=[],$queryArr=[]) 
+    {
+        //比对2个数组的id
+        $issArr=array_intersect($issArr,$queryArr);
     }
 
     /**
@@ -210,18 +421,11 @@ class Issinfo extends Model
     //定义issinfo的多态模型,涉及issinfo表中的issmap_id和issmap_type两个字段内容。可得到对应关联模型的所有字段内容。
     public function issmap()
     {
-        $this->getData('issmap_type');
         //本模型内已定义获取器getIssmapTypeAttr,本属性读取的是获取器输出的issmap_type字段值（中文），所以要以获取器的输出值来对应模型
-        $data = ['专利授权申报' => 'Patinfo', '专利授权到期续费' => 'Patinfo', '项目申报' => 'Proinfo', '论文审查' => 'Theinfo'];
-        return $this->morphTo(null, $data);
-
-        //return $this->morphTo(null, [
-        //            //已定义获取器getIssmapTypeAttr,本属性读取的是获取器输出的issmap_type字段值，所以要以获取器的输出值来对应模型
-        //            '专利授权申报' => 'Patinfo',
-        //            '专利授权到期续费' => 'Patinfo',
-        //            '项目申报' => 'Proinfo',
-        //            '论文审查' => 'Theinfo',
-        //        ]);
+        $data = ['专利授权申报' => 'Patinfo', '专利授权到期续费' => 'Patinfo', '项目申报' => 'Proinfo', '论文审查' => 'Theinfo',
+                    '_ISST_PAT1'=> 'Patinfo','_ISST_PAT2'=> 'Patinfo'
+                ];
+        return $this->morphTo('issmap', $data);
     }
 
     /**

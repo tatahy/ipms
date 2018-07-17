@@ -1173,6 +1173,49 @@ str.toLowerCase();
 
 <!--//  HY 2018/6/7 -->	
 
+
+
+<!--  HY 2018/7/11 -->
+//FormData对象中的键值对数据，转化为JSON数据，FormData是XMLHttpRequest2中的新接口，IE10以前的版本都不支持。
+<meta charset="utf-8">
+
+<html>
+<form id="fm" >
+	<label class="" for="searchTopic">事务标题</label>
+	<input name="s1" type="text" value="" placeholder="...不限">
+	
+	<label class="" for="searchTopic">事务状态</label>
+	<input name="s2" type="text" value="" placeholder="...不限">
+
+</html>
+
+<script>
+
+var formdata=new FormData($('#fm')[0]);
+var objData={};
+//方法一，使用迭代器迭代formdata.entries()对象组装键值对
+for (var pair of formdata.entries()){
+	objData[pair[0]]=pair[1];
+}
+
+//方法二，使用Map对象的forEach方法组装键值对
+formdata.forEach((value,key)=>objData[key]=value);
+
+//方法三，使用Map对象的forEach方法的回调函数组装键值对
+formData.forEach(function(val,key,){
+	if(val='' && val!=0){
+		objData[key]=val;
+	}
+});
+
+//将键值对转换为json对象
+JSON.stringify(objData);
+
+</script>
+	
+
+<!--//  HY 2018/7/11 -->	
+
 <!-- ......................问题................................ -->
 
 <!--/  HY 2018/1/21 -->

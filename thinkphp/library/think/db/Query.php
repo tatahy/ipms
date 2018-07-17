@@ -67,6 +67,8 @@ class Query
         $this->model      = $model;
         // 设置当前连接的Builder对象
         $this->setBuilder();
+        
+        
     }
 
     /**

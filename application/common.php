@@ -106,7 +106,7 @@
               break;
               
               case'audit':
-                  $status[$value]='待审核';
+                  $status[$value]=array('待审核');
               break;
               
               case'approve':

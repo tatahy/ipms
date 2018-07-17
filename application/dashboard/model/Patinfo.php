@@ -8,6 +8,7 @@
 namespace app\dashboard\model;
 
 use think\Model;
+use app\dashboard\model\Issinfo;
 
 class Patinfo extends Model
 {
@@ -162,6 +163,19 @@ class Patinfo extends Model
             paginate();
         // ->select();
     }
+    
+    /**
+     * 获取即将到期需授权续费的patent结构集
+     */
+    public function patRenewList()
+    {
+        $today = date('Y-m-d');
+        $deadline = date('Y-m-d', strtotime("+6 month"));
+        $map['status'] = ['in', ['授权', '续费授权']];
+        return $this->where($map)->where('renewdeadlinedate', 'between time', [$today, $deadline])->order('renewdeadlinedate asc')->
+            paginate();
+        // ->select();
+    }
 
     /**
      * 获取内容所属的issue信息
@@ -177,7 +191,9 @@ class Patinfo extends Model
      */
     public function issues()
     {
-        return $this->morphMany('Issinfo', 'issmap', ['_ISST_PAT1', '_ISST_PAT2']);
+        //return $this->morphMany('Issinfo', 'issmap', ['_ISST_PAT1', '_ISST_PAT2']);
+        return $this->morphMany('Issinfo', 'issmap',['_ISST_PAT1', '_ISST_PAT2']);
+        
     }
 
     ///**

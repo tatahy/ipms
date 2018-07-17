@@ -113,7 +113,7 @@
 		<!-- nav 与 jQuery结合实现菜单栏导航效果-->
 		<ul class="nav nav-pills nav-stacked" >
 			<li><a class="aTab" href="#issPro"><span class="glyphicon glyphicon-inbox"></span>&nbsp;项目事务<span class="badge">{$numIssPro}</span></a></li>
-			<li class="active"><a class="aTab" href="#issPat"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利事务<span class="badge">{$numIssPat}</span></a></li>
+			<li class="active"><a class="aTab" href="#issPat2"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利事务<span class="badge">{$numIssPat}</span></a></li>
 			<li><a class="aTab" href="#issThe"><span class="glyphicon glyphicon-list"></span>&nbsp;论文事务<span class="badge">{$numIssThe}</span></a></li>
 			<li><a class="aTab" href="#attManage"><span class="glyphicon glyphicon-bookmark"></span>&nbsp;附件管理</a></li>
 			<li><a class="aTab" href="#userInfo"><span class="glyphicon glyphicon-user"></span>&nbsp;个人信息</a></li>
@@ -167,8 +167,7 @@ $(document).ready(function(){
 		$('#mySidenav').css('width','150px');
 		//#main的内容不被遮蔽就需要修改'margin-left'与#mySidenav的'width'相同
     	$('#main').css('margin-left','150px');
-    	$('#footer').css('margin-left','150px');
-		
+    	$('#footer').css('margin-left','150px');	
     });	
 	//关闭SideNavbar
 	$('#closeBtn').click(function(){
@@ -177,8 +176,7 @@ $(document).ready(function(){
 		$('#openBtn').show();
 		$('#mySidenav').css('width','0');
     	$('#main').css('margin-left','0');
-    	$('#footer').css('margin-left','0');
-		
+    	$('#footer').css('margin-left','0');	
     });			
 	
 <!-- function  -->

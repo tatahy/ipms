@@ -1,0 +1,126 @@
+<!-- // issPat:renewSingle.html： -->
+{extend name="../application/dashboard/view/index/issPatSingle/baseSingle.html" /}
+
+{block name="abstract"}
+	<div class="myFieldset">
+	
+		<div id="divAbstractCollapse" class="myLegend" data-toggle="collapse" data-target="#divAbstract"><span class="label label-warning">概要隐藏<span class="glyphicon glyphicon-menu-up"></span></span></div>
+		
+		<div id="divAbstract" class="row myRow-noform-group collapse in">
+			<div class="bs-callout bs-callout-default">
+			<h4 class="text-info">关联专利：<strong>{$pat.topic}</strong></h4>
+			<ul>
+				<li>发明人：{$pat.inventor}；&nbsp;&nbsp;其他发明人：{$pat.otherinventor}；</li>
+				<li>专利类型：{$pat.pattype}；</li>
+				<li>专利关键词：{$pat.keyword}；</li>
+				<li>专利简介：<pre>{$pat.summary}</pre></li>
+				<li>状态：
+					<a href="{$home}/patent/index/patrecords/id/{$pat.id}" target="_blank" data-toggle="tooltip" title="过程记录">
+				{switch name="$pat.status"}
+    				{case value="授权|续费授权|续费中"}
+					<span class="label label-success">{$pat.status}</span>
+					{/case}
+					{case value="驳回|驳回续费"}
+					<span class="label label-danger">{$pat.status}</span>
+					{/case}
+					{case value="放弃续费"}
+					<span class="label label-warning">{$pat.status}</span>
+					{/case}
+					{case value="超期无效"}
+					<span class="label label-default">{$pat.status}</span>
+					{/case}
+					
+					{default /}
+					<span class="label label-primary">{$pat.status}</span>
+				{/switch}
+						
+					</a>
+				</li>
+			</ul>
+			<footer>
+				<div class="row">
+					<div class="col-sm-3">
+						<a href="{$home}/patent/index/patinfo/id/{$pat.id}" target="_blank" data-toggle="tooltip" title="专利详情">查看详情</a>
+					</div>
+					<div id="" class="col-sm-3">填报时间：{$pat.create_time}</div>
+					<div id="" class="col-sm-3">专利所有人：{$pat.patowner}</div>
+					<div id="" class="col-sm-3">专利撰写人：{$pat.author}</div>				
+				</div>
+			</footer>
+			</div>				
+		</div>	
+	</div>	
+
+{/block}
+
+{block name="patInput"}
+
+			<form action="" id="fmPat">
+<!-- // class="sr-only" 仅源代码文件中显示-->
+				<input id="patId" name="patId" value="{$pat.id}" type="text" class="sr-only">
+				<input id="patTopic" name="patTopic" value="{$pat.topic}" type="text" class="sr-only">
+			
+			</form>
+{/block}
+
+{block name="attInput"}
+{__block__}
+
+{/block}
+
+{block name="issPatInput"}
+	<div class="myFieldset">
+		<div class="myLegend" ><span class="label label-warning">续费事务信息</span></div>
+					
+		<form id="fmIssPat" action="" method="" role="form" enctype="multipart/form-data">
+	
+			<input id="issId" name="issId" value="{$iss.id}" type="text" class="sr-only">
+			<input name="issStatus" value="{$iss.status}" type="text" class="sr-only">
+			
+			<div class="row myRow">
+				<div class="form-group col-sm-6">
+					<label class="control-label" for="issPatTopic">事务标题<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<input class="form-control empty-check" id="issPatTopic" name="issPatTopic" value="{$iss.topic}" type="text" placeholder="关于XX专利的YY申请" required>
+				</div>
+					
+				<div class="form-group col-sm-3">
+					<label for="issMapType">事务类型</label>
+					<select class="form-control" id="issMapType" name="issMapType" readonly="true">
+						<option value="_ISST_PAT2">专利授权到期续费</option>
+					</select>
+            	</div>
+				
+				<div class="form-group col-sm-3">
+					<label for="issMapType">续费截止时间</label>
+					<span class="label label-danger">{$pat.renewdeadlinedate}</span>
+            	</div>
+			</div>
+				
+			<div class="row myRow">
+				<div class="form-group col-sm-8">
+					<label class="control-label" for="issPatAbstract">续费说明<span class="glyphicon glyphicon-asterisk text-danger"></span></label>
+					<textarea class="form-control empty-check" rows="5" id="statusDescription" name="statusDescription" placeholder="填写事务的说明，字数不超过100字。" required></textarea>
+				</div>
+			</div>
+		</form>
+	</div>			
+
+{/block}
+
+{block name="btn"}
+	<button type="submit" id="btnAddRenew" class="btn btn-primary btn-sm" data-oprt="_ADDRENEW" data-topic="{$iss.topic}" data-btnLabel="label-primary"><span class="glyphicon glyphicon-info-sign"></span>新增续费事务</button>
+{/block}
+
+{block name="script"}
+<script>
+
+$(document).ready(function(){
+	//附加#btnReset 的click事件
+	$('#btnReset').click(function(){	
+	
+		$('#issPatAbstract').removeClass('label label-danger label-primary label-success');
+		
+	});
+});
+</script>
+{/block}

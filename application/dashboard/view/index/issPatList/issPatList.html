@@ -1,0 +1,773 @@
+<!-- // issPatList.html -->
+{/*  
+
+*/}
+	
+<div id="divIssPatList">		
+	
+	<p style="margin-top:5px;">
+		<span id="spTitle"></span>
+		
+		<button id="btnSearchInfo" type="button" class="btn-link" data-toggle="collapse" data-target="#divCollapse"><span class="glyphicon glyphicon-collapse-down"></span>搜索</button>
+				
+		<button id="btnRefresh" type="button" class="btn-link"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+	</p>
+	
+	<div id="divCollapse" class="collapse" >
+		<div class="label label-info" style="font-size:14px;">搜索条件</div>
+		<form id="fmIssPatSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;">
+			
+			<div class="row myRow">
+			<div class="form-group col-sm-6">
+				<label class="" for="searchTopic">事务标题</label>
+				<input class="form-control" id="searchTopic" name="searchTopic" type="text" value="" placeholder="...不限">
+										
+			</div>
+			
+			<div class="form-group col-sm-2">
+				<label class="control-label" for="searchStatus">事务状态</label>
+				<select class="form-control" id="searchStatus" name="searchStatus">
+					<option value="0">...不限</option>
+											
+				</select>
+			</div>
+			
+			<div class="form-group col-sm-4">
+				<label class="control-label" for="searchDept">部门</label>
+				<select class="form-control" id="searchDept" name="searchDept">
+					<option value="0">...不限</option>
+											
+				</select>
+			</div>
+			</div>
+			
+			<div class="row myRow">
+			<div class="form-group col-sm-3">
+				<label class="" for="searchWriter">事务撰写人</label>
+				<input class="form-control" id="searchWriter" name="searchWriter" type="text" value="" placeholder="...不限">
+										
+			</div>	
+
+			<div class="form-group col-sm-3">
+				<label class="" for="searchExecuter">事务执行人</label>
+				<input class="form-control" id="searchExecuter" name="searchExecuter" type="text" value="" placeholder="...不限">
+										
+			</div>			
+			</div>			
+			
+			<div class="row myRow">
+			<div class="form-group col-sm-2">
+				<label class="" for="searchTime">日期</label>
+				<select class="form-control" id="searchTime" name="searchTime">
+					<option value="0">...无</option>	
+					<option value="_CREATETIME">创建日期</option>
+					<option value="_UPDATETIME">更新日期</option>
+				</select>						
+			</div>
+			
+			<div class="timeGroup form-group col-sm-2">
+				<label class="" for="searchTimeRange">查询日期</label>
+				<select class="form-control" id="searchTimeRange" name="searchTimeRange">
+					<option value="0" selected>...无</option>
+					<option value="_LE">…小于&nbsp;&le;</option>
+					<option value="_GE">&le;&nbsp;大于…</option>
+					<option value="_BT">&le;&nbsp;大于…小于&nbsp;&le;</option>
+				</select>
+			</div>
+			
+			<div class="timeGroup form-group col-sm-3 text-right">
+				<label class="" for="searchStartTime"><span class="label label-info text-right">&le;</span>&nbsp;大于…</label>
+				<input class="form-control" id="searchStartTime" name="searchStartTime" type="text" value="" placeholder="...不限">
+			</div>
+			
+			<div class="timeGroup form-group col-sm-3">
+				<label class="" for="searchEndTime">…小于&nbsp;<span class="label label-warning">&le;</span></label>
+				<input class="form-control text-right" id="searchEndTime" name="searchEndTime" type="text" value="" placeholder="...不限">
+			</div>
+			</div>
+			
+			<div class="row myRow">
+			<div class="col-sm-6">
+				<button id="btnSearch" type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>搜索</button>
+			
+				<button id="btnSearchReset" type="button" class="btn btn-primary btn-sm">条件重置</button>
+			</div>
+			</div>
+		</form>
+		<br>
+	</div>
+	
+	<p id="pSearchResultNum" hidden="true"><strong>搜索结果</strong>:&nbsp;<span class="label label-info">{$searchResultNum}</span>条</p>
+		
+	<div class="table-responsive">
+	
+		<table id="tblIssPat" class="table table-bordered table-hover" data-sort-name="{$sortName}" data-sort-order="{$sortOrder}" data-list-rows="{$listRows}" data-process="{$process}" data-pagenum="{$pageNum}">
+			<thead>
+				<tr>
+					<th class="text-center">序号</th>
+					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_TOPIC" sortOrder="{$sortOrder}">专利事务标题</a></th>
+					
+					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_STATUS" sortOrder="{$sortOrder}">状态</a></th>
+					
+					<th class="text-center">状态说明</th>
+					
+					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_CREATETIME" sortOrder="{$sortOrder}">创建时间</a></th>
+					
+					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_UPDATETIME" sortOrder="{$sortOrder}">更新时间</a></th>
+					
+					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_PATNAME" sortOrder="{$sortOrder}">专利名称</a></th>
+					
+					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="_PATTYPE" sortOrder="{$sortOrder}">专利类型</a></th>
+					
+					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_DEPT" sortOrder="{$sortOrder}">所属部门</a></th>
+					
+					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_WRITER" sortOrder="{$sortOrder}">事务撰写人</a></th>
+					
+					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_EXECUTER" sortOrder="{$sortOrder}">事务执行人</a></th>
+					
+				{in name="process" value="_INPROCESS,_DONE"}
+					<th class="tpl text-center"><a data-toggle="tooltip" href="#" sortName="_PATSTATUS" sortOrder="{$sortOrder}">专利状态</a></th>
+				{else/}					
+					<th class="tpl text-center"><a data-toggle="tooltip" href="#" sortName="_OPRT" sortOrder="{$sortOrder}">操作</a></th>
+				
+				{/in}
+
+				</tr>
+			</thead>
+			<tbody><!-- 此处显示数据库查询后的数据集 -->
+				{volist name="iss" id="vo" empty="暂时没有数据"}
+				<tr>
+					<td>{$i+($pageNum-1)*$listRows}</a></td>
+					
+					<td class="issInfo"><a href="{$home}/issue/index/issinfo/id/{$vo.id}" target="_blank" data-toggle="tooltip">{$vo.topic}</a></td>
+			
+					<td class="issPatStatus"><a href="{$home}/issue/index/issrecords/id/{$vo.id}" target="_blank" data-toggle="tooltip">{$vo.status}</a></td>
+					
+					<td><pre style="padding:0px;border:none;background-color:transparent;">{$vo.statusdescription}</pre></td>
+					
+					<td>{$vo.create_time}</td>
+					
+					<td>{$vo.update_time}</td>
+					{//应用TP5中模型的多态1对多关联得到专利事务对应的专利名称$vo.issmap.topic，关键是要在issinfo模型中定义morphTo的方法名"issmap"，就可"." 出$vo.issmap.topic}
+					<td class="patInfo"><a href="{$home}/patent/index/patinfo/id/{$vo.issmap_id}" target="_blank" data-toggle="tooltip">{$vo.issmap.topic}</a></td>
+					
+					{//同上得到$vo.issmap.pattype}
+					<td>{$vo.issmap.pattype}</td>
+					
+					<td>{$vo.dept}</td>
+					<td>{$vo.writer}</td>
+					<td>{$vo.executer}</td>
+					
+					{in name="process" value="_INPROCESS,_DONE"}
+					<td class="patStatus">
+						<a href="{$home}/patent/index/patrecords/id/{$vo.issmap_id}" target="_blank" data-toggle="tooltip">
+					{switch name="vo.issmap.status"}
+    					{case value="授权|续费授权|续费中"}
+						<span class="label label-success">{$vo.issmap.status}</span>
+						{/case}
+						{case value="驳回|驳回续费"}
+						<span class="label label-danger">{$vo.issmap.status}</span>
+						{/case}
+						{case value="放弃续费"}
+						<span class="label label-warning">{$vo.issmap.status}</span>
+						{/case}
+						{case value="超期无效"}
+						<span class="label label-default">{$vo.issmap.status}</span>
+						{/case}
+					
+						{default /}
+						<span class="label label-primary">{$vo.issmap.status}</span>
+						{/switch}
+						</a>
+					</td>
+					{else/}
+					<td class="btnTpl">
+						<a class="aAuth" href="#modalIssPatSingle" data-issId="{$vo.id}" data-issTopic="{$vo.topic}" data-issue-status="{$vo.status}"  data-issue-authority="" data-issue-oprt="_NONE" data-toggle="modal" ></a>
+				
+					</td>
+					{/in}
+					
+				</tr>
+				{/volist}
+			</tbody>
+		</table>
+	</div>
+	
+	<div id="divListRows" class="col-sm-12 text-right search">
+		<!-- // 分页变量 -->
+		<div class="col-sm-10 text-right">{$pageRender}</div>
+						
+		<div class="form-group form-group-sm col-sm-2">
+			<span class="">每页记录行数：</span>
+				<select class="form-control" id="listRows">
+					<option value="5">5</option>
+					<option value="10">10</option>
+					<option value="20">20</option>
+					<option value="50">50</option>
+				</select>
+						
+		</div>
+	</div>
+	
+</div>
+
+<!-- Modal "modalIssPatSingle" -->
+<div class="modal fade" id="modalIssPatSingle" role="dialog">
+	<div class="modal-dialog modal-lg">
+    
+      <!-- Modal content-->
+      	<div class="modal-content">
+        <div class="modal-header bg-warning" style="border-radius:5px;">
+          	<button type="button" class="close" data-dismiss="modal">&times;</button>
+		  
+          	<h4><span class="glyphicon glyphicon-wrench">专利事务</span></h4>
+        </div>
+		
+        <div class="modal-body">
+			<!-- // 单个issPat增删改查页面显示位置，需load其他模板文件的div-->
+			<div id="divIssPatSingle_load"><h4 style="margin:50px;">加载中……</h4></div>
+		</div>
+		
+		<div class="modal-footer" hidden="true">
+        	<input type="button" class="btn btn-primary btn-sm" data-dismiss="modal" value="返回">  
+          
+        </div>
+		</div>
+	</div>
+
+</div>
+<!--/ Modal "modalIssPatSingle" -->
+
+{block name="script"}
+<script>
+
+//**函数名：dateBeforeToday
+ 	//* 作用：得到距离今天n天的日期(以“2018-7-2”的格式返回)
+function dateBeforeToday(n){
+	var today=new Date();
+	var targetTime=new Date();
+	var targetDate='';
+	if(n>0){
+		//距离现在时间n天前的毫秒数
+		targetTime.setTime(today.getTime()-n*24*60*60*1000);
+	}else{
+		targetTime.setTime(today.getTime());
+	}
+	targetDate=targetTime.getFullYear()+'-'+(targetTime.getMonth()+1)+'-'+targetTime.getDate();
+ 	return targetDate;
+}
+
+//**函数名：getJsonLength
+ 	//* 作用：得到jsonData的长度
+function getJsonLength(jsonData){
+	var jsonLength = 0;
+	for(var item in jsonData){
+		jsonLength++;
+	}
+ 	return jsonLength;
+}
+
+//**函数名：aHtml
+ 	//* 作用：初始化$('#fmIssPatSearch')
+	//* 参数1：auth，String。值：必须，登录用户的iss权限。
+	//* 参数2：oprt，String。值：必须，登录用户要进行的操作。
+function aHtml(auth,oprt){
+	var aSpanClass='';
+	var aText='';
+	switch(auth){
+		case'_EDIT':
+			aSpanClass='glyphicon glyphicon-pencil text-primary';
+			aText='_编辑';
+			if(oprt=='_ADDNEW'){
+				aSpanClass='glyphicon glyphicon-modal-window text-primary';
+				aText='_新增';	
+			}
+			break;
+		case'_AUDIT':
+			aSpanClass='glyphicon glyphicon-check text-warning';
+			aText='_审核';
+			break;
+		case'_APPROVE':
+			aSpanClass='glyphicon glyphicon-ok text-danger';
+			aText='_审批';
+			break;
+		case'_EXECUTE':
+			aSpanClass='glyphicon glyphicon-random text-primary';
+			aText='_执行';
+			break;
+		case'_MAINTAIN':
+			aSpanClass='glyphicon glyphicon-calendar text-primary';
+			aText='_管理/维护';
+		break;
+		default:
+			
+			break;
+	}
+	return '<span class="'+aSpanClass+'"></span>'+aText;
+};
+
+//**函数名：loadMe
+ 	//* 作用：加载本页面内容到指定div中<div id="divIssPatList_load"></div>
+	//* 参数1：listRows，Int。值：可为空，每页显示的记录行数。默认为10。
+	//* 参数2：sortName，String。值：可为空，排序字段名称。默认为‘_TOPIC’。
+	//* 参数3：sortOrder，String。值：可为空，排序方式。默认为'_ASC'。
+	//* 参数4：pageNum，Int。值：可为空，当前页数。默认为1。
+	//* 参数5：process，String。值：可为空，所处进程。默认为'_TODO'。
+	//* 参数6：serchWord，Array。值：可为空，用户搜索关键词键值对。默认为空。	
+function loadMe(){
+	var searchNum=$('#pSearchResultNum');
+	//排序有关的参数都从$('#tblIssPat')获取
+	var obj=$('#tblIssPat');
+	var sortData={
+		'listRows':obj.data('list-rows'),
+		'sortName':obj.data('sort-name'),
+		'sortOrder':obj.data('sort-order'),
+		'process':obj.data('process'),
+		'pageNum':obj.data('pagenum'),
+	};
+	//用户搜索有关键值对从表单$('#fmIssPatSearch')获取
+	var formData=new FormData($('#fmIssPatSearch')[0]);
+	
+	//引入外部参数的方式：
+	<!-- var sortData=$.extend({},sortDefaults,sortOptions); -->
+	<!-- var searchData=$.extend({},searchDefaults, searchOptions); -->
+	
+	var searchData={};
+	//使用Map对象的forEach方法组装键值对
+	formData.forEach(function(val,key,){
+		//非0非空的值才进行组装
+		if(val!='' && val!=0){
+			searchData[key]=val;
+		}
+	});
+	JSON.stringify(searchData);
+	console.dir(searchData);
+	
+	searchNum.hide();	
+	$('#divIssPatList_load').html('<h4 style="margin:50px;">加载中……</h4>');
+	
+	// jquery load()方法，本文件加载到index.html的指定区域<div id="divIssPatList_load"></div>
+	$('#divIssPatList_load').load('issPatList',{'sortData':sortData,'searchData':searchData},function(){
+		if(getJsonLength(searchData)){
+			searchNum.show();
+			<!-- fmIssPatSearchShow(searchData); -->
+			$('#divCollapse').collapse('show');
+			
+		}else{
+			searchNum.hide();
+			fmIssPatSearchInit();
+		}
+	});
+};
+
+//**函数名：fmIssPatSearchInit
+ 	//* 作用：$('#fmIssPatSearch')根据参数显示
+function fmIssPatSearchInit(options){
+	var defaults={
+		'searchTopic':'',
+		'searchStatus':'',
+		'searchDept':'',
+		'searchWriter':'',
+		'searchExecuter':'',
+		'searchTime':'',
+		'searchTimeRange':'',
+		'searchStartTime':'',
+		'searchEndTime':'',
+	};
+	var searchData = $.extend({},defaults, options);	
+	
+	var fm=$('#fmIssPatSearch');
+	var timeGroup=fm.find('div .timeGroup');
+	timeGroup.hide();
+	var searchDeptOptions={'sendData':{'req':'_DEPT'},'obj':$('#searchDept'),'selected':searchData.searchDept};
+	var searchStatusOptions={'sendData':{'req':'_STATUS'},'obj':$('#searchStatus'),'selected':searchData.searchStatus};
+	//表单reset
+	fm[0].reset();
+	//2个selection的option数量<=1，ajax赋值	
+	if($('#searchDept option').length<=1 && $('#searchStatus option').length<=1){
+		$.when(
+			ajaxShowSelect(searchDeptOptions),
+			ajaxShowSelect(searchStatusOptions) 
+		).then(
+			function(data, textStatus, jqXHR){
+     			<!-- $('#searchTopic').focus(); // ajax成功 -->
+				for(var key in searchData){
+					if(searchData[key]!=0 && searchData[key]!=''){
+						$('#'+key).val(searchData[key]).closest('div').show();
+					}
+				}
+				<!-- $('#searchTopic').focus(); -->
+			},
+			function(){
+				alert("失败Group，请稍后再试！");//ajax失败
+			}
+		);
+	}
+	$('#searchTopic').focus();
+};
+
+//**函数名：ajaxShowSelect
+ 	//* 作用：本页面ajax过程向服务器请求特定单选框内容所需数据，并组装好HTML语句
+	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
+	//* 参数sendData，类型：数值。值：传送给后端的键值对数据。
+	//* 参数obj，类型：对象。值：必须，单选框的对象名称
+	//*参数attach，类型：json数组。值：可为空，需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
+	//*参数selected，类型：字符。值：字符，可为空。
+	//* 返回值：无
+function ajaxShowSelect(options){
+	var defaults={
+		'url':'selectResponse',
+		'attach':[{"text":"...不限","val":"0"}],
+		'sendData':'',
+		'obj':'',
+		'selected':'',
+	};
+	var data = $.extend({},defaults, options);
+	var arrJson=data.attach;
+	var req=data.sendData.req;
+	var obj=data.obj;
+	var selected=data.selected;
+	var str='';
+	
+	$.post(data.url,data.sendData,function(result){
+		if(arrJson.length){
+			for(i=0;i<arrJson.length;i++){
+				str+='<option value="'+arrJson[i].val+'">'+arrJson[i].text+'</option>';
+			}
+		}
+		<!-- // 遍历backData数组组装HTML语句 -->
+		<!-- // result的结构是数组类的：[{key:value1},{key:value2}],所以要进行嵌套取出value值组装HTML语句-->
+		$.each(result,function(n1,v1){
+			$.each(v1,function(n2,v2){
+				str+='<option value="'+v2+'">'+v2+'</option>';	
+			});
+		});
+			
+		<!--// 清空单选框Obj的所有选项-->
+		obj.empty();
+		<!--// 添加单选框Obj的新选项-->
+		obj.append(str);
+		<!-- // value=selected 的项为选定项-->
+		if (selected){
+			obj.val(selected);
+		}
+	});
+};
+
+//利用自调用匿名函数立即执行的特点，设定$('#spTitle')、$('a[data-issue-process="'+process+'"]')。
+(function($,authEdit){
+    var process=$('#tblIssPat').data('process');
+	var obj=$('a[data-issue-process="'+process+'"]');
+	
+	//恢复数字显示的初始格式
+	$('.num').removeClass('badge').removeClass('mycolorred-bgwhite').addClass('mycolorwhite-bgtransparent');
+	//设置a所在li为“active”
+	obj.closest('li').addClass('active');
+	//设置a所含数字的显示格式
+	obj.find('.num').addClass('badge mycolorred-bgwhite');
+		
+	//load的文件中根据process的不同对#spTitle添加class和text
+	switch(process){
+		case'_TODO':
+			<!-- spClass=''; -->
+			if(authEdit){
+				spText='<a class="aAuth" href="#modalIssPatSingle" style="font-size:14px;" data-issId="0" data-issTopic="" data-issue-status="" data-issue-authority="_EDIT" data-issue-oprt="_ADDNEW" data-toggle="modal"><span class="glyphicon glyphicon-modal-window text-primary"></span>_新增</a>';
+			}else{
+				spText='';
+			}
+			break;
+		case'_INPROCESS':
+			<!-- spClass='label-info'; -->
+			spText='';
+			break;
+		case'_RENEW':
+			<!-- spClass='label-warning'; -->
+			spText='';
+			break;
+		case'_DONE':
+			<!-- spClass='label-default'; -->
+			spText='';
+			break;
+	}
+	$('#spTitle').html(spText);	
+})(jQuery,{$authEdit});
+
+$(document).ready(function(){	
+	
+	<!-- // 显示搜索条件的div，修改触发"显示"的btn内容-->
+	$('#divCollapse').on('hide.bs.collapse', function(){
+    	$('#btnSearchInfo').html('<span class="glyphicon glyphicon-collapse-down">搜索</span>');
+  	});
+	
+	<!-- // 隐藏搜索条件的div，修改触发"隐藏"的btn内容-->
+  	$('#divCollapse').on('show.bs.collapse', function(){
+    	$('#btnSearchInfo').html('<span class="glyphicon glyphicon-collapse-up">隐藏搜索</span>');
+		var jsonLength=getJsonLength({$searchData});
+		var showSearchNum=$('#pSearchResultNum');
+		<!-- console.log(jsonLength); -->
+		
+		fmIssPatSearchInit({$searchData});
+		
+		if(jsonLength){
+			showSearchNum.show();
+		}else{
+			showSearchNum.hide();
+		}
+		
+		$('#searchTopic').focus();
+  	});
+		
+	<!-- // 页面刷新 -->
+	$('#btnRefresh').click(function(){
+		//搜索表单重置
+		$('#fmIssPatSearch')[0].reset();
+		loadMe();
+	});
+	
+	<!-- //表格每页显示记录行数 -->
+	$('#listRows').val('{$listRows}');
+	
+	//调整span里的.label
+	$('span.label').css({'padding-bottom':'2px','margin-bottom':'2px'});
+	//调整span里的.badge
+	$('span.badge').css({'margin-bottom':'1px'});
+	
+	//为指定行上色
+	$('table').find('a[data-issid="{$issId}"]').closest('tr').addClass('bg-warning');
+	
+	//完善.aAuth中a的data属性和HTML内容
+	$('.aAuth').each(function(){
+		var status=$(this).attr('data-issue-status');
+		var oprt=$(this).attr('data-issue-oprt');
+		var auth='_EDIT';
+		
+		if($.inArray(status,{$statusArr}.edit)>=0){
+			auth='_EDIT';
+		}
+		
+		if($.inArray(status,{$statusArr}.audit)>=0){
+			auth='_AUDIT';
+		}
+		
+		if($.inArray(status,{$statusArr}.approve)>=0){
+			auth='_APPROVE';
+		}
+		
+		if($.inArray(status,{$statusArr}.execute)>=0){
+			auth='_EXECUTE';
+		}
+		
+		if($.inArray(status,{$statusArr}.maintain)>=0){
+			auth='_MAINTAIN';
+		}
+		
+		$(this).attr('data-issue-authority',auth);
+		$(this).html(aHtml(auth,oprt));
+	
+	});
+		
+	
+	// 根据后端控制器给出的排序字段{$sortName},排序方式{ $sortOrder}，修改th中a的显示形式
+	$('#divIssPatList thead a').each(function(){
+	
+		var glyAsc='&nbsp;<span class="small glyphicon glyphicon-sort-by-attributes"></span>';
+		var glyDesc='&nbsp;<span class="small glyphicon glyphicon-sort-by-order-alt"></span>';
+		
+		//排序字段{$sortName}已赋值在a的“sortName”属性中
+		var sortName=$(this).attr('sortName');
+		// 排序方式{$sortOrder}已赋值在a的“sortOrder”属性中
+		var sortOrder=$(this).attr('sortOrder');
+		
+		// 后端控制器给出的排序字段{$sortName},
+		if (sortName=='{$sortName}'){
+			$(this).addClass('label label-primary');
+			<!-- $(this).data('selected',1); -->
+			//排序有关的参数都向$('#tblIssPat')汇集(更新有变化的)
+			$('#tblIssPat').data('sort-order',sortOrder)
+			
+			if(sortOrder=='_ASC'){
+				$(this).append(glyAsc);
+				$(this).attr('sortOrder','_DESC');
+				// bootstap3中修改tooltip的options属性值
+				<!-- $(this).data("bs.tooltip").options.title="点击后降序"; -->
+				<!-- $(this).data("bs.tooltip").options.placement="top"; -->
+				$(this).attr('data-original-title','当前为升序。点击后降序');
+				$(this).tooltip({placement: 'top'});
+			}else{
+				$(this).append(glyDesc);
+				$(this).attr('sortOrder','_ASC');
+				// bootstap3中修改tooltip的options属性值
+				<!-- $(this).data("bs.tooltip").options.title="点击后降序"; -->
+				<!-- $(this).data("bs.tooltip").options.placement="top"; -->
+				$(this).attr('data-original-title','当前为降序。点击后升序');
+				$(this).tooltip({placement: 'top'});
+			}
+		}
+	});	
+	
+	// 点击th中的a，表格中的内容根据a中的属性值进行排序
+	$('#divIssPatList thead a').click(function(){
+		//排序有关的参数都向$('#tblIssPat')汇集(更新有变化的)
+		var objSort=$('#tblIssPat');
+		objSort.data('sort-order',$(this).attr('sortOrder'));
+		objSort.data('sort-name',$(this).attr('sortName'));
+		objSort.data('pagenum',1);
+		
+		loadMe();
+		
+	});
+	
+	// 添加bootstrap的tooltip属性
+	$('#divIssPatList thead th a').tooltip({title: '点击排序', placement: 'bottom'});
+	
+	$('.patInfo a').tooltip({title: '专利信息', placement: 'bottom'});
+	$('.patStatus a').tooltip({title: '专利过程记录', placement: 'bottom'});
+	
+	$('.issInfo a').tooltip({title: '事务信息', placement: 'bottom'});
+	$('.issPatStatus a').tooltip({title: '事务过程记录', placement: 'bottom'});
+	
+	// <td>里<a>标签的click事件,给标签所在行上色
+	$('td a').click(function(){
+		// 所有行去掉附加的bg-warning
+		$('tr').removeClass('bg-warning');
+		// 本<a>标签所在行上色bg-warning
+		$(this).parent().parent().addClass('bg-warning');
+	});
+	
+	<!-- //根据listRows和process加载页面 -->
+	$('#listRows').change(function(){
+		<!-- var obj=$('#tblIssPat th').find('.label'); -->
+		var objSort=$('#tblIssPat');
+		//排序有关的参数都向$('#tblIssPat')汇集(更新有变化的)
+		objSort.data('list-rows',$(this).val());
+		objSort.data('pagenum',1);
+		
+		loadMe();
+	
+	});	
+	
+	<!-- // 点击后端提供分页内容后分页索引中的a，根据a中的属性值进行显示 -->
+	$('#divListRows a').click(function(event){
+		// a所在分页页数
+		var pageStr=$(this).text();
+		var pageNum;
+		//(li.active)所代表的页数
+		var pageNumActive=$('#divListRows li.active').children('span').text();
+		// jQuery的preventDefault()方法阻止元素发生默认的行为。阻止访问a的URL
+        event.preventDefault();
+		<!-- alert("pageStr:"+pageStr+" active:"+pageNumActive); -->
+		
+		switch(pageStr){
+			case'»':
+				//用"*"确保得到的是加法运算结果，而不是字符串
+				pageNum=(pageNumActive*1+1);
+			break;
+			
+			case'«':
+				pageNum=(pageNumActive*1-1);
+			break;
+			
+			default:
+				pageNum=pageStr;
+			break;
+		
+		}
+		<!-- alert("pageNum:"+pageNum); -->
+		//排序有关的参数都向$('#tblIssPat')汇集(更新有变化的)
+		var objSort=$('#tblIssPat');
+		objSort.data('pagenum',pageNum);
+		
+		loadMe();
+	
+	});
+	
+	// 表格中<td>里<a class="aAuth">标签的click事件,Ajax处理数据引入#modalIssPatSingle所需内容
+	$('.aAuth').click(function(){
+		var issId=$(this).attr('data-issId');
+		var topic=$(this).attr('data-issTopic');
+		var auth=$(this).attr('data-issue-authority');
+		var oprt=$(this).attr('data-issue-oprt');
+		var aHtml=$(this).html();
+		//向后端“issPatSingle”(TP5中 'issPatSingle'='{$home}/dashboard/index/issPatSingle' )发送数据(后端用于选择返回的模板文件)		
+		$.post('issPatSingle',
+			{
+				'issId':issId,
+				'auth':auth,
+				'oprt':oprt,
+			},
+			//得到后端返回的data(模板文件)
+			function(data){
+				//在本文件#divIssPatSingle_load处渲染显示data
+				$('#divIssPatSingle_load').html(data);
+				$('.modal-header').find('h4').empty().html('<span class="glyphicon glyphicon-wrench">专利事务：</span>【<strong>'+aHtml+'</strong>】《'+topic+'》');
+			}
+		);
+		
+	});
+	
+<!-- //$('#fmIssPatSearch')有关的代码块 -->
+	$('#searchTime').change(function(){
+		var timeGroup=$('#fmIssPatSearch').find('div .timeGroup');
+		if($(this).val()!=0){
+			timeGroup.show();
+			$('#searchTimeRange').val('_BT');
+			$('#searchStartTime').val(dateBeforeToday(10))
+			$('#searchEndTime').val(dateBeforeToday())
+		}else{
+			timeGroup.hide().children('.form-control').val(0);
+		}
+	});
+	
+	$('#searchTimeRange').change(function(){
+		var startDate=dateBeforeToday(10);
+		var endDate=dateBeforeToday();
+		var timeGroup=$('#fmIssPatSearch').find('div .timeGroup');
+		timeGroup.hide();
+		$('#searchEndTime').val(0);
+		$('#searchStartTime').val(0);
+		$(this).closest('div').show();
+		
+		switch($(this).val()){
+			case '_LE':
+				$('#searchEndTime').val(endDate).closest('div').show();
+				break;
+			case '_GE':
+				$('#searchStartTime').val(startDate).closest('div').show();
+				break;
+			case '_BT':
+				$('#fmIssPatSearch').find('div .timeGroup').show();
+				$('#searchEndTime').val(endDate);
+				$('#searchStartTime').val(startDate)
+				break;
+			//'0'
+			default:
+				timeGroup.hide();
+				$('#searchTime').val(0);
+				break;
+		}
+	});
+	
+	//表单提交，开始用户搜索
+	$('#btnSearch').click(function(){
+		//排序有关的参数都向$('#tblIssPat')汇集(更新有变化的)
+		var objSort=$('#tblIssPat');
+		objSort.data('list-rows',10);
+		objSort.data('pagenum',1);
+		
+		loadMe();
+	});
+	
+	//表单重置
+	$('#btnSearchReset').click(function(){
+		fmIssPatSearchInit()
+	});
+<!-- //$('#fmIssPatSearch')有关的代码块 -->
+	
+	
+<!-- function -->
+
+<!-- function -->
+});
+
+</script>
+{/block}
