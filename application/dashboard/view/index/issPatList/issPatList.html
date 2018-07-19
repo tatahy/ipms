@@ -238,7 +238,6 @@
 </div>
 <!--/ Modal "modalIssPatSingle" -->
 
-{block name="script"}
 <script>
 
 //**函数名：dateBeforeToday
@@ -341,7 +340,7 @@ function loadMe(){
 		}
 	});
 	JSON.stringify(searchData);
-	console.dir(searchData);
+	//console.dir(searchData);
 	
 	searchNum.hide();	
 	$('#divIssPatList_load').html('<h4 style="margin:50px;">加载中……</h4>');
@@ -375,12 +374,12 @@ function fmIssPatSearchInit(options){
 		'searchEndTime':'',
 	};
 	var searchData = $.extend({},defaults, options);	
-	
+	var process=$('#tblIssPat').data('process');
 	var fm=$('#fmIssPatSearch');
 	var timeGroup=fm.find('div .timeGroup');
 	timeGroup.hide();
-	var searchDeptOptions={'sendData':{'req':'_DEPT'},'obj':$('#searchDept'),'selected':searchData.searchDept};
-	var searchStatusOptions={'sendData':{'req':'_STATUS'},'obj':$('#searchStatus'),'selected':searchData.searchStatus};
+	var searchDeptOptions={'sendData':{'req':'_DEPT','process':process,'issType':'_PAT'},'obj':$('#searchDept'),'selected':searchData.searchDept};
+	var searchStatusOptions={'sendData':{'req':'_STATUS','process':process,'issType':'_PAT'},'obj':$('#searchStatus'),'selected':searchData.searchStatus};
 	//表单reset
 	fm[0].reset();
 	//2个selection的option数量<=1，ajax赋值	
@@ -402,7 +401,10 @@ function fmIssPatSearchInit(options){
 				alert("失败Group，请稍后再试！");//ajax失败
 			}
 		);
+	}else{
+	
 	}
+	console.log($('#searchDept option').length+' || '+$('#searchStatus option').length)
 	$('#searchTopic').focus();
 };
 
@@ -435,14 +437,10 @@ function ajaxShowSelect(options){
 				str+='<option value="'+arrJson[i].val+'">'+arrJson[i].text+'</option>';
 			}
 		}
-		<!-- // 遍历backData数组组装HTML语句 -->
-		<!-- // result的结构是数组类的：[{key:value1},{key:value2}],所以要进行嵌套取出value值组装HTML语句-->
+		// result是数组,取出value值组装HTML语句
 		$.each(result,function(n1,v1){
-			$.each(v1,function(n2,v2){
-				str+='<option value="'+v2+'">'+v2+'</option>';	
-			});
+			str+='<option value="'+v1+'">'+v1+'</option>';	
 		});
-			
 		<!--// 清空单选框Obj的所有选项-->
 		obj.empty();
 		<!--// 添加单选框Obj的新选项-->
@@ -492,6 +490,8 @@ function ajaxShowSelect(options){
 	$('#spTitle').html(spText);	
 })(jQuery,{$authEdit});
 
+
+
 $(document).ready(function(){	
 	
 	<!-- // 显示搜索条件的div，修改触发"显示"的btn内容-->
@@ -501,10 +501,10 @@ $(document).ready(function(){
 	
 	<!-- // 隐藏搜索条件的div，修改触发"隐藏"的btn内容-->
   	$('#divCollapse').on('show.bs.collapse', function(){
-    	$('#btnSearchInfo').html('<span class="glyphicon glyphicon-collapse-up">隐藏搜索</span>');
 		var jsonLength=getJsonLength({$searchData});
 		var showSearchNum=$('#pSearchResultNum');
-		<!-- console.log(jsonLength); -->
+	
+    	$('#btnSearchInfo').html('<span class="glyphicon glyphicon-collapse-up">隐藏搜索</span>');
 		
 		fmIssPatSearchInit({$searchData});
 		
@@ -770,4 +770,3 @@ $(document).ready(function(){
 });
 
 </script>
-{/block}

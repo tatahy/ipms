@@ -101,9 +101,10 @@ class Issinfo extends Model
      * 获取登录用户各类isspat的总数和数据集
      * @param  Array $logUser 登录用户信息数组
      * @param  String $type 决定返回数据('_NUM','_TODO',_INPROCESS','_PATRENEW','_DONE') 
+     * @param  Array $field 进行分组的字段名 
      * @return Array $result 返回的数组
      */
-    public function issPatProcess($logUser= [], $type = '')
+    public function issPatProcess($logUser= [], $type = '', $field=[])
     {
         //存放各类isspat的procss类别名称及其对应记录数的数组$num 
         $num = array('todo'=>0,'inprocess'=>0,'done'=>0,'patrenew'=>0);
@@ -120,6 +121,13 @@ class Issinfo extends Model
         
         //基础查询，在isspat中进行查询
         $iss=$this::scope('issmap_type','_PAT');
+        
+        if (count($field)){
+            $visibleField=$field;
+        }else{
+            $visibleField=['id','topic','status','statusdescription','create_time','update_time','dept','writer','executer','issmap_id','issmap_type',
+                            'issmap' => ['id','patnum','topic','pattype','status']]; 
+        }
         
         foreach ($logUser['auth']['iss'] as $key => $value) {
             //清空查询条件数组
@@ -154,11 +162,8 @@ class Issinfo extends Model
                     break;
 
             }
-            $visibleField=['id','topic','status','statusdescription','create_time','update_time','dept','writer','executer','issmap_id','issmap_type',
-                            'issmap' => ['id','patnum','topic','pattype','status']]; 
-             
+                         
             $arrToDo= $iss->where($mapToDo)->select();
-
             if(count($arrToDo)){
                 $arrToDo = collection($arrToDo)->load('issmap')->visible($visibleField)->toArray();
             }else{
@@ -214,7 +219,7 @@ class Issinfo extends Model
             case '_DONE':
                 $listDone=$iss->where('status','完结')->select();
                 //$listDone= collection($listDone)->append(['issmap'])->visible(['issmap' => ['id', 'patnum','topic','pattype','status']])->toArray();
-                $listDone = collection($listDone)->load('issmap')->toArray();  
+                $listDone = collection($listDone)->load('issmap')->visible($visibleField)->toArray();  
                 $result=$listDone;
                 
                 break;

@@ -1542,21 +1542,51 @@ class IndexController extends \think\Controller
         return view('index'.DS.'issPatAuthSingle'.DS.'attFileList'); //$returnArr=array('result'=>true/false,'msg'=>'string')
     }
     //响应前端请求，返回信息
-    public function selectResponse(Request $request,IssinfoModel $issMdl)
+    public function selectResponse(Request $request,IssinfoModel $issMdl,$req='',$process='_TODO',$issType='_PAT')
     {
       $this->_loginUser();
-      $req=$request->param('req');
-           
+      
+      $req = empty($request->param('req'))?0:$request->param('req');
+      $process = empty($request->param('process'))?'_TODO':$request->param('process');
+      $issType = empty($request->param('issType'))?'_PAT':$request->param('issType');
+      
+      $field=[];
+      
       switch($req){
         case '_DEPT':
-          $res=$issMdl->where('id','>',0)->field('dept')->group('dept')->select();
+          $field='dept';
         break;
         
         case '_STATUS':
-          $res=$issMdl->where('id','>',0)->field('status')->group('status')->select();
+          $field='status';
         break;
       }
-      //返回前端的是数据集（索引数组）  
+      
+      switch($issType){
+        case '_PAT':
+          //调用issinfo模型的查询方法issPatProcess()得到仅含$field字段的查询结果数据集(数组)
+          $res=$issMdl->issPatProcess($this->logUser,$process,[$field]);
+          
+        break;
+        
+        case '_THE':
+         
+        break;
+      }
+      
+      //将得到的数据集降为一维数组
+      if(is_array($res)){
+        $res=collection($res)->column($field);        
+      }else{
+        $res=$res->column($field);
+      }
+      //数组去重
+      $res=array_unique($res);
+      //对得到的数组进行排序
+      sort($res);
+      //natsort($res); 
+      
+      //返回前端的是索引数组  
       return $res;
     }
 }
