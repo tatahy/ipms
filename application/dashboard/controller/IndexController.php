@@ -1176,10 +1176,18 @@ class IndexController extends \think\Controller
         return view('index'.DS.'issPatAuth'.DS.'patRenew');
     }
 
-    public function userInfo(Request $request)
+    public function userInfo(Request $request,UserModel $userMdl)
     {
-
-        //return ':)<br> userInfo 模块开发中……';
+        $this->_loginUser();
+        
+        $user=$userMdl::get($this->userId);
+        
+        $this->assign([
+                    'home' => $request->domain(),
+                    
+                    'user' => $user
+                    ]);
+        
         return view();
 
 

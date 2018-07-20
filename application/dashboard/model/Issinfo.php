@@ -384,19 +384,7 @@ class Issinfo extends Model
         }
         return $result;
     }
-   //issPatIntersect()得到查询结果数据集(数组）与搜索结果数据集(数组)的交集
-   /**
-     * 根据搜索条件查询结果数据集(数组)
-     * @param  Array $issArr 查询结果数据集(数组）
-     * @param  Array $queryArr 搜索结果数据集(数组)
-     * @return Array $result 返回的索引数组
-     */
-    public function issPatIntersect($issArr=[],$queryArr=[]) 
-    {
-        //比对2个数组的id
-        $issArr=array_intersect($issArr,$queryArr);
-    }
-
+    
     /**
      * 获取对应patent的内容
      */

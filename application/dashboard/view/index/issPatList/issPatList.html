@@ -239,8 +239,10 @@
 <!--/ Modal "modalIssPatSingle" -->
 
 <script>
+//本文件中的全局变量
 var statusArr={$statusArr};
 var authEdit={$authEdit};
+var searchDataArr={$searchData};
 
 //**函数名：dateBeforeToday
  	//* 作用：得到距离今天n天的日期(以“2018-7-2”的格式返回)
@@ -256,7 +258,7 @@ function dateBeforeToday(n){
 	}
 	targetDate=targetTime.getFullYear()+'-'+(targetTime.getMonth()+1)+'-'+targetTime.getDate();
  	return targetDate;
-}
+};
 
 //**函数名：getJsonLength
  	//* 作用：得到jsonData的长度
@@ -266,7 +268,7 @@ function getJsonLength(jsonData){
 		jsonLength++;
 	}
  	return jsonLength;
-}
+};
 
 //**函数名：aHtml
  	//* 作用：初始化$('#fmIssPatSearch')
@@ -314,7 +316,7 @@ function aHtml(auth,oprt){
 	//* 参数3：sortOrder，String。值：可为空，排序方式。默认为'_ASC'。
 	//* 参数4：pageNum，Int。值：可为空，当前页数。默认为1。
 	//* 参数5：process，String。值：可为空，所处进程。默认为'_TODO'。
-	//* 参数6：serchWord，Array。值：可为空，用户搜索关键词键值对。默认为空。	
+	//* 参数6：serchWord，Array。值：可为空，用户搜索关键词键值对。默认为空。
 function loadMe(){
 	var searchNum=$('#pSearchResultNum');
 	//排序有关的参数都从$('#tblIssPat')获取
@@ -351,63 +353,11 @@ function loadMe(){
 	$('#divIssPatList_load').load('issPatList',{'sortData':sortData,'searchData':searchData},function(){
 		if(getJsonLength(searchData)){
 			searchNum.show();
-			<!-- fmIssPatSearchShow(searchData); -->
 			$('#divCollapse').collapse('show');
-			
 		}else{
 			searchNum.hide();
-			fmIssPatSearchInit();
 		}
 	});
-};
-
-//**函数名：fmIssPatSearchInit
- 	//* 作用：$('#fmIssPatSearch')根据参数显示
-function fmIssPatSearchInit(options){
-	var defaults={
-		'searchTopic':'',
-		'searchStatus':'',
-		'searchDept':'',
-		'searchWriter':'',
-		'searchExecuter':'',
-		'searchTime':'',
-		'searchTimeRange':'',
-		'searchStartTime':'',
-		'searchEndTime':'',
-	};
-	var searchData = $.extend({},defaults, options);	
-	var process=$('#tblIssPat').data('process');
-	var fm=$('#fmIssPatSearch');
-	var timeGroup=fm.find('div .timeGroup');
-	timeGroup.hide();
-	var searchDeptOptions={'sendData':{'req':'_DEPT','process':process,'issType':'_PAT'},'obj':$('#searchDept'),'selected':searchData.searchDept};
-	var searchStatusOptions={'sendData':{'req':'_STATUS','process':process,'issType':'_PAT'},'obj':$('#searchStatus'),'selected':searchData.searchStatus};
-	//表单reset
-	fm[0].reset();
-	//2个selection的option数量<=1，ajax赋值	
-	if($('#searchDept option').length<=1 && $('#searchStatus option').length<=1){
-		$.when(
-			ajaxShowSelect(searchDeptOptions),
-			ajaxShowSelect(searchStatusOptions) 
-		).then(
-			function(data, textStatus, jqXHR){
-     			<!-- $('#searchTopic').focus(); // ajax成功 -->
-				for(var key in searchData){
-					if(searchData[key]!=0 && searchData[key]!=''){
-						$('#'+key).val(searchData[key]).closest('div').show();
-					}
-				}
-				<!-- $('#searchTopic').focus(); -->
-			},
-			function(){
-				alert("失败Group，请稍后再试！");//ajax失败
-			}
-		);
-	}else{
-	
-	}
-	console.log($('#searchDept option').length+' || '+$('#searchStatus option').length)
-	$('#searchTopic').focus();
 };
 
 //**函数名：ajaxShowSelect
@@ -439,7 +389,7 @@ function ajaxShowSelect(options){
 				str+='<option value="'+arrJson[i].val+'">'+arrJson[i].text+'</option>';
 			}
 		}
-		// result是数组,取出value值组装HTML语句
+		// result数组,取出value值组装HTML语句
 		$.each(result,function(n1,v1){
 			str+='<option value="'+v1+'">'+v1+'</option>';	
 		});
@@ -448,18 +398,18 @@ function ajaxShowSelect(options){
 		<!--// 添加单选框Obj的新选项-->
 		obj.append(str);
 		<!-- // value=selected 的项为选定项-->
-		if (selected){
+		if (selected!=''){
 			obj.val(selected);
 		}
 	});
 };
 
-//利用自调用匿名函数立即执行的特点，设定$('#spTitle')、$('a[data-issue-process="'+process+'"]')。
-(function($,authEdit){
+//利用自调用匿名函数立即执行的特点，设定$('#spTitle')、$('a[data-issue-process="'+process+'"]')、$('#searchDept')、$('#searchStatus')。
+(function($,authEdit,ajaxShowSelect,searchData){
     var process=$('#tblIssPat').data('process');
 	var obj=$('a[data-issue-process="'+process+'"]');
 	var spText='';
-	
+
 	//恢复数字显示的初始格式
 	$('.num').removeClass('badge').removeClass('mycolorred-bgwhite').addClass('mycolorwhite-bgtransparent');
 	//设置a所在li为“active”
@@ -485,9 +435,35 @@ function ajaxShowSelect(options){
 			<!-- spClass='label-default'; -->
 			break;
 	}
-	$('#spTitle').html(spText);	
-<!-- })(jQuery,{$authEdit}); -->
-})(jQuery,authEdit);
+	$('#spTitle').html(spText);
+
+	//ajax得到select的option
+	$.when(
+			ajaxShowSelect({'sendData':{'req':'_DEPT','process':process,'issType':'_PAT'},'obj':$('#searchDept'),'selected':searchData.searchDept}),
+			ajaxShowSelect({'sendData':{'req':'_STATUS','process':process,'issType':'_PAT'},'obj':$('#searchStatus'),'selected':searchData.searchStatus}) 
+		).then(
+			function(data, textStatus, jqXHR){
+     			//ajax成功，设置$('#fmIssPatSearch')
+				var fm=$('#fmIssPatSearch');
+				var timeGroup=fm.find('div .timeGroup');
+				timeGroup.hide();
+				if(getJsonLength(searchData)){
+					for(var key in searchData){
+						if(searchData[key]!=0 && searchData[key]!=''){
+							$('#'+key).val(searchData[key]).closest('div').show();
+						}
+					}
+				}else{
+					//表单reset
+					fm[0].reset();
+				}
+			},
+			function(){
+				//ajax失败
+				alert("失败Group，请稍后再试！");
+			}
+		);		
+})(jQuery,authEdit,ajaxShowSelect,searchDataArr);
 
 $(document).ready(function(){	
 	
@@ -498,19 +474,18 @@ $(document).ready(function(){
 	
 	<!-- // 隐藏搜索条件的div，修改触发"隐藏"的btn内容-->
   	$('#divCollapse').on('show.bs.collapse', function(){
-		var jsonLength=getJsonLength({$searchData});
 		var showSearchNum=$('#pSearchResultNum');
 	
     	$('#btnSearchInfo').html('<span class="glyphicon glyphicon-collapse-up">隐藏搜索</span>');
 		
-		fmIssPatSearchInit({$searchData});
-		
-		if(jsonLength){
+		if(getJsonLength(searchDataArr)){
 			showSearchNum.show();
 		}else{
 			showSearchNum.hide();
 		}
-		
+  	});
+	
+	$('#divCollapse').on('shown.bs.collapse', function(){
 		$('#searchTopic').focus();
   	});
 		
@@ -758,7 +733,7 @@ $(document).ready(function(){
 	
 	//表单重置
 	$('#btnSearchReset').click(function(){
-		fmIssPatSearchInit()
+		$('#fmIssPatSearch')[0].reset();
 	});
 <!-- //$('#fmIssPatSearch')有关的代码块 -->
 	
