@@ -170,13 +170,16 @@ $(document).ready(function(){
 		<!-- } -->
 	<!-- }); -->
 	
-	//issPatTopic的内容自动跟随生成
+	//issPatTopic、modal-header的内容自动跟随生成
 	$('#patTopic').change(function(){ 	
+		var topic='';
 		if($(this).val()==''){
 			$(this).focus();
 		}else{
-			$('#issPatTopic').val('关于“'+$(this).val()+'”的授权申报');
+			topic='关于“'+$(this).val()+'”的授权申报';
 		}
+		$('#issPatTopic').val(topic);
+		$('.modal-header').find('h4 strong').next('span').html(topic);
 	});
 	
 	//ajax检查是否重复，若有显示提示信息和获取焦点。
@@ -192,6 +195,10 @@ $(document).ready(function(){
 				$('#patTopic').parent().removeClass('has-error');
 			}	
 		},'json');
+	});
+	
+	$('#btnReset').on('click',function(){	
+		$('.modal-header').find('h4 strong').next('span').html('');
 	});
 });
 </script>
