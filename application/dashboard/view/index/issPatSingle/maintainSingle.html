@@ -437,9 +437,9 @@ $(document).ready(function(){
 		//mydate.getMonth()的取值为0~11，将月份统一为mm的格式
 		var strMonth=(mydate.getMonth()+1)>9?(mydate.getMonth()+1).toString():'0'+(mydate.getMonth()+1);
 		//将天数统一为dd格式
-		var strDate=mydate.getDate()>9?mydate.getDate().toString():'0'+mydate.getDate();
+		var strDay=mydate.getDate()>9?mydate.getDate().toString():'0'+mydate.getDate();
 		
-		var today=mydate.getFullYear()+'-'+strMonth+'-'+strDate;
+		var today=mydate.getFullYear()+'-'+strMonth+'-'+strDay;
 		//系统当前时间字符串
 		<!-- var todayDate=mydate.toLocaleString(); -->
 		return today;
