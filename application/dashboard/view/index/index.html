@@ -147,9 +147,9 @@ function loadTplFile(){
 	if(sId=='' || sId=='#undefined'){
 		sId='#issPat2';
 	}
-
+	$('#divContent_load').html('<p class="text-center" style="font-size:24px;">加载中……</p>');
     //提交锚点值给后端，由后端返回需加载的页面文件
-	$("#divContent_load").load('tplFile',{'sId':sId},function(){
+	$('#divContent_load').load('tplFile',{'sId':sId},function(){
 		//load的回调函数改变样式
 		$('.nav a[href="'+sId+'"]').find('.badge').css('color','red');
 	}); 

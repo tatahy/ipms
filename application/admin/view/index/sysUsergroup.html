@@ -14,6 +14,7 @@
 				<tr >
 					<th class="text-center">序号</th>
 					<th>用户组名</th>
+					<th>用户组说明</th>
 					<th class="text-center">“事务”权限</th>
 					<th class="text-center">“专利”权限</th>
 					<th class="text-center">“项目”权限</th>
@@ -29,6 +30,7 @@
 				<tr class="text-center">
 					<td>{$i+($usergroupPageNum-1)*$usergroupTableRows}</td>
 					<td class="name text-left">{$vo.name}</td>
+					<td class="name text-left">{$vo.description}</td>
 					<!-- //iss -->
 					<td class="authority"> 
 						<div style="padding-top:3px" class="text-left">

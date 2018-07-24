@@ -1,84 +1,54 @@
 <!-- // issPat.html： -->
-<div>
-<h4><span class="label label-warning" style="padding-bottom:2px;padding-top:4px;"><span class="glyphicon glyphicon-user"></span></span>&nbsp;个人信息</h4>
 
-	<ul class="nav nav-pills" style="margin-top:10px;border-bottom: 1px solid #faebcc;">
-	<!-- <ul class="nav nav-tabs" > -->
-		<li class="" ><a class="aPill" href="#" data-issue-type="_USERINFO" data-issue-authority="edit" ><span class="glyphicon glyphicon-pencil"></span>编辑</a></li>
-		
-		<li style="marging-left:0px;"><a class="aPill" href="#"  data-issue-type="_USERINFO" data-issue-authority="audit"><span class="glyphicon glyphicon-check"></span>审核</a></li>
-			
-	</ul>
-			
-	<div class="tab-content">
-		<div>
-			<!-- <P>前端模板变量$userlg={ $userlg}<br> -->
-			<!-- $userlg.0={ $userlg.0},&nbsp;$userlg.id={ $userlg.id}<br> -->
-			<!-- 后端赋值语句'userlg'=>$userlg -->
-			<!-- </P> -->
-					
-		</div>
-		<!-- //需load其他模板文件的div -->
-		<!-- <div id="divUserinfo_load"><h4 style="margin:50px;">开发中……</h4></div> -->
-	</div>
+
+<div id="divUsergroup" data-user-id="{$user.id}" style="margin-top:10px;">
+	<a href="#divUserBasicInfo" data-toggle="collapse" class="label label-warning" style="font-size:16px;"><span class="glyphicon glyphicon-duplicate"></span>&nbsp;基本信息</a>
 	
-</div>
-
-<form id="fmUsergroup" role="form" action="" method="post">
-	<input id="id" type="text" name="id" value="{$user.id}" class="sr-only">
-	<div class="myFieldset">
-		<div class="myLegend"><span class="label label-warning"><span class="glyphicon glyphicon-duplicate"></span>&nbsp;基本信息</span></div>
-		<div class="row myRow">		
-			<div class="form-group has-feedback col-sm-3">
-			
-				<label for="userName">用户名：
-				<h4>{$user.username}</h4>	
+	<div id="divUserBasicInfo" class="row myRow collaps in" style="margin-top:10px;">		
+			<div class="col-sm-3">
+				<span>用户名：<strong style="font-size:16px;">{$user.username}</strong></span>	
 			</div>
 		
-			<div class="form-group col-sm-3">
-				<label class="" for="searchTopic">手机号码：</label>
-				<h4>{$user.mobile}</h4>
-										
+			<div class="col-sm-3">
+				<span>注册手机号：<strong style="font-size:16px;">{$user.mobile}</strong></span>			
 			</div>
 			
-			<div class="form-group col-sm-6">
-				<label class="" for="searchTopic">所属部门: </label>
-				<h4>{$user.dept}</h4>
-										
+			<div class="col-sm-6">
+				<span>所属部门：<strong style="font-size:16px;">{$user.dept}</strong></span>		
 			</div>
-		
-		</div>
 	</div>
-
-	<div class="myFieldset">
-		<div class="myLegend"><span class="label label-warning"><span class="glyphicon glyphicon-alert"></span>&nbsp;权限</span></div>
+	<hr>
+	
+	<a href="#divUserAuth" data-toggle="collapse" class="label label-warning" style="font-size:16px;"><span class="glyphicon glyphicon-alert"></span>&nbsp;系统权限</a>
 		
-		<div class="row myRow">		
+	<div id="divUserAuth" class="row myRow collaps in" style="margin-top:10px;">		
 		<div class="form-group col-sm-6">	
 			<label><span class="text-info">【事务】</span></label>	
-			<div style="border-bottom:solid 1px #ccc; padding:5px;">				
+			<div style="border-bottom:solid 1px #ccc; padding:5px;">	
 				{foreach name="$user.authority.iss" item="v" }
     			{if condition="($v==1)"} 
 				<span class="label label-info"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-ok"></span></span>
 				
 				{else /} 
-				<span class="label label-default"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-remove"></span></span>
+				<span class="text-muted"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-unchecked"></span></span>
 				{/if}
-				{/foreach}
+				{/foreach}			
+				
 			</div>
 		</div>
 		
 		<div class="form-group col-sm-6">	
 			<label><span class="text-default">【专利】</span></label>	
-			<div style="border-bottom:solid 1px #ccc; padding:5px;">				
+			<div style="border-bottom:solid 1px #ccc; padding:5px;">
 				{foreach name="$user.authority.pat" item="v" }
     			{if condition="($v==1)"} 
 				<span class="label label-info"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-ok"></span></span>
 				
 				{else /} 
-				<span class="label label-default"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-remove"></span></span>
+				<span class="text-muted"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-unchecked"></span></span>
 				{/if}
-				{/foreach}
+				{/foreach}			
+				
 			</div>
 		</div>
 		
@@ -90,7 +60,7 @@
 				<span class="label label-info"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-ok"></span></span>
 				
 				{else /} 
-				<span class="label label-default"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-remove"></span></span>
+				<span class="text-muted"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-unchecked"></span></span>
 				{/if}
 				{/foreach}
 			</div>
@@ -104,7 +74,7 @@
 				<span class="label label-info"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-ok"></span></span>
 				
 				{else /} 
-				<span class="label label-default"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-remove"></span></span>
+				<span class="text-muted"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-unchecked"></span></span>
 				{/if}
 				{/foreach}
 			</div>
@@ -118,7 +88,7 @@
 				<span class="label label-info"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-ok"></span></span>
 				
 				{else /} 
-				<span class="label label-default"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-remove"></span></span>
+				<span class="text-muted"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-unchecked"></span></span>
 				{/if}
 				{/foreach}
 			</div>
@@ -130,13 +100,27 @@
 				{eq name="$user.authority.admin.enable" value="1"} 
 				<span class="label label-info">有<span class="glyphicon glyphicon-ok"></span></span>
 				{else /} 
-				<span class="label label-default">无<span class="glyphicon glyphicon-remove"></span></span>
+				<span class="text-muted">无<span class="glyphicon glyphicon-unchecked"></span></span>
 				{/eq}
 			</div>
 		</div>
-		</div>
-		
 	</div>
+	<hr>
+		
+	<a href="#divUserGroup" data-toggle="collapse" class="label label-warning" style="font-size:16px;"><span class="glyphicon glyphicon-magnet"></span>&nbsp;所属用户组</a>
+	
+	<div id="divUserGroup" class="row myRow collaps in" style="margin-top:10px;">		
+		<ul class="list-group">
+			{volist name="userGroup" id="vo"}			
+			<a class="list-group-item col-sm-4" style="border:0px;">【<span class="label label-info">{$vo.name}</span>】：{$vo.description}</a>
+			<!-- <li class="list-group-item">【<span class="label label-info">{$vo.name}</span>】：{$vo.description}</li> -->
+			
+			{/volist}
+		</ul>	
+			
+			
+	</div>
+	
 				
 
 	
@@ -154,10 +138,12 @@
 			<!-- <button type="button" class="btn btn-warning btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 取消</button> -->
 		<!-- </div> -->
 	</div>			
-	</form>
 
+</div>
 <br>
 <!-- /pagewrap  -->
+
+
 
 
 <script>
@@ -217,7 +203,6 @@ $(document).ready(function(){
 		var str=$(this).text();
 		$(this).text(textEnToChi(str));
    	});
-	
 	
 
 });

@@ -248,23 +248,32 @@ class Issinfo extends Model
         //排序字段名称
         $field=('oprt'==$field)?'status':$field;
         
-        //取排序数组id索引数组
-        $idSortArr=collection($issArr)->column('id');        
+        //取排序数组的id索引数组
+        $idSortArr=collection($issArr)->column('id');
+                
         if(count($idSearchArr)){
             //id索引数组交集
             $idArr=array_intersect($idSortArr,$idSearchArr);
+            if(count($idArr)){
+                //交集不为空，重组$idArr下标，保证$idArr的下标是连续，使用模型的all方法根据id进行查询时要求
+                $idArr=array_values($idArr);
+            }else{
+                $idArr=[];
+            }
         }else{
             $idArr=$idSortArr;
         }
-        //重组$idArr下标，保证$idArr的下标是连续
-        $idArr=array_values($idArr);
-        
-        //根据交集得到数据集
-        //$issArr=$this->all($idArr,'issmap'); 
-        $issArr=$this->all($idArr); 
-        $visibleField=['id','topic','status','statusdescription','create_time','update_time','dept','writer','executer','issmap_id','issmap_type',
+  
+        if(count($idArr)){
+            $issArr=$this->all($idArr);
+            $visibleField=['id','topic','status','statusdescription','create_time','update_time','dept','writer','executer','issmap_id','issmap_type',
                             'issmap' => ['id','patnum','topic','pattype','status']]; 
-        $issArr = collection($issArr)->load('issmap')->visible($visibleField)->toArray();
+            $issArr = collection($issArr)->load('issmap')->visible($visibleField)->toArray();
+            //根据交集得到数据集
+            //$issArr=$this->all($idArr,'issmap'); 
+        }else{
+            $issArr=$this->all(0);
+        }
         
         //对数据集进行排序
         //1.生成一个仅含排序字段值的索引数组  
@@ -283,7 +292,7 @@ class Issinfo extends Model
             arsort($arr,SORT_NATURAL);
         }        
         //3.得到排序好的id值数组        
-        //方法：按$arr的顺序将$issArr的‘id’字段值拷贝到新数组$idSortArr        
+        //方法：按$arr的顺序将$issArr的‘id’字段值拷贝到新数组$result        
         $i=0;
         foreach($arr as $key=>$value){
             $result[$i]=$issArr[$key];
@@ -296,10 +305,10 @@ class Issinfo extends Model
     /**
      * 根据搜索条件查询结果数据集(数组)
      * @param  Array $queryParam 搜索条件数组
-     * @param  Array $field 查询结果数据集所包含的字段名数组
+     * @param  Array $field 查询结果数据集所包含的字段名数组，默认只是‘id’字段
      * @return Array $result 返回的索引数组
      */
-    public function issPatSearch($queryParam=[],$field=[]) 
+    public function issPatSearch($queryParam=[],$field=['id']) 
     {
         //需返回的索引数组
         $result=array();

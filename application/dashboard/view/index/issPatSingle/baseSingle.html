@@ -374,7 +374,6 @@ $(document).ready(function(){
 				conHtml+='<p class="text-center text-danger">已上传的附件文件也会一并删除！</P>';
 				}
 				
-				
 				//是否开始ajax传3个form的数据
 				$.confirm(conHtml,function(e){
 					con=e;
@@ -505,6 +504,9 @@ $(document).ready(function(){
 		
 		// select显示为模板变量值
 		$('#patType').val('{$patType}').attr('selected');
+		
+		//modal-header内容与#issPatTopic内容保持一致
+		$('.modal-header').find('h4 strong').next('span').html($('#issPatTopic').val());
 	
 	});
 
@@ -541,9 +543,7 @@ $(document).ready(function(){
 			console.log('无附件上传'+' xhr.readyState='+xhr.readyState);
 			//$.alert('无附件上传');
 		}
-			
 		return xhr;
-	
 	}
 	
 	//**函数名：inputsNotEmpty
@@ -554,7 +554,6 @@ $(document).ready(function(){
 	function inputsNotEmpty(objSet){
 		var arr=[];
 		var i=0;
-		
 		var obj=(objSet==null)?$('.empty-check'):objSet;
 		//检查所有的input(class="form-control")是否都填入内容并不为0，无内容的加'has-error'和tooltip
 		for (i;i<obj.length;i++){

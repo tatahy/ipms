@@ -708,12 +708,13 @@ class IndexController extends \think\Controller
                             );
         $usergroupData=array('name'=>$request->param('usergroupName'),
                                 'enable'=>$request->param('usergroupEn'),
-                                'authority'=>$authority);
+                                'authority'=>$authority,
+                                'description'=>'无');
       }
       //2. 分情况操作数据库
       switch($oprt){
         case '_ADDNEW':
-          $usergroup=array('id'=>$id,'name'=>'','authority'=>_commonModuleAuth());
+          $usergroup=array('id'=>$id,'name'=>'','authority'=>_commonModuleAuth(),'description'=>'无');
           //将iss权限数组的$key转为中文_commonAuthArrKeyToCHN
           //$usergroup['authority']['iss']=_commonAuthArrKeyToCHN($usergroup['authority']['iss']);
 //          $usergroup['authority']['pat']=_commonAuthArrKeyToCHN($usergroup['authority']['pat']);

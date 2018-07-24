@@ -5,31 +5,47 @@
 <div class="container-fluid mainDiv">
 	<h4 class="label label-info" style="font-size:16px;">事务标题</h4>
 	<h4 style="padding-bottom:10px;">《{$topic}》</h4>
+		
+	<a class="label label-info" style="font-size:16px;" href="#divIssrecords" data-toggle="collapse" title="事务过程记录">事务过程</a>
 	
-	<h4 class="label label-info" style="font-size:16px;">事务过程</h4>
+	<div id="divIssrecords" class="panel-group collaps in" style="margin-top:10px;">
 	
-	<div class="table-responsive" style="margin-top:10px;">	
-			<table id="" class="table table-hover table-condensed">
-				<thead>
-					<tr>
-						<th class="text-center">序号</th>
-						<th class="text-center">用户</th>
-						<th class="text-center">事务权限</th>
-						<th class="text-center">操作</th>
-						<th>操作说明</th>
-						<th class="text-center">操作时间</th>
-					</tr>
-				</thead>
-				<tbody><!-- 此处显示数据库查询后的数据集 -->
-					{volist name="issrecords" id="vo" empty="暂无信息"}
-					<tr class="text-center">
-						<td>{$i}</td>
-						<td>{$vo.username}</a></td>
-						<td>【{$vo.rolename}】</a></td>
-						<td>{$vo.act}</td>
-						<td class="text-left">
-						{notempty name="vo.actdetailhtml"}
-							<p>{$vo.actdetailhtml.p.prefix}
+		{volist name="issrecords" id="vo" empty="暂无信息"}
+		<div class="panel panel-info">
+		<div class="panel-heading">
+			<h4 class="panel-title" style="height:20px;">
+				<div class="pull-left">{$i}<a data-toggle="collapse" data-parent="#divIssrecords" href="#collapse{$i}" title="查看详情"><strong class="text-primary">
+        		{$vo.username}</strong>【{$vo.rolename}】</a>-{switch name="vo.actdetailhtml.p.spanclass"}
+							{case value="info"}
+							<span class="label label-info">
+							{/case}
+							{case value="primary"}
+							<span class="label label-primary">
+							{/case}
+							{case value="warning"}
+							<span class="label label-warning">
+							{/case}
+    						{case value="danger"}
+							<span class="label label-danger">
+							{/case}
+							{case value="success"}
+							<span class="label label-success">
+							{/case}
+							{case value="default"}
+							<span class="label label-default">
+							{/case}
+    						{default /}<span>
+					{/switch}
+							{$vo.act}
+				</span>
+				</div>
+      			<div class="pull-right">{$vo.acttime}</div>
+			</h4>
+			
+		</div>
+		<div id="collapse{$i}" class="panel-collapse collapse">
+			{notempty name="vo.actdetailhtml"}
+			<p>{$vo.actdetailhtml.p.prefix}
 							
 							{switch name="vo.actdetailhtml.p.spanclass"}
 							{case value="info"}
@@ -53,8 +69,10 @@
     						{default /}<span>
 							{/switch}
 							{$vo.actdetailhtml.p.spantext}</span>
-							{$vo.actdetailhtml.p.nextstage}</p>
-							
+							{$vo.actdetailhtml.p.nextstage}
+			</p>
+			
+			
 							{switch name="vo.actdetailhtml.span.class"}
 							{case value="info"}
 							<span class="text-info">
@@ -83,18 +101,14 @@
 						{else /}
 							{$vo.actdetail}
 						{/notempty}
-						</td>
-						<td>{$vo.acttime}</td>
-					</tr>
-					{/volist}
-				
-				</tbody>
-				
-			</table>
+			
+		</div>
+		</div>
 		
-		
-	</div>
+		{/volist}
 	
+	</div>
+<hr>
 	<div class="btn-group-sm">
 		<button type="submit" class="btn btn-primary btnClose" >关闭本页</button>
 	</div>
@@ -109,7 +123,9 @@ $(document).ready(function(){
 	$(".btnClose").click(function(){
 		window.close();
 	});
-	console.log()
+	
+	
+	$('[data-toggle="tooltip"]').tooltip(); 
 	
 });
 </script>
