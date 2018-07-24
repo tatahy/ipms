@@ -419,7 +419,7 @@ class IndexController extends \think\Controller
         
         //要进行搜索
         if(count($searchData)){
-            //调用issinfo模型的查询方法issPatSearch()得到仅含‘id’字段的搜索结果数据集(数组)
+            //调用issinfo模型的方法issPatSearch()得到仅含‘id’字段的搜索结果数据集(数组)
             $searchResultArr=$issMdl->issPatSearch($searchParamArr,['id']);
             //有搜索结果
             if(count($searchResultArr)){
@@ -436,7 +436,7 @@ class IndexController extends \think\Controller
                 $issArr=array();  
             }
         }else{
-        //无需进行搜索
+            //无需进行搜索
             $issArr=$issMdl->issPatSort($issArr,$sortName,$sortOrder);      
         }
         
@@ -446,7 +446,7 @@ class IndexController extends \think\Controller
         
         $showList=array_slice($issArr,($pageNum-1)*$listRows,$listRows);
         
-        //将数据库issinfo表对应字段转换为前端的排序字段
+        //将数据库issinfo表对应字段转换为前端的排序字段，回传给前端。
         foreach($sortField as $key=>$value){
            if($value==$sortName){
                 $sortName=$key;
@@ -470,7 +470,6 @@ class IndexController extends \think\Controller
                 'sortName' => $sortName, 
                 'sortOrder' => $sortOrder,
         
-                //'auth' => $auth, 
                 //前端判断权限用数组（权限/状态数组），保持中文
                 'statusArr' => json_encode($statusArr,JSON_UNESCAPED_UNICODE),
                 'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
@@ -1176,10 +1175,21 @@ class IndexController extends \think\Controller
         return view('index'.DS.'issPatAuth'.DS.'patRenew');
     }
 
-    public function userInfo(Request $request)
+    public function userInfo(Request $request,UserModel $userMdl)
     {
-
-        //return ':)<br> userInfo 模块开发中……';
+        $this->_loginUser();
+        
+        $user=$userMdl::get($this->userId);
+        
+        $userGroup=$userMdl->userGroupArr($this->userId);
+        
+        $this->assign([
+                    'home' => $request->domain(),
+                    
+                    'user' => $user,
+                    'userGroup' => $userGroup,
+                    ]);
+        
         return view();
 
 

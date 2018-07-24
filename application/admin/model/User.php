@@ -23,6 +23,16 @@ class User extends Model
     //只读字段，这个字段的值一旦写入，就无法更改。
     //protected $readonly = ['rolety_id'];
     
+     //获取器，获取数据表mobile字段值，转换为掩码输出(类似：139xxxx1111)
+    protected function getMobileAttr($val)
+    {
+        //将电话号码中间4位转为x
+        if(strlen($val)==11){
+            $val=substr_replace($val, 'xxxx', 3,4);
+        }
+        return $val;
+    }
+    
     /**
      * 获取用户所属的角色信息
      */

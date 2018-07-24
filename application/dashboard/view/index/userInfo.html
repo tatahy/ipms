@@ -1,44 +1,209 @@
 <!-- // issPat.html： -->
-<div>
-<h4><span class="label label-warning" style="padding-bottom:2px;padding-top:4px;"><span class="glyphicon glyphicon-user"></span></span>&nbsp;个人信息</h4>
 
-	<ul class="nav nav-pills" style="margin-top:10px;border-bottom: 1px solid #faebcc;">
-	<!-- <ul class="nav nav-tabs" > -->
-		<li class="" ><a class="aPill" href="#" data-issue-type="_USERINFO" data-issue-authority="edit" ><span class="glyphicon glyphicon-pencil"></span>编辑</a></li>
+
+<div id="divUsergroup" data-user-id="{$user.id}" style="margin-top:10px;">
+	<a href="#divUserBasicInfo" data-toggle="collapse" class="label label-warning" style="font-size:16px;"><span class="glyphicon glyphicon-duplicate"></span>&nbsp;基本信息</a>
+	
+	<div id="divUserBasicInfo" class="row myRow collaps in" style="margin-top:10px;">		
+			<div class="col-sm-3">
+				<span>用户名：<strong style="font-size:16px;">{$user.username}</strong></span>	
+			</div>
 		
-		<li style="marging-left:0px;"><a class="aPill" href="#"  data-issue-type="_USERINFO" data-issue-authority="audit"><span class="glyphicon glyphicon-check"></span>审核</a></li>
+			<div class="col-sm-3">
+				<span>注册手机号：<strong style="font-size:16px;">{$user.mobile}</strong></span>			
+			</div>
 			
-	</ul>
-			
-	<div class="tab-content">
-		<div>
-			<!-- <P>前端模板变量$userlg={ $userlg}<br> -->
-			<!-- $userlg.0={ $userlg.0},&nbsp;$userlg.id={ $userlg.id}<br> -->
-			<!-- 后端赋值语句'userlg'=>$userlg -->
-			<!-- </P> -->
-					
-		</div>
-		<!-- //需load其他模板文件的div -->
-		<div id="divUserinfo_load"><h4 style="margin:50px;">开发中……</h4></div>
+			<div class="col-sm-6">
+				<span>所属部门：<strong style="font-size:16px;">{$user.dept}</strong></span>		
+			</div>
 	</div>
-</div>
+	<hr>
+	
+	<a href="#divUserAuth" data-toggle="collapse" class="label label-warning" style="font-size:16px;"><span class="glyphicon glyphicon-alert"></span>&nbsp;系统权限</a>
+		
+	<div id="divUserAuth" class="row myRow collaps in" style="margin-top:10px;">		
+		<div class="form-group col-sm-6">	
+			<label><span class="text-info">【事务】</span></label>	
+			<div style="border-bottom:solid 1px #ccc; padding:5px;">	
+				{foreach name="$user.authority.iss" item="v" }
+    			{if condition="($v==1)"} 
+				<span class="label label-info"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-ok"></span></span>
+				
+				{else /} 
+				<span class="text-muted"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-unchecked"></span></span>
+				{/if}
+				{/foreach}			
+				
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label><span class="text-default">【专利】</span></label>	
+			<div style="border-bottom:solid 1px #ccc; padding:5px;">
+				{foreach name="$user.authority.pat" item="v" }
+    			{if condition="($v==1)"} 
+				<span class="label label-info"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-ok"></span></span>
+				
+				{else /} 
+				<span class="text-muted"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-unchecked"></span></span>
+				{/if}
+				{/foreach}			
+				
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label><span class="text-default">【项目】</span></label>	
+			<div style="border-bottom:solid 1px #ccc; padding:5px;">
+				{foreach name="$user.authority.pro" item="v" }
+    			{if condition="($v==1)"} 
+				<span class="label label-info"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-ok"></span></span>
+				
+				{else /} 
+				<span class="text-muted"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-unchecked"></span></span>
+				{/if}
+				{/foreach}
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label><span class="text-default">【论文】</span></label>	
+			<div style="border-bottom:solid 1px #ccc; padding:5px;">
+				{foreach name="$user.authority.the" item="v" }
+    			{if condition="($v==1)"} 
+				<span class="label label-info"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-ok"></span></span>
+				
+				{else /} 
+				<span class="text-muted"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-unchecked"></span></span>
+				{/if}
+				{/foreach}
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label><span class="text-danger">【附件】</span></label>	
+			<div style="border-bottom:solid 1px #ccc; padding:5px;">
+				{foreach name="$user.authority.att" item="v" }
+    			{if condition="($v==1)"} 
+				<span class="label label-info"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-ok"></span></span>
+				
+				{else /} 
+				<span class="text-muted"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-unchecked"></span></span>
+				{/if}
+				{/foreach}
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label><span class="text-danger">【后台管理】</span></label>	
+			<div class="form-group" style="border-bottom:solid 1px #ccc; padding:5px;">
+				{eq name="$user.authority.admin.enable" value="1"} 
+				<span class="label label-info">有<span class="glyphicon glyphicon-ok"></span></span>
+				{else /} 
+				<span class="text-muted">无<span class="glyphicon glyphicon-unchecked"></span></span>
+				{/eq}
+			</div>
+		</div>
+	</div>
+	<hr>
+		
+	<a href="#divUserGroup" data-toggle="collapse" class="label label-warning" style="font-size:16px;"><span class="glyphicon glyphicon-magnet"></span>&nbsp;所属用户组</a>
+	
+	<div id="divUserGroup" class="row myRow collaps in" style="margin-top:10px;">		
+		<ul class="list-group">
+			{volist name="userGroup" id="vo"}			
+			<a class="list-group-item col-sm-4" style="border:0px;">【<span class="label label-info">{$vo.name}</span>】：{$vo.description}</a>
+			<!-- <li class="list-group-item">【<span class="label label-info">{$vo.name}</span>】：{$vo.description}</li> -->
+			
+			{/volist}
+		</ul>	
+			
+			
+	</div>
+	
+				
 
-<div>cc
+	
+		<!-- <hr> -->
+	<div class="row myRow">	
+		<!-- <button id="btnCreate" type="submit" class="btn btn-primary btn-sm" data-oprt="_CREATE"><span class="glyphicon glyphicon-duplicate"></span>&nbsp;新增</button> -->
+		
+		<!-- <button id="btnUpdate" type="submit" class="btn btn-primary btn-sm" data-oprt="_UPDATE"><span class="glyphicon glyphicon-ok"></span>&nbsp;保存</button> -->
+		
+		<!-- <button id="btnDelete" type="submit" class="btn btn-danger btn-sm" data-oprt="_DELETE"><span class="glyphicon glyphicon-remove"></span>删除</button> -->
+	
+		<!-- <div class="pull-right">	 -->
+			<!-- <button id="btnReset" type="reset" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-refresh"></span>&nbsp;重置</button> -->
+				
+			<!-- <button type="button" class="btn btn-warning btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 取消</button> -->
+		<!-- </div> -->
+	</div>			
 
 </div>
+<br>
 <!-- /pagewrap  -->
 
 
+
+
 <script>
+
+//**函数名：textEnToChi
+ 	//* 作用：本页面特定英文字符串转换成中文字符串
+	//* 参数text，类型：字符串。值：不为空。说明：待转换的英文字符串。
+	//* 返回值：中文字符串
+function textEnToChi(text){
+	switch(text){
+		case 'edit':
+            text='编辑';
+        break;
+        case 'audit':
+            text='审核';
+        break;
+        case 'approve':
+            text='审批';
+        break;
+        case 'execute':
+            text='执行';
+        break;
+        case 'maintain':
+            text='维护';
+        break;
+       //...................附件.....................
+        case 'upload':
+            text='上传';
+        break;
+        case 'download':
+            text='下载';
+        break;
+        case 'erase':
+            text='删除';
+        break;
+        case 'move':
+            text='移动';
+        break;
+        case 'copy':
+            text='复制';
+        break;
+		case 'enable':
+	        text='启用';
+         break;
+	}
+	return text;
+};
+
 $(document).ready(function(){
 	//侧边栏消除li的active
 	$('.nav .active').removeClass('active');
 	//侧边栏本页对应a添加数字,其所在li加acitve
 	$('.nav a[href="'+window.location.hash+'"]').closest('li').addClass('active');
-<!-- function  -->
-
-
-<!--/ function -->
+	
+	//将span的text转换成中文
+	$('.spAuthKey').each(function(){
+		var str=$(this).text();
+		$(this).text(textEnToChi(str));
+   	});
+	
 
 });
 </script>

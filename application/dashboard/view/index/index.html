@@ -140,23 +140,40 @@
 <!-- /pagewrap  -->
 
 <script>
+//**函数名：loadTplFile
+ 	//* 作用：提交锚点值给后端，由后端返回需加载的页面文件
+function loadTplFile(){
+	var sId=window.location.hash;
+	if(sId=='' || sId=='#undefined'){
+		sId='#issPat2';
+	}
+	$('#divContent_load').html('<p class="text-center" style="font-size:24px;">加载中……</p>');
+    //提交锚点值给后端，由后端返回需加载的页面文件
+	$('#divContent_load').load('tplFile',{'sId':sId},function(){
+		//load的回调函数改变样式
+		$('.nav a[href="'+sId+'"]').find('.badge').css('color','red');
+	}); 
+};
+
 $(document).ready(function(){
 	$('[data-toggle="tooltip"]').tooltip();
 	
-	loadTplFile($('li.active').children('a').attr('href'));
-	<!-- loadTplFile('#issPat'); -->
+	loadTplFile();
 	
 	$('#closeBtn').hide();	
 	
 	<!-- //点击nav-pills中的各个按钮后，加载对应的页面-->
 	$('.aTab').click(function(){
-        var sId = $(this).attr('href');  //a的href属性值即是页面的锚点值
+        //改变页面的锚点值为a的href属性值
+		window.location.hash = $(this).attr('href');  
 		
 		//a所在li高亮
 		$(this).tab('show');
 		//各个badge恢复初始颜色
 		$('.nav').find('.badge').css('color','#fff');
-        loadTplFile(sId);              //加载锚点对应的页面文件
+		
+		//加载锚点对应的页面文件
+        loadTplFile();              
     });	
 	
 	//显示SideNavbar
@@ -178,21 +195,6 @@ $(document).ready(function(){
     	$('#main').css('margin-left','0');
     	$('#footer').css('margin-left','0');	
     });			
-	
-<!-- function  -->
-	
-// 作用：提交锚点值给后端，由后端返回需加载的页面文件
-	function loadTplFile(sId){
-		if(null==sId || sId=='#undefined'){sId='#issPat';}
-        //提交锚点值给后端，由后端返回需加载的页面文件
-		$("#divContent_load").load('tplFile',{'sId':sId},function(){
-			//load的回调函数改变样式
-			$('.nav a[href="'+sId+'"]').find('.badge').css('color','red');
-		}); 
-    }
-
-<!--/ function -->
-
 });
 </script>
 

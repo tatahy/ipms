@@ -29,7 +29,7 @@ class Issrecord extends Model
       $value=$key;
       $roleName = [
                 'writer'=>'撰写','reviewer'=>'审核','approver'=>'批准','operator'=>'执行','maintainer'=>'申报/管理',
-                '_EDIT'=>'撰写','_AUDIT'=>'审核','_APPROVE'=>'批准','_EXECUTE'=>'执行','_MAINTAIN'=>'申报/管理',
+                '_EDIT'=>'撰写','_AUDIT'=>'审核','_APPROVE'=>'审批','_EXECUTE'=>'执行','_MAINTAIN'=>'申报/管理',
                 ];
       if(array_key_exists($key,$roleName)){
         $value = $roleName[$key];
