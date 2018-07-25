@@ -6,7 +6,7 @@
 	<h4 class="label label-info" style="font-size:16px;">事务标题</h4>
 	<h4 style="padding-bottom:10px;">《{$topic}》</h4>
 		
-	<a class="label label-info" style="font-size:16px;" href="#divIssrecords" data-toggle="collapse" title="事务过程记录">事务过程</a>
+	<a id="aCollapse" class="label label-info" style="font-size:16px;" data-toggle="popover" title="事务过程记录">事务过程<span class="glyphicon glyphicon-menu-up"></span></a>
 	
 	<div id="divIssrecords" class="panel-group collaps in" style="margin-top:10px;">
 	
@@ -14,7 +14,7 @@
 		<div class="panel panel-info">
 		<div class="panel-heading">
 			<h4 class="panel-title" style="height:20px;">
-				<div class="pull-left">{$i}<a data-toggle="collapse" data-parent="#divIssrecords" href="#collapse{$i}" title="查看详情"><strong class="text-primary">
+				<div class="pull-left">{$i}<a class="aPanelCollapse" data-toggle="collapse" href="#collapse{$i}" title="查看详情"><strong class="text-primary">
         		{$vo.username}</strong>【{$vo.rolename}】</a>-{switch name="vo.actdetailhtml.p.spanclass"}
 							{case value="info"}
 							<span class="label label-info">
@@ -44,8 +44,10 @@
 			
 		</div>
 		<div id="collapse{$i}" class="panel-collapse collapse">
+			<!-- <div style="padding:5px;"> -->
+			<div style="margin:5px;">
 			{notempty name="vo.actdetailhtml"}
-			<p>{$vo.actdetailhtml.p.prefix}
+				<p class="text-center">{$vo.actdetailhtml.p.prefix}
 							
 							{switch name="vo.actdetailhtml.p.spanclass"}
 							{case value="info"}
@@ -70,7 +72,7 @@
 							{/switch}
 							{$vo.actdetailhtml.p.spantext}</span>
 							{$vo.actdetailhtml.p.nextstage}
-			</p>
+				</p>
 			
 			
 							{switch name="vo.actdetailhtml.span.class"}
@@ -95,16 +97,16 @@
 							
 							{notempty name="vo.actdetailhtml.pre.text"}
 							<!-- <pre class="">{$vo.actdetailhtml.pre.text}</pre> -->
-							<pre style="background-color:transparent;">{$vo.actdetailhtml.pre.text}</pre>
+							<pre style="background-color:transparent;border:0px;">{$vo.actdetailhtml.pre.text}</pre>
 							{/notempty}
 							
 						{else /}
 							{$vo.actdetail}
 						{/notempty}
 			
+			</div>
 		</div>
 		</div>
-		
 		{/volist}
 	
 	</div>
@@ -118,14 +120,48 @@
 <!-- /pagewrap  -->
 
 <script>
+
+//**函数名：glyphiconChange
+ 	//* 作用：obj内含的glyphicon进行变换
+	//* 参数1：obj，String。值：必须，要交换glyphicon的obj
+	//* 参数2：icon1，String。值：必须，glyphicon1。
+	//* 参数3：icon2，String。值：必须，glyphicon2。
+	//* 无返回值
+function glyphiconChange(obj,icon1,icon2){
+	if(obj.find('.'+icon2).length){
+	    obj.find('.glyphicon').removeClass(icon2).addClass(icon1);
+    }else{
+	    obj.find('.glyphicon').removeClass(icon1).addClass(icon2);
+	}
+};
+
 $(document).ready(function(){
 
-	$(".btnClose").click(function(){
+	$('.btnClose').click(function(){
 		window.close();
 	});
 	
+	$('#aCollapse').click(function(){
+		var icon1='glyphicon-menu-up';
+		var icon2='glyphicon-menu-down';
+		glyphiconChange($(this),icon1,icon2);
+
+		if($(this).find('.'+icon2).length){
+			$('.panel-collapse').collapse('hide');
+		}		
+		
+		$('#divIssrecords').collapse('toggle');
+    });
 	
-	$('[data-toggle="tooltip"]').tooltip(); 
+	$('.aPanelCollapse').click(function(){
+		var target=$(this).attr('href');
+		<!-- $(target).collapse({toggle:'true',parent:'#divIssrecords'}); -->
+		$(target).collapse('toggle');
+
+    });
+	
+	$('.aPanelCollapse').tooltip({toggle:'true',trigger:'hover'});
+	$('#aCollapse').popover({content:'事务每一次操作的摘要记录',trigger:'hover',delay:{show:500, hide: 10}}); 	
 	
 });
 </script>

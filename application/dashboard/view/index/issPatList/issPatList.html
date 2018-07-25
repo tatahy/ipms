@@ -8,12 +8,12 @@
 	<p style="margin-top:5px;">
 		<span id="spTitle"></span>
 		
-		<button id="btnSearchInfo" type="button" class="btn-link" data-toggle="collapse" data-target="#divCollapse"><span class="glyphicon glyphicon-collapse-down"></span>搜索</button>
+		<button id="btnSearchInfo" type="button" class="btn-link" data-toggle="collapse" data-target="#divSearchInfo"><span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span></button>
 				
 		<button id="btnRefresh" type="button" class="btn-link"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 	</p>
 	
-	<div id="divCollapse" class="collapse" >
+	<div id="divSearchInfo" class="collapse" >
 		<div class="label label-info" style="font-size:14px;">搜索条件</div>
 		<form id="fmIssPatSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;">
 			
@@ -244,6 +244,20 @@ var statusArr={$statusArr};
 var authEdit={$authEdit};
 var searchDataArr={$searchData};
 
+//**函数名：glyphiconChange
+ 	//* 作用：obj内含的glyphicon进行变换
+	//* 参数1：obj，String。值：必须，要交换glyphicon的obj
+	//* 参数2：icon1，String。值：必须，glyphicon1。
+	//* 参数3：icon2，String。值：必须，glyphicon2。
+	//* 无返回值
+function glyphiconChange(obj,icon1,icon2){
+	if(obj.find('.'+icon2).length){
+	    obj.find('.glyphicon').removeClass(icon2).addClass(icon1);
+    }else{
+	    obj.find('.glyphicon').removeClass(icon1).addClass(icon2);
+	}
+};
+
 //**函数名：dateBeforeToday
  	//* 作用：得到距离今天n天的日期(以“2018-7-2”的格式返回)
 function dateBeforeToday(n){
@@ -353,7 +367,7 @@ function loadMe(){
 	$('#divIssPatList_load').load('issPatList',{'sortData':sortData,'searchData':searchData},function(){
 		if(getJsonLength(searchData)){
 			searchNum.show();
-			$('#divCollapse').collapse('show');
+			$('#divSearchInfo').collapse('show');
 		}else{
 			searchNum.hide();
 		}
@@ -469,25 +483,26 @@ function ajaxShowSelect(options){
 
 $(document).ready(function(){	
 	
-	<!-- // 显示搜索条件的div，修改触发"显示"的btn内容-->
-	$('#divCollapse').on('hide.bs.collapse', function(){
-    	$('#btnSearchInfo').html('<span class="glyphicon glyphicon-collapse-down">搜索</span>');
-  	});
-	
-	<!-- // 隐藏搜索条件的div，修改触发"隐藏"的btn内容-->
-  	$('#divCollapse').on('show.bs.collapse', function(){
-		var showSearchNum=$('#pSearchResultNum');
-	
-    	$('#btnSearchInfo').html('<span class="glyphicon glyphicon-collapse-up">隐藏搜索</span>');
+	$('#btnSearchInfo').click(function(){
+		var icon1='glyphicon-collapse-up';
+		var icon2='glyphicon-collapse-down';
+		glyphiconChange($(this),icon1,icon2);
 		
-		if(getJsonLength(searchDataArr)){
-			showSearchNum.show();
+		if($(this).find('.'+icon2).length){
+			$(this).find('.glyphicon').next('span').html('显示搜索');
 		}else{
-			showSearchNum.hide();
+			$(this).find('.glyphicon').next('span').html('隐藏搜索');
 		}
-  	});
+		
+	});
 	
-	$('#divCollapse').on('shown.bs.collapse', function(){
+	if(getJsonLength(searchDataArr)){
+		$('#pSearchResultNum').show();
+	}else{
+		$('#pSearchResultNum').hide();
+	}
+	
+	$('#divSearchInfo').on('shown.bs.collapse', function(){
 		$('#searchTopic').focus();
   	});
 		
