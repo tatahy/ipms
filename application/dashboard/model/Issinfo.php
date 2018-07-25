@@ -128,7 +128,7 @@ class Issinfo extends Model
             $visibleField=['id','topic','status','statusdescription','create_time','update_time','dept','writer','executer','issmap_id','issmap_type',
                             'issmap' => ['id','patnum','topic','pattype','status']]; 
         }
-        
+        //根据登录用户的系统模块权限准备数据
         foreach ($logUser['auth']['iss'] as $key => $value) {
             //清空查询条件数组
             $mapToDo = array();
@@ -266,7 +266,7 @@ class Issinfo extends Model
   
         if(count($idArr)){
             $issArr=$this->all($idArr);
-            $visibleField=['id','topic','status','statusdescription','create_time','update_time','dept','writer','executer','issmap_id','issmap_type',
+            $visibleField=['id','topic','status','statusdescription','create_time','update_time','close_time','dept','writer','executer','issmap_id','issmap_type',
                             'issmap' => ['id','patnum','topic','pattype','status']]; 
             $issArr = collection($issArr)->load('issmap')->visible($visibleField)->toArray();
             //根据交集得到数据集
@@ -395,7 +395,7 @@ class Issinfo extends Model
     }
     
     /**
-     * 获取对应patent的内容
+     * 获取对应patent的内容，与Patinfo模型关联，是一对一的关联关系
      */
     public function patinfo()
     {

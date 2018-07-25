@@ -47,6 +47,7 @@ abstract class MaintainState{
     $data=$this->_oprtData;
     //写入数据库的信息
     $data['iss']['info']['status'] = '完结';
+    $data['iss']['info']['close_time'] = time();
     $data['iss']['info']['statusdescription'] = '专利事务完结。';
     //$data['iss']['record']['actdetail']='<p>《'.$data['iss']['info']['topic'].'》<span class="label label-default">完结</span></p>';
     $data['iss']['record']['actdetail']='0';

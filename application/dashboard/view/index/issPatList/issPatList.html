@@ -61,7 +61,7 @@
 				<select class="form-control" id="searchTime" name="searchTime">
 					<option value="0">...无</option>	
 					<option value="_CREATETIME">创建日期</option>
-					<option value="_UPDATETIME">更新日期</option>
+					<option class="updateCloseTime" value="_UPDATETIME">更新日期</option>
 				</select>						
 			</div>
 			
@@ -113,7 +113,7 @@
 					
 					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_CREATETIME" sortOrder="{$sortOrder}">创建时间</a></th>
 					
-					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_UPDATETIME" sortOrder="{$sortOrder}">更新时间</a></th>
+					<th class="text-center"><a class="updateCloseTime" data-toggle="tooltip" href="#" sortName="_UPDATETIME" sortOrder="{$sortOrder}">更新时间</a></th>
 					
 					<th class="text-center"><a data-toggle="tooltip" href="#" sortName="_PATNAME" sortOrder="{$sortOrder}">专利名称</a></th>
 					
@@ -417,7 +417,8 @@ function ajaxShowSelect(options){
 	//设置a所含数字的显示格式
 	obj.find('.num').addClass('badge mycolorred-bgwhite');
 		
-	//根据process的不同对#spTitle添加class和text
+	//根据process的不同对#spTitle添加class和text，修改$('.updateCloseTime')
+	$('.updateCloseTime').html('更新时间');
 	switch(process){
 		case'_TODO':
 			<!-- spClass=''; -->
@@ -433,6 +434,7 @@ function ajaxShowSelect(options){
 			break;
 		case'_DONE':
 			<!-- spClass='label-default'; -->
+			$('.updateCloseTime').html('完结时间');
 			break;
 	}
 	$('#spTitle').html(spText);
