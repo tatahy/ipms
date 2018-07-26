@@ -244,18 +244,18 @@ var statusArr={$statusArr};
 var authEdit={$authEdit};
 var searchDataArr={$searchData};
 
-//**函数名：glyphiconChange
+//**函数名：glyphiconTextChange
  	//* 作用：obj内含的glyphicon进行变换
 	//* 参数1：obj，String。值：必须，要交换glyphicon的obj
-	//* 参数2：icon1，String。值：必须，glyphicon1。
-	//* 参数3：icon2，String。值：必须，glyphicon2。
+	//* 参数2：iconText1，Json。值：必须，{icon:'glyphicon-xx',text:'xx'}。
+	//* 参数3：iconText2，Json。值：必须，{icon:'glyphicon-yy',text:'yy'}。
 	//* 无返回值
-function glyphiconChange(obj,icon1,icon2){
-	if(obj.find('.'+icon2).length){
-	    obj.find('.glyphicon').removeClass(icon2).addClass(icon1);
+function glyphiconTextChange(obj,iconText1,iconText2){
+	if(obj.find('.'+iconText2.icon).length){
+	    obj.find('.glyphicon').removeClass(iconText2.icon).addClass(iconText1.icon).next('span').html(iconText1.text);
     }else{
-	    obj.find('.glyphicon').removeClass(icon1).addClass(icon2);
-	}
+	    obj.find('.glyphicon').removeClass(iconText1.icon).addClass(iconText2.icon).next('span').html(iconText2.text);
+    }
 };
 
 //**函数名：dateBeforeToday
@@ -418,8 +418,8 @@ function ajaxShowSelect(options){
 	});
 };
 
-//利用自调用匿名函数立即执行的特点，设定$('#spTitle')、$('a[data-issue-process="'+process+'"]')、$('#searchDept')、$('#searchStatus')。
-(function($,authEdit,ajaxShowSelect,searchData){
+//利用自调用匿名函数立即执行的特点，设定$('#spTitle')、$('a[data-issue-process="'+process+'"]')、$('#searchDept')、$('#searchStatus')、$('#pSearchResultNum')、$('#btnSearchInfo')。
+(function($,authEdit,ajaxShowSelect,searchData,glyphiconTextChange){
     var process=$('#tblIssPat').data('process');
 	var obj=$('a[data-issue-process="'+process+'"]');
 	var spText='';
@@ -455,13 +455,15 @@ function ajaxShowSelect(options){
 
 	//ajax得到select的option
 	$.when(
-			ajaxShowSelect({'sendData':{'req':'_DEPT','process':process,'issType':'_PAT'},'obj':$('#searchDept'),'selected':searchData.searchDept}),
-			ajaxShowSelect({'sendData':{'req':'_STATUS','process':process,'issType':'_PAT'},'obj':$('#searchStatus'),'selected':searchData.searchStatus}) 
+			ajaxShowSelect({sendData:{req:'_DEPT',process:process,issType:'_PAT'},obj:$('#searchDept'),selected:searchData.searchDept}),
+			ajaxShowSelect({sendData:{req:'_STATUS',process:process,issType:'_PAT'},obj:$('#searchStatus'),selected:searchData.searchStatus}) 
 		).then(
 			function(data, textStatus, jqXHR){
      			//ajax成功，设置$('#fmIssPatSearch')
 				var fm=$('#fmIssPatSearch');
 				var timeGroup=fm.find('div .timeGroup');
+				var iconText1={icon:'glyphicon-collapse-up',text:'隐藏搜索'};
+				var iconText2={icon:'glyphicon-collapse-down',text:'显示搜索'};
 				timeGroup.hide();
 				if(getJsonLength(searchData)){
 					for(var key in searchData){
@@ -469,9 +471,12 @@ function ajaxShowSelect(options){
 							$('#'+key).val(searchData[key]).closest('div').show();
 						}
 					}
+					$('#pSearchResultNum').show();
+					glyphiconTextChange($('#btnSearchInfo'),iconText1,iconText2);
 				}else{
 					//表单reset
 					fm[0].reset();
+					$('#pSearchResultNum').hide();
 				}
 			},
 			function(){
@@ -479,28 +484,17 @@ function ajaxShowSelect(options){
 				alert("失败Group，请稍后再试！");
 			}
 		);		
-})(jQuery,authEdit,ajaxShowSelect,searchDataArr);
+})(jQuery,authEdit,ajaxShowSelect,searchDataArr,glyphiconTextChange);
 
 $(document).ready(function(){	
 	
 	$('#btnSearchInfo').click(function(){
-		var icon1='glyphicon-collapse-up';
-		var icon2='glyphicon-collapse-down';
-		glyphiconChange($(this),icon1,icon2);
+		var iconText1={icon:'glyphicon-collapse-up',text:'隐藏搜索'};
+		var iconText2={icon:'glyphicon-collapse-down',text:'显示搜索'};
 		
-		if($(this).find('.'+icon2).length){
-			$(this).find('.glyphicon').next('span').html('显示搜索');
-		}else{
-			$(this).find('.glyphicon').next('span').html('隐藏搜索');
-		}
+		glyphiconTextChange($(this),iconText2,iconText1);
 		
 	});
-	
-	if(getJsonLength(searchDataArr)){
-		$('#pSearchResultNum').show();
-	}else{
-		$('#pSearchResultNum').hide();
-	}
 	
 	$('#divSearchInfo').on('shown.bs.collapse', function(){
 		$('#searchTopic').focus();
@@ -682,9 +676,9 @@ $(document).ready(function(){
 		//向后端“issPatSingle”(TP5中 'issPatSingle'='{$home}/dashboard/index/issPatSingle' )发送数据(后端用于选择返回的模板文件)		
 		$.post('issPatSingle',
 			{
-				'issId':issId,
-				'auth':auth,
-				'oprt':oprt,
+				issId:issId,
+				auth:auth,
+				oprt:oprt,
 			},
 			//得到后端返回的data(模板文件)
 			function(data){
