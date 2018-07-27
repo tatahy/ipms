@@ -5,13 +5,13 @@
 	
 <div id="divIssPatList">		
 	
-	<p style="margin-top:5px;">
-		<span id="spTitle"></span>
+	<div id="divTopBtn" style="margin:10px 0px;">
+		<span id="spTitle" data-toggle="tooltip" data-placement="bottom" title="新增专利事务"></span>
 		
-		<button id="btnSearchInfo" type="button" class="btn-link" data-toggle="collapse" data-target="#divSearchInfo"><span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span></button>
+		<button id="btnSearchInfo" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏搜索条件"><span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span></button>
 				
-		<button id="btnRefresh" type="button" class="btn-link"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
-	</p>
+		<button id="btnRefresh" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="刷新表格"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+	</div>
 	
 	<div id="divSearchInfo" class="collapse" >
 		<div class="label label-info" style="font-size:14px;">搜索条件</div>
@@ -367,9 +367,10 @@ function loadMe(){
 	$('#divIssPatList_load').load('issPatList',{'sortData':sortData,'searchData':searchData},function(){
 		if(getJsonLength(searchData)){
 			searchNum.show();
-			$('#divSearchInfo').collapse('show');
+			<!-- $('#divSearchInfo').collapse('show'); -->
 		}else{
 			searchNum.hide();
+			
 		}
 	});
 };
@@ -418,8 +419,8 @@ function ajaxShowSelect(options){
 	});
 };
 
-//利用自调用匿名函数立即执行的特点，设定$('#spTitle')、$('a[data-issue-process="'+process+'"]')、$('#searchDept')、$('#searchStatus')、$('#pSearchResultNum')、$('#btnSearchInfo')。
-(function($,authEdit,ajaxShowSelect,searchData,glyphiconTextChange){
+//利用自调用匿名函数立即执行的特点，设定$('#spTitle')、$('a[data-issue-process="'+process+'"]')、$('#searchDept')、$('#searchStatus'))。
+(function($,authEdit,ajaxShowSelect,searchData){
     var process=$('#tblIssPat').data('process');
 	var obj=$('a[data-issue-process="'+process+'"]');
 	var spText='';
@@ -460,53 +461,43 @@ function ajaxShowSelect(options){
 		).then(
 			function(data, textStatus, jqXHR){
      			//ajax成功，设置$('#fmIssPatSearch')
-				var fm=$('#fmIssPatSearch');
-				var timeGroup=fm.find('div .timeGroup');
-				var iconText1={icon:'glyphicon-collapse-up',text:'隐藏搜索'};
-				var iconText2={icon:'glyphicon-collapse-down',text:'显示搜索'};
-				timeGroup.hide();
-				if(getJsonLength(searchData)){
-					for(var key in searchData){
-						if(searchData[key]!=0 && searchData[key]!=''){
-							$('#'+key).val(searchData[key]).closest('div').show();
-						}
-					}
-					$('#pSearchResultNum').show();
-					glyphiconTextChange($('#btnSearchInfo'),iconText1,iconText2);
-				}else{
-					//表单reset
-					fm[0].reset();
-					$('#pSearchResultNum').hide();
-				}
+				$('#fmIssPatSearch').find('.timeGroup').hide();
 			},
 			function(){
 				//ajax失败
 				alert("失败Group，请稍后再试！");
 			}
 		);		
-})(jQuery,authEdit,ajaxShowSelect,searchDataArr,glyphiconTextChange);
+})(jQuery,authEdit,ajaxShowSelect,searchDataArr);
 
 $(document).ready(function(){	
+	// 设置各类tooltip
+	$('#divTopBtn [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
+	$('#divIssPatList thead th a').tooltip({title: '点击排序', placement: 'bottom'});
+	$('.patInfo a').tooltip({title: '专利信息', placement: 'bottom'});
+	$('.patStatus a').tooltip({title: '专利过程记录', placement: 'bottom'});
+	$('.issInfo a').tooltip({title: '事务信息', placement: 'bottom'});
+	$('.issPatStatus a').tooltip({title: '事务过程记录', placement: 'bottom'});
 	
 	$('#btnSearchInfo').click(function(){
 		var iconText1={icon:'glyphicon-collapse-up',text:'隐藏搜索'};
 		var iconText2={icon:'glyphicon-collapse-down',text:'显示搜索'};
-		
+		//变换换图标和内容
 		glyphiconTextChange($(this),iconText2,iconText1);
+		//显示、隐藏#divSearchInfo
+		$('#divSearchInfo').collapse('toggle');
 		
+		if($(this).find('.'+iconText1.icon).length && getJsonLength(searchDataArr)==0){
+			$('#searchTopic').focus();
+		}
 	});
-	
-	$('#divSearchInfo').on('shown.bs.collapse', function(){
-		$('#searchTopic').focus();
-  	});
-		
+
 	<!-- // 页面刷新 -->
 	$('#btnRefresh').click(function(){
 		//搜索表单重置
 		$('#fmIssPatSearch')[0].reset();
 		loadMe();
 	});
-	
 	<!-- //表格每页显示记录行数 -->
 	$('#listRows').val('{$listRows}');
 	
@@ -605,15 +596,6 @@ $(document).ready(function(){
 		
 	});
 	
-	// 添加bootstrap的tooltip属性
-	$('#divIssPatList thead th a').tooltip({title: '点击排序', placement: 'bottom'});
-	
-	$('.patInfo a').tooltip({title: '专利信息', placement: 'bottom'});
-	$('.patStatus a').tooltip({title: '专利过程记录', placement: 'bottom'});
-	
-	$('.issInfo a').tooltip({title: '事务信息', placement: 'bottom'});
-	$('.issPatStatus a').tooltip({title: '事务过程记录', placement: 'bottom'});
-	
 	// <td>里<a>标签的click事件,给标签所在行上色
 	$('td a').click(function(){
 		// 所有行去掉附加的bg-warning
@@ -690,7 +672,30 @@ $(document).ready(function(){
 		
 	});
 	
-<!-- //$('#fmIssPatSearch')有关的代码块 -->
+<!-- //表单$('#fmIssPatSearch')有关的代码块 -->
+	if(getJsonLength(searchDataArr)){
+		for(var key in searchDataArr){
+			//显示有值的表单输入框并附加底色
+			if(searchDataArr[key]!=0 && searchDataArr[key]!=''){
+				$('#'+key).val(searchDataArr[key]).addClass('label-info').closest('div').show();
+			}else{
+				$('#'+key).val(searchDataArr[key]).removeClass('label-info');			
+			}
+		}
+		//查询结果数量显示
+		$('#pSearchResultNum').show();
+	}else{
+		//表单reset
+		$('#fmIssPatSearch')[0].reset();
+		//查询结果数量隐藏
+		$('#pSearchResultNum').hide();	
+	}
+
+	$('#fmIssPatSearch .form-control').change(function(){
+		//表单输入框去掉附加底色
+		$(this).removeClass('label-info');
+	});
+
 	$('#searchTime').change(function(){
 		var timeGroup=$('#fmIssPatSearch').find('div .timeGroup');
 		if($(this).val()!=0){
@@ -744,7 +749,10 @@ $(document).ready(function(){
 	
 	//表单重置
 	$('#btnSearchReset').click(function(){
-		$('#fmIssPatSearch')[0].reset();
+		var fm=$(this).closest('form');
+		fm[0].reset();
+		fm.find('.form-control').removeClass('label-info');
+		fm.find('.timeGroup').hide();
 	});
 <!-- //$('#fmIssPatSearch')有关的代码块 -->
 	

@@ -2466,3 +2466,13 @@ $users = User::scope('email')->scope('status')->select();
     
 
 <!--//  HY 2018/7/5 -->
+
+
+<!--  HY 2018/7/26 -->
+//系统自定义常量？？
+
+__DIR__
+DIRECTORY_SEPARATOR
+
+
+<!--//  HY 2018/7/26 -->
