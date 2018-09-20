@@ -60,7 +60,7 @@ class User extends Model
 //    }
     
     /**
-     * 刷新登录用户的各个模块（issue，project，patent，thesis，attachment）权限
+     * 刷新登录用户的各个模块（issue，project，patent，thesis，attachment，asset）权限
      */
      public function refreshUserAuth($username,$pwd)
     {
@@ -80,6 +80,7 @@ class User extends Model
       $pro=_commonModuleAuth('_PRO');
       $the=_commonModuleAuth('_THE');
       $admin=_commonModuleAuth('_ADMIN');
+      $ass=_commonModuleAuth('_ASS');
       
       for($i=0;$i<count($usergroup_id);$i++){
         //根据usergroup_id，应用模型UsergroupModel分别取出对应usergroup的iss/pat/pro/the/att权限的项，
@@ -115,6 +116,9 @@ class User extends Model
         if(array_filter($usergroup['authority']['att'])){
           $att=array_merge($att,array_filter($usergroup['authority']['att']));
         }
+        if(array_filter($usergroup['authority']['ass'])){
+          $ass=array_merge($ass,array_filter($usergroup['authority']['ass']));
+        }
         
         
       }
@@ -124,7 +128,8 @@ class User extends Model
                         "pat"=>$pat,
                         "pro"=>$pro,
                         "the"=>$the,
-                        "admin"=>$admin
+                        "admin"=>$admin,
+                        "ass"=>$ass,
                         );
         
       // 使用静态方法，向User表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。

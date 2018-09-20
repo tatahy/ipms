@@ -19,11 +19,11 @@
 	</div>
 	
 	<div class="form-group col-sm-6">
-		<label for="psw">登录密码<span class="small text-muted">（自动生成，同用户名）</span></label>
+		<label for="psw">登录密码<span class="small text-danger">（用户需登录后自己修改）</span></label>
 		<!-- // bootstrap实现矢量图在输入框开头 -->
 		<div class="input-group">
 			<span class="input-group-addon"><span class="small glyphicon glyphicon-th-large"></span></span>
-			<input type="password" class="form-control" id="pwd" name="pwd" readonly="true" autocomplete="pwd">
+			<input type="password" class="form-control" id="pwd" name="pwd" readonly="true" autocomplete="pwd" placeholder="系统默认为‘111111’">
 		</div>		
 		
 	</div>
@@ -36,7 +36,12 @@
 		<!-- // bootstrap实现矢量图在输入框开头 -->
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+			{if condition="($oprt=='_ADDNEW')"} 
 			<input type="text" class="form-control inputCheck" id="userMobile" name="mobile" value="{$user.mobile}" placeholder="输入用户手机号">	
+			{else /}
+			<input type="text" class="form-control inputCheck" id="userMobile" name="mobile" value="{$user->getData('mobile')}" placeholder="输入用户手机号">	
+			{/if}
+			
 		</div>
 					
 		<!-- // 配合jQuery 中的内容验证代码-->
@@ -165,7 +170,7 @@ $(document).ready(function(){
 	// 输入内容有效性判断，#userName
 	$('#userName').focusout(function() { 
 		check[$('.inputCheck').index($(this))]=inputCheck($(this));
-		$('#pwd').val($(this).val());
+		$('#pwd').val('111111');
 	});
 	
 	//输入内容有效性判断,#userMobile
@@ -348,7 +353,7 @@ function ajaxProcess(url,data,archor){
 	//*param.multiple,类型：boolean。值：默认为0。说明：调用函数后obj是否为单选框，默认为单选框。
 	//* 返回值：optionHtml
 function ajaxSelectOption(obj,param){
-	var defaultParam={"async":true,"url":0,"ajaxData":0,"first":{"val":"0","text":"first"},"show":0,"remove":0,"selected":0,'multiple':0};
+	var defaultParam={"async":true,"url":0,"ajaxData":0,"first":{"val":0,"text":"first"},"show":0,"remove":0,"selected":0,'multiple':0};
     param=$.extend({},defaultParam,param); 
     var str='';
 	var optionHtml='';
@@ -365,6 +370,7 @@ function ajaxSelectOption(obj,param){
 			<!-- // 遍历backData数组组装HTML语句 -->
 			<!-- // backData的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
 			$.each(backData,function(n1,v1){
+				var i=0;
 				$.each(v1,function(n2,v2){
 					//根据data的内容安排backData
 					switch(param.ajaxData.req){
@@ -386,6 +392,7 @@ function ajaxSelectOption(obj,param){
 							}
 						break;	
 					}
+					i++;
 				});
 			});
 			obj.empty();
@@ -399,18 +406,17 @@ function ajaxSelectOption(obj,param){
 			}
 			if(param.show!=0){
         		obj.find('option').each(function(){
-					if(param.show.val.indexOf($(this).val())==-1 && $(this).val()!=0){
+					if(param.show.val.split(',').indexOf($(this).val())==-1 && $(this).val()!=0){
             			$(this).remove();
-        			}
+        			}	
     			});
 				obj.closest('.form-group').find('.spNum').text(obj.find('option').length-1);
-				
     		}
 			if(param.remove!=0){
 				obj.find('option').each(function(){
-					if(param.remove.val.indexOf($(this).val())!=-1 && $(this).val()!=0){
+					if(param.remove.val.split(',').indexOf($(this).val())!=-1 && $(this).val()!=0){
             			$(this).remove();
-        			}
+        			}	
     			});
 				obj.closest('.form-group').find('.spNum').text(obj.find('option').length-1);
     		}
@@ -420,7 +426,7 @@ function ajaxSelectOption(obj,param){
     		}else{
 				//param.selected.val是option的value值字符串，设定值在param.selected.val中的option为选定项
 				obj.find('option').each(function(){
-	    			if(param.selected.val.indexOf($(this).val())!=-1){
+	    			if(param.selected.val.indexOf($(this).val())!==-1){
                 		$(this).attr('selected',true);
             		}else{
                 		$(this).attr('selected',false);

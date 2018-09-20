@@ -16,6 +16,7 @@
 					<th>用户组名</th>
 					<th>用户组说明</th>
 					<th class="text-center">“事务”权限</th>
+					<th class="text-center">“资产”权限</th>
 					<th class="text-center">“专利”权限</th>
 					<th class="text-center">“项目”权限</th>
 					<th class="text-center">“论文”权限</th>
@@ -39,6 +40,15 @@
 						{/foreach}
 						</div>
 					</td>
+					<!-- //ass -->
+					<td class="authority"> 
+						<div style="padding-top:3px" class="text-left">
+						{foreach name="$vo.authority.ass" item="v" }
+    						<span value="{$v}">{$key}</span>
+						{/foreach}
+						</div>
+					</td>
+					
 					<!-- //pat -->
 					<td class="authority"> 
 						<div style="padding-top:3px" class="text-left">

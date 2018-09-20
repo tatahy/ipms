@@ -38,6 +38,21 @@
 		</div>
 		
 		<div class="form-group col-sm-6">	
+			<label><span class="text-info">【资产】</span></label>	
+			<div style="border-bottom:solid 1px #ccc; padding:5px;">	
+				{foreach name="$user.authority.ass" item="v" }
+    			{if condition="($v==1)"} 
+				<span class="label label-info"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-ok"></span></span>
+				
+				{else /} 
+				<span class="text-muted"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-unchecked"></span></span>
+				{/if}
+				{/foreach}			
+				
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
 			<label><span class="text-default">【专利】</span></label>	
 			<div style="border-bottom:solid 1px #ccc; padding:5px;">
 				{foreach name="$user.authority.pat" item="v" }

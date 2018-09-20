@@ -53,6 +53,20 @@
 		</div>
 		
 		<div class="form-group col-sm-6">	
+			<label for="authAss"><span class="text-info">【资产】</span>模块</label>	
+			<div id="authAss" style="border-bottom:solid 1px #ccc; padding:5px;">
+						
+				{foreach name="$usergroup.authority.ass" item="v" }
+    			{if condition="($v==1)"} 
+				<label class="checkbox-inline"><input type="checkbox" name="authAss[]" value="{$key}" checked><span class="spAuthKey">{$key}</span></label>
+				{else /} 
+				<label class="checkbox-inline"><input type="checkbox" name="authAss[]" value="{$key}"><span class="spAuthKey">{$key}</span></label>
+				{/if}
+				{/foreach}
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
 			<label for="authPat"><span class="text-default">【专利】</span>模块</label>	
 			<div id="authPat" style="border-bottom:solid 1px #ccc; padding:5px;">				
 				{foreach name="$usergroup.authority.pat" item="v" }

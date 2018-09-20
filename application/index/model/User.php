@@ -40,7 +40,7 @@ class User extends Model
 //    }
 
     /**
-     * 刷新登录用户的各个模块（issue，project，patent，thesis，attachment）权限
+     * 刷新登录用户的各个模块（issue，project，patent，thesis，attachment，asset）权限
      */
      public function userAuth($username,$pwd)
     {
@@ -141,12 +141,12 @@ class User extends Model
     }
     
     /**
-     * 刷新登录用户的各个模块（issue，project，patent，thesis，attachment）权限
+     * 刷新登录用户的各个模块（issue，project，patent，thesis，attachment，asset）权限
      */
      public function refreshUserAuth($username,$pwd)
     {
       $user=$this->where('username',$username)->where('pwd',$pwd)->where('enable',1)->find();
-      $usergroup_id= explode(",", $user['usergroup_id']);//$usergroup_id由“,”分隔的字符串转换为array(8,9,10)
+      $usergroup_id= explode(",", $user->usergroup_id);//$usergroup_id=array(8,9,10)
       
       //$iss=array("edit"=>0,"audit"=>0,"approve"=>0,"execute"=>0,"maintain"=>0);
 //      $pat=array("edit"=>0,"audit"=>0,"approve"=>0,"execute"=>0,"maintain"=>0);
@@ -161,18 +161,47 @@ class User extends Model
       $pro=_commonModuleAuth('_PRO');
       $the=_commonModuleAuth('_THE');
       $admin=_commonModuleAuth('_ADMIN');
+      $ass=_commonModuleAuth('_ASS');
       
       for($i=0;$i<count($usergroup_id);$i++){
         //根据usergroup_id，应用模型UsergroupModel分别取出对应usergroup的iss/pat/pro/the/att权限的项，
         $usergroup=UsergroupModel::get($usergroup_id[$i]);
         //array_filter($arr)去除数组$arr中值为false的键值对后的新数组
         //array_merge再重新合并成新数组，得到用户所在所有用户组权限的交集。
-        $iss=array_merge($iss,array_filter($usergroup['authority']['iss']));
-        $pat=array_merge($pat,array_filter($usergroup['authority']['pat']));
-        $pro=array_merge($att,array_filter($usergroup['authority']['pro']));
-        $the=array_merge($pro,array_filter($usergroup['authority']['the']));
-        $att=array_merge($the,array_filter($usergroup['authority']['att']));
-        $admin=array_merge($admin,array_filter($usergroup['authority']['admin']));
+        //$iss=array_merge($iss,array_filter($usergroup['authority']['iss']));
+//        $pat=array_merge($pat,array_filter($usergroup['authority']['pat']));
+//        $pro=array_merge($pro,array_filter($usergroup['authority']['pro']));
+//        $the=array_merge($the,array_filter($usergroup['authority']['the']));
+//        $att=array_merge($att,array_filter($usergroup['authority']['att']));
+//        $admin=array_merge($admin,array_filter($usergroup['authority']['admin']));
+
+        //$iss=array_merge($iss,array($usergroup['authority']['iss']));
+//        $pat=array_merge($pat,array($usergroup['authority']['pat']));
+//        $pro=array_merge($pro,array($usergroup['authority']['pro']));
+//        $the=array_merge($the,array($usergroup['authority']['the']));
+//        $att=array_merge($att,array($usergroup['authority']['att']));
+//        $admin=array_merge($admin,array($usergroup['authority']['admin']));
+
+        if(array_filter($usergroup['authority']['iss'])){
+          $iss=array_merge($iss,array_filter($usergroup['authority']['iss']));
+        }
+        if(array_filter($usergroup['authority']['pat'])){
+          $pat=array_merge($pat,array_filter($usergroup['authority']['pat']));
+        }
+        if(array_filter($usergroup['authority']['pro'])){
+          $pro=array_merge($pro,array_filter($usergroup['authority']['pro']));
+        }
+        if(array_filter($usergroup['authority']['the'])){
+          $the=array_merge($the,array_filter($usergroup['authority']['the']));
+        }
+        if(array_filter($usergroup['authority']['att'])){
+          $att=array_merge($att,array_filter($usergroup['authority']['att']));
+        }
+        if(array_filter($usergroup['authority']['ass'])){
+          $ass=array_merge($ass,array_filter($usergroup['authority']['ass']));
+        }
+        
+        
       }
       //组装数据
       $authority=array("iss"=>$iss,
@@ -180,8 +209,10 @@ class User extends Model
                         "pat"=>$pat,
                         "pro"=>$pro,
                         "the"=>$the,
-                        "admin"=>$admin
-                        );        
+                        "admin"=>$admin,
+                        "ass"=>$ass,
+                        );
+        
       // 使用静态方法，向User表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
       $this::update([
           'authority'  => $authority,

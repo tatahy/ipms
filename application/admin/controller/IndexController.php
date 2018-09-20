@@ -106,6 +106,7 @@ class IndexController extends \think\Controller
       // 返回前端数组
       //return json_encode($res).json_encode($showVal).json_encode($removeVal);
       return $res;
+      
     }
     
     // 
@@ -502,7 +503,7 @@ class IndexController extends \think\Controller
       $this->_loginUser();
       
       $oprt=$request->param('oprt');
-      $id=$request->param('id');
+      $id=!empty($request->param('id'))?$request->param('id'):0;
       $result='';
       $msg='';
       $msgPatch='';
@@ -535,6 +536,7 @@ class IndexController extends \think\Controller
         
         case '_EDIT':
           $user=$userMdl::get($id);
+          
         break;
         
         case '_CREATE':
@@ -554,7 +556,8 @@ class IndexController extends \think\Controller
         
         case '_UPDATE': 
           $name=$userMdl::get($id)->username;
-          $mobile=$userMdl::get($id)->mobile;
+          //因对‘mobile’字段定义了获取器，调用getData()方法得到数据库的原始数据
+          $mobile=$userMdl::get($id)->getData('mobile');
           
           //手机号要唯一
           if($request->param('mobile')==$mobile){
@@ -614,6 +617,10 @@ class IndexController extends \think\Controller
       
       //3.分情况组装数据，返回前端
        if ($oprt=='_ADDNEW' || $oprt=='_EDIT'){
+          if($oprt=='_EDIT'){
+            //因对‘mobile’字段定义了获取器，调用getData()方法得到数据库的原始数据
+            $user['mobile']=$userMdl::get($id)->getData('mobile');
+          }
           $this->assign([
                'home'=>$request->domain(),
                'user'=>$user,
@@ -685,6 +692,14 @@ class IndexController extends \think\Controller
           $att=array();
         }
         
+        if(count($request->param('authAss/a'))){
+          foreach($request->param('authAss/a') as $v){
+            $ass[$v]=1;
+          }
+        }else{
+          $ass=array();
+        }
+        
         if(!empty($request->param('adminEn')) && $request->param('adminEn')){
           $admin=['enable'=>1];
         }else{
@@ -697,6 +712,7 @@ class IndexController extends \think\Controller
         $the=array_merge(_commonModuleAuth('_THE'),$the);
         $att=array_merge(_commonModuleAuth('_ATT'),$att);
         $admin=array_merge(_commonModuleAuth('_ADMIN'),$admin); 
+        $ass=array_merge(_commonModuleAuth('_ASS'),$ass);
            
         //组装数据
         $authority=array("iss"=>$iss,
@@ -704,12 +720,13 @@ class IndexController extends \think\Controller
                             "pat"=>$pat,
                             "pro"=>$pro,
                             "the"=>$the,
-                            "admin"=>$admin
+                            "admin"=>$admin,
+                            "ass"=>$ass,
                             );
         $usergroupData=array('name'=>$request->param('usergroupName'),
                                 'enable'=>$request->param('usergroupEn'),
                                 'authority'=>$authority,
-                                'description'=>'无');
+                                'description'=>!empty($request->param('usergroupDescription'))?$request->param('usergroupDescription'):'无');
       }
       //2. 分情况操作数据库
       switch($oprt){
@@ -731,7 +748,7 @@ class IndexController extends \think\Controller
           $usergroup=$usergroupMdl::get(['name'=>$request->param('usergroupName')]);
           $name=$request->param('usergroupName');
           $result='success';
-          $id=$usergroup->id;
+          $id=!empty($usergroup->id)?$usergroup->id:0;
           if(count($usergroup)){
             $msg='创建失败';
             $msgPatch='用户组【'.$request->param('usergroupName').'】已存在。';

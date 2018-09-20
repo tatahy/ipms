@@ -14,7 +14,7 @@
   function _commonModuleAuth($module='')
   {
     //各个模块的名称
-    $nameArr=array('_ISS','_PAT','_PRO','_THE','_ATT','_ADMIN','');
+    $nameArr=array('_ISS','_PAT','_PRO','_THE','_ATT','_ADMIN','_ASS','');
     //if(empty($module)){
 //      $module='_ALL';
 //    }else{
@@ -42,6 +42,7 @@
     $authPro=array('edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0);
     $authThe=array('edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0);
     $authAtt=array('upload'=>0,'download'=>0,'erase'=>0,'move'=>0,'copy'=>0);
+    $authAss=array('edit'=>0,'audit'=>0,'approve'=>0,'maintain'=>0);
 
     $authAdmin=array('enable'=>0);
 
@@ -64,10 +65,14 @@
       case'_ADMIN':
         $auth=$authAdmin;
       break;
+      case'_ASS':
+        $auth=$authAss;
+      break;
       //all
       case'_ALL':
       //default:
-        $auth=array('iss'=>$authIss,'pat'=>$authPat,'att'=>$authAtt,'pro'=>$authPro,'the'=>$authThe,'admin'=>$authAdmin);
+        $auth=array('iss'=>$authIss,'pat'=>$authPat,'att'=>$authAtt,'pro'=>$authPro,
+                    'the'=>$authThe,'admin'=>$authAdmin,'ass'=>$authAss);
       break;
     }
     return $auth;
