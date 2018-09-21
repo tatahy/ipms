@@ -1,0 +1,175 @@
+{include file="../application/common/header.html" title="固定资产信息" }
+
+<!-- pagewrap  -->
+
+<div class="container-fluid" style="padding-top: 55px;">
+	
+	<div id="divTopBtn" style="margin:10px 0px;">
+		<span class="label label-default" style="padding:6px;">固定资产总数&nbsp;<span class="badge">{$numTotal}</span>
+		</span>&nbsp;
+		<button id="btnSearchInfo" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏搜索条件"><span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span></button>
+				
+		<button id="btnRefresh" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+	</div>
+	<!-- // 搜索区域-->
+	<div id="divSearchInfo" class="collapse">
+		<div class="label label-info" style="font-size:14px;">搜索条件</div>
+		<form id="fmAssSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;">
+			
+			<div class="row myRow">
+			<div class="form-group col-sm-4">
+				<label class="" for="brand_model">名称（品牌型号）</label>
+				<input class="form-control" id="brand_model" name="brand_model" type="text" value="" placeholder="...不限">
+										
+			</div>
+			<div class="form-group col-sm-2">
+				<label class="" for="assnum">编号</label>
+				<input class="form-control" id="assnum" name="assnum" type="text" value="" placeholder="...不限">
+										
+			</div>
+			
+			<div class="form-group col-sm-3">
+				<label class="" for="code">卡号</label>
+				<input class="form-control" id="code" name="code" type="text" value="" placeholder="...不限">
+										
+			</div>
+			
+			<div class="form-group col-sm-3">
+				<label class="" for="bar_code">条形码号</label>
+				<input class="form-control" id="bar_code" name="bar_code" type="text" value="" placeholder="...不限">
+										
+			</div>
+			</div>
+			
+			<div class="row myRow">
+			<div class="form-group col-sm-6">
+				<label class="control-label" for="dept_now">现使用部门</label>
+				<!-- <select multiple class="form-control" id="searchPatType" name="searchPatType" > -->
+				<select class="form-control" id="dept_now" name="dept_now" >
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+											
+				</select>
+			</div>
+			<div class="form-group col-sm-4">
+				<label class="" for="place_now">现放置地点</label>
+				<input class="form-control" id="place_now" name="place_now" type="text" value="" placeholder="...不限">
+										
+			</div>
+			
+			<div class="form-group col-sm-2">
+				<label class="" for="keeper_now">现保管人</label>
+				<input class="form-control" id="keeper_now" name="keeper_now" type="text" value="" placeholder="...不限">
+										
+			</div>
+			</div>			
+			
+			
+			<div class="row myRow">
+			<div class="col-sm-6">
+				<button id="btnSearch" type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>搜索</button>
+			
+				<button id="btnSearchReset" type="button" class="btn btn-primary btn-sm">条件重置</button>
+			</div>
+			</div>
+			
+			<!-- <button id="btnAssSearch" type="button" class="btn btn-primary btn-sm">搜索&nbsp;<span class="glyphicon glyphicon-search"></span></button> -->
+		
+		</form>
+		</br>
+	</div>
+	
+	<div id="divLoadAssList"><p class="text-center" style="font-size:20px;">加载中……</p></div>
+	
+	
+</div>
+
+<!-- /pagewrap  -->
+
+<script>
+
+//**函数名：getJsonLength
+ 	//* 作用：得到jsonData的长度
+function getJsonLength(jsonData){
+	var jsonLength = 0;
+	for(var item in jsonData){
+		jsonLength++;
+	}
+ 	return jsonLength;
+};
+
+//**函数名：glyphiconTextChange
+ 	//* 作用：obj内含的glyphicon进行变换
+	//* 参数1：obj，String。值：必须，要交换glyphicon的obj
+	//* 参数2：iconText1，Json。值：必须，{icon:'glyphicon-xx',text:'xx'}。
+	//* 参数3：iconText2，Json。值：必须，{icon:'glyphicon-yy',text:'yy'}。
+	//* 无返回值
+function glyphiconTextChange(obj,iconText1,iconText2){
+	if(obj.find('.'+iconText2.icon).length){
+	    obj.find('.glyphicon').removeClass(iconText2.icon).addClass(iconText1.icon).next('span').html(iconText1.text);
+    }else{
+	    obj.find('.glyphicon').removeClass(iconText1.icon).addClass(iconText2.icon).next('span').html(iconText2.text);
+    }
+};
+
+$(document).ready(function(){
+	// 设置各类tooltip
+	$('#divTopBtn [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
+	
+	<!-- 选中id为"nav_pat"的标签（header.html文件中的li标签）,添加.active -->
+	$('#nav_ass').addClass('active');
+	
+	<!-- // jquery load()方法，加载asslist.html页面内容到本页面中<div id="patlist"></div>位置  -->
+    $('#divLoadAssList').load('asslist');
+	
+	$('#btnSearchInfo').click(function(){
+		var iconText1={icon:'glyphicon-collapse-up',text:'隐藏搜索'};
+		var iconText2={icon:'glyphicon-collapse-down',text:'显示搜索'};
+		//变换图标和内容
+		glyphiconTextChange($(this),iconText2,iconText1);
+		//显示、隐藏#divSearchInfo
+		$('#divSearchInfo').collapse('toggle');
+		
+		<!-- if($(this).find('.'+iconText1.icon).length && getJsonLength(searchDataArr)==0){ -->
+			<!-- $('#searchTopic').focus(); -->
+		<!-- } -->
+	});
+	
+	<!-- // 页面刷新 -->
+	$('#btnRefresh').click(function(){
+		//搜索表单重置
+		$('#fmAssSearch')[0].reset();
+		$('#divLoadAssList').load('asslist');
+	});
+	
+
+<!-- //表单$('#fmAssSearch')有关的代码块 -->
+	
+	//表单提交，开始用户搜索
+	$('#btnSearch').click(function(){
+		//排序有关的参数都向$('#tblIssPat')汇集(更新有变化的)
+		var objSort=$('#tblIssPat');
+		objSort.data('list-rows',10);
+		objSort.data('pagenum',1);
+		
+		//loadMe();
+	});
+	
+	//表单重置
+	$('#btnSearchReset').click(function(){
+		var fm=$(this).closest('form');
+		fm[0].reset();
+		fm.find('.form-control').removeClass('label-info');
+		fm.find('.timeGroup').hide();
+	});
+	
+<!-- function  -->
+
+
+<!-- /function  -->
+	
+});
+</script>
+
+{include file="../application/common/footer.html"}

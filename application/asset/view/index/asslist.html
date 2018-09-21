@@ -1,0 +1,131 @@
+<!-- pagewrap  -->	
+<div>
+	<div class="table-responsive"> 
+		<table class="table table-bordered table-striped table-hover table-condensed">
+			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产列表</h4></caption>
+			<thead>
+				<tr>
+					<th class="text-center">序号</th>
+					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="assnum" sort="{ $sort}">编号</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="code" sort="{ $sort}">卡号</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="bar_code" sort="{ $sort}">条形码号</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="brand_model" sort="{ $sort}">名称</a></th>
+					
+					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="place_now" sort="{ $sort}">现放置地点</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="dept_now" sort="{ $sort}">现使用部门</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="keeper_now" sort="{ $sort}">现保管人</a></th>
+					
+					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="status_now" sort="{ $sort}">状态</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="status_now_user_name" sort="{ $sort}">登记人</a></th>
+					
+				</tr>
+			
+			</thead>
+			<tbody><!-- 此处显示数据库查询后的数据集 -->
+				{volist name="assSet" id="vo" empty="暂时没有数据"}
+				<tr>
+					<td>{$i+($pageTotalNum-1)*$listRows}</td>
+					<td>{$vo.assnum}</td>
+					<td>{$vo.code}</td>
+					<td>{$vo.bar_code}</td>
+					<td>{$vo.brand_model}</td>
+					<td>{$vo.place_now}</td>
+					<td>{$vo.dept_now}</td>
+					<td>{$vo.keeper_now}</td>
+					<td>{$vo.status_now}</td>
+					<td>{$vo.status_now_user_name}</td>
+				
+				</tr>
+				{/volist}
+			
+			</tbody>
+			
+		</table>
+	
+	</div>
+	
+	
+	<div id="divListRows" class="col-sm-12 text-right">
+		<!-- // 分页变量 -->
+		<div class="col-sm-10 text-right">{$assList}</div>
+		
+		<div class="form-group form-group-sm col-sm-2">
+			<span class="">每页记录行数：</span>
+			<select class="form-control" id="listRows">
+				<option value="5">5</option>
+				<option value="10">10</option>
+				<option value="20">20</option>
+				<option value="50">50</option>
+			</select>
+						
+		</div>
+	
+	</div>
+	
+</div>
+
+<!-- /pagewrap  -->
+
+<script>
+
+//**箭头函数名：loadAssList
+ 	//* 作用：加载asslist.html页面内容到index.html页面中<div id="divLoadAssList"></div>
+	//* listRows，类型：数值。值：可为空，默认为10。
+	//* sortName，类型：字符。值：可为空，默认为‘place_now’。
+	//* sort，类型：字符。值：可为空，默认为'_ASC'。
+	//* pageTotalNum，类型：数值。值：可为空，默认为1。
+var loadAssList=(opts)=>{
+	var optsDefault={'listRows':10,'sortName':'place_now','sort':'_ASC','pageTotalNum':1};
+	var sendData=$.extend({},optsDefault,opts);
+		
+	$('#divLoadAssList').html('<p class="text-center" style="font-size:20px;">加载中……</p>');
+	
+	// jquery load()方法，加载asslist.html页面内容到patlist.html页面中<div id="divLoadAssList"></div>
+	$('#divLoadAssList').load('asslist',sendData);
+	
+};
+
+$(document).ready(function(){
+	
+	<!-- //表格每页显示记录行数 -->
+	$('#listRows').val('{$listRows}'); 
+	
+	$('#listRows').change(function(){
+		<!-- //根据每页显示记录行数加载页面 -->
+		loadAssList({'listRows':$(this).val()});
+	
+	});	
+	
+	<!-- // 点击分页中的a，表格中的内容根据a中的属性值进行排序 -->
+	$('#divListRows a').click(function(evt){
+		// a所在分页页数
+		var pageStr=$(this).text();
+		var pageNum;
+		//(li.active)所代表的页数
+		var pageNumActive=$('#divListRows li.active').children('span').text();
+		
+		evt.preventDefault();
+		
+		switch(pageStr){
+			case'»':
+				//用"*"确保得到的是加法运算结果，而不是字符串
+				pageNum=(pageNumActive*1+1);
+			break;
+			
+			case'«':
+				pageNum=(pageNumActive*1-1);
+			break;
+			
+			default:
+				pageNum=pageStr;
+			break;
+		
+		}
+		
+		loadAssList({'listRows':$("#listRows").val(),'pageTotalNum':pageNum});
+	});
+	
+	
+});
+</script>
+

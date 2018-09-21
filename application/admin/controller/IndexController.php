@@ -619,12 +619,17 @@ class IndexController extends \think\Controller
        if ($oprt=='_ADDNEW' || $oprt=='_EDIT'){
           if($oprt=='_EDIT'){
             //因对‘mobile’字段定义了获取器，调用getData()方法得到数据库的原始数据
-            $user['mobile']=$userMdl::get($id)->getData('mobile');
+            $mobile=$userMdl::get($id)->getData('mobile');
+          
+          }else{
+            $mobile=0;
           }
+          
           $this->assign([
                'home'=>$request->domain(),
                'user'=>$user,
-               'oprt'=>$oprt
+               'oprt'=>$oprt,
+               'userMobile'=>$mobile
           ]);
           // 返回前端模板文件
           return view('editUser');

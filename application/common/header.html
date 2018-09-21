@@ -13,9 +13,9 @@
   
  {// TP5中的模板注释格式，单行。<!-- TP5的资源文件加载写法 -->内容不会出现在发送给浏览器的HTML文件中 }  
   {css href="/home/res/css/bootstrap3.3.7.min.css" }
-  {css href="/home/res/css/bs-callout.css" }
+  {css href="/home/res/css/style.css" }
   {js href="/home/res/js/jquery1.12.4.min.js" }
-  {js href="/home/res/js/bootstrap3.3.7.min.js" }
+  {js href="/home/res/js/bootstrap3.3.7.min.js" } 
 
   {// TP5中的模板注释格式，单行。<!-- 自定义的页面弹窗 -->}  
   {js href="/home/res/js/alert.min.js" }
@@ -66,6 +66,7 @@ $(document).ready(function(){
         <li id="nav_pat"><a href="{$home}/patent/index/patlist#total"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利</a></li>
 		<li id="nav_the"><a href="{$home}/thesis/index/thelist#total"><span class="glyphicon glyphicon-list"></span>&nbsp;论文</a></li>
 		<li id="nav_pro"><a href="{$home}/project/index/prolist#total"><span class="glyphicon glyphicon-inbox"></span>&nbsp;项目</a></li>
+		<li id="nav_ass"><a href="{$home}/asset/index/index"><span class="glyphicon glyphicon-oil"></span>&nbsp;固定资产</a></li>
         <!-- <li><a href="#">获奖</a></li> -->
 		<!-- <li><a href="#">成果转化</a></li> -->
 		
@@ -107,7 +108,7 @@ $(document).ready(function(){
 <!-- 调试，输出结果显示代码-->
 
 <!-- <div class="container-fluid" data-offset-top="200"> -->
-<!-- <p>{$destr}</p> -->
+<!-- <p>{ $destr}</p> -->
 
 <!-- </div> -->
 

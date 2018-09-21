@@ -36,11 +36,7 @@
 		<!-- // bootstrap实现矢量图在输入框开头 -->
 		<div class="input-group">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-			{if condition="($oprt=='_ADDNEW')"} 
-			<input type="text" class="form-control inputCheck" id="userMobile" name="mobile" value="{$user.mobile}" placeholder="输入用户手机号">	
-			{else /}
-			<input type="text" class="form-control inputCheck" id="userMobile" name="mobile" value="{$user->getData('mobile')}" placeholder="输入用户手机号">	
-			{/if}
+			<input type="text" class="form-control inputCheck" id="userMobile" name="mobile" value="{$userMobile}" placeholder="输入用户手机号">	
 			
 		</div>
 					
