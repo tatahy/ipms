@@ -2,20 +2,36 @@
 
 
 <div id="divUsergroup" data-user-id="{$user.id}" style="margin-top:10px;">
-	<a href="#divUserBasicInfo" data-toggle="collapse" class="label label-warning" style="font-size:16px;"><span class="glyphicon glyphicon-duplicate"></span>&nbsp;基本信息</a>
+	<!-- <a href="#divUserBasicInfo" data-toggle="collapse" class="label label-warning" style="font-size:16px;"><span class="glyphicon glyphicon-duplicate"></span>&nbsp;基本信息</a> -->
+	
+	<!-- Split button -->
+<div class="btn-group" >
+  <a href="#divUserBasicInfo" data-toggle="collapse" class="label label-warning" style="font-size:16px;border-top-right-radius: 0;border-bottom-right-radius: 0;"><span class="glyphicon glyphicon-duplicate"></span>&nbsp;基本信息</a>
+  <a class="label label-warning" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size:16px;border-top-left-radius: 0;border-bottom-left-radius: 0;border-left: #eea236 solid 1px;margin-left: -5px;">
+    <span class="caret"></span>
+    <span class="sr-only">Toggle Dropdown</span>
+  </a>
+  <ul class="dropdown-menu">
+    <li><a href="#userInfo" class="aModalTrig" data-toggle="tooltip" data-title="修改个人基本信息" data-trig-form="info"><span><span class="glyphicon glyphicon-edit"></span></span>修改信息</a></li>
+    <li role="separator" class="divider"></li>
+    <li><a href="#userInfo" class="aModalTrig" data-toggle="tooltip" data-title="重设登录密码" data-trig-form="pwd"><span><span class="glyphicon glyphicon-eye-open"></span></span>重设密码</a></li>
+  </ul>
+</div>
 	
 	<div id="divUserBasicInfo" class="row myRow collaps in" style="margin-top:10px;">		
-			<div class="col-sm-3">
-				<span>用户名：<strong style="font-size:16px;">{$user.username}</strong></span>	
-			</div>
 		
-			<div class="col-sm-3">
-				<span>注册手机号：<strong style="font-size:16px;">{$user.mobile}</strong></span>			
-			</div>
+		<div class="col-sm-3">
+			<span>用户名：<strong style="font-size:16px;">{$user.username}</strong></span>	
+		</div>
+		
+		<div class="col-sm-3">
+			<span>注册手机号：<strong style="font-size:16px;">{$user.mobile}</strong></span>			
+		</div>
 			
-			<div class="col-sm-6">
-				<span>所属部门：<strong style="font-size:16px;">{$user.dept}</strong></span>		
-			</div>
+		<div class="col-sm-6">
+			<span>所属部门：<strong style="font-size:16px;">{$user.dept}</strong></span>		
+		</div>
+		
 	</div>
 	<hr>
 	
@@ -137,6 +153,40 @@
 
 </div>
 <br>
+<!-- Modal "modalUserInfo" -->
+<div class="modal fade" id="modalUserInfo" role="dialog">
+	<div class="modal-dialog modal-lg">
+    
+      <!-- Modal content-->
+      	<div class="modal-content">
+        <div class="modal-header bg-warning" style="border-radius:5px;">
+          	<button type="button" class="close" data-dismiss="modal">&times;</button>
+		  
+          	<h4>【<strong>{$user.username}</strong>】<span></span></h4>
+        </div>
+		
+        <div class="modal-body">
+			<form id="fmUserInfo" action="">
+				Info
+			</form>
+			
+			<form id="fmUserPwd" action="">
+				
+				Pwd
+			</form>
+			
+		</div>
+		
+		<div class="modal-footer" hidden="true">
+        	<input type="button" class="btn btn-primary btn-sm" data-dismiss="modal" value="返回">  
+          
+        </div>
+		</div>
+	</div>
+
+</div>
+<!--/ Modal "modalUserInfo" -->
+
 <!-- /pagewrap  -->
 
 <script>
@@ -185,6 +235,21 @@ function textEnToChi(text){
 	return text;
 };
 
+var modalUserInfoShow=(h4Html,fmName)=>{
+	var obj=$('#modalUserInfo');
+	obj.find('.modal-header h4 span').html(h4Html);
+	obj.find('form').hide();
+	switch(fmName){
+		case'info':
+			$('#fmUserInfo').show();
+			break;
+		case'pwd':
+			$('#fmUserPwd').show();
+			break;
+	}
+	obj.modal();
+};
+
 $(document).ready(function(){
 	//侧边栏消除li的active
 	$('.nav .active').removeClass('active');
@@ -196,6 +261,16 @@ $(document).ready(function(){
 		var str=$(this).text();
 		$(this).text(textEnToChi(str));
    	});
+	
+	// 设置各类tooltip
+	$('#divUsergroup [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
+	
+	$('.aModalTrig').click(function(){
+		var h4Html=$(this).find('span').html()+$(this).data('title');
+		var fmName=$(this).data('trigForm');
+		modalUserInfoShow(h4Html,fmName);
+		
+	});
 	
 
 });
