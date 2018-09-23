@@ -1183,11 +1183,16 @@ class IndexController extends \think\Controller
         
         $userGroup=$userMdl->userGroupArr($this->userId);
         
+        $newPwd=(!empty($request->param('newPwd')))?Md5($request->param('newPwd')):0;
+        
         $this->assign([
                     'home' => $request->domain(),
                     
                     'user' => $user,
                     'userGroup' => $userGroup,
+                    'userMobile'=>$user->getData('mobile'),
+                    
+                    'newPwd'=>$newPwd
                     ]);
         
         return view();

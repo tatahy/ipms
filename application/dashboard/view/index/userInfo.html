@@ -12,9 +12,9 @@
     <span class="sr-only">Toggle Dropdown</span>
   </a>
   <ul class="dropdown-menu">
-    <li><a href="#userInfo" class="aModalTrig" data-toggle="tooltip" data-title="修改个人基本信息" data-trig-form="info"><span><span class="glyphicon glyphicon-edit"></span></span>修改信息</a></li>
+    <li><a href="#userInfo" class="aModalTrig" data-toggle="tooltip" data-title="修改个人基本信息" data-div-part="info"><span><span class="glyphicon glyphicon-edit"></span></span>修改信息</a></li>
     <li role="separator" class="divider"></li>
-    <li><a href="#userInfo" class="aModalTrig" data-toggle="tooltip" data-title="重设登录密码" data-trig-form="pwd"><span><span class="glyphicon glyphicon-eye-open"></span></span>重设密码</a></li>
+    <li><a href="#userInfo" class="aModalTrig" data-toggle="tooltip" data-title="重设登录密码" data-div-part="pwd"><span><span class="glyphicon glyphicon-eye-open"></span></span>重设密码</a></li>
   </ul>
 </div>
 	
@@ -166,15 +166,93 @@
         </div>
 		
         <div class="modal-body">
-			<form id="fmUserInfo" action="">
-				Info
-			</form>
+			<form id="fmUser" action="post" href="">
+				<input type="text" class="sr-only" name="userId" value="{$user.id}">
+				<div class="row myRow" data-div-part="info">
+				<div class="form-group has-feedback col-sm-6">
+					<label for="username">用户名<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+					<!-- // bootstrap实现矢量图在输入框开头 -->
+					<div class="input-group">
+						<span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+						<input type="text" class="form-control inputCheck" name="userName" value="{$user.username}" placeholder="登录系统的用户名">	
+					</div>
+					
+					<!-- // 配合jQuery 中的内容验证代码-->
+					<span style="color:red;display:none;" class="spTips"></span>
+        			<span style="display: none;margin-right:17px;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span>
+        			<span style="display: none;margin-right:17px;" class="spOk glyphicon glyphicon-ok form-control-feedback"></span>	
+				</div>
 			
-			<form id="fmUserPwd" action="">
+				<div class="form-group has-feedback col-sm-6">
+					<label for="userMobile">手机号<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+					<!-- // bootstrap实现矢量图在输入框开头 -->
+					<div class="input-group">
+						<span class="input-group-addon"><span class="glyphicon glyphicon-phone"></span></span>
+						<input type="text" class="form-control inputCheck" name="userMobile" value="{$userMobile}" placeholder="输入个人手机号">	
+			
+					</div>
+					
+					<!-- // 配合jQuery 中的内容验证代码-->
+					<span style="color:red;display:none;" class="spTips"></span>
+        			<span style="display: none;margin-right:17px;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span>
+        			<span style="display: none;margin-right:17px;" class="spOk glyphicon glyphicon-ok form-control-feedback"></span>	
+				</div>
+			
+				</div>
 				
-				Pwd
+				<div class="row myRow" data-div-part="pwd">
+					<div class="form-group has-feedback col-sm-4">
+						<label for="originPwd">原登录密码<span class="small text-danger"></span></label>
+						<!-- // bootstrap实现矢量图在输入框开头 -->
+						<div class="input-group">
+							<span class="input-group-addon"><span class="small glyphicon glyphicon-th-large"></span></span>
+							<input type="password" class="form-control  inputCheck" name="originPwd" autocomplete="pwd" placeholder="请输入原密码">
+						</div>
+						<!-- // 配合jQuery 中的内容验证代码-->
+						<span style="color:red;display:none;" class="spTips"></span>
+        				<span style="display: none;margin-right:17px;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span>
+        				<span style="display: none;margin-right:17px;" class="spOk glyphicon glyphicon-ok form-control-feedback"></span>				
+					</div>
+					
+					<div class="form-group has-feedback col-sm-4">
+						<label for="newPwd">新登录密码<span class="small text-danger"></span></label>
+						<!-- // bootstrap实现矢量图在输入框开头 -->
+						<div class="input-group">
+							<span class="input-group-addon"><span class="small glyphicon glyphicon-tag"></span></span>
+							<input type="password" class="form-control  inputCheck" name="newPwd"  value="{$newPwd}"  autocomplete="pwd" placeholder="请输入新密码">
+						</div>
+						<!-- // 配合jQuery 中的内容验证代码-->
+						<span style="color:red;display:none;" class="spTips"></span>
+        				<span style="display: none;margin-right:17px;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span>
+        				<span style="display: none;margin-right:17px;" class="spOk glyphicon glyphicon-ok form-control-feedback"></span>					
+					</div>
+					
+					<div class="form-group has-feedback col-sm-4">
+						<label for="confirmNewPwd">确认新登录密码<span class="small text-danger"></span></label>
+						<!-- // bootstrap实现矢量图在输入框开头 -->
+						<div class="input-group">
+							<span class="input-group-addon"><span class="small glyphicon glyphicon-tags"></span></span>
+							<input type="password" class="form-control  inputCheck" name="confirmNewPwd" autocomplete="pwd" placeholder="请再输入一次新密码">
+						</div>		
+						<!-- // 配合jQuery 中的内容验证代码-->
+						<span style="color:red;display:none;" class="spTips"></span>
+        				<span style="display: none;margin-right:17px;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span>
+        				<span style="display: none;margin-right:17px;" class="spOk glyphicon glyphicon-ok form-control-feedback"></span>
+		
+					</div>
+				
+				</div>
+				<button id="btnUpdate" type="submit" class="btn btn-primary btn-sm" data-oprt="_UPDATE"><span class="glyphicon glyphicon-ok"></span>&nbsp;更新</button>
+				
+				<div class="pull-right">	
+					<button id="btnFormReset" type="reset" class="btn btn-primary btn-sm">重置</button>
+				
+					<button type="button" class="btn btn-warning btn-sm" data-dismiss="modal">取消</button>
+				</div>
+				
 			</form>
 			
+		
 		</div>
 		
 		<div class="modal-footer" hidden="true">
@@ -191,11 +269,14 @@
 
 <script>
 
+//必填输入框内容有效性判断结果数组
+var check = [];
+
 //**函数名：textEnToChi
  	//* 作用：本页面特定英文字符串转换成中文字符串
 	//* 参数text，类型：字符串。值：不为空。说明：待转换的英文字符串。
 	//* 返回值：中文字符串
-function textEnToChi(text){
+var textEnToChi=(text)=>{
 	switch(text){
 		case 'edit':
             text='编辑';
@@ -235,19 +316,127 @@ function textEnToChi(text){
 	return text;
 };
 
-var modalUserInfoShow=(h4Html,fmName)=>{
+var modalUserInfoShow=(h4Html,divPart)=>{
 	var obj=$('#modalUserInfo');
 	obj.find('.modal-header h4 span').html(h4Html);
-	obj.find('form').hide();
-	switch(fmName){
-		case'info':
-			$('#fmUserInfo').show();
-			break;
-		case'pwd':
-			$('#fmUserPwd').show();
-			break;
-	}
+	obj.find('.myRow').each(function(){
+		if(divPart==$(this).data('divPart')){
+			$(this).show().find('.form-control').addClass('inputCheck');
+		}else{
+			$(this).hide().find('.form-control').removeClass('inputCheck');
+		}
+	});
 	obj.modal();
+};
+
+var regCheckUserName=(obj)=>{
+	//userName正则表达式，由英文、数字、中文和下划线组成,但不能以数字开头,长度为2到20个字符。unicode编码中的汉字范围:\u2E80-\u9FFF
+	var regUserName = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{1,19}$/;
+	var len=obj.val().length;
+	var result=false;
+	if (regUserName.test(obj.val())) {
+        result=regSuccess(obj);
+    } else if (len < 2) {
+        regFail(obj,'有'+obj.val().length+'个字符，不能少于2个字符。');
+    } else {
+        regFail(obj,'可由英文、数字、中文和下划线组成，但不能以数字开头。')
+    }
+	return result;
+};
+
+var regCheckUserMobile=(obj)=>{
+	//mobile正则表达式，11位数字。必须以1开头。
+	var regMobile = /^1[0-9]{10}$/;
+	var len=obj.val().length;
+	var result=false;
+	if (regMobile.test(obj.val())) {
+        result=regSuccess(obj);
+    } else if (len< 11) {
+        regFail(obj, '只有'+len+'位。手机号是11位数字，必须以1开头。');
+    } else if (len > 11) {
+        regFail(obj,'有'+len+'位，手机号由1开头的11位数字组成。');
+    }else {
+        regFail(obj,'已有'+len+'位，但必须是以1开头的11位数字')
+    }
+	return result;
+};
+
+var regCheckUserPwd=(obj)=>{
+	//pwd正则表达式，
+	//1.以字母开头，长度在6~20之间，只能包含字符、数字和下划线
+	//var regPwd = /^[a-zA-Z]\w{5,19}$/;
+	
+	//2.数字，字母和下划线（至少包含其中两种，数字不能开头）,长度在6~20之间
+	//var regPwd = /^(?![0-9]+$)(?![a-zA-Z]+$)[A-Za-z_][A-Za-z_0-9]{5,19}$/;
+	
+	//3.数字，字母和下划线（至少包含其中两种，下划线不能开头）,长度在6~20之间。非下划线开头，不是纯数字，不是纯字母，字母数字组合，字母数字下划线组合，长度在6~20之间
+	var regPwd = /^(?![_]+$)(?![0-9]+$)(?![A-Za-z]+$)[A-Za-z0-9][A-Za-z_0-9]{5,19}$/;
+	var len=obj.val().length;
+	var result=false;
+	if (regPwd.test(obj.val())) {
+        result=regSuccess(obj);
+    } else if (len < 6 || len>20) {
+        regFail(obj,'有'+obj.val().length+'个字符，长度在6~20之间。');
+    } else {
+        //1.
+		//regFail(obj,'以字母开头，只能包含字符、数字和下划线');
+		//2.	
+		//regFail(obj,'数字，字母和下划线（至少包含其中两种，数字不能开头）');
+		
+		//3.
+		regFail(obj,'数字，字母和下划线（至少包含其中两种，下划线不能开头）');
+    }
+	return result;
+};
+
+
+//校验成功函数，返回true
+var regSuccess=(obj)=> {
+    var divParent=obj.closest('.has-feedback');
+	divParent.removeClass('has-error').addClass('has-success');
+	divParent.children('span').hide();
+	divParent.children('.spOk').show();
+    return true;
+};
+
+// 校验失败函数，返回false
+var regFail=(obj,msg)=> {
+    var divParent=obj.closest('.has-feedback');
+	divParent.removeClass('has-success').addClass('has-error');
+	divParent.children('span').hide();
+	divParent.children('.spTips').text(msg).show();
+    divParent.children('.spRemove').show();
+	return false;
+};
+
+//**函数名：inputCheck
+ 	//* 作用：本页面必填输入框内容有效性判断
+	//* 参数obj，类型：对象。值：不为空。说明：调用函数的对象。
+	//* 返回值：boolean
+var inputCheck=(obj)=>{
+	var name=obj.attr('name');
+	//var i=$('.inputCheck').index(obj);
+	var result=false;
+	
+	switch(name){
+		case 'userName':
+			result=regCheckUserName(obj);
+			break;
+		case 'userMobile':
+			result=regCheckUserMobile(obj);
+			break;
+		case 'originPwd':
+			result=regCheckUserPwd(obj);
+			break;
+		case 'newPwd':
+			result=regCheckUserPwd(obj);
+			break;
+		case 'confirmNewPwd':
+			result=regCheckUserPwd(obj);
+			break;
+		
+	}
+	return result;
 };
 
 $(document).ready(function(){
@@ -267,11 +456,86 @@ $(document).ready(function(){
 	
 	$('.aModalTrig').click(function(){
 		var h4Html=$(this).find('span').html()+$(this).data('title');
-		var fmName=$(this).data('trigForm');
-		modalUserInfoShow(h4Html,fmName);
+		var divPart=$(this).data('divPart');
+		modalUserInfoShow(h4Html,divPart);
 		
 	});
 	
+	$('.inputCheck').focusout(function(){
+		var i=$('.inputCheck').index($(this));
+		var val=$(this).val();
+		check[i]=inputCheck($(this));
+		switch($(this).attr('name')){
+			//confirmNewPwd的输入内容必须与newPwd相同
+			case 'confirmNewPwd':
+				var newPwd= $('.inputCheck').eq(i-1).val();
+				if(check[i] && val== newPwd){
+					check[i]=true;
+				}else if(val!= newPwd){
+					check[i]=false;
+					regFail($(this),'与第一次输入的新密码不符，请重新输入。');
+				}
+				break;
+			case 'newPwd':
+				var originPwd=$('.inputCheck').eq(i-1).val();
+				var originPwdObj=$('.inputCheck').eq(i+1).closest('.has-feedback');
+				if(check[i] && val!= originPwd){
+					check[i]=true;
+					originPwdObj.show();
+				}else if(val== originPwd){
+					check[i]=false;
+					regFail($(this),'新密码与原密码相同，请重新输入。');
+					originPwdObj.hide();
+				}
+				break;
+		}
+		
+		
+	});
+	
+	$('#fmUser').submit(function(evt){
+				
+		$('.inputCheck').each(function(){
+			//有效性判断结果
+			check[$('.inputCheck').index($(this))]=inputCheck($(this));
+		});
+		//var formData = new FormData($(this)[0]);
+		var formData = $(this).serialize();
+		var flag=check.every(function(value) {
+            return value == true
+        });
+		evt.preventDefault();
+		
+		if(flag){
+			console.dir(formData);
+			//向后端传送数据
+			$.post('{$home}/dashboard/index/userinfo',formData,
+        		function(data){
+            		//返回成功，可以做一个其他事情
+            		console.log(data);
+        		},
+				'json'
+			);
+		}else{
+			for(key in check){
+				if (!check[key]) {
+					$('.inputCheck').eq(key).focus();
+					break;
+				}
+			}
+		}
+	
+	});
+	
+	$('#btnFormReset').click(function(evt){
+		evt.preventDefault();
+		var fm=$(this).closest('form');
+		fm[0].reset();
+		fm.find('.inputCheck').each(function(){
+			$(this).closest('.has-feedback').removeClass('has-error').removeClass('has-success').show().children('span').hide();
+		});
+		$('.inputCheck').eq(0).focus();
+	});
 
 });
 </script>
