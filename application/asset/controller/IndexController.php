@@ -45,11 +45,15 @@ class IndexController extends \think\Controller
         
         $numTotal=count($assMdl::all());
         
+        $sortData=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1);
+        
         $this->assign([
                     
           'home'=>$request->domain(),
           'username'=>$this->username,
           'year'=>date('Y'),
+          
+          'sortData'=>$sortData,
           
           'numTotal'=>$numTotal,
         ]);
@@ -57,22 +61,35 @@ class IndexController extends \think\Controller
         //return '<style type="text/css">*{ padding: 0; margin: 0; } div{ padding: 4px 48px;} a{color:#2E5CD5;cursor: pointer;text-decoration: none} a:hover{text-decoration:underline; } body{ background: #fff; font-family: "Century Gothic","Microsoft yahei"; color: #333;font-size:18px;} h1{ font-size: 100px; font-weight: normal; margin-bottom: 12px; } p{ line-height: 1.6em; font-size: 42px }</style><div style="padding: 24px 48px;"> <h1>:)</h1><p> ThinkPHP V5<br/><span style="font-size:30px">十年磨一剑 - 为API开发设计的高性能框架</span></p><span style="font-size:22px;">[ V5.0 版本由 <a href="http://www.qiniu.com" target="qiniu">七牛云</a> 独家赞助发布 ]</span></div><script type="text/javascript" src="http://tajs.qq.com/stats?sId=9347272" charset="UTF-8"></script><script type="text/javascript" src="http://ad.topthink.com/Public/static/client.js"></script><thinkad id="ad_bd568ce7058a1091"></thinkad>';
     }
     
-    public function assList(Request $request,AssinfoModel $assMdl)
+    //根据前端的sortData/searchData，选择返回前端的asset list
+    public function assList(Request $request,AssinfoModel $assMdl,$sortData=[],$searchData=[])
     {
         $this->priLogin();
         
+        //分页参数
         $listRows=!empty($request->param('listRows'))?$request->param('listRows'):10;
-        $pageTotalNum=!empty($request->param('pageTotalNum'))?$request->param('pageTotalNum'):1;
+        $pageNum=!empty($request->param('pageNum'))?$request->param('pageNum'):1;
+        
+        $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1);
+        // 接收前端的排序参数数组
+        $sortData=!empty($request->param('sortData/a'))?$request->param('sortData/a'):$sortDefaults;
+        $sortData=array_merge($sortDefaults,$sortData);
+        
+        $searchDefaults=array();
+        // 接收前端的搜索参数数组，由前端保证传来的搜索参数值非0，非空。
+        $searchData=!empty($request->param('searchData/a'))?$request->param('searchData/a'):$searchDefaults;
+        $searchData=array_merge($searchDefaults,$searchData);
         
                 
-        //利用模型对象得到非“填报”状态的patent总数
+        //利用模型对象得到asset记录总数
         $numTotal=count($assMdl::all());
         
         //分页,每页$listRows条记录
         $assSet=$assMdl::where('id','>',0)
-                        ->order('place_now', 'asc')
-                        ->paginate($listRows,false,['type'=>'bootstrap','var_page' => 'pageTotalNum',
-                        'query'=>['listRows'=>$listRows]]);
+                        //->order('place_now', 'asc')
+                        ->order($sortData['sortName'], $sortData['sortOrder'])
+                        ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
+                        'query'=>['listRows'=>$sortData['listRows']]]);
         // 获取分页显示
         $assList=$assSet->render(); 
         
@@ -83,13 +100,41 @@ class IndexController extends \think\Controller
 //          'year'=>date('Y'),
           
           'numTotal'=>$numTotal,
-          'pageTotalNum'=>$pageTotalNum,
+          
           
           'assSet'=>$assSet,
           'assList'=>$assList,
-          'listRows'=>$listRows,
+          
+          
+          //排序字段值
+          'sortData'=>$sortData,
+          
+          //分页参数
+          
+          //搜索字段值
+		  
         ]);
         return view();
         
+    }
+    
+    //响应前端请求，返回信息
+    public function selectResponse(Request $request,AssinfoModel $assMdl,$req='')
+    {
+      $this->priLogin();
+      
+      $req = empty($request->param('req'))?0:$request->param('req');
+      
+      $res=$assMdl->field($req)->group($req)->select();
+         
+      //将得到的数据集降为一维数组
+      if(is_array($res)){
+        $res=collection($res)->column($req);        
+      }else{
+        $res=$res->column($req);
+      }
+      
+      //返回前端的是索引数组  
+      return $res;
     }
 }

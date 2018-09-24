@@ -166,7 +166,7 @@
         </div>
 		
         <div class="modal-body">
-			<form id="fmUser" action="post" href="">
+			<form id="fmUser" data-div-part="">
 				<input type="text" class="sr-only" name="userId" value="{$user.id}">
 				<div class="row myRow" data-div-part="info">
 				<div class="form-group has-feedback col-sm-6">
@@ -202,7 +202,7 @@
 				
 				<div class="row myRow" data-div-part="pwd">
 					<div class="form-group has-feedback col-sm-4">
-						<label for="originPwd">原登录密码<span class="small text-danger"></span></label>
+						<label for="originPwd">原密码<span class="small text-danger"></span></label>
 						<!-- // bootstrap实现矢量图在输入框开头 -->
 						<div class="input-group">
 							<span class="input-group-addon"><span class="small glyphicon glyphicon-th-large"></span></span>
@@ -215,11 +215,11 @@
 					</div>
 					
 					<div class="form-group has-feedback col-sm-4">
-						<label for="newPwd">新登录密码<span class="small text-danger"></span></label>
+						<label for="newPwd">新密码<span class="small text-danger"></span></label>
 						<!-- // bootstrap实现矢量图在输入框开头 -->
 						<div class="input-group">
 							<span class="input-group-addon"><span class="small glyphicon glyphicon-tag"></span></span>
-							<input type="password" class="form-control  inputCheck" name="newPwd"  value="{$newPwd}"  autocomplete="pwd" placeholder="请输入新密码">
+							<input type="password" class="form-control  inputCheck" name="newPwd" autocomplete="pwd" placeholder="请输入新密码">
 						</div>
 						<!-- // 配合jQuery 中的内容验证代码-->
 						<span style="color:red;display:none;" class="spTips"></span>
@@ -228,7 +228,7 @@
 					</div>
 					
 					<div class="form-group has-feedback col-sm-4">
-						<label for="confirmNewPwd">确认新登录密码<span class="small text-danger"></span></label>
+						<label for="confirmNewPwd">确认新密码<span class="small text-danger"></span></label>
 						<!-- // bootstrap实现矢量图在输入框开头 -->
 						<div class="input-group">
 							<span class="input-group-addon"><span class="small glyphicon glyphicon-tags"></span></span>
@@ -317,16 +317,19 @@ var textEnToChi=(text)=>{
 };
 
 var modalUserInfoShow=(h4Html,divPart)=>{
-	var obj=$('#modalUserInfo');
-	obj.find('.modal-header h4 span').html(h4Html);
-	obj.find('.myRow').each(function(){
+	var modalObj=$('#modalUserInfo');
+	modalObj.find('.modal-header h4 span').html(h4Html);
+	modalObj.find('.myRow').each(function(){
 		if(divPart==$(this).data('divPart')){
 			$(this).show().find('.form-control').addClass('inputCheck');
+			$(this).closest('form').data('divPart',divPart);
+			console.log($(this).closest('form').data('divPart'));
 		}else{
 			$(this).hide().find('.form-control').removeClass('inputCheck');
 		}
 	});
-	obj.modal();
+	
+	modalObj.modal();
 };
 
 var regCheckUserName=(obj)=>{
@@ -376,7 +379,7 @@ var regCheckUserPwd=(obj)=>{
 	if (regPwd.test(obj.val())) {
         result=regSuccess(obj);
     } else if (len < 6 || len>20) {
-        regFail(obj,'有'+obj.val().length+'个字符，长度在6~20之间。');
+        regFail(obj,'有'+obj.val().length+'个字符，长度应为6~20。');
     } else {
         //1.
 		//regFail(obj,'以字母开头，只能包含字符、数字和下划线');
@@ -439,6 +442,18 @@ var inputCheck=(obj)=>{
 	return result;
 };
 
+//函数名：fmInit
+ 	//* 作用：本页面表单初始化
+	//* 参数obj，类型：对象。值：不为空。说明：需要初始化的表单。
+var fmInit=(fm)=>{
+
+	fm[0].reset();
+	fm.find('.inputCheck').each(function(){
+		$(this).closest('.has-feedback').removeClass('has-error').removeClass('has-success').show().children('span').hide();
+	});
+	$('.inputCheck').eq(0).focus();
+};
+
 $(document).ready(function(){
 	//侧边栏消除li的active
 	$('.nav .active').removeClass('active');
@@ -453,6 +468,11 @@ $(document).ready(function(){
 	
 	// 设置各类tooltip
 	$('#divUsergroup [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
+	
+	//
+	$('#modalUserInfo').on('show.bs.modal', function () {
+        fmInit($('#fmUser'));
+    });
 	
 	$('.aModalTrig').click(function(){
 		var h4Html=$(this).find('span').html()+$(this).data('title');
@@ -504,15 +524,46 @@ $(document).ready(function(){
 		var flag=check.every(function(value) {
             return value == true
         });
+		var url='{$home}/dashboard/index/';
+
+		switch($(this).data('divPart')){
+			case 'info':
+				url+='updateUserInfo';
+				break;
+			case 'pwd':
+				url+='updateUserPwd';
+				break;
+			default:
+				url+='userInfo';
+				break;	
+		}
+		
+		console.log(url);
+	
 		evt.preventDefault();
 		
 		if(flag){
 			console.dir(formData);
 			//向后端传送数据
-			$.post('{$home}/dashboard/index/userinfo',formData,
+			$.post(url,formData,
         		function(data){
-            		//返回成功，可以做一个其他事情
-            		console.log(data);
+            		var labelStr='default';
+            		//console.log(data);
+					$('#modalUserInfo').modal('hide');
+					
+					switch(data.code*1){
+						case 1:
+							labelStr='success';
+							//重新载入本文件
+							$('#divContent_load').load('tplFile',{'sId':window.location.hash});
+							
+							break;
+						case 0:
+							labelStr='danger';
+							break;		
+					}
+					
+					$.alert('<p>'+data.msgHead+'</p><p class=" text-center"><span class="label label-'+labelStr+'">'+data.msgBody+'</span></p>');
         		},
 				'json'
 			);
@@ -528,13 +579,11 @@ $(document).ready(function(){
 	});
 	
 	$('#btnFormReset').click(function(evt){
+		
 		evt.preventDefault();
-		var fm=$(this).closest('form');
-		fm[0].reset();
-		fm.find('.inputCheck').each(function(){
-			$(this).closest('.has-feedback').removeClass('has-error').removeClass('has-success').show().children('span').hide();
-		});
-		$('.inputCheck').eq(0).focus();
+		
+		fmInit($(this).closest('form'));
+		
 	});
 
 });

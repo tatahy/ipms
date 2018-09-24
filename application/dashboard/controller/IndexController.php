@@ -1183,21 +1183,102 @@ class IndexController extends \think\Controller
         
         $userGroup=$userMdl->userGroupArr($this->userId);
         
-        $newPwd=(!empty($request->param('newPwd')))?Md5($request->param('newPwd')):0;
-        
         $this->assign([
                     'home' => $request->domain(),
                     
                     'user' => $user,
                     'userGroup' => $userGroup,
-                    'userMobile'=>$user->getData('mobile'),
-                    
-                    'newPwd'=>$newPwd
+                    'userMobile'=>$user->getData('mobile')
                     ]);
         
         return view();
 
 
+    }
+    
+    public function updateUserInfo(Request $request,UserModel $userMdl)
+    {
+        $this->_loginUser();
+        
+        $userId=(!empty($request->param('userId')))?$request->param('userId'):0;
+        $userName=(!empty($request->param('userName')))?$request->param('userName'):0;
+        $userMobile=(!empty($request->param('userMobile')))?$request->param('userMobile'):0;
+        
+        $n=2;
+        $msgBody='';
+        
+        $user=$userMdl::get($this->userId);
+        $mobile=$userMdl::get($this->userId)->getData('mobile');
+        
+        if($this->userId!=$userId){
+            $msgBody.='表单数据错误。'; 
+        }
+        
+        if(!$userName){
+            $msgBody.='用户名不能为空。';
+            $n=0;
+        }else{
+            //手机号唯一
+            if($mobile==$userMobile){
+                $msgBody.='手机号没变。';
+                //修改pwd,模型的save方法，返回的是受影响的记录数。
+                $n=$user->save(['username'=>$userName,'mobile'=>$userMobile]);
+            }else if(count($userMdl->where('mobile',$userMobile)->select())){
+                $msgBody.='手机号已存在。';
+                $n=0;
+            }else{
+                //修改pwd,模型的save方法，返回的是受影响的记录数。
+                $n=$user->save(['username'=>$userName,'mobile'=>$userMobile]);
+            }
+        }
+        
+        if($n==1){
+            $msgBody='成功';
+            $this->userName=$userName;
+            session::set('username',$this->userName);
+        }else if($n==0){
+            $msgBody.='失败';
+        }
+        
+        return ['code'=>$n,'msgHead'=>'【'.$this->userName.'】修改个人信息结果：','msgBody'=>$msgBody];
+
+    }
+    
+    public function updateUserPwd(Request $request,UserModel $userMdl)
+    {
+        $this->_loginUser();
+        
+        $userId=(!empty($request->param('userId')))?$request->param('userId'):0;
+        $originPwd=(!empty($request->param('originPwd')))?md5($request->param('originPwd')):0;
+        $newPwd=(!empty($request->param('newPwd')))?md5($request->param('newPwd')):0;
+        $n=2;
+    
+        $msgBody='';
+        
+        $user=$userMdl::get($this->userId);
+        
+        if($this->userId!=$userId){
+            $msgBody.='表单数据错误。'; 
+        }
+        
+        if($this->pwd!=$originPwd){
+            $msgBody.='输入的原密码错误。';
+        }else if($this->pwd==$newPwd){
+            $msgBody.='输入的新密码与原密码相同。';
+        }else{
+            //修改pwd,模型的save方法，返回的是受影响的记录数。
+            $n=$user->save(['pwd'=>$newPwd]);
+        }
+        
+        if($n==1){
+            $msgBody='成功';
+            $this->pwd=$newPwd;
+            session::set('pwd',$this->pwd);
+        }else if($n==0){
+            $msgBody.='失败';
+        }
+        
+        return ['code'=>$n,'msgHead'=>'【'.$this->userName.'】修改密码结果：','msgBody'=>$msgBody];
     }
 
     public function attManage(Request $request)

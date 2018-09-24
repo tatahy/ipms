@@ -6,17 +6,17 @@
 			<thead>
 				<tr>
 					<th class="text-center">序号</th>
-					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="assnum" sort="{ $sort}">编号</a></th>
-					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="code" sort="{ $sort}">卡号</a></th>
-					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="bar_code" sort="{ $sort}">条形码号</a></th>
-					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="brand_model" sort="{ $sort}">名称</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#"  data-sort-Name="assnum" data-sort-order="{$sortData.sortOrder}">编号</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#"  data-sort-Name="code" data-sort-order="{$sortData.sortOrder}">卡号</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#"  data-sort-Name="bar_code" data-sort-order="{$sortData.sortOrder}">条形码号</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#"  data-sort-Name="brand_model" data-sort-order="{$sortData.sortOrder}">名称</a></th>
 					
-					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="place_now" sort="{ $sort}">现放置地点</a></th>
-					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="dept_now" sort="{ $sort}">现使用部门</a></th>
-					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="keeper_now" sort="{ $sort}">现保管人</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#"  data-sort-Name="place_now" data-sort-order="{$sortData.sortOrder}">现放置地点</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#"  data-sort-Name="dept_now" data-sort-order="{$sortData.sortOrder}">现使用部门</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#"  data-sort-Name="keeper_now" data-sort-order="{$sortData.sortOrder}">现保管人</a></th>
 					
-					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="status_now" sort="{ $sort}">状态</a></th>
-					<th class="text-center"><a data-toggle="tooltip" href="#"  sortName="status_now_user_name" sort="{ $sort}">登记人</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#"  data-sort-Name="status_now" data-sort-order="{$sortData.sortOrder}">状态</a></th>
+					<th class="text-center"><a data-toggle="tooltip" href="#"  data-sort-Name="status_now_user_name" data-sort-order="{$sortData.sortOrder}">登记人</a></th>
 					
 				</tr>
 			
@@ -24,7 +24,7 @@
 			<tbody><!-- 此处显示数据库查询后的数据集 -->
 				{volist name="assSet" id="vo" empty="暂时没有数据"}
 				<tr>
-					<td>{$i+($pageTotalNum-1)*$listRows}</td>
+					<td>{$i+($sortData.pageNum-1)*$sortData.listRows}</td>
 					<td>{$vo.assnum}</td>
 					<td>{$vo.code}</td>
 					<td>{$vo.bar_code}</td>
@@ -68,32 +68,21 @@
 
 <script>
 
-//**箭头函数名：loadAssList
- 	//* 作用：加载asslist.html页面内容到index.html页面中<div id="divLoadAssList"></div>
-	//* listRows，类型：数值。值：可为空，默认为10。
-	//* sortName，类型：字符。值：可为空，默认为‘place_now’。
-	//* sort，类型：字符。值：可为空，默认为'_ASC'。
-	//* pageTotalNum，类型：数值。值：可为空，默认为1。
-var loadAssList=(opts)=>{
-	var optsDefault={'listRows':10,'sortName':'place_now','sort':'_ASC','pageTotalNum':1};
-	var sendData=$.extend({},optsDefault,opts);
-		
-	$('#divLoadAssList').html('<p class="text-center" style="font-size:20px;">加载中……</p>');
-	
-	// jquery load()方法，加载asslist.html页面内容到patlist.html页面中<div id="divLoadAssList"></div>
-	$('#divLoadAssList').load('asslist',sendData);
-	
-};
-
 $(document).ready(function(){
 	
 	<!-- //表格每页显示记录行数 -->
-	$('#listRows').val('{$listRows}'); 
+	$('#listRows').val('{$sortData.listRows}'); 
 	
 	$('#listRows').change(function(){
-		<!-- //根据每页显示记录行数加载页面 -->
-		loadAssList({'listRows':$(this).val()});
+		//调用index.html中的loadAssList()
+		loadAssList({'listRows':$(this).val()*1});
+	});	
 	
+	$('thead a').click(function(){
+	
+		//调用index.html中的loadAssList()
+		loadAssList({'listRows':$('#listRows').val()*1,'sortOrder':$(this).data('sortOrder'),'sortName':$(this).data('sortName')});
+		
 	});	
 	
 	<!-- // 点击分页中的a，表格中的内容根据a中的属性值进行排序 -->
@@ -117,12 +106,14 @@ $(document).ready(function(){
 			break;
 			
 			default:
-				pageNum=pageStr;
+				pageNum=pageStr*1;
 			break;
 		
 		}
 		
-		loadAssList({'listRows':$("#listRows").val(),'pageTotalNum':pageNum});
+		//调用index.html中的loadAssList()
+		loadAssList({'listRows':$('#listRows').val()*1,'pageNum':pageNum});
+		
 	});
 	
 	

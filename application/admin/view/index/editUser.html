@@ -23,7 +23,7 @@
 		<!-- // bootstrap实现矢量图在输入框开头 -->
 		<div class="input-group">
 			<span class="input-group-addon"><span class="small glyphicon glyphicon-th-large"></span></span>
-			<input type="password" class="form-control" id="pwd" name="pwd" readonly="true" autocomplete="pwd" placeholder="系统默认为‘111111’">
+			<input type="password" class="form-control" id="pwd" name="pwd" readonly="true" autocomplete="pwd" placeholder="系统默认为‘111111a’">
 		</div>		
 		
 	</div>
@@ -166,7 +166,7 @@ $(document).ready(function(){
 	// 输入内容有效性判断，#userName
 	$('#userName').focusout(function() { 
 		check[$('.inputCheck').index($(this))]=inputCheck($(this));
-		$('#pwd').val('111111');
+		$('#pwd').val('111111a');
 	});
 	
 	//输入内容有效性判断,#userMobile

@@ -5,14 +5,14 @@
 <div class="container-fluid" style="padding-top: 55px;">
 	
 	<div id="divTopBtn" style="margin:10px 0px;">
-		<span class="label label-default" style="padding:6px;">固定资产总数&nbsp;<span class="badge">{$numTotal}</span>
+		<span class="label label-default" style="padding:6px;">固定资产记录数&nbsp;<span class="badge">{$numTotal}</span>
 		</span>&nbsp;
 		<button id="btnSearchInfo" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏搜索条件"><span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span></button>
 				
 		<button id="btnRefresh" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 	</div>
 	<!-- // 搜索区域-->
-	<div id="divSearchInfo" class="collapse">
+	<div id="divSearchData" class="collapse">
 		<div class="label label-info" style="font-size:14px;">搜索条件</div>
 		<form id="fmAssSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;">
 			
@@ -45,22 +45,32 @@
 			<div class="form-group col-sm-6">
 				<label class="control-label" for="dept_now">现使用部门</label>
 				<!-- <select multiple class="form-control" id="searchPatType" name="searchPatType" > -->
-				<select class="form-control" id="dept_now" name="dept_now" >
-						<option value="1">1</option>
-						<option value="2">2</option>
-						<option value="3">3</option>
+				<select class="form-control" id="selectDeptNow" name="dept_now" >
+						<option value="1">d1</option>
+						<option value="2">d2</option>
+						<option value="3">d3</option>
 											
 				</select>
 			</div>
 			<div class="form-group col-sm-4">
 				<label class="" for="place_now">现放置地点</label>
-				<input class="form-control" id="place_now" name="place_now" type="text" value="" placeholder="...不限">
+				<select class="form-control" id="selectPlaceNow" name="place_now" >
+						<option value="1">p1</option>
+						<option value="2">p2</option>
+						<option value="3">p3</option>
+											
+				</select>
 										
 			</div>
 			
 			<div class="form-group col-sm-2">
 				<label class="" for="keeper_now">现保管人</label>
-				<input class="form-control" id="keeper_now" name="keeper_now" type="text" value="" placeholder="...不限">
+				<select class="form-control" id="selectKeeperNow" name="keeper_now" >
+						<option value="1">k1</option>
+						<option value="2">k2</option>
+						<option value="3">k3</option>
+											
+				</select>
 										
 			</div>
 			</div>			
@@ -80,6 +90,8 @@
 		</br>
 	</div>
 	
+	<p id="pSearchResultNum" hidden="true"><strong>搜索结果</strong>:&nbsp;<span class="label label-info">{ $searchResultNum}</span>条记录</p>
+	
 	<div id="divLoadAssList"><p class="text-center" style="font-size:20px;">加载中……</p></div>
 	
 	
@@ -89,9 +101,11 @@
 
 <script>
 
+
+
 //**函数名：getJsonLength
  	//* 作用：得到jsonData的长度
-function getJsonLength(jsonData){
+var getJsonLength=(jsonData)=>{
 	var jsonLength = 0;
 	for(var item in jsonData){
 		jsonLength++;
@@ -105,13 +119,115 @@ function getJsonLength(jsonData){
 	//* 参数2：iconText1，Json。值：必须，{icon:'glyphicon-xx',text:'xx'}。
 	//* 参数3：iconText2，Json。值：必须，{icon:'glyphicon-yy',text:'yy'}。
 	//* 无返回值
-function glyphiconTextChange(obj,iconText1,iconText2){
+var glyphiconTextChange=(obj,iconText1,iconText2)=>{
 	if(obj.find('.'+iconText2.icon).length){
 	    obj.find('.glyphicon').removeClass(iconText2.icon).addClass(iconText1.icon).next('span').html(iconText1.text);
     }else{
 	    obj.find('.glyphicon').removeClass(iconText1.icon).addClass(iconText2.icon).next('span').html(iconText2.text);
     }
 };
+
+//**函数名：ajaxShowSelect
+ 	//* 作用：本页面ajax过程向服务器请求特定单选框内容所需数据，并组装好HTML语句
+	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
+	//* 参数sendData，类型：数值。值：传送给后端的键值对数据。
+	//* 参数obj，类型：对象。值：必须，单选框的对象名称
+	//*参数attach，类型：json数组。值：可为空，需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
+	//*参数selected，类型：字符。值：字符，可为空。
+	//* 返回值：无
+var ajaxShowSelect=(options)=>{
+	var defaults={
+		'url':'selectResponse',
+		'attach':[{"text":"...不限","val":"0"}],
+		'sendData':'',
+		'obj':'',
+		'selected':'',
+	};
+	var data = $.extend({},defaults, options);
+	var arrJson=data.attach;
+	var req=data.sendData.req;
+	var obj=data.obj;
+	var selected=data.selected;
+	var str='';
+	
+	$.post(data.url,data.sendData,function(result){
+		if(arrJson.length){
+			for(i=0;i<arrJson.length;i++){
+				str+='<option value="'+arrJson[i].val+'">'+arrJson[i].text+'</option>';
+			}
+		}
+		// result数组,取出value值组装HTML语句
+		$.each(result,function(n1,v1){
+			str+='<option value="'+v1+'">'+v1+'</option>';	
+		});
+		<!--// 清空单选框Obj的所有选项-->
+		obj.empty();
+		<!--// 添加单选框Obj的新选项-->
+		obj.append(str);
+		<!-- // value=selected 的项为选定项-->
+		if (selected!=''){
+			obj.val(selected);
+		}
+	});
+};
+
+//**函数名：loadAssList
+ 	//* 作用：加载本页面内容到指定div中<div id="divLoadAssList"></div>
+	//* 参数1：listRows，Int。值：可为空，每页显示的记录行数。默认为10。
+	//* 参数2：sortName，String。值：可为空，排序字段名称。默认为‘_TOPIC’。
+	//* 参数3：sortOrder，String。值：可为空，排序方式。默认为'_ASC'。
+	//* 参数4：pageNum，Int。值：可为空，当前页数。默认为1。
+	//* 参数6：serchWord，Array。值：可为空，用户搜索关键词键值对。默认为空。
+var loadAssList=(sortData)=>{
+	
+	var searchNum=$('#pSearchResultNum');
+	
+	//排序有关的参数默认值
+	var sortDataDefault={'listRows':10,'sortName':'assnum','sortOrder':'asc','pageNum':1};
+	sortData=$.extend({},sortDataDefault,sortData);
+	
+	//用户搜索有关键值对从表单$('#fmIssPatSearch')获取
+	var formData=new FormData($('#fmAssSearch')[0]);
+	
+	var searchData={};
+	//使用Map对象的forEach方法组装键值对
+	formData.forEach(function(val,key,){
+		//非0非空的值才进行组装
+		if(val!='' && val!=0){
+			searchData[key]=val;
+		}
+	});
+	JSON.stringify(searchData);
+	
+	$('#divLoadAssList').html('<p class="text-center" style="font-size:20px;">加载中……</p>');
+	
+	console.log('sortData:');
+	console.dir(sortData);
+	
+	// jquery load()方法，文件加载到本页面<div id="divLoadAssList"></div>
+	$('#divLoadAssList').load('assList',{'sortData':sortData,'searchData':searchData});
+};
+
+//利用自调用匿名函数立即执行的特点，设定$('#selectDeptNow')、$('#selectPlaceNow')、$('#selectKeeperNow')。
+(function($,ajaxShowSelect){
+
+	//设定$('#fmAssSearch')内的select组件的option
+	$.when(
+		ajaxShowSelect({sendData:{req:$('#selectDeptNow').attr('name')},obj:$('#selectDeptNow')}),
+		ajaxShowSelect({sendData:{req:$('#selectPlaceNow').attr('name')},obj:$('#selectPlaceNow')}),
+		ajaxShowSelect({sendData:{req:$('#selectKeeperNow').attr('name')},obj:$('#selectKeeperNow')}),
+	).then(
+		function(data, textStatus, jqXHR){
+     		//ajax成功
+			loadAssList();
+		},
+		function(){
+			//ajax失败
+			alert("失败Group，请稍后再试！");
+		}
+	);
+	
+})(jQuery,ajaxShowSelect);
 
 $(document).ready(function(){
 	// 设置各类tooltip
@@ -120,16 +236,13 @@ $(document).ready(function(){
 	<!-- 选中id为"nav_pat"的标签（header.html文件中的li标签）,添加.active -->
 	$('#nav_ass').addClass('active');
 	
-	<!-- // jquery load()方法，加载asslist.html页面内容到本页面中<div id="patlist"></div>位置  -->
-    $('#divLoadAssList').load('asslist');
-	
 	$('#btnSearchInfo').click(function(){
 		var iconText1={icon:'glyphicon-collapse-up',text:'隐藏搜索'};
 		var iconText2={icon:'glyphicon-collapse-down',text:'显示搜索'};
 		//变换图标和内容
 		glyphiconTextChange($(this),iconText2,iconText1);
-		//显示、隐藏#divSearchInfo
-		$('#divSearchInfo').collapse('toggle');
+		//显示、隐藏#divSearchData
+		$('#divSearchData').collapse('toggle');
 		
 		<!-- if($(this).find('.'+iconText1.icon).length && getJsonLength(searchDataArr)==0){ -->
 			<!-- $('#searchTopic').focus(); -->
@@ -140,20 +253,16 @@ $(document).ready(function(){
 	$('#btnRefresh').click(function(){
 		//搜索表单重置
 		$('#fmAssSearch')[0].reset();
-		$('#divLoadAssList').load('asslist');
+		loadAssList();
 	});
 	
 
 <!-- //表单$('#fmAssSearch')有关的代码块 -->
 	
-	//表单提交，开始用户搜索
+	//表单提交，开始asset搜索
 	$('#btnSearch').click(function(){
-		//排序有关的参数都向$('#tblIssPat')汇集(更新有变化的)
-		var objSort=$('#tblIssPat');
-		objSort.data('list-rows',10);
-		objSort.data('pagenum',1);
-		
-		//loadMe();
+				
+		loadAssList();
 	});
 	
 	//表单重置
