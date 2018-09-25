@@ -1,16 +1,17 @@
-{include file="../application/common/header.html" title="固定资产信息" }
+<!-- // view/index.html 对应AssetController.php的index操作 -->
 
-<!-- pagewrap  -->
-
-<div class="container-fluid" style="padding-top: 55px;">
-	
+<div>
 	<div id="divTopBtn" style="margin:10px 0px;">
 		<span class="label label-info" style="font-size:16px;">固定资产总数
 		</span>&nbsp;<span class="badge">{$quanCount}</span>&nbsp;
 		<button id="btnSearchInfo" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏搜索条件"><span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span></button>
 				
-		<button id="btnRefresh" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+		<button id="btnRefresh" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="刷新固定资产信息表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+		
+		<button id="btnCreate" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="新增固定资产记录"><span class="glyphicon glyphicon-pencil"></span>新增</button>
+		
 	</div>
+	
 	<!-- // 搜索区域-->
 	<div id="divSearchData" class="collapse">
 		<div class="label label-info" style="font-size:14px;">搜索条件</div>
@@ -74,37 +75,118 @@
 				<button id="btnSearchReset" type="button" class="btn btn-primary btn-sm">条件重置</button>
 			</div>
 			</div>
-			
-			<!-- <button id="btnAssSearch" type="button" class="btn btn-primary btn-sm">搜索&nbsp;<span class="glyphicon glyphicon-search"></span></button> -->
 		
 		</form>
 		</br>
 	</div>
 	
-	<!-- <p id="pSearchResultNum" hidden="true"><strong>搜索结果</strong>:&nbsp;<span class="label label-info">{ $searchResultNum}</span>条记录</p> -->
 	
-	<div id="divLoadAssList"><p class="text-center" style="font-size:20px;">加载中……</p></div>
+	<p id="pSearchResultNum" ><strong>搜索结果</strong>:&nbsp;<span class="label label-info">{$searchResultNum}</span>条记录</p>
 	
+	<div id="divLoadAssList">
+		<div id="divTblAssList" class="table-responsive" data-sort-name="" data-sort-order="" data-list-rows="" data-page-num=""> 
+			<table class="table table-bordered table-striped table-hover table-condensed">
+				<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产信息表</h4></caption>
+				<thead>
+					<tr>
+						<th class="text-center">序号</th>
+						<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-Name="assnum" data-sort-order="">编号</a></th>
+						<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-Name="code" data-sort-order="">卡号</a></th>
+						<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#" data-sort-Name="bar_code" data-sort-order="" >条形码号</a></th>
+						<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-Name="brand_model" data-sort-order="">名称</a></th>
+					
+						<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-Name="place_now" data-sort-order="">现放置地点</a></th>
+					
+						<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-Name="quantity" data-sort-order="">数量</a></th>
+						<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-Name="dept_now" data-sort-order="">现使用部门</a></th>
+						<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-Name="keeper_now" data-sort-order="">现保管人</a></th>
+					
+						<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-Name="status_now" data-sort-order="">状态</a></th>
+						<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-Name="status_now_user_name" data-sort-order="">登记人</a></th>
+						<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-Name="status_now_user_name" data-sort-order="">操作</a></th>
+					
+					</tr>
+			
+				</thead>
+				<tbody><!-- 此处显示数据库查询后的数据集assSet -->
+					{volist name="assSet" id="vo" empty="暂时没有数据"}
+					<tr>
+						<td>{$i+($sortData.pageNum-1)* $sortData.listRows}</td>
+						<td>{$vo.assnum}</td>
+						<td>{$vo.code}</td>
+						<td>{$vo.bar_code}</td>
+						<td>{$vo.brand_model}</td>
+						<td>{$vo.place_now}</td>
+						<td>{$vo.quantity}</td>
+						<td>{$vo.dept_now}</td>
+						<td>{$vo.keeper_now}</td>
+						<td>{$vo.status_now}</td>
+						<td>{$vo.status_now_user_name}</td>
+						<td>oprt</td>
+				
+					</tr>
+					{/volist}
+			
+				</tbody>
+			
+			</table>
+			
+			<div id="divListRows" class="col-sm-12 text-right">
+				<!-- // 分页变量 -->
+				<div class="col-sm-10 text-right">{$assList}</div>
+		
+				<div class="form-group form-group-sm col-sm-2">
+					<span class="">每页记录行数：</span>
+					<select class="form-control" id="listRows">
+						<option value="5">5</option>
+						<option value="10">10</option>
+						<option value="20">20</option>
+						<option value="50">50</option>
+					</select>
+						
+				</div>
 	
+			</div>
+	
+		</div>
+		
+	</div>
+		
+
 </div>
+<!-- Modal "modalAssSingle" -->
+<div class="modal fade" id="modalAssSingle" role="dialog">
+	<div class="modal-dialog modal-lg">
+    
+      <!-- Modal content-->
+      	<div class="modal-content">
+        <div class="modal-header bg-info" style="border-radius:5px;">
+          	<button type="button" class="close" data-dismiss="modal">&times;</button>
+		  
+          	<h4><strong>新增固定资产</strong</h4>
+        </div>
+		
+        <div class="modal-body">
+			<!-- // 单个issPat增删改查页面显示位置，需load其他模板文件的div-->
+			<div id="divLoadAssSingle"><p class="text-center" style="font-size:28px;">加载中……</p></div>
+		</div>
+		
+		<div class="modal-footer" hidden="true">
+        	<input type="button" class="btn btn-primary btn-sm" data-dismiss="modal" value="返回">  
+          
+        </div>
+		</div>
+	</div>
+
+</div>
+<!--/ Modal "modalAssSingle" -->
 
 <!-- /pagewrap  -->
 
 <script>
-var searchDataArr={$searchData};
-
-console.dir(searchDataArr);
-
-
-//**函数名：getJsonLength
- 	//* 作用：得到jsonData的长度
-var getJsonLength=(jsonData)=>{
-	var jsonLength = 0;
-	for(var item in jsonData){
-		jsonLength++;
-	}
- 	return jsonLength;
-};
+//全局变量
+<!-- var sortDataObj={'listRows':10,'sortName':'assnum','sortOrder':'asc','pageNum':1}; -->
+var urlPrefix='{$home}/dashboard/asset/';
 
 //**函数名：glyphiconTextChange
  	//* 作用：obj内含的glyphicon进行变换
@@ -130,7 +212,7 @@ var glyphiconTextChange=(obj,iconText1,iconText2)=>{
 	//* 返回值：无
 var ajaxShowSelect=(options)=>{
 	var defaults={
-		'url':'selectResponse',
+		'url':urlPrefix+'selectRes',
 		'attach':[{"text":"...不限","val":"0"}],
 		'sendData':'',
 		'obj':'',
@@ -164,19 +246,26 @@ var ajaxShowSelect=(options)=>{
 	});
 };
 
-//**函数名：loadAssList
- 	//* 作用：加载本页面内容到指定div中<div id="divLoadAssList"></div>
+//**函数名：loadMe
+ 	//* 作用：加载本页面内容
 	//* 参数1：listRows，Int。值：可为空，每页显示的记录行数。默认为10。
 	//* 参数2：sortName，String。值：可为空，排序字段名称。默认为‘_TOPIC’。
 	//* 参数3：sortOrder，String。值：可为空，排序方式。默认为'_ASC'。
 	//* 参数4：pageNum，Int。值：可为空，当前页数。默认为1。
 	//* 参数6：serchWord，Array。值：可为空，用户搜索关键词键值对。默认为空。
-var loadAssList=(sortData)=>{
-		
+var loadMe=()=>{
+	//排序有关的参数都从$('#divTblAssList')获取
+	var obj=$('#divTblAssList');
+	var sortData={
+		'listRows':obj.data('listRows'),
+		'sortName':obj.data('sortName'),
+		'sortOrder':obj.data('sortOrder'),
+		'pageNum':obj.data('pageNum'),
+	};	
 	//排序有关的参数默认值
 	var sortDataDefault={'listRows':10,'sortName':'assnum','sortOrder':'asc','pageNum':1};
 	sortData=$.extend({},sortDataDefault,sortData);
-	
+	console.log(sortData);
 	//用户搜索有关键值对从表单$('#fmIssPatSearch')获取
 	var formData=new FormData($('#fmAssSearch')[0]);
 	
@@ -195,46 +284,10 @@ var loadAssList=(sortData)=>{
 	//console.log('sortData:');
 	//console.dir(sortData);
 	
-	// jquery load()方法，文件加载到本页面<div id="divLoadAssList"></div>
-	$('#divLoadAssList').load('assList',
-		{'sortData':sortData,'searchData':searchData},
-		function(){
-			sortOrderToggle(sortData.sortName);
-		}
-	);
-};
-
-//函数名：sortOrderToggle
-//作用：对选定的assList列表字段进行升序降序转换，改变该字段表头显示格式
-var sortOrderToggle=(sortName)=>{
-	var obj='';
-	var glyAsc='&nbsp;<span class="small glyphicon glyphicon-sort-by-attributes"></span>';
-	var glyDesc='&nbsp;<span class="small glyphicon glyphicon-sort-by-order-alt"></span>';
-	
-	$('thead a').removeClass('label label-primary');
-	
-	$('thead a').each(function(){
-		if(sortName==$(this).data('sortName')){
-			obj=$(this);
-		}else{
-			$(this).tooltip({placement: 'bottom'});
-		}
-	});
-		
-	obj.addClass('label label-primary');
-	
-	if(obj.data('sortOrder') == 'asc'){
-		//当前为升序
-		obj.append(glyAsc);
-		obj.tooltip({title:'当前为升序。点击后降序',placement: 'top'});
-		obj.data('sortOrder','desc');
-	}else{
-		//当前为降序
-		obj.append(glyDesc);
-		obj.tooltip({title:'当前为降序。点击后升序',placement: 'top'});
-		obj.data('sortOrder','asc');
-	}
-		
+	<!-- $.post(urlPrefix+'index', -->
+		<!-- {'sortData':sortData,'searchData':searchData} -->
+	<!-- ); -->
+	$('#divLoadAssList').load(urlPrefix+'index #divTblAssList',{'sortData':sortData,'searchData':searchData});
 };
 
 //利用自调用匿名函数立即执行的特点，设定$('#selectDeptNow')、$('#selectPlaceNow')、$('#selectKeeperNow')。
@@ -248,11 +301,11 @@ var sortOrderToggle=(sortName)=>{
 	).then(
 		function(data, textStatus, jqXHR){
      		//ajax成功
-			loadAssList();
+			loadMe();
 		},
 		function(){
 			//ajax失败
-			alert("失败Group，请稍后再试！");
+			$.alert('失败Group，请稍后再试！');
 		}
 	);
 })(jQuery,ajaxShowSelect);
@@ -260,9 +313,6 @@ var sortOrderToggle=(sortName)=>{
 $(document).ready(function(){
 	// 设置各类tooltip
 	$('#divTopBtn [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
-	
-	<!-- 选中id为"nav_pat"的标签（header.html文件中的li标签）,添加.active -->
-	$('#nav_ass').addClass('active');
 	
 	$('#btnSearchInfo').click(function(){
 		var iconText1={icon:'glyphicon-collapse-up',text:'隐藏搜索'};
@@ -285,14 +335,72 @@ $(document).ready(function(){
 		<!-- } -->
 	});
 	
+	<!-- //表格每页显示记录行数 -->
+	$('#listRows').val('{$sortData.listRows}'); 
+	
+	$('#listRows').change(function(){
+		//排序数据向$('#divTblAssList')汇集
+		$('#divTblAssList').data('listRows',$(this).val());
+		loadMe();
+	});	
+	
+	//列表按选中的组件信息重新排序
+	$('thead a').click(function(){
+		sortData=$.extend({},sortData,{'listRows':$('#listRows').val()*1,'sortOrder':$(this).data('sortOrder'),'sortName':$(this).data('sortName')});
+		//loadAssList(sortData);
+		
+	});	
+	
+	<!-- // 点击分页中的a，表格中的内容根据a中的属性值进行排序,但不改变之前选中 thead a时的排序信息-->
+	$('#divListRows a').click(function(evt){
+		// a所在分页页数
+		var pageStr=$(this).text();
+		var pageNum;
+		//(li.active)所代表的页数
+		var pageNumActive=$('#divListRows li.active').children('span').text();
+		
+		var sortName=$('thead').find('.label').data('sortName');
+		var sortOrder=$('thead').find('.label').data('sortOrder');
+		<!-- var sortObj=$('thead').find('.label'); -->
+		
+		evt.preventDefault();
+		
+		switch(pageStr){
+			case'»':
+				//用"*"确保得到的是加法运算结果，而不是字符串
+				pageNum=(pageNumActive*1+1);
+			break;
+			
+			case'«':
+				pageNum=(pageNumActive*1-1);
+			break;
+			
+			default:
+				pageNum=pageStr*1;
+			break;
+		
+		}
+		
+		//loadAssList({'listRows':$('#listRows').val()*1,'pageNum':pageNum,'sortName':sortName,'sortOrder':sortOrder});
+		
+	});
+	
 	<!-- // 页面刷新 -->
 	$('#btnRefresh').click(function(){
 		//搜索表单重置
 		$('#fmAssSearch')[0].reset();
-		loadAssList();
+		//loadAssList();
+		
 	});
 	
-
+	//新增固定资产记录
+	$('#btnCreate').click(function(){
+	
+		$("#modalAssSingle").modal();
+	});
+	
+	
+	
 <!-- //表单$('#fmAssSearch')有关的代码块 -->
 	
 	$('#fmAssSearch .form-control').change(function(){
@@ -302,7 +410,7 @@ $(document).ready(function(){
 	
 	//表单提交，开始asset搜索
 	$('#btnSearch').click(function(){
-		loadAssList();
+		//loadAssList();
 	});
 	
 	//表单重置
@@ -313,12 +421,6 @@ $(document).ready(function(){
 		fm.find('.timeGroup').hide();
 	});
 	
-<!-- function  -->
 
-
-<!-- /function  -->
-	
 });
 </script>
-
-{include file="../application/common/footer.html"}

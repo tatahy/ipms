@@ -16,6 +16,7 @@ use app\dashboard\model\Issrecord as IssrecordModel;
 use app\dashboard\model\Patinfo as PatinfoModel;
 use app\dashboard\model\Patrecord as PatrecordModel;
 use app\dashboard\model\Attinfo as AttinfoModel;
+use app\dashboard\model\Assinfo as AssinfoModel;
 
 //引入issPatFSM
 //use isspatfsm\IssPatFSM;
@@ -1684,5 +1685,13 @@ class IndexController extends \think\Controller
       
       //返回前端的是索引数组  
       return $res;
+    }
+    
+    public function assInfo(Request $request,AssinfoModel $assMdl,$req='')
+    {
+        $this->_loginUser();
+        
+        
+        return view();
     }
 }

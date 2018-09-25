@@ -116,7 +116,9 @@
 			<li class="active"><a class="aTab" href="#issPat2"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利事务<span class="badge">{$numIssPat}</span></a></li>
 			<li><a class="aTab" href="#issThe"><span class="glyphicon glyphicon-list"></span>&nbsp;论文事务<span class="badge">{$numIssThe}</span></a></li>
 			<li><a class="aTab" href="#attManage"><span class="glyphicon glyphicon-bookmark"></span>&nbsp;附件管理</a></li>
+			<li><a class="aTab" href="#assInfo"><span class="glyphicon glyphicon-oil"></span>&nbsp;固定资产</a></li>
 			<li><a class="aTab" href="#userInfo"><span class="glyphicon glyphicon-user"></span>&nbsp;个人信息</a></li>
+			
 				
 		</ul>
 		
@@ -144,12 +146,25 @@
  	//* 作用：提交锚点值给后端，由后端返回需加载的页面文件
 function loadTplFile(){
 	var sId=window.location.hash;
+	var url='';
 	if(sId=='' || sId=='#undefined'){
 		sId='#issPat2';
 	}
 	$('#divContent_load').html('<p class="text-center" style="font-size:24px;">加载中……</p>');
     //提交锚点值给后端，由后端返回需加载的页面文件
-	$('#divContent_load').load('tplFile',{'sId':sId},function(){
+	switch(sId){
+		case '#assInfo':
+			url='{$home}/dashboard/asset/index';
+			break;
+		case '':
+		
+			break;
+		default:
+			url='tplFile';
+			break;
+	}
+	
+	$('#divContent_load').load(url,{'sId':sId},function(){
 		//load的回调函数改变样式
 		$('.nav a[href="'+sId+'"]').find('.badge').css('color','red');
 	}); 
