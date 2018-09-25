@@ -5,8 +5,8 @@
 <div class="container-fluid" style="padding-top: 55px;">
 	
 	<div id="divTopBtn" style="margin:10px 0px;">
-		<span class="label label-default" style="padding:6px;">固定资产记录数&nbsp;<span class="badge">{$numTotal}</span>
-		</span>&nbsp;
+		<span class="label label-info" style="font-size:16px;">固定资产总数
+		</span><span class="badge">{$quanCount}</span>&nbsp;
 		<button id="btnSearchInfo" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏搜索条件"><span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span></button>
 				
 		<button id="btnRefresh" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
@@ -178,7 +178,7 @@ var ajaxShowSelect=(options)=>{
 	//* 参数3：sortOrder，String。值：可为空，排序方式。默认为'_ASC'。
 	//* 参数4：pageNum，Int。值：可为空，当前页数。默认为1。
 	//* 参数6：serchWord，Array。值：可为空，用户搜索关键词键值对。默认为空。
-var loadAssList=(sortData)=>{
+var loadAssList=(sortData,callBack)=>{
 	
 	var searchNum=$('#pSearchResultNum');
 	
@@ -201,11 +201,49 @@ var loadAssList=(sortData)=>{
 	
 	$('#divLoadAssList').html('<p class="text-center" style="font-size:20px;">加载中……</p>');
 	
-	console.log('sortData:');
-	console.dir(sortData);
+	//console.log('sortData:');
+	//console.dir(sortData);
 	
 	// jquery load()方法，文件加载到本页面<div id="divLoadAssList"></div>
-	$('#divLoadAssList').load('assList',{'sortData':sortData,'searchData':searchData});
+	$('#divLoadAssList').load('assList',
+		{'sortData':sortData,'searchData':searchData},
+		function(){
+			sortOrderToggle(sortData.sortName);
+		}
+	);
+};
+
+//函数名：sortOrderToggle
+//作用：对选定的assList列表字段进行升序降序转换，改变该字段表头显示格式
+var sortOrderToggle=(sortName)=>{
+	var obj='';
+	var glyAsc='&nbsp;<span class="small glyphicon glyphicon-sort-by-attributes"></span>';
+	var glyDesc='&nbsp;<span class="small glyphicon glyphicon-sort-by-order-alt"></span>';
+	
+	$('thead a').removeClass('label label-primary');
+	
+	$('thead a').each(function(){
+		if(sortName==$(this).data('sortName')){
+			obj=$(this);
+		}else{
+			$(this).tooltip({placement: 'bottom'});
+		}
+	});
+		
+	obj.addClass('label label-primary');
+	
+	if(obj.data('sortOrder') == 'asc'){
+		//升序
+		obj.append(glyAsc);
+		obj.data('sortOrder','desc');
+		obj.tooltip({title:'当前为升序。点击后降序',placement: 'top'});
+	}else{
+		//降序
+		obj.append(glyDesc);
+		obj.data('sortOrder','asc');
+		obj.tooltip({title:'当前为降序。点击后升序',placement: 'top'});
+	}
+		
 };
 
 //利用自调用匿名函数立即执行的特点，设定$('#selectDeptNow')、$('#selectPlaceNow')、$('#selectKeeperNow')。
@@ -226,7 +264,6 @@ var loadAssList=(sortData)=>{
 			alert("失败Group，请稍后再试！");
 		}
 	);
-	
 })(jQuery,ajaxShowSelect);
 
 $(document).ready(function(){
@@ -259,9 +296,13 @@ $(document).ready(function(){
 
 <!-- //表单$('#fmAssSearch')有关的代码块 -->
 	
+	$('#fmAssSearch .form-control').change(function(){
+		//表单输入框去掉附加底色
+		$(this).removeClass('label-info');
+	});
+	
 	//表单提交，开始asset搜索
 	$('#btnSearch').click(function(){
-				
 		loadAssList();
 	});
 	

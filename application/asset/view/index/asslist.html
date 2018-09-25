@@ -2,21 +2,23 @@
 <div>
 	<div class="table-responsive"> 
 		<table class="table table-bordered table-striped table-hover table-condensed">
-			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产列表</h4></caption>
+			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产概况列表</h4></caption>
 			<thead>
 				<tr>
 					<th class="text-center">序号</th>
-					<th class="text-center"><a data-toggle="tooltip" href="#"  data-sort-Name="assnum" data-sort-order="{$sortData.sortOrder}">编号</a></th>
-					<th class="text-center"><a data-toggle="tooltip" href="#"  data-sort-Name="code" data-sort-order="{$sortData.sortOrder}">卡号</a></th>
-					<th class="text-center"><a data-toggle="tooltip" href="#"  data-sort-Name="bar_code" data-sort-order="{$sortData.sortOrder}">条形码号</a></th>
-					<th class="text-center"><a data-toggle="tooltip" href="#"  data-sort-Name="brand_model" data-sort-order="{$sortData.sortOrder}">名称</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-Name="assnum" data-sort-order="{$sortData.sortOrder}">编号</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-Name="code" data-sort-order="{$sortData.sortOrder}">卡号</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#" data-sort-Name="bar_code" data-sort-order="{$sortData.sortOrder}" >条形码号</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-Name="brand_model" data-sort-order="{$sortData.sortOrder}">名称</a></th>
 					
-					<th class="text-center"><a data-toggle="tooltip" href="#"  data-sort-Name="place_now" data-sort-order="{$sortData.sortOrder}">现放置地点</a></th>
-					<th class="text-center"><a data-toggle="tooltip" href="#"  data-sort-Name="dept_now" data-sort-order="{$sortData.sortOrder}">现使用部门</a></th>
-					<th class="text-center"><a data-toggle="tooltip" href="#"  data-sort-Name="keeper_now" data-sort-order="{$sortData.sortOrder}">现保管人</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-Name="place_now" data-sort-order="{$sortData.sortOrder}">现放置地点</a></th>
 					
-					<th class="text-center"><a data-toggle="tooltip" href="#"  data-sort-Name="status_now" data-sort-order="{$sortData.sortOrder}">状态</a></th>
-					<th class="text-center"><a data-toggle="tooltip" href="#"  data-sort-Name="status_now_user_name" data-sort-order="{$sortData.sortOrder}">登记人</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-Name="quantity" data-sort-order="{$sortData.sortOrder}">数量</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-Name="dept_now" data-sort-order="{$sortData.sortOrder}">现使用部门</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-Name="keeper_now" data-sort-order="{$sortData.sortOrder}">现保管人</a></th>
+					
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-Name="status_now" data-sort-order="{$sortData.sortOrder}">状态</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-Name="status_now_user_name" data-sort-order="{$sortData.sortOrder}">登记人</a></th>
 					
 				</tr>
 			
@@ -30,6 +32,7 @@
 					<td>{$vo.bar_code}</td>
 					<td>{$vo.brand_model}</td>
 					<td>{$vo.place_now}</td>
+					<td>{$vo.quantity}</td>
 					<td>{$vo.dept_now}</td>
 					<td>{$vo.keeper_now}</td>
 					<td>{$vo.status_now}</td>
@@ -79,7 +82,8 @@ $(document).ready(function(){
 	});	
 	
 	$('thead a').click(function(){
-	
+		//sortOrderToggle($(this).data('sortName'));
+		
 		//调用index.html中的loadAssList()
 		loadAssList({'listRows':$('#listRows').val()*1,'sortOrder':$(this).data('sortOrder'),'sortName':$(this).data('sortName')});
 		
