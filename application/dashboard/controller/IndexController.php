@@ -237,7 +237,7 @@ class IndexController extends \think\Controller
         if (!empty($request->param('sId'))) {
             $tplFile = $request->param('sId');
         } else {
-            $tplFile = '#issPat';
+            $tplFile = '#userInfo';
         }
 
         if (!empty($request->param('auth'))) {

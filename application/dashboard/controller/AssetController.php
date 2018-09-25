@@ -46,6 +46,21 @@ class AssetController extends \think\Controller
         //数量总计
         $quanCount=$assMdl->where('quantity','>=',1)->count();
         
+        
+        $this->assign([
+          'home'=>$request->domain(),
+          'quanCount'=>$quanCount,
+          
+        ]);
+        return view();
+        
+    }
+    
+    //根据前端的sortData/searchData，选择返回前端的asset list
+    public function assList(Request $request,AssinfoModel $assMdl,$sortData=[],$searchData=[])
+    {
+        $this->priLogin();
+        
         //搜索查询条件数组
         $whereArr=[];
         $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1);
@@ -85,11 +100,9 @@ class AssetController extends \think\Controller
         $searchResultNum=count($assMdl::where($whereArr)->select());
         // 获取分页显示
         $assList=$assSet->render(); 
-        
+               
         $this->assign([
-          'home'=>$request->domain(),
-          'quanCount'=>$quanCount,
-          'assSet'=>$assSet,
+           'assSet'=>$assSet,
           'assList'=>$assList,
           
           //排序数组
@@ -99,29 +112,6 @@ class AssetController extends \think\Controller
           'searchData'=>$searchData,
           
           'searchResultNum'=>$searchResultNum,
-          
-        ]);
-        return view();
-        
-    }
-    
-    //根据前端的sortData/searchData，选择返回前端的asset list
-    public function assList(Request $request,AssinfoModel $assMdl,$sortData=[],$searchData=[])
-    {
-        $this->priLogin();
-        
-        
-       
-        $this->assign([
-          
-          
-          
-          //排序数组
-          'sortData'=>$sortData,
-          
-          //搜索数组
-          'searchData'=>$searchData,
-          
           'whereArr'=>json_encode($whereArr,JSON_UNESCAPED_UNICODE)
 		  
         ]);
@@ -146,6 +136,34 @@ class AssetController extends \think\Controller
       }
       
       //返回前端的是索引数组  
+      return $res;
+    }
+    
+    public function editAss(Request $request,AssinfoModel $assMdl)
+    {
+      $this->priLogin();
+      $assSet=array('id'=>0);
+      $this->assign([
+          'home'=>$request->domain(),
+          'userName'=>$this->username,
+          'assSet'=>$assSet
+        ]);
+        return view();
+    }
+    
+    
+    public function assOprt(Request $request,AssinfoModel $assMdl)
+    {
+      $this->priLogin();
+      
+      $data=$request->param();
+      unset($data['id']);
+      unset($data['oprt']);
+      //写入数据库
+      $res=$assMdl::create($data,true)->id;
+      
+      //$res='aa'; 
+      //return json_encode($res,JSON_UNESCAPED_UNICODE);
       return $res;
     }
 }

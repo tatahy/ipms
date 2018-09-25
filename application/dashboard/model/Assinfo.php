@@ -12,11 +12,17 @@ use think\Model;
 class Assinfo extends Model
 {
     //protected $auto = ['assnum','pronum'];
-    protected $insert = ['assinfo_id'];
+    //protected $insert = ['assinfo_id'];
     //protected $update = [];
 
     //只读字段，这个字段的值一旦写入，就无法更改。
     protected $readonly = ['assnum', 'assinfo_id'];
+    
+    // 开启时间字段自动写入 并设置字段类型为datetime
+	//protected $autoWriteTimestamp = 'datetime';
+    protected $autoWriteTimestamp = 'timestamp';
+    // 时间字段输出格式
+    protected $dateFormat = 'Y/m/d H:i:s';
 
     
     //获取器，获取数据表assinfo中status字段值，转换为中文输出，待考虑是否采用？？

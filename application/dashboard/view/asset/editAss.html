@@ -1,0 +1,119 @@
+<!-- editAss.html -->
+
+<form id="fmAssInfo" role="form" action="{$home}/dashboard/asset/assOprt"  method="post">
+	<input id="id" type="text" name="id" value="{$assSet.id}" class="sr-only">
+	<input id="oprt" type="text" name="oprt" value="_CREATE" class="sr-only">
+	
+	<div class="row">
+	<div class="form-group col-sm-4">
+		<label for="brand_model">名称（含品牌、型号）<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+		<input class="form-control empty-check" name="brand_model" value="" type="text" required>
+	
+	</div>
+	
+	<div class="form-group col-sm-3">
+		<label for="code">卡号<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+		<input class="form-control empty-check" name="code" value="" type="text" required>
+	
+	</div>
+	
+	<div class="form-group col-sm-3">
+		<label for="bar_code">条形码号<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+		<input class="form-control empty-check" id="" name="bar_code" value="" type="text" required>
+	
+	</div>
+	
+	<div class="form-group col-sm-2">
+		<label for="assnum">编号<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+		<input class="form-control empty-check" id="" name="assnum" value="" type="text" required>
+	
+	</div>
+	</div>
+	
+	<div class="row">
+	<div class="form-group col-sm-2">
+		<label for="quantity">数量<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+		<input class="form-control empty-check" name="quantity" value="" type="text" required>
+	
+	</div>
+	
+	<div class="form-group col-sm-3">
+		<label for="place_now">现放置地点<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+		<input class="form-control empty-check" name="place_now" value="" type="text" required>
+	
+	</div>
+	
+	<div class="form-group col-sm-5">
+		<label for="dept_now">现使用部门<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+		<input class="form-control empty-check" name="dept_now" value="" type="text" required>
+	
+	</div>
+	
+	<div class="form-group col-sm-2">
+		<label for="keeper_now">现保管人<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+		<input class="form-control empty-check" id="" name="keeper_now" value="" type="text" required>
+	
+	</div>
+	</div>
+	
+	<div class="row">
+	<div class="form-group col-sm-2">
+		<label for="status_now">状态</label>
+		<input class="form-control empty-check" name="status_now" value="新增" type="text" readonly>
+	
+	</div>
+	
+	<div class="form-group col-sm-3">
+		<label for="status_now_user_name">登记人</label>
+		<input class="form-control empty-check" name="status_now_user_name" value="{$userName}" type="text" readonly>
+	
+	</div>
+	</div>
+	<hr>
+	<div class="row myRow">
+	
+	<div class="pull-left">
+		<button type="submit" id="btnCreate" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-tag"></span>提交</button>
+	</div>
+	
+	<div  class="pull-right">
+		<input id="btnReset" type="button" class="btn btn-primary btn-sm" value="重置">
+		<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
+	</div>
+	
+	</div>
+	
+</form>
+
+
+
+<script>
+
+$(document).ready(function(){
+	
+	$('#fmAssInfo').submit(function(evt){
+		var url = this.action; 
+    	var formData = $(this).serialize();
+		
+		console.log(url);
+		console.dir(formData);
+		evt.preventDefault();
+		$('#modalAssSingle').modal('hide');
+		$.confirm('aa',function(e){
+			con=e;
+			if(true==con){
+				$.post(url,formData,function(data){
+					$.alert(data);
+					loadAssList();
+					
+				});
+			}else{
+				$('#modalAssSingle').modal('show');
+			}
+		}).cancel('否(N)').ok('是(Y)');	
+	});
+
+});
+
+</script>
+
