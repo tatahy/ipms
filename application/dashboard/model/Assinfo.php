@@ -16,11 +16,12 @@ class Assinfo extends Model
     //protected $update = [];
 
     //只读字段，这个字段的值一旦写入，就无法更改。
-    protected $readonly = ['assnum', 'assinfo_id'];
+    //protected $readonly = ['assnum', 'assinfo_id'];
     
     // 开启时间字段自动写入 并设置字段类型为datetime
 	//protected $autoWriteTimestamp = 'datetime';
-    protected $autoWriteTimestamp = 'timestamp';
+    //protected $autoWriteTimestamp = 'timestamp';
+    protected $autoWriteTimestamp = 'true';
     // 时间字段输出格式
     protected $dateFormat = 'Y/m/d H:i:s';
 
