@@ -23,6 +23,7 @@
 					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="status_now">状态</a></th>
 					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="status_now_user_name">登记人</a></th>
 					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="create_time">登记时间</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="update_time">更新时间</a></th>
 					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="oprt">操作</a></th>
 				</tr>
 			
@@ -42,6 +43,7 @@
 					<td>{$vo.status_now}</td>
 					<td>{$vo.status_now_user_name}</td>
 					<td>{$vo.create_time}</td>
+					<td>{$vo.update_time}</td>
 					<td class="btnAssOprt">
 						{eq name="authAss.edit" value="1"}
 						<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_EDIT"><span class="glyphicon glyphicon-pencil text-primary"></span>_编辑</a>

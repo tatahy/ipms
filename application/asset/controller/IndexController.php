@@ -43,7 +43,7 @@ class IndexController extends \think\Controller
     {
         $this->priLogin();
         //数量总计
-        $quanCount=$assMdl->where('quantity','>=',1)->count();
+        $quanCount=$assMdl->where('quantity','>=',1)->sum('quantity');
         
         $sortData=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1);
         

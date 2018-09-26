@@ -28,7 +28,7 @@
 			<tbody><!-- 此处显示数据库查询后的数据集 -->
 				{volist name="assSet" id="vo" empty="暂时没有数据"}
 				<tr>
-					<td>{$i+($sortData.pageNum-1)*$sortData.listRows}</td>
+					<td class="text-center">{$i+($sortData.pageNum-1)*$sortData.listRows}</td>
 					<td>{$vo.assnum}</td>
 					<td>{$vo.code}</td>
 					<td>{$vo.bar_code}</td>

@@ -49,12 +49,13 @@ class AssetController extends \think\Controller
         $this->priLogin();
         
         //数量总计
-        $quanCount=$assMdl->where('quantity','>=',1)->count();
+        $quanCount=$assMdl->where('quantity','>=',1)->sum('quantity');
         
         
         $this->assign([
           'home'=>$request->domain(),
           'quanCount'=>$quanCount,
+          'assStatusArr'=>json_encode(assStatusArr,JSON_UNESCAPED_UNICODE)
           //'auth'=>json_encode($this->auth,JSON_UNESCAPED_UNICODE)
         ]);
         return view();

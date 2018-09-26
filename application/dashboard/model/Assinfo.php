@@ -21,7 +21,7 @@ class Assinfo extends Model
     // 开启时间字段自动写入 并设置字段类型为datetime
 	//protected $autoWriteTimestamp = 'datetime';
     //protected $autoWriteTimestamp = 'timestamp';
-    protected $autoWriteTimestamp = 'true';
+    protected $autoWriteTimestamp = true;
     // 时间字段输出格式
     protected $dateFormat = 'Y/m/d H:i:s';
 
