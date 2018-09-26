@@ -2,14 +2,19 @@
 
 <div>
 	<div id="divTopBtn" style="margin:10px 0px;">
-		<span class="label label-info" style="font-size:16px;">固定资产总数
-		</span>&nbsp;<span class="badge">{$quanCount}</span>&nbsp;
+		<div class="row myRow">
+		<p class="label label-info" style="font-size:16px;">固定资产总数
+		&nbsp;<span class="badge">{$quanCount}</span>&nbsp;</p>
+		
+		</div>
+		<hr>
+		<div class="row myRow">
 		<button id="btnSearchInfo" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏搜索条件"><span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span></button>
 				
 		<button id="btnRefresh" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="刷新固定资产信息表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 		
-		<button id="btnCreate" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="新增固定资产记录"><span class="glyphicon glyphicon-pencil"></span>新增</button>
-		
+		<a class="aAssOprt" href="#assInfo" data-ass-id="0" data-ass-oprt="_CREATE" ><span class="glyphicon glyphicon-modal-window text-primary"></span>_新增</a>
+		</div>
 	</div>
 	
 	<!-- // 搜索区域-->
@@ -308,13 +313,11 @@ $(document).ready(function(){
 	
 	//新增固定资产记录
 	$('#btnCreate').click(function(){
-		$('#divLoadAssSingle').load(urlPrefix+'editAss');
-		$('#modalAssSingle').find('.title').html($(this).html()+'固定资产');
+		$('#divLoadAssSingle').load(urlPrefix+'oprtAssSingle');
+		$('#modalAssSingle').find('.title').html('【'+$(this).html()+'】固定资产');
 		$('#modalAssSingle').modal();
 		
-	});
-	
-	
+	});	
 	
 <!-- //表单$('#fmAssSearch')有关的代码块 -->
 	

@@ -6,6 +6,7 @@ use think\Session;
 use think\View;
 
 use app\dashboard\model\Assinfo as AssinfoModel;
+use app\dashboard\model\User as UserModel;
 
 class AssetController extends \think\Controller
 {
@@ -19,6 +20,8 @@ class AssetController extends \think\Controller
     private $roles=array();
     //用户所在部门
     private $dept = null;
+    //
+    private $auth=[];
     
     // 初始化
     protected function _initialize()
@@ -28,6 +31,8 @@ class AssetController extends \think\Controller
         $this->log=Session::get('log');
         $this->roles=Session::get('role');
         $this->dept=Session::get('dept');
+        
+        $this->auth=UserModel::where(['username'=>$this->username,'pwd'=>$this->pwd])->find()->authority;
     }
     
     //
@@ -50,7 +55,7 @@ class AssetController extends \think\Controller
         $this->assign([
           'home'=>$request->domain(),
           'quanCount'=>$quanCount,
-          
+          //'auth'=>json_encode($this->auth,JSON_UNESCAPED_UNICODE)
         ]);
         return view();
         
@@ -102,7 +107,8 @@ class AssetController extends \think\Controller
         $assList=$assSet->render(); 
                
         $this->assign([
-           'assSet'=>$assSet,
+          'home'=>$request->domain(),
+          'assSet'=>$assSet,
           'assList'=>$assList,
           
           //排序数组
@@ -112,6 +118,8 @@ class AssetController extends \think\Controller
           'searchData'=>$searchData,
           
           'searchResultNum'=>$searchResultNum,
+          
+          'authAss'=>$this->auth['ass'],
           'whereArr'=>json_encode($whereArr,JSON_UNESCAPED_UNICODE)
 		  
         ]);
@@ -139,28 +147,67 @@ class AssetController extends \think\Controller
       return $res;
     }
     
-    public function editAss(Request $request,AssinfoModel $assMdl)
+    public function showAssSingle(Request $request,AssinfoModel $assMdl,$id=0,$oprt='')
     {
       $this->priLogin();
-      $assSet=array('id'=>0);
+      $id=$request->param('id');
+      $oprt=$request->param('oprt');
+      $authAss=$this->auth['ass'];
+      $assSetArr=array('id'=>$id,
+                        'assnum'=>'',
+                        'code'=>'',
+                        'bar_code'=>'',
+                        'brand_model'=>'',
+                        'quantity'=>1,
+                        'place_now'=>'',
+                        'dept_now'=>'',
+                        'keeper_now'=>'',
+                        'dept_now'=>'',
+                        'status_now'=>'新增',
+                        'status_now_user_name'=>$this->username,
+                        );
+      
+      $assSet=$id?$assMdl::get($id):$assSetArr;
+           
       $this->assign([
           'home'=>$request->domain(),
+          'oprt'=>$oprt,
+          'assSet'=>$assSet,
           'userName'=>$this->username,
-          'assSet'=>$assSet
+          'authAss'=>$authAss
         ]);
-        return view();
+      return view();
     }
     
     
-    public function assOprt(Request $request,AssinfoModel $assMdl)
+    public function assOprt(Request $request,AssinfoModel $assMdl,$data=[])
     {
       $this->priLogin();
       
       $data=$request->param();
-      unset($data['id']);
-      unset($data['oprt']);
-      //写入数据库
-      $res=$assMdl::create($data,true)->id;
+      $id=$data['id'];
+      $oprt=$data['oprt'];
+      $res=0;
+      
+      switch($oprt){
+        case '_CREATE':
+            //数据库create
+            $res=$assMdl::create($data,true)->id;
+            break;
+        case '_EDIT':
+            //数据库update
+            //模型的save方法，返回的是受影响的记录数。
+            $assSet = $assMdl::get($id);
+            $res=$assSet->allowField(true)->save($data);
+            break;
+        case '_AUDIT':
+            //数据库update
+            //模型的save方法，返回的是受影响的记录数。
+            $assSet = $assMdl::get($id);
+            $res=$assSet->allowField(true)->save($data);
+            break;
+      }
+      
       
       //$res='aa'; 
       //return json_encode($res,JSON_UNESCAPED_UNICODE);

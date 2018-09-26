@@ -12,21 +12,18 @@
 			<thead>
 				<tr>
 					<th class="text-center">序号</th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="assnum">编号</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="code">卡号</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#" data-sort-name="bar_code">条形码号</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="brand_model">名称</a></th>
-					
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="place_now">现放置地点</a></th>
-					
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="quantity">数量</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="dept_now">现使用部门</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="keeper_now">现保管人</a></th>
-					
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="status_now">状态</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="status_now_user_name">登记人</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="create_time">登记时间</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="oprt">操作</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="brand_model">名称</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="assnum">编号</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="code">卡号</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo" data-sort-name="bar_code">条形码号</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="place_now">现放置地点</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="quantity">数量</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="dept_now">现使用部门</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="keeper_now">现保管人</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="status_now">状态</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="status_now_user_name">登记人</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="create_time">登记时间</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="oprt">操作</a></th>
 				</tr>
 			
 			</thead>
@@ -34,10 +31,10 @@
 				{volist name="assSet" id="vo" empty="暂时没有数据"}
 				<tr>
 					<td class="text-center">{$i+($sortData.pageNum-1)*$sortData.listRows}</td>
+					<td>{$vo.brand_model}</td>
 					<td>{$vo.assnum}</td>
 					<td>{$vo.code}</td>
 					<td>{$vo.bar_code}</td>
-					<td>{$vo.brand_model}</td>
 					<td>{$vo.place_now}</td>
 					<td>{$vo.quantity}</td>
 					<td>{$vo.dept_now}</td>
@@ -45,7 +42,23 @@
 					<td>{$vo.status_now}</td>
 					<td>{$vo.status_now_user_name}</td>
 					<td>{$vo.create_time}</td>
-					<td>oprt</td>
+					<td class="btnAssOprt">
+						{eq name="authAss.edit" value="1"}
+						<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_EDIT"><span class="glyphicon glyphicon-pencil text-primary"></span>_编辑</a>
+						{/eq}
+						
+						{eq name="authAss.audit" value="1"}
+						<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}" data-ass-oprt="_AUDIT" ><span class="glyphicon glyphicon-check text-warning"></span>_审核</a>
+						{/eq}
+						
+						{eq name="authAss.approve" value="1"}
+						<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_APPROVE" ><span class="glyphicon glyphicon-check text-danger"></span>_审批</a>
+						{/eq}
+						
+						{eq name="authAss.maintain" value="1"}
+						<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_MAIINTAIN" ><span class="glyphicon glyphicon-calendar text-danger"></span>_维护</a>
+						{/eq}
+					</td>
 				
 				</tr>
 				{/volist}
@@ -80,7 +93,7 @@
 
 <script>
 
-
+var urlPrefix='{$home}/dashboard/asset/';
 
 $(document).ready(function(){
 	$('#tblAssList').data('sortOrder','{$sortData.sortOrder}');
@@ -150,6 +163,14 @@ $(document).ready(function(){
 		}
 		//调用index.html中的loadAssList()
 		loadAssList();
+		
+	});
+	
+	$('.aAssOprt').click(function(){
+		var data={'oprt':$(this).data('assOprt'),'id':$(this).data('assId')}
+		$('#divLoadAssSingle').load(urlPrefix+'showAssSingle',data);
+		$('#modalAssSingle').find('.title').html('【'+$(this).html()+'】固定资产');
+		$('#modalAssSingle').modal();
 		
 	});
 	
