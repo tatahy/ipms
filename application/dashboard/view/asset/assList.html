@@ -46,19 +46,23 @@
 					<td>{$vo.update_time}</td>
 					<td class="btnAssOprt">
 						{eq name="authAss.edit" value="1"}
-						<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_EDIT"><span class="glyphicon glyphicon-pencil text-primary"></span>_编辑</a>
+						<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_UPDATE"><span class="glyphicon glyphicon-pencil text-primary"></span>_更新&nbsp;</a>
+						
+							{in name="vo.status_now" value="*,新增(待分配)"}
+							<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_DELETE"><span class="glyphicon glyphicon-remove text-danger"></span>_删除&nbsp;</a>
+							{/in}
 						{/eq}
 						
 						{eq name="authAss.audit" value="1"}
-						<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}" data-ass-oprt="_AUDIT" ><span class="glyphicon glyphicon-check text-warning"></span>_审核</a>
+						<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}" data-ass-oprt="_AUDIT" ><span class="glyphicon glyphicon-check text-warning"></span>_审核&nbsp;</a>
 						{/eq}
 						
 						{eq name="authAss.approve" value="1"}
-						<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_APPROVE" ><span class="glyphicon glyphicon-check text-danger"></span>_审批</a>
+						<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_APPROVE" ><span class="glyphicon glyphicon-check text-danger"></span>_审批&nbsp;</a>
 						{/eq}
 						
 						{eq name="authAss.maintain" value="1"}
-						<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_MAIINTAIN" ><span class="glyphicon glyphicon-calendar text-danger"></span>_维护</a>
+						<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_MAIINTAIN" ><span class="glyphicon glyphicon-calendar text-danger"></span>_维护&nbsp;</a>
 						{/eq}
 					</td>
 				

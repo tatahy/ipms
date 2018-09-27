@@ -81,7 +81,8 @@ class AssetController extends \think\Controller
         $searchData=!empty($request->param('searchData/a'))?$request->param('searchData/a'):$searchDefaults;
         $searchData=array_merge($searchDefaults,$searchData);
         //基础搜索条件
-        $whereArr['id']=['>',0];
+        //$whereArr['id']=['>',0];
+        
         //前端输入的关键字搜索
         $whereArr['brand_model']=!empty($searchData['brand_model'])?['like','%'.$searchData['brand_model'].'%']:'';
         $whereArr['assnum']=!empty($searchData['assnum'])?['like','%'.$searchData['assnum'].'%']:'';
@@ -100,8 +101,7 @@ class AssetController extends \think\Controller
         }
         
         //分页,每页$listRows条记录
-        $assSet=$assMdl::where($whereArr)
-                        //->order('place_now', 'asc')
+        $assSet=$assMdl::where($whereArr)//->order('place_now', 'asc')
                         ->order($sortData['sortName'], $sortData['sortOrder'])
                         ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
                         'query'=>['listRows'=>$sortData['listRows']]]);
@@ -131,21 +131,27 @@ class AssetController extends \think\Controller
     }
     
     //响应前端请求，返回信息
-    public function selectRes(Request $request,AssinfoModel $assMdl,$req='')
+    public function selectRes(Request $request,AssinfoModel $assMdl,$req='',$source='db')
     {
       $this->priLogin();
       
-      $req = empty($request->param('req'))?0:$request->param('req');
+      $req = !empty($request->param('req'))?$request->param('req'):0;
+      $source = !empty($request->param('source'))?$request->param('source'):0;
       
-      $res=$assMdl->field($req)->group($req)->select();
-         
-      //将得到的数据集降为一维数组
-      if(is_array($res)){
-        $res=collection($res)->column($req);        
+      if($source=='common' && $req=='status_now'){
+        //引用本模块公共文件（dashboard/common.php）中定义的数组常量assStatusArr
+        $res=assStatusArr;
       }else{
-        $res=$res->column($req);
+        //从数据库获得数据
+        $res=$assMdl->field($req)->group($req)->select();
+        //将得到的数据集降为一维索引数组
+        if(is_array($res)){
+            $res=collection($res)->column($req);        
+        }else{
+            $res=$res->column($req);
+        }
       }
-      
+         
       //返回前端的是索引数组  
       return $res;
     }
@@ -155,6 +161,7 @@ class AssetController extends \think\Controller
       $this->priLogin();
       $id=$request->param('id');
       $oprt=$request->param('oprt');
+      $statusEn='*';
       $authAss=$this->auth['ass'];
       $assSetArr=array('id'=>$id,
                         'assnum'=>'',
@@ -171,7 +178,7 @@ class AssetController extends \think\Controller
                         );
       
       $assSet=$id?$assMdl::get($id):$assSetArr;
-           
+             
       $this->assign([
           'home'=>$request->domain(),
           'oprt'=>$oprt,
@@ -197,7 +204,7 @@ class AssetController extends \think\Controller
             //数据库create
             $res=$assMdl::create($data,true)->id;
             break;
-        case '_EDIT':
+        case '_UPDATE':
             //数据库update
             //模型的save方法，返回的是受影响的记录数。
             $assSet = $assMdl::get($id);
@@ -208,6 +215,11 @@ class AssetController extends \think\Controller
             //模型的save方法，返回的是受影响的记录数。
             $assSet = $assMdl::get($id);
             $res=$assSet->allowField(true)->save($data);
+            break;
+        case '_Delete':
+            //模型的destroy方法，返回的是受影响的记录数。已启用框架的软删除，数据仍然在数控库中。
+            $assSet = $assMdl::get($id);
+            $res =$assSet->delete();
             break;
       }
       

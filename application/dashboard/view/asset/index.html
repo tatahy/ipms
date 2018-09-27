@@ -48,13 +48,21 @@
 			</div>
 			
 			<div class="row myRow">
-			<div class="form-group col-sm-6">
+			<div class="form-group col-sm-4">
 				<label class="control-label" for="dept_now">现使用部门</label>
 				<!-- <select multiple class="form-control" id="searchPatType" name="searchPatType" > -->
 				<select class="form-control" id="selectDeptNow" name="dept_now" >
 						<option value="">d1</option>
 				</select>
 			</div>
+			<div class="form-group col-sm-2">
+				<label class="control-label" for="status_now">状态</label>
+				<!-- <select multiple class="form-control" id="searchPatType" name="searchPatType" > -->
+				<select class="form-control" id="selectStatusNow" name="status_now" >
+						<option value="">s1</option>
+				</select>
+			</div>
+			
 			<div class="form-group col-sm-4">
 				<label class="" for="place_now">现放置地点</label>
 				<select class="form-control" id="selectPlaceNow" name="place_now" >
@@ -278,6 +286,7 @@ var fmReset=()=>{
 	//设定$('#fmAssSearch')内的select组件的option
 	$.when(
 		ajaxShowSelect({sendData:{req:$('#selectDeptNow').attr('name')},obj:$('#selectDeptNow')}),
+		ajaxShowSelect({sendData:{req:$('#selectStatusNow').attr('name'),source:'db'},obj:$('#selectStatusNow')}),
 		ajaxShowSelect({sendData:{req:$('#selectPlaceNow').attr('name')},obj:$('#selectPlaceNow')}),
 		ajaxShowSelect({sendData:{req:$('#selectKeeperNow').attr('name')},obj:$('#selectKeeperNow')}),
 	).then(
