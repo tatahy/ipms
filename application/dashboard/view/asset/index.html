@@ -5,7 +5,7 @@
 		<div class="row myRow">
 		<p class="label label-info" style="font-size:16px;">固定资产总数
 		&nbsp;<span class="badge">{$quanCount}</span>&nbsp;</p>
-		<!-- <p></p> -->
+		<!-- <p>{$assStatusArr}</p> -->
 		</div>
 		<hr>
 		<div class="row myRow">
@@ -133,6 +133,8 @@ var urlPrefix='{$home}/dashboard/asset/';
 	//* 参数3：iconText2，Json。值：必须，{icon:'glyphicon-yy',text:'yy'}。
 	//* 无返回值
 var glyphiconTextChange=(obj,iconText1,iconText2)=>{
+	iconText1=$.extend({icon:'glyphicon-collapse-up',text:'隐藏搜索'},iconText1);
+	iconText2=$.extend({icon:'glyphicon-collapse-down',text:'显示搜索'},iconText2);
 	if(obj.find('.'+iconText2.icon).length){
 	    obj.find('.glyphicon').removeClass(iconText2.icon).addClass(iconText1.icon).next('span').html(iconText1.text);
     }else{
@@ -222,9 +224,6 @@ var loadAssList=()=>{
 	//console.log('sortData:');
 	//console.dir(sortData);
 	
-	<!-- $.post(urlPrefix+'index', -->
-		<!-- {'sortData':sortData,'searchData':searchData} -->
-	<!-- ); -->
 	$('#divLoadAssList').load(urlPrefix+'assList',
 		{'sortData':sortData,'searchData':searchData},
 		function(){
@@ -266,6 +265,13 @@ var sortOrderToggle=()=>{
 	}
 };
 
+//搜索表单重置
+var fmReset=()=>{
+	var fm=$('#fmAssSearch');
+	fm[0].reset();
+	fm.find('.form-control').removeClass('label-info');
+};
+
 //利用自调用匿名函数立即执行的特点，设定$('#selectDeptNow')、$('#selectPlaceNow')、$('#selectKeeperNow')。
 (function($,ajaxShowSelect){
 
@@ -291,22 +297,21 @@ $(document).ready(function(){
 	$('#divTopBtn [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
 	
 	$('#btnSearchInfo').click(function(){
-		var iconText1={icon:'glyphicon-collapse-up',text:'隐藏搜索'};
-		var iconText2={icon:'glyphicon-collapse-down',text:'显示搜索'};
 		//变换图标和内容
-		glyphiconTextChange($(this),iconText2,iconText1);
+		glyphiconTextChange($(this));
 		//显示、隐藏#divSearchData
 		$('#divSearchData').collapse('toggle');
 			
-		<!-- if($(this).find('.'+iconText1.icon).length && getJsonLength(searchDataArr)==0){ -->
-			<!-- $('#searchTopic').focus(); -->
-		<!-- } -->
 	});
 	
 	<!-- // 页面刷新 -->
 	$('#btnRefresh').click(function(){
 		//搜索表单重置
-		$('#fmAssSearch')[0].reset();
+		fmReset();
+		//$('#btnSearchInfo')恢复初始html
+		$('#btnSearchInfo').html('<span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span>');
+		//隐藏搜索条件
+		$('#divSearchData').collapse('hide');
 		loadAssList();
 		
 	});
@@ -322,21 +327,24 @@ $(document).ready(function(){
 <!-- //表单$('#fmAssSearch')有关的代码块 -->
 	
 	$('#fmAssSearch .form-control').change(function(){
-		//表单输入框去掉附加底色
-		$(this).removeClass('label-info');
+		
+		if($(this).val()!=0){
+			//表单输入框附加底色
+			$(this).addClass('label-info');
+		}else{
+			//表单输入框去掉附加底色
+			$(this).removeClass('label-info');
+		}
 	});
 	
-	//表单提交，开始asset搜索
+	//表单提交，显示asset结果
 	$('#btnSearch').click(function(){
 		loadAssList();
 	});
 	
 	//表单重置
 	$('#btnSearchReset').click(function(){
-		var fm=$(this).closest('form');
-		fm[0].reset();
-		fm.find('.form-control').removeClass('label-info');
-		fm.find('.timeGroup').hide();
+		fmReset();
 	});
 	
 

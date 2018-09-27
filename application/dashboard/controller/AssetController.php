@@ -55,7 +55,9 @@ class AssetController extends \think\Controller
         $this->assign([
           'home'=>$request->domain(),
           'quanCount'=>$quanCount,
-          'assStatusArr'=>json_encode(assStatusArr,JSON_UNESCAPED_UNICODE)
+          //引用本模块公共文件（dashboard/common.php）中定义的数组常量assStatusArr
+          //'assStatusArr'=>json_encode(assStatusArr,JSON_UNESCAPED_UNICODE)
+          'assStatusArr'=>assStatusArr['_ASSS4']
           //'auth'=>json_encode($this->auth,JSON_UNESCAPED_UNICODE)
         ]);
         return view();
@@ -78,14 +80,14 @@ class AssetController extends \think\Controller
         // 接收前端的搜索参数数组，由前端保证传来的搜索参数值非0，非空。
         $searchData=!empty($request->param('searchData/a'))?$request->param('searchData/a'):$searchDefaults;
         $searchData=array_merge($searchDefaults,$searchData);
-        
+        //基础搜索条件
         $whereArr['id']=['>',0];
-        
+        //前端输入的关键字搜索
         $whereArr['brand_model']=!empty($searchData['brand_model'])?['like','%'.$searchData['brand_model'].'%']:'';
         $whereArr['assnum']=!empty($searchData['assnum'])?['like','%'.$searchData['assnum'].'%']:'';
         $whereArr['code']=!empty($searchData['code'])?['like','%'.$searchData['code'].'%']:'';
         $whereArr['bar_code']=!empty($searchData['bar_code'])?['like','%'.$searchData['bar_code'].'%']:'';
-        
+        //前端select值搜索
         $whereArr['dept_now']=!empty($searchData['dept_now'])?$searchData['dept_now']:'';
         $whereArr['place_now']=!empty($searchData['place_now'])?$searchData['place_now']:'';
         $whereArr['keeper_now']=!empty($searchData['keeper_now'])?$searchData['keeper_now']:'';
@@ -148,7 +150,7 @@ class AssetController extends \think\Controller
       return $res;
     }
     
-    public function showAssSingle(Request $request,AssinfoModel $assMdl,$id=0,$oprt='')
+    public function modalAssSingle(Request $request,AssinfoModel $assMdl,$id=0,$oprt='')
     {
       $this->priLogin();
       $id=$request->param('id');
@@ -164,7 +166,7 @@ class AssetController extends \think\Controller
                         'dept_now'=>'',
                         'keeper_now'=>'',
                         'dept_now'=>'',
-                        'status_now'=>'新增',
+                        'status_now'=>'新增(待分配)',
                         'status_now_user_name'=>$this->username,
                         );
       

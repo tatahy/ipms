@@ -3,7 +3,7 @@
 <!-- pagewrap  -->	
 <div>
 	<!-- <p>{$whereArr}</p> -->
-	<p id="pSearchResultNum"><strong>搜索结果</strong>:&nbsp;<span class="label label-info">{$searchResultNum}</span>条记录</p>
+	<p id="pSearchResultNum"><strong>列表记录总数：</strong><span class="label label-info">{$searchResultNum}</span></p>
 	<!-- // 表格排序信息汇总组件 -->
 	<div id="divTblSortData" data-sort-name="{$sortData.sortName}" data-sort-order="{$sortData.sortOrder}" data-list-rows="{$sortData.listRows}" data-page-num="{$sortData.pageNum}"></div>
 	<div class="table-responsive" > 
@@ -77,7 +77,7 @@
 		<div class="col-sm-10 text-right">{$assList}</div>
 		
 		<div class="form-group form-group-sm col-sm-2">
-			<span class="">每页记录行数：</span>
+			<span class="">每页显示记录数：</span>
 			<select class="form-control" id="listRows">
 				<option value="5">5</option>
 				<option value="10">10</option>
@@ -170,7 +170,7 @@ $(document).ready(function(){
 	
 	$('.aAssOprt').click(function(){
 		var data={'oprt':$(this).data('assOprt'),'id':$(this).data('assId')}
-		$('#divLoadAssSingle').load(urlPrefix+'showAssSingle',data);
+		$('#divLoadAssSingle').load(urlPrefix+'modalAssSingle',data);
 		$('#modalAssSingle').find('.title').html('【'+$(this).html()+'】固定资产');
 		$('#modalAssSingle').modal();
 		
