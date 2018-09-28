@@ -68,6 +68,7 @@ class AssetController extends \think\Controller
     public function assList(Request $request,AssinfoModel $assMdl,$sortData=[],$searchData=[])
     {
         $this->priLogin();
+        $authAss=$this->auth['ass'];
         
         //搜索查询条件数组
         $whereArr=[];
@@ -100,13 +101,30 @@ class AssetController extends \think\Controller
             }
         }
         
-        //分页,每页$listRows条记录
-        $assSet=$assMdl::where($whereArr)//->order('place_now', 'asc')
-                        ->order($sortData['sortName'], $sortData['sortOrder'])
-                        ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
-                        'query'=>['listRows'=>$sortData['listRows']]]);
-        $searchResultNum=count($assMdl::where($whereArr)->select());
-        // 获取分页显示
+        if($authAss['audit'] || $authAss['approve']){
+            //分页,每页$listRows条记录
+            //仅查询软删除的记录
+            //$assSet=$assMdl::onlyTrashed()->where($whereArr)
+            //查询包含软删除的记录
+            $assSet=$assMdl::withTrashed()->where($whereArr)
+                            ->order($sortData['sortName'], $sortData['sortOrder'])
+                            ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
+                            'query'=>['listRows'=>$sortData['listRows']]]);
+            $searchResultNum=count($assMdl::withTrashed()->where($whereArr)->select());
+        }else{
+            //分页,每页$listRows条记录
+            //仅查询软删除的记录
+            //$assSet=$assMdl::onlyTrashed()->where($whereArr)
+            //查询包含软删除的记录
+            //$assSet=$assMdl::withTrashed()->where($whereArr)
+            //查询排除软删除的记录
+            $assSet=$assMdl->where($whereArr)//->order('place_now', 'asc')
+                            ->order($sortData['sortName'], $sortData['sortOrder'])
+                            ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
+                            'query'=>['listRows'=>$sortData['listRows']]]);
+            $searchResultNum=count($assMdl::where($whereArr)->select());
+        }
+       
         $assList=$assSet->render(); 
                
         $this->assign([
@@ -123,7 +141,9 @@ class AssetController extends \think\Controller
           'searchResultNum'=>$searchResultNum,
           
           'authAss'=>$this->auth['ass'],
-          'whereArr'=>json_encode($whereArr,JSON_UNESCAPED_UNICODE)
+          'authAssObj'=>json_encode($this->auth['ass'],JSON_UNESCAPED_UNICODE),
+          'assStatusArr'=>json_encode(array_values(assStatusArr),JSON_UNESCAPED_UNICODE),
+          'assSetArr'=>json_encode($assSet,JSON_UNESCAPED_UNICODE)
 		  
         ]);
         return view();
@@ -177,7 +197,12 @@ class AssetController extends \think\Controller
                         'status_now_user_name'=>$this->username,
                         );
       
-      $assSet=$id?$assMdl::get($id):$assSetArr;
+      if($oprt=='_RESTORE' || $oprt=='_DELETE_TRUE'){
+        $assSet=$id?$assMdl::withTrashed()->where('id',$id)->find():$assSetArr;
+      }else{
+        $assSet=$id?$assMdl::get($id):$assSetArr;
+      }
+      
              
       $this->assign([
           'home'=>$request->domain(),
@@ -189,15 +214,16 @@ class AssetController extends \think\Controller
       return view();
     }
     
-    
     public function assOprt(Request $request,AssinfoModel $assMdl,$data=[])
     {
       $this->priLogin();
       
       $data=$request->param();
-      $id=$data['id'];
-      $oprt=$data['oprt'];
+      $id=$request->param('id');
+      $oprt=$request->param('oprt');
       $res=0;
+      
+      //$res=
       
       switch($oprt){
         case '_CREATE':
@@ -216,10 +242,19 @@ class AssetController extends \think\Controller
             $assSet = $assMdl::get($id);
             $res=$assSet->allowField(true)->save($data);
             break;
-        case '_Delete':
+        case '_DELETE':
             //模型的destroy方法，返回的是受影响的记录数。已启用框架的软删除，数据仍然在数控库中。
-            $assSet = $assMdl::get($id);
-            $res =$assSet->delete();
+            $res = $assMdl::destroy($id);
+            break;
+        
+        case'_DELETE_TRUE':
+            //模型的destroy方法，返回的是受影响的记录数。已启用框架的软删除，但是执行物理删除。
+            $res = $assMdl::destroy($id,true);
+            break;
+            
+        case'_RESTORE':
+            //模型的软删除restore()方法，返回的是受影响的记录数。
+            $res = $assMdl->restore(['id'=>$id]);
             break;
       }
       
@@ -227,5 +262,53 @@ class AssetController extends \think\Controller
       //$res='aa'; 
       //return json_encode($res,JSON_UNESCAPED_UNICODE);
       return $res;
+      
+      
+      //part2：组装状态机要处理的数据，配置状态机参数
+      //组装状态机（IssPatFSM）要处理的数据
     }
+    
+    //应用AssFSM
+    //1.需要前端提供
+    //1.1启动fsm必须的参数：$param=array('auth'=>'_EDIT','status'=>'填报','oprt'=>'_ADDNEW');
+    //1.2fsm要处理的对象/数据：
+    //2.程序结构
+    //part1：变量赋初值
+    //part2：配置状态机参数，组装状态机要处理的数据，
+    //part3：启动状态机处理数据，得到处理结果，返回前端处理结果
+    public function oprtAssFSM(Request $request, AssinfoModel $assMdl, AssFSM $fsm)
+    {
+        //part1：变量赋初值
+        
+        
+        //part2：配置状态机参数，组装状态机要处理的数据，
+        //组装状态机（IssPatFSM）要处理的数据
+        $data = array(
+                    'ass' => array(
+                    'id' => $assId,
+                    'info' => $assInfo,
+                    'record' => $assRecord)
+                );
+        
+        //配置启动状态机（AssFSM）的参数
+        $param = array(
+            'auth' => $assAuth,
+            'status' => $assStatus,
+            'oprt' => $assOprt);
+        
+        //part3：启动状态机处理数据，得到处理结果，返回前端处理结果
+        //启动AssFSM处理$data，得到处理结果
+        $msg = $fsm->setFSM($param)->result($data);
+
+        //返回前端处理结果
+        return json(array(
+            'msg' => $msg,
+            //'topic' => $issMdl::get($issId)->topic,
+            'topic' => $assInfo['topic'],
+            'assId' => $assId)
+            );
+        
+        
+    }
+    
 }

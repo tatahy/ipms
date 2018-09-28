@@ -302,6 +302,7 @@ var fmReset=()=>{
 })(jQuery,ajaxShowSelect);
 
 $(document).ready(function(){
+	var searchDataChanged=false;
 	// 设置各类tooltip
 	$('#divTopBtn [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
 	
@@ -336,7 +337,6 @@ $(document).ready(function(){
 <!-- //表单$('#fmAssSearch')有关的代码块 -->
 	
 	$('#fmAssSearch .form-control').change(function(){
-		
 		if($(this).val()!=0){
 			//表单输入框附加底色
 			$(this).addClass('label-info');
@@ -344,10 +344,15 @@ $(document).ready(function(){
 			//表单输入框去掉附加底色
 			$(this).removeClass('label-info');
 		}
+		searchDataChanged=true;
 	});
 	
 	//表单提交，显示asset结果
 	$('#btnSearch').click(function(){
+		//检查搜索表单的值是否有变化，若有变化，排序参数pageNum要重设为1，避免出现在当前分页无法显示查询结果的情况
+		if(searchDataChanged){
+			$('#divTblSortData').data('pageNum',1);
+		}
 		loadAssList();
 	});
 	

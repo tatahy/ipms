@@ -2,7 +2,7 @@
 
 <!-- pagewrap  -->	
 <div>
-	<!-- <p>{$whereArr}</p> -->
+	<!-- <p>{$authAss.edit}</p> -->
 	<p id="pSearchResultNum"><strong>列表记录总数：</strong><span class="label label-info">{$searchResultNum}</span></p>
 	<!-- // 表格排序信息汇总组件 -->
 	<div id="divTblSortData" data-sort-name="{$sortData.sortName}" data-sort-order="{$sortData.sortOrder}" data-list-rows="{$sortData.listRows}" data-page-num="{$sortData.pageNum}"></div>
@@ -48,13 +48,23 @@
 						{eq name="authAss.edit" value="1"}
 						<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_UPDATE"><span class="glyphicon glyphicon-pencil text-primary"></span>_更新&nbsp;</a>
 						
+						<button class="aAssOprt btn btn-xs btn-primary"  data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_UPDATE"><span class="small glyphicon glyphicon-pencil"></span>更新</button>
+						
 							{in name="vo.status_now" value="*,新增(待分配)"}
-							<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_DELETE"><span class="glyphicon glyphicon-remove text-danger"></span>_删除&nbsp;</a>
+							<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_DELETE"><span class="glyphicon glyphicon-trash text-danger"></span>_删除&nbsp;</a>
 							{/in}
 						{/eq}
 						
 						{eq name="authAss.audit" value="1"}
-						<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}" data-ass-oprt="_AUDIT" ><span class="glyphicon glyphicon-check text-warning"></span>_审核&nbsp;</a>
+						
+						<!-- // 对应软删除的处理 -->
+							{empty name="vo.delete_time"}
+							<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}" data-ass-oprt="_AUDIT" ><span class="glyphicon glyphicon-check text-warning"></span>_审核&nbsp;</a>
+							<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_DELETE_TRUE"><span class="glyphicon glyphicon-remove text-danger"></span>_永久删除&nbsp;</a>
+							{else/}
+							<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_RESTORE"><span class="glyphicon glyphicon-retweet text-success"></span>_还原&nbsp;</a>
+							<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_DELETE_TRUE"><span class="glyphicon glyphicon-remove text-danger"></span>_永久删除&nbsp;</a>
+							{/empty}
 						{/eq}
 						
 						{eq name="authAss.approve" value="1"}
@@ -100,6 +110,19 @@
 <script>
 
 var urlPrefix='{$home}/dashboard/asset/';
+
+var assAuthObj={$authAssObj};
+//console.dir(authAssObj);
+
+var assStatusArr={$assStatusArr};
+console.log(assStatusArr);
+
+//根据登录用户的权限assAuth，固定资产的状态值assStatus，得到操作固定资产的组件的html字符串
+var getHtmlStr=()=>{
+
+	
+
+}; 
 
 $(document).ready(function(){
 	$('#tblAssList').data('sortOrder','{$sortData.sortOrder}');

@@ -22,11 +22,12 @@ class Assinfo extends Model
     //只读字段，这个字段的值一旦写入，就无法更改。
     //protected $readonly = ['assnum', 'assinfo_id'];
     
-    // 开启时间字段自动写入 并设置字段类型为datetime
+    // 开启时间字段自动写入 并设置字段类型
 	//protected $autoWriteTimestamp = 'datetime';
     //protected $autoWriteTimestamp = 'timestamp';
     protected $autoWriteTimestamp = 'integer';
-    protected $deleteTime='delete_time';
+    //设置软删除所用的字段为‘delete_soft_time’,不设置的话默认为‘delete_time’
+    //protected $deleteTime='delete_soft_time';
     // 时间字段输出格式
     protected $dateFormat = 'Y/m/d H:i:s';
 
@@ -58,9 +59,16 @@ class Assinfo extends Model
     protected static function base($query)
     {
         //
-        $query->where('delete_time',0)->where('id','>',0);
+        $query->whereNull('delete_time')->where('id','>',0);
+        //$query->where('delete_time',0)->where('id','>',0);
     }
-
+    
+    protected function scopeWithSoftDelete($query)
+    {
+        $query->where('delete_time','>',0);
+    }
+    
+   
     /**
      * 获取assent的过程记录
      */
