@@ -5,7 +5,7 @@
 		<div class="row myRow">
 		<p class="label label-info" style="font-size:16px;">固定资产总数
 		&nbsp;<span class="badge">{$quanCount}</span>&nbsp;</p>
-		<!-- <p>{$assStatusArr}</p> -->
+		<!-- <p>{ $ assStatusArr}</p> -->
 		</div>
 		<hr>
 		<div class="row myRow">
@@ -200,6 +200,7 @@ var ajaxShowSelect=(options)=>{
 	//* 参数2：sortName，String。值：可为空，排序字段名称。默认为‘_TOPIC’。
 	//* 参数3：sortOrder，String。值：可为空，排序方式。默认为'_ASC'。
 	//* 参数4：pageNum，Int。值：可为空，当前页数。默认为1。
+	//* 参数5：showAssId，Int。值：可为空。加底色的行的assId,默认为0。
 	//* 参数6：serchWord，Array。值：可为空，用户搜索关键词键值对。默认为空。
 var loadAssList=()=>{
 	//排序有关的参数都从$('#divTblSortData')获取
@@ -209,11 +210,12 @@ var loadAssList=()=>{
 		'sortName':obj.data('sortName'),
 		'sortOrder':obj.data('sortOrder'),
 		'pageNum':obj.data('pageNum'),
+		'showAssId':obj.data('showAssId')
 	};	
 	//排序有关的参数默认值
-	var sortDataDefault={'listRows':10,'sortName':'assnum','sortOrder':'asc','pageNum':1};
+	var sortDataDefault={'listRows':10,'sortName':'assnum','sortOrder':'asc','pageNum':1,'showAssId':0};
 	sortData=$.extend({},sortDataDefault,sortData);
-	console.log(sortData);
+	
 	//用户搜索有关键值对从表单$('#fmIssPatSearch')获取
 	var formData=new FormData($('#fmAssSearch')[0]);
 	
@@ -229,13 +231,21 @@ var loadAssList=()=>{
 	
 	$('#divLoadAssList').html('<p class="text-center" style="font-size:20px;">加载中……</p>');
 	
-	//console.log('sortData:');
-	//console.dir(sortData);
+	//console.log(sortData);
 	
 	$('#divLoadAssList').load(urlPrefix+'assList',
 		{'sortData':sortData,'searchData':searchData},
 		function(){
 			sortOrderToggle();
+			if(sortData.showAssId){
+				$('tbody tr').removeClass('bg-warning');
+				//sortData.showAssId所在行上底色
+				$('.btnAssOprt').each(function(){
+					if($(this).data('assId')==sortData.showAssId){
+						$(this).closest('tr').addClass('bg-warning');
+					}
+				});
+			}
 		}
 	);
 };
@@ -316,10 +326,18 @@ $(document).ready(function(){
 	
 	<!-- // 页面刷新 -->
 	$('#btnRefresh').click(function(){
+		//排序有关的参数使用默认值
+		var obj=$('#divTblSortData');
+		obj.data('listRows',10),
+		obj.data('sortName','assnum'),
+		obj.data('sortOrder','asc'),
+		obj.data('pageNum',1),
+		obj.data('showAssId',0)
 		//搜索表单重置
 		fmReset();
 		//$('#btnSearchInfo')恢复初始html
 		$('#btnSearchInfo').html('<span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span>');
+		
 		//隐藏搜索条件
 		$('#divSearchData').collapse('hide');
 		loadAssList();

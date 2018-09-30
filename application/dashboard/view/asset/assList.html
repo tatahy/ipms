@@ -5,9 +5,9 @@
 	<!-- <p>{$authAss.edit}</p> -->
 	<p id="pSearchResultNum"><strong>列表记录总数：</strong><span class="label label-info">{$searchResultNum}</span></p>
 	<!-- // 表格排序信息汇总组件 -->
-	<div id="divTblSortData" data-sort-name="{$sortData.sortName}" data-sort-order="{$sortData.sortOrder}" data-list-rows="{$sortData.listRows}" data-page-num="{$sortData.pageNum}"></div>
+	<div id="divTblSortData" data-sort-name="{$sortData.sortName}" data-sort-order="{$sortData.sortOrder}" data-list-rows="{$sortData.listRows}" data-page-num="{$sortData.pageNum}" data-show-ass-id="{$sortData.showAssId}"></div>
 	<div class="table-responsive" > 
-		<table  class="table table-bordered table-striped table-hover table-condensed" >
+		<table  class="table table-bordered table-hover table-condensed" >
 			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产概况列表</h4></caption>
 			<thead>
 				<tr>
@@ -21,6 +21,7 @@
 					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="dept_now">现使用部门</a></th>
 					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="keeper_now">现保管人</a></th>
 					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="status_now">状态</a></th>
+					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="status_now_desc">状态说明</a></th>
 					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="status_now_user_name">登记人</a></th>
 					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="create_time">登记时间</a></th>
 					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="update_time">更新时间</a></th>
@@ -41,39 +42,12 @@
 					<td>{$vo.dept_now}</td>
 					<td>{$vo.keeper_now}</td>
 					<td>{$vo.status_now}</td>
+					<td>{$vo.status_now_desc}</td>
 					<td>{$vo.status_now_user_name}</td>
 					<td>{$vo.create_time}</td>
 					<td>{$vo.update_time}</td>
-					<td class="btnAssOprt">
-						{eq name="authAss.edit" value="1"}
-						<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_UPDATE"><span class="glyphicon glyphicon-pencil text-primary"></span>_更新&nbsp;</a>
+					<td class="btnAssOprt" data-ass-status="{$vo.status_now}" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}" >
 						
-						<button class="aAssOprt btn btn-xs btn-primary"  data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_UPDATE"><span class="small glyphicon glyphicon-pencil"></span>更新</button>
-						
-							{in name="vo.status_now" value="*,新增(待分配)"}
-							<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_DELETE"><span class="glyphicon glyphicon-trash text-danger"></span>_删除&nbsp;</a>
-							{/in}
-						{/eq}
-						
-						{eq name="authAss.audit" value="1"}
-						
-						<!-- // 对应软删除的处理 -->
-							{empty name="vo.delete_time"}
-							<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}" data-ass-oprt="_AUDIT" ><span class="glyphicon glyphicon-check text-warning"></span>_审核&nbsp;</a>
-							<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_DELETE_TRUE"><span class="glyphicon glyphicon-remove text-danger"></span>_永久删除&nbsp;</a>
-							{else/}
-							<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_RESTORE"><span class="glyphicon glyphicon-retweet text-success"></span>_还原&nbsp;</a>
-							<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_DELETE_TRUE"><span class="glyphicon glyphicon-remove text-danger"></span>_永久删除&nbsp;</a>
-							{/empty}
-						{/eq}
-						
-						{eq name="authAss.approve" value="1"}
-						<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_APPROVE" ><span class="glyphicon glyphicon-check text-danger"></span>_审批&nbsp;</a>
-						{/eq}
-						
-						{eq name="authAss.maintain" value="1"}
-						<a class="aAssOprt" href="#assInfo" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}"  data-ass-oprt="_MAIINTAIN" ><span class="glyphicon glyphicon-calendar text-danger"></span>_维护&nbsp;</a>
-						{/eq}
 					</td>
 				
 				</tr>
@@ -108,25 +82,176 @@
 <!-- /pagewrap  -->
 
 <script>
+//定义常量，asset状态对象
+const conAssStatusObj={$conAssStatusArr};
+
+//定义常量，asset状态数组
+const conAssStatusArr=fnJsonToArr(conAssStatusObj);
+console.log(conAssStatusArr);
+
+//定义常量，asset权限与操作的对应关系
+const conAuthOprtArr=[
+			{name:'edit',val:['_CREATE','_SUBMIT','_SAVE','_READ','TRASH','_RESTORE']},
+			{name:'audit',val:['_AUDIT','_SAVE','_READ','TRASH','_RESTORE']},
+			{name:'approve',val:['_APPROVE','_SAVE','_READ','_DELETE']},
+			{name:'maintain',val:['_MAIINTAIN','_SAVE','_READ','TRASH','_RESTORE']}
+			];
+
+//定义常量，asset权限数组
+const conAssAuthArr=fnJsonToArr({$authAssObj});
+console.log('conAssAuthArr:');
+console.log(conAssAuthArr);
 
 var urlPrefix='{$home}/dashboard/asset/';
 
-var assAuthObj={$authAssObj};
-//console.dir(authAssObj);
 
-var assStatusArr={$assStatusArr};
-console.log(assStatusArr);
+//2个数组合并后去掉重复值
+var arrMerge=(arr1,arr2)=>{ 
+	var result = []; 
+	var arr = []; 
+	//将arr1和arr2合并入新数组arr.
+	arr = arr2.reduce(function(prev, curr){ 
+				prev.push(curr); 
+				return prev; 
+			}
+			,arr1
+		); 
+	//arr是否为2个数组的简单连接？？	
+	//console.log(arr);
+	//将arr数组中的值挨个推入result数组，推入前检查result中是否已经存在，不存在才推入result数组。从而达到对arr数组去掉重复值的目的。
+	for (var i = 0; i < arr.length; i++) { 
+		var index = arr[i]; 
+		if (result.indexOf(index) === -1) { 
+			result.push(index); 
+		} 
+	} 
+		
+	return result; 
+};
 
-//根据登录用户的权限assAuth，固定资产的状态值assStatus，得到操作固定资产的组件的html字符串
-var getHtmlStr=()=>{
+//输入JSON对象：{$ authAssObj}={edit:1,audit:1,approve:0,maintain:0}
+//转成键值对数组形式输出authAssArr=[{name:'edit',val:'1'},{name:'audit',val:'1'},{name:'approve',val:'0'},{name:'maintain',val:'0'}]
+//便于应用数组的.forEach等函数进行自定义处理
+function fnJsonToArr(jsonObj){
+	var nameArr=Object.keys(jsonObj);
+	var valArr=Object.values(jsonObj);
+	var arr=[]
+	for(var i=0;i<nameArr.length;i++){
+		arr[i]={name:nameArr[i],val:valArr[i]};
+	}
+	return arr;
+};
 
+//某个值是否在数组内
+function fnInArr(item, arr){
+	for (var i = 0; i < arr.length; i++) {
+		if (arr[i] == item) {
+			return true
+		}
+	}
+	return false
+};
+
+//根据登录用户的权限(conAssStatusArr)，权限与操作的对应关系(conAuthOprtArr)，固定资产的状态(assStatus)，得到固定资产的操作组件的html字符串
+//1.要产生多少个组件？
+//2.决定产生组件的条件？auth,status,??
+//status决定产生的操作组件数量，auth结合authVSoprt来决定显示给登录用户的操作组件数量。
+function getOprtHtmlStr(status){
+ 	var oprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'info'},
+			{name:'提交',val:'_SUBMIT',gly:'send',color:'info'},
+			{name:'审核',val:'_AUDIT',gly:'check',color:'warning'},
+			{name:'审批',val:'_APPROVE',gly:'ok',color:'danger'},
+			{name:'维护',val:'_MAINTAIN',gly:'list-alt',color:'primary'},
+			{name:'保存',val:'_SAVE',gly:'save-file',color:'primary'},
+			{name:'查询',val:'_READ',gly:'search',color:'primary'},
+			{name:'永久删除',val:'_DELETE',gly:'remove',color:'danger'},
+			{name:'回收站',val:'_TRASH',gly:'trash',color:'danger'},
+			{name:'还原',val:'_RESTORE',gly:'retweet',color:'success'}];
+			
+	var statusOprtDefaultArr=[
+            {status:'*',statusChi:'*',oprt:['_SAVE','_SUBMIT','_TRASH','_RESTORE','_DELETE']},
+            {status:'_ASSS0',statusChi:'新增_待验收',oprt:['_SAVE','_SUBMIT']},
+            {status:'_ASSS1',statusChi:'验收合格_待分配',oprt:['_SAVE','_AUDIT']},
+            {status:'_ASSS2_1',statusChi:'正常_折旧中',oprt:['_SAVE','_SUBMIT']},
+            {status:'_ASSS2_2',statusChi:'正常_折旧完',oprt:['_SAVE','_SUBMIT']},
+            {status:'_ASSS3_1',statusChi:'异常_待更新',oprt:['_SAVE','_AUDIT']},
+            {status:'_ASSS3_2',statusChi:'异常_待维修',oprt:['_SAVE','_SUBMIT']},
+            {status:'_ASSS3_3',statusChi:'异常_遗失',oprt:['_SAVE','_APPROVE']},
+             {status:'_ASSS4_1',statusChi:'停用_维修中',oprt:['_SAVE','_SUBMIT','TRASH','_RESTORE']},
+            {status:'_ASSS4_2',statusChi:'停用_封存',oprt:['_SAVE','_APPROVE','TRASH','_RESTORE']},
+            {status:'_ASSS4_3',statusChi:'停用_待销账',oprt:['_SAVE','_APPROVE','TRASH','_RESTORE']},
+            {status:'_ASSS5',statusChi:'销账',oprt:[]}
+            ];
+	var aHtml='';
+	var authOprtArr=[];
+	var statusOprtArr=[];
+	var oprtArr=[];
 	
+	var authVsOprtArr=[
+			{name:'edit',val:['_CREATE','_SUBMIT','_SAVE','_READ','_TRASH','_RESTORE']},
+			{name:'audit',val:['_AUDIT','_SAVE','_READ','_TRASH','_RESTORE']},
+			{name:'approve',val:['_APPROVE','_SAVE','_READ','_DELETE']},
+			{name:'maintain',val:['_MAIINTAIN','_SAVE','_READ','_TRASH','_RESTORE']}
+			];
+	
+	//由authArr决定authVsOprtArr中选用的val值，组成authOprtArr
+	for(var i=0;i<conAssAuthArr.length;i++){
+		if(conAssAuthArr[i].val){
+			var name=conAssAuthArr[i].name;
+			for(var n=0;n<authVsOprtArr.length;n++){
+					if(name==authVsOprtArr[n].name){
+						authOprtArr=arrMerge(authOprtArr,authVsOprtArr[n].val)
+						break;
+					}
+			}
+		}
+	}
+		
+	//由status决定statusOprtArr中的oprt值，组成statusOprtArr
+	for(var i=0;i<statusOprtDefaultArr.length;i++){
+		if(statusOprtDefaultArr[i].statusChi==status){
+			statusOprtArr=statusOprtDefaultArr[i].oprt;
+			
+		}
+	}
+	
+	//authOprtArr与statusOprtArr取交集得到oprtArr
+	authOprtArr.forEach(function(e){
+		for(var i=0;i<statusOprtArr.length;i++){
+			if(e==statusOprtArr[i]){
+				oprtArr.push(e);
+			}
+		}
+	});
+	
+	console.log('oprtArr:'+status);
+	console.log(oprtArr);
+	
+	oprtArr.forEach(function(el){		
+		oprtComAttr.forEach(function(e){
+			if(el==e.val){
+				aHtml+='<a class="aAssOprt text-'+e.color+'" href="#assInfo" data-ass-oprt="'+e.val+'" ><span class="small glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'&nbsp;</a>';
+			}
+		});
+	});
+		
+	return aHtml;
+};
 
-}; 
+//利用自调用匿名函数立即执行的特点，设定固定资产的操作组件的html字符串。
+(function($,getOprtHtmlStr){
+	//每个.btnAssOprt根据该行记录的data-ass-status="{$vo.status_now}"添加相应的a标签
+	$('.btnAssOprt').each(function(){
+		var ahtml=getOprtHtmlStr($(this).data('assStatus'));
+		$(this).append(ahtml);
+	});
+
+})(jQuery,getOprtHtmlStr);
+
 
 $(document).ready(function(){
 	$('#tblAssList').data('sortOrder','{$sortData.sortOrder}');
-	
+		
 	<!-- //表格每页显示记录行数 -->
 	$('#listRows').val('{$sortData.listRows}'); 
 	
@@ -196,13 +321,19 @@ $(document).ready(function(){
 	});
 	
 	$('.aAssOprt').click(function(){
-		var data={'oprt':$(this).data('assOprt'),'id':$(this).data('assId')}
+		var dataFromObj=$(this).closest('td');
+		//去掉所有行的底色
+		$('tr').removeClass('bg-warning');
+		//给本行上底色
+		$(this).closest('tr').addClass('bg-warning');
+		//排序有关的值向$('#divTblSortData')汇集。发送本行的assId，便于刷新时本行继续加底色
+		$('#divTblSortData').data('showAssId',dataFromObj.data('assId'));
+		var data={'oprt':$(this).data('assOprt'),'id':dataFromObj.data('assId')}
 		$('#divLoadAssSingle').load(urlPrefix+'modalAssSingle',data);
 		$('#modalAssSingle').find('.title').html('【'+$(this).html()+'】固定资产');
 		$('#modalAssSingle').modal();
 		
 	});
-	
 	
 });
 </script>

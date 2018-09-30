@@ -57,19 +57,25 @@
 	</div>
 	
 	<div class="row">
-	<div class="form-group col-sm-2">
+	<div class="form-group col-sm-4">
 		<label for="status_now">状态</label>
-		{in name="oprt" value="_CREATE,_DELETE"}
+		{in name="oprt" value="_CREATE,_TRASH,_DELETE"}
 		<input class="form-control empty-check" name="status_now" value="{$assSet.status_now}" type="text" readonly>
 		{else/}
-		<select class="form-control" id="modalStatusNow" name="status_now" >
+		<select class="form-control" id="modalSelectStatusNow" name="status_now" >
 			<option value="">d1</option>
 		</select>
 		{/in}
 	
 	</div>
 	
-	<div class="form-group col-sm-3">
+	<div class="form-group col-sm-4">
+		<label for="status_now">状态说明</label>
+		<input class="form-control empty-check" name="status_now_desc" value="{$assSet.status_now_desc}" type="text" placeholder="请填入状态改变的简短说明" required>
+	
+	</div>
+	
+	<div class="form-group col-sm-2">
 		<label for="status_now_user_name">登记人</label>
 		{eq name="oprt" value="_CREATE"}
 		<input class="form-control empty-check" name="status_now_user_name" value="{$userName}" type="text" readonly>
@@ -83,11 +89,12 @@
 	<div class="row myRow">
 	
 	<div class="pull-left">
-		{in name="oprt" value="_DELETE,_DELETE_TRUE"}
+		{in name="oprt" value="_TRASH,_DELETE"}
 		<button type="submit" id="btnDelete" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-remove"></span>删除</button>
 		{else/}
 		<button type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-send"></span>&nbsp;提交</button>
 		{/in}
+		<button type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-save-file"></span>&nbsp;保存</button>
 	</div>
 	
 	<div  class="pull-right">
@@ -105,18 +112,19 @@
 
 //$.alert组件上用的HTML字符串。由oprt英文转中文，加上HTML标签组成HTML字符串
 var oprtToHtml=(topic,oprtEn,result)=>{
-	var arr=[{name:'新增',val:'_CREATE',gly:'modal-window',labelType:'info'},
-			{name:'提交',val:'_SUBMIT',gly:'send',labelType:'info'},
-			{name:'审核',val:'_AUDIT',gly:'check',labelType:'warning'},
-			{name:'审批',val:'_APPROVE',gly:'ok',labelType:'danger'},
-			{name:'维护',val:'_MAINTAIN',gly:'list-alt',labelType:'primary'},
-			{name:'查询',val:'_READ',gly:'search',labelType:'primary'},
-			{name:'永久删除',val:'_DELETE',gly:'remove',labelType:'danger'},
-			{name:'删除',val:'_ERASE',gly:'trash',labelType:'danger'},
-			{name:'还原',val:'_RESTORE',gly:'retweet',labelType:'success'}];
+	var arr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'info'},
+			{name:'提交',val:'_SUBMIT',gly:'send',color:'info'},
+			{name:'审核',val:'_AUDIT',gly:'check',color:'warning'},
+			{name:'审批',val:'_APPROVE',gly:'ok',color:'danger'},
+			{name:'维护',val:'_MAINTAIN',gly:'list-alt',color:'primary'},
+			{name:'保存',val:'_SAVE',gly:'save-file',color:'primary'},
+			{name:'查询',val:'_READ',gly:'search',color:'primary'},
+			{name:'永久删除',val:'_DELETE',gly:'remove',color:'danger'},
+			{name:'回收站',val:'_TRASH',gly:'trash',color:'danger'},
+			{name:'还原',val:'_RESTORE',gly:'retweet',color:'success'}];
 	var oprtChi = '';
 	var gly='';
-	var labelType='';
+	var color='';
 	var resultHtml='';
 	var htmlStr='';
 	
@@ -126,7 +134,7 @@ var oprtToHtml=(topic,oprtEn,result)=>{
 		if (oprtEn==arr[i].val){
 			oprtChi = arr[i].name;
 			gly=arr[i].gly;
-			labelType=arr[i].labelType;
+			color=arr[i].color;
 			break;
 		}
 	}
@@ -143,15 +151,15 @@ var oprtToHtml=(topic,oprtEn,result)=>{
 			break;
 	}
 	
-	htmlStr='<p>固定资产：</p><p class="text-center">【<strong>'+topic +'</strong>】</p><p class="text-center"><span class="label label-'+labelType+'">'+oprtChi+'<span class="glyphicon glyphicon-'+gly+'"></span></span></p>'+resultHtml;
+	htmlStr='<p>固定资产：</p><p class="text-center">【<strong>'+topic +'</strong>】</p><p class="text-center"><span class="label label-'+color+'">'+oprtChi+'<span class="glyphicon glyphicon-'+gly+'"></span></span></p>'+resultHtml;
 	
 	return htmlStr;
 };
 
 $(document).ready(function(){
 	
-	if('_CREATE'!='{$oprt}' || '_DELETE'!='{$oprt}' || '_DELETE_TRUE'!='{$oprt}'){
-		ajaxShowSelect({sendData:{req:$('#modalStatusNow').attr('name'),source:'common'},'attach':'',selected:'{$assSet.status_now}',obj:$('#modalStatusNow')});	
+	if('_CREATE'!='{$oprt}' || '_TRASH'!='{$oprt}' || '_DELETE'!='{$oprt}'){
+		ajaxShowSelect({sendData:{req:$('#modalSelectStatusNow').attr('name'),source:'common'},'attach':'',selected:'{$assSet.status_now}',obj:$('#modalSelectStatusNow')});	
 	}
 	
 	$('#fmAssInfo').submit(function(evt){

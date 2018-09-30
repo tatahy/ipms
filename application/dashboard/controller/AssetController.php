@@ -55,9 +55,9 @@ class AssetController extends \think\Controller
         $this->assign([
           'home'=>$request->domain(),
           'quanCount'=>$quanCount,
-          //引用本模块公共文件（dashboard/common.php）中定义的数组常量assStatusArr
-          //'assStatusArr'=>json_encode(assStatusArr,JSON_UNESCAPED_UNICODE)
-          'assStatusArr'=>assStatusArr['_ASSS4']
+          //引用本模块公共文件（dashboard/common.php）中定义的数组常量conAssStatusArr
+          //'conAssStatusArr'=>json_encode(conAssStatusArr,JSON_UNESCAPED_UNICODE)
+          //'conAssStatusArr'=>conAssStatusArr['_ASSS4']
           //'auth'=>json_encode($this->auth,JSON_UNESCAPED_UNICODE)
         ]);
         return view();
@@ -72,7 +72,7 @@ class AssetController extends \think\Controller
         
         //搜索查询条件数组
         $whereArr=[];
-        $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1);
+        $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1,'showAssId'=>0);
         // 接收前端的排序参数数组
         $sortData=!empty($request->param('sortData/a'))?$request->param('sortData/a'):$sortDefaults;
         $sortData=array_merge($sortDefaults,$sortData);
@@ -142,7 +142,8 @@ class AssetController extends \think\Controller
           
           'authAss'=>$this->auth['ass'],
           'authAssObj'=>json_encode($this->auth['ass'],JSON_UNESCAPED_UNICODE),
-          'assStatusArr'=>json_encode(array_values(assStatusArr),JSON_UNESCAPED_UNICODE),
+          //'conAssStatusArr'=>json_encode(array_values(conAssStatusArr),JSON_UNESCAPED_UNICODE),
+          'conAssStatusArr'=>json_encode(conAssStatusArr,JSON_UNESCAPED_UNICODE),
           'assSetArr'=>json_encode($assSet,JSON_UNESCAPED_UNICODE)
 		  
         ]);
@@ -159,8 +160,8 @@ class AssetController extends \think\Controller
       $source = !empty($request->param('source'))?$request->param('source'):0;
       
       if($source=='common' && $req=='status_now'){
-        //引用本模块公共文件（dashboard/common.php）中定义的数组常量assStatusArr
-        $res=assStatusArr;
+        //引用本模块公共文件（dashboard/common.php）中定义的数组常量conAssStatusArr
+        $res=conAssStatusArr;
       }else{
         //从数据库获得数据
         $res=$assMdl->field($req)->group($req)->select();
@@ -193,7 +194,8 @@ class AssetController extends \think\Controller
                         'dept_now'=>'',
                         'keeper_now'=>'',
                         'dept_now'=>'',
-                        'status_now'=>'新增(待分配)',
+                        'status_now'=>'新增(待验收)',
+                        'status_now_desc'=>'新固定资产填报',
                         'status_now_user_name'=>$this->username,
                         );
       

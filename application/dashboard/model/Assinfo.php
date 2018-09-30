@@ -36,9 +36,9 @@ class Assinfo extends Model
     protected function getStatusNowAttr($dBStrEn)
     {
         $output = $dBStrEn;
-        //引用本模块公共文件（dashboard/common.php）中定义的数组常量assStatusArr
-        if (array_key_exists($dBStrEn, assStatusArr)) {
-            $output = assStatusArr[$dBStrEn];
+        //引用本模块公共文件（dashboard/common.php）中定义的数组常量conAssStatusArr
+        if (array_key_exists($dBStrEn, conAssStatusArr)) {
+            $output = conAssStatusArr[$dBStrEn];
         }
         return $output;
     }
@@ -47,8 +47,8 @@ class Assinfo extends Model
     protected function setStatusNowAttr($strChi)
     {
         $output = $strChi;
-        //引用本模块公共文件（dashboard/common.php）中定义的数组常量assStatusArr
-        foreach(assStatusArr as $key => $val){
+        //引用本模块公共文件（dashboard/common.php）中定义的数组常量conAssStatusArr
+        foreach(conAssStatusArr as $key => $val){
             if($strChi==$val){
                 $output=$key;
             }
