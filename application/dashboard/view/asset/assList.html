@@ -82,25 +82,33 @@
 <!-- /pagewrap  -->
 
 <script>
-//定义常量，asset状态对象
-const conAssStatusObj={$conAssStatusArr};
-
-//定义常量，asset状态数组
-const conAssStatusArr=fnJsonToArr(conAssStatusObj);
-console.log(conAssStatusArr);
+//定义常量，asset状态与操作对应关系conAssStatusOprtArr
+const conAssStatusOprtArr={$conAssStatusOprtArr};
+<!-- console.log('conAssStatusOprtArr:'); -->
+<!-- console.log(conAssStatusOprtArr); -->
 
 //定义常量，asset权限与操作的对应关系
-const conAuthOprtArr=[
-			{name:'edit',val:['_CREATE','_SUBMIT','_SAVE','_READ','TRASH','_RESTORE']},
-			{name:'audit',val:['_AUDIT','_SAVE','_READ','TRASH','_RESTORE']},
-			{name:'approve',val:['_APPROVE','_SAVE','_READ','_DELETE']},
-			{name:'maintain',val:['_MAIINTAIN','_SAVE','_READ','TRASH','_RESTORE']}
-			];
+const conAssAuthOprtArr={$conAssAuthOprtArr};
+<!-- console.log('conAssAuthOprtArr:'); -->
+<!-- console.log(conAssAuthOprtArr); -->
 
 //定义常量，asset权限数组
 const conAssAuthArr=fnJsonToArr({$authAssObj});
-console.log('conAssAuthArr:');
-console.log(conAssAuthArr);
+<!-- console.log('conAssAuthArr:'); -->
+<!-- console.log(conAssAuthArr); -->
+
+//定义常量，
+const conOprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'info'},
+			{name:'提交',val:'_SUBMIT',gly:'send',color:'info'},
+			{name:'审核',val:'_AUDIT',gly:'check',color:'warning'},
+			{name:'审批',val:'_APPROVE',gly:'ok',color:'danger'},
+			{name:'维护',val:'_MAINTAIN',gly:'list-alt',color:'primary'},
+			{name:'更新',val:'_UPDATE',gly:'save-file',color:'primary'},
+			{name:'查询',val:'_READ',gly:'search',color:'primary'},
+			{name:'永久删除',val:'_DELETE',gly:'remove',color:'danger'},
+			{name:'回收',val:'_TRASH',gly:'trash',color:'danger'},
+			{name:'还原',val:'_RESTORE',gly:'retweet',color:'success'}];
+
 
 var urlPrefix='{$home}/dashboard/asset/';
 
@@ -152,55 +160,24 @@ function fnInArr(item, arr){
 	return false
 };
 
-//根据登录用户的权限(conAssStatusArr)，权限与操作的对应关系(conAuthOprtArr)，固定资产的状态(assStatus)，得到固定资产的操作组件的html字符串
+//根据登录用户的权限(auth)，权限与操作的对应关系(conAuthOprtArr)，固定资产的状态(assStatus)，得到固定资产的操作组件的html字符串
 //1.要产生多少个组件？
 //2.决定产生组件的条件？auth,status,??
 //status决定产生的操作组件数量，auth结合authVSoprt来决定显示给登录用户的操作组件数量。
 function getOprtHtmlStr(status){
- 	var oprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'info'},
-			{name:'提交',val:'_SUBMIT',gly:'send',color:'info'},
-			{name:'审核',val:'_AUDIT',gly:'check',color:'warning'},
-			{name:'审批',val:'_APPROVE',gly:'ok',color:'danger'},
-			{name:'维护',val:'_MAINTAIN',gly:'list-alt',color:'primary'},
-			{name:'保存',val:'_SAVE',gly:'save-file',color:'primary'},
-			{name:'查询',val:'_READ',gly:'search',color:'primary'},
-			{name:'永久删除',val:'_DELETE',gly:'remove',color:'danger'},
-			{name:'回收站',val:'_TRASH',gly:'trash',color:'danger'},
-			{name:'还原',val:'_RESTORE',gly:'retweet',color:'success'}];
-			
-	var statusOprtDefaultArr=[
-            {status:'*',statusChi:'*',oprt:['_SAVE','_SUBMIT','_TRASH','_RESTORE','_DELETE']},
-            {status:'_ASSS0',statusChi:'新增_待验收',oprt:['_SAVE','_SUBMIT']},
-            {status:'_ASSS1',statusChi:'验收合格_待分配',oprt:['_SAVE','_AUDIT']},
-            {status:'_ASSS2_1',statusChi:'正常_折旧中',oprt:['_SAVE','_SUBMIT']},
-            {status:'_ASSS2_2',statusChi:'正常_折旧完',oprt:['_SAVE','_SUBMIT']},
-            {status:'_ASSS3_1',statusChi:'异常_待更新',oprt:['_SAVE','_AUDIT']},
-            {status:'_ASSS3_2',statusChi:'异常_待维修',oprt:['_SAVE','_SUBMIT']},
-            {status:'_ASSS3_3',statusChi:'异常_遗失',oprt:['_SAVE','_APPROVE']},
-             {status:'_ASSS4_1',statusChi:'停用_维修中',oprt:['_SAVE','_SUBMIT','TRASH','_RESTORE']},
-            {status:'_ASSS4_2',statusChi:'停用_封存',oprt:['_SAVE','_APPROVE','TRASH','_RESTORE']},
-            {status:'_ASSS4_3',statusChi:'停用_待销账',oprt:['_SAVE','_APPROVE','TRASH','_RESTORE']},
-            {status:'_ASSS5',statusChi:'销账',oprt:[]}
-            ];
+ 	
 	var aHtml='';
 	var authOprtArr=[];
 	var statusOprtArr=[];
 	var oprtArr=[];
 	
-	var authVsOprtArr=[
-			{name:'edit',val:['_CREATE','_SUBMIT','_SAVE','_READ','_TRASH','_RESTORE']},
-			{name:'audit',val:['_AUDIT','_SAVE','_READ','_TRASH','_RESTORE']},
-			{name:'approve',val:['_APPROVE','_SAVE','_READ','_DELETE']},
-			{name:'maintain',val:['_MAIINTAIN','_SAVE','_READ','_TRASH','_RESTORE']}
-			];
-	
 	//由authArr决定authVsOprtArr中选用的val值，组成authOprtArr
 	for(var i=0;i<conAssAuthArr.length;i++){
 		if(conAssAuthArr[i].val){
 			var name=conAssAuthArr[i].name;
-			for(var n=0;n<authVsOprtArr.length;n++){
-					if(name==authVsOprtArr[n].name){
-						authOprtArr=arrMerge(authOprtArr,authVsOprtArr[n].val)
+			for(var n=0;n<conAssAuthOprtArr.length;n++){
+					if(name==conAssAuthOprtArr[n].auth){
+						authOprtArr=arrMerge(authOprtArr,conAssAuthOprtArr[n].oprt)
 						break;
 					}
 			}
@@ -208,9 +185,9 @@ function getOprtHtmlStr(status){
 	}
 		
 	//由status决定statusOprtArr中的oprt值，组成statusOprtArr
-	for(var i=0;i<statusOprtDefaultArr.length;i++){
-		if(statusOprtDefaultArr[i].statusChi==status){
-			statusOprtArr=statusOprtDefaultArr[i].oprt;
+	for(var i=0;i<conAssStatusOprtArr.length;i++){
+		if(conAssStatusOprtArr[i].statusChi==status){
+			statusOprtArr=conAssStatusOprtArr[i].oprt;
 			
 		}
 	}
@@ -224,13 +201,13 @@ function getOprtHtmlStr(status){
 		}
 	});
 	
-	console.log('oprtArr:'+status);
-	console.log(oprtArr);
+	<!-- console.log('oprtArr:'+status); -->
+	<!-- console.log(oprtArr); -->
 	
 	oprtArr.forEach(function(el){		
-		oprtComAttr.forEach(function(e){
+		conOprtComAttr.forEach(function(e){
 			if(el==e.val){
-				aHtml+='<a class="aAssOprt text-'+e.color+'" href="#assInfo" data-ass-oprt="'+e.val+'" ><span class="small glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'&nbsp;</a>';
+				aHtml+='<a class="aAssOprt text-'+e.color+'" href="#assInfo" data-ass-oprt="'+e.val+'" ><span class="glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'&nbsp;</a>';
 			}
 		});
 	});
@@ -322,15 +299,28 @@ $(document).ready(function(){
 	
 	$('.aAssOprt').click(function(){
 		var dataFromObj=$(this).closest('td');
+		var oprt=$(this).data('assOprt');
 		//去掉所有行的底色
 		$('tr').removeClass('bg-warning');
 		//给本行上底色
 		$(this).closest('tr').addClass('bg-warning');
 		//排序有关的值向$('#divTblSortData')汇集。发送本行的assId，便于刷新时本行继续加底色
 		$('#divTblSortData').data('showAssId',dataFromObj.data('assId'));
-		var data={'oprt':$(this).data('assOprt'),'id':dataFromObj.data('assId')}
+		var data={'oprt':oprt,'id':dataFromObj.data('assId')}
 		$('#divLoadAssSingle').load(urlPrefix+'modalAssSingle',data);
-		$('#modalAssSingle').find('.title').html('【'+$(this).html()+'】固定资产');
+		
+		var spanStr=(oprt)=>{
+			var strHtml='';
+			conOprtComAttr.forEach(function(e){
+				if(oprt==e.val){
+					strHtml='<span class="text-'+e.color+'"><span class="glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'</span>';
+				}
+			});
+			console.log(strHtml);
+			return strHtml;
+		};
+		
+		$('#modalAssSingle').find('.title').html('【'+spanStr(oprt)+'】固定资产记录');
 		$('#modalAssSingle').modal();
 		
 	});

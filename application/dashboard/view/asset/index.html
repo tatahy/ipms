@@ -13,7 +13,7 @@
 				
 		<button id="btnRefresh" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="刷新固定资产信息表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 		
-		<a class="aAssOprt" href="#assInfo" data-ass-id="0" data-ass-oprt="_CREATE" ><span class="glyphicon glyphicon-modal-window text-primary"></span>_新增</a>
+		<a class="aAssOprt" href="#assInfo" data-ass-id="0" data-ass-oprt="_CREATE" ><span class="glyphicon glyphicon-modal-window text-primary"></span>新增</a>
 		</div>
 	</div>
 	
@@ -191,6 +191,16 @@ var ajaxShowSelect=(options)=>{
 		if (selected!=''){
 			obj.val(selected);
 		}
+		
+		//没有option就隐藏自己和有关联的同伴
+		if(obj.find('option').length==0){
+			obj.closest('div').hide();
+			obj.closest('form').find('[name="status_now_desc"]').closest('div').hide();
+		}else{
+			obj.closest('div').show();
+			obj.closest('form').find('[name="status_now_desc"]').closest('div').show();
+		}
+
 	});
 };
 

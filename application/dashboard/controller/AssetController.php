@@ -144,6 +144,8 @@ class AssetController extends \think\Controller
           'authAssObj'=>json_encode($this->auth['ass'],JSON_UNESCAPED_UNICODE),
           //'conAssStatusArr'=>json_encode(array_values(conAssStatusArr),JSON_UNESCAPED_UNICODE),
           'conAssStatusArr'=>json_encode(conAssStatusArr,JSON_UNESCAPED_UNICODE),
+          'conAssStatusOprtArr'=>json_encode(conAssStatusOprtArr,JSON_UNESCAPED_UNICODE),
+          'conAssAuthOprtArr'=>json_encode(conAssAuthOprtArr,JSON_UNESCAPED_UNICODE),
           'assSetArr'=>json_encode($assSet,JSON_UNESCAPED_UNICODE)
 		  
         ]);
@@ -158,10 +160,23 @@ class AssetController extends \think\Controller
       
       $req = !empty($request->param('req'))?$request->param('req'):0;
       $source = !empty($request->param('source'))?$request->param('source'):0;
+      $oprt=!empty($request->param('oprt'))?$request->param('oprt'):0;
+      
+      $arr=conAssOprtChangeStatusArr;
       
       if($source=='common' && $req=='status_now'){
-        //引用本模块公共文件（dashboard/common.php）中定义的数组常量conAssStatusArr
-        $res=conAssStatusArr;
+        //引用本模块公共文件（dashboard/common.php）中定义的数组常量
+        //foreach(conAssOprtChangeStatusArr as $val){
+//          if($oprt==$val['oprt']){
+//            $res=$val['statusChangeTo'];
+//          }
+//        }
+        
+        for($i=0;$i<count($arr);$i++){
+          if($oprt==$arr[$i]['oprt']){
+            $res=$arr[$i]['statusChangeTo'];
+          }
+        }
       }else{
         //从数据库获得数据
         $res=$assMdl->field($req)->group($req)->select();
@@ -198,12 +213,12 @@ class AssetController extends \think\Controller
                         'status_now_desc'=>'新固定资产填报',
                         'status_now_user_name'=>$this->username,
                         );
-      
-      if($oprt=='_RESTORE' || $oprt=='_DELETE_TRUE'){
-        $assSet=$id?$assMdl::withTrashed()->where('id',$id)->find():$assSetArr;
-      }else{
-        $assSet=$id?$assMdl::get($id):$assSetArr;
-      }
+      $assSet=($id*1)?$assMdl::get($id):$assSetArr;
+      //if($oprt=='_RESTORE' || $oprt=='_DELETE'){
+//        $assSet=$id?$assMdl::withTrashed()->where('id',$id)->find():$assSetArr;
+//      }else{
+//        $assSet=$id?$assMdl::get($id):$assSetArr;
+//      }
       
              
       $this->assign([
@@ -221,16 +236,22 @@ class AssetController extends \think\Controller
       $this->priLogin();
       
       $data=$request->param();
-      $id=$request->param('id');
-      $oprt=$request->param('oprt');
+      //$id=$request->param('id');
+//      $oprt=$request->param('oprt');
+      $id=$data['id'];
+      $oprt=$data['oprt'];
       $res=0;
-      
-      //$res=
       
       switch($oprt){
         case '_CREATE':
             //数据库create
             $res=$assMdl::create($data,true)->id;
+            break;
+        case '_SUMBIT':
+            //数据库update
+            //模型的save方法，返回的是受影响的记录数。
+            $assSet = $assMdl::get($id);
+            $res=$assSet->allowField(true)->save($data);
             break;
         case '_UPDATE':
             //数据库update
@@ -244,20 +265,35 @@ class AssetController extends \think\Controller
             $assSet = $assMdl::get($id);
             $res=$assSet->allowField(true)->save($data);
             break;
-        case '_DELETE':
+        case '_APPROVE':
+            //数据库update
+            //模型的save方法，返回的是受影响的记录数。
+            $assSet = $assMdl::get($id);
+            $res=$assSet->allowField(true)->save($data);
+            break;
+        case '_MAINTAIN':
+            //数据库update
+            //模型的save方法，返回的是受影响的记录数。
+            $assSet = $assMdl::get($id);
+            $res=$assSet->allowField(true)->save($data);
+            break;
+        case '_TRASH':
             //模型的destroy方法，返回的是受影响的记录数。已启用框架的软删除，数据仍然在数控库中。
+            $assMdl::update(['status_now'=>'回收站'], ['id' =>$id], true);
             $res = $assMdl::destroy($id);
             break;
         
-        case'_DELETE_TRUE':
+        case'_DELETE':
             //模型的destroy方法，返回的是受影响的记录数。已启用框架的软删除，但是执行物理删除。
             $res = $assMdl::destroy($id,true);
             break;
             
         case'_RESTORE':
             //模型的软删除restore()方法，返回的是受影响的记录数。
+            $assMdl::update($data, ['id' =>$id], true);
             $res = $assMdl->restore(['id'=>$id]);
             break;
+        
       }
       
       

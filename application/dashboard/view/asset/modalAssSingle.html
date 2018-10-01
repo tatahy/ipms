@@ -58,19 +58,20 @@
 	
 	<div class="row">
 	<div class="form-group col-sm-4">
-		<label for="status_now">状态</label>
-		{in name="oprt" value="_CREATE,_TRASH,_DELETE"}
-		<input class="form-control empty-check" name="status_now" value="{$assSet.status_now}" type="text" readonly>
-		{else/}
+		<label for="status_now">现状</label>
+		<input class="form-control empty-check" value="{$assSet.status_now}" type="text" readonly>
+	</div>
+	
+	<div class="form-group col-sm-4">
+		<label for="status_now">状态变更为</label>
 		<select class="form-control" id="modalSelectStatusNow" name="status_now" >
 			<option value="">d1</option>
 		</select>
-		{/in}
 	
 	</div>
 	
 	<div class="form-group col-sm-4">
-		<label for="status_now">状态说明</label>
+		<label for="status_now">状态变更说明</label>
 		<input class="form-control empty-check" name="status_now_desc" value="{$assSet.status_now_desc}" type="text" placeholder="请填入状态改变的简短说明" required>
 	
 	</div>
@@ -89,16 +90,12 @@
 	<div class="row myRow">
 	
 	<div class="pull-left">
-		{in name="oprt" value="_TRASH,_DELETE"}
-		<button type="submit" id="btnDelete" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-remove"></span>删除</button>
-		{else/}
-		<button type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-send"></span>&nbsp;提交</button>
-		{/in}
-		<button type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-save-file"></span>&nbsp;保存</button>
+		
+		<button id="btnSave" type="submit" data-oprt="_SAVE" class="btn btn-sm btn-primary "><span class="glyphicon glyphicon-save-file"></span>保存</button>
 	</div>
 	
 	<div  class="pull-right">
-		<input id="btnReset" type="button" class="btn btn-primary btn-sm" value="重置">
+		<input type="reset" class="btn btn-primary btn-sm" value="重置">
 		<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
 	</div>
 	
@@ -106,22 +103,22 @@
 	
 </form>
 
-
-
 <script>
-
-//$.alert组件上用的HTML字符串。由oprt英文转中文，加上HTML标签组成HTML字符串
-var oprtToHtml=(topic,oprtEn,result)=>{
-	var arr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'info'},
+//定义常量，
+const conOprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'info'},
 			{name:'提交',val:'_SUBMIT',gly:'send',color:'info'},
 			{name:'审核',val:'_AUDIT',gly:'check',color:'warning'},
 			{name:'审批',val:'_APPROVE',gly:'ok',color:'danger'},
 			{name:'维护',val:'_MAINTAIN',gly:'list-alt',color:'primary'},
-			{name:'保存',val:'_SAVE',gly:'save-file',color:'primary'},
+			{name:'更新',val:'_UPDATE',gly:'save-file',color:'primary'},
 			{name:'查询',val:'_READ',gly:'search',color:'primary'},
 			{name:'永久删除',val:'_DELETE',gly:'remove',color:'danger'},
-			{name:'回收站',val:'_TRASH',gly:'trash',color:'danger'},
+			{name:'回收',val:'_TRASH',gly:'trash',color:'danger'},
 			{name:'还原',val:'_RESTORE',gly:'retweet',color:'success'}];
+			
+//生成$.alert,$.confirm组件(com:component)上显示内容的HTML字符串。由oprt英文转中文，加上HTML标签组成HTML字符串
+var comHtml=(topic,oprtEn,result)=>{
+	
 	var oprtChi = '';
 	var gly='';
 	var color='';
@@ -130,11 +127,11 @@ var oprtToHtml=(topic,oprtEn,result)=>{
 	
 	var result=(result==null)?'':result;
 	
-	for(var i=0;i<arr.length;i++){
-		if (oprtEn==arr[i].val){
-			oprtChi = arr[i].name;
-			gly=arr[i].gly;
-			color=arr[i].color;
+	for(var i=0;i<conOprtComAttr.length;i++){
+		if (oprtEn==conOprtComAttr[i].val){
+			oprtChi = conOprtComAttr[i].name;
+			gly=conOprtComAttr[i].gly;
+			color=conOprtComAttr[i].color;
 			break;
 		}
 	}
@@ -151,38 +148,65 @@ var oprtToHtml=(topic,oprtEn,result)=>{
 			break;
 	}
 	
-	htmlStr='<p>固定资产：</p><p class="text-center">【<strong>'+topic +'</strong>】</p><p class="text-center"><span class="label label-'+color+'">'+oprtChi+'<span class="glyphicon glyphicon-'+gly+'"></span></span></p>'+resultHtml;
+	htmlStr='<p>固定资产：</p><p class="text-center">【<strong>'+topic +'</strong>】记录</p><p class="text-center"><span class="label label-'+color+'"><span class="glyphicon glyphicon-'+gly+'"></span>'+oprtChi+'</span></p>'+resultHtml;
 	
 	return htmlStr;
 };
 
+//生成modal上的操作组件HTML字符串。
+var oprtBtnHtml=(oprtEn)=>{
+	var oprtChi = '';
+	var gly='';
+	var color='';
+	
+	var htmlStr='';
+	
+	conOprtComAttr.forEach(function(e){
+		if(oprtEn==e.val){
+			oprtChi = e.name;
+			gly=e.gly;
+			color=e.color;
+		}
+	});
+	
+	htmlStr='<button type="submit" class="btn btn-sm btn-'+color+'"data-oprt="'+oprtEn+'"><span class="glyphicon glyphicon-'+gly+'"></span>'+oprtChi+'</button>&nbsp;';
+	
+	return htmlStr;
+
+};
+
 $(document).ready(function(){
+	var oprt=$('#fmAssInfo').find('[name="oprt"]').val();
 	
-	if('_CREATE'!='{$oprt}' || '_TRASH'!='{$oprt}' || '_DELETE'!='{$oprt}'){
-		ajaxShowSelect({sendData:{req:$('#modalSelectStatusNow').attr('name'),source:'common'},'attach':'',selected:'{$assSet.status_now}',obj:$('#modalSelectStatusNow')});	
-	}
+	ajaxShowSelect({sendData:{req:$('#modalSelectStatusNow').attr('name'),source:'common',oprt:oprt},'attach':'',selected:0,obj:$('#modalSelectStatusNow')});
 	
+	//消除按钮
+	$('.pull-left').children().remove();
+	
+	//添加按钮
+	$('.pull-left').append(oprtBtnHtml(oprt));
+		
 	$('#fmAssInfo').submit(function(evt){
-		var url = this.action; 
+		evt.preventDefault();
+	
+		var oprt=$(this).find('[name="oprt"]').val();;
+				
+		var url = $(this).attr('action'); 
+		console.log(oprt+url);
     	var formData = $(this).serialize();
 		var topic=$(this).find('[name="brand_model"]').val();
-		var oprt=$(this).find('[name="oprt"]').val();
-		var str=oprtToHtml(topic,oprt);
-		console.log(str);
-		<!-- console.log(url); -->
-		<!-- console.dir(formData); -->
-		evt.preventDefault();
+		
 		$('#modalAssSingle').modal('hide');
-		$.confirm(str,function(e){
+		$.confirm(comHtml(topic,oprt),function(e){
 			con=e;
 			if(true==con){
 				$.post(url,formData,function(data){
 					if(data){
-						str=oprtToHtml(topic,oprt,'success');
+						$.alert(comHtml(topic,oprt,'success'));
 					}else{
-						str=oprtToHtml(topic,oprt,'fail');
+						$.alert(comHtml(topic,oprt,'fail'));
 					}
-					$.alert(str);
+				
 					loadAssList();
 				});
 			}else{
