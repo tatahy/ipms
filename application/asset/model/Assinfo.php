@@ -26,13 +26,26 @@ class Assinfo extends Model
     protected $dateFormat = 'Y/m/d H:i:s';
 
     
-    //获取器，获取数据表assinfo中status字段值，转换为中文输出
+   //获取器，获取数据表assinfo中status_now字段值，转换为中文输出
     protected function getStatusNowAttr($dBStrEn)
     {
         $output = $dBStrEn;
-        //引用本模块公共文件（asset/common.php）中定义的数组常量assStatusArr
-        if (array_key_exists($dBStrEn, assStatusArr)) {
-            $output = assStatusArr[$dBStrEn];
+        //引用本模块公共文件（dashboard/common.php）中定义的数组常量conAssStatusArr
+        if (array_key_exists($dBStrEn, conAssStatusArr)) {
+            $output = conAssStatusArr[$dBStrEn];
+        }
+        return $output;
+    }
+
+    //修改器，修改存入数据表assinfo中status_now字段值，转换为类型编码。
+    protected function setStatusNowAttr($strChi)
+    {
+        $output = $strChi;
+        //引用本模块公共文件（dashboard/common.php）中定义的数组常量conAssStatusArr
+        foreach(conAssStatusArr as $key => $val){
+            if($strChi==$val){
+                $output=$key;
+            }
         }
         return $output;
     }

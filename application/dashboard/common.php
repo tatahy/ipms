@@ -1,7 +1,7 @@
 <?php
 
 
-//asset的状态数组共7类12个
+//asset的状态数组共7类14个
 const conAssStatusArr=['*'=>'*',
                     '_ASSS0'=>'新增_待验收',
                     '_ASSS1_1'=>'验收合格_待分配',
@@ -48,7 +48,7 @@ const conAssOprtArr=['_CREATE'=>'新增',
                     '_TRASH'=>'回收',
                     '_RESTORE'=>'还原',
                     '_READ'=>'查询',
-                    '_DELETE'=>'永久删除',
+                    '_DELETE'=>'删除',
                     ];
                     
 //asset的操作与操作后状态的对应关系（conAssStatusOprtArr）
@@ -62,14 +62,18 @@ const conAssOprtChangeStatusArr=[
                         ['oprt'=>'_TRASH','oprtChi'=>'回收','statusChangeTo'=>['回收站']],
                         ['oprt'=>'_RESTORE','oprtChi'=>'还原','statusChangeTo'=>['异常_待更新','异常_待维修','异常_遗失','正常_折旧中','正常_折旧完',]],
                         ['oprt'=>'_READ','oprtChi'=>'查询','statusChangeTo'=>[]],
-                        ['oprt'=>'_DELETE','oprtChi'=>'永久删除','statusChangeTo'=>[]]
+                        ['oprt'=>'_DELETE','oprtChi'=>'删除','statusChangeTo'=>[]]
                         ];
                         
 //asset的权限与操作的对应关系（conAssAuthOprtArr）
 const conAssAuthOprtArr=[
+                      //一般员工
                       ['auth'=>'edit','oprt'=>['_CREATE','_SUBMIT','_UPDATE','_READ','_TRASH','_RESTORE']],
+                      //部门资产管理员
                       ['auth'=>'audit','oprt'=>['_AUDIT','_UPDATE','_READ','_TRASH','_RESTORE']],
+                      //院资产管理部门负责人
                       ['auth'=>'approve','oprt'=>['_APPROVE','_UPDATE','_READ','_DELETE']],
+                      //院资产管理员
                       ['auth'=>'maintain','oprt'=>['_MAIINTAIN','_UPDATE','_READ','_TRASH','_RESTORE']]
                     ];
                     

@@ -48,13 +48,28 @@ class AssetController extends \think\Controller
     {
         $this->priLogin();
         
-        //数量总计
-        $quanCount=$assMdl->where('quantity','>=',1)->sum('quantity');
+        $assType=!empty($request->param('assType'))?$request->param('assType'):'normal';
+        $quantityNormal=$assMdl::sum('quantity');
+        $quantityTrash=$assMdl::onlyTrashed()->sum('quantity');
         
+        switch($assType){
+          case 'normal';
+            $quantityNormal=$assMdl::sum('quantity');
+            
+            break;
+           
+          case 'trash';
+            $quantityTrash=$assMdl::onlyTrashed()->sum('quantity');
+            
+            break; 
+        }
         
         $this->assign([
           'home'=>$request->domain(),
-          'quanCount'=>$quanCount,
+          'quantityNormal'=>$quantityNormal,
+          'quantityTrash'=>$quantityTrash,
+          'assType'=>$assType
+          
           //引用本模块公共文件（dashboard/common.php）中定义的数组常量conAssStatusArr
           //'conAssStatusArr'=>json_encode(conAssStatusArr,JSON_UNESCAPED_UNICODE)
           //'conAssStatusArr'=>conAssStatusArr['_ASSS4']
@@ -69,6 +84,9 @@ class AssetController extends \think\Controller
     {
         $this->priLogin();
         $authAss=$this->auth['ass'];
+        $assType=!empty($request->param('assType'))?$request->param('assType'):'normal';
+        $quantityNormal=0;
+        $quantityTrash=0;
         
         //搜索查询条件数组
         $whereArr=[];
@@ -93,6 +111,13 @@ class AssetController extends \think\Controller
         $whereArr['dept_now']=!empty($searchData['dept_now'])?$searchData['dept_now']:'';
         $whereArr['place_now']=!empty($searchData['place_now'])?$searchData['place_now']:'';
         $whereArr['keeper_now']=!empty($searchData['keeper_now'])?$searchData['keeper_now']:'';
+        $whereArr['status_now']=!empty($searchData['status_now'])?$searchData['status_now']:'';
+        //将$whereArr['status_now']的值（中文）转为类型编码
+        foreach(conAssStatusArr as $key=>$val){
+          if($whereArr['status_now']==$val){
+            $whereArr['status_now']=$key;
+          }
+        }
         
         //将空白元素删除
         foreach($whereArr as $key=>$val){
@@ -101,29 +126,35 @@ class AssetController extends \think\Controller
             }
         }
         
-        if($authAss['audit'] || $authAss['approve']){
-            //分页,每页$listRows条记录
-            //仅查询软删除的记录
-            //$assSet=$assMdl::onlyTrashed()->where($whereArr)
-            //查询包含软删除的记录
-            $assSet=$assMdl::withTrashed()->where($whereArr)
-                            ->order($sortData['sortName'], $sortData['sortOrder'])
-                            ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
-                            'query'=>['listRows'=>$sortData['listRows']]]);
-            $searchResultNum=count($assMdl::withTrashed()->where($whereArr)->select());
-        }else{
-            //分页,每页$listRows条记录
-            //仅查询软删除的记录
-            //$assSet=$assMdl::onlyTrashed()->where($whereArr)
-            //查询包含软删除的记录
-            //$assSet=$assMdl::withTrashed()->where($whereArr)
-            //查询排除软删除的记录
-            $assSet=$assMdl->where($whereArr)//->order('place_now', 'asc')
+        switch($assType){
+          case 'normal';
+            $quantityNormal=$assMdl::where($whereArr)->sum('quantity');
+            $quantity=$quantityNormal;
+            
+            $assSet=$assMdl::where($whereArr)
                             ->order($sortData['sortName'], $sortData['sortOrder'])
                             ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
                             'query'=>['listRows'=>$sortData['listRows']]]);
             $searchResultNum=count($assMdl::where($whereArr)->select());
+            
+            
+            break;
+           
+          case 'trash';
+            $quantityTrash=$assMdl::onlyTrashed()->sum('quantity');
+            $quantity=$quantityTrash;
+            
+            $assSet=$assMdl::onlyTrashed()->where($whereArr)//->order('place_now', 'asc')
+                            ->order($sortData['sortName'], $sortData['sortOrder'])
+                            ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
+                            'query'=>['listRows'=>$sortData['listRows']]]);
+            $searchResultNum=count($assMdl::onlyTrashed()->where($whereArr)->select());
+            //数量总计
+            $quantity=$assMdl::onlyTrashed()->where($whereArr)->sum('quantity');
+            break; 
         }
+        
+        
        
         $assList=$assSet->render(); 
                
@@ -131,6 +162,13 @@ class AssetController extends \think\Controller
           'home'=>$request->domain(),
           'assSet'=>$assSet,
           'assList'=>$assList,
+          
+          'quantityNormal'=>$quantityNormal,
+          'quantityTrash'=>$quantityTrash,
+          'quantity'=>$quantity,
+          
+          //asset类型
+          'assType'=>$assType,
           
           //排序数组
           'sortData'=>$sortData,
@@ -213,14 +251,13 @@ class AssetController extends \think\Controller
                         'status_now_desc'=>'新固定资产填报',
                         'status_now_user_name'=>$this->username,
                         );
-      $assSet=($id*1)?$assMdl::get($id):$assSetArr;
-      //if($oprt=='_RESTORE' || $oprt=='_DELETE'){
-//        $assSet=$id?$assMdl::withTrashed()->where('id',$id)->find():$assSetArr;
-//      }else{
-//        $assSet=$id?$assMdl::get($id):$assSetArr;
-//      }
+      //$assSet=($id*1)?$assMdl::get($id):$assSetArr;
+      if($oprt=='_RESTORE' || $oprt=='_DELETE'){
+        $assSet=$id?$assMdl::withTrashed()->where('id',$id)->find():$assSetArr;
+      }else{
+        $assSet=$id?$assMdl::get($id):$assSetArr;
+      }
       
-             
       $this->assign([
           'home'=>$request->domain(),
           'oprt'=>$oprt,
@@ -242,12 +279,15 @@ class AssetController extends \think\Controller
       $oprt=$data['oprt'];
       $res=0;
       
+      $quantityNormal=0;
+      $quantityTrash=0;
+      
       switch($oprt){
         case '_CREATE':
             //数据库create
             $res=$assMdl::create($data,true)->id;
             break;
-        case '_SUMBIT':
+        case '_SUBMIT':
             //数据库update
             //模型的save方法，返回的是受影响的记录数。
             $assSet = $assMdl::get($id);
@@ -293,17 +333,16 @@ class AssetController extends \think\Controller
             $assMdl::update($data, ['id' =>$id], true);
             $res = $assMdl->restore(['id'=>$id]);
             break;
+        //'_SUBMIT','_UPDATE','_AUDIT','_APPROVE','_MAINTAIN'
+        default:
         
+          break;
       }
       
-      
-      //$res='aa'; 
-      //return json_encode($res,JSON_UNESCAPED_UNICODE);
-      return $res;
-      
-      
-      //part2：组装状态机要处理的数据，配置状态机参数
-      //组装状态机（IssPatFSM）要处理的数据
+      $quantityNormal=$assMdl::sum('quantity');
+      $quantityTrash=$assMdl::onlyTrashed()->sum('quantity');
+            
+      return ['res'=>$res,'quantityNormal'=>$quantityNormal,'quantityTrash'=>$quantityTrash];
     }
     
     //应用AssFSM

@@ -1687,11 +1687,5 @@ class IndexController extends \think\Controller
       return $res;
     }
     
-    public function assInfo(Request $request,AssinfoModel $assMdl,$req='')
-    {
-        $this->_loginUser();
-        
-        
-        return view();
-    }
+   
 }

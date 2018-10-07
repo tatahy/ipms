@@ -3,29 +3,38 @@
 <!-- pagewrap  -->	
 <div>
 	<!-- <p>{$authAss.edit}</p> -->
-	<p id="pSearchResultNum"><strong>列表记录总数：</strong><span class="label label-info">{$searchResultNum}</span></p>
+	<p id="pSearchResultNum">
+		<strong>列表记录总数：</strong>
+		<span class="badge">{$searchResultNum}</span>&nbsp;
+		<strong>数量总计：</strong>
+		{eq name="quantity" value="0"}
+		<span class="label label-default">0</span>
+		{else/}
+		<span class="label label-info">{$quantity}</span>
+		{/eq}
+	</p>
 	<!-- // 表格排序信息汇总组件 -->
-	<div id="divTblSortData" data-sort-name="{$sortData.sortName}" data-sort-order="{$sortData.sortOrder}" data-list-rows="{$sortData.listRows}" data-page-num="{$sortData.pageNum}" data-show-ass-id="{$sortData.showAssId}"></div>
+	<div id="divTblSortData" data-ass-type="{$assType}" data-sort-name="{$sortData.sortName}" data-sort-order="{$sortData.sortOrder}" data-list-rows="{$sortData.listRows}" data-page-num="{$sortData.pageNum}" data-show-ass-id="{$sortData.showAssId}" class="sr-only"></div>
 	<div class="table-responsive" > 
 		<table  class="table table-bordered table-hover table-condensed" >
 			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产概况列表</h4></caption>
 			<thead>
 				<tr>
 					<th class="text-center">序号</th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="brand_model">名称</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="assnum">编号</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="code">卡号</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo" data-sort-name="bar_code">条形码号</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="place_now">现放置地点</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="quantity">数量</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="dept_now">现使用部门</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="keeper_now">现保管人</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="status_now">状态</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="status_now_desc">状态说明</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="status_now_user_name">登记人</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="create_time">登记时间</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="update_time">更新时间</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#assInfo"  data-sort-name="oprt">操作</a></th>
+					<th><a data-sort-name="brand_model">名称</a></th>
+					<th><a data-sort-name="assnum">编号</a></th>
+					<th><a data-sort-name="code">卡号</a></th>
+					<th><a data-sort-name="bar_code">条形码号</a></th>
+					<th><a data-sort-name="place_now">现放置地点</a></th>
+					<th><a data-sort-name="quantity">数量</a></th>
+					<th><a data-sort-name="dept_now">现使用部门</a></th>
+					<th><a data-sort-name="keeper_now">现保管人</a></th>
+					<th><a data-sort-name="status_now">状态</a></th>
+					<th><a data-sort-name="status_now_desc">状态说明</a></th>
+					<th><a data-sort-name="status_now_user_name">登记人</a></th>
+					<th><a data-sort-name="create_time">登记时间</a></th>
+					<th><a data-sort-name="update_time">更新时间</a></th>
+					<th><a data-sort-name="status_now">操作</a></th>
 				</tr>
 			
 			</thead>
@@ -98,16 +107,17 @@ const conAssAuthArr=fnJsonToArr({$authAssObj});
 <!-- console.log(conAssAuthArr); -->
 
 //定义常量，
-const conOprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'info'},
-			{name:'提交',val:'_SUBMIT',gly:'send',color:'info'},
-			{name:'审核',val:'_AUDIT',gly:'check',color:'warning'},
-			{name:'审批',val:'_APPROVE',gly:'ok',color:'danger'},
-			{name:'维护',val:'_MAINTAIN',gly:'list-alt',color:'primary'},
-			{name:'更新',val:'_UPDATE',gly:'save-file',color:'primary'},
-			{name:'查询',val:'_READ',gly:'search',color:'primary'},
-			{name:'永久删除',val:'_DELETE',gly:'remove',color:'danger'},
-			{name:'回收',val:'_TRASH',gly:'trash',color:'danger'},
-			{name:'还原',val:'_RESTORE',gly:'retweet',color:'success'}];
+const conOprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'info',title:'新增固定资产记录'},
+			{name:'提交',val:'_SUBMIT',gly:'send',color:'info',title:'提交记录'},
+			{name:'审核',val:'_AUDIT',gly:'check',color:'warning',title:'审核记录'},
+			{name:'审批',val:'_APPROVE',gly:'ok',color:'danger',title:'审批记录'},
+			{name:'维护',val:'_MAINTAIN',gly:'list-alt',color:'primary',title:'维护记录'},
+			{name:'更新',val:'_UPDATE',gly:'save-file',color:'primary',title:'更新记录'},
+			{name:'查询',val:'_READ',gly:'search',color:'primary',title:'查询记录'},
+			{name:'删除',val:'_DELETE',gly:'remove',color:'danger',title:'删除记录'},
+			{name:'回收',val:'_TRASH',gly:'trash',color:'danger',title:'记录放入回收站'},
+			{name:'还原',val:'_RESTORE',gly:'retweet',color:'success',title:'记录还原'}
+			];
 
 
 var urlPrefix='{$home}/dashboard/asset/';
@@ -171,7 +181,7 @@ function getOprtHtmlStr(status){
 	var statusOprtArr=[];
 	var oprtArr=[];
 	
-	//由authArr决定authVsOprtArr中选用的val值，组成authOprtArr
+	//由auth决定authOprtArr中选用的val值，组成authOprtArr
 	for(var i=0;i<conAssAuthArr.length;i++){
 		if(conAssAuthArr[i].val){
 			var name=conAssAuthArr[i].name;
@@ -207,7 +217,7 @@ function getOprtHtmlStr(status){
 	oprtArr.forEach(function(el){		
 		conOprtComAttr.forEach(function(e){
 			if(el==e.val){
-				aHtml+='<a class="aAssOprt text-'+e.color+'" href="#assInfo" data-ass-oprt="'+e.val+'" ><span class="glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'&nbsp;</a>';
+				aHtml+='<a class="aAssOprt text-'+e.color+'" href="#assInfo" data-ass-oprt="'+e.val+'" data-toggle="tooltip" data-title="'+e.title+'"><span class="glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'&nbsp;</a>';
 			}
 		});
 	});
@@ -215,12 +225,20 @@ function getOprtHtmlStr(status){
 	return aHtml;
 };
 
-//利用自调用匿名函数立即执行的特点，设定固定资产的操作组件的html字符串。
+//利用自调用匿名函数立即执行的特点，设定固定资产的操作组件的html字符串;$('thead a') 添加属性
 (function($,getOprtHtmlStr){
-	//每个.btnAssOprt根据该行记录的data-ass-status="{$vo.status_now}"添加相应的a标签
+	//每个.btnAssOprt根据该行记录的data-ass-status="{$ vo.status_now}"添加相应的a标签
 	$('.btnAssOprt').each(function(){
 		var ahtml=getOprtHtmlStr($(this).data('assStatus'));
 		$(this).append(ahtml);
+	});
+	
+	// 设置$('.btnAssOprt')的tooltip
+	$('.btnAssOprt [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
+	 
+	//每个$('thead a')添加属性
+	$('thead a').each(function(){
+		$(this).attr({'href':'#assInfo','data-title':'点击排序','data-toggle':'tooltip'}).closest('th').addClass('text-center');
 	});
 
 })(jQuery,getOprtHtmlStr);
@@ -309,6 +327,7 @@ $(document).ready(function(){
 		var data={'oprt':oprt,'id':dataFromObj.data('assId')}
 		$('#divLoadAssSingle').load(urlPrefix+'modalAssSingle',data);
 		
+		//$('#modalAssSingle')标题上的span组件生成函数
 		var spanStr=(oprt)=>{
 			var strHtml='';
 			conOprtComAttr.forEach(function(e){
@@ -316,7 +335,7 @@ $(document).ready(function(){
 					strHtml='<span class="text-'+e.color+'"><span class="glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'</span>';
 				}
 			});
-			console.log(strHtml);
+			//console.log(strHtml);
 			return strHtml;
 		};
 		

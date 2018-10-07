@@ -253,7 +253,7 @@ var fmReset=()=>{
 	fm.find('.form-control').removeClass('label-info');
 };
 
-//利用自调用匿名函数立即执行的特点，设定$('#selectDeptNow')、$('#selectPlaceNow')、$('#selectKeeperNow')。
+//利用自调用匿名函数立即执行的特点，设定$('#selectDeptNow')、$('#selectPlaceNow')、$('#selectKeeperNow')、$('#selectStatusNow')。
 (function($,ajaxShowSelect){
 
 	//设定$('#fmAssSearch')内的select组件的option
@@ -269,7 +269,7 @@ var fmReset=()=>{
 		},
 		function(){
 			//ajax失败
-			alert("失败Group，请稍后再试！");
+			$.alert('加载失败，请稍后再试！');
 		}
 	);
 })(jQuery,ajaxShowSelect);
