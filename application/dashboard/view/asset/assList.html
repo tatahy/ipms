@@ -5,12 +5,16 @@
 	<!-- <p>{$authAss.edit}</p> -->
 	<p id="pSearchResultNum">
 		<strong>列表记录总数：</strong>
-		<span class="badge">{$searchResultNum}</span>&nbsp;
+		<span class="badge">{$searchResultNum}</span>&nbsp;|
 		<strong>数量总计：</strong>
 		{eq name="quantity" value="0"}
 		<span class="label label-default">0</span>
 		{else/}
-		<span class="label label-info">{$quantity}</span>
+			{eq name="assType" value="normal"}
+			<span class="label label-info">{$quantity}</span>
+			{else/}
+			<span class="label label-warning">{$quantity}</span>
+			{/eq}
 		{/eq}
 	</p>
 	<!-- // 表格排序信息汇总组件 -->
