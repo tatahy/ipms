@@ -176,7 +176,7 @@ var oprtBtnHtml=(oprtEn)=>{
 $(document).ready(function(){
 	var oprt=$('#fmAssInfo').find('[name="oprt"]').val();
 	
-	ajaxShowSelect({sendData:{req:$('#modalSelectStatusNow').attr('name'),source:'common',oprt:oprt,assType:'{$assType}'},'attach':'',selected:0,obj:$('#modalSelectStatusNow')});
+	ajaxShowSelect({sendData:{req:$('#modalSelectStatusNow').attr('name'),source:'common',oprt:oprt},'attach':'',selected:0,obj:$('#modalSelectStatusNow')});
 	
 	//消除按钮
 	$('.pull-left').children().remove();
