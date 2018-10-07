@@ -344,26 +344,31 @@ var contentBodyInit=(assType)=>{
 	
 };
 
-//利用自调用匿名函数立即执行的特点，设定$('#selectDeptNow')、$('#selectPlaceNow')、$('#selectKeeperNow')。
-(function($){
-
-	//设定$('#fmAssSearch')内的select组件的option
+//设定$('#fmAssSearch')内的select组件的option(包括$('#selectDeptNow')、$('#selectPlaceNow')、$('#selectKeeperNow'))
+var buildfmSelectCom=(assType)=>{
 	$.when(
-		ajaxShowSelect({sendData:{req:$('#selectDeptNow').attr('name')},obj:$('#selectDeptNow')}),
-		ajaxShowSelect({sendData:{req:$('#selectStatusNow').attr('name'),source:'db'},obj:$('#selectStatusNow')}),
-		ajaxShowSelect({sendData:{req:$('#selectPlaceNow').attr('name')},obj:$('#selectPlaceNow')}),
-		ajaxShowSelect({sendData:{req:$('#selectKeeperNow').attr('name')},obj:$('#selectKeeperNow')}),
+		ajaxShowSelect({sendData:{req:$('#selectDeptNow').attr('name'),assType:assType},obj:$('#selectDeptNow')}),
+		ajaxShowSelect({sendData:{req:$('#selectStatusNow').attr('name'),source:'db',assType:assType},obj:$('#selectStatusNow')}),
+		ajaxShowSelect({sendData:{req:$('#selectPlaceNow').attr('name'),assType:assType},obj:$('#selectPlaceNow')}),
+		ajaxShowSelect({sendData:{req:$('#selectKeeperNow').attr('name'),assType:assType},obj:$('#selectKeeperNow')}),
 	).then(
 		function(data, textStatus, jqXHR){
 			//$('.content-body')初始化
-			contentBodyInit('{$assType}');
+			contentBodyInit(assType);
 		},
 		function(){
 			//ajax失败
 			$.alert('加载失败，请稍后再试！');
 		}
 	);
-	
+
+};
+
+//利用自调用匿名函数立即执行的特点，对页面的组件进行初始化
+(function($){
+	//设定$('#fmAssSearch')内的select组件的option
+	buildfmSelectCom('{$assType}');
+
 	//ul.nav-tabs调整.aPill
 	$('.aPill').each(function(){
 		//1.缩小padding
@@ -383,9 +388,7 @@ $(document).ready(function(){
 	//点击.aPill中的各个按钮后，load相应的assList-->
 	$('.aPill').click(function(){
 		$(this).tab('show');
-		
-		//$('.content-body')初始化
-		contentBodyInit($(this).data('assType'));
+		buildfmSelectCom($(this).data('assType'));
 		
     });
 	

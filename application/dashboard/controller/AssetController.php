@@ -192,13 +192,14 @@ class AssetController extends \think\Controller
     }
     
     //响应前端请求，返回信息
-    public function selectRes(Request $request,AssinfoModel $assMdl,$req='',$source='db')
+    public function selectRes(Request $request,AssinfoModel $assMdl,$req='',$source='db',$assType='normal')
     {
       $this->priLogin();
       
       $req = !empty($request->param('req'))?$request->param('req'):0;
       $source = !empty($request->param('source'))?$request->param('source'):0;
       $oprt=!empty($request->param('oprt'))?$request->param('oprt'):0;
+      $assType=!empty($request->param('assType'))?$request->param('assType'):'normal';
       
       $arr=conAssOprtChangeStatusArr;
       
@@ -217,7 +218,16 @@ class AssetController extends \think\Controller
         }
       }else{
         //从数据库获得数据
-        $res=$assMdl->field($req)->group($req)->select();
+        switch($assType){
+          case 'normal';
+            $res=$assMdl->field($req)->group($req)->select();           
+            break;
+           
+          case 'trash';
+            $res=$assMdl::onlyTrashed()->field($req)->group($req)->select();
+            break; 
+        }
+        
         //将得到的数据集降为一维索引数组
         if(is_array($res)){
             $res=collection($res)->column($req);        
