@@ -1303,9 +1303,8 @@ class IndexController extends \think\Controller
             $this->error('未登录用户，请先登录系统');
             //$this->redirect($request->domain());
         }else{
-            $status=PatinfoModel::field('id,status')->group('status')->select();
-            // 将数组转化为json
-            return json($status);
+            $status=PatinfoModel::field('status')->group('status')->select();
+            return $status;
         }
     }
     
@@ -1317,11 +1316,8 @@ class IndexController extends \think\Controller
             $this->error('未登录用户，请先登录系统');
             //$this->redirect($request->domain());
         }else{
-            $patSet=PatinfoModel::field('id,pattype')->group('pattype')->select();
-            //$type=PatinfoModel::group('pattype')->select();
-            // 将数组转化为json
-            $type=$patSet;
-            return json($type);
+            $patType=PatinfoModel::field('pattype')->group('pattype')->select();
+            return $patType;
         }
     }
 
