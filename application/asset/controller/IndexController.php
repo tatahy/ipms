@@ -89,6 +89,13 @@ class IndexController extends \think\Controller
         $whereArr['dept_now']=!empty($searchData['dept_now'])?$searchData['dept_now']:'';
         $whereArr['place_now']=!empty($searchData['place_now'])?$searchData['place_now']:'';
         $whereArr['keeper_now']=!empty($searchData['keeper_now'])?$searchData['keeper_now']:'';
+        $whereArr['status_now']=!empty($searchData['status_now'])?$searchData['status_now']:'';
+        //将$whereArr['status_now']的值（中文）转为类型编码
+        foreach(conAssStatusArr as $key=>$val){
+          if($whereArr['status_now']==$val){
+            $whereArr['status_now']=$key;
+          }
+        }
         
         foreach($whereArr as $key=>$val){
             if(empty($val)){

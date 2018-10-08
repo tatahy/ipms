@@ -247,6 +247,14 @@ var loadAssList=(assType)=>{
 	assType=(assType!='undefined')?assType:obj.data('assType');
 	obj.data('assType',assType)
 	
+	//是否出现‘新增’按钮
+	
+	if(assType=='normal'){
+		$('[data-ass-oprt="_CREATE"]').show();
+	}else{
+		$('[data-ass-oprt="_CREATE"]').hide();
+	}
+	
 	//用户搜索有关键值对从表单$('#fmIssPatSearch')获取
 	var formData=new FormData($('#fmAssSearch')[0]);
 	

@@ -113,12 +113,21 @@
 		<!-- nav 与 jQuery结合实现菜单栏导航效果-->
 		<ul class="nav nav-pills nav-stacked" >
 			<li class="active"><a class="aTab" href="#userInfo"><span class="glyphicon glyphicon-user"></span>&nbsp;个人信息</a></li>
+			{neq name="proEn" value="0"}
 			<li><a class="aTab" href="#issPro"><span class="glyphicon glyphicon-inbox"></span>&nbsp;项目事务<span class="badge">{$numIssPro}</span></a></li>
+			{/neq}
+			{neq name="issEn" value="0"}
 			<li ><a class="aTab" href="#issPat2"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利事务<span class="badge">{$numIssPat}</span></a></li>
+			{/neq}
+			{neq name="theEn" value="0"}
 			<li><a class="aTab" href="#issThe"><span class="glyphicon glyphicon-list"></span>&nbsp;论文事务<span class="badge">{$numIssThe}</span></a></li>
+			{/neq}
+			{neq name="attEn" value="0"}
 			<li><a class="aTab" href="#attManage"><span class="glyphicon glyphicon-bookmark"></span>&nbsp;附件管理</a></li>
+			{/neq}
+			{neq name="assEn" value="0"}
 			<li><a class="aTab" href="#assInfo"><span class="glyphicon glyphicon-oil"></span>&nbsp;固定资产</a></li>
-							
+			{/neq}			
 		</ul>
 		
 		

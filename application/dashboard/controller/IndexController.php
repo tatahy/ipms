@@ -98,6 +98,42 @@ class IndexController extends \think\Controller
 
         $numIssPro = $issMdl::where('issmap_type', 'like', '%'.'_PRO'.'%')->count();
         $numIssThe = $issMdl::where('issmap_type', 'like', '%'.'_THE'.'%')->count();
+        
+        $issEn=0;
+        $patEn=0;
+        $proEn=0;
+        $theEn=0;
+        $attEn=0;
+        $assEn=0;
+        
+        foreach($this->authArr as $key => $val){
+          $n=0;
+          foreach($val as $k => $v){
+            $n+=$v;
+          }
+          switch($key){
+            case 'iss':
+              $issEn=$n;
+              break;
+            case 'pat':
+              $patEn=$n;
+              break;
+            case 'pro':
+              $proEn=$n;
+              break;
+            case 'the':
+              $theEn=$n;
+              break;
+            case 'att':
+              $attEn=$n;
+              break;  
+            case 'ass':
+              $assEn=$n;
+              break; 
+          }
+          
+        }
+        
 
         // 模板变量赋值
         $this->assign([
@@ -106,6 +142,14 @@ class IndexController extends \think\Controller
             'numIssPat' => $num['todo'], 
             'numIssPro' => $numIssPro,
             'numIssThe' => $numIssThe, 
+            
+            'issEn'=> $issEn ,
+            'patEn'=> $patEn,
+            'proEn'=> $proEn,
+            'theEn'=> $theEn,
+            'attEn'=> $attEn,
+            'assEn'=> $assEn,
+            
             'year' => date('Y')
             ]);
 
