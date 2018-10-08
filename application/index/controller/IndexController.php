@@ -12,7 +12,7 @@ use app\patent\model\Patinfo as PatinfoModel;
 
 class IndexController extends Controller
 {
-  public function index(Request $request)
+  public function index(Request $request,UserModel $userMdl)
   {
     //'username'和'pwd'的来源：session或初次登录时表单POST提交
     if (!empty($request->post('username')))
@@ -49,7 +49,7 @@ class IndexController extends Controller
 
     //通过浏览器端验证后再在数据库中查询是否有相应的用户存在,
     //连接数据库,利用模型对象查询有效的$username，$pwd在数据库中是否存在并已启用
-    $user = UserModel::where('username', $username)->where('pwd', $pwd)->where('enable',
+    $user = $userMdl::where('username', $username)->where('pwd', $pwd)->where('enable',
       1)->find();
 
     //不存在，同验证失败的处理
@@ -73,14 +73,14 @@ class IndexController extends Controller
         '续费中', '放弃续费'])->count();
 
       //调用User模型层定义的refreshUserAuth()方法，刷新登录用户的各个模块权限
-      $authority = $user->refreshUserAuth($username, $pwd);
+      $authority = $userMdl->refreshUserAuth($username, $pwd);
 
       Session::set('userId', $user->id);
       Session::set('username', $username);
       Session::set('pwd', $pwd);
       Session::set('log', 1);
       Session::set('dept', $user->dept);
-      Session::set('authArr', $user->authority);
+      Session::set('authArr', $authority);
 
       //--在index.html页面输出自定义信息的HTML代码块
       $destr = "请求方法:" . $request->method() . "</br>" . "username:" . $username .

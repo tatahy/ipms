@@ -142,6 +142,7 @@ class User extends Model
     
     /**
      * 刷新登录用户的各个模块（issue，project，patent，thesis，attachment，asset）权限
+     * 返回值：json数组,刷新后的各个模块权限
      */
      public function refreshUserAuth($username,$pwd)
     {
