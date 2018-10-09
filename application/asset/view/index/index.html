@@ -90,10 +90,41 @@
 	
 	<!-- <p id="pSearchResultNum" hidden="true"><strong>搜索结果</strong>:&nbsp;<span class="label label-info">{ $searchResultNum}</span>条记录</p> -->
 	
-	<div id="divLoadAssList"><p class="text-center" style="font-size:20px;">加载中……</p></div>
+	<div id="divLoadAssList">
+		<p class="text-center" style="font-size:20px;">加载中……</p>
+	</div>
 	
 	
 </div>
+
+<!-- Modal "modalAssSingle" -->
+<div class="modal fade" id="modalAssSingle" role="dialog">
+	<div class="modal-dialog modal-lg">
+    
+      <!-- Modal content-->
+      	<div class="modal-content">
+        <div class="modal-header bg-info" style="border-radius:5px;">
+          	<button type="button" class="close" data-dismiss="modal">&times;</button>
+		  
+          	<h4 class="title"></h4>
+        </div>
+		
+        <div class="modal-body">
+			<!-- // 单个asset增删改查页面显示位置，需load其他模板文件的div-->
+			<div id="divLoadAssSingle">
+				<p class="text-center" style="font-size:28px;">加载中……</p>
+			</div>
+		</div>
+		
+		<div class="modal-footer">
+        	<input type="button" class="btn btn-primary btn-sm" data-dismiss="modal" value="关闭">  
+          
+        </div>
+		</div>
+	</div>
+
+</div>
+<!--/ Modal "modalAssSingle" -->
 
 <!-- /pagewrap  -->
 
@@ -217,6 +248,7 @@ var loadAssList=(sortData)=>{
 //作用：对选定的assList列表字段进行升序降序转换，改变该字段表头显示格式
 var sortOrderToggle=(sortName)=>{
 	var obj='';
+	var sortOrder=$('#tblAssList').data('sortOrder');
 	var glyAsc='&nbsp;<span class="small glyphicon glyphicon-sort-by-attributes"></span>';
 	var glyDesc='&nbsp;<span class="small glyphicon glyphicon-sort-by-order-alt"></span>';
 	
@@ -232,7 +264,7 @@ var sortOrderToggle=(sortName)=>{
 		
 	obj.addClass('label label-primary');
 	
-	if(obj.data('sortOrder') == 'asc'){
+	if(sortOrder == 'asc'){
 		//当前为升序
 		obj.append(glyAsc);
 		obj.tooltip({title:'当前为升序。点击后降序',placement: 'top'});

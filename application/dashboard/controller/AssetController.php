@@ -240,7 +240,7 @@ class AssetController extends \think\Controller
       return $res;
     }
     
-    public function modalAssSingle(Request $request,AssinfoModel $assMdl,$id=0,$oprt='')
+    public function fmAssSingle(Request $request,AssinfoModel $assMdl,$id=0,$oprt='')
     {
       $this->priLogin();
       $id=$request->param('id');
@@ -274,6 +274,18 @@ class AssetController extends \think\Controller
           'assSet'=>$assSet,
           'userName'=>$this->username,
           'authAss'=>$authAss
+        ]);
+      return view();
+    }
+    
+     public function tblAssSingle(Request $request,AssinfoModel $assMdl)
+    {
+      $this->priLogin();
+      $assSet=$assMdl::get($request->param('id'));
+           
+      $this->assign([
+          'assSet'=>$assSet,
+         
         ]);
       return view();
     }

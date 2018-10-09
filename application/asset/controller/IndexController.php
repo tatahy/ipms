@@ -115,7 +115,7 @@ class IndexController extends \think\Controller
         //数量总计
         $quanCount=$assMdl->where($whereArr)->sum('quantity');
         $this->assign([
-          
+          'home'=>$request->domain(),
           'assSet'=>$assSet,
           'assList'=>$assList,
           
@@ -153,5 +153,17 @@ class IndexController extends \think\Controller
       
       //返回前端的是索引数组  
       return $res;
+    }
+    
+     public function tblAssSingle(Request $request,AssinfoModel $assMdl)
+    {
+      $this->priLogin();
+      $assSet=$assMdl::get($request->param('id'));
+           
+      $this->assign([
+          'assSet'=>$assSet,
+         
+        ]);
+      return view();
     }
 }

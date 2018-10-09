@@ -31,11 +31,23 @@ const conAssStatusOprtArr=[
                       ['status'=>'_ASSS3_2','statusChi'=>'异常_待维修','oprt'=>['_UPDATE','_SUBMIT'],'nextStatus'=>[]],
                       ['status'=>'_ASSS3_3','statusChi'=>'异常_遗失','oprt'=>['_UPDATE','_APPROVE'],'nextStatus'=>[]],
                       ['status'=>'_ASSS4_1','statusChi'=>'停用_维修中','oprt'=>['_UPDATE','_SUBMIT','_TRASH'],'nextStatus'=>[]],
-                      ['status'=>'_ASSS4_2','statusChi'=>'停用_封存','oprt'=>['_UPDATE','_APPROVE','_TRASH'],'nextStatus'=>[]],
-                      ['status'=>'_ASSS4_3','statusChi'=>'停用_待销账','oprt'=>['_UPDATE','_APPROVE','_TRASH'],'nextStatus'=>[]],
+                      ['status'=>'_ASSS4_2','statusChi'=>'停用_封存','oprt'=>['_APPROVE','_TRASH'],'nextStatus'=>[]],
+                      ['status'=>'_ASSS4_3','statusChi'=>'停用_待销账','oprt'=>['_APPROVE','_TRASH'],'nextStatus'=>[]],
                       ['status'=>'_ASSS4_4','statusChi'=>'遗失_待销账','oprt'=>['_UPDATE','_APPROVE','_TRASH'],'nextStatus'=>[]],
                       ['status'=>'_ASSS5','statusChi'=>'销账','oprt'=>[],'nextStatus'=>[]],
                       ['status'=>'_ASSS6','statusChi'=>'回收站','oprt'=>['_RESTORE'],'nextStatus'=>['正常_折旧完','正常_折旧中','异常_待更新','停用_封存',]]
+                    ];
+
+//asset的权限与操作的对应关系（conAssAuthOprtArr）
+const conAssAuthOprtArr=[
+                      //一般员工
+                      ['auth'=>'edit','oprt'=>['_CREATE','_SUBMIT','_UPDATE','_READ','_TRASH','_RESTORE']],
+                      //部门资产管理员
+                      ['auth'=>'audit','oprt'=>['_AUDIT','_UPDATE','_READ','_TRASH','_RESTORE']],
+                      //院资产管理部门负责人
+                      ['auth'=>'approve','oprt'=>['_APPROVE','_READ','_DELETE']],
+                      //院资产管理员
+                      ['auth'=>'maintain','oprt'=>['_MAIINTAIN','_UPDATE','_READ','_TRASH','_RESTORE']]
                     ];
 
 //asset的操作数组,4类（CURD）10个
@@ -65,17 +77,7 @@ const conAssOprtChangeStatusArr=[
                         ['oprt'=>'_DELETE','oprtChi'=>'删除','statusChangeTo'=>[]]
                         ];
                         
-//asset的权限与操作的对应关系（conAssAuthOprtArr）
-const conAssAuthOprtArr=[
-                      //一般员工
-                      ['auth'=>'edit','oprt'=>['_CREATE','_SUBMIT','_UPDATE','_READ','_TRASH','_RESTORE']],
-                      //部门资产管理员
-                      ['auth'=>'audit','oprt'=>['_AUDIT','_UPDATE','_READ','_TRASH','_RESTORE']],
-                      //院资产管理部门负责人
-                      ['auth'=>'approve','oprt'=>['_APPROVE','_UPDATE','_READ','_DELETE']],
-                      //院资产管理员
-                      ['auth'=>'maintain','oprt'=>['_MAIINTAIN','_UPDATE','_READ','_TRASH','_RESTORE']]
-                    ];
+
                     
 
 

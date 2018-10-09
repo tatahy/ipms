@@ -29,8 +29,8 @@
 					<th><a data-sort-name="assnum">编号</a></th>
 					<th><a data-sort-name="code">卡号</a></th>
 					<th><a data-sort-name="bar_code">条形码号</a></th>
-					<th><a data-sort-name="place_now">现放置地点</a></th>
 					<th><a data-sort-name="quantity">数量</a></th>
+					<th><a data-sort-name="place_now">现放置地点</a></th>
 					<th><a data-sort-name="dept_now">现使用部门</a></th>
 					<th><a data-sort-name="keeper_now">现保管人</a></th>
 					<th><a data-sort-name="status_now">状态</a></th>
@@ -38,7 +38,7 @@
 					<th><a data-sort-name="status_now_user_name">登记人</a></th>
 					<th><a data-sort-name="create_time">登记时间</a></th>
 					<th><a data-sort-name="update_time">更新时间</a></th>
-					<th><a data-sort-name="status_now">操作</a></th>
+					<th>操作</th>
 				</tr>
 			
 			</thead>
@@ -46,19 +46,19 @@
 				{volist name="assSet" id="vo" empty="暂时没有数据"}
 				<tr>
 					<td class="text-center">{$i+($sortData.pageNum-1)*$sortData.listRows}</td>
-					<td>{$vo.brand_model}</td>
-					<td>{$vo.assnum}</td>
+					<td class="text-center"><a class="aTblAssSingle" href="#assInfo" data-ass-id="{$vo.id}">{$vo.brand_model}</a></td>
+					<td class="text-right">{$vo.assnum}</td>
 					<td>{$vo.code}</td>
-					<td>{$vo.bar_code}</td>
-					<td>{$vo.place_now}</td>
-					<td>{$vo.quantity}</td>
-					<td>{$vo.dept_now}</td>
-					<td>{$vo.keeper_now}</td>
-					<td>{$vo.status_now}</td>
-					<td>{$vo.status_now_desc}</td>
-					<td>{$vo.status_now_user_name}</td>
-					<td>{$vo.create_time}</td>
-					<td>{$vo.update_time}</td>
+					<td class="text-right">{$vo.bar_code}</td>
+					<td class="text-right">{$vo.quantity}</td>
+					<td class="text-right">{$vo.place_now}</td>
+					<td class="text-right">{$vo.dept_now}</td>
+					<td class="text-right">{$vo.keeper_now}</td>
+					<td class="text-right">{$vo.status_now}</td>
+					<td class="text-right">{$vo.status_now_desc}</td>
+					<td class="text-right">{$vo.status_now_user_name}</td>
+					<td class="text-right">{$vo.create_time}</td>
+					<td class="text-right">{$vo.update_time}</td>
 					<td class="btnAssOprt" data-ass-status="{$vo.status_now}" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}" >
 						
 					</td>
@@ -215,22 +215,29 @@ function getOprtHtmlStr(status){
 		}
 	});
 	
-	<!-- console.log('oprtArr:'+status); -->
-	<!-- console.log(oprtArr); -->
+	<!-- console.log('statusOprtArr:'+statusOprtArr); -->
+	<!-- console.log('authOprtArr:'+authOprtArr); -->
+	<!-- console.log('oprtArr:'+oprtArr); -->
 	
-	oprtArr.forEach(function(el){		
-		conOprtComAttr.forEach(function(e){
-			if(el==e.val){
-				aHtml+='<a class="aAssOprt text-'+e.color+'" href="#assInfo" data-ass-oprt="'+e.val+'" data-toggle="tooltip" data-title="'+e.title+'"><span class="glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'&nbsp;</a>';
-			}
+	if(oprtArr.length){
+		oprtArr.forEach(function(el){		
+			conOprtComAttr.forEach(function(e){
+				if(el==e.val){
+					aHtml+='<a class="aAssOprt text-'+e.color+'" href="#assInfo" data-ass-oprt="'+e.val+'" data-toggle="tooltip" data-title="'+e.title+'"><span class="glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'&nbsp;</a>';
+				}
+			
+			});
 		});
-	});
+	}else{
+		aHtml='无';
+	}
 		
 	return aHtml;
 };
 
 //利用自调用匿名函数立即执行的特点，设定固定资产的操作组件的html字符串;$('thead a') 添加属性
-(function($,getOprtHtmlStr){
+(function($){
+	
 	//每个.btnAssOprt根据该行记录的data-ass-status="{$ vo.status_now}"添加相应的a标签
 	$('.btnAssOprt').each(function(){
 		var ahtml=getOprtHtmlStr($(this).data('assStatus'));
@@ -244,12 +251,14 @@ function getOprtHtmlStr(status){
 	$('thead a').each(function(){
 		$(this).attr({'href':'#assInfo','data-title':'点击排序','data-toggle':'tooltip'}).closest('th').addClass('text-center');
 	});
+	
+	//每个$('.aTblAssSingle')添加tooltip
+	$('.aTblAssSingle').tooltip({title: "查看详情", placement: "bottom"}); 
 
-})(jQuery,getOprtHtmlStr);
+})(jQuery);
 
 
 $(document).ready(function(){
-	$('#tblAssList').data('sortOrder','{$sortData.sortOrder}');
 		
 	<!-- //表格每页显示记录行数 -->
 	$('#listRows').val('{$sortData.listRows}'); 
@@ -274,12 +283,22 @@ $(document).ready(function(){
 		if(sortOrder){
 			$('#divTblSortData').data('sortOrder',sortOrder);
 		}
-		
-		//$('#tblAssList').data('sortOrder',$(this).data('sortOrder'));
 		//调用index.html中的loadAssList()
 		loadAssList();
 		
 	});	
+	
+	$('.aTblAssSingle').click(function(){
+		//去掉所有行的底色
+		$('tr').removeClass('bg-warning');
+		//给本行上底色
+		$(this).closest('tr').addClass('bg-warning');
+		
+		$('#divLoadAssSingle').load(urlPrefix+'tblAssSingle',{'id':$(this).data('assId')});
+		
+		$('#modalAssSingle').find('.title').html('固定资产详情');
+		$('#modalAssSingle').modal();
+	});
 	
 	<!-- // 点击分页中的a，表格中的内容根据a中的属性值进行排序 -->
 	$('#divListRows a').click(function(evt){
@@ -289,9 +308,7 @@ $(document).ready(function(){
 		//(li.active)所代表的页数
 		var pageNumActive=$('#divListRows li.active').children('span').text();
 		var sortName=$('thead').find('.label').data('sortName');
-		var sortOrder=$('#tblAssList').data('sortOrder');
-		<!-- var sortObj=$('thead').find('.label'); -->
-		
+
 		evt.preventDefault();
 		
 		switch(pageStr){
@@ -329,7 +346,7 @@ $(document).ready(function(){
 		//排序有关的值向$('#divTblSortData')汇集。发送本行的assId，便于刷新时本行继续加底色
 		$('#divTblSortData').data('showAssId',dataFromObj.data('assId'));
 		var data={'oprt':oprt,'id':dataFromObj.data('assId')}
-		$('#divLoadAssSingle').load(urlPrefix+'modalAssSingle',data);
+		$('#divLoadAssSingle').load(urlPrefix+'fmAssSingle',data);
 		
 		//$('#modalAssSingle')标题上的span组件生成函数
 		var spanStr=(oprt)=>{

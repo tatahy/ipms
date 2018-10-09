@@ -6,24 +6,21 @@
 		<strong>数量总计：</strong><span class="badge">{$quanCount}</span>
 	</p>
 	<div class="table-responsive"> 
-		<table id="tblAssList" class="table table-bordered table-striped table-hover table-condensed" data-sort-order="asc">
+		<table id="tblAssList" class="table table-bordered table-hover table-condensed" data-sort-order="asc">
 			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产概况列表</h4></caption>
 			<thead>
 				<tr>
 					<th class="text-center">序号</th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="assnum" data-sort-order="{$sortData.sortOrder}">编号</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="code" data-sort-order="{$sortData.sortOrder}">卡号</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#" data-sort-name="bar_code" data-sort-order="{$sortData.sortOrder}" >条形码号</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="brand_model" data-sort-order="{$sortData.sortOrder}">名称</a></th>
-					
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="place_now" data-sort-order="{$sortData.sortOrder}">现放置地点</a></th>
-					
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="quantity" data-sort-order="{$sortData.sortOrder}">数量</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="dept_now" data-sort-order="{$sortData.sortOrder}">现使用部门</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="keeper_now" data-sort-order="{$sortData.sortOrder}">现保管人</a></th>
-					
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="status_now" data-sort-order="{$sortData.sortOrder}">状态</a></th>
-					<th class="text-center"><a class="" data-title="点击排序" data-toggle="tooltip" href="#"  data-sort-name="status_now_user_name" data-sort-order="{$sortData.sortOrder}">登记人</a></th>
+					<th><a data-sort-name="brand_model">名称</a></th>
+					<th><a data-sort-name="assnum">编号</a></th>
+					<th><a data-sort-name="code">卡号</a></th>
+					<th><a data-sort-name="bar_code">条形码号</a></th>
+					<th><a data-sort-name="place_now">现放置地点</a></th>
+					<th><a data-sort-name="quantity">数量</a></th>
+					<th><a data-sort-name="dept_now">现使用部门</a></th>
+					<th><a data-sort-name="keeper_now">现保管人</a></th>
+					<th><a data-sort-name="status_now">状态</a></th>
+					<th><a data-sort-name="status_now_user_name">登记人</a></th>
 					
 				</tr>
 			
@@ -32,16 +29,16 @@
 				{volist name="assSet" id="vo" empty="暂时没有数据"}
 				<tr>
 					<td class="text-center">{$i+($sortData.pageNum-1)*$sortData.listRows}</td>
-					<td>{$vo.assnum}</td>
+					<td class="text-center"><a class="aTblAssSingle" href="#" data-ass-id="{$vo.id}">{$vo.brand_model}</a></td>
+					<td class="text-right">{$vo.assnum}</td>
 					<td>{$vo.code}</td>
-					<td>{$vo.bar_code}</td>
-					<td>{$vo.brand_model}</td>
-					<td>{$vo.place_now}</td>
-					<td>{$vo.quantity}</td>
-					<td>{$vo.dept_now}</td>
-					<td>{$vo.keeper_now}</td>
-					<td>{$vo.status_now}</td>
-					<td>{$vo.status_now_user_name}</td>
+					<td class="text-right">{$vo.bar_code}</td>
+					<td class="text-right">{$vo.place_now}</td>
+					<td class="text-right">{$vo.quantity}</td>
+					<td class="text-right">{$vo.dept_now}</td>
+					<td class="text-right">{$vo.keeper_now}</td>
+					<td class="text-right">{$vo.status_now}</td>
+					<td class="text-right">{$vo.status_now_user_name}</td>
 				
 				</tr>
 				{/volist}
@@ -75,12 +72,26 @@
 <!-- /pagewrap  -->
 
 <script>
-
-$(document).ready(function(){
+var urlPrefix='{$home}/asset/index/';
+//利用自调用匿名函数立即执行的特点，$('thead a') 添加属性等
+(function($){
+	//表格排序asc/desc
 	$('#tblAssList').data('sortOrder','{$sortData.sortOrder}');
+	
+	//每个$('thead a')添加属性
+	$('thead a').each(function(){
+		$(this).attr({'href':'#','data-title':'点击排序','data-toggle':'tooltip'}).closest('th').addClass('text-center');
+	});
+	
+	//每个$('.aTblAssSingle')添加tooltip
+	$('.aTblAssSingle').tooltip({title: "查看详情", placement: "bottom"}); 
 	
 	<!-- //表格每页显示记录行数 -->
 	$('#listRows').val('{$sortData.listRows}'); 
+	
+})(jQuery);
+
+$(document).ready(function(){
 	
 	$('#listRows').change(function(){
 		//调用index.html中的loadAssList()
@@ -94,6 +105,18 @@ $(document).ready(function(){
 		loadAssList({'listRows':$('#listRows').val()*1,'sortOrder':$(this).data('sortOrder'),'sortName':$(this).data('sortName')});
 		
 	});	
+	
+	$('.aTblAssSingle').click(function(){
+		//去掉所有行的底色
+		$('tr').removeClass('bg-warning');
+		//给本行上底色
+		$(this).closest('tr').addClass('bg-warning');
+		
+		$('#divLoadAssSingle').load(urlPrefix+'tblAssSingle',{'id':$(this).data('assId')});
+		
+		$('#modalAssSingle').find('.title').html('固定资产详情');
+		$('#modalAssSingle').modal();
+	});
 	
 	<!-- // 点击分页中的a，表格中的内容根据a中的属性值进行排序 -->
 	$('#divListRows a').click(function(evt){
@@ -129,7 +152,6 @@ $(document).ready(function(){
 		loadAssList({'listRows':$('#listRows').val()*1,'pageNum':pageNum,'sortName':sortName,'sortOrder':sortOrder});
 		
 	});
-	
 	
 });
 </script>
