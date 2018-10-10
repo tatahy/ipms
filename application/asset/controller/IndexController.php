@@ -128,7 +128,9 @@ class IndexController extends \think\Controller
           'searchData'=>$searchData,
           'quanCount'=>$quanCount,
           
-          'whereArr'=>json_encode($whereArr,JSON_UNESCAPED_UNICODE)
+          'whereArr'=>json_encode($whereArr,JSON_UNESCAPED_UNICODE),
+          'conAssStatusArr'=>json_encode(conAssStatusArr,JSON_UNESCAPED_UNICODE), 
+          'conAssStatusLabelArr'=>json_encode(conAssStatusLabelArr,JSON_UNESCAPED_UNICODE),     
 		  
         ]);
         return view();
@@ -162,7 +164,8 @@ class IndexController extends \think\Controller
            
       $this->assign([
           'assSet'=>$assSet,
-         
+          'conAssStatusArr'=>json_encode(conAssStatusArr,JSON_UNESCAPED_UNICODE), 
+          'conAssStatusLabelArr'=>json_encode(conAssStatusLabelArr,JSON_UNESCAPED_UNICODE),     
         ]);
       return view();
     }

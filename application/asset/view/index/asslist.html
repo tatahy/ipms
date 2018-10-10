@@ -1,6 +1,6 @@
 <!-- pagewrap  -->	
 <div>
-	<!-- <p>{$whereArr}</p> -->
+	<!-- <p>{$ conAssStatusArr}</p> -->
 	<p id="pSearchResultNum">
 		<strong>列表记录总数</strong>:&nbsp;<span class="label label-info">{$searchResultNum}</span>&nbsp;|
 		<strong>数量总计：</strong><span class="badge">{$quanCount}</span>
@@ -37,7 +37,7 @@
 					<td class="text-right">{$vo.quantity}</td>
 					<td class="text-right">{$vo.dept_now}</td>
 					<td class="text-right">{$vo.keeper_now}</td>
-					<td class="text-right">{$vo.status_now}</td>
+					<td class="text-right"><span class="spStatus">{$vo.status_now}</span></td>
 					<td class="text-right">{$vo.status_now_user_name}</td>
 				
 				</tr>
@@ -73,6 +73,10 @@
 
 <script>
 var urlPrefix='{$home}/asset/index/';
+
+const conStatusArr=Object.values({$conAssStatusArr});
+const conLabelArr=Object.values({$conAssStatusLabelArr});
+
 //利用自调用匿名函数立即执行的特点，$('thead a') 添加属性等
 (function($){
 	//表格排序asc/desc
@@ -89,6 +93,13 @@ var urlPrefix='{$home}/asset/index/';
 	<!-- //表格每页显示记录行数 -->
 	$('#listRows').val('{$sortData.listRows}'); 
 	
+	<!-- // status单元格内容上色-->
+	$('.spStatus').each(function(){
+		var status=$(this).text();
+		var index=0;
+		index=conStatusArr.indexOf(status);
+		$(this).addClass('label label-'+conLabelArr[index]);
+	});
 })(jQuery);
 
 $(document).ready(function(){

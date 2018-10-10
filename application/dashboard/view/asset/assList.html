@@ -54,7 +54,7 @@
 					<td class="text-right">{$vo.place_now}</td>
 					<td class="text-right">{$vo.dept_now}</td>
 					<td class="text-right">{$vo.keeper_now}</td>
-					<td class="text-right">{$vo.status_now}</td>
+					<td class="text-right"><span class="spStatus">{$vo.status_now}</span></td>
 					<td class="text-right">{$vo.status_now_desc}</td>
 					<td class="text-right">{$vo.status_now_user_name}</td>
 					<td class="text-right">{$vo.create_time}</td>
@@ -109,6 +109,9 @@ const conAssAuthOprtArr={$conAssAuthOprtArr};
 const conAssAuthArr=fnJsonToArr({$authAssObj});
 <!-- console.log('conAssAuthArr:'); -->
 <!-- console.log(conAssAuthArr); -->
+
+const conStatusArr=Object.values({$conAssStatusArr});
+const conLabelArr=Object.values({$conAssStatusLabelArr});
 
 //定义常量，
 const conOprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'info',title:'新增固定资产记录'},
@@ -254,6 +257,14 @@ function getOprtHtmlStr(status){
 	
 	//每个$('.aTblAssSingle')添加tooltip
 	$('.aTblAssSingle').tooltip({title: "查看详情", placement: "bottom"}); 
+	
+	<!-- // status单元格内容上色-->
+	$('.spStatus').each(function(){
+		var status=$(this).text();
+		var index=0;
+		index=conStatusArr.indexOf(status);
+		$(this).addClass('label label-'+conLabelArr[index]);
+	});
 
 })(jQuery);
 

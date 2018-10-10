@@ -184,6 +184,8 @@ class AssetController extends \think\Controller
           'conAssStatusArr'=>json_encode(conAssStatusArr,JSON_UNESCAPED_UNICODE),
           'conAssStatusOprtArr'=>json_encode(conAssStatusOprtArr,JSON_UNESCAPED_UNICODE),
           'conAssAuthOprtArr'=>json_encode(conAssAuthOprtArr,JSON_UNESCAPED_UNICODE),
+          'conAssStatusLabelArr'=>json_encode(conAssStatusLabelArr,JSON_UNESCAPED_UNICODE),   
+          
           'assSetArr'=>json_encode($assSet,JSON_UNESCAPED_UNICODE)
 		  
         ]);
@@ -281,10 +283,14 @@ class AssetController extends \think\Controller
      public function tblAssSingle(Request $request,AssinfoModel $assMdl)
     {
       $this->priLogin();
-      $assSet=$assMdl::get($request->param('id'));
+      //不是normal就是trashed
+      $assSet=count($assMdl::get($request->param('id')))?$assMdl::get($request->param('id')):$assMdl::onlyTrashed()->where('id',$request->param('id'))->find();
            
       $this->assign([
           'assSet'=>$assSet,
+          
+          'conAssStatusArr'=>json_encode(conAssStatusArr,JSON_UNESCAPED_UNICODE), 
+          'conAssStatusLabelArr'=>json_encode(conAssStatusLabelArr,JSON_UNESCAPED_UNICODE),   
          
         ]);
       return view();

@@ -4,14 +4,54 @@
  * @copyright 2018
  * 应用公共文件
  * 所有的公共函数都以"_common"开头，再遵循驼峰命名法。
+ * 所有的公共常量都以"con"开头，再遵循驼峰命名法。
  */
-//asset对象的状态数组
-//const assStatusArr=['*','新增(待分配)',
-//                '正常(折旧中)','正常(折旧完)',
-//                '异常(待更新)','异常(待维修)','异常(遗失)',
-//                '停用(维修中)','停用(封存)','停用(待销账)',
-//                '销账'];
-                
+//asset的状态数组共7类14个
+const conAssStatusArr=['*'=>'*',
+                    '_ASSS0'=>'新增_待验收',
+                    //label-primary
+                    '_ASSS1_1'=>'待分配_初次验收合格',
+                    '_ASSS1_2'=>'待分配_维修验收合格',
+                    //label-success
+                    '_ASSS2_1'=>'正常_折旧中',
+                    '_ASSS2_2'=>'正常_折旧完',
+                    //label-warning
+                    '_ASSS3_1'=>'异常_待更新',
+                    '_ASSS3_2'=>'异常_待维修',
+                    '_ASSS3_3'=>'异常_遗失',
+                    //label-default
+                    '_ASSS4_1'=>'停用_维修中',
+                    '_ASSS4_2'=>'停用_封存',
+                    '_ASSS4-3'=>'待销账_报废',
+                    '_ASSS4-4'=>'待销账_遗失',
+                    '_ASSS5'=>'销账',
+                    //label-danger
+                    '_ASSS6'=>'回收站'
+                    ];
+
+//asset的状态标志数组共6类14个
+const conAssStatusLabelArr=['*'=>'info',
+                    '_ASSS0'=>'info',
+                    //label-primary
+                    '_ASSS1_1'=>'primary',
+                    '_ASSS1_2'=>'primary',
+                    //label-success
+                    '_ASSS2_1'=>'success',
+                    '_ASSS2_2'=>'success',
+                    //label-warning
+                    '_ASSS3_1'=>'warning',
+                    '_ASSS3_2'=>'warning',
+                    '_ASSS3_3'=>'warning',
+                    //label-default
+                    '_ASSS4_1'=>'default',
+                    '_ASSS4_2'=>'default',
+                    '_ASSS4-3'=>'default',
+                    '_ASSS4-4'=>'default',
+                    '_ASSS5'=>'default',
+                    //label-danger
+                    '_ASSS6'=>'danger'
+                    ];                    
+
    
   /**
      * 各个模块权限设置初始值

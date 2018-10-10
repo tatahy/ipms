@@ -28,7 +28,7 @@
 		<tr>
 			<td>
 				<div class="col-sm-5">
-					<label>现状：</label>{$assSet.status_now}
+					<label>现状：</label><span class="spStatus">{$assSet.status_now}</span>
 				</div>
 	
 				<div class="col-sm-4">
@@ -91,6 +91,19 @@
 
 
 <script>
+const conStatusArr=Object.values({$conAssStatusArr});
+const conLabelArr=Object.values({$conAssStatusLabelArr});
+
+//利用自调用匿名函数立即执行的特点， 添加属性等
+(function($){
+<!-- // status内容上色-->
+	$('.spStatus').each(function(){
+		var status=$(this).text();
+		var index=0;
+		index=conStatusArr.indexOf(status);
+		$(this).addClass('label label-'+conLabelArr[index]);
+	});
+})(jQuery);
 
 $(document).ready(function(){
 	
