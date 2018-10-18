@@ -260,7 +260,7 @@ var loadAssList=(assType)=>{
 	
 	var searchData={};
 	//使用Map对象的forEach方法组装键值对
-	formData.forEach(function(val,key,){
+	formData.forEach(function(val,key){
 		//非0非空的值才进行组装
 		if(val!='' && val!=0){
 			searchData[key]=val;
