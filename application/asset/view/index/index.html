@@ -288,12 +288,29 @@ var fmReset=()=>{
 //利用自调用匿名函数立即执行的特点，设定$('#selectDeptNow')、$('#selectPlaceNow')、$('#selectKeeperNow')、$('#selectStatusNow')。
 (function($,ajaxShowSelect){
 
-	//设定$('#fmAssSearch')内的select组件的option
-	$.when(
+	<!-- //设定$('#fmAssSearch')内的select组件的option -->
+	<!-- $.when( -->
+		<!-- ajaxShowSelect({sendData:{req:$('#selectDeptNow').attr('name')},obj:$('#selectDeptNow')}), -->
+		<!-- ajaxShowSelect({sendData:{req:$('#selectStatusNow').attr('name')},obj:$('#selectStatusNow')}), -->
+		<!-- ajaxShowSelect({sendData:{req:$('#selectPlaceNow').attr('name')},obj:$('#selectPlaceNow')}), -->
+		<!-- ajaxShowSelect({sendData:{req:$('#selectKeeperNow').attr('name')},obj:$('#selectKeeperNow')}), -->
+	<!-- ).then( -->
+		<!-- function(data, textStatus, jqXHR){ -->
+     		<!-- //ajax成功 -->
+			<!-- loadAssList(); -->
+		<!-- }, -->
+		<!-- function(){ -->
+			<!-- //ajax失败 -->
+			<!-- $.alert('加载失败，请稍后再试！'); -->
+		<!-- } -->
+	<!-- ); -->
+	
+	
+		$.when(
 		ajaxShowSelect({sendData:{req:$('#selectDeptNow').attr('name')},obj:$('#selectDeptNow')}),
 		ajaxShowSelect({sendData:{req:$('#selectStatusNow').attr('name')},obj:$('#selectStatusNow')}),
 		ajaxShowSelect({sendData:{req:$('#selectPlaceNow').attr('name')},obj:$('#selectPlaceNow')}),
-		ajaxShowSelect({sendData:{req:$('#selectKeeperNow').attr('name')},obj:$('#selectKeeperNow')}),
+		ajaxShowSelect({sendData:{req:$('#selectKeeperNow').attr('name')},obj:$('#selectKeeperNow')})
 	).then(
 		function(data, textStatus, jqXHR){
      		//ajax成功
@@ -304,6 +321,7 @@ var fmReset=()=>{
 			$.alert('加载失败，请稍后再试！');
 		}
 	);
+	
 })(jQuery,ajaxShowSelect);
 
 $(document).ready(function(){

@@ -95,6 +95,19 @@
 <!-- /pagewrap  -->
 
 <script>
+//输入JSON对象：{$ authAssObj}={edit:1,audit:1,approve:0,maintain:0}
+//转成键值对数组形式输出authAssArr=[{name:'edit',val:'1'},{name:'audit',val:'1'},{name:'approve',val:'0'},{name:'maintain',val:'0'}]
+//便于应用数组的.forEach等函数进行自定义处理
+var fnJsonToArr=(jsonObj)=>{
+	var nameArr=Object.keys(jsonObj);
+	var valArr=Object.values(jsonObj);
+	var arr=[]
+	for(var i=0;i<nameArr.length;i++){
+		arr[i]={name:nameArr[i],val:valArr[i]};
+	}
+	return arr;
+};
+
 //定义常量，asset状态与操作对应关系conAssStatusOprtArr
 const conAssStatusOprtArr={$conAssStatusOprtArr};
 <!-- console.log('conAssStatusOprtArr:'); -->
@@ -106,12 +119,9 @@ const conAssAuthOprtArr={$conAssAuthOprtArr};
 <!-- console.log(conAssAuthOprtArr); -->
 
 //定义常量，asset权限数组
-const conAssAuthArr=fnJsonToArr({$authAssObj});
+const conAssAuthArr= fnJsonToArr({$authAssObj});
 <!-- console.log('conAssAuthArr:'); -->
 <!-- console.log(conAssAuthArr); -->
-
-const conStatusArr=Object.values({$conAssStatusArr});
-const conLabelArr=Object.values({$conAssStatusLabelArr});
 
 //定义常量，
 const conOprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'info',title:'新增固定资产记录'},
@@ -126,49 +136,11 @@ const conOprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'inf
 			{name:'还原',val:'_RESTORE',gly:'retweet',color:'success',title:'记录还原'}
 			];
 
-
-var urlPrefix='{$home}/dashboard/asset/';
-
-
-//2个数组合并后去掉重复值
-var arrMerge=(arr1,arr2)=>{ 
-	var result = []; 
-	var arr = []; 
-	//将arr1和arr2合并入新数组arr.
-	arr = arr2.reduce(function(prev, curr){ 
-				prev.push(curr); 
-				return prev; 
-			}
-			,arr1
-		); 
-	//arr是否为2个数组的简单连接？？	
-	//console.log(arr);
-	//将arr数组中的值挨个推入result数组，推入前检查result中是否已经存在，不存在才推入result数组。从而达到对arr数组去掉重复值的目的。
-	for (var i = 0; i < arr.length; i++) { 
-		var index = arr[i]; 
-		if (result.indexOf(index) === -1) { 
-			result.push(index); 
-		} 
-	} 
-		
-	return result; 
-};
-
-//输入JSON对象：{$ authAssObj}={edit:1,audit:1,approve:0,maintain:0}
-//转成键值对数组形式输出authAssArr=[{name:'edit',val:'1'},{name:'audit',val:'1'},{name:'approve',val:'0'},{name:'maintain',val:'0'}]
-//便于应用数组的.forEach等函数进行自定义处理
-function fnJsonToArr(jsonObj){
-	var nameArr=Object.keys(jsonObj);
-	var valArr=Object.values(jsonObj);
-	var arr=[]
-	for(var i=0;i<nameArr.length;i++){
-		arr[i]={name:nameArr[i],val:valArr[i]};
-	}
-	return arr;
-};
+const conStatusArr=Object.values({$conAssStatusArr});
+const conLabelArr=Object.values({$conAssStatusLabelArr});
 
 //某个值是否在数组内
-function fnInArr(item, arr){
+var fnInArr=(item, arr)=>{
 	for (var i = 0; i < arr.length; i++) {
 		if (arr[i] == item) {
 			return true
@@ -181,7 +153,7 @@ function fnInArr(item, arr){
 //1.要产生多少个组件？
 //2.决定产生组件的条件？auth,status,??
 //status决定产生的操作组件数量，auth结合authVSoprt来决定显示给登录用户的操作组件数量。
-function getOprtHtmlStr(status){
+var getOprtHtmlStr=(status)=>{
  	
 	var aHtml='';
 	var authOprtArr=[];
@@ -228,7 +200,6 @@ function getOprtHtmlStr(status){
 				if(el==e.val){
 					aHtml+='<a class="aAssOprt text-'+e.color+'" href="#assInfo" data-ass-oprt="'+e.val+'" data-toggle="tooltip" data-title="'+e.title+'"><span class="glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'&nbsp;</a>';
 				}
-			
 			});
 		});
 	}else{
@@ -238,8 +209,36 @@ function getOprtHtmlStr(status){
 	return aHtml;
 };
 
+
+var urlPrefix='{$home}/dashboard/asset/';
+
+
+//2个数组合并后去掉重复值
+var arrMerge=(arr1,arr2)=>{ 
+	var result = []; 
+	var arr = []; 
+	//将arr1和arr2合并入新数组arr.
+	arr = arr2.reduce(function(prev, curr){ 
+				prev.push(curr); 
+				return prev; 
+			}
+			,arr1
+		); 
+	//arr是否为2个数组的简单连接？？	
+	//console.log(arr);
+	//将arr数组中的值挨个推入result数组，推入前检查result中是否已经存在，不存在才推入result数组。从而达到对arr数组去掉重复值的目的。
+	for (var i = 0; i < arr.length; i++) { 
+		var index = arr[i]; 
+		if (result.indexOf(index) === -1) { 
+			result.push(index); 
+		} 
+	} 
+		
+	return result; 
+};
+
 //利用自调用匿名函数立即执行的特点，设定固定资产的操作组件的html字符串;$('thead a') 添加属性
-(function($){
+;(function($){
 	
 	//每个.btnAssOprt根据该行记录的data-ass-status="{$ vo.status_now}"添加相应的a标签
 	$('.btnAssOprt').each(function(){

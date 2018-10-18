@@ -358,7 +358,7 @@ var buildfmSelectCom=(assType)=>{
 		ajaxShowSelect({sendData:{req:$('#selectDeptNow').attr('name'),assType:assType},obj:$('#selectDeptNow')}),
 		ajaxShowSelect({sendData:{req:$('#selectStatusNow').attr('name'),source:'db',assType:assType},obj:$('#selectStatusNow')}),
 		ajaxShowSelect({sendData:{req:$('#selectPlaceNow').attr('name'),assType:assType},obj:$('#selectPlaceNow')}),
-		ajaxShowSelect({sendData:{req:$('#selectKeeperNow').attr('name'),assType:assType},obj:$('#selectKeeperNow')}),
+		ajaxShowSelect({sendData:{req:$('#selectKeeperNow').attr('name'),assType:assType},obj:$('#selectKeeperNow')})
 	).then(
 		function(data, textStatus, jqXHR){
 			//$('.content-body')初始化

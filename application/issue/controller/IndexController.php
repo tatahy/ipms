@@ -1035,6 +1035,7 @@ class IndexController extends \think\Controller
           'topic'=>$topic,
          
           'issrecords'=>$issrecords,
+          'totalNum'=>count($issrecords),
           'year'=>date('Y')
         ]);
          
