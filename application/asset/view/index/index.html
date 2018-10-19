@@ -26,24 +26,24 @@
 			
 			<div class="row myRow">
 			<div class="form-group col-sm-4">
-				<label class="" for="brand_model">名称（品牌型号）</label>
+				<label class="control-label" for="brand_model">名称（品牌型号）</label>
 				<input class="form-control searchBg" id="brand_model" name="brand_model" type="text" value="" placeholder="...不限" />
 										
 			</div>
 			<div class="form-group col-sm-2">
-				<label class="" for="assnum">编号</label>
+				<label class="control-label" for="assnum">编号</label>
 				<input class="form-control searchBg" id="assnum" name="assnum" type="text" value="" placeholder="...不限" />
 										
 			</div>
 			
 			<div class="form-group col-sm-3">
-				<label class="" for="code">卡号</label>
+				<label class="control-label" for="code">卡号</label>
 				<input class="form-control searchBg" id="code" name="code" type="text" value="" placeholder="...不限" />
 										
 			</div>
 			
 			<div class="form-group col-sm-3">
-				<label class="" for="bar_code">条形码号</label>
+				<label class="control-label" for="bar_code">条形码号</label>
 				<input class="form-control searchBg" id="bar_code" name="bar_code" type="text" value="" placeholder="...不限" />
 										
 			</div>
@@ -65,7 +65,7 @@
 				</select>
 			</div>
 			<div class="form-group col-sm-3">
-				<label class="" for="place_now">现放置地点</label>
+				<label class="control-label" for="place_now">现放置地点</label>
 				<select multiple="multiple" size="4" class="form-control" id="selectPlaceNow" name="place_now" >
 						<option value="">p1</option>
 				</select>
@@ -75,13 +75,13 @@
 
 			<div class="row myRow">			
 			<div class="form-group col-sm-2">
-				<label class="" for="keeper_now">现保管人</label>
+				<label class="control-label" for="keeper_now">现保管人</label>
 				<input class="form-control searchBg" name="keeper_now" type="text" value="" placeholder="...不限" />
 										
 			</div>
 			
 			<div class="form-group col-sm-2">
-				<label class="" for="status_now_user_name">登记人</label>
+				<label class="control-label" for="status_now_user_name">登记人</label>
 				<input class="form-control searchBg" name="status_now_user_name" type="text" value="" placeholder="...不限" />
 						
 										
@@ -161,8 +161,8 @@ var getJsonLength=(jsonData)=>{
 //**函数名：glyphiconTextChange
  	//* 作用：obj内含的glyphicon进行变换
 	//* 参数1：obj，String。值：必须，要交换glyphicon的obj
-	//* 参数2：iconText1，Json。值：必须，{icon:'glyphicon-xx',text:'xx'}。
-	//* 参数3：iconText2，Json。值：必须，{icon:'glyphicon-yy',text:'yy'}。
+	//* 参数2：iconText1，Json。值：可为空，{icon:'glyphicon-xx',text:'xx'}。
+	//* 参数3：iconText2，Json。值：可为空，{icon:'glyphicon-yy',text:'yy'}。
 	//* 无返回值
 var glyphiconTextChange=(obj,iconText1,iconText2)=>{
 	iconText1=$.extend({icon:'glyphicon-collapse-up',text:'隐藏搜索'},iconText1);
@@ -334,7 +334,7 @@ var sortOrderToggle=(sortName)=>{
 var fmReset=()=>{
 	var fm=$('#fmAssSearch');
 	fm[0].reset();
-	fm.find('.form-control').prev('label').removeClass('label label-info');
+	fm.find('.form-control').closest('div').removeClass('has-warning');
 };
 
 //自调用匿名函数立即执行的特点，进行页面初始化。
@@ -364,7 +364,6 @@ $(document).ready(function(){
 	$('#nav_ass').addClass('active');
 	
 	$('#btnSearchInfo').click(function(){
-		
 		//变换图标和内容
 		glyphiconTextChange($(this));
 		//显示、隐藏#divSearchData
@@ -388,11 +387,11 @@ $(document).ready(function(){
 	
 	$('#fmAssSearch .form-control').change(function(){
 		if($(this).val()!=0){
-			//表单输入项的label附加底色
-			$(this).prev('label').addClass('label label-info');
+			//表单输入项做标识
+			$(this).closest('div').addClass('has-warning');
 		}else{
-			//表单输入项的label去除底色
-			$(this).prev('label').removeClass('label label-info');
+			//表单输入项去掉标识
+			$(this).closest('div').removeClass('has-warning');
 		}
 	});
 	

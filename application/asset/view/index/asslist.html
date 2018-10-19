@@ -2,12 +2,11 @@
 <div>
 	<!-- <p>{ $display}</p> -->
 	<p id="pSearchResultNum">
-		<strong class="label label-primary"></strong>记录数：<span id="spNum" class="">{$searchResultNum}</span>&nbsp;|
-		<strong class="label label-primary"></strong>数量：<span class="badge">{$quanCount}</span>
+		<span class="label label-primary assType"></span>记录数：<span id="spNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span>
 	</p>
 	<div class="table-responsive"> 
 		<table id="tblAssList" class="table table-bordered table-hover table-condensed" data-sort-order="asc">
-			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产信息列表</h4></caption>
+			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产信息列表<span class="label label-primary assType"></span></h4></caption>
 			<thead>
 				<tr>
 					<th class="text-center">序号</th>
@@ -83,8 +82,8 @@ const conLabelArr=Object.values({$conAssStatusLabelArr});
 	$('#tblAssList').data('sortOrder','{$sortData.sortOrder}');
 	
 	let spTitle=$('#ulAssType li.active a').find('.spTitle').html();
-	//#pSearchResultNum的strong内容随$('#ulAssType li.active a').find('.spTitle')变化
-	$('#pSearchResultNum').find('strong').html(spTitle);
+	//.assType内容随$('#ulAssType li.active a').find('.spTitle')变化
+	$('.assType').html(spTitle);
 	
 	
 	//#spNum的class跟随$('#ulAssType li.active a').find('.spClass')变化
@@ -104,7 +103,7 @@ const conLabelArr=Object.values({$conAssStatusLabelArr});
 	$('.aTblAssSingle').tooltip({title: "资产详情", placement: "bottom"}); 
 	
 	//每个$('.aAssRecords')添加tooltip
-	$('.aAssRecords').tooltip({title: "状态变化详情", placement: "bottom"}); 
+	$('.aAssRecords').tooltip({title: "状态历史记录", placement: "bottom"}); 
 	
 	<!-- //表格每页显示记录行数 -->
 	$('#listRows').val('{$sortData.listRows}'); 
