@@ -8,9 +8,13 @@
 namespace app\asset\model;
 
 use think\Model;
+//启用软删除
+use traits\model\SoftDelete;
 
 class Assinfo extends Model
 {
+    //启用软删除
+    use SoftDelete;
     //protected $auto = ['assnum','pronum'];
     //protected $insert = ['assinfo_id'];
     //protected $update = [];
@@ -48,6 +52,24 @@ class Assinfo extends Model
             }
         }
         return $output;
+    }
+    //全局查询范围，框架在查询时会自动调用
+    protected static function base($query)
+    {
+        //
+        $query->whereNull('delete_time')->where('id','>',0);
+        //$query->where('delete_time',0)->where('id','>',0);
+    }
+    
+    //查询asset的类别
+    protected function scopeAssType($query,$assType)
+    {
+      if($assType=='usual'){
+        $query->where('id','>',0);
+      }else{
+        $query->where('status_now','like','%'.$assType.'%');
+      }
+      
     }
 
     /**

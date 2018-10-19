@@ -7,34 +7,36 @@
  * 所有的公共常量都以"con"开头，再遵循驼峰命名法。
  */
 //asset的状态数组共7类14个
-const conAssStatusArr=['*'=>'*',
-                    '_ASSS0'=>'新增_待验收',
-                    //label-primary
-                    '_ASSS1_1'=>'待分配_初次验收合格',
-                    '_ASSS1_2'=>'待分配_维修验收合格',
-                    //label-success
+const conAssStatusArr=['_ASSS0'=>'*',
+                    //label-primary，待定
+                    '_ASSS1_1'=>'新增_待验收',
+                    '_ASSS1_2'=>'待分配_初次验收合格',
+                    '_ASSS1_3'=>'待分配_维修验收合格',
+                    //label-success，正常
                     '_ASSS2_1'=>'正常_折旧中',
                     '_ASSS2_2'=>'正常_折旧完',
-                    //label-warning
+                    //label-warning，异常
                     '_ASSS3_1'=>'异常_待更新',
                     '_ASSS3_2'=>'异常_待维修',
                     '_ASSS3_3'=>'异常_遗失',
-                    //label-default
+                    //label-default，停用
                     '_ASSS4_1'=>'停用_维修中',
                     '_ASSS4_2'=>'停用_封存',
-                    '_ASSS4-3'=>'待销账_报废',
-                    '_ASSS4-4'=>'待销账_遗失',
+                    '_ASSS4_3'=>'待销账_报废',
+                    '_ASSS4_4'=>'待销账_遗失',
+                    //label-default，销账
                     '_ASSS5'=>'销账',
                     //label-danger
                     '_ASSS6'=>'回收站'
                     ];
 
 //asset的状态标志数组共6类14个
-const conAssStatusLabelArr=['*'=>'info',
+const conAssStatusLabelArr=[
                     '_ASSS0'=>'info',
                     //label-primary
                     '_ASSS1_1'=>'primary',
                     '_ASSS1_2'=>'primary',
+                    '_ASSS1_3'=>'primary',
                     //label-success
                     '_ASSS2_1'=>'success',
                     '_ASSS2_2'=>'success',
@@ -45,8 +47,8 @@ const conAssStatusLabelArr=['*'=>'info',
                     //label-default
                     '_ASSS4_1'=>'default',
                     '_ASSS4_2'=>'default',
-                    '_ASSS4-3'=>'default',
-                    '_ASSS4-4'=>'default',
+                    '_ASSS4_3'=>'default',
+                    '_ASSS4_4'=>'default',
                     '_ASSS5'=>'default',
                     //label-danger
                     '_ASSS6'=>'danger'

@@ -3,10 +3,18 @@
 <!-- pagewrap  -->
 
 <div class="container-fluid" style="padding-top: 55px;">
+	<ul id="ulAssType" class="nav nav-pills nav-justified" style="border-bottom:solid 0.1px #ddd;">
+		<li class="active"><a class="aPill" href="#" data-ass-type="usual">固定资产<span class="spTitle">总计</span></a></li>
+		<li><a class="aPill" href="#" data-ass-type="_ASSS1"><span class="spTitle">待定</span></a></li>
+		<li><a class="aPill" href="#" data-ass-type="_ASSS2"><span class="spTitle">正常&nbsp;</span><span class="label label-success spClass">{$numNormal}</span></a></li>
+		<li><a class="aPill" href="#" data-ass-type="_ASSS3"><span class="spTitle">异常&nbsp;</span><span class="label label-warning spClass">{$numAbnormal}</span></a></li>
+		<li><a class="aPill" href="#" data-ass-type="_ASSS4"><span class="spTitle">停用&nbsp;</span><span class="label label-default spClass">{$numStopped}</a></span></li>
+		<li><a class="aPill" href="#" data-ass-type="_ASSS5"><span class="spTitle">销账</span></a></li>
+	</ul>
 	
 	<div id="divTopBtn" style="margin:10px 0px;">
-		<span class="label label-info" style="font-size:16px;">固定资产
-		</span>
+		<!-- <span class="label label-info" style="font-size:16px;">固定资产 -->
+		<!-- </span> -->
 		<button id="btnSearchInfo" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏搜索条件"><span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span></button>
 				
 		<button id="btnRefresh" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
@@ -19,24 +27,24 @@
 			<div class="row myRow">
 			<div class="form-group col-sm-4">
 				<label class="" for="brand_model">名称（品牌型号）</label>
-				<input class="form-control" id="brand_model" name="brand_model" type="text" value="" placeholder="...不限">
+				<input class="form-control searchBg" id="brand_model" name="brand_model" type="text" value="" placeholder="...不限" />
 										
 			</div>
 			<div class="form-group col-sm-2">
 				<label class="" for="assnum">编号</label>
-				<input class="form-control" id="assnum" name="assnum" type="text" value="" placeholder="...不限">
+				<input class="form-control searchBg" id="assnum" name="assnum" type="text" value="" placeholder="...不限" />
 										
 			</div>
 			
 			<div class="form-group col-sm-3">
 				<label class="" for="code">卡号</label>
-				<input class="form-control" id="code" name="code" type="text" value="" placeholder="...不限">
+				<input class="form-control searchBg" id="code" name="code" type="text" value="" placeholder="...不限" />
 										
 			</div>
 			
 			<div class="form-group col-sm-3">
 				<label class="" for="bar_code">条形码号</label>
-				<input class="form-control" id="bar_code" name="bar_code" type="text" value="" placeholder="...不限">
+				<input class="form-control searchBg" id="bar_code" name="bar_code" type="text" value="" placeholder="...不限" />
 										
 			</div>
 			</div>
@@ -45,34 +53,40 @@
 			<div class="form-group col-sm-4">
 				<label class="control-label" for="dept_now">现使用部门</label>
 				<!-- <select multiple class="form-control" id="searchPatType" name="searchPatType" > -->
-				<select class="form-control" id="selectDeptNow" name="dept_now" >
+				<select multiple="multiple" size="4" class="form-control" id="selectDeptNow" name="dept_now" >
 						<option value="">d1</option>
 				</select>
 			</div>
 			<div class="form-group col-sm-2">
 				<label class="control-label" for="status_now">状态</label>
 				<!-- <select multiple class="form-control" id="searchPatType" name="searchPatType" > -->
-				<select class="form-control" id="selectStatusNow" name="status_now" >
+				<select multiple="multiple" size="4" class="form-control" id="selectStatusNow" name="status_now" >
 						<option value="">s1</option>
 				</select>
 			</div>
-			<div class="form-group col-sm-4">
+			<div class="form-group col-sm-3">
 				<label class="" for="place_now">现放置地点</label>
-				<select class="form-control" id="selectPlaceNow" name="place_now" >
+				<select multiple="multiple" size="4" class="form-control" id="selectPlaceNow" name="place_now" >
 						<option value="">p1</option>
 				</select>
 										
 			</div>
-			
+			</div>	
+
+			<div class="row myRow">			
 			<div class="form-group col-sm-2">
 				<label class="" for="keeper_now">现保管人</label>
-				<select class="form-control" id="selectKeeperNow" name="keeper_now" >
-						<option value="">k1</option>
-				</select>
+				<input class="form-control searchBg" name="keeper_now" type="text" value="" placeholder="...不限" />
 										
 			</div>
-			</div>			
 			
+			<div class="form-group col-sm-2">
+				<label class="" for="status_now_user_name">登记人</label>
+				<input class="form-control searchBg" name="status_now_user_name" type="text" value="" placeholder="...不限" />
+						
+										
+			</div>
+			</div>	
 			
 			<div class="row myRow">
 			<div class="col-sm-6">
@@ -88,13 +102,14 @@
 		</br>
 	</div>
 	
-	<!-- <p id="pSearchResultNum" hidden="true"><strong>搜索结果</strong>:&nbsp;<span class="label label-info">{ $searchResultNum}</span>条记录</p> -->
-	
-	<div id="divLoadAssList">
-		<p class="text-center" style="font-size:20px;">加载中……</p>
+	<div class="tab-content">
+		<div id="divLoadAssList">
+			<p class="text-center" style="font-size:20px;">加载中……</p>
+		</div>
 	</div>
 	
-	
+	<!-- <p id="pSearchResultNum" hidden="true"><strong>搜索结果</strong>:&nbsp;<span class="label label-info">{ $searchResultNum}</span>条记录</p> -->
+		
 </div>
 
 <!-- Modal "modalAssSingle" -->
@@ -129,10 +144,9 @@
 <!-- /pagewrap  -->
 
 <script>
-var searchDataArr={$searchData};
+//var searchDataArr={$searchData};
 
-console.dir(searchDataArr);
-
+var assType='{$assType}';
 
 //**函数名：getJsonLength
  	//* 作用：得到jsonData的长度
@@ -178,7 +192,7 @@ var ajaxShowSelect=(options)=>{
 	};
 	var data = $.extend({},defaults, options);
 	var arrJson=data.attach;
-	var req=data.sendData.req;
+	//var req=data.sendData.req;
 	var obj=data.obj;
 	var selected=data.selected;
 	var str='';
@@ -198,7 +212,11 @@ var ajaxShowSelect=(options)=>{
 		<!--// 添加单选框Obj的新选项-->
 		obj.append(str);
 		<!-- // value=selected 的项为选定项-->
-		if (selected!=''){
+		if (Array.isArray(selected)){
+			selected.forEach(function(e){
+				obj.val(selected);
+			});
+		}else{
 			obj.val(selected);
 		}
 	});
@@ -214,22 +232,41 @@ var ajaxShowSelect=(options)=>{
 var loadAssList=(sortData)=>{
 		
 	//排序有关的参数默认值
-	var sortDataDefault={'listRows':10,'sortName':'assnum','sortOrder':'asc','pageNum':1};
+	var sortDataDefault={'listRows':10,'sortName':'assnum','sortOrder':'asc','pageNum':1,'assType':assType};
 	sortData=$.extend({},sortDataDefault,sortData);
+	var deptNowArr=$('#selectDeptNow').val();
+	var statusNowArr=$('#selectStatusNow').val();
+	var placeNowArr=$('#selectPlaceNow').val();
 	
 	//用户搜索有关键值对从表单$('#fmIssPatSearch')获取
 	var formData=new FormData($('#fmAssSearch')[0]);
-	
+	<!-- for(var pair of formData.entries()){ -->
+		<!-- console.log(pair[0]+','+pair[1]); -->
+	<!-- } -->
 	var searchData={};
+	
+	if(deptNowArr){
+		formData.append('dept_now',deptNowArr);
+	}
+	
+	if(statusNowArr){
+		formData.append('status_now',statusNowArr);
+	}
+	
+	if(placeNowArr){
+		formData.append('place_now',placeNowArr);
+	}
+	
 	//使用Map对象的forEach方法组装键值对
 	formData.forEach(function(val,key){
 		//非0非空的值才进行组装
 		if(val!='' && val!=0){
 			searchData[key]=val;
-		}
+		}	
 	});
+	<!-- // 转换成json字符串-->
 	JSON.stringify(searchData);
-	
+		
 	$('#divLoadAssList').html('<p class="text-center" style="font-size:20px;">加载中……</p>');
 	
 	//console.log('sortData:');
@@ -240,6 +277,22 @@ var loadAssList=(sortData)=>{
 		{'sortData':sortData,'searchData':searchData},
 		function(){
 			sortOrderToggle(sortData.sortName);
+			<!-- //设定$('#fmAssSearch')内的select组件的option -->
+			$.when(
+				ajaxShowSelect({'sendData':{'req':$('#selectDeptNow').attr('name'),'assType':assType},'selected':deptNowArr,'obj':$('#selectDeptNow')}),
+				ajaxShowSelect({'sendData':{'req':$('#selectStatusNow').attr('name'),'assType':assType},'selected':statusNowArr,'obj':$('#selectStatusNow')}),
+				ajaxShowSelect({'sendData':{'req':$('#selectPlaceNow').attr('name'),'assType':assType},'selected':placeNowArr,'obj':$('#selectPlaceNow')})
+		<!-- ajaxShowSelect({sendData:{req:$('#selectKeeperNow').attr('name')},obj:$('#selectKeeperNow')}) -->
+			).then(
+				function(data, textStatus, jqXHR){
+     			//ajax成功
+				
+				},
+				function(){
+					//ajax失败
+					$.alert('加载失败，请稍后再试！');
+				}
+			);
 		}
 	);
 };
@@ -275,59 +328,38 @@ var sortOrderToggle=(sortName)=>{
 		obj.tooltip({title:'当前为降序。点击后升序',placement: 'top'});
 		obj.data('sortOrder','asc');
 	}
-		
 };
 
 //搜索表单重置
 var fmReset=()=>{
 	var fm=$('#fmAssSearch');
 	fm[0].reset();
-	fm.find('.form-control').removeClass('label-info');
+	fm.find('.form-control').prev('label').removeClass('label label-info');
 };
 
-//利用自调用匿名函数立即执行的特点，设定$('#selectDeptNow')、$('#selectPlaceNow')、$('#selectKeeperNow')、$('#selectStatusNow')。
-(function($,ajaxShowSelect){
-
-	<!-- //设定$('#fmAssSearch')内的select组件的option -->
-	<!-- $.when( -->
-		<!-- ajaxShowSelect({sendData:{req:$('#selectDeptNow').attr('name')},obj:$('#selectDeptNow')}), -->
-		<!-- ajaxShowSelect({sendData:{req:$('#selectStatusNow').attr('name')},obj:$('#selectStatusNow')}), -->
-		<!-- ajaxShowSelect({sendData:{req:$('#selectPlaceNow').attr('name')},obj:$('#selectPlaceNow')}), -->
-		<!-- ajaxShowSelect({sendData:{req:$('#selectKeeperNow').attr('name')},obj:$('#selectKeeperNow')}), -->
-	<!-- ).then( -->
-		<!-- function(data, textStatus, jqXHR){ -->
-     		<!-- //ajax成功 -->
-			<!-- loadAssList(); -->
-		<!-- }, -->
-		<!-- function(){ -->
-			<!-- //ajax失败 -->
-			<!-- $.alert('加载失败，请稍后再试！'); -->
-		<!-- } -->
-	<!-- ); -->
+//自调用匿名函数立即执行的特点，进行页面初始化。
+(function($){
+	loadAssList();
 	
+	$('.aPill').each(function(){
+		// 显示边框
+		$(this).css("border","solid 1px #ddd");	
+	});
 	
-		$.when(
-		ajaxShowSelect({sendData:{req:$('#selectDeptNow').attr('name')},obj:$('#selectDeptNow')}),
-		ajaxShowSelect({sendData:{req:$('#selectStatusNow').attr('name')},obj:$('#selectStatusNow')}),
-		ajaxShowSelect({sendData:{req:$('#selectPlaceNow').attr('name')},obj:$('#selectPlaceNow')}),
-		ajaxShowSelect({sendData:{req:$('#selectKeeperNow').attr('name')},obj:$('#selectKeeperNow')})
-	).then(
-		function(data, textStatus, jqXHR){
-     		//ajax成功
-			loadAssList();
-		},
-		function(){
-			//ajax失败
-			$.alert('加载失败，请稍后再试！');
-		}
-	);
-	
-})(jQuery,ajaxShowSelect);
+})(jQuery);
 
 $(document).ready(function(){
 	// 设置各类tooltip
 	$('#divTopBtn [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
 	
+	$('.aPill').click(function(){
+		assType=$(this).data('assType');
+		$(this).tab('show');
+		//搜索表单重置
+		fmReset();
+		loadAssList();
+
+    });
 	<!-- 选中id为"nav_pat"的标签（header.html文件中的li标签）,添加.active -->
 	$('#nav_ass').addClass('active');
 	
@@ -355,13 +387,12 @@ $(document).ready(function(){
 <!-- //表单$('#fmAssSearch')有关的代码块 -->
 	
 	$('#fmAssSearch .form-control').change(function(){
-		
 		if($(this).val()!=0){
-			//表单输入框附加底色
-			$(this).addClass('label-info');
+			//表单输入项的label附加底色
+			$(this).prev('label').addClass('label label-info');
 		}else{
-			//表单输入框去掉附加底色
-			$(this).removeClass('label-info');
+			//表单输入项的label去除底色
+			$(this).prev('label').removeClass('label label-info');
 		}
 	});
 	

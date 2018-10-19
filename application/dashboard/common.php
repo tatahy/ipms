@@ -3,10 +3,10 @@
 
 //asset的状态与操作的对应关系（conAssStatusOprtArr）
 const conAssStatusOprtArr=[
-                      ['status'=>'*','statusChi'=>'*','oprt'=>['_UPDATE','_SUBMIT','_DELETE'],'nextStatus'=>[]],
-                      ['status'=>'_ASSS0','statusChi'=>'新增_待验收','oprt'=>['_UPDATE','_SUBMIT'],'nextStatus'=>[]],
-                      ['status'=>'_ASSS1_1','statusChi'=>'待分配_初次验收合格','oprt'=>['_UPDATE','_AUDIT'],'nextStatus'=>[]],
-                      ['status'=>'_ASSS1_2','statusChi'=>'待分配_维修验收合格','oprt'=>['_UPDATE','_AUDIT'],'nextStatus'=>[]],
+                      ['status'=>'_ASSS0','statusChi'=>'*','oprt'=>['_UPDATE','_SUBMIT','_DELETE'],'nextStatus'=>[]],
+                      ['status'=>'_ASSS1_1','statusChi'=>'新增_待验收','oprt'=>['_UPDATE','_SUBMIT'],'nextStatus'=>[]],
+                      ['status'=>'_ASSS1_2','statusChi'=>'待分配_初次验收合格','oprt'=>['_UPDATE','_AUDIT'],'nextStatus'=>[]],
+                      ['status'=>'_ASSS1_3','statusChi'=>'待分配_维修验收合格','oprt'=>['_UPDATE','_AUDIT'],'nextStatus'=>[]],
                       ['status'=>'_ASSS2_1','statusChi'=>'正常_折旧中','oprt'=>['_UPDATE','_SUBMIT'],'nextStatus'=>[]],
                       ['status'=>'_ASSS2_2','statusChi'=>'正常_折旧完','oprt'=>['_UPDATE','_SUBMIT'],'nextStatus'=>[]],
                       ['status'=>'_ASSS3_1','statusChi'=>'异常_待更新','oprt'=>['_UPDATE','_AUDIT','_TRASH'],'nextStatus'=>[]],

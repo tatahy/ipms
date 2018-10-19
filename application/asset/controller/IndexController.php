@@ -38,6 +38,11 @@ class IndexController extends \think\Controller
             //$this->redirect($request->domain());
         }
     }
+    //asset数量
+    private function priAssNum($assType){
+      $num=AssinfoModel::scope('assType',$assType)->count();
+      return $num;
+    }
     
     public function index(Request $request,AssinfoModel $assMdl)
     {
@@ -49,6 +54,10 @@ class IndexController extends \think\Controller
         $searchData=array('brand_model'=>'','assnum'=>'','code'=>'','bar_code'=>'','dept_now'=>'','place_now'=>'','keeper_now'=>'');
         
         $this->assign([
+          'numNormal'=>$this->priAssNum('_ASSS2'),
+          'numAbnormal'=>$this->priAssNum('_ASSS3'),
+          'numStopped'=>$this->priAssNum('_ASSS4'),
+          'assType'=>'usual',
                     
           'home'=>$request->domain(),
           'username'=>$this->username,
@@ -66,37 +75,47 @@ class IndexController extends \think\Controller
     public function assList(Request $request,AssinfoModel $assMdl,$sortData=[],$searchData=[])
     {
         $this->priLogin();
-        
-        //搜索查询条件数组
-        $whereArr=[];
-        $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1);
+        $whereAssType=[];
+        $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1,'assType'=>'usual');
         // 接收前端的排序参数数组
         $sortData=!empty($request->param('sortData/a'))?$request->param('sortData/a'):$sortDefaults;
         $sortData=array_merge($sortDefaults,$sortData);
+        $assType=$sortData['assType'];
         
         $searchDefaults=array();
-        // 接收前端的搜索参数数组，由前端保证传来的搜索参数值非0，非空。
+        // 接收前端的搜索参数（json字符串），由前端保证传来的搜索参数值非0，非空。
         $searchData=!empty($request->param('searchData/a'))?$request->param('searchData/a'):$searchDefaults;
         $searchData=array_merge($searchDefaults,$searchData);
-        
-        $whereArr['id']=['>',0];
-        
+        //搜索查询条件数组
+        $whereArr=[];
+        $statusArr=[];
+               
         $whereArr['brand_model']=!empty($searchData['brand_model'])?['like','%'.$searchData['brand_model'].'%']:'';
         $whereArr['assnum']=!empty($searchData['assnum'])?['like','%'.$searchData['assnum'].'%']:'';
         $whereArr['code']=!empty($searchData['code'])?['like','%'.$searchData['code'].'%']:'';
         $whereArr['bar_code']=!empty($searchData['bar_code'])?['like','%'.$searchData['bar_code'].'%']:'';
         
-        $whereArr['dept_now']=!empty($searchData['dept_now'])?$searchData['dept_now']:'';
-        $whereArr['place_now']=!empty($searchData['place_now'])?$searchData['place_now']:'';
-        $whereArr['keeper_now']=!empty($searchData['keeper_now'])?$searchData['keeper_now']:'';
-        $whereArr['status_now']=!empty($searchData['status_now'])?$searchData['status_now']:'';
-        //将$whereArr['status_now']的值（中文）转为类型编码
-        foreach(conAssStatusArr as $key=>$val){
-          if($whereArr['status_now']==$val){
-            $whereArr['status_now']=$key;
+        $whereArr['dept_now']=!empty($searchData['dept_now'])?['in',$searchData['dept_now']]:'';
+        $whereArr['place_now']=!empty($searchData['place_now'])?['in',$searchData['place_now']]:'';
+        //将$searchData['status_now']的值（‘,’分隔的中文字符串）转为数据库中存储的类型编码数组
+        if(!empty($searchData['status_now'])){
+          $arr=explode(',',$searchData['status_now']);
+          foreach(conAssStatusArr as $key=>$val){
+            for($i=0;$i<count($arr);$i++){
+              if($arr[$i]==$val){
+                array_push($statusArr,$key);
+              }
+            }
           }
+          $whereArr['status_now']=['in',$statusArr];
+        }else{
+          $whereArr['status_now']='';
         }
+                
+        $whereArr['keeper_now']=!empty($searchData['keeper_now'])?['like','%'.$searchData['keeper_now'].'%']:'';
+        $whereArr['status_now_user_name']=!empty($searchData['status_now_user_name'])?['like','%'.$searchData['status_now_user_name'].'%']:'';
         
+        //将空值的whereArr元素删除        
         foreach($whereArr as $key=>$val){
             if(empty($val)){
                 unset($whereArr[$key]);
@@ -104,33 +123,34 @@ class IndexController extends \think\Controller
         }
         
         //分页,每页$listRows条记录
-        $assSet=$assMdl::where($whereArr)
+        $assSet=$assMdl::scope('assType',$assType)
+                        ->where($whereArr)
                         //->order('place_now', 'asc')
                         ->order($sortData['sortName'], $sortData['sortOrder'])
                         ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
                         'query'=>['listRows'=>$sortData['listRows']]]);
-        $searchResultNum=count($assMdl::where($whereArr)->select());
+        $searchResultNum=count($assMdl::scope('assType',$assType)->where($whereArr)->select());
         // 获取分页显示
         $assList=$assSet->render(); 
         //数量总计
-        $quanCount=$assMdl->where($whereArr)->sum('quantity');
+        $quanCount=$assMdl::scope('assType',$assType)->where($whereArr)->sum('quantity');
         $this->assign([
           'home'=>$request->domain(),
           'assSet'=>$assSet,
           'assList'=>$assList,
           
           'searchResultNum'=>$searchResultNum,
-          
           //排序数组
           'sortData'=>$sortData,
-          
           //搜索数组
           'searchData'=>$searchData,
           'quanCount'=>$quanCount,
-          
-          'whereArr'=>json_encode($whereArr,JSON_UNESCAPED_UNICODE),
+          //传送状态有关的设置
           'conAssStatusArr'=>json_encode(conAssStatusArr,JSON_UNESCAPED_UNICODE), 
-          'conAssStatusLabelArr'=>json_encode(conAssStatusLabelArr,JSON_UNESCAPED_UNICODE),     
+          'conAssStatusLabelArr'=>json_encode(conAssStatusLabelArr,JSON_UNESCAPED_UNICODE), 
+          //调试用
+          'whereArr'=>json_encode($whereArr,JSON_UNESCAPED_UNICODE),
+          'display'=>json_encode($statusArr,JSON_UNESCAPED_UNICODE), 
 		  
         ]);
         return view();
@@ -138,14 +158,19 @@ class IndexController extends \think\Controller
     }
     
     //响应前端请求，返回信息
-    public function selectResponse(Request $request,AssinfoModel $assMdl,$req='')
+    public function selectResponse(Request $request,AssinfoModel $assMdl,$req='',$assType='')
     {
       $this->priLogin();
       
       $req = empty($request->param('req'))?0:$request->param('req');
+      $assType = empty($request->param('assType'))?0:$request->param('assType');
       
-      $res=$assMdl->field($req)->group($req)->select();
-         
+      if($assType){
+        $res=$assMdl::scope('assType',$assType)->field($req)->group($req)->select();
+      }else{
+        $res=$assMdl->field($req)->group($req)->select();
+      }
+               
       //将得到的数据集降为一维数组
       if(is_array($res)){
         $res=collection($res)->column($req);        
@@ -158,6 +183,19 @@ class IndexController extends \think\Controller
     }
     
      public function tblAssSingle(Request $request,AssinfoModel $assMdl)
+    {
+      $this->priLogin();
+      $assSet=$assMdl::get($request->param('id'));
+           
+      $this->assign([
+          'assSet'=>$assSet,
+          'conAssStatusArr'=>json_encode(conAssStatusArr,JSON_UNESCAPED_UNICODE), 
+          'conAssStatusLabelArr'=>json_encode(conAssStatusLabelArr,JSON_UNESCAPED_UNICODE),     
+        ]);
+      return view();
+    }
+    
+     public function assRecords(Request $request,AssinfoModel $assMdl)
     {
       $this->priLogin();
       $assSet=$assMdl::get($request->param('id'));

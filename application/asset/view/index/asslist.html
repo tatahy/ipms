@@ -1,13 +1,13 @@
 <!-- pagewrap  -->	
 <div>
-	<!-- <p>{$ conAssStatusArr}</p> -->
+	<!-- <p>{ $display}</p> -->
 	<p id="pSearchResultNum">
-		<strong>列表记录总数</strong>:&nbsp;<span class="label label-info">{$searchResultNum}</span>&nbsp;|
-		<strong>数量总计：</strong><span class="badge">{$quanCount}</span>
+		<strong class="label label-primary"></strong>记录数：<span id="spNum" class="">{$searchResultNum}</span>&nbsp;|
+		<strong class="label label-primary"></strong>数量：<span class="badge">{$quanCount}</span>
 	</p>
 	<div class="table-responsive"> 
 		<table id="tblAssList" class="table table-bordered table-hover table-condensed" data-sort-order="asc">
-			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产概况列表</h4></caption>
+			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产信息列表</h4></caption>
 			<thead>
 				<tr>
 					<th class="text-center">序号</th>
@@ -37,7 +37,7 @@
 					<td class="text-right">{$vo.quantity}</td>
 					<td class="text-right">{$vo.dept_now}</td>
 					<td class="text-right">{$vo.keeper_now}</td>
-					<td class="text-right"><span class="spStatus">{$vo.status_now}</span></td>
+					<td class="text-right"><a class="aAssRecords" href="#" data-ass-id="{$vo.id}"><span class="spStatus">{$vo.status_now}</span></a></td>
 					<td class="text-right">{$vo.status_now_user_name}</td>
 				
 				</tr>
@@ -77,10 +77,23 @@ var urlPrefix='{$home}/asset/index/';
 const conStatusArr=Object.values({$conAssStatusArr});
 const conLabelArr=Object.values({$conAssStatusLabelArr});
 
-//利用自调用匿名函数立即执行的特点，$('thead a') 添加属性等
+//利用自调用匿名函数立即执行的特点，页面初始化
 (function($){
 	//表格排序asc/desc
 	$('#tblAssList').data('sortOrder','{$sortData.sortOrder}');
+	
+	let spTitle=$('#ulAssType li.active a').find('.spTitle').html();
+	//#pSearchResultNum的strong内容随$('#ulAssType li.active a').find('.spTitle')变化
+	$('#pSearchResultNum').find('strong').html(spTitle);
+	
+	
+	//#spNum的class跟随$('#ulAssType li.active a').find('.spClass')变化
+	let spClass=$('#ulAssType li.active a').find('.spClass').attr('class');
+	if(spClass){
+		$('#spNum').addClass(spClass);
+	}else{
+		$('#spNum').addClass('label label-info');
+	}
 	
 	//每个$('thead a')添加属性
 	$('thead a').each(function(){
@@ -88,7 +101,10 @@ const conLabelArr=Object.values({$conAssStatusLabelArr});
 	});
 	
 	//每个$('.aTblAssSingle')添加tooltip
-	$('.aTblAssSingle').tooltip({title: "查看详情", placement: "bottom"}); 
+	$('.aTblAssSingle').tooltip({title: "资产详情", placement: "bottom"}); 
+	
+	//每个$('.aAssRecords')添加tooltip
+	$('.aAssRecords').tooltip({title: "状态变化详情", placement: "bottom"}); 
 	
 	<!-- //表格每页显示记录行数 -->
 	$('#listRows').val('{$sortData.listRows}'); 
@@ -126,6 +142,18 @@ $(document).ready(function(){
 		$('#divLoadAssSingle').load(urlPrefix+'tblAssSingle',{'id':$(this).data('assId')});
 		
 		$('#modalAssSingle').find('.title').html('固定资产详情');
+		$('#modalAssSingle').modal();
+	});
+	
+	$('.aAssRecords').click(function(){
+		//去掉所有行的底色
+		$('tr').removeClass('bg-warning');
+		//给本行上底色
+		$(this).closest('tr').addClass('bg-warning');
+		
+		$('#divLoadAssSingle').load(urlPrefix+'assRecords',{'id':$(this).data('assId')});
+		
+		$('#modalAssSingle').find('.title').html('固定资产状态变化详情');
 		$('#modalAssSingle').modal();
 	});
 	
