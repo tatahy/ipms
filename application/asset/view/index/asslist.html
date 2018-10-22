@@ -1,9 +1,12 @@
 <!-- pagewrap  -->	
 <div>
 	<!-- <p>{ $display}</p> -->
+	<!-- <p>{ $whereArr}</p> -->
+	{neq name="searchResultNum" value="0"}
 	<p id="pSearchResultNum">
 		<span class="label label-primary assType"></span>记录数：<span id="spNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span>
 	</p>
+	{/neq}
 	<div class="table-responsive"> 
 		<table id="tblAssList" class="table table-bordered table-hover table-condensed" data-sort-order="asc">
 			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产信息列表<span class="label label-primary assType"></span></h4></caption>

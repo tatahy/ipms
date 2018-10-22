@@ -10,7 +10,7 @@ use app\asset\model\Assinfo as AssinfoModel;
 class IndexController extends \think\Controller
 {
      //用户名
-    private $username = null;
+    private $userName = null;
     //用户密码
     private $pwd = null;
     //用户登录状态
@@ -19,15 +19,18 @@ class IndexController extends \think\Controller
     private $roles=array();
     //用户所在部门
     private $dept = null;
+    //用户的asset权限
+    private $auth = [];
     
     // 初始化
     protected function _initialize()
     {
-        $this->username=Session::get('username');
+        $this->userName=Session::get('username');
         $this->pwd=Session::get('pwd');
         $this->log=Session::get('log');
         $this->roles=Session::get('role');
         $this->dept=Session::get('dept');
+        $this->auth=Session::get('authArr')['ass'];
     }
     
     //
@@ -38,33 +41,56 @@ class IndexController extends \think\Controller
             //$this->redirect($request->domain());
         }
     }
+    
     //asset数量
-    private function priAssNum($assType){
-      $num=AssinfoModel::scope('assType',$assType)->count();
-      return $num;
+    private function priAssNum($assType=''){
+      $assType=!empty($assType)?$assType:'usual';
+      return $this->priAssQueryObj($assType)->count();
+    }
+    
+    //asset查询语句对象
+    private function priAssQueryObj($assType){
+      $authNum=0;
+        foreach($this->auth as $val){
+        $authNum+=$val;
+      }
+      //登录用户的asset权限有且仅有read，仅能查阅自己名下的asset，
+      if($this->auth['read']==1 && $authNum<=1){
+        $query=AssinfoModel::scope('assType',$assType)->where('keeper_now',$this->userName);
+      }else{
+        $query=AssinfoModel::scope('assType',$assType);
+      }
+      
+      return $query;
     }
     
     public function index(Request $request,AssinfoModel $assMdl)
     {
         $this->priLogin();
         
-        
         $sortData=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1);
         
         $searchData=array('brand_model'=>'','assnum'=>'','code'=>'','bar_code'=>'','dept_now'=>'','place_now'=>'','keeper_now'=>'');
         
         $this->assign([
-          'numNormal'=>$this->priAssNum('_ASSS2'),
-          'numAbnormal'=>$this->priAssNum('_ASSS3'),
-          'numStopped'=>$this->priAssNum('_ASSS4'),
+          'read'=>$this->auth['read'],
+          
+          'numTotal'=>$this->priAssNum(),
+          'num_ASSS1'=>$this->priAssNum('_ASSS1'),
+          'num_ASSS2'=>$this->priAssNum('_ASSS2'),
+          'num_ASSS3'=>$this->priAssNum('_ASSS3'),
+          'num_ASSS4'=>$this->priAssNum('_ASSS4'),
+          'num_ASSS5'=>$this->priAssNum('_ASSS5'),
+          
           'assType'=>'usual',
                     
           'home'=>$request->domain(),
-          'username'=>$this->username,
+          'username'=>$this->userName,
           'year'=>date('Y'),
           
           'sortData'=>$sortData,
           'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
+          'auth'=>json_encode($this->auth,JSON_UNESCAPED_UNICODE)
           
         ]);
         return view();
@@ -75,7 +101,7 @@ class IndexController extends \think\Controller
     public function assList(Request $request,AssinfoModel $assMdl,$sortData=[],$searchData=[])
     {
         $this->priLogin();
-        $whereAssType=[];
+                          
         $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1,'assType'=>'usual');
         // 接收前端的排序参数数组
         $sortData=!empty($request->param('sortData/a'))?$request->param('sortData/a'):$sortDefaults;
@@ -89,7 +115,7 @@ class IndexController extends \think\Controller
         //搜索查询条件数组
         $whereArr=[];
         $statusArr=[];
-               
+                
         $whereArr['brand_model']=!empty($searchData['brand_model'])?['like','%'.$searchData['brand_model'].'%']:'';
         $whereArr['assnum']=!empty($searchData['assnum'])?['like','%'.$searchData['assnum'].'%']:'';
         $whereArr['code']=!empty($searchData['code'])?['like','%'.$searchData['code'].'%']:'';
@@ -121,36 +147,38 @@ class IndexController extends \think\Controller
                 unset($whereArr[$key]);
             }
         }
-        
+              
         //分页,每页$listRows条记录
-        $assSet=$assMdl::scope('assType',$assType)
-                        ->where($whereArr)
-                        //->order('place_now', 'asc')
-                        ->order($sortData['sortName'], $sortData['sortOrder'])
-                        ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
+        $assSet=$this->priAssQueryObj($assType)
+                      ->order($sortData['sortName'], $sortData['sortOrder'])
+                      ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
                         'query'=>['listRows'=>$sortData['listRows']]]);
-        $searchResultNum=count($assMdl::scope('assType',$assType)->where($whereArr)->select());
         // 获取分页显示
         $assList=$assSet->render(); 
+        
+        //记录总数
+        $searchResultNum=count($this->priAssQueryObj($assType)->select());        
         //数量总计
-        $quanCount=$assMdl::scope('assType',$assType)->where($whereArr)->sum('quantity');
+        $quanCount=$this->priAssQueryObj($assType)->sum('quantity');
+        
         $this->assign([
           'home'=>$request->domain(),
           'assSet'=>$assSet,
           'assList'=>$assList,
           
           'searchResultNum'=>$searchResultNum,
+          'quanCount'=>$quanCount,
+          
           //排序数组
           'sortData'=>$sortData,
           //搜索数组
           'searchData'=>$searchData,
-          'quanCount'=>$quanCount,
-          //传送状态有关的设置
+          //状态有关的设置
           'conAssStatusArr'=>json_encode(conAssStatusArr,JSON_UNESCAPED_UNICODE), 
           'conAssStatusLabelArr'=>json_encode(conAssStatusLabelArr,JSON_UNESCAPED_UNICODE), 
           //调试用
           'whereArr'=>json_encode($whereArr,JSON_UNESCAPED_UNICODE),
-          'display'=>json_encode($statusArr,JSON_UNESCAPED_UNICODE), 
+          'display'=>$this->userName, 
 		  
         ]);
         return view();

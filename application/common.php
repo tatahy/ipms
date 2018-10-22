@@ -30,7 +30,7 @@ const conAssStatusArr=['_ASSS0'=>'*',
                     '_ASSS6'=>'回收站'
                     ];
 
-//asset的状态标志数组共6类14个
+//asset的状态标志数组共6类14个，发送给前端决定label标签类型
 const conAssStatusLabelArr=[
                     '_ASSS0'=>'info',
                     //label-primary
@@ -84,13 +84,13 @@ const conAssStatusLabelArr=[
 //    $authPro=array('编辑'=>0,'审核'=>0,'审批'=>0,'执行'=>0,'维护'=>0);
 //    $authThe=array('编辑'=>0,'审核'=>0,'审批'=>0,'执行'=>0,'维护'=>0);
 //    $authAtt=array('上传'=>0,'下载'=>0,'删除'=>0,'移动'=>0,'复制'=>0); 
-        
+    //'read'权限仅为用户登录后前台的“查阅”权限，后台“用户中心”无需该权限
     $authIss=array('edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0);
     $authPat=array('edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0);
     $authPro=array('edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0);
     $authThe=array('edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0);
     $authAtt=array('upload'=>0,'download'=>0,'erase'=>0,'move'=>0,'copy'=>0);
-    $authAss=array('edit'=>0,'audit'=>0,'approve'=>0,'maintain'=>0);
+    $authAss=array('read'=>0,'edit'=>0,'audit'=>0,'approve'=>0,'maintain'=>0);
 
     $authAdmin=array('enable'=>0);
 

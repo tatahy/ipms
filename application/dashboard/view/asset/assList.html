@@ -123,7 +123,7 @@ const conAssAuthArr= fnJsonToArr({$authAssObj});
 <!-- console.log('conAssAuthArr:'); -->
 <!-- console.log(conAssAuthArr); -->
 
-//定义常量，
+//定义常量，操作组件的重要属性
 const conOprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'info',title:'新增固定资产记录'},
 			{name:'提交',val:'_SUBMIT',gly:'send',color:'info',title:'提交记录'},
 			{name:'审核',val:'_AUDIT',gly:'check',color:'warning',title:'审核记录'},
@@ -346,6 +346,7 @@ $(document).ready(function(){
 		
 	});
 	
+	//页面内所有'.aAssOprt'的click事件
 	$('.aAssOprt').click(function(){
 		var dataFromObj=$(this).closest('td');
 		var oprt=$(this).data('assOprt');
@@ -353,8 +354,9 @@ $(document).ready(function(){
 		$('tr').removeClass('bg-warning');
 		//给本行上底色
 		$(this).closest('tr').addClass('bg-warning');
-		//排序有关的值向$('#divTblSortData')汇集。发送本行的assId，便于刷新时本行继续加底色
+		//排序有关的值向$('#divTblSortData')汇集。发送本行的assId，便于刷新后本行继续加底色
 		$('#divTblSortData').data('showAssId',dataFromObj.data('assId'));
+		//向后端请求具体内容
 		var data={'oprt':oprt,'id':dataFromObj.data('assId')}
 		$('#divLoadAssSingle').load(urlPrefix+'fmAssSingle',data);
 		
@@ -369,7 +371,7 @@ $(document).ready(function(){
 			//console.log(strHtml);
 			return strHtml;
 		};
-		
+		//显示modal
 		$('#modalAssSingle').find('.title').html('【'+spanStr(oprt)+'】固定资产记录');
 		$('#modalAssSingle').modal();
 		

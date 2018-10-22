@@ -109,7 +109,10 @@ class IndexController extends \think\Controller
         foreach($this->authArr as $key => $val){
           $n=0;
           foreach($val as $k => $v){
-            $n+=$v;
+            //'read'权限仅为用户登录后前台的“查阅”权限，后台“用户中心”无需该权限
+            if($k!='read'){
+              $n+=$v;
+            }
           }
           switch($key){
             case 'iss':

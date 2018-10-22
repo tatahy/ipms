@@ -278,7 +278,7 @@ $(document).ready(function(){
     		modalObj.find('.spRemove').hide();
 			
 			//根据.modal的'data-oprt'值选定button，初始化赋值
-			$('button:submit').hide();
+			$('#modalEditUsergroup button:submit').hide();
 			switch($('.modal').attr('data-oprt')){
 				case '_ADDNEW':
 					$('#btnCreate').show();
@@ -376,6 +376,9 @@ function textEnToChi(text){
         break;
 		case 'enable':
 	        text='启用';
+         break;
+		case 'read':
+	        text='查阅';
          break;
 	}
 	return text;

@@ -95,7 +95,7 @@ class IndexController extends \think\Controller
         break;
         
         case '_USERGROUP':
-          $res=UsergroupModel::field('id,name')->select();
+          $res=UsergroupModel::field('id,name')->where('enable','1')->select();
         break;
         
          case '_TIME':
