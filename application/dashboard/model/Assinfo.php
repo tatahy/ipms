@@ -63,11 +63,11 @@ class Assinfo extends Model
         //$query->where('delete_time',0)->where('id','>',0);
     }
     
-    protected function scopeWithSoftDelete($query)
+    //查询asset的类别
+    protected function scopeAssType($query,$assType)
     {
-        $query->where('delete_time','>',0);
+        $query->where('status_now','like','%'.$assType.'%');      
     }
-    
    
     /**
      * 获取assent的过程记录

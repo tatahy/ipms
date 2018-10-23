@@ -6,7 +6,7 @@
  * 所有的公共函数都以"_common"开头，再遵循驼峰命名法。
  * 所有的公共常量都以"con"开头，再遵循驼峰命名法。
  */
-//asset的状态数组共7类14个
+//asset的状态数组共7类15个
 const conAssStatusArr=['_ASSS0'=>'*',
                     //label-primary，待定
                     '_ASSS1_1'=>'新增_待验收',
@@ -30,7 +30,7 @@ const conAssStatusArr=['_ASSS0'=>'*',
                     '_ASSS6'=>'回收站'
                     ];
 
-//asset的状态标志数组共6类14个，发送给前端决定label标签类型
+//asset的状态标志数组共7类15个，要发送给前端决定label标签类型
 const conAssStatusLabelArr=[
                     '_ASSS0'=>'info',
                     //label-primary

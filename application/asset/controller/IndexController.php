@@ -150,6 +150,7 @@ class IndexController extends \think\Controller
               
         //分页,每页$listRows条记录
         $assSet=$this->priAssQueryObj($assType)
+                      ->where($whereArr)
                       ->order($sortData['sortName'], $sortData['sortOrder'])
                       ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
                         'query'=>['listRows'=>$sortData['listRows']]]);
@@ -157,9 +158,9 @@ class IndexController extends \think\Controller
         $assList=$assSet->render(); 
         
         //记录总数
-        $searchResultNum=count($this->priAssQueryObj($assType)->select());        
+        $searchResultNum=count($this->priAssQueryObj($assType)->where($whereArr)->select());        
         //数量总计
-        $quanCount=$this->priAssQueryObj($assType)->sum('quantity');
+        $quanCount=$this->priAssQueryObj($assType)->where($whereArr)->sum('quantity');
         
         $this->assign([
           'home'=>$request->domain(),

@@ -36,7 +36,8 @@ class AssetController extends \think\Controller
     }
     
     //
-    private function priLogin(){
+    private function priLogin()
+    {
         //通过$log判断是否是登录用户，非登录用户退回到登录页面
         if(1!==$this->log){
             $this->error('未登录用户，请先登录系统');
@@ -44,30 +45,54 @@ class AssetController extends \think\Controller
         }
     }
     
+     //asset数量
+    private function priAssNum($assType='')
+    {
+      $assType=!empty($assType)?$assType:'usual';
+      return $this->priAssQueryObj($assType)->count();
+    }
+    
+    //asset查询语句对象
+    private function priAssQueryObj($assType)
+    {
+      switch($assType){
+        case 'usual':
+          $query=AssinfoModel::all();
+          break;
+        case '_ASSS6':
+          $query=AssinfoModel::onlyTrashed();
+          break;
+        default :
+          $query=AssinfoModel::scope('assType',$assType);
+          break;
+      }
+      return $query;
+    }
+    
+    
     public function index(Request $request,AssinfoModel $assMdl,$sortData=[],$searchData=[])
     {
         $this->priLogin();
         
         $assType=!empty($request->param('assType'))?$request->param('assType'):'normal';
+        
         $quantityNormal=$assMdl::sum('quantity');
         $quantityTrash=$assMdl::onlyTrashed()->sum('quantity');
-        
-        switch($assType){
-          case 'normal';
-            $quantityNormal=$assMdl::sum('quantity');
-            
-            break;
-           
-          case 'trash';
-            $quantityTrash=$assMdl::onlyTrashed()->sum('quantity');
-            
-            break; 
-        }
-        
+               
         $this->assign([
           'home'=>$request->domain(),
-          'quantityNormal'=>$quantityNormal,
-          'quantityTrash'=>$quantityTrash,
+          
+          'numTotal'=>count($assMdl::all())+$assMdl::onlyTrashed()->count(),
+          'num_ASSS1'=>$this->priAssNum('_ASSS1'),
+          'num_ASSS2'=>$this->priAssNum('_ASSS2'),
+          'num_ASSS3'=>$this->priAssNum('_ASSS3'),
+          'num_ASSS4'=>$this->priAssNum('_ASSS4'),
+          'num_ASSS5'=>$this->priAssNum('_ASSS5'),
+          'num_ASSS6'=>$this->priAssNum('_ASSS6'),
+          
+          
+          'quanTotal'=>$quantityNormal+$quantityTrash,
+          
           'assType'=>$assType
           
           //引用本模块公共文件（dashboard/common.php）中定义的数组常量conAssStatusArr
@@ -84,16 +109,17 @@ class AssetController extends \think\Controller
     {
         $this->priLogin();
         $authAss=$this->auth['ass'];
-        $assType=!empty($request->param('assType'))?$request->param('assType'):'normal';
+        
         $quantityNormal=0;
         $quantityTrash=0;
         
         //搜索查询条件数组
         $whereArr=[];
-        $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1,'showAssId'=>0);
+        $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1,'showAssId'=>0,'assType'=>'_ASSS1');
         // 接收前端的排序参数数组
         $sortData=!empty($request->param('sortData/a'))?$request->param('sortData/a'):$sortDefaults;
         $sortData=array_merge($sortDefaults,$sortData);
+        $assType=$sortData['assType'];
         
         $searchDefaults=array();
         // 接收前端的搜索参数数组，由前端保证传来的搜索参数值非0，非空。
@@ -126,38 +152,20 @@ class AssetController extends \think\Controller
             }
         }
         
-        switch($assType){
-          case 'normal';
-            $quantityNormal=$assMdl::where($whereArr)->sum('quantity');
-            $quantity=$quantityNormal;
-            
-            $assSet=$assMdl::where($whereArr)
-                            ->order($sortData['sortName'], $sortData['sortOrder'])
-                            ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
-                            'query'=>['listRows'=>$sortData['listRows']]]);
-            $searchResultNum=count($assMdl::where($whereArr)->select());
-            
-            
-            break;
-           
-          case 'trash';
-            $quantityTrash=$assMdl::onlyTrashed()->sum('quantity');
-            $quantity=$quantityTrash;
-            
-            $assSet=$assMdl::onlyTrashed()->where($whereArr)//->order('place_now', 'asc')
-                            ->order($sortData['sortName'], $sortData['sortOrder'])
-                            ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
-                            'query'=>['listRows'=>$sortData['listRows']]]);
-            $searchResultNum=count($assMdl::onlyTrashed()->where($whereArr)->select());
-            //数量总计
-            $quantity=$assMdl::onlyTrashed()->where($whereArr)->sum('quantity');
-            break; 
-        }
-        
-        
-       
+        //分页,每页$listRows条记录
+        $assSet=$this->priAssQueryObj($assType)
+                      ->where($whereArr)
+                      ->order($sortData['sortName'], $sortData['sortOrder'])
+                      ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
+                        'query'=>['listRows'=>$sortData['listRows']]]);
+        // 获取分页显示
         $assList=$assSet->render(); 
-               
+        
+        //记录总数
+        $searchResultNum=count($this->priAssQueryObj($assType)->where($whereArr)->select());        
+        //数量总计
+        $quanCount=$this->priAssQueryObj($assType)->where($whereArr)->sum('quantity');
+                       
         $this->assign([
           'home'=>$request->domain(),
           'assSet'=>$assSet,
@@ -165,7 +173,7 @@ class AssetController extends \think\Controller
           
           'quantityNormal'=>$quantityNormal,
           'quantityTrash'=>$quantityTrash,
-          'quantity'=>$quantity,
+          'quanCount'=>$quanCount,
           
           //asset类型
           'assType'=>$assType,
@@ -220,16 +228,7 @@ class AssetController extends \think\Controller
         }
       }else{
         //从数据库获得数据
-        switch($assType){
-          case 'normal';
-            $res=$assMdl->field($req)->group($req)->select();           
-            break;
-           
-          case 'trash';
-            $res=$assMdl::onlyTrashed()->field($req)->group($req)->select();
-            break; 
-        }
-        
+        $res=$this->priAssQueryObj($assType)->field($req)->group($req)->select();
         //将得到的数据集降为一维索引数组
         if(is_array($res)){
             $res=collection($res)->column($req);        
@@ -324,6 +323,7 @@ class AssetController extends \think\Controller
         case '_UPDATE':
             //数据库update
             //模型的save方法，返回的是受影响的记录数。
+            unset($data['status_now']);
             $assSet = $assMdl::get($id);
             $res=$assSet->allowField(true)->save($data);
             break;

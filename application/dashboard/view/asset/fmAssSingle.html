@@ -90,7 +90,7 @@
 	
 	<div class="row myRow">
 	<div class="pull-left">
-		<button id="btnSave" type="submit" data-oprt="_SAVE" class="btn btn-sm btn-primary "><span class="glyphicon glyphicon-save-file"></span>保存</button>
+		<button id="btnUpdate" type="submit" data-oprt="_UPDATE" class="btn btn-sm btn-primary "><span class="glyphicon glyphicon-save-file"></span>更新</button>
 	</div>
 	
 	<div  class="pull-right">
@@ -114,6 +114,8 @@ const conOprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'inf
 			{name:'回收',val:'_TRASH',gly:'trash',color:'danger'},
 			{name:'还原',val:'_RESTORE',gly:'retweet',color:'success'}];
 			
+var oprt=$('#fmAssInfo').find('[name="oprt"]').val();
+			
 //生成$.alert,$.confirm组件(com:component)上显示内容的HTML字符串。由oprt英文转中文，加上HTML标签组成HTML字符串
 var comHtml=(topic,oprtEn,result)=>{
 	
@@ -122,9 +124,7 @@ var comHtml=(topic,oprtEn,result)=>{
 	var color='';
 	var resultHtml='';
 	var htmlStr='';
-	
 	var result=(result==null)?'':result;
-	
 	for(var i=0;i<conOprtComAttr.length;i++){
 		if (oprtEn==conOprtComAttr[i].val){
 			oprtChi = conOprtComAttr[i].name;
@@ -133,7 +133,6 @@ var comHtml=(topic,oprtEn,result)=>{
 			break;
 		}
 	}
-	
 	switch(result){
 		case 'success':
 			resultHtml='<p class="text-center"><span class="text-success"><span class="glyphicon glyphicon-ok"></span><strong>成功</strong></span> </p>';
@@ -145,9 +144,7 @@ var comHtml=(topic,oprtEn,result)=>{
 			resultHtml='';
 			break;
 	}
-	
 	htmlStr='<p>固定资产：</p><p class="text-center">【<strong>'+topic +'</strong>】记录</p><p class="text-center"><span class="label label-'+color+'"><span class="glyphicon glyphicon-'+gly+'"></span>'+oprtChi+'</span></p>'+resultHtml;
-	
 	return htmlStr;
 };
 
@@ -156,9 +153,7 @@ var oprtBtnHtml=(oprtEn)=>{
 	var oprtChi = '';
 	var gly='';
 	var color='';
-	
 	var htmlStr='';
-	
 	conOprtComAttr.forEach(function(e){
 		if(oprtEn==e.val){
 			oprtChi = e.name;
@@ -166,28 +161,34 @@ var oprtBtnHtml=(oprtEn)=>{
 			color=e.color;
 		}
 	});
-	
 	htmlStr='<button type="submit" class="btn btn-sm btn-'+color+'"data-oprt="'+oprtEn+'"><span class="glyphicon glyphicon-'+gly+'"></span>'+oprtChi+'</button>&nbsp;';
-	
 	return htmlStr;
-
 };
 
+//利用自调用匿名函数立即执行的特点，对页面的组件进行初始化
+(function($){
+	ajaxShowSelect({'sendData':{'req':$('#modalSelectStatusNow').attr('name'),'source':'common','oprt':oprt},'attach':'','selected':0,'obj':$('#modalSelectStatusNow')});
+	
+	if(oprt=='_CREATE' || oprt=='_RESTORE'){
+		//消除_UPDATE按钮
+		$('.pull-left').children().remove()
+		//添加新按钮
+		$('.pull-left').append(oprtBtnHtml(oprt));
+	}else{
+		//_UPDATE按钮后添加新按钮
+		$('#btnUpdate').after('&nbsp;'+oprtBtnHtml(oprt));
+	}
+})(jQuery);
+
 $(document).ready(function(){
-	var oprt=$('#fmAssInfo').find('[name="oprt"]').val();
+	$('#fmAssInfo').find('button:submit').click(function(){	
+		$(this).closest('form').find('[name="oprt"]').val($(this).data('oprt'));
+	});
 	
-	ajaxShowSelect({sendData:{req:$('#modalSelectStatusNow').attr('name'),source:'common',oprt:oprt},'attach':'',selected:0,obj:$('#modalSelectStatusNow')});
-	
-	//消除按钮
-	$('.pull-left').children().remove();
-	
-	//添加按钮
-	$('.pull-left').append(oprtBtnHtml(oprt));
-		
 	$('#fmAssInfo').submit(function(evt){
 		evt.preventDefault();
 	
-		var oprt=$(this).find('[name="oprt"]').val();;
+		var oprt=$(this).find('[name="oprt"]').val();
 				
 		var url = $(this).attr('action'); 
 		//console.log(oprt+url);

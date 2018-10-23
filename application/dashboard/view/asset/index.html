@@ -1,24 +1,57 @@
 <!-- // view/index.html 对应AssetController.php的index操作 -->
 
 <div class="content-header">
-	<h4><span class="label label-info"><span class="glyphicon glyphicon-oil"></span></span>&nbsp;固定资产</h4>
+	<h4>
+		<span class="label label-info"><span class="glyphicon glyphicon-oil"></span></span>&nbsp;固定资产
+		<span style="font-size:14px;">
+			【<strong>记录总数：</strong><span class="label label-info">{$numTotal}</span>&nbsp;|
+			<strong>数量总计：</strong><span class="badge">{$quanTotal}</span>】
+		</span>
+	</h4>
 	
 	<ul class="nav nav-pills" style="margin-top:10px;border-bottom: 1px solid #eee;">
-		<li class="" >
-			<a class="aPill" href="#assInfo" data-ass-type="normal"><span class="glyphicon glyphicon-blackboard"></span>正常
-			<span class="label label-info">{$quantityNormal}</span>
+		<li class="active">
+			<a class="aPill" href="#assInfo" data-ass-type="_ASSS1">待定
+			{neq name="num_ASSS1" value="0"}
+			<span class="label label-info spClass">{$num_ASSS1}</span>{/neq}
+			</a>
+		</li>
+		<li>
+			<a class="aPill" href="#assInfo" data-ass-type="_ASSS2">正常
+			{neq name="num_ASSS2" value="0"}
+			<span class="label label-success spClass">{$num_ASSS2}</span>
+			{/neq}
+			</a>
+		</li>
+		<li>
+			<a class="aPill" href="#assInfo" data-ass-type="_ASSS3">异常
+			{neq name="num_ASSS3" value="0"}
+			<span class="label label-warning spClass">{$num_ASSS3}</span>
+			{/neq}
+			</a>
+		</li>
+		<li>
+			<a class="aPill" href="#assInfo" data-ass-type="_ASSS6"><span class="glyphicon glyphicon-trash">回收站</span>
+			{neq name="num_ASSS3" value="0"}
+			<span class="label label-danger spClass">{$num_ASSS6}</span>
+			{/neq}
+			</a>
+		</li>
+		<li>
+			<a class="aPill" href="#assInfo" data-ass-type="_ASSS4">停用
+			{neq name="num_ASSS4" value="0"}
+			<span class="label label-default spClass">{$num_ASSS4}</span>
+			{/neq}
+			</a>
+		</li>
+		<li>
+			<a class="aPill" href="#assInfo" data-ass-type="_ASSS5">销账
+			{neq name="num_ASSS5" value="0"}
+			<span class="badge spClass">{$num_ASSS5}</span>
+			{/neq}
 			</a>
 		</li>
 		
-		<li class="" >
-			<a class="aPill text-danger" href="#assTrashInfo" data-ass-type="trash"><span class="glyphicon glyphicon-trash "></span>回收站
-			{eq name="quantityTrash" value="0"}
-			<span class="label label-default">0</span>
-			{else/}
-			<span class="label label-warning">{$quantityTrash}</span>
-			{/eq}
-			</a>
-		</li>
 	
 	</ul>
 </div>
@@ -147,8 +180,9 @@
 <!-- /pagewrap  -->
 
 <script>
-//全局变量
-<!-- var sortDataObj={'listRows':10,'sortName':'assnum','sortOrder':'asc','pageNum':1}; -->
+
+var assType='{$assType}';
+
 var urlPrefix='{$home}/dashboard/asset/';
 
 //**函数名：glyphiconTextChange
@@ -229,7 +263,7 @@ var ajaxShowSelect=(options)=>{
 	//* 参数4：pageNum，Int。值：可为空，当前页数。默认为1。
 	//* 参数5：showAssId，Int。值：可为空。加底色的行的assId,默认为0。
 	//* 参数6：serchWord，Array。值：可为空，用户搜索关键词键值对。默认为空。
-var loadAssList=(assType)=>{
+var loadAssList=()=>{
 	
 	//排序有关的参数都从$('#divTblSortData')获取
 	var obj=$('#divTblSortData');
@@ -238,21 +272,21 @@ var loadAssList=(assType)=>{
 		'sortName':obj.data('sortName'),
 		'sortOrder':obj.data('sortOrder'),
 		'pageNum':obj.data('pageNum'),
+		'assType':obj.data('assType'),
 		'showAssId':obj.data('showAssId')
 	};	
 	//排序有关的参数默认值
-	var sortDataDefault={'listRows':10,'sortName':'assnum','sortOrder':'asc','pageNum':1,'showAssId':0};
+	var sortDataDefault={'listRows':10,'sortName':'assnum','sortOrder':'asc','pageNum':1,'assType':'_ASSS1','showAssId':0};
 	sortData=$.extend({},sortDataDefault,sortData);
 	
-	assType=(assType!='undefined')?assType:obj.data('assType');
-	obj.data('assType',assType)
+	var assType=sortData.assType;
+	<!-- obj.data('assType',assType) -->
 	
 	//是否出现‘新增’按钮
-	
-	if(assType=='normal'){
-		$('[data-ass-oprt="_CREATE"]').show();
-	}else{
+	if(assType=='_ASSS6'){
 		$('[data-ass-oprt="_CREATE"]').hide();
+	}else{
+		$('[data-ass-oprt="_CREATE"]').show();
 	}
 	
 	//用户搜索有关键值对从表单$('#fmIssPatSearch')获取
@@ -266,6 +300,7 @@ var loadAssList=(assType)=>{
 			searchData[key]=val;
 		}
 	});
+	<!-- // 转换成json字符串-->
 	JSON.stringify(searchData);
 	
 	$('#divLoadAssList').html('<p class="text-center" style="font-size:20px;">加载中……</p>');
@@ -283,7 +318,21 @@ var loadAssList=(assType)=>{
 					}
 				});
 			}
-			
+			<!-- //设定$('#fmAssSearch')内的select组件的option -->
+			$.when(
+				ajaxShowSelect({'sendData':{'req':$('#selectDeptNow').attr('name'),'assType':assType},'obj':$('#selectDeptNow')}),
+				ajaxShowSelect({'sendData':{'req':$('#selectStatusNow').attr('name'),'source':'db','assType':assType},'obj':$('#selectStatusNow')}),
+				ajaxShowSelect({'sendData':{'req':$('#selectPlaceNow').attr('name'),'assType':assType},'obj':$('#selectPlaceNow')}),
+				ajaxShowSelect({'sendData':{'req':$('#selectKeeperNow').attr('name'),'assType':assType},'obj':$('#selectKeeperNow')})
+			).then(
+				function(data, textStatus, jqXHR){
+					
+				},
+				function(){
+					//ajax失败
+					$.alert('加载失败，请稍后再试！');
+				}
+			);
 		}
 	);
 };
@@ -328,61 +377,19 @@ var fmReset=()=>{
 	fm.find('.form-control').removeClass('label-info');
 };
 
-//$('.content-body')初始化
-var contentBodyInit=(assType)=>{
-	//排序有关的参数使用默认值
-	var obj=$('#divTblSortData');
-	
-	$('#divTblSortData').data('assType',assType);
-	
-	obj.data('listRows',10),
-	obj.data('sortName','assnum'),
-	obj.data('sortOrder','asc'),
-	obj.data('pageNum',1),
-	obj.data('showAssId',0)
-	//搜索表单重置
-	fmReset();
-	//$('#btnSearchInfo')恢复初始html
-	$('#btnSearchInfo').html('<span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span>');
-		
-	//隐藏搜索条件
-	$('#divSearchData').collapse('hide');
-	
-	loadAssList(assType);
-	
-};
 
-//设定$('#fmAssSearch')内的select组件的option(包括$('#selectDeptNow')、$('#selectPlaceNow')、$('#selectKeeperNow'))
-var buildfmSelectCom=(assType)=>{
-	$.when(
-		ajaxShowSelect({sendData:{req:$('#selectDeptNow').attr('name'),assType:assType},obj:$('#selectDeptNow')}),
-		ajaxShowSelect({sendData:{req:$('#selectStatusNow').attr('name'),source:'db',assType:assType},obj:$('#selectStatusNow')}),
-		ajaxShowSelect({sendData:{req:$('#selectPlaceNow').attr('name'),assType:assType},obj:$('#selectPlaceNow')}),
-		ajaxShowSelect({sendData:{req:$('#selectKeeperNow').attr('name'),assType:assType},obj:$('#selectKeeperNow')})
-	).then(
-		function(data, textStatus, jqXHR){
-			//$('.content-body')初始化
-			contentBodyInit(assType);
-		},
-		function(){
-			//ajax失败
-			$.alert('加载失败，请稍后再试！');
-		}
-	);
 
-};
-
-//利用自调用匿名函数立即执行的特点，对页面的组件进行初始化
+//自调用匿名函数立即执行的特点，进行页面初始化。
 (function($){
-	//设定$('#fmAssSearch')内的select组件的option
-	buildfmSelectCom('{$assType}');
+	
+	loadAssList();
 
 	//ul.nav-tabs调整.aPill
 	$('.aPill').each(function(){
 		//1.缩小padding
 		$(this).css('padding','5px 10px');
 		//去掉底部边框圆角
-		<!-- $(this).css({'border-bottom-right-radius':'0px','border-bottom-left-radius':'0px'}); -->
+		$(this).css({'border-bottom-right-radius':'0px','border-bottom-left-radius':'0px'});
 		
 		$('span.label').css({'padding-bottom':'1px','margin-bottom':'2px'});
 	});
@@ -392,16 +399,20 @@ var buildfmSelectCom=(assType)=>{
 $(document).ready(function(){
 	//搜索内容是否发生变化标志
 	var searchDataChanged=false;
+	// 设置各类tooltip
+	$('#divTopBtn [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
 	
 	//点击.aPill中的各个按钮后，load相应的assList-->
 	$('.aPill').click(function(){
+		assType=$(this).data('assType');
+		$('#divTblSortData').data('assType',assType);
+		console.log($('#divTblSortData').data('assType'));
 		$(this).tab('show');
-		buildfmSelectCom($(this).data('assType'));
+		//搜索表单重置
+		fmReset();
+		loadAssList();
 		
     });
-	
-	// 设置各类tooltip
-	$('#divTopBtn [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
 	
 	$('#btnSearchInfo').click(function(){
 		//变换图标和内容
@@ -413,20 +424,16 @@ $(document).ready(function(){
 	
 	<!-- // 页面刷新 -->
 	$('#btnRefresh').click(function(){
-		var assType=$('.content-header').find('li.active').children('a').data('assType');
-		
-		//$('.content-body')初始化
-		contentBodyInit(assType);
+		//搜索表单重置
+		fmReset();
+		//$('#btnSearchInfo')恢复初始html
+		$('#btnSearchInfo').html('<span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span>');
+		//隐藏搜索条件
+		$('#divSearchData').collapse('hide');
+		loadAssList();
 		
 	});
 	
-	//新增固定资产记录
-	<!-- $('#btnCreate').click(function(){ -->
-		<!-- $('#divLoadAssSingle').load(urlPrefix+'oprtAssSingle'); -->
-		<!-- $('#modalAssSingle').find('.title').html('【'+$(this).html()+'】固定资产'); -->
-		<!-- $('#modalAssSingle').modal(); -->
-		
-	<!-- });	 -->
 	
 <!-- //表单$('#fmAssSearch')有关的代码块 -->
 	
@@ -449,7 +456,7 @@ $(document).ready(function(){
 		if(searchDataChanged){
 			$('#divTblSortData').data('pageNum',1);
 		}
-		loadAssList(assType);
+		loadAssList();
 	});
 	
 	//表单重置

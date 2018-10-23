@@ -5,48 +5,48 @@
 <div class="container-fluid" style="padding-top: 55px;">
 	{eq name="read" value="0"}
 	<div style="padding: 50px 0px;font-size:20px;">
-		<p class="text-center">无查看“固定资产”权限，请与系统管理员联系。</p>
+		<p class="text-center">无“固定资产”【查阅】权限，请与系统管理员联系。</p>
 	</div>
 	{else/}
 	<ul id="ulAssType" class="nav nav-pills nav-justified" style="border-bottom:solid 0.1px #ddd;">
 		<li class="active">
 			<a class="aPill" href="#" data-ass-type="usual">固定资产<span class="spTitle">总计</span>
 			{neq name="numTotal" value="0"}
-			&nbsp;<span class="label label-primary spClass">{$numTotal}</span>
+			<span class="label label-primary spClass">{$numTotal}</span>
 			{/neq}
 			</a>
 		</li>
 		<li>
 			<a class="aPill" href="#" data-ass-type="_ASSS1"><span class="spTitle">待定</span>
 			{neq name="num_ASSS1" value="0"}
-			&nbsp;<span class="label label-info spClass">{$num_ASSS1}</span>{/neq}
+			<span class="label label-info spClass">{$num_ASSS1}</span>{/neq}
 			</a>
 		</li>
 		<li>
 			<a class="aPill" href="#" data-ass-type="_ASSS2"><span class="spTitle">正常</span>
 			{neq name="num_ASSS2" value="0"}
-			&nbsp;<span class="label label-success spClass">{$num_ASSS2}</span>
+			<span class="label label-success spClass">{$num_ASSS2}</span>
 			{/neq}
 			</a>
 		</li>
 		<li>
-			<a class="aPill" href="#" data-ass-type="_ASSS3"><span class="spTitle">异常
+			<a class="aPill" href="#" data-ass-type="_ASSS3"><span class="spTitle">异常</span>
 			{neq name="num_ASSS3" value="0"}
-			&nbsp;</span><span class="label label-warning spClass">{$num_ASSS3}</span>
+			<span class="label label-warning spClass">{$num_ASSS3}</span>
 			{/neq}
 			</a>
 		</li>
 		<li>
 			<a class="aPill" href="#" data-ass-type="_ASSS4"><span class="spTitle">停用</span>
 			{neq name="num_ASSS4" value="0"}
-			&nbsp;<span class="label label-default spClass">{$num_ASSS4}</span>
+			<span class="label label-default spClass">{$num_ASSS4}</span>
 			{/neq}
 			</a>
 		</li>
 		<li>
 			<a class="aPill" href="#" data-ass-type="_ASSS5"><span class="spTitle">销账</span>
 			{neq name="num_ASSS5" value="0"}
-			&nbsp;<span class="badge spClass">{$num_ASSS5}</span>
+			<span class="badge spClass">{$num_ASSS5}</span>
 			{/neq}
 			</a>
 		</li>
