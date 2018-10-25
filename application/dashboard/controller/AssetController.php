@@ -20,8 +20,10 @@ class AssetController extends \think\Controller
     private $roles=array();
     //用户所在部门
     private $dept = null;
-    //
+    //登录用户的权限。
     private $auth=[];
+    //asset分类汇总记录数据
+    private $assNum=[];
     
     // 初始化
     protected function _initialize()
@@ -33,8 +35,8 @@ class AssetController extends \think\Controller
         $this->dept=Session::get('dept');
         
         $this->auth=UserModel::where(['username'=>$this->username,'pwd'=>$this->pwd])->find()->authority;
+        $this->assNum=$this->priGetAssNum();
     }
-    
     //
     private function priLogin()
     {
@@ -44,20 +46,32 @@ class AssetController extends \think\Controller
             //$this->redirect($request->domain());
         }
     }
-    
-     //asset数量
+     //获得各类asset数量
+    private function priGetAssNum()
+    {
+      $this->assNum=['_TOTAL'=>$this->priAssNum('_USUAL')+$this->priAssNum('_ASSS6'),
+                        '_USUAL'=>$this->priAssNum('_USUAL'),
+                        '_ASSS1'=>$this->priAssNum('_ASSS1'),
+                        '_ASSS2'=>$this->priAssNum('_ASSS2'),
+                        '_ASSS3'=>$this->priAssNum('_ASSS3'),
+                        '_ASSS4'=>$this->priAssNum('_ASSS4'),
+                        '_ASSS5'=>$this->priAssNum('_ASSS5'),
+                        '_ASSS6'=>$this->priAssNum('_ASSS6')
+                        ];
+      return $this->assNum;
+    }
+     //计算各类asset数量
     private function priAssNum($assType='')
     {
-      $assType=!empty($assType)?$assType:'usual';
+      $assType=!empty($assType)?$assType:'_USUAL';
       return $this->priAssQueryObj($assType)->count();
     }
-    
-    //asset查询语句对象
+    //各类asset查询语句对象
     private function priAssQueryObj($assType)
     {
       switch($assType){
-        case 'usual':
-          $query=AssinfoModel::all();
+        case '_USUAL':
+          $query=AssinfoModel::where('id','>',0);
           break;
         case '_ASSS6':
           $query=AssinfoModel::onlyTrashed();
@@ -74,7 +88,8 @@ class AssetController extends \think\Controller
     {
         $this->priLogin();
         
-        $assType=!empty($request->param('assType'))?$request->param('assType'):'normal';
+        $assType=!empty($request->param('assType'))?$request->param('assType'):'_USUAL';
+        $sortData=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1,'showAssId'=>0,'assType'=>$assType);
         
         $quantityNormal=$assMdl::sum('quantity');
         $quantityTrash=$assMdl::onlyTrashed()->sum('quantity');
@@ -82,18 +97,16 @@ class AssetController extends \think\Controller
         $this->assign([
           'home'=>$request->domain(),
           
-          'numTotal'=>count($assMdl::all())+$assMdl::onlyTrashed()->count(),
-          'num_ASSS1'=>$this->priAssNum('_ASSS1'),
-          'num_ASSS2'=>$this->priAssNum('_ASSS2'),
-          'num_ASSS3'=>$this->priAssNum('_ASSS3'),
-          'num_ASSS4'=>$this->priAssNum('_ASSS4'),
-          'num_ASSS5'=>$this->priAssNum('_ASSS5'),
-          'num_ASSS6'=>$this->priAssNum('_ASSS6'),
-          
-          
+          'num'=>$this->assNum,
+          'numObj'=>json_encode($this->assNum,JSON_UNESCAPED_UNICODE),
+     
           'quanTotal'=>$quantityNormal+$quantityTrash,
           
-          'assType'=>$assType
+          'assType'=>$assType,
+          'sortData'=>$sortData,
+          
+          //将应用公共文件（common.php）中定义的数组常量conAssStatusLabelArr转为json对象
+          'conAssStatusLabelArr'=>json_encode(conAssStatusLabelArr,JSON_UNESCAPED_UNICODE),
           
           //引用本模块公共文件（dashboard/common.php）中定义的数组常量conAssStatusArr
           //'conAssStatusArr'=>json_encode(conAssStatusArr,JSON_UNESCAPED_UNICODE)
@@ -115,7 +128,7 @@ class AssetController extends \think\Controller
         
         //搜索查询条件数组
         $whereArr=[];
-        $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1,'showAssId'=>0,'assType'=>'_ASSS1');
+        $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1,'showAssId'=>0,'assType'=>'_USUAL');
         // 接收前端的排序参数数组
         $sortData=!empty($request->param('sortData/a'))?$request->param('sortData/a'):$sortDefaults;
         $sortData=array_merge($sortDefaults,$sortData);
@@ -136,15 +149,16 @@ class AssetController extends \think\Controller
         //前端select值搜索
         $whereArr['dept_now']=!empty($searchData['dept_now'])?$searchData['dept_now']:'';
         $whereArr['place_now']=!empty($searchData['place_now'])?$searchData['place_now']:'';
-        $whereArr['keeper_now']=!empty($searchData['keeper_now'])?$searchData['keeper_now']:'';
         $whereArr['status_now']=!empty($searchData['status_now'])?$searchData['status_now']:'';
+        
+        $whereArr['keeper_now']=!empty($searchData['keeper_now'])?['like','%'.$searchData['keeper_now'].'%']:'';
+        $whereArr['status_now_user_name']=!empty($searchData['status_now_user_name'])?['like','%'.$searchData['status_now_user_name'].'%']:'';
         //将$whereArr['status_now']的值（中文）转为类型编码
         foreach(conAssStatusArr as $key=>$val){
           if($whereArr['status_now']==$val){
             $whereArr['status_now']=$key;
           }
         }
-        
         //将空白元素删除
         foreach($whereArr as $key=>$val){
             if(empty($val)){
@@ -153,8 +167,7 @@ class AssetController extends \think\Controller
         }
         
         //分页,每页$listRows条记录
-        $assSet=$this->priAssQueryObj($assType)
-                      ->where($whereArr)
+        $assSet=$this->priAssQueryObj($assType)->where($whereArr)
                       ->order($sortData['sortName'], $sortData['sortOrder'])
                       ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
                         'query'=>['listRows'=>$sortData['listRows']]]);

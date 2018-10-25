@@ -5,14 +5,13 @@
 	<!-- <p>{$authAss.edit}</p> -->
 	{neq name="searchResultNum" value="0"}
 	<p id="pSearchResultNum">
-		<span class="label label-primary assType"></span>记录数：<span id="spNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span>
+		<span class="label label-primary spAssType"></span>记录数：<span id="spAssNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span>
 	</p>
 	{/neq}
-	<!-- // 表格排序信息汇总组件 -->
-	<div id="divTblSortData" data-ass-type="{$assType}" data-sort-name="{$sortData.sortName}" data-sort-order="{$sortData.sortOrder}" data-list-rows="{$sortData.listRows}" data-page-num="{$sortData.pageNum}" data-show-ass-id="{$sortData.showAssId}" class="sr-only"></div>
+	
 	<div class="table-responsive" > 
 		<table class="table table-bordered table-hover table-condensed" >
-			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产概况列表</h4></caption>
+			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产信息列表<span class="label label-primary spAssType"></span></h4></caption>
 			<thead>
 				<tr>
 					<th class="text-center">序号</th>
@@ -99,7 +98,7 @@ var fnJsonToArr=(jsonObj)=>{
 	return arr;
 };
 
-console.log($('#divTblSortData').data('assType'));
+//console.log($('#divTblSortData').data('assType'));
 
 //定义常量，asset状态与操作对应关系conAssStatusOprtArr
 const conAssStatusOprtArr={$conAssStatusOprtArr};
@@ -131,7 +130,6 @@ const conOprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'inf
 
 const conStatusArr=Object.values({$conAssStatusArr});
 const conLabelArr=Object.values({$conAssStatusLabelArr});
-
 //某个值是否在数组内
 var fnInArr=(item, arr)=>{
 	for (var i = 0; i < arr.length; i++) {
@@ -232,6 +230,22 @@ var arrMerge=(arr1,arr2)=>{
 
 //利用自调用匿名函数立即执行的特点，设定固定资产的操作组件的html字符串;$('thead a') 添加属性
 (function($){
+	let spType=$('#ulAssType .dropdown-menu li.active a').find('.spType').html();
+	//.spAssType内容随$('#ulAssType li.active a').find('.spType')变化
+	$('.spAssType').html(spType);
+	
+	//#spNum的class跟随$('#ulAssType li.active a').find('.spClass')变化
+	let spClass=$('#ulAssType .dropdown-menu li.active a').find('.spClass').attr('class');
+	if(spClass){
+		$('#spAssNum').addClass(spClass);
+	}else{
+		$('#spAssNum').addClass('label label-info');
+	}
+	
+	if($('#ulAssType li.active a').data('assType')=='_ASSS6'){
+		
+		$('#spAssNum').addClass('label label-danger');
+	}
 	
 	//每个.btnAssOprt根据该行记录的data-ass-status="{$ vo.status_now}"添加相应的a标签
 	$('.btnAssOprt').each(function(){

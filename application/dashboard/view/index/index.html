@@ -155,7 +155,7 @@
  	//* 作用：提交锚点值给后端，由后端返回需加载的页面文件
 function loadTplFile(){
 	var sId=window.location.hash;
-	var assType=''
+	var assType='';
 	var url='';
 	if(sId=='' || sId=='#undefined'){
 		sId='#issPat2';
@@ -165,11 +165,32 @@ function loadTplFile(){
 	switch(sId){
 		case '#assInfo':
 			url='{$home}/dashboard/asset/index';
-			assType='normal';
+			assType='_USUAL';
 			break;
-		case '#assTrashInfo':
+		case '#_ASSS1':
 			url='{$home}/dashboard/asset/index';
-			assType='trash';
+			assType='_ASSS1';
+			break;
+		case '#_ASSS2':
+			url='{$home}/dashboard/asset/index';
+			assType='_ASSS2';
+			break;
+		case '#_ASSS3':
+			url='{$home}/dashboard/asset/index';
+			assType='_ASSS3';
+			break;
+		case '#_ASSS4':
+			url='{$home}/dashboard/asset/index';
+			assType='_ASSS4';
+			break;
+		case '#_ASSS5':
+			url='{$home}/dashboard/asset/index';
+			assType='_ASSS5';
+			break;			
+			
+		case '#_ASSS6':
+			url='{$home}/dashboard/asset/index';
+			assType='_ASSS6';
 			break;
 		default:
 			url='tplFile';

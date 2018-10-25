@@ -9,17 +9,21 @@
 //asset的状态数组共7类15个
 const conAssStatusArr=['_ASSS0'=>'*',
                     //label-primary，待定
+                    '_ASSS1'=>'待定',
                     '_ASSS1_1'=>'新增_待验收',
                     '_ASSS1_2'=>'待分配_初次验收合格',
                     '_ASSS1_3'=>'待分配_维修验收合格',
                     //label-success，正常
+                    '_ASSS2'=>'正常',
                     '_ASSS2_1'=>'正常_折旧中',
                     '_ASSS2_2'=>'正常_折旧完',
                     //label-warning，异常
+                    '_ASSS3'=>'异常',
                     '_ASSS3_1'=>'异常_待更新',
                     '_ASSS3_2'=>'异常_待维修',
                     '_ASSS3_3'=>'异常_遗失',
                     //label-default，停用
+                    '_ASSS4'=>'停用',
                     '_ASSS4_1'=>'停用_维修中',
                     '_ASSS4_2'=>'停用_封存',
                     '_ASSS4_3'=>'待销账_报废',
@@ -34,17 +38,21 @@ const conAssStatusArr=['_ASSS0'=>'*',
 const conAssStatusLabelArr=[
                     '_ASSS0'=>'info',
                     //label-primary
+                    '_ASSS1'=>'primary',
                     '_ASSS1_1'=>'primary',
                     '_ASSS1_2'=>'primary',
                     '_ASSS1_3'=>'primary',
                     //label-success
+                    '_ASSS2'=>'success',
                     '_ASSS2_1'=>'success',
                     '_ASSS2_2'=>'success',
                     //label-warning
+                    '_ASSS3'=>'warning',
                     '_ASSS3_1'=>'warning',
                     '_ASSS3_2'=>'warning',
                     '_ASSS3_3'=>'warning',
                     //label-default
+                    '_ASSS4'=>'default',
                     '_ASSS4_1'=>'default',
                     '_ASSS4_2'=>'default',
                     '_ASSS4_3'=>'default',
