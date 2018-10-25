@@ -5,13 +5,13 @@
 	<!-- <p>{$authAss.edit}</p> -->
 	{neq name="searchResultNum" value="0"}
 	<p id="pSearchResultNum">
-		<span class="label label-primary spAssType"></span>记录数：<span id="spAssNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span>
+		<strong class="spAssType"></strong>记录数：<span id="spAssNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span>
 	</p>
 	{/neq}
 	
 	<div class="table-responsive" > 
 		<table class="table table-bordered table-hover table-condensed" >
-			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产信息列表<span class="label label-primary spAssType"></span></h4></caption>
+			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产信息列表&nbsp;<strong class="spAssType"></strong></h4></caption>
 			<thead>
 				<tr>
 					<th class="text-center">序号</th>

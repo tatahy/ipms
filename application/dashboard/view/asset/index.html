@@ -17,33 +17,33 @@
 			 </a>
       			<ul class="dropdown-menu">
         			<li>
-						<a class="aPill" href="#assInfo" data-ass-type="_USUAL"><span class="spType">总计&nbsp;</span></a>
+						<a class="aPill" href="#assInfo" data-ass-type="_USUAL"><span class="spType">[总计]&nbsp;</span></a>
 					</li>
 					<li class="divider"></li>
 					
 					<li>
-						<a class="aPill" href="#_ASSS1" data-ass-type="_ASSS1"><span class="spType">待定&nbsp;</span></a>
+						<a class="aPill" href="#_ASSS1" data-ass-type="_ASSS1"><span class="spType">[待定]&nbsp;</span></a>
 					</li>
 				
 					<li>
-						<a class="aPill" href="#_ASSS2" data-ass-type="_ASSS2"><span class="spType">正常&nbsp;</span></a>
+						<a class="aPill" href="#_ASSS2" data-ass-type="_ASSS2"><span class="spType">[正常]&nbsp;</span></a>
 					</li>
 					
         			<li>
-						<a class="aPill" href="#_ASSS3" data-ass-type="_ASSS3"><span class="spType">异常&nbsp;</span></a>
+						<a class="aPill" href="#_ASSS3" data-ass-type="_ASSS3"><span class="spType">[异常]&nbsp;</span></a>
 					</li>
 					<li>
-						<a class="aPill" href="#_ASSS4" data-ass-type="_ASSS4"><span class="spType">停用&nbsp;</span></a>
+						<a class="aPill" href="#_ASSS4" data-ass-type="_ASSS4"><span class="spType">[停用]&nbsp;</span></a>
 					</li>  
 					<li>
-						<a class="aPill" href="#_ASSS5" data-ass-type="_ASSS5"><span class="spType">销账&nbsp;</span></a>
+						<a class="aPill" href="#_ASSS5" data-ass-type="_ASSS5"><span class="spType">[销账]&nbsp;</span></a>
 					</li>  					
       			</ul>
 			
 		</li>
 		
 		<li>
-			<a class="aPill text-danger" href="#_ASSS6" data-ass-type="_ASSS6"><span class="glyphicon glyphicon-trash"></span><span class="spType">回收站&nbsp;</span></a>
+			<a class="aPill text-danger" href="#_ASSS6" data-ass-type="_ASSS6"><span class="glyphicon glyphicon-trash"></span><span class="spType">[回收站]&nbsp;</span></a>
 		</li>
 	
 	</ul>
@@ -53,7 +53,7 @@
 	<div id="divTopBtn" style="margin:10px 0px;">
 		
 		<div class="row myRow">
-		<button id="btnSearchInfo" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏搜索条件"><span class="glyphicon glyphicon-collapse-down"></span>显示搜索</button>
+		<button id="btnSearchInfo" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏搜索条件"><span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span></button>
 				
 		<button id="btnRefresh" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="刷新固定资产信息表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 		
@@ -364,7 +364,7 @@ var loadAssList=()=>{
 				ajaxShowSelect({'sendData':{'req':$('#selectPlaceNow').attr('name'),'assType':assType},'selected':placeNowArr,'obj':$('#selectPlaceNow')})
 			).then(
 				function(data, textStatus, jqXHR){
-					
+					//ajax成功
 				},
 				function(){
 					//ajax失败
@@ -506,7 +506,6 @@ $(document).ready(function(){
 			//表单输入框去掉附加底色
 			$(this).removeClass('label-info');
 		}
-		searchDataChanged=true;
 	});
 	
 	//表单提交，显示asset结果
