@@ -62,7 +62,18 @@ const conAssStatusLabelArr=[
                     '_ASSS6'=>'danger'
                     ];                    
 
-   
+//asset的操作数组,4类（CURD）10个
+const conAssOprtArr=['_CREATE'=>'新增',
+                    '_SUBMIT'=>'提交',
+                    '_AUDIT'=>'审核',
+                    '_APPROVE'=>'审批',
+                    '_MAINTAIN'=>'维护',
+                    '_UPDATE'=>'更新',
+                    '_TRASH'=>'回收',
+                    '_RESTORE'=>'还原',
+                    '_READ'=>'查阅',
+                    '_DELETE'=>'删除',
+                    ];
   /**
      * 各个模块权限设置初始值
      * 参数$module，类型：字符串。值：可为空。说明：模块名称。默认值：'_ALL'

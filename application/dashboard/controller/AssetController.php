@@ -6,6 +6,7 @@ use think\Session;
 use think\View;
 
 use app\dashboard\model\Assinfo as AssinfoModel;
+use app\dashboard\model\Assrecord as AssrecordModel;
 use app\dashboard\model\User as UserModel;
 
 class AssetController extends \think\Controller
@@ -46,7 +47,7 @@ class AssetController extends \think\Controller
             //$this->redirect($request->domain());
         }
     }
-     //获得各类asset数量
+    //获得各类asset数量
     private function priGetAssNum()
     {
       $this->assNum=['_TOTAL'=>$this->priAssNum('_USUAL')+$this->priAssNum('_ASSS6'),
@@ -60,7 +61,7 @@ class AssetController extends \think\Controller
                         ];
       return $this->assNum;
     }
-     //计算各类asset数量
+    //计算各类asset数量
     private function priAssNum($assType='')
     {
       $assType=!empty($assType)?$assType:'_USUAL';
@@ -83,7 +84,6 @@ class AssetController extends \think\Controller
       return $query;
     }
     
-    
     public function index(Request $request,AssinfoModel $assMdl,$sortData=[],$searchData=[])
     {
         $this->priLogin();
@@ -97,7 +97,7 @@ class AssetController extends \think\Controller
         $this->assign([
           'home'=>$request->domain(),
           
-          'num'=>$this->assNum,
+          'numTotal'=>$this->assNum['_TOTAL'],
           'numObj'=>json_encode($this->assNum,JSON_UNESCAPED_UNICODE),
      
           'quanTotal'=>$quantityNormal+$quantityTrash,
@@ -108,10 +108,6 @@ class AssetController extends \think\Controller
           //将应用公共文件（common.php）中定义的数组常量conAssStatusLabelArr转为json对象
           'conAssStatusLabelArr'=>json_encode(conAssStatusLabelArr,JSON_UNESCAPED_UNICODE),
           
-          //引用本模块公共文件（dashboard/common.php）中定义的数组常量conAssStatusArr
-          //'conAssStatusArr'=>json_encode(conAssStatusArr,JSON_UNESCAPED_UNICODE)
-          //'conAssStatusArr'=>conAssStatusArr['_ASSS4']
-          //'auth'=>json_encode($this->auth,JSON_UNESCAPED_UNICODE)
         ]);
         return view();
         
@@ -308,30 +304,31 @@ class AssetController extends \think\Controller
       return view();
     }
     
-    public function assOprt(Request $request,AssinfoModel $assMdl,$data=[])
+    public function assOprt(Request $request,AssinfoModel $assMdl,AssrecordMde $assRdMdl,$data=[])
     {
       $this->priLogin();
       
       $data=$request->param();
-      //$id=$request->param('id');
-//      $oprt=$request->param('oprt');
+
       $id=$data['id'];
       $oprt=$data['oprt'];
       $res=0;
       
-      $quantityNormal=0;
-      $quantityTrash=0;
+      $rdDataArr=['status_now'=>'',
+                  'status_now_user_name'=>'',
+                  'oprt'=>'',
+                  'oprt_detail'=>'',
+                  'oprt_detail_json'=>'',
+                  'assinfo_id'=>''
+                  ];
       
       switch($oprt){
         case '_CREATE':
             //数据库create
             $res=$assMdl::create($data,true)->id;
-            break;
-        case '_SUBMIT':
-            //数据库update
-            //模型的save方法，返回的是受影响的记录数。
-            $assSet = $assMdl::get($id);
-            $res=$assSet->allowField(true)->save($data);
+            
+            //新状态写入assRecord表
+            
             break;
         case '_UPDATE':
             //数据库update
@@ -340,28 +337,13 @@ class AssetController extends \think\Controller
             $assSet = $assMdl::get($id);
             $res=$assSet->allowField(true)->save($data);
             break;
-        case '_AUDIT':
-            //数据库update
-            //模型的save方法，返回的是受影响的记录数。
-            $assSet = $assMdl::get($id);
-            $res=$assSet->allowField(true)->save($data);
-            break;
-        case '_APPROVE':
-            //数据库update
-            //模型的save方法，返回的是受影响的记录数。
-            $assSet = $assMdl::get($id);
-            $res=$assSet->allowField(true)->save($data);
-            break;
-        case '_MAINTAIN':
-            //数据库update
-            //模型的save方法，返回的是受影响的记录数。
-            $assSet = $assMdl::get($id);
-            $res=$assSet->allowField(true)->save($data);
-            break;
+       
         case '_TRASH':
             //模型的destroy方法，返回的是受影响的记录数。已启用框架的软删除，数据仍然在数控库中。
             $assMdl::update(['status_now'=>'回收站'], ['id' =>$id], true);
             $res = $assMdl::destroy($id);
+            //新状态写入assRecord表
+            
             break;
         
         case'_DELETE':
@@ -373,17 +355,22 @@ class AssetController extends \think\Controller
             //模型的软删除restore()方法，返回的是受影响的记录数。
             $assMdl::update($data, ['id' =>$id], true);
             $res = $assMdl->restore(['id'=>$id]);
+            //新状态写入assRecord表
+            
             break;
-        //'_SUBMIT','_UPDATE','_AUDIT','_APPROVE','_MAINTAIN'
+        //'_SUBMIT','_AUDIT','_APPROVE','_MAINTAIN'
         default:
-        
+          //数据库update
+          //模型的save方法，返回的是受影响的记录数。
+          $assSet = $assMdl::get($id);
+          $res=$assSet->allowField(true)->save($data);
+            
+          //新状态写入assRecord表
+              
           break;
       }
-      
-      $quantityNormal=$assMdl::sum('quantity');
-      $quantityTrash=$assMdl::onlyTrashed()->sum('quantity');
-            
-      return ['res'=>$res,'quantityNormal'=>$quantityNormal,'quantityTrash'=>$quantityTrash];
+      //返回各类asset的数量
+      return ['res'=>$res,'num'=>$this->priGetAssNum()];
     }
     
     //应用AssFSM

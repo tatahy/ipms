@@ -202,14 +202,22 @@ $(document).ready(function(){
 				$.post(url,formData,function(data){
 					if(data.res){
 						$.alert(comHtml(topic,oprt,'success'));
-						//数量发生变化
-						$('[data-ass-type="normal"]').find('.label').text(data.quantityNormal);
-						$('[data-ass-type="trash"]').find('.label').text(data.quantityTrash);
+						//更新各类asset的数量
+						//console.log(data.num);
+						$('#ulAssType [data-ass-type]').each(function(){
+							var assType=$(this).data('assType');
+							//应用index.html中定义的2个函数
+							var spanStr=buildAssNumSpan(assType,fnJsonToArr(data.num));
+							$(this).find('.spClass').remove();
+							$(this).find('.spType').after(spanStr);
+							//调整内部span.label的大小
+							$(this).find('.spClass').css({'padding-bottom':'1px','margin-bottom':'2px'});
+						});
 					}else{
 						$.alert(comHtml(topic,oprt,'fail'));
 					}
 			
-					loadAssList($('#divTblSortData').data('assType'));
+					loadAssList();
 				});
 			}else{
 				$('#modalAssSingle').modal('show');

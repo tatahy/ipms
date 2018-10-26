@@ -4,7 +4,7 @@
 	<h4>
 		<span class="label label-info"><span class="glyphicon glyphicon-oil"></span></span>&nbsp;固定资产
 		<span style="font-size:14px;">
-			【<strong>记录总数：</strong><span class="label label-info">{$num._TOTAL}</span>&nbsp;|
+			【<strong>记录总数：</strong><span class="label label-info">{$numTotal}</span>&nbsp;|
 			<strong>数量总计：</strong><span class="badge">{$quanTotal}</span>】
 		</span>
 	</h4>
@@ -197,30 +197,50 @@ var fnJsonToArr=(jsonObj)=>{
 	return arr;
 };
 
-//得到asset的type/Num/Label对应关系数组
-var getTypeNumLabelArr=(numArr,labelArr)=>{
-	var arr=[];
-	var label='info';
-	
-	for(var i=0;i<numArr.length;i++){
-		for(var n=0;n<labelArr.length;n++){
-			if(labelArr[n].name==numArr[i].name){
-				label=labelArr[n].val;
-				break;
-			}
-		}
-		arr[i]={'type':numArr[i].name,'num':numArr[i].val,'label':label};
-	}
-		
-	return arr;
-}; 
-
 const conAssNumArr=fnJsonToArr({$numObj});
 const conAssLabelArr=fnJsonToArr({$conAssStatusLabelArr});
 <!-- console.log(conAssNumArr); -->
 <!-- console.log(conAssLabelArr); -->
 
-const conAssTypeNumLabelArr=getTypeNumLabelArr(conAssNumArr,conAssLabelArr);
+var buildAssNumSpan=(type,numArr)=>{
+	
+	var label='';
+	var num=0;
+	//得到asset的type/Num/Label对应关系数组
+	var typeNumLabelArr=(numArr,labelArr)=>{
+		var arr=[];
+		var label='info';
+		for(var i=0;i<numArr.length;i++){
+			for(var n=0;n<labelArr.length;n++){
+				if(labelArr[n].name==numArr[i].name){
+					label=labelArr[n].val;
+					break;
+				}
+			}
+			arr[i]={'name':numArr[i].name,'num':numArr[i].val,'label':label};
+		}
+		return arr;
+	};
+	numArr=(numArr==undefined)?conAssNumArr:numArr;
+	var arr=typeNumLabelArr(numArr,conAssLabelArr);
+		
+	for(var i=0;i<arr.length;i++){
+		if(type==arr[i].name){
+			label=arr[i].label;
+			num=arr[i].num;
+			break;
+		}
+	}
+	if(num){
+		htmlStr='<span class="label label-'+label+' spClass">'+num+'</span>';
+	}else{
+		htmlStr='<span class="spClass">'+num+'</span>';
+		$(this).removeClass('aPill');
+		$(this).closest('li').addClass('disabled');
+	}
+	return htmlStr;
+};
+
 
 //**函数名：glyphiconTextChange
  	//* 作用：obj内含的glyphicon进行变换
@@ -365,6 +385,7 @@ var loadAssList=()=>{
 			).then(
 				function(data, textStatus, jqXHR){
 					//ajax成功
+					
 				},
 				function(){
 					//ajax失败
@@ -416,12 +437,19 @@ var fmReset=()=>{
 };
 
 
-//自调用匿名函数立即执行的特点，进行页面初始化。
+//自调用匿名函数立即执行的特点，进行页面初始化，有顺序讲究。
 (function($){
 	$('#divTblSortData').data('assType',assType);
 	
 	loadAssList();
 	
+	//.aPill添加内容
+	$('.aPill').each(function(){
+		var type=$(this).data('assType');
+		var htmlStr=buildAssNumSpan(type,conAssNumArr);
+		$(this).find('.spClass').remove();
+		$(this).find('.spType').after(htmlStr);
+	});
 	//ul.nav-tabs调整.aPill
 	$('ul.nav-pills').find('a').each(function(){
 		//1.缩小padding
@@ -429,37 +457,12 @@ var fmReset=()=>{
 		//去掉底部边框圆角
 		$(this).css({'border-bottom-right-radius':'0px','border-bottom-left-radius':'0px'});
 		//调整内部span.label的大小
-		$('span.label').css({'padding-bottom':'1px','margin-bottom':'2px'});
-	});
-	
-	//.aPill添加内容
-	$('.aPill').each(function(){
-		var htmlStr='';
-		var type=$(this).data('assType');
-		var label='';
-		var num=0;
-		
-		for(var i=0;i<conAssTypeNumLabelArr.length;i++){
-			if(type==conAssTypeNumLabelArr[i].type){
-				label=conAssTypeNumLabelArr[i].label;
-				num=conAssTypeNumLabelArr[i].num;
-				break;
-			}
-		}
-		if(num){
-			htmlStr='<span class="label label-'+label+' spClass">'+num+'</span>';
-		}else{
-			htmlStr='<span class="spClass">'+num+'</span>';
-			$(this).removeClass('aPill');
-			$(this).closest('li').addClass('disabled');
-		}
-		$(this).find('.spType').after(htmlStr);
+		$(this).find('.spClass').css({'padding-bottom':'1px','margin-bottom':'2px'});
 	});
 	
 })(jQuery);
 
 $(document).ready(function(){
-	//搜索内容是否发生变化标志
 	var searchDataChanged=false;
 	// 设置各类tooltip
 	$('#divTopBtn [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
@@ -468,12 +471,10 @@ $(document).ready(function(){
 	$('.aPill').click(function(){
 		assType=$(this).data('assType');
 		$('#divTblSortData').data('assType',assType);
-		console.log($('#divTblSortData').data('assType'));
 		$(this).tab('show');
 		//搜索表单重置
 		fmReset();
 		loadAssList();
-		
     });
 	
 	$('#btnSearchInfo').click(function(){
@@ -481,7 +482,6 @@ $(document).ready(function(){
 		glyphiconTextChange($(this));
 		//显示、隐藏#divSearchData
 		$('#divSearchData').collapse('toggle');
-			
 	});
 	
 	<!-- // 页面刷新 -->
@@ -493,15 +493,14 @@ $(document).ready(function(){
 		//隐藏搜索条件
 		$('#divSearchData').collapse('hide');
 		loadAssList();
-		
 	});
 	
 <!-- //表单$('#fmAssSearch')有关的代码块 -->
-	
 	$('#fmAssSearch .form-control').change(function(){
 		if($(this).val()!=0){
 			//表单输入框附加底色
 			$(this).addClass('label-info');
+			searchDataChanged=true;
 		}else{
 			//表单输入框去掉附加底色
 			$(this).removeClass('label-info');
@@ -510,7 +509,6 @@ $(document).ready(function(){
 	
 	//表单提交，显示asset结果
 	$('#btnSearch').click(function(){
-		
 		var assType=$('#divTblSortData').data('assType');
 		//检查搜索表单的值是否有变化，若有变化，排序参数pageNum要重设为1，避免出现在当前分页无法显示查询结果的情况
 		if(searchDataChanged){

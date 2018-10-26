@@ -242,8 +242,9 @@ var arrMerge=(arr1,arr2)=>{
 		$('#spAssNum').addClass('label label-info');
 	}
 	
-	if($('#ulAssType li.active a').data('assType')=='_ASSS6'){
-		
+	var trashObj=$('#ulAssType li.active a');
+	if(trashObj.data('assType')=='_ASSS6'){
+		$('.spAssType').html(trashObj.find('.spType').text());
 		$('#spAssNum').addClass('label label-danger');
 	}
 	
