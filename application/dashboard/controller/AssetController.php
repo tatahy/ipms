@@ -304,7 +304,7 @@ class AssetController extends \think\Controller
       return view();
     }
     
-    public function assOprt(Request $request,AssinfoModel $assMdl,AssrecordMde $assRdMdl,$data=[])
+    public function assOprt(Request $request,AssinfoModel $assMdl,AssrecordModel $assRdMdl,$data=[])
     {
       $this->priLogin();
       
@@ -314,21 +314,23 @@ class AssetController extends \think\Controller
       $oprt=$data['oprt'];
       $res=0;
       
-      $rdDataArr=['status_now'=>'',
-                  'status_now_user_name'=>'',
-                  'oprt'=>'',
-                  'oprt_detail'=>'',
-                  'oprt_detail_json'=>'',
-                  'assinfo_id'=>''
+      $rdDataArr=['status_now'=>$data['status_now'],
+                  'status_now_user_name'=>$data['status_now_user_name'],
+                  'oprt'=>$data['oprt'],
+                  'oprt_detail'=>$data['status_now_desc'],
+                  'oprt_detail_json'=>'{}',
+                  'assinfo_id'=>$data['id'],
+                  'keeper_now'=>$data['keeper_now'],
+                  'dept_now'=>$data['dept_now'],
+                  'place_now'=>$data['place_now'],
                   ];
       
       switch($oprt){
         case '_CREATE':
             //数据库create
             $res=$assMdl::create($data,true)->id;
-            
             //新状态写入assRecord表
-            
+            $assRdMdl::create($rdDataArr,true);
             break;
         case '_UPDATE':
             //数据库update
@@ -343,12 +345,16 @@ class AssetController extends \think\Controller
             $assMdl::update(['status_now'=>'回收站'], ['id' =>$id], true);
             $res = $assMdl::destroy($id);
             //新状态写入assRecord表
-            
+            $assRdMdl::create($rdDataArr,true);
             break;
         
         case'_DELETE':
             //模型的destroy方法，返回的是受影响的记录数。已启用框架的软删除，但是执行物理删除。
             $res = $assMdl::destroy($id,true);
+            //assRecord表删除相应的记录
+            $assRdMdl::destroy(function($query){
+                  $query->where('assinfo_id',$id);
+                });
             break;
             
         case'_RESTORE':
@@ -356,7 +362,7 @@ class AssetController extends \think\Controller
             $assMdl::update($data, ['id' =>$id], true);
             $res = $assMdl->restore(['id'=>$id]);
             //新状态写入assRecord表
-            
+            $assRdMdl::create($rdDataArr,true);
             break;
         //'_SUBMIT','_AUDIT','_APPROVE','_MAINTAIN'
         default:
@@ -364,9 +370,8 @@ class AssetController extends \think\Controller
           //模型的save方法，返回的是受影响的记录数。
           $assSet = $assMdl::get($id);
           $res=$assSet->allowField(true)->save($data);
-            
           //新状态写入assRecord表
-              
+          $assRdMdl::create($rdDataArr,true);    
           break;
       }
       //返回各类asset的数量
