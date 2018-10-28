@@ -213,6 +213,9 @@ $(document).ready(function(){
 							//调整内部span.label的大小
 							$(this).find('.spClass').css({'padding-bottom':'1px','margin-bottom':'2px'});
 						});
+						//对asset的总数进行更新
+						$('#assNumTotal').text(data.num._TOTAL);
+						$('#assQuanTotal').text(data.quanTotal);
 					}else{
 						$.alert(comHtml(topic,oprt,'fail'));
 					}

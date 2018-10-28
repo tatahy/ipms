@@ -375,7 +375,7 @@ class AssetController extends \think\Controller
           break;
       }
       //返回各类asset的数量
-      return ['res'=>$res,'num'=>$this->priGetAssNum()];
+      return ['res'=>$res,'num'=>$this->priGetAssNum(),'quanTotal'=>$assMdl::sum('quantity')+$assMdl::onlyTrashed()->sum('quantity')];
     }
     
     //应用AssFSM
