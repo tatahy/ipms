@@ -40,13 +40,11 @@
 			<div class="panel-heading">
 				<h4 class="panel-title" style="height:20px;">
 					<div class="pull-left">{$totalNum-$i+1}
-						<a class="aPanelCollapse" data-toggle="collapse" href="#collapse{$i}" title="查看详情"><strong class="text-primary">
-        		{$vo.status_now_user_name}</strong>【{$vo.oprt}】<span class="spStatus">{$vo.status_now}</span></a>
+						<a class="aPanelCollapse" data-toggle="collapse" href="#collapse{$i}" title="查看详情"><strong class="text-primary">{$vo.status_now_user_name}</strong>【{$vo.oprt}】<span class="spStatus">{$vo.status_now}</span></a>
 					</div>
 					
 					<div class="pull-right" style="font-size:14px;">{$vo.create_time}</div>
 				</h4>
-				
 			</div>
 			<div id="collapse{$i}" class="panel-collapse collapse">
 			
@@ -96,6 +94,7 @@ var glyphiconChange=(obj,icon1,icon2)=>{
 		index=conStatusArr.indexOf(status);
 		$(this).addClass('label label-'+conLabelArr[index]);
 	});
+	$('.modal-footer').attr('hidden',false)
 })(jQuery);
 
 $(document).ready(function(){

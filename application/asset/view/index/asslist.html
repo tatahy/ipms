@@ -81,14 +81,15 @@ const conLabelArr=Object.values({$conAssStatusLabelArr});
 
 //利用自调用匿名函数立即执行的特点，页面初始化
 (function($){
+	let sId=window.location.hash;
+	//传递锚点值,添加tooltip
+	$('.aTblAssSingle').attr('href',sId).tooltip({title: "资产详情", placement: "bottom"});
+	$('.aAssRecords').attr('href',sId).tooltip({title: "状态历史记录", placement: "bottom"});
 	//表格排序asc/desc
 	$('#tblAssList').data('sortOrder','{$sortData.sortOrder}');
-	
 	let spTitle=$('#ulAssType li.active a').find('.spTitle').html();
 	//.assType内容随$('#ulAssType li.active a').find('.spTitle')变化
 	$('.assType').html(spTitle);
-	
-	
 	//#spNum的class跟随$('#ulAssType li.active a').find('.spClass')变化
 	let spClass=$('#ulAssType li.active a').find('.spClass').attr('class');
 	if(spClass){
@@ -96,21 +97,12 @@ const conLabelArr=Object.values({$conAssStatusLabelArr});
 	}else{
 		$('#spNum').addClass('label label-info');
 	}
-	
 	//每个$('thead a')添加属性
 	$('thead a').each(function(){
 		$(this).attr({'href':'#','data-title':'点击排序','data-toggle':'tooltip'}).closest('th').addClass('text-center');
 	});
-	
-	//每个$('.aTblAssSingle')添加tooltip
-	$('.aTblAssSingle').tooltip({title: "资产详情", placement: "bottom"}); 
-	
-	//每个$('.aAssRecords')添加tooltip
-	$('.aAssRecords').tooltip({title: "状态历史记录", placement: "bottom"}); 
-	
 	<!-- //表格每页显示记录行数 -->
 	$('#listRows').val('{$sortData.listRows}'); 
-	
 	<!-- // status单元格内容上色-->
 	$('.spStatus').each(function(){
 		var status=$(this).text();

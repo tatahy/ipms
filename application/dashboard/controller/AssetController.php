@@ -303,6 +303,21 @@ class AssetController extends \think\Controller
         ]);
       return view();
     }
+     public function assRecords(Request $request,AssinfoModel $assMdl,AssrecordModel $assRdMdl)
+    {
+      $this->priLogin();
+      $id=$request->param('id');
+      $assSet=$assMdl::get($id);
+      $assRdSet=$assRdMdl::where('assinfo_id',$id)->order('create_time','desc')->select();
+      $this->assign([
+          'assSet'=>$assSet,
+          'assRdSet'=>$assRdSet,
+          'totalNum'=>count($assRdSet),
+          'conAssStatusArr'=>json_encode(conAssStatusArr,JSON_UNESCAPED_UNICODE), 
+          'conAssStatusLabelArr'=>json_encode(conAssStatusLabelArr,JSON_UNESCAPED_UNICODE),     
+        ]);
+      return view();
+    }
     
     public function assOprt(Request $request,AssinfoModel $assMdl,AssrecordModel $assRdMdl,$data=[])
     {
@@ -330,6 +345,7 @@ class AssetController extends \think\Controller
             //数据库create
             $res=$assMdl::create($data,true)->id;
             //新状态写入assRecord表
+            $rdDataArr['assinfo_id']=$res;
             $assRdMdl::create($rdDataArr,true);
             break;
         case '_UPDATE':

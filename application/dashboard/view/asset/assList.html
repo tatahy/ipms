@@ -44,7 +44,7 @@
 					<td class="text-right">{$vo.place_now}</td>
 					<td class="text-right">{$vo.dept_now}</td>
 					<td class="text-right">{$vo.keeper_now}</td>
-					<td class="text-right"><span class="spStatus">{$vo.status_now}</span></td>
+					<td class="text-right"><a class="aAssRecords" href="#assInfo" data-ass-id="{$vo.id}"><span class="spStatus">{$vo.status_now}</span></a></td>
 					<td class="text-right">{$vo.status_now_desc}</td>
 					<td class="text-right">{$vo.status_now_user_name}</td>
 					<td class="text-right">{$vo.create_time}</td>
@@ -228,12 +228,16 @@ var arrMerge=(arr1,arr2)=>{
 	return result; 
 };
 
-//利用自调用匿名函数立即执行的特点，设定固定资产的操作组件的html字符串;$('thead a') 添加属性
+//利用自调用匿名函数立即执行的特点， 页面初始化
 (function($){
+	let sId=window.location.hash;
+	//传递锚点值,添加tooltip
+	$('.aTblAssSingle').attr('href',sId).tooltip({title: "资产详情", placement: "bottom"});
+	$('.aAssRecords').attr('href',sId).tooltip({title: "状态历史记录", placement: "bottom"});
+	
 	let spType=$('#ulAssType .dropdown-menu li.active a').find('.spType').html();
 	//.spAssType内容随$('#ulAssType li.active a').find('.spType')变化
 	$('.spAssType').html(spType);
-	
 	//#spNum的class跟随$('#ulAssType li.active a').find('.spClass')变化
 	let spClass=$('#ulAssType .dropdown-menu li.active a').find('.spClass').attr('class');
 	if(spClass){
@@ -241,30 +245,22 @@ var arrMerge=(arr1,arr2)=>{
 	}else{
 		$('#spAssNum').addClass('label label-info');
 	}
-	
 	var trashObj=$('#ulAssType li.active a');
 	if(trashObj.data('assType')=='_ASSS6'){
 		$('.spAssType').html(trashObj.find('.spType').text());
 		$('#spAssNum').addClass('label label-danger');
 	}
-	
 	//每个.btnAssOprt根据该行记录的data-ass-status="{$ vo.status_now}"添加相应的a标签
 	$('.btnAssOprt').each(function(){
 		var ahtml=getOprtHtmlStr($(this).data('assStatus'));
 		$(this).append(ahtml);
 	});
-	
 	// 设置$('.btnAssOprt')的tooltip
 	$('.btnAssOprt [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
-	 
 	//每个$('thead a')添加属性
 	$('thead a').each(function(){
 		$(this).attr({'href':'#assInfo','data-title':'点击排序','data-toggle':'tooltip'}).closest('th').addClass('text-center');
 	});
-	
-	//每个$('.aTblAssSingle')添加tooltip
-	$('.aTblAssSingle').tooltip({title: "查看详情", placement: "bottom"}); 
-	
 	<!-- // status单元格内容上色-->
 	$('.spStatus').each(function(){
 		var status=$(this).text();
@@ -272,7 +268,6 @@ var arrMerge=(arr1,arr2)=>{
 		index=conStatusArr.indexOf(status);
 		$(this).addClass('label label-'+conLabelArr[index]);
 	});
-
 })(jQuery);
 
 
@@ -315,6 +310,18 @@ $(document).ready(function(){
 		$('#divLoadAssSingle').load(urlPrefix+'tblAssSingle',{'id':$(this).data('assId')});
 		
 		$('#modalAssSingle').find('.title').html('固定资产详情');
+		$('#modalAssSingle').modal();
+	});
+	
+	$('.aAssRecords').click(function(){
+		//去掉所有行的底色
+		$('tr').removeClass('bg-warning');
+		//给本行上底色
+		$(this).closest('tr').addClass('bg-warning');
+		
+		$('#divLoadAssSingle').load(urlPrefix+'assRecords',{'id':$(this).data('assId')});
+		
+		$('#modalAssSingle').find('.title').html('固定资产状态变化详情');
 		$('#modalAssSingle').modal();
 	});
 	

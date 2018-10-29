@@ -6,6 +6,7 @@ use think\Session;
 use think\View;
 
 use app\asset\model\Assinfo as AssinfoModel;
+use app\asset\model\Assrecord as AssrecordModel;
 
 class IndexController extends \think\Controller
 {
@@ -44,7 +45,7 @@ class IndexController extends \think\Controller
     
     //asset数量
     private function priAssNum($assType=''){
-      $assType=!empty($assType)?$assType:'usual';
+      $assType=!empty($assType)?$assType:'_USUAL';
       return $this->priAssQueryObj($assType)->count();
     }
     
@@ -82,7 +83,7 @@ class IndexController extends \think\Controller
           'num_ASSS4'=>$this->priAssNum('_ASSS4'),
           'num_ASSS5'=>$this->priAssNum('_ASSS5'),
           
-          'assType'=>'usual',
+          'assType'=>'_USUAL',
                     
           'home'=>$request->domain(),
           'username'=>$this->userName,
@@ -102,7 +103,7 @@ class IndexController extends \think\Controller
     {
         $this->priLogin();
                           
-        $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1,'assType'=>'usual');
+        $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1,'assType'=>'_USUAL');
         // 接收前端的排序参数数组
         $sortData=!empty($request->param('sortData/a'))?$request->param('sortData/a'):$sortDefaults;
         $sortData=array_merge($sortDefaults,$sortData);
@@ -224,13 +225,16 @@ class IndexController extends \think\Controller
       return view();
     }
     
-     public function assRecords(Request $request,AssinfoModel $assMdl)
+     public function assRecords(Request $request,AssinfoModel $assMdl,AssrecordModel $assRdMdl)
     {
       $this->priLogin();
-      $assSet=$assMdl::get($request->param('id'));
-           
+      $id=$request->param('id');
+      $assSet=$assMdl::get($id);
+      $assRdSet=$assRdMdl::where('assinfo_id',$id)->order('create_time','desc')->select();
       $this->assign([
           'assSet'=>$assSet,
+          'assRdSet'=>$assRdSet,
+          'totalNum'=>count($assRdSet),
           'conAssStatusArr'=>json_encode(conAssStatusArr,JSON_UNESCAPED_UNICODE), 
           'conAssStatusLabelArr'=>json_encode(conAssStatusLabelArr,JSON_UNESCAPED_UNICODE),     
         ]);

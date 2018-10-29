@@ -64,7 +64,7 @@ class Assinfo extends Model
     //查询asset的类别
     protected function scopeAssType($query,$assType)
     {
-      if($assType=='usual'){
+      if($assType=='_USUAL'){
         $query->where('id','>',0);
       }else{
         $query->where('status_now','like','%'.$assType.'%');
