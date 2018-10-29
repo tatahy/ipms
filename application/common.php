@@ -19,15 +19,16 @@ const conAssStatusArr=['_ASSS0'=>'*',
                     '_ASSS2_2'=>'正常_折旧完',
                     //label-warning，异常
                     '_ASSS3'=>'异常',
-                    '_ASSS3_1'=>'异常_待更新',
+                    '_ASSS3_1'=>'异常_待审核',
                     '_ASSS3_2'=>'异常_待维修',
                     '_ASSS3_3'=>'异常_遗失',
                     //label-default，停用
                     '_ASSS4'=>'停用',
                     '_ASSS4_1'=>'停用_维修中',
                     '_ASSS4_2'=>'停用_封存',
-                    '_ASSS4_3'=>'待销账_报废',
-                    '_ASSS4_4'=>'待销账_遗失',
+                    '_ASSS4_3'=>'停用_遗失',
+                    '_ASSS4_4'=>'待销账_报废',
+                    '_ASSS4_5'=>'待销账_遗失',
                     //label-default，销账
                     '_ASSS5'=>'销账',
                     //label-danger
@@ -57,6 +58,7 @@ const conAssStatusLabelArr=[
                     '_ASSS4_2'=>'default',
                     '_ASSS4_3'=>'default',
                     '_ASSS4_4'=>'default',
+                    '_ASSS4_5'=>'default',
                     '_ASSS5'=>'default',
                     //label-danger
                     '_ASSS6'=>'danger'

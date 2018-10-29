@@ -3,21 +3,22 @@
 
 //asset的状态与操作的对应关系（conAssStatusOprtArr），现状->可对现状进行的操作->操作后的状态
 const conAssStatusOprtArr=[
-                      ['status'=>'_ASSS0','statusChi'=>'*','oprt'=>['_UPDATE','_SUBMIT','_DELETE'],'nextStatus'=>['_SUBMIT'=>['新增_待验收','异常_待更新']]],
+                      ['status'=>'_ASSS0','statusChi'=>'*','oprt'=>['_UPDATE','_SUBMIT','_DELETE'],'nextStatus'=>['_SUBMIT'=>['新增_待验收','异常_待审核']]],
                       ['status'=>'_ASSS1_1','statusChi'=>'新增_待验收','oprt'=>['_UPDATE','_SUBMIT'],'nextStatus'=>['_SUBMIT'=>['待分配_初次验收合格','异常_待维修','异常_遗失']]],
-                      ['status'=>'_ASSS1_2','statusChi'=>'待分配_初次验收合格','oprt'=>['_UPDATE','_AUDIT'],'nextStatus'=>['_AUDIT'=>['正常_折旧中','异常_待维修','异常_遗失']]],
-                      ['status'=>'_ASSS1_3','statusChi'=>'待分配_维修验收合格','oprt'=>['_UPDATE','_AUDIT'],'nextStatus'=>['_AUDIT'=>['正常_折旧中','正常_折旧完','异常_待维修','异常_遗失']]],
-                      ['status'=>'_ASSS2_1','statusChi'=>'正常_折旧中','oprt'=>['_UPDATE','_SUBMIT'],'nextStatus'=>['_SUBMIT'=>['异常_待维修','异常_遗失','异常_待更新']]],
-                      ['status'=>'_ASSS2_2','statusChi'=>'正常_折旧完','oprt'=>['_UPDATE','_SUBMIT'],'nextStatus'=>['_SUBMIT'=>['异常_待维修','异常_遗失','异常_待更新']]],
-                      ['status'=>'_ASSS3_1','statusChi'=>'异常_待更新','oprt'=>['_UPDATE','_AUDIT','_TRASH'],'nextStatus'=>['_AUDIT'=>['异常_待维修','异常_遗失','停用_维修中'],'_TRASH'=>['回收站']]],
+                      ['status'=>'_ASSS1_2','statusChi'=>'待分配_初次验收合格','oprt'=>['_UPDATE','_AUDIT'],'nextStatus'=>['_AUDIT'=>['正常_折旧中','异常_待维修','异常_遗失','停用_维修中','停用_封存']]],
+                      ['status'=>'_ASSS1_3','statusChi'=>'待分配_维修验收合格','oprt'=>['_UPDATE','_AUDIT'],'nextStatus'=>['_AUDIT'=>['正常_折旧中','正常_折旧完','异常_待维修','异常_遗失','停用_维修中','停用_封存']]],
+                      ['status'=>'_ASSS2_1','statusChi'=>'正常_折旧中','oprt'=>['_UPDATE','_SUBMIT'],'nextStatus'=>['_SUBMIT'=>['异常_待维修','异常_遗失','异常_待审核']]],
+                      ['status'=>'_ASSS2_2','statusChi'=>'正常_折旧完','oprt'=>['_UPDATE','_SUBMIT'],'nextStatus'=>['_SUBMIT'=>['异常_待维修','异常_遗失','异常_待审核']]],
+                      ['status'=>'_ASSS3_1','statusChi'=>'异常_待审核','oprt'=>['_UPDATE','_AUDIT','_TRASH'],'nextStatus'=>['_AUDIT'=>['异常_待维修','异常_遗失','停用_维修中'],'_TRASH'=>['回收站']]],
                       ['status'=>'_ASSS3_2','statusChi'=>'异常_待维修','oprt'=>['_UPDATE','_AUDIT',],'nextStatus'=>['_AUDIT'=>['异常_遗失','停用_维修中','待分配_维修验收合格']]],
-                      ['status'=>'_ASSS3_3','statusChi'=>'异常_遗失','oprt'=>['_UPDATE','_AUDIT',],'nextStatus'=>['_AUDIT'=>['异常_待维修','停用_维修中','停用_封存']]],
+                      ['status'=>'_ASSS3_3','statusChi'=>'异常_遗失','oprt'=>['_UPDATE','_AUDIT',],'nextStatus'=>['_AUDIT'=>['异常_待维修','停用_维修中','停用_遗失']]],
                       ['status'=>'_ASSS4_1','statusChi'=>'停用_维修中','oprt'=>['_UPDATE','_APPROVE','_TRASH'],'nextStatus'=>['_APPROVE'=>['待分配_维修验收合格','待销账_报废','待销账_遗失'],'_TRASH'=>['回收站']]],
                       ['status'=>'_ASSS4_2','statusChi'=>'停用_封存','oprt'=>['_UPDATE','_APPROVE','_TRASH'],'nextStatus'=>['_APPROVE'=>['待销账_报废','待销账_遗失','正常_折旧完'],'_TRASH'=>['回收站']]],
-                      ['status'=>'_ASSS4_3','statusChi'=>'待销账_报废','oprt'=>['_UPDATE','_MAINTAIN'],'nextStatus'=>['_MAINTAIN'=>['销账']]],
-                      ['status'=>'_ASSS4_4','statusChi'=>'待销账_遗失','oprt'=>['_UPDATE','_MAINTAIN'],'nextStatus'=>['_MAINTAIN'=>['销账']]],
+                      ['status'=>'_ASSS4_3','statusChi'=>'停用_遗失','oprt'=>['_UPDATE','_APPROVE'],'nextStatus'=>['_APPROVE'=>['待销账_遗失']]],
+                      ['status'=>'_ASSS4_4','statusChi'=>'待销账_报废','oprt'=>['_UPDATE','_MAINTAIN'],'nextStatus'=>['_MAINTAIN'=>['销账']]],
+                      ['status'=>'_ASSS4_5','statusChi'=>'待销账_遗失','oprt'=>['_UPDATE','_MAINTAIN'],'nextStatus'=>['_MAINTAIN'=>['销账']]],
                       ['status'=>'_ASSS5','statusChi'=>'销账','oprt'=>[],'nextStatus'=>[]],
-                      ['status'=>'_ASSS6','statusChi'=>'回收站','oprt'=>['_RESTORE'],'nextStatus'=>['_RESTORE'=>['正常_折旧完','正常_折旧中','异常_待维修','异常_遗失','停用_维修中','停用_封存']]]
+                      ['status'=>'_ASSS6','statusChi'=>'回收站','oprt'=>['_RESTORE'],'nextStatus'=>['_RESTORE'=>['正常_折旧完','正常_折旧中','异常_待维修','异常_遗失','停用_维修中','停用_封存','停用_遗失']]]
                     ];
 
 //asset的权限与操作的对应关系（conAssAuthOprtArr）
@@ -42,7 +43,7 @@ const conAssOprtChangeStatusArr=[
                         ['oprt'=>'_APPROVE','oprtChi'=>'审批','statusNow'=>[''],'statusChangeTo'=>['待销账_报废','待销账_遗失']],
                         ['oprt'=>'_MAINTAIN','oprtChi'=>'维护','statusNow'=>['_ASSS4_3'=>'待销账_报废','_ASSS4_4'=>'待销账_遗失'],'statusChangeTo'=>['销账']],
                         ['oprt'=>'_UPDATE','oprtChi'=>'更新','statusNow'=>[''],'statusChangeTo'=>[]],
-                        ['oprt'=>'_TRASH','oprtChi'=>'回收','statusNow'=>['_ASSS3_1'=>'异常_待更新',],'statusChangeTo'=>['回收站']],
+                        ['oprt'=>'_TRASH','oprtChi'=>'回收','statusNow'=>['_ASSS3_1'=>'异常_待审核',],'statusChangeTo'=>['回收站']],
                         ['oprt'=>'_RESTORE','oprtChi'=>'还原','statusNow'=>['_ASSS6'=>'回收站'],'statusChangeTo'=>['正常_折旧完','正常_折旧中','异常_待维修','异常_遗失','停用_维修中','停用_封存']],
                         ['oprt'=>'_READ','oprtChi'=>'查阅','statusNow'=>[''],'statusChangeTo'=>[]],
                         ['oprt'=>'_DELETE','oprtChi'=>'删除','statusNow'=>['_ASSS0'=>'*','_ASSS1_1'=>'新增_待验收'],'statusChangeTo'=>[]]
