@@ -277,10 +277,12 @@ $(document).ready(function(){
 	$('#listRows').val('{$sortData.listRows}'); 
 	
 	$('#listRows').change(function(){
-		var listRows=$(this).val();
+		var listRows=$(this).val()*1;
 		//排序有关的值向$('#divTblSortData')汇集
 		if(listRows){
 			$('#divTblSortData').data('listRows',listRows);
+			//分页从第一页开始
+			$('#divTblSortData').data('pageNum',1);
 		}
 		//调用index.html中的loadAssList()
 		loadAssList();
