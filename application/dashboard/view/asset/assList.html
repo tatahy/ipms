@@ -102,13 +102,13 @@ var fnJsonToArr=(jsonObj)=>{
 
 //定义常量，asset状态与操作对应关系conAssStatusOprtArr
 const conAssStatusOprtArr={$conAssStatusOprtArr};
-<!-- console.log('conAssStatusOprtArr:'); -->
-<!-- console.log(conAssStatusOprtArr); -->
+console.log('conAssStatusOprtArr:');
+console.log(conAssStatusOprtArr);
 
 //定义常量，asset权限与操作的对应关系
 const conAssAuthOprtArr={$conAssAuthOprtArr};
-<!-- console.log('conAssAuthOprtArr:'); -->
-<!-- console.log(conAssAuthOprtArr); -->
+console.log('conAssAuthOprtArr:');
+console.log(conAssAuthOprtArr);
 
 //定义常量，asset权限数组
 const conAssAuthArr= fnJsonToArr({$authAssObj});
@@ -151,7 +151,7 @@ var getOprtHtmlStr=(status)=>{
 	var statusOprtArr=[];
 	var oprtArr=[];
 	
-	//由auth决定authOprtArr中选用的val值，组成authOprtArr
+	//由auth决定authOprtArr中的值。authOprtArr：登录用户所有asset权限下的操作值数组(去掉重复值的数组)
 	for(var i=0;i<conAssAuthArr.length;i++){
 		if(conAssAuthArr[i].val){
 			var name=conAssAuthArr[i].name;
@@ -164,7 +164,7 @@ var getOprtHtmlStr=(status)=>{
 		}
 	}
 		
-	//由status决定statusOprtArr中的oprt值，组成statusOprtArr
+	//由status决定statusOprtArr中的值。statusOprtArr：状态对应的操作值数组
 	for(var i=0;i<conAssStatusOprtArr.length;i++){
 		if(conAssStatusOprtArr[i].statusChi==status){
 			statusOprtArr=conAssStatusOprtArr[i].oprt;
@@ -181,9 +181,10 @@ var getOprtHtmlStr=(status)=>{
 		}
 	});
 	
-	<!-- console.log('statusOprtArr:'+statusOprtArr); -->
-	<!-- console.log('authOprtArr:'+authOprtArr); -->
-	<!-- console.log('oprtArr:'+oprtArr); -->
+	
+	console.log('authOprtArr:'+authOprtArr);
+	console.log('statusOprtArr:'+statusOprtArr);
+	console.log('oprtArr:'+oprtArr);
 	
 	if(oprtArr.length){
 		oprtArr.forEach(function(el){		

@@ -211,30 +211,37 @@ class AssetController extends \think\Controller
     }
     
     //响应前端请求，返回信息
-    public function selectRes(Request $request,AssinfoModel $assMdl,$req='',$source='db',$assType='normal')
+    public function selectRes(Request $request,AssinfoModel $assMdl,$req='',$source='db',$assType='_USUAL')
     {
       $this->priLogin();
       
       $req = !empty($request->param('req'))?$request->param('req'):0;
       $source = !empty($request->param('source'))?$request->param('source'):0;
       $oprt=!empty($request->param('oprt'))?$request->param('oprt'):0;
-      $assType=!empty($request->param('assType'))?$request->param('assType'):'normal';
-      
-      $arr=conAssOprtChangeStatusArr;
+      $assType=!empty($request->param('assType'))?$request->param('assType'):'_USUAL';
+      $statusNow=!empty($request->param('statusNow'))?$request->param('statusNow'):'';
+      //$arr=conAssOprtChangeStatusArr;
+      $arr=conAssStatusOprtArr;
       
       if($source=='common' && $req=='status_now'){
-        //引用本模块公共文件（dashboard/common.php）中定义的数组常量
-        //foreach(conAssOprtChangeStatusArr as $val){
-//          if($oprt==$val['oprt']){
-//            $res=$val['statusChangeTo'];
+        
+        //for($i=0;$i<count($arr);$i++){
+//          if($oprt==$arr[$i]['oprt']){
+//            $res=$arr[$i]['statusChangeTo'];
 //          }
 //        }
         
         for($i=0;$i<count($arr);$i++){
-          if($oprt==$arr[$i]['oprt']){
-            $res=$arr[$i]['statusChangeTo'];
+          if($statusNow==$arr[$i]['statusChi']){
+            foreach($arr[$i]['nextStatus'] as $key=>$val){
+              if($oprt==$key){
+                $res=$val;
+              }
+            }
+            break;
           }
         }
+        
       }else{
         //从数据库获得数据
         $res=$this->priAssQueryObj($assType)->field($req)->group($req)->select();

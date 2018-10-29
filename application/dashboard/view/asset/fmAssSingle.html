@@ -59,7 +59,7 @@
 	<div class="row">
 	<div class="form-group col-sm-4">
 		<label>现状</label>
-		<input class="form-control" value="{$assSet.status_now}" type="text" readonly>
+		<input class="form-control" id="statusNow" value="{$assSet.status_now}" type="text" readonly>
 	</div>
 	
 	<div class="form-group col-sm-4">
@@ -167,7 +167,7 @@ var oprtBtnHtml=(oprtEn)=>{
 
 //利用自调用匿名函数立即执行的特点，对页面的组件进行初始化
 (function($){
-	ajaxShowSelect({'sendData':{'req':$('#modalSelectStatusNow').attr('name'),'source':'common','oprt':oprt},'attach':'','selected':0,'obj':$('#modalSelectStatusNow')});
+	ajaxShowSelect({'sendData':{'req':$('#modalSelectStatusNow').attr('name'),'source':'common','oprt':oprt,'statusNow':$('#statusNow').val()},'attach':'','selected':0,'obj':$('#modalSelectStatusNow')});
 	
 	if(oprt=='_CREATE' || oprt=='_RESTORE'){
 		//消除_UPDATE按钮
