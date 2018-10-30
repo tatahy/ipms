@@ -135,7 +135,7 @@ $(document).ready(function(){
 		//给本行上底色
 		$(this).closest('tr').addClass('bg-warning');
 		
-		$('#divLoadAssSingle').load(urlPrefix+'tblAssSingle',{'id':$(this).data('assId')});
+		$('#divLoadAssSingle').html('<p class="text-center" style="font-size:20px;">加载中……</p>').load(urlPrefix+'tblAssSingle',{'id':$(this).data('assId')});
 		
 		$('#modalAssSingle').find('.title').html('固定资产详情');
 		$('#modalAssSingle').modal();
@@ -147,7 +147,7 @@ $(document).ready(function(){
 		//给本行上底色
 		$(this).closest('tr').addClass('bg-warning');
 		
-		$('#divLoadAssSingle').load(urlPrefix+'assRecords',{'id':$(this).data('assId')});
+		$('#divLoadAssSingle').html('<p class="text-center" style="font-size:20px;">加载中……</p>').load(urlPrefix+'assRecords',{'id':$(this).data('assId')});
 		
 		$('#modalAssSingle').find('.title').html('固定资产状态变化详情');
 		$('#modalAssSingle').modal();

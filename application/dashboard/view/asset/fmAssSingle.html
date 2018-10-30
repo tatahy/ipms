@@ -60,22 +60,27 @@
 	<div class="form-group col-sm-4">
 		<label>现状</label>
 		<input class="form-control" id="statusNow" value="{$assSet.status_now}" type="text" readonly>
+		<div class="alert alert-warning fade in small" style="padding:5px;"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>【<span class="glyphicon glyphicon-save-file"></span>更新】不会改变“现状”</div>
 	</div>
+	
 	
 	<div class="form-group col-sm-4">
 		<label for="status_now">状态变更为</label>
 		<select class="form-control" id="modalSelectStatusNow" name="status_now" >
 			<option value="">d1</option>
 		</select>
-	
+		<span class="small text-muted"></span>
 	</div>
 	
 	<div class="form-group col-sm-4">
 		<label for="status_now_desc">状态说明</label>
 		<input class="form-control empty-check" name="status_now_desc" value="{$assSet.status_now_desc}" type="text" placeholder="请填入状态改变的简短说明" required>
+		<span class="small text-muted"></span>
 	
 	</div>
+	</div>
 	
+	<div class="row">
 	<div class="form-group col-sm-2">
 		<label for="status_now_user_name">登记人</label>
 		{notin name="oprt" value="_DELETE"}
@@ -165,10 +170,39 @@ var oprtBtnHtml=(oprtEn)=>{
 	return htmlStr;
 };
 
+var selectStatusNowAttached=(oprtEn,statusNext)=>{
+	var oprtChi = '';
+	var statusNow=$('#statusNow').val();
+
+	conOprtComAttr.forEach(function(e){
+		if(oprtEn==e.val){
+			oprtChi = e.name;
+			gly=e.gly;
+			oprtChi='<span class="glyphicon glyphicon-'+gly+'"></span>'+oprtChi;
+		}
+	});
+	
+	$('select[name="status_now"]').next('span').html('【'+oprtChi+'】后，状态由：'+statusNow+'->'+statusNext);
+		
+	$('input[name="status_now_desc"]').val('状态变为：'+statusNext);
+};
+
 //利用自调用匿名函数立即执行的特点，对页面的组件进行初始化
 (function($){
-	ajaxShowSelect({'sendData':{'req':$('#modalSelectStatusNow').attr('name'),'source':'common','oprt':oprt,'statusNow':$('#statusNow').val()},'attach':'','selected':0,'obj':$('#modalSelectStatusNow')});
-	
+	//单选框$('select[name="status_now"]')的初始化	
+	$.post('{$home}/dashboard/asset/selectRes',{'req':$('#modalSelectStatusNow').attr('name'),'source':'common','oprt':oprt,'statusNow':$('#statusNow').val()},function(result){
+		selectStatusNowAttached(oprt,result[0]);
+		var obj=$('select[name="status_now"]');
+		var str='';
+		$.each(result,function(n1,v1){
+			str+='<option value="'+v1+'">'+v1+'</option>';	
+		});
+		<!--// 清空单选框Obj的所有选项-->
+		obj.empty();
+		<!--// 添加单选框Obj的新选项-->
+		obj.append(str);
+	});
+		
 	if(oprt=='_CREATE' || oprt=='_RESTORE'){
 		//消除_UPDATE按钮
 		$('.pull-left').children().remove()
@@ -184,6 +218,11 @@ var oprtBtnHtml=(oprtEn)=>{
 $(document).ready(function(){
 	$('#fmAssInfo').find('button:submit').click(function(){	
 		$(this).closest('form').find('[name="oprt"]').val($(this).data('oprt'));
+	});
+	
+	
+	$('select[name="status_now"]').change(function(){
+		selectStatusNowAttached(oprt,$(this).val());	
 	});
 	
 	$('#fmAssInfo').submit(function(evt){

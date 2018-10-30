@@ -308,13 +308,11 @@ var loadAssList=(sortData)=>{
 	<!-- // 转换成json字符串-->
 	JSON.stringify(searchData);
 		
-	$('#divLoadAssList').html('<p class="text-center" style="font-size:20px;">加载中……</p>');
-	
 	//console.log('sortData:');
 	//console.dir(sortData);
 	
 	// jquery load()方法，文件加载到本页面<div id="divLoadAssList"></div>
-	$('#divLoadAssList').load('assList',
+	$('#divLoadAssList').html('<p class="text-center" style="font-size:20px;">加载中……</p>').load('assList',
 		{'sortData':sortData,'searchData':searchData},
 		function(){
 			sortOrderToggle(sortData.sortName);
@@ -323,7 +321,6 @@ var loadAssList=(sortData)=>{
 				ajaxShowSelect({'sendData':{'req':$('#selectDeptNow').attr('name'),'assType':assType},'selected':deptNowArr,'obj':$('#selectDeptNow')}),
 				ajaxShowSelect({'sendData':{'req':$('#selectStatusNow').attr('name'),'assType':assType},'selected':statusNowArr,'obj':$('#selectStatusNow')}),
 				ajaxShowSelect({'sendData':{'req':$('#selectPlaceNow').attr('name'),'assType':assType},'selected':placeNowArr,'obj':$('#selectPlaceNow')})
-		<!-- ajaxShowSelect({sendData:{req:$('#selectKeeperNow').attr('name')},obj:$('#selectKeeperNow')}) -->
 			).then(
 				function(data, textStatus, jqXHR){
      			//ajax成功
