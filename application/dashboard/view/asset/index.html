@@ -180,7 +180,7 @@
 
 <!-- /pagewrap  -->
 
-<script>
+<script type="text/javascript">
 
 var assType='{$assType}';
 
@@ -198,8 +198,10 @@ var fnJsonToArr=(jsonObj)=>{
 };
 
 const conAssNumArr=fnJsonToArr({$numObj});
-const conAssLabelArr=fnJsonToArr({$conAssStatusLabelArr});
-<!-- console.log(conAssNumArr); -->
+<!-- var conAssNumArr=fnJsonToArr({$numObj}); -->
+<!-- const conAssLabelArr=fnJsonToArr({$conAssStatusLabelArr}); -->
+var conAssLabelArr=fnJsonToArr({$conAssStatusLabelArr});
+<!-- console.table(conAssNumArr); -->
 <!-- console.log(conAssLabelArr); -->
 
 var buildAssNumSpan=(type,numArr)=>{

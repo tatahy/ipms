@@ -87,7 +87,7 @@
 
 <!-- /pagewrap  -->
 
-<script>
+<script type="text/javascript">
 //输入JSON对象：{$ authAssObj}={edit:1,audit:1,approve:0,maintain:0}
 //转成键值对数组形式输出authAssArr=[{name:'edit',val:'1'},{name:'audit',val:'1'},{name:'approve',val:'0'},{name:'maintain',val:'0'}]
 //便于应用数组的.forEach等函数进行自定义处理
@@ -104,22 +104,37 @@ var fnJsonToArr=(jsonObj)=>{
 //console.log($('#divTblSortData').data('assType'));
 
 //定义常量，asset状态与操作对应关系conAssStatusOprtArr
-const conAssStatusOprtArr={$conAssStatusOprtArr};
+<!-- const conAssStatusOprtArr={$conAssStatusOprtArr}; -->
+var conAssStatusOprtArr={$conAssStatusOprtArr};
 <!-- console.log('conAssStatusOprtArr:'); -->
 <!-- console.log(conAssStatusOprtArr); -->
 
 //定义常量，asset权限与操作的对应关系
-const conAssAuthOprtArr={$conAssAuthOprtArr};
+<!-- const conAssAuthOprtArr={$conAssAuthOprtArr}; -->
+var conAssAuthOprtArr={$conAssAuthOprtArr};
 <!-- console.log('conAssAuthOprtArr:'); -->
 <!-- console.log(conAssAuthOprtArr); -->
 
 //定义常量，asset权限数组
-const conAssAuthArr= fnJsonToArr({$authAssObj});
+<!-- const conAssAuthArr= fnJsonToArr({$authAssObj}); -->
+var conAssAuthArr= fnJsonToArr({$authAssObj});
 <!-- console.log('conAssAuthArr:'); -->
-<!-- console.log(conAssAuthArr); -->
+<!-- console.table(conAssAuthArr); -->
 
 //定义常量，操作组件的重要属性
-const conOprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'info',title:'新增固定资产记录'},
+<!-- const conOprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'info',title:'新增固定资产记录'}, -->
+			<!-- {name:'提交',val:'_SUBMIT',gly:'send',color:'info',title:'提交记录'}, -->
+			<!-- {name:'审核',val:'_AUDIT',gly:'check',color:'warning',title:'审核记录'}, -->
+			<!-- {name:'审批',val:'_APPROVE',gly:'ok',color:'danger',title:'审批记录'}, -->
+			<!-- {name:'维护',val:'_MAINTAIN',gly:'list-alt',color:'primary',title:'维护记录'}, -->
+			<!-- {name:'更新',val:'_UPDATE',gly:'save-file',color:'primary',title:'更新记录'}, -->
+			<!-- {name:'查询',val:'_READ',gly:'search',color:'primary',title:'查询记录'}, -->
+			<!-- {name:'删除',val:'_DELETE',gly:'remove',color:'danger',title:'删除记录'}, -->
+			<!-- {name:'回收',val:'_TRASH',gly:'trash',color:'danger',title:'记录放入回收站'}, -->
+			<!-- {name:'还原',val:'_RESTORE',gly:'retweet',color:'success',title:'记录还原'} -->
+			<!-- ]; -->
+			
+var conOprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'info',title:'新增固定资产记录'},
 			{name:'提交',val:'_SUBMIT',gly:'send',color:'info',title:'提交记录'},
 			{name:'审核',val:'_AUDIT',gly:'check',color:'warning',title:'审核记录'},
 			{name:'审批',val:'_APPROVE',gly:'ok',color:'danger',title:'审批记录'},
@@ -132,7 +147,9 @@ const conOprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'inf
 			];
 
 const conStatusArr=Object.values({$conAssStatusArr});
+<!-- var conStatusArr=Object.values({$conAssStatusArr}); -->
 const conLabelArr=Object.values({$conAssStatusLabelArr});
+<!-- var conLabelArr=Object.values({$conAssStatusLabelArr}); -->
 //某个值是否在数组内
 var fnInArr=(item, arr)=>{
 	for (var i = 0; i < arr.length; i++) {
@@ -148,12 +165,12 @@ var fnInArr=(item, arr)=>{
 //2.决定产生组件的条件？auth,status,??
 //status决定产生的操作组件数量，auth结合authVSoprt来决定显示给登录用户的操作组件数量。
 var getOprtHtmlStr=(status)=>{
- 	
+
 	var aHtml='';
 	var authOprtArr=[];
 	var statusOprtArr=[];
 	var oprtArr=[];
-	
+	//console.table(conAssAuthArr);
 	//由auth决定authOprtArr中的值。authOprtArr：登录用户所有asset权限下的操作值数组(去掉重复值的数组)
 	for(var i=0;i<conAssAuthArr.length;i++){
 		if(conAssAuthArr[i].val){
