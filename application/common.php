@@ -6,13 +6,14 @@
  * 所有的公共函数都以"_common"开头，再遵循驼峰命名法。
  * 所有的公共常量都以"con"开头，再遵循驼峰命名法。
  */
-//asset的状态数组共7类15个
+//asset的状态数组共7类17个
 const conAssStatusArr=['_ASSS0'=>'*',
                     //label-primary，待定
                     '_ASSS1'=>'待定',
-                    '_ASSS1_1'=>'新增_待验收',
-                    '_ASSS1_2'=>'待分配_初次验收合格',
-                    '_ASSS1_3'=>'待分配_维修验收合格',
+                    '_ASSS1_1'=>'填报中',
+                    '_ASSS1_2'=>'新增_待验收',
+                    '_ASSS1_3'=>'待分配_初次验收合格',
+                    '_ASSS1_4'=>'待分配_维修验收合格',
                     //label-success，正常
                     '_ASSS2'=>'正常',
                     '_ASSS2_1'=>'正常_折旧中',
@@ -43,6 +44,7 @@ const conAssStatusLabelArr=[
                     '_ASSS1_1'=>'primary',
                     '_ASSS1_2'=>'primary',
                     '_ASSS1_3'=>'primary',
+                    '_ASSS1_4'=>'primary',
                     //label-success
                     '_ASSS2'=>'success',
                     '_ASSS2_1'=>'success',

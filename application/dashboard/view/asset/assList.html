@@ -3,13 +3,13 @@
 <!-- pagewrap  -->	
 <div>
 	<!-- <p>{$authAss.edit}</p> -->
-	{neq name="searchResultNum" value="0"}
+{neq name="searchResultNum" value="0"}
 	<p id="pSearchResultNum">
 		<strong class="spAssType"></strong>记录数：<span id="spAssNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span>
 	</p>
-	{/neq}
-	
-	<div class="table-responsive" > 
+		
+	<div id="divAssList" class="table-responsive" > 
+		
 		<table class="table table-bordered table-hover table-condensed" >
 			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产信息列表&nbsp;<strong class="spAssType"></strong></h4></caption>
 			<thead>
@@ -33,7 +33,7 @@
 			
 			</thead>
 			<tbody><!-- 此处显示数据库查询后的数据集 -->
-				{volist name="assSet" id="vo" empty="暂时没有数据"}
+				{volist name="assSet" id="vo" empty=""}
 				<tr>
 					<td class="text-center">{$i+($sortData.pageNum-1)*$sortData.listRows}</td>
 					<td class="text-center"><a class="aTblAssSingle" href="#assInfo" data-ass-id="{$vo.id}">{$vo.brand_model}</a></td>
@@ -79,6 +79,9 @@
 		</div>
 	
 	</div>
+{else/}
+	<p class="text-center" ><span class="label label-default" style="font-size:14px;">无符合搜索条件信息</span></p>
+{/neq}
 	
 </div>
 
@@ -102,13 +105,13 @@ var fnJsonToArr=(jsonObj)=>{
 
 //定义常量，asset状态与操作对应关系conAssStatusOprtArr
 const conAssStatusOprtArr={$conAssStatusOprtArr};
-console.log('conAssStatusOprtArr:');
-console.log(conAssStatusOprtArr);
+<!-- console.log('conAssStatusOprtArr:'); -->
+<!-- console.log(conAssStatusOprtArr); -->
 
 //定义常量，asset权限与操作的对应关系
 const conAssAuthOprtArr={$conAssAuthOprtArr};
-console.log('conAssAuthOprtArr:');
-console.log(conAssAuthOprtArr);
+<!-- console.log('conAssAuthOprtArr:'); -->
+<!-- console.log(conAssAuthOprtArr); -->
 
 //定义常量，asset权限数组
 const conAssAuthArr= fnJsonToArr({$authAssObj});
@@ -171,7 +174,6 @@ var getOprtHtmlStr=(status)=>{
 			
 		}
 	}
-	
 	//authOprtArr与statusOprtArr取交集得到oprtArr
 	authOprtArr.forEach(function(e){
 		for(var i=0;i<statusOprtArr.length;i++){
@@ -180,12 +182,9 @@ var getOprtHtmlStr=(status)=>{
 			}
 		}
 	});
-	
-	
-	console.log('authOprtArr:'+authOprtArr);
-	console.log('statusOprtArr:'+statusOprtArr);
-	console.log('oprtArr:'+oprtArr);
-	
+	<!-- console.log('authOprtArr:'+authOprtArr); -->
+	<!-- console.log('statusOprtArr:'+statusOprtArr); -->
+	<!-- console.log('oprtArr:'+oprtArr); -->
 	if(oprtArr.length){
 		oprtArr.forEach(function(el){		
 			conOprtComAttr.forEach(function(e){
@@ -231,6 +230,7 @@ var arrMerge=(arr1,arr2)=>{
 
 //利用自调用匿名函数立即执行的特点， 页面初始化
 (function($){
+	
 	let sId=window.location.hash;
 	//传递锚点值,添加tooltip
 	$('.aTblAssSingle').attr('href',sId).tooltip({title: "资产详情", placement: "bottom"});
@@ -310,7 +310,7 @@ $(document).ready(function(){
 		//给本行上底色
 		$(this).closest('tr').addClass('bg-warning');
 		
-		$('#divLoadAssSingle').load(urlPrefix+'tblAssSingle',{'id':$(this).data('assId')});
+		$('#divLoadAssSingle').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(urlPrefix+'tblAssSingle',{'id':$(this).data('assId')});
 		
 		$('#modalAssSingle').find('.title').html('固定资产详情');
 		$('#modalAssSingle').modal();
@@ -322,7 +322,7 @@ $(document).ready(function(){
 		//给本行上底色
 		$(this).closest('tr').addClass('bg-warning');
 		
-		$('#divLoadAssSingle').load(urlPrefix+'assRecords',{'id':$(this).data('assId')});
+		$('#divLoadAssSingle').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(urlPrefix+'assRecords',{'id':$(this).data('assId')});
 		
 		$('#modalAssSingle').find('.title').html('固定资产状态变化详情');
 		$('#modalAssSingle').modal();
@@ -376,7 +376,7 @@ $(document).ready(function(){
 		$('#divTblSortData').data('showAssId',dataFromObj.data('assId'));
 		//向后端请求具体内容
 		var data={'oprt':oprt,'id':dataFromObj.data('assId')}
-		$('#divLoadAssSingle').load(urlPrefix+'fmAssSingle',data);
+		$('#divLoadAssSingle').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(urlPrefix+'fmAssSingle',data);
 		
 		//$('#modalAssSingle')标题上的span组件生成函数
 		var spanStr=(oprt)=>{
@@ -389,8 +389,8 @@ $(document).ready(function(){
 			//console.log(strHtml);
 			return strHtml;
 		};
-		//显示modal
 		$('#modalAssSingle').find('.title').html('【'+spanStr(oprt)+'】固定资产记录');
+		//显示modal
 		$('#modalAssSingle').modal();
 		
 	});

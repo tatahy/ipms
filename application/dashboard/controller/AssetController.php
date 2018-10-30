@@ -224,13 +224,11 @@ class AssetController extends \think\Controller
       $arr=conAssStatusOprtArr;
       
       if($source=='common' && $req=='status_now'){
-        
         //for($i=0;$i<count($arr);$i++){
 //          if($oprt==$arr[$i]['oprt']){
 //            $res=$arr[$i]['statusChangeTo'];
 //          }
 //        }
-        
         for($i=0;$i<count($arr);$i++){
           if($statusNow==$arr[$i]['statusChi']){
             foreach($arr[$i]['nextStatus'] as $key=>$val){
@@ -274,7 +272,7 @@ class AssetController extends \think\Controller
                         'dept_now'=>'',
                         'keeper_now'=>'',
                         'dept_now'=>'',
-                        'status_now'=>'新增(待验收)',
+                        'status_now'=>'*',
                         'status_now_desc'=>'新固定资产填报',
                         'status_now_user_name'=>$this->username,
                         );
@@ -298,8 +296,9 @@ class AssetController extends \think\Controller
      public function tblAssSingle(Request $request,AssinfoModel $assMdl)
     {
       $this->priLogin();
-      //不是normal就是trashed
-      $assSet=count($assMdl::get($request->param('id')))?$assMdl::get($request->param('id')):$assMdl::onlyTrashed()->where('id',$request->param('id'))->find();
+      $id=$request->param('id');
+      //不是usual就是trashed
+      $assSet=count($assMdl::get($id))?$assMdl::get($id):$assMdl::onlyTrashed()->where('id',$id)->find();
            
       $this->assign([
           'assSet'=>$assSet,
@@ -314,7 +313,8 @@ class AssetController extends \think\Controller
     {
       $this->priLogin();
       $id=$request->param('id');
-      $assSet=$assMdl::get($id);
+      //不是usual就是trashed
+      $assSet=count($assMdl::get($id))?$assMdl::get($id):$assMdl::onlyTrashed()->where('id',$id)->find();
       $assRdSet=$assRdMdl::where('assinfo_id',$id)->order('create_time','desc')->select();
       $this->assign([
           'assSet'=>$assSet,
@@ -334,9 +334,10 @@ class AssetController extends \think\Controller
 
       $id=$data['id'];
       $oprt=$data['oprt'];
+      $statusNow=!empty($data['status_now'])?$data['status_now']:'';
       $res=0;
       
-      $rdDataArr=['status_now'=>$data['status_now'],
+      $rdDataArr=['status_now'=>$statusNow,
                   'status_now_user_name'=>$data['status_now_user_name'],
                   'oprt'=>$data['oprt'],
                   'oprt_detail'=>$data['status_now_desc'],
@@ -375,7 +376,7 @@ class AssetController extends \think\Controller
             //模型的destroy方法，返回的是受影响的记录数。已启用框架的软删除，但是执行物理删除。
             $res = $assMdl::destroy($id,true);
             //assRecord表删除相应的记录
-            $assRdMdl::destroy(function($query){
+            $assRdMdl::destroy(function($query) use($id){
                   $query->where('assinfo_id',$id);
                 });
             break;
