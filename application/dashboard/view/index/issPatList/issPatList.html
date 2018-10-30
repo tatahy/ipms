@@ -5,12 +5,12 @@
 	
 <div id="divIssPatList">		
 	
-	<div id="divTopBtn" style="margin:10px 0px;">
-		<span id="spTitle" data-toggle="tooltip" data-placement="bottom" title="新增专利事务"></span>
-		
+	<div id="divTopBtn" style="margin:10px 0px;">	
 		<button id="btnSearchInfo" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏搜索条件"><span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span></button>
 				
 		<button id="btnRefresh" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="刷新表格"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+		
+		<span id="spTitle" data-toggle="tooltip" data-placement="bottom" title="新增专利事务"></span>
 	</div>
 	
 	<div id="divSearchInfo" class="collapse" >
@@ -351,7 +351,7 @@ function loadMe(){
 	
 	var searchData={};
 	//使用Map对象的forEach方法组装键值对
-	formData.forEach(function(val,key,){
+	formData.forEach(function(val,key){
 		//非0非空的值才进行组装
 		if(val!='' && val!=0){
 			searchData[key]=val;

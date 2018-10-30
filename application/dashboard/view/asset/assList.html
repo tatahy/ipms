@@ -170,8 +170,10 @@ var getOprtHtmlStr=(status)=>{
 	var authOprtArr=[];
 	var statusOprtArr=[];
 	var oprtArr=[];
+	// 360浏览器9.0，极速模式下的兼容问题：箭头函数内部无法使用函数外部已定义的const常量conAssAuthArr，提示该常量未定义。将const定义改为var定义解决。
 	//console.table(conAssAuthArr);
 	//由auth决定authOprtArr中的值。authOprtArr：登录用户所有asset权限下的操作值数组(去掉重复值的数组)
+	
 	for(var i=0;i<conAssAuthArr.length;i++){
 		if(conAssAuthArr[i].val){
 			var name=conAssAuthArr[i].name;
