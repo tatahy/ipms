@@ -366,7 +366,7 @@ class AssetController extends \think\Controller
        
         case '_TRASH':
             //模型的destroy方法，返回的是受影响的记录数。已启用框架的软删除，数据仍然在数控库中。
-            $assMdl::update(['status_now'=>'回收站'], ['id' =>$id], true);
+            $assMdl::update($data, ['id' =>$id], true);
             $res = $assMdl::destroy($id);
             //新状态写入assRecord表
             $assRdMdl::create($rdDataArr,true);

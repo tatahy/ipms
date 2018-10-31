@@ -8,7 +8,7 @@
  */
 //asset的状态数组共7类17个
 const conAssStatusArr=['_ASSS0'=>'*',
-                    //label-primary，待定
+                    //label-info，待定
                     '_ASSS1'=>'待定',
                     '_ASSS1_1'=>'填报中',
                     '_ASSS1_2'=>'新增_待验收',
@@ -39,12 +39,12 @@ const conAssStatusArr=['_ASSS0'=>'*',
 //asset的状态标志数组共7类15个，要发送给前端决定label标签类型
 const conAssStatusLabelArr=[
                     '_ASSS0'=>'info',
-                    //label-primary
-                    '_ASSS1'=>'primary',
-                    '_ASSS1_1'=>'primary',
-                    '_ASSS1_2'=>'primary',
-                    '_ASSS1_3'=>'primary',
-                    '_ASSS1_4'=>'primary',
+                    //label-info
+                    '_ASSS1'=>'info',
+                    '_ASSS1_1'=>'info',
+                    '_ASSS1_2'=>'info',
+                    '_ASSS1_3'=>'info',
+                    '_ASSS1_4'=>'info',
                     //label-success
                     '_ASSS2'=>'success',
                     '_ASSS2_1'=>'success',

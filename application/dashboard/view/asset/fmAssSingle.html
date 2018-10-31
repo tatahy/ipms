@@ -60,7 +60,7 @@
 	<div class="form-group col-sm-4">
 		<label>现状</label>
 		<input class="form-control" id="statusNow" value="{$assSet.status_now}" type="text" readonly>
-		<div class="alert alert-warning fade in small" style="padding:5px;"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>【<span class="glyphicon glyphicon-save-file"></span>更新】不会改变“现状”</div>
+		<div class="alert alert-info fade in small" style="padding:5px;"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><span class="text-primary">【<span class="glyphicon glyphicon-save-file"></span>更新】</span>不改变“现状”</div>
 	</div>
 	
 	
@@ -149,7 +149,7 @@ var comHtml=(topic,oprtEn,result)=>{
 			resultHtml='';
 			break;
 	}
-	htmlStr='<p>固定资产：</p><p class="text-center">【<strong>'+topic +'</strong>】记录</p><p class="text-center"><span class="label label-'+color+'"><span class="glyphicon glyphicon-'+gly+'"></span>'+oprtChi+'</span></p>'+resultHtml;
+	htmlStr='<p>固定资产：</p><p class="text-center">【<strong>'+topic +'</strong>】记录</p><p class="text-center">进行【<span class="text-'+color+'"><span class="glyphicon glyphicon-'+gly+'"></span>'+oprtChi+'</span>】</p>'+resultHtml;
 	return htmlStr;
 };
 
@@ -170,30 +170,30 @@ var oprtBtnHtml=(oprtEn)=>{
 	return htmlStr;
 };
 
-var selectStatusNowAttached=(oprtEn,statusNext)=>{
-	var oprtChi = '';
+var spanNextSelectStatusNow=(oprtEn,statusNext)=>{
+	var spStr = '';
 	var statusNow=$('#statusNow').val();
+	var spanObj=$('#fmAssInfo').find('select[name="status_now"]').next('span');
 
 	conOprtComAttr.forEach(function(e){
 		if(oprtEn==e.val){
-			oprtChi = e.name;
-			gly=e.gly;
-			oprtChi='<span class="glyphicon glyphicon-'+gly+'"></span>'+oprtChi;
+			spStr='<span class="text-'+e.color+'"><span class="glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'</span>';
 		}
 	});
 	
-	$('select[name="status_now"]').next('span').html('【'+oprtChi+'】后，状态由：'+statusNow+'->'+statusNext);
+	spanObj.html('【'+spStr+'】成功后，“现状”变为：'+statusNext);
 		
-	$('input[name="status_now_desc"]').val('状态变为：'+statusNext);
+	<!-- $('#fmAssInfo').find('input[name="status_now_desc"]').val('状态变为：'+statusNext); -->
 };
 
 //利用自调用匿名函数立即执行的特点，对页面的组件进行初始化
 (function($){
 	//单选框$('select[name="status_now"]')的初始化	
 	$.post('{$home}/dashboard/asset/selectRes',{'req':$('#modalSelectStatusNow').attr('name'),'source':'common','oprt':oprt,'statusNow':$('#statusNow').val()},function(result){
-		selectStatusNowAttached(oprt,result[0]);
-		var obj=$('select[name="status_now"]');
+		var obj=$('#fmAssInfo').find('select[name="status_now"]');
 		var str='';
+		spanNextSelectStatusNow(oprt,result[0]);
+				
 		$.each(result,function(n1,v1){
 			str+='<option value="'+v1+'">'+v1+'</option>';	
 		});
@@ -221,8 +221,8 @@ $(document).ready(function(){
 	});
 	
 	
-	$('select[name="status_now"]').change(function(){
-		selectStatusNowAttached(oprt,$(this).val());	
+	$('#fmAssInfo').find('select[name="status_now"]').change(function(){
+		spanNextSelectStatusNow(oprt,$(this).val());	
 	});
 	
 	$('#fmAssInfo').submit(function(evt){

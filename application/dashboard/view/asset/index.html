@@ -2,12 +2,14 @@
 
 <div class="content-header">
 	<h4>
-		<span class="label label-info"><span class="glyphicon glyphicon-oil"></span></span>&nbsp;固定资产
-		<span style="font-size:14px;">
-			【<strong>记录总数：</strong><span id="assNumTotal" class="label label-info">{$numTotal}</span>&nbsp;|
-			<strong>数量总计：</strong><span id="assQuanTotal" class="badge">{$quanTotal}</span>】
-		</span>
+		<span class="label label-info"><span class="glyphicon glyphicon-oil"></span></span>&nbsp;<a href="#divAssTotal" data-toggle="collapse">固定资产</a>
+		
 	</h4>
+	
+	<div id="divAssTotal" class="collapse" style="font-size:14px;">
+		【<strong>记录总数：</strong><span id="assNumTotal" class="label label-info">{$numTotal}</span>&nbsp;|
+			<strong>数量总计：</strong><span id="assQuanTotal" class="badge">{$quanTotal}</span>】
+	</div>
 	
 	<ul id="ulAssType" class="nav nav-pills" style="margin-top:10px;border-bottom: 1px solid #eee;">
 		<li class="active dropdown">			
@@ -460,12 +462,15 @@ var fmReset=()=>{
 		$(this).find('.spClass').css({'padding-bottom':'1px','margin-bottom':'2px'});
 	});
 	
+	// 设置各类tooltip
+	$('#divTopBtn [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
+	$('a[href="#divAssTotal"]').tooltip({triger:'hover',placement: 'auto right',title:'查看固定资产总数'});	
+	
 })(jQuery);
 
 $(document).ready(function(){
 	var searchDataChanged=false;
-	// 设置各类tooltip
-	$('#divTopBtn [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
+	
 	
 	//点击.aPill中的各个按钮后，load相应的assList-->
 	$('.aPill').click(function(){
