@@ -9,10 +9,11 @@ use think\Controller;
 use app\common\validate\Ipvalidate;
 use app\index\model\User as UserModel;
 use app\patent\model\Patinfo as PatinfoModel;
+use app\asset\model\Assinfo as AssinfoModel;
 
 class IndexController extends Controller
 {
-  public function index(Request $request,UserModel $userMdl)
+  public function index(Request $request,PatinfoModel $patMdl,UserModel $userMdl,AssinfoModel $assMdl)
   {
     //'username'和'pwd'的来源：session或初次登录时表单POST提交
     if (!empty($request->post('username')))
@@ -62,14 +63,14 @@ class IndexController extends Controller
       $pats = new PatinfoModel;
 
       //利用模型对象得到状态status"="新增"）的patent总数
-      $numpatadd = $pats->where('status', '拟申报')->count();
+      $numpatadd = $patMdl->where('status', '拟申报')->count();
 
       //利用模型对象得到申报的patent总数
-      $numpatapp = $pats->where('status', ['=', '申报'], ['=', '申报修改'], 'or')->count();
+      $numpatapp = $patMdl->where('status', ['=', '申报'], ['=', '申报修改'], 'or')->count();
 
       //利用模型对象得到有效的patent总数
       //$numpataut=$pats->where('status',['=','授权'],['=','续费授权'],['=','续费中'],['=','放弃续费'],'or')->count();
-      $numpataut = $pats->where('id', '>', 0)->where('status', 'in', ['授权', '续费授权',
+      $numpataut = $patMdl->where('id', '>', 0)->where('status', 'in', ['授权', '续费授权',
         '续费中', '放弃续费'])->count();
 
       //调用User模型层定义的refreshUserAuth()方法，刷新登录用户的各个模块权限
@@ -95,6 +96,8 @@ class IndexController extends Controller
         'destr' => $destr . "</br>", 'home' => $request->domain(), 'username' => $username,
         //patent数据
         'numpatadd' => $numpatadd, 'numpatapp' => $numpatapp, 'numpataut' => $numpataut,
+        //asset数据
+        'assNum'=>$assMdl->countAssNum($authority['ass'],$username),
         'year' => date('Y'), 
         ]);
       //return view();

@@ -71,6 +71,47 @@ class Assinfo extends Model
       }
       
     }
+    //获得各类asset数量
+    public function countAssNum($auth=[],$userName)
+    {
+      $assNum=['_TOTAL'=>$this->assTypeNum($auth,'_USUAL',$userName)+$this->assTypeNum($auth,'_ASSS6',$userName),
+                        '_USUAL'=>$this->assTypeNum($auth,'_USUAL',$userName),
+                        '_ASSS1'=>$this->assTypeNum($auth,'_ASSS1',$userName),
+                        '_ASSS2'=>$this->assTypeNum($auth,'_ASSS2',$userName),
+                        '_ASSS3'=>$this->assTypeNum($auth,'_ASSS3',$userName),
+                        '_ASSS4'=>$this->assTypeNum($auth,'_ASSS4',$userName),
+                        '_ASSS5'=>$this->assTypeNum($auth,'_ASSS5',$userName),
+                        '_ASSS6'=>$this->assTypeNum($auth,'_ASSS6',$userName)
+                        ];
+      return $assNum;
+    }
+    
+    //asset数量
+    protected function assTypeNum($auth=[],$assType='',$userName)
+    {
+      $query=$this->assTypeQuery($auth,$assType,$userName);
+      return $query->count();
+    }
+    
+    //asset数量
+    public function assTypeQuery($auth=[],$assType='',$userName)
+    {
+      
+      $assType=!empty($assType)?$assType:'_USUAL';
+      $authNum=0;
+      
+      foreach($auth as $val){
+        $authNum+=$val;
+      }
+      //登录用户的asset权限有且仅有read，仅能查阅自己名下的asset，
+      if($auth['read']==1 && $authNum<=1){
+        $query=$this->scope('assType',$assType)->where('keeper_now',$userName);
+      }else{
+        $query=$this->scope('assType',$assType);
+      }
+      
+      return $query;
+    }
 
     /**
      * 获取assent的过程记录

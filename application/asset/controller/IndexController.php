@@ -75,14 +75,8 @@ class IndexController extends \think\Controller
         
         $this->assign([
           'read'=>$this->auth['read'],
-          
-          'numTotal'=>$this->priAssNum(),
-          'num_ASSS1'=>$this->priAssNum('_ASSS1'),
-          'num_ASSS2'=>$this->priAssNum('_ASSS2'),
-          'num_ASSS3'=>$this->priAssNum('_ASSS3'),
-          'num_ASSS4'=>$this->priAssNum('_ASSS4'),
-          'num_ASSS5'=>$this->priAssNum('_ASSS5'),
-          
+                   
+          'assNum'=>$assMdl->countAssNum($this->auth,$this->userName),
           'assType'=>'_USUAL',
                     
           'home'=>$request->domain(),
@@ -148,10 +142,9 @@ class IndexController extends \think\Controller
                 unset($whereArr[$key]);
             }
         }
-              
+        
         //分页,每页$listRows条记录
-        $assSet=$this->priAssQueryObj($assType)
-                      ->where($whereArr)
+        $assSet=$assMdl->assTypeQuery($this->auth,$assType,$this->userName)->where($whereArr)
                       ->order($sortData['sortName'], $sortData['sortOrder'])
                       ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
                         'query'=>['listRows'=>$sortData['listRows']]]);
@@ -159,9 +152,11 @@ class IndexController extends \think\Controller
         $assList=$assSet->render(); 
         
         //记录总数
-        $searchResultNum=count($this->priAssQueryObj($assType)->where($whereArr)->select());        
+        //$searchResultNum=count($this->priAssQueryObj($assType)->where($whereArr)->select()); 
+        $searchResultNum=count($assMdl->assTypeQuery($this->auth,$assType,$this->userName)->where($whereArr)->select()); 
+               
         //数量总计
-        $quanCount=$this->priAssQueryObj($assType)->where($whereArr)->sum('quantity');
+        $quanCount=$assMdl->assTypeQuery($this->auth,$assType,$this->userName)->where($whereArr)->sum('quantity');
         
         $this->assign([
           'home'=>$request->domain(),
