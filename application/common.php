@@ -68,7 +68,7 @@ const conAssStatusLabelArr=[
 
 //asset的操作数组,4类（CURD）10个
 const conAssOprtArr=['_CREATE'=>'新增',
-                    '_SUBMIT'=>'提交',
+                    '_SUBMIT'=>'送审',
                     '_AUDIT'=>'审核',
                     '_APPROVE'=>'审批',
                     '_MAINTAIN'=>'维护',

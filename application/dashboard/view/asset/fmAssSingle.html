@@ -6,52 +6,52 @@
 	
 	<div class="row">
 	<div class="form-group col-sm-4">
-		<label for="brand_model">名称（含品牌、型号）<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
-		<input class="form-control empty-check" name="brand_model" value="{$assSet.brand_model}" type="text" required>
+		<label class="control-label" for="brand_model">名称（含品牌、型号）<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+		<input class="form-control empty-check" name="brand_model" value="{$assSet.brand_model}" type="text">
 	
 	</div>
 	
 	<div class="form-group col-sm-3">
-		<label for="code">卡号<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
-		<input class="form-control empty-check" name="code" value="{$assSet.code}" type="text" required>
+		<label class="control-label" for="code">卡号<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+		<input class="form-control empty-check" name="code" value="{$assSet.code}" type="text">
 	
 	</div>
 	
 	<div class="form-group col-sm-3">
-		<label for="bar_code">条形码号<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
-		<input class="form-control empty-check" id="" name="bar_code" value="{$assSet.bar_code}" type="text" required>
+		<label class="control-label" for="bar_code">条形码号<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+		<input class="form-control empty-check" name="bar_code" value="{$assSet.bar_code}" type="text"  >
 	
 	</div>
 	
 	<div class="form-group col-sm-2">
-		<label for="assnum">编号<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
-		<input class="form-control empty-check" id="" name="assnum" value="{$assSet.assnum}" type="text" required>
+		<label class="control-label" for="assnum">编号<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+		<input class="form-control empty-check" name="assnum" value="{$assSet.assnum}" type="text">
 	
 	</div>
 	</div>
 	
 	<div class="row">
 	<div class="form-group col-sm-2">
-		<label for="quantity">数量<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
-		<input class="form-control empty-check" name="quantity" value="{$assSet.quantity}" type="text" required>
+		<label class="control-label" for="quantity">数量<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+		<input class="form-control empty-check" name="quantity" value="{$assSet.quantity}" type="text">
 	
 	</div>
 	
 	<div class="form-group col-sm-3">
-		<label for="place_now">现放置地点<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
-		<input class="form-control empty-check" name="place_now" value="{$assSet.place_now}" type="text" required>
+		<label class="control-label" for="place_now">现放置地点<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+		<input class="form-control empty-check" name="place_now" value="{$assSet.place_now}" type="text">
 	
 	</div>
 	
 	<div class="form-group col-sm-5">
-		<label for="dept_now">现使用部门<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
-		<input class="form-control empty-check" name="dept_now" value="{$assSet.dept_now}" type="text" required>
+		<label class="control-label" for="dept_now">现使用部门<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+		<input class="form-control empty-check" name="dept_now" value="{$assSet.dept_now}" type="text">
 	
 	</div>
 	
 	<div class="form-group col-sm-2">
-		<label for="keeper_now">现保管人<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
-		<input class="form-control empty-check" id="" name="keeper_now" value="{$assSet.keeper_now}" type="text" required>
+		<label class="control-label" for="keeper_now">现保管人<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+		<input class="form-control empty-check" id="" name="keeper_now" value="{$assSet.keeper_now}" type="text">
 	
 	</div>
 	</div>
@@ -60,7 +60,7 @@
 	<div class="form-group col-sm-4">
 		<label>现状</label>
 		<input class="form-control" id="statusNow" value="{$assSet.status_now}" type="text" readonly>
-		<div class="alert alert-info fade in small" style="padding:5px;"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><span class="text-primary">【<span class="glyphicon glyphicon-save-file"></span>更新】</span>不改变“现状”</div>
+		<span class="small text-muted">【<span class="text-primary"><span class="glyphicon glyphicon-save-file"></span>更新】</span>不改变“现状”</span>
 	</div>
 	
 	
@@ -73,24 +73,20 @@
 	</div>
 	
 	<div class="form-group col-sm-4">
-		<label for="status_now_desc">状态说明</label>
-		<input class="form-control empty-check" name="status_now_desc" value="{$assSet.status_now_desc}" type="text" placeholder="请填入状态改变的简短说明" required>
-		<span class="small text-muted"></span>
-	
+		<label class="control-label" for="status_now_desc">状态说明</label>
+		<input class="form-control empty-check" name="status_now_desc" value="{$assSet.status_now_desc}" type="text" placeholder="请填入状态改变的简短说明">
+		
 	</div>
 	</div>
 	
+	{notin name="oprt" value="_DELETE"}
 	<div class="row">
 	<div class="form-group col-sm-2">
 		<label for="status_now_user_name">登记人</label>
-		{notin name="oprt" value="_DELETE"}
-		<input class="form-control empty-check" name="status_now_user_name" value="{$userName}" type="text" readonly>
-		{else/}
-		<input class="form-control empty-check" name="status_now_user_name" value="{$assSet.status_now_user_name}" type="text" required>
-		{/notin}
-	
+		<input class="form-control" name="status_now_user_name" value="{$userName}" type="text" readonly>
 	</div>
 	</div>
+	{/notin}
 	<hr>
 	
 	<div class="row myRow">
@@ -109,7 +105,7 @@
 <script type="text/javascript">
 //定义常量
 const conOprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'info'},
-			{name:'提交',val:'_SUBMIT',gly:'send',color:'info'},
+			{name:'送审',val:'_SUBMIT',gly:'send',color:'info'},
 			{name:'审核',val:'_AUDIT',gly:'check',color:'warning'},
 			{name:'审批',val:'_APPROVE',gly:'ok',color:'danger'},
 			{name:'维护',val:'_MAINTAIN',gly:'list-alt',color:'primary'},
@@ -120,7 +116,7 @@ const conOprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'inf
 			{name:'还原',val:'_RESTORE',gly:'retweet',color:'success'}];
 			
 var oprt=$('#fmAssInfo').find('[name="oprt"]').val();
-			
+
 //生成$.alert,$.confirm组件(com:component)上显示内容的HTML字符串。由oprt英文转中文，加上HTML标签组成HTML字符串
 var comHtml=(topic,oprtEn,result)=>{
 	
@@ -186,24 +182,47 @@ var spanNextSelectStatusNow=(oprtEn,statusNext)=>{
 	<!-- $('#fmAssInfo').find('input[name="status_now_desc"]').val('状态变为：'+statusNext); -->
 };
 
+var emptyCheck=(obj)=>{
+	var divObj=obj.closest('div');
+    var result=false;
+	
+	divObj.removeClass('has-feedback has-error');
+	obj.nextAll('.spAdd').remove();
+		
+	if(obj.val()!=''){
+		result=true;
+	}else{
+		divObj.addClass('has-feedback has-error');
+		obj.after('<span class="spAdd" style="color:#a94442;">内容不能为空</span><span class="glyphicon glyphicon-remove form-control-feedback spAdd" style="text-align:unset;"></span>');
+		result=false;
+	}
+	
+	return result;
+};
+
 //利用自调用匿名函数立即执行的特点，对页面的组件进行初始化
 (function($){
 	//单选框$('select[name="status_now"]')的初始化	
 	$.post('{$home}/dashboard/asset/selectRes',{'req':$('#modalSelectStatusNow').attr('name'),'source':'common','oprt':oprt,'statusNow':$('#statusNow').val()},function(result){
 		var obj=$('#fmAssInfo').find('select[name="status_now"]');
 		var str='';
-		spanNextSelectStatusNow(oprt,result[0]);
+		if(result.length){
+			spanNextSelectStatusNow(oprt,result[0]);
 				
-		$.each(result,function(n1,v1){
-			str+='<option value="'+v1+'">'+v1+'</option>';	
-		});
-		<!--// 清空单选框Obj的所有选项-->
-		obj.empty();
-		<!--// 添加单选框Obj的新选项-->
-		obj.append(str);
+			$.each(result,function(n1,v1){
+				str+='<option value="'+v1+'">'+v1+'</option>';	
+			});
+			<!--// 清空单选框Obj的所有选项-->
+			obj.empty();
+			<!--// 添加单选框Obj的新选项-->
+			obj.append(str);
+		
+		}else{
+			obj.closest('div').hide();
+		}
 	});
 		
-	if(oprt=='_CREATE' || oprt=='_RESTORE'){
+	if(oprt=='_CREATE' || oprt=='_RESTORE' || oprt=='_DELETE'){
 		//消除_UPDATE按钮
 		$('.pull-left').children().remove()
 		//添加新按钮
@@ -213,6 +232,7 @@ var spanNextSelectStatusNow=(oprtEn,statusNext)=>{
 		$('#btnUpdate').after('&nbsp;'+oprtBtnHtml(oprt));
 	}
 	$('.modal-footer').attr('hidden',true)
+	
 })(jQuery);
 
 $(document).ready(function(){
@@ -220,20 +240,62 @@ $(document).ready(function(){
 		$(this).closest('form').find('[name="oprt"]').val($(this).data('oprt'));
 	});
 	
-	
 	$('#fmAssInfo').find('select[name="status_now"]').change(function(){
 		spanNextSelectStatusNow(oprt,$(this).val());	
 	});
 	
+	$('#fmAssInfo .form-control').change(function(){
+		emptyCheck($(this));
+		//有变化加底色
+		if($(this).val()!=''){
+			$(this).addClass('alert-info');
+		}else{
+			$(this).removeClass('alert-info');
+		}
+	});
+	
+	$('#fmAssInfo input:reset').click(function(){
+		var obj=$('#fmAssInfo .form-control');
+		var divObj=obj.closest('div');
+	
+		divObj.removeClass('has-feedback has-error');
+		obj.nextAll('.spAdd').remove();
+		obj.removeClass('alert-info');
+
+		
+	});
+	
+	
 	$('#fmAssInfo').submit(function(evt){
 		evt.preventDefault();
-	
-		var oprt=$(this).find('[name="oprt"]').val();
-				
+		var oprt=$(this).find('[name="oprt"]').val();	
 		var url = $(this).attr('action'); 
 		//console.log(oprt+url);
     	var formData = $(this).serialize();
 		var topic=$(this).find('[name="brand_model"]').val();
+		var emptyCheckArr=[];
+		var obj=$(this).find('.empty-check');
+			
+		//输入框非空检查
+		obj.each(function(){
+			emptyCheckArr.push(emptyCheck($(this)));
+		});
+		//是否有输入框为空的情况
+		var flag=emptyCheckArr.every(function(value) {
+            return value == true;
+        });
+		//有输入框为空的情况
+		if(!flag ){
+			let arr=[];
+        	for (key in emptyCheckArr) {
+            	if(!emptyCheckArr[key]){
+					arr.push(key);
+            	}
+        	}
+			//序号最小的$('.empty-check').eq(i)获得焦点
+			obj.eq(Math.min.apply(null, arr)).focus();
+			return;
+		}
 		
 		$('#modalAssSingle').modal('hide');
 		$.confirm(comHtml(topic,oprt),function(e){
@@ -266,6 +328,7 @@ $(document).ready(function(){
 				$('#modalAssSingle').modal('show');
 			}
 		}).cancel('否(N)').ok('是(Y)');	
+	
 	});
 	
 

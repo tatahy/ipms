@@ -373,7 +373,7 @@ var sortOrderToggle=(sortName)=>{
 var fmReset=()=>{
 	var fm=$('#fmAssSearch');
 	fm[0].reset();
-	fm.find('.form-control').closest('div').removeClass('has-error');
+	fm.find('.form-control').removeClass('alert-info');
 };
 
 //自调用匿名函数立即执行的特点，进行页面初始化。
@@ -429,12 +429,14 @@ $(document).ready(function(){
 <!-- //表单$('#fmAssSearch')有关的代码块 -->
 	
 	$('#fmAssSearch .form-control').change(function(){
-		if($(this).val()!=0){
+		if($(this).val()!=0 || $(this).val()!=''){
 			//表单输入项做标识
-			$(this).closest('div').addClass('has-error');
+			<!-- $(this).closest('div').addClass('has-error'); -->
+			$(this).addClass('alert-info');
 		}else{
 			//表单输入项去掉标识
-			$(this).closest('div').removeClass('has-error');
+			<!-- $(this).closest('div').removeClass('has-error'); -->
+			$(this).removeClass('alert-info');
 		}
 	});
 	

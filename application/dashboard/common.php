@@ -40,7 +40,7 @@ const conAssAuthOprtArr=[
 //asset的操作与操作后状态的对应关系（conAssStatusOprtArr）
 const conAssOprtChangeStatusArr=[
                         ['oprt'=>'_CREATE','oprtChi'=>'新增','statusNow'=>['_ASSS0'=>'*'],'statusChangeTo'=>['新增_待验收']],
-                        ['oprt'=>'_SUBMIT','oprtChi'=>'提交','statusNow'=>['_ASSS1_1'=>'新增_待验收','_ASSS2_1'=>'正常_折旧中','_ASSS2_2'=>'正常_折旧完'],'statusChangeTo'=>['待分配_初次验收合格','异常_待维修','异常_遗失']],
+                        ['oprt'=>'_SUBMIT','oprtChi'=>'送审','statusNow'=>['_ASSS1_1'=>'新增_待验收','_ASSS2_1'=>'正常_折旧中','_ASSS2_2'=>'正常_折旧完'],'statusChangeTo'=>['待分配_初次验收合格','异常_待维修','异常_遗失']],
                         ['oprt'=>'_AUDIT','oprtChi'=>'审核','statusNow'=>['_ASSS1_2'=>'待分配_初次验收合格','_ASSS1_3'=>'待分配_维修验收合格'],'statusChangeTo'=>['正常_折旧中','正常_折旧完','停用_封存','停用_维修中']],
                         ['oprt'=>'_APPROVE','oprtChi'=>'审批','statusNow'=>[''],'statusChangeTo'=>['待销账_报废','待销账_遗失']],
                         ['oprt'=>'_MAINTAIN','oprtChi'=>'维护','statusNow'=>['_ASSS4_3'=>'待销账_报废','_ASSS4_4'=>'待销账_遗失'],'statusChangeTo'=>['销账']],
