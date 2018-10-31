@@ -3,13 +3,13 @@
 	<!-- <p>{ $display}</p> -->
 	<!-- <p>{ $whereArr}</p> -->
 {neq name="searchResultNum" value="0"}
-	<p id="pSearchResultNum">
-		<span class="label label-primary assType"></span>记录数：<span id="spNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span>
-	</p>
+	<!-- <p id="pSearchResultNum"> -->
+		<!-- <span class="label label-primary assType"></span>记录数：<span id="spNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span> -->
+	<!-- </p> -->
 
 	<div class="table-responsive"> 
 		<table id="tblAssList" class="table table-bordered table-hover table-condensed" data-sort-order="asc">
-			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产信息列表<span class="label label-primary assType"></span></h4></caption>
+			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产信息列表&nbsp;<strong class="assType"></strong></h4></caption>
 			<thead>
 				<tr>
 					<th class="text-center">序号</th>
@@ -50,14 +50,18 @@
 		</table>
 	
 	</div>
+	<div class="row myRow">
+		<div class="pull-right">
+			<strong class="assType"></strong><span id="spSearchResult" class="label label-info">搜索结果</span>&nbsp;记录数：<span id="spNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span>
+		</div>
+	</div>
 	
-	
-	<div id="divListRows" class="col-sm-12 text-right">
+	<div id="divListRows" class="row text-right" style="padding-top:10px;">
 		<!-- // 分页变量 -->
-		<div class="col-sm-10 text-right">{$assList}</div>
+		<div class="col-sm-10">{$assList}</div>
 		
 		<div class="form-group form-group-sm col-sm-2">
-			<span class="">每页记录行数：</span>
+			<span class="">每页显示记录数：</span>
 			<select class="form-control" id="listRows">
 				<option value="5">5</option>
 				<option value="10">10</option>
@@ -89,7 +93,7 @@ const conLabelArr=Object.values({$conAssStatusLabelArr});
 	$('.aAssRecords').attr('href',sId).tooltip({title: "状态历史记录", placement: "bottom"});
 	//表格排序asc/desc
 	$('#tblAssList').data('sortOrder','{$sortData.sortOrder}');
-	let spTitle=$('#ulAssType li.active a').find('.spTitle').html();
+	let spTitle='['+$('#ulAssType li.active a').find('.spTitle').html()+']';
 	//.assType内容随$('#ulAssType li.active a').find('.spTitle')变化
 	$('.assType').html(spTitle);
 	//#spNum的class跟随$('#ulAssType li.active a').find('.spClass')变化

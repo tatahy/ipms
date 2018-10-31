@@ -2,13 +2,12 @@
 
 <div class="content-header">
 	<h4>
-		<span class="label label-info"><span class="glyphicon glyphicon-oil"></span></span>&nbsp;<a href="#divAssTotal" data-toggle="collapse">固定资产</a>
+		<span class="label label-info"><span class="glyphicon glyphicon-oil"></span></span>&nbsp;<a href="#divAssTotal" data-toggle="collapse">固定资产管理</a>
 		
 	</h4>
 	
-	<div id="divAssTotal" class="collapse" style="font-size:14px;">
-		【<strong>记录总数：</strong><span id="assNumTotal" class="label label-info">{$numTotal}</span>&nbsp;|
-			<strong>数量总计：</strong><span id="assQuanTotal" class="badge">{$quanTotal}</span>】
+	<div id="divAssTotal" class="collapse text-center" style="font-size:18px;">
+		【记录总数：<span id="assNumTotal" class="label label-info">{$numTotal}</span>&nbsp;|&nbsp;数量总计：<span id="assQuanTotal" class="badge">{$quanTotal}</span>】
 	</div>
 	
 	<ul id="ulAssType" class="nav nav-pills" style="margin-top:10px;border-bottom: 1px solid #eee;">
@@ -52,9 +51,8 @@
 </div>
 
 <div class="content-body">
-	<div id="divTopBtn" style="margin:10px 0px;">
-		
-		<div class="row myRow">
+	<div id="divTopBtn" class="row myRow" style="margin:10px 0px;">
+		<div  class="pull-right" >
 		<button id="btnSearchInfo" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏搜索条件"><span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span></button>
 				
 		<button id="btnRefresh" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="刷新固定资产信息表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
@@ -109,32 +107,25 @@
 				</select>
 			</div>
 			
-			<div class="form-group col-sm-3">
+			<div class="form-group col-sm-2">
 				<label class="" for="place_now">现放置地点</label>
 				<select class="form-control" id="selectPlaceNow" name="place_now" >
 						<option value="">p1</option>
 				</select>
-										
 			</div>
-			</div>			
-			
-			<div class="row myRow">			
 			<div class="form-group col-sm-2">
 				<label class="control-label" for="keeper_now">现保管人</label>
 				<input class="form-control" name="keeper_now" type="text" value="" placeholder="...不限" />
-										
 			</div>
 			
 			<div class="form-group col-sm-2">
 				<label class="control-label" for="status_now_user_name">登记人</label>
 				<input class="form-control" name="status_now_user_name" type="text" value="" placeholder="...不限" />
-						
-										
 			</div>
-			</div>	
+			</div>			
 			
 			<div class="row myRow">
-			<div class="col-sm-6">
+			<div class="pull-right">
 				<button id="btnSearch" type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>搜索</button>
 			
 				<button id="btnSearchReset" type="button" class="btn btn-primary btn-sm">条件重置</button>
@@ -363,6 +354,7 @@ var loadAssList=()=>{
 			searchData[key]=val;
 		}
 	});
+	
 	<!-- // 转换成json字符串-->
 	JSON.stringify(searchData);
 	
@@ -378,6 +370,13 @@ var loadAssList=()=>{
 						$(this).closest('tr').addClass('bg-warning');
 					}
 				});
+			}
+			
+			//是否显示assList.html中的$('#spSearchResult')组件
+			if(Object.keys(searchData).length){
+				$('#spSearchResult').show();
+			}else{
+				$('#spSearchResult').hide();
 			}
 			<!-- //设定$('#fmAssSearch')内的select组件的option -->
 			$.when(
@@ -453,7 +452,7 @@ var fmReset=()=>{
 		$(this).find('.spType').after(htmlStr);
 	});
 	//ul.nav-tabs调整.aPill
-	$('ul.nav-pills').find('a').each(function(){
+	$('#ulAssType.nav-pills').find('a').each(function(){
 		//1.缩小padding
 		$(this).css('padding','5px 10px');
 		//去掉底部边框圆角
@@ -461,10 +460,9 @@ var fmReset=()=>{
 		//调整内部span.label的大小
 		$(this).find('.spClass').css({'padding-bottom':'1px','margin-bottom':'2px'});
 	});
-	
 	// 设置各类tooltip
 	$('#divTopBtn [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
-	$('a[href="#divAssTotal"]').tooltip({triger:'hover',placement: 'auto right',title:'查看固定资产总数'});	
+	$('a[href="#divAssTotal"]').tooltip({triger:'hover',placement: 'auto right',title:'显示/隐藏固定资产总数'});	
 	
 })(jQuery);
 

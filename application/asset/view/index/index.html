@@ -51,13 +51,14 @@
 			</a>
 		</li>
 	</ul>
-	
-	<div id="divTopBtn" style="margin:10px 0px;">
+	<div class="row" style="margin:10px 0px;">
+	<div id="divTopBtn" class="pull-right">
 		<!-- <span class="label label-info" style="font-size:16px;">固定资产 -->
 		<!-- </span> -->
-		<button id="btnSearchInfo" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏搜索条件"><span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span></button>
+		<button id="btnSearchInfo" type="button" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏搜索条件"><span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span></button>
 				
-		<button id="btnRefresh" type="button" class="btn-link" data-toggle="tooltip" data-placement="bottom" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+	</div>
 	</div>
 	
 	<!-- // 搜索区域-->
@@ -105,16 +106,13 @@
 						<option value="">s1</option>
 				</select>
 			</div>
-			<div class="form-group col-sm-3">
+			<div class="form-group col-sm-2">
 				<label class="control-label" for="place_now">现放置地点</label>
 				<select multiple="multiple" size="4" class="form-control" id="selectPlaceNow" name="place_now" >
 						<option value="">p1</option>
 				</select>
 										
 			</div>
-			</div>	
-
-			<div class="row myRow">			
 			<div class="form-group col-sm-2">
 				<label class="control-label" for="keeper_now">现保管人</label>
 				<input class="form-control" name="keeper_now" type="text" value="" placeholder="...不限" />
@@ -130,7 +128,7 @@
 			</div>	
 			
 			<div class="row myRow">
-			<div class="col-sm-6">
+			<div class="pull-right">
 				<button id="btnSearch" type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>搜索</button>
 			
 				<button id="btnSearchReset" type="button" class="btn btn-primary btn-sm">条件重置</button>
@@ -148,8 +146,6 @@
 			<p class="text-center" style="font-size:20px;">加载中……</p>
 		</div>
 	</div>
-	
-	<!-- <p id="pSearchResultNum" hidden="true"><strong>搜索结果</strong>:&nbsp;<span class="label label-info">{ $searchResultNum}</span>条记录</p> -->
 	{/eq}	
 </div>
 
@@ -316,6 +312,12 @@ var loadAssList=(sortData)=>{
 		{'sortData':sortData,'searchData':searchData},
 		function(){
 			sortOrderToggle(sortData.sortName);
+			//是否显示assList.html中的$('#spSearchResult')组件
+			if(Object.keys(searchData).length){
+				$('#spSearchResult').show();
+			}else{
+				$('#spSearchResult').hide();
+			}
 			<!-- //设定$('#fmAssSearch')内的select组件的option -->
 			$.when(
 				ajaxShowSelect({'sendData':{'req':$('#selectDeptNow').attr('name'),'assType':assType},'selected':deptNowArr,'obj':$('#selectDeptNow')}),
@@ -371,7 +373,7 @@ var sortOrderToggle=(sortName)=>{
 var fmReset=()=>{
 	var fm=$('#fmAssSearch');
 	fm[0].reset();
-	fm.find('.form-control').closest('div').removeClass('has-warning');
+	fm.find('.form-control').closest('div').removeClass('has-error');
 };
 
 //自调用匿名函数立即执行的特点，进行页面初始化。
@@ -429,10 +431,10 @@ $(document).ready(function(){
 	$('#fmAssSearch .form-control').change(function(){
 		if($(this).val()!=0){
 			//表单输入项做标识
-			$(this).closest('div').addClass('has-warning');
+			$(this).closest('div').addClass('has-error');
 		}else{
 			//表单输入项去掉标识
-			$(this).closest('div').removeClass('has-warning');
+			$(this).closest('div').removeClass('has-error');
 		}
 	});
 	

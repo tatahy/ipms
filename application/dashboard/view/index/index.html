@@ -109,9 +109,10 @@
 <!-- pagewrap  -->
 <div class="container-fluid" style="padding-top: 55px;">
 	<div id="mySidenav" class="sidenav">
-		
+		<button id="closeBtn" type="button" class="btn btn-link btn-lg pull-right" style="padding:0px 10px 0px 0px;"><span class="glyphicon glyphicon-chevron-left"></span><span style="font-size:16px;">隐藏</span></button>
+		</br>
 		<!-- nav 与 jQuery结合实现菜单栏导航效果-->
-		<ul class="nav nav-pills nav-stacked" >
+		<ul class="nav nav-pills nav-stacked" style="padding-top:10px;">
 			<li class="active"><a class="aTab" href="#userInfo"><span class="glyphicon glyphicon-user"></span>&nbsp;个人信息</a></li>
 			{neq name="proEn" value="0"}
 			<li><a class="aTab" href="#issPro"><span class="glyphicon glyphicon-inbox"></span>&nbsp;项目事务<span class="badge">{$numIssPro}</span></a></li>
@@ -126,16 +127,14 @@
 			<li><a class="aTab" href="#attManage"><span class="glyphicon glyphicon-bookmark"></span>&nbsp;附件管理</a></li>
 			{/neq}
 			{neq name="assEn" value="0"}
-			<li><a class="aTab" href="#assInfo"><span class="glyphicon glyphicon-oil"></span>&nbsp;固定资产</a></li>
+			<li><a class="aTab" href="#assInfo"><span class="glyphicon glyphicon-oil"></span>&nbsp;固定资产管理</a></li>
 			{/neq}			
 		</ul>
 		
 	</div>
 	
 	<div id="main">
-		<button id="openBtn" type="button" class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-chevron-right"></span></button>
-		
-		<button id="closeBtn" type="button" class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-chevron-left"></span></button>
+		<button id="openBtn" type="button" class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-chevron-right"></span><span style="font-size:16px;">显示</span></button>
   
   		<div id="divContent_load">
 			<p class="text-center" style="font-size:28px;">加载中……</p>
@@ -151,6 +150,23 @@
 <!-- /pagewrap  -->
 
 <script>
+var showSideNavbar=(y)=>{
+	if(y){
+		//show
+		$('#openBtn').hide();
+		$('#closeBtn').show();
+		$('#mySidenav').css('width','150px');
+		//#main的内容不被遮蔽就需要修改'margin-left'与#mySidenav的'width'相同
+    	$('#main').css('margin-left','150px');
+    	$('#footer').css('margin-left','150px');
+	}else{
+		$('#openBtn').show();
+		$('#closeBtn').hide();
+		$('#mySidenav').css('width','0');
+    	$('#main').css('margin-left','0');
+    	$('#footer').css('margin-left','0');	
+	}
+};
 //**函数名：loadTplFile
  	//* 作用：提交锚点值给后端，由后端返回需加载的页面文件
 function loadTplFile(){
@@ -204,13 +220,17 @@ function loadTplFile(){
 	}); 
 };
 
-$(document).ready(function(){
+//利用自调用匿名函数立即执行的特点， 页面初始化
+(function($){
 	$('[data-toggle="tooltip"]').tooltip();
 	
 	loadTplFile();
 	
-	$('#closeBtn').hide();	
-	
+	showSideNavbar(true);	
+
+})(jQuery);
+
+$(document).ready(function(){
 	<!-- //点击nav-pills中的各个按钮后，加载对应的页面-->
 	$('.aTab').click(function(){
         //改变页面的锚点值为a的href属性值
@@ -227,22 +247,11 @@ $(document).ready(function(){
 	
 	//显示SideNavbar
 	$('#openBtn').click(function(){
-		//隐藏
-		$(this).hide();
-		$('#closeBtn').show();
-		$('#mySidenav').css('width','150px');
-		//#main的内容不被遮蔽就需要修改'margin-left'与#mySidenav的'width'相同
-    	$('#main').css('margin-left','150px');
-    	$('#footer').css('margin-left','150px');	
+		showSideNavbar(true);		
     });	
 	//关闭SideNavbar
 	$('#closeBtn').click(function(){
-        //隐藏
-		$(this).hide();
-		$('#openBtn').show();
-		$('#mySidenav').css('width','0');
-    	$('#main').css('margin-left','0');
-    	$('#footer').css('margin-left','0');	
+        showSideNavbar(false);		
     });			
 });
 </script>
