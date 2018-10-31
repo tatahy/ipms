@@ -42,29 +42,7 @@ class IndexController extends \think\Controller
             //$this->redirect($request->domain());
         }
     }
-    
-    //asset数量
-    private function priAssNum($assType=''){
-      $assType=!empty($assType)?$assType:'_USUAL';
-      return $this->priAssQueryObj($assType)->count();
-    }
-    
-    //asset查询语句对象
-    private function priAssQueryObj($assType){
-      $authNum=0;
-        foreach($this->auth as $val){
-        $authNum+=$val;
-      }
-      //登录用户的asset权限有且仅有read，仅能查阅自己名下的asset，
-      if($this->auth['read']==1 && $authNum<=1){
-        $query=AssinfoModel::scope('assType',$assType)->where('keeper_now',$this->userName);
-      }else{
-        $query=AssinfoModel::scope('assType',$assType);
-      }
-      
-      return $query;
-    }
-    
+       
     public function index(Request $request,AssinfoModel $assMdl)
     {
         $this->priLogin();
@@ -191,7 +169,7 @@ class IndexController extends \think\Controller
       $assType = empty($request->param('assType'))?0:$request->param('assType');
       
       if($assType){
-        $res=$assMdl::scope('assType',$assType)->field($req)->group($req)->select();
+        $res=$assMdl->assTypeQuery($this->auth,$assType,$this->userName)->field($req)->group($req)->select();
       }else{
         $res=$assMdl->field($req)->group($req)->select();
       }

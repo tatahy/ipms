@@ -93,7 +93,7 @@ class Assinfo extends Model
       return $query->count();
     }
     
-    //asset数量
+    //asset查询对象
     public function assTypeQuery($auth=[],$assType='',$userName)
     {
       
