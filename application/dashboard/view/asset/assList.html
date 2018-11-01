@@ -29,7 +29,7 @@
 					<th><a data-sort-name="status_now_user_name">登记人</a></th>
 					<th><a data-sort-name="create_time">创建时间</a></th>
 					<th><a data-sort-name="update_time">登记时间</a></th>
-					<th>操作</th>
+					<th class="text-center">操作</th>
 				</tr>
 			
 			</thead>
@@ -50,7 +50,7 @@
 					<td class="text-right">{$vo.status_now_user_name}</td>
 					<td class="text-right">{$vo.create_time}</td>
 					<td class="text-right">{$vo.update_time}</td>
-					<td class="btnAssOprt" data-ass-status="{$vo.status_now}" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}" >
+					<td class="tdAssOprt text-right" data-ass-status="{$vo.status_now}" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}" >
 						
 					</td>
 				
@@ -170,8 +170,7 @@ var fnInArr=(item, arr)=>{
 //2.决定产生组件的条件？auth,status,??
 //status决定产生的操作组件数量，auth结合authVSoprt来决定显示给登录用户的操作组件数量。
 var getOprtHtmlStr=(status)=>{
-
-	var aHtml='';
+	var btnHtml='';
 	var authOprtArr=[];
 	var statusOprtArr=[];
 	var oprtArr=[];
@@ -213,15 +212,15 @@ var getOprtHtmlStr=(status)=>{
 		oprtArr.forEach(function(el){		
 			conOprtComAttr.forEach(function(e){
 				if(el==e.val){
-					aHtml+='<a class="aAssOprt text-'+e.color+'" href="#assInfo" data-ass-oprt="'+e.val+'" data-toggle="tooltip" data-title="'+e.title+'"><span class="glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'&nbsp;</a>';
+					btnHtml+='<button class="btn btn-'+e.color+' btn-xs btnAssOprt" data-ass-oprt="'+e.val+'" data-toggle="tooltip" title="'+e.title+'" style="margin:2px;"><span class="glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'</button>'
 				}
 			});
 		});
 	}else{
-		aHtml='无';
+		btnHtml='无';
 	}
 		
-	return aHtml;
+	return btnHtml;
 };
 
 
@@ -275,13 +274,15 @@ var arrMerge=(arr1,arr2)=>{
 		$('.spAssType').html(trashObj.find('.spType').text());
 		$('#spAssNum').addClass('label label-danger');
 	}
-	//每个.btnAssOprt根据该行记录的data-ass-status="{$ vo.status_now}"添加相应的a标签
-	$('.btnAssOprt').each(function(){
-		var ahtml=getOprtHtmlStr($(this).data('assStatus'));
-		$(this).append(ahtml);
+	//每个.tdAssOprt根据该行记录的data-ass-status="{$ vo.status_now}"添加相应的a标签
+	$('.tdAssOprt').each(function(){
+		<!-- var ahtml=getOprtHtmlStr($(this).data('assStatus')); -->
+		<!-- $(this).append(ahtml); -->
+		var btnHtml=getOprtHtmlStr($(this).data('assStatus'));
+		$(this).append(btnHtml);
 	});
-	// 设置$('.btnAssOprt')的tooltip
-	$('.btnAssOprt [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
+	// 设置$('.tdAssOprt')的tooltip
+	$('.tdAssOprt [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
 	//每个$('thead a')添加属性
 	$('thead a').each(function(){
 		$(this).attr({'href':'#assInfo','data-title':'点击排序','data-toggle':'tooltip'}).closest('th').addClass('text-center');
@@ -388,8 +389,8 @@ $(document).ready(function(){
 		
 	});
 	
-	//页面内所有'.aAssOprt'的click事件
-	$('.aAssOprt').click(function(){
+	//页面内所有'.btnAssOprt'的click事件
+	$('.btnAssOprt').click(function(){
 		var dataFromObj=$(this).closest('td');
 		var oprt=$(this).data('assOprt');
 		//去掉所有行的底色

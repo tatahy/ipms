@@ -66,7 +66,7 @@
 	
 	<div class="form-group col-sm-4">
 		<label for="status_now">状态变更为</label>
-		<select class="form-control" id="modalSelectStatusNow" name="status_now" >
+		<select class="form-control" name="status_now" >
 			<option value="">d1</option>
 		</select>
 		<span class="small text-muted"></span>
@@ -118,8 +118,8 @@ const conOprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'inf
 var oprt=$('#fmAssInfo').find('[name="oprt"]').val();
 
 //生成$.alert,$.confirm组件(com:component)上显示内容的HTML字符串。由oprt英文转中文，加上HTML标签组成HTML字符串
-var comHtml=(topic,oprtEn,result)=>{
-	
+var comHtml=(assMeta,oprtEn,result)=>{
+	var meta=Object.assign({'topic':'xxx','code':000},assMeta);
 	var oprtChi = '';
 	var gly='';
 	var color='';
@@ -145,7 +145,7 @@ var comHtml=(topic,oprtEn,result)=>{
 			resultHtml='';
 			break;
 	}
-	htmlStr='<p>固定资产：</p><p class="text-center">【<strong>'+topic +'</strong>】记录</p><p class="text-center">进行【<span class="text-'+color+'"><span class="glyphicon glyphicon-'+gly+'"></span>'+oprtChi+'</span>】</p>'+resultHtml;
+	htmlStr='<p class="text-primary" style="font-size:16px;"><span class="glyphicon glyphicon-oil"></span>固定资产</p><p class="text-center">【<strong>'+meta.topic +'</strong>&nbsp;/&nbsp;'+meta.code+'】记录</p><p class="text-center">进行【<span class="text-'+color+'"><span class="glyphicon glyphicon-'+gly+'"></span>'+oprtChi+'</span>】</p>'+resultHtml;
 	return htmlStr;
 };
 
@@ -166,20 +166,16 @@ var oprtBtnHtml=(oprtEn)=>{
 	return htmlStr;
 };
 
-var spanNextSelectStatusNow=(oprtEn,statusNext)=>{
+var spanNextSelectStatusNow=(oprtEn)=>{
 	var spStr = '';
 	var statusNow=$('#statusNow').val();
 	var spanObj=$('#fmAssInfo').find('select[name="status_now"]').next('span');
-
 	conOprtComAttr.forEach(function(e){
 		if(oprtEn==e.val){
 			spStr='<span class="text-'+e.color+'"><span class="glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'</span>';
 		}
 	});
-	
-	spanObj.html('【'+spStr+'】成功后，“现状”变为：'+statusNext);
-		
-	<!-- $('#fmAssInfo').find('input[name="status_now_desc"]').val('状态变为：'+statusNext); -->
+	spanObj.html('【'+spStr+'】成功后，“现状”变为上述值');
 };
 
 var emptyCheck=(obj)=>{
@@ -202,36 +198,24 @@ var emptyCheck=(obj)=>{
 
 //利用自调用匿名函数立即执行的特点，对页面的组件进行初始化
 (function($){
-	//单选框$('select[name="status_now"]')的初始化	
-	$.post('{$home}/dashboard/asset/selectRes',{'req':$('#modalSelectStatusNow').attr('name'),'source':'common','oprt':oprt,'statusNow':$('#statusNow').val()},function(result){
-		var obj=$('#fmAssInfo').find('select[name="status_now"]');
-		var str='';
-		if(result.length){
-			spanNextSelectStatusNow(oprt,result[0]);
-				
-			$.each(result,function(n1,v1){
-				str+='<option value="'+v1+'">'+v1+'</option>';	
-			});
-			<!--// 清空单选框Obj的所有选项-->
-			obj.empty();
-			<!--// 添加单选框Obj的新选项-->
-			obj.append(str);
-		
-		}else{
-			obj.closest('div').hide();
-		}
-	});
-		
+	//单选框$('select[name="status_now"]')的初始化
+	var selectObj=$('#fmAssInfo select[name="status_now"]');
+	ajaxShowSelect({'sendData':{'req':selectObj.attr('name'),'source':'common','oprt':oprt,'statusNow':$('#statusNow').val()},'attach':'','selected':0,'obj':selectObj});
+	
+	spanNextSelectStatusNow(oprt);	
+	
 	if(oprt=='_CREATE' || oprt=='_RESTORE' || oprt=='_DELETE'){
 		//消除_UPDATE按钮
-		$('.pull-left').children().remove()
+		$('.pull-left').children().remove();
+		//消除$('#statusNow').next('span')
+		$('#statusNow').next('span').remove();
 		//添加新按钮
 		$('.pull-left').append(oprtBtnHtml(oprt));
 	}else{
 		//_UPDATE按钮后添加新按钮
 		$('#btnUpdate').after('&nbsp;'+oprtBtnHtml(oprt));
 	}
-	$('.modal-footer').attr('hidden',true)
+	$('.modal-footer').attr('hidden',true);
 	
 })(jQuery);
 
@@ -272,7 +256,8 @@ $(document).ready(function(){
 		var url = $(this).attr('action'); 
 		//console.log(oprt+url);
     	var formData = $(this).serialize();
-		var topic=$(this).find('[name="brand_model"]').val();
+		var assMeta={'topic':$(this).find('[name="brand_model"]').val(),'code':$(this).find('[name="code"]').val()};
+		
 		var emptyCheckArr=[];
 		var obj=$(this).find('.empty-check');
 			
@@ -298,12 +283,12 @@ $(document).ready(function(){
 		}
 		
 		$('#modalAssSingle').modal('hide');
-		$.confirm(comHtml(topic,oprt),function(e){
+		$.confirm(comHtml(assMeta,oprt),function(e){
 			con=e;
 			if(true==con){
 				$.post(url,formData,function(data){
 					if(data.res){
-						$.alert(comHtml(topic,oprt,'success'));
+						$.alert(comHtml(assMeta,oprt,'success'));
 						//更新各类asset的数量
 						//console.log(data.num);
 						$('#ulAssType [data-ass-type]').each(function(){
