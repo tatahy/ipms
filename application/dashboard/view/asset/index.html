@@ -196,6 +196,9 @@ var conAssLabelArr=fnJsonToArr({$conAssStatusLabelArr});
 <!-- console.table(conAssNumArr); -->
 <!-- console.log(conAssLabelArr); -->
 
+//由表格头字段创建数组
+var tblColObjArr=[];
+
 var buildAssNumSpan=(type,numArr)=>{
 	
 	var label='';
@@ -392,6 +395,9 @@ var loadAssList=()=>{
 					$.alert('加载失败，请稍后再试！');
 				}
 			);
+			
+			//根据tblColObjArr显示、隐藏col
+			tblColshowChange(tblColObjArr);	
 		}
 	);
 };

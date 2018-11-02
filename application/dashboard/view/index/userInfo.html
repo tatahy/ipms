@@ -2,21 +2,18 @@
 
 
 <div id="divUsergroup" data-user-id="{$user.id}" style="margin-top:10px;">
-	<!-- <a href="#divUserBasicInfo" data-toggle="collapse" class="label label-warning" style="font-size:16px;"><span class="glyphicon glyphicon-duplicate"></span>&nbsp;基本信息</a> -->
 	
-	<!-- Split button -->
-<div class="btn-group" >
-  <a href="#divUserBasicInfo" data-toggle="collapse" class="label label-warning" style="font-size:16px;border-top-right-radius: 0;border-bottom-right-radius: 0;"><span class="glyphicon glyphicon-duplicate"></span>&nbsp;基本信息</a>
-  <a class="label label-warning" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size:16px;border-top-left-radius: 0;border-bottom-left-radius: 0;border-left: #eea236 solid 1px;margin-left: -5px;">
-    <span class="caret"></span>
-    <span class="sr-only">Toggle Dropdown</span>
-  </a>
-  <ul class="dropdown-menu">
-    <li><a href="#userInfo" class="aModalTrig" data-toggle="tooltip" data-title="修改个人基本信息" data-div-part="info"><span><span class="glyphicon glyphicon-edit"></span></span>修改信息</a></li>
-    <li role="separator" class="divider"></li>
-    <li><a href="#userInfo" class="aModalTrig" data-toggle="tooltip" data-title="重设登录密码" data-div-part="pwd"><span><span class="glyphicon glyphicon-eye-open"></span></span>重设密码</a></li>
-  </ul>
-</div>
+	<div class="btn-group">
+    	<button type="button" class="btn btn-warning" style="padding:1px 5px;font-size:16px;" data-toggle="collapse" data-target="#divUserBasicInfo"><span class="glyphicon glyphicon-duplicate"></span>基本信息</button>
+    	<div class="btn-group">
+      		<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" style="padding:1px 5px;font-size:16px;">修改<span class="caret"></span></button>
+      		<ul class="dropdown-menu" role="menu">
+				<li><a href="#userInfo" class="aModalTrig" data-toggle="tooltip" data-title="修改个人基本信息" data-div-part="info"><span class="glyphicon glyphicon-edit"></span>基本信息</a></li>
+    			<li role="separator" class="divider"></li>
+    			<li><a href="#userInfo" class="aModalTrig" data-toggle="tooltip" data-title="重设登录密码" data-div-part="pwd"><span class="glyphicon glyphicon-eye-open"></span>登录密码</a></li>
+      		</ul>
+    	</div>
+  	</div>
 	
 	<div id="divUserBasicInfo" class="row myRow collaps in" style="margin-top:10px;">		
 		
@@ -35,7 +32,7 @@
 	</div>
 	<hr>
 	
-	<a href="#divUserAuth" data-toggle="collapse" class="label label-warning" style="font-size:16px;"><span class="glyphicon glyphicon-alert"></span>&nbsp;系统权限</a>
+	<button type="button" class="btn btn-warning" style="padding:1px 5px;font-size:16px;" data-toggle="collapse" data-target="#divUserAuth"><span class="glyphicon glyphicon-alert"></span>系统权限</button>
 		
 	<div id="divUserAuth" class="row myRow collaps in" style="margin-top:10px;">		
 		<div class="form-group col-sm-6">	
@@ -138,14 +135,13 @@
 	</div>
 	<hr>
 		
-	<a href="#divUserGroup" data-toggle="collapse" class="label label-warning" style="font-size:16px;"><span class="glyphicon glyphicon-magnet"></span>&nbsp;所属用户组</a>
+	<button type="button" class="btn btn-warning" style="padding:1px 5px;font-size:16px;" data-toggle="collapse" data-target="#divUserGroup"><span class="glyphicon glyphicon-alert"></span>所属用户组</button>
 	
 	<div id="divUserGroup" class="row myRow collaps in" style="margin-top:10px;">		
 		<ul class="list-group">
 			{volist name="userGroup" id="vo"}			
 			<a class="list-group-item col-sm-4" style="border:0px;">【<span class="label label-info">{$vo.name}</span>】：{$vo.description}</a>
 			<!-- <li class="list-group-item">【<span class="label label-info">{$vo.name}</span>】：{$vo.description}</li> -->
-			
 			{/volist}
 		</ul>	
 			

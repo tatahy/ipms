@@ -1,6 +1,6 @@
 <!-- assRecords.html -->
 
-<div>
+<div id="divAssRecords">
 	<h4><span class="label label-info" style="font-size:16px;">固定资产现状</span><span class="small pull-right">{$assSet.update_time}</span></h4>
 	<div class="row" style="margin-top:10px;">	
 		<div class="col-sm-5" >
@@ -44,7 +44,7 @@
 	
 	<a id="aCollapse" class="label label-info" style="font-size:16px;" data-toggle="popover" title="状态变化过程记录">状态历史记录<span class="glyphicon glyphicon-menu-up"></span></a>
 	
-	<div id="divAssrecords" class="panel-group collaps in" style="margin-top:10px;">
+	<div id="divPanel" class="panel-group collaps in" style="margin-top:10px;">
 		{volist name="assRdSet" id="vo" empty="暂无信息"}
 		<div class="panel panel-info">
 			<div class="panel-heading" style="padding:10px;">
@@ -97,13 +97,14 @@ var glyphiconChange=(obj,icon1,icon2)=>{
 //利用自调用匿名函数立即执行的特点， 页面初始化
 (function($){
 <!-- // status内容上色-->
-	$('.spStatus').each(function(){
+	$('#divAssRecords .spStatus').each(function(){
 		var status=$(this).text();
 		var index=0;
 		index=conStatusArr.indexOf(status);
-		$(this).addClass('label label-'+conLabelArr[index]);
+		$(this).addClass('label label-'+conLabelArr[index]).css('padding','1px 5px');
 	});
-	$('.modal-footer').attr('hidden',false)
+	$('.modal-footer').attr('hidden',false);
+	
 })(jQuery);
 
 $(document).ready(function(){
@@ -121,7 +122,7 @@ $(document).ready(function(){
 			$('.panel-collapse').collapse('hide');
 		}		
 		
-		$('#divAssrecords').collapse('toggle');
+		$('#divPanel').collapse('toggle');
     });
 
 });

@@ -1,23 +1,32 @@
 <!-- assList.html -->
 
 <!-- pagewrap  -->	
-<div>
+<div id="divAssList">
 	<!-- <p>{$authAss.edit}</p> -->
 {neq name="searchResultNum" value="0"}
 	<!-- <p id="pSearchResultNum" class="text-center"> -->
 		<!-- <strong class="spAssType"></strong>记录数：<span id="spAssNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span> -->
 	<!-- </p> -->
 		
-	<div id="divAssList" class="table-responsive" > 
-		
-		<table class="table table-bordered table-hover table-condensed" >
-			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产信息列表&nbsp;<strong class="spAssType"></strong></h4>
+	<div class="table-responsive" > 
+		<table id="tblAssList" class="table table-bordered table-hover table-condensed" >
+			<caption class="text-center" style="border-bottom:1px solid #eee;">
+			<h4>固定资产信息列表&nbsp;<strong class="spAssType"></strong>
+			   	<div class="btn-group">
+      				<button type="button" class="btn btn-xs btn-primary dropdown-toggle" data-toggle="dropdown">选择显示字段<span class="caret"></span></button>
+      				<ul class="dropdown-menu">
+						<li><div class="checkbox" style="padding-left:10px;"><label><input type="checkbox" value="all" checked><span class="text-primary">全选</span></label></div></li>
+						<li class="divider"></li>
+					</ul>
+    			</div>
+			</h4>
 			</caption>
+			<colgroup></colgroup>
 			<thead>
 				<tr>
 					<th class="text-center">序号</th>
 					<th><a data-sort-name="brand_model">名称</a></th>
-					<th><a data-sort-name="assnum">编号</a></th>
+					<th class="assnum"><a data-sort-name="assnum">编号</a></th>
 					<th><a data-sort-name="code">卡号</a></th>
 					<th><a data-sort-name="bar_code">条形码号</a></th>
 					<th><a data-sort-name="quantity">数量</a></th>
@@ -85,7 +94,7 @@
 	
 	</div>
 {else/}
-	<p class="text-center" ><span class="label label-default" style="font-size:14px;">无符合搜索条件信息</span></p>
+	<p class="text-center" ><span class="label label-default" style="font-size:14px;">无符合条件信息</span></p>
 {/neq}
 	
 </div>
@@ -155,6 +164,10 @@ const conStatusArr=Object.values({$conAssStatusArr});
 <!-- var conStatusArr=Object.values({$conAssStatusArr}); -->
 const conLabelArr=Object.values({$conAssStatusLabelArr});
 <!-- var conLabelArr=Object.values({$conAssStatusLabelArr}); -->
+
+<!-- //由表格头字段创建数组 -->
+<!-- var tblColObjArr=[]; -->
+	
 //某个值是否在数组内
 var fnInArr=(item, arr)=>{
 	for (var i = 0; i < arr.length; i++) {
@@ -251,6 +264,31 @@ var arrMerge=(arr1,arr2)=>{
 	return result; 
 };
 
+//根据tblColObjArr的值，改变复选框，显示/隐藏col
+var tblColshowChange=(objArr)=>{
+	//col，一个([data-hide-val="'+el.val+'"]的th、td集合
+	objArr.forEach(function(el){		
+		//复选框
+		$('#tblAssList input').each(function(){
+			if($(this).val()==el.val){
+				//改变复选框的值
+				$(this).prop('checked',el.showFlag);
+				//改变复选框的字体颜色
+				$(this).next().removeClass('text-primary text-muted');
+				if(el.showFlag){
+					$(this).next().addClass('text-primary');
+					//显示col
+					$('#tblAssList').find('[data-hide-val="'+el.val+'"]').show();
+				}else{
+					$(this).next().addClass('text-muted');
+					//隐藏col
+					$('#tblAssList').find('[data-hide-val="'+el.val+'"]').hide();
+				}
+			}
+		});
+	});	
+};
+
 //利用自调用匿名函数立即执行的特点， 页面初始化
 (function($){
 	
@@ -284,9 +322,8 @@ var arrMerge=(arr1,arr2)=>{
 	// 设置$('.tdAssOprt')的tooltip
 	$('.tdAssOprt [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
 	//每个$('thead a')添加属性
-	$('thead a').each(function(){
-		$(this).attr({'href':'#assInfo','data-title':'点击排序','data-toggle':'tooltip'}).closest('th').addClass('text-center');
-	});
+	$('thead a').attr({'href':'#assInfo','data-title':'点击排序','data-toggle':'tooltip'}).closest('th').addClass('text-center');
+
 	<!-- // status单元格内容上色-->
 	$('.spStatus').each(function(){
 		var status=$(this).text();
@@ -294,11 +331,74 @@ var arrMerge=(arr1,arr2)=>{
 		index=conStatusArr.indexOf(status);
 		$(this).addClass('label label-'+conLabelArr[index]);
 	});
+	
+	<!-- //对index.html中定义的tblColObjArr进行赋值 -->	
+	tblColObjArr=(function($,arr){
+		if(arr.length==0){
+		
+		$('#tblAssList').find('th').each(function(){
+			<!-- tblColObjArr.push($(this).text()); -->
+			let nameEn=$(this).children('a').data('sortName');
+			let nameChi=$(this).text();
+			<!-- let nameChi=$(this).children('a').html(); -->
+			if(nameEn){
+				arr.push({'nameChi':nameChi,'val':nameEn,'showFlag':true});
+			}else{
+				arr.push({'nameChi':nameChi,'val':0,'showFlag':false});
+			}
+		});
+		//附加value="all"的input复选框信息
+		arr.push({'nameChi':'全选','val':'all','showFlag':$('#tblAssList ul input').eq(0).prop('checked')});
+		}
+		return arr;
+	})(jQuery,tblColObjArr);
+	
+	<!-- console.table(tblColObjArr); -->
+	
+	tblColObjArr.forEach(function(el,index){
+		let obj=$('#tblAssList');
+		let trObj=$('#tblAssList').find('tr');
+		//添加col标签
+		obj.find('colgroup').append('<col data-col-index="'+index+'">');
+			
+		//生成显示字段的多选框内容，
+		if(el.val && el.val!='all'){
+			obj.find('ul').append('<li><div class="checkbox" style="padding-left:10px;"><label><input type="checkbox" value="'+el.val+'" checked><span class="text-primary">'+el.nameChi+'</span></label></div></li>');
+		}
+		//每个th、td添加data-hide-val=""，相同的data-hide-val=""用于组合成一个col
+		trObj.each(function(){
+			if(el.val){
+				$(this).children().eq(index).attr('data-hide-val',el.val);
+			}
+		});	
+	});
+	
 })(jQuery);
 
 
 $(document).ready(function(){
 		
+	$('#tblAssList ul input').click(function(){
+		//复选框点击后的值
+		var checkVal=$(this).prop('checked');
+		var val=$(this).val();
+		
+		//修改tblColObjArr
+		if(val=='all'){
+			tblColObjArr.forEach(function(el,index){
+				el.showFlag=checkVal;
+			});
+		}else{
+			for(var i=0;i<tblColObjArr.length;i++){
+				if(val==tblColObjArr[i].val){
+					tblColObjArr[i].showFlag=checkVal;
+				}
+			}
+		}
+		//根据tblColObjArr进行操作
+		tblColshowChange(tblColObjArr);	
+	});
+	
 	<!-- //表格每页显示记录行数 -->
 	$('#listRows').val('{$sortData.listRows}'); 
 	
