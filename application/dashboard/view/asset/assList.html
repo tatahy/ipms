@@ -1,4 +1,17 @@
 <!-- assList.html -->
+<style>
+
+
+@media screen and (max-width: 767px) {
+.dropdown-menu{
+	<!-- z-index: 1; -->
+	<!-- border-radius: 3px; -->
+	<!-- box-shadow:0px 0px 5px 2px #aaa; -->
+	<!-- overflow-y: scroll; -->
+}
+
+}
+</style>
 
 <!-- pagewrap  -->	
 <div id="divAssList">
@@ -8,14 +21,14 @@
 		<!-- <strong class="spAssType"></strong>记录数：<span id="spAssNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span> -->
 	<!-- </p> -->
 		
-	<div class="table-responsive" > 
+	<div class="table-responsive" style="overflow: auto;"> 
 		<table id="tblAssList" class="table table-bordered table-hover table-condensed" >
 			<caption class="text-center" style="border-bottom:1px solid #eee;">
 			<h4>固定资产信息列表&nbsp;<strong class="spAssType"></strong>
 			   	<div class="btn-group">
-      				<button type="button" class="btn btn-xs btn-primary dropdown-toggle" data-toggle="dropdown">选择显示字段<span class="caret"></span></button>
-      				<ul class="dropdown-menu">
-						<li><div class="checkbox" style="padding-left:10px;"><label><input type="checkbox" value="all" checked><span class="text-primary">全选</span></label></div></li>
+      				<button type="button" class="btn btn-xs btn-primary dropdown-toggle" data-toggle="dropdown" >选择显示字段<span class="caret"></span></button>
+      				<ul class="dropdown-menu" >
+						<li><div class="checkbox"><label><input type="checkbox" value="all" checked><span class="text-primary">全选</span></label></div></li>
 						<li class="divider"></li>
 					</ul>
     			</div>
@@ -363,7 +376,7 @@ var tblColshowChange=(objArr)=>{
 			
 		//生成显示字段的多选框内容，
 		if(el.val && el.val!='all'){
-			obj.find('ul').append('<li><div class="checkbox" style="padding-left:10px;"><label><input type="checkbox" value="'+el.val+'" checked><span class="text-primary">'+el.nameChi+'</span></label></div></li>');
+			obj.find('ul').append('<li><div class="checkbox"><label><input type="checkbox" value="'+el.val+'" checked><span class="text-primary">'+el.nameChi+'</span></label></div></li>');
 		}
 		//每个th、td添加data-hide-val=""，相同的data-hide-val=""用于组合成一个col
 		trObj.each(function(){
@@ -372,6 +385,9 @@ var tblColshowChange=(objArr)=>{
 			}
 		});	
 	});
+	
+	//对生成的显示字段的多选框格式进行微调
+	$('#tblAssList caption div.checkbox').css('padding-left','10px').find('input').css('margin-top','0');
 	
 })(jQuery);
 

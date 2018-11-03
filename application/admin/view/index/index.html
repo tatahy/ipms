@@ -15,51 +15,75 @@
 {/*<!-- 实现nav固定在页面顶端效果的补充代码块,
 同时还需设置nav的data-offset-top="-3"防止鼠标单击页面时出现跳动-->
 */}
-  <style>
-  .affix {
-      top: 0;
-      width: 100%;
-  }
-
-  .affix + .container-fluid {
-      //padding-top: 50px;
-  }
-  
-  .sidenav {
-    height: 100%;
-    width: 0;
-    position: fixed;
-    z-index: 1;
-    top: 50px;
-    left: 0;
-    background-color: #f2f2f2;
-    overflow-x: hidden;
-    transition: 0.5s;
-    padding-top: 10px;
+<style>
+.affix {
+    top: 0;
+    width: 100%;
 }
 
-#main {
-    transition: margin-left 0.5s;
-    //padding-top: 60px;
-	margin-top: 60px;
-	
+.affix + .container-fluid {
+    //padding-top: 50px;
+}
+
+.sidenav {
+    padding-top: 10px;
+	height: 100%;
+    width: 0px;
+    position: fixed;
+    z-index: 0;
+    top: 50px;
+    left: 0;
+	border:1px solid #e3e3e3;
+    background-color: #f5f5f5;
+    //background-color: #f2f2f2;
+    overflow: hidden;
+    transition: 0.5s;
+}
+
+.sidenav.sidenav-show{
+    width: 200px;
+}
+
+
+#divContainer {
+    padding-top: 55px;
+	margin-left:0px;
+	position: relative;
+	z-index: 0;
+	transition: margin-left 0.5s;
+}
+
+#divContainer.sidenav-show{
+	margin-left:200px;
 }
 
 #footer {
-	background-color:#f2f2f2;
-	padding-top: 10px;
+	//background-color:#f2f2f2;
+	background-color:#f5f5f5; 
 	border:1px solid #e3e3e3;
-	margin-bottom:1px;
-	<!-- height: 10%; -->
-	<!-- bottom:5px; -->
-	<!-- position: fixed; -->
-	<!-- width:100%; -->
-	<!-- z-index: 1; -->
+	position: absolute;
+	bottom:0;
+	width: 100%;
+	z-index: 0;
+  
 }
 
-@media screen and (max-height: 450px) {
-  .sidenav {padding-top: 15px;}
-  .sidenav a {font-size: 18px;}
+@media screen and (max-width: 767px) {
+.sidenav.sidenav-show {
+	z-index: 1;
+	height: 70%;
+	border-radius: 3px;
+	box-shadow:0px 0px 5px 2px #aaa;
+}
+
+#divContainer.sidenav-show {
+	margin-left:0px;
+}
+
+.sidenav a {font-size: 16px;}
+
+#footer {position: relative;}
+
 }
   </style>
   
@@ -90,55 +114,65 @@
   </div>
 </nav>
 <!-- pagewrap  -->
-<div id="divContainer" class="container-fluid" style="height:80%;">
-	<div id="mySidenav" class="sidenav">
-		<!-- <button id="closeBtn" type="button" class="btn btn-link btn-lg" style="margin-left:70%;"><span class="glyphicon glyphicon-chevron-left"></span></button> -->
+<div id="mySidenav" class="sidenav">
+	<div style="height:30px;border-bottom:1px solid #e3e3e3;"><button id="closeBtn" type="button" class="btn btn-link btn-lg pull-right" style="padding:0px 10px 0px 0px;"><span class="glyphicon glyphicon-chevron-left"></span><span style="font-size:16px;">隐藏</span></button>
+	</div>
 		
-		<!-- nav 与 jQuery结合实现菜单栏导航效果-->
-		<ul class="nav nav-pills nav-stacked" >
-			<li class="active"><a class="aTab" href="#sysSummary"><span class="glyphicon glyphicon-inbox"></span>&nbsp;系统概况</a></li>
+	<!-- //nav 与 jQuery结合实现菜单栏导航效果-->
+	<ul class="nav nav-pills nav-stacked" >
+		<li class="active"><a class="aTab" href="#sysSummary"><span class="glyphicon glyphicon-inbox"></span>&nbsp;系统概况</a></li>
 				
-			<li class="dropdown">
-				<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span>&nbsp;系统用户<span class="caret"></span></a>
-				<ul class="dropdown-menu">
-					<li class="text-right"><a class="aTab" href="#sysUser">用户&nbsp;<span class="glyphicon glyphicon-file"></span></a></li>
-					<li class="text-right"><a class="aTab" href="#sysUsergroup">用户组&nbsp;<span class="glyphicon glyphicon-duplicate"></span></a></li>
-					  <!-- //<li><a href="#"><span class="glyphicon glyphicon-link"></span>&nbsp;功能1-3</a></li> -->
-				</ul>
-			</li>
+		<li class="dropdown">
+			<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span>&nbsp;系统用户<span class="caret"></span></a>
+			<ul class="dropdown-menu">
+				<li class="text-right"><a class="aTab" href="#sysUser">用户&nbsp;<span class="glyphicon glyphicon-file"></span></a></li>
+				<li class="text-right"><a class="aTab" href="#sysUsergroup">用户组&nbsp;<span class="glyphicon glyphicon-duplicate"></span></a></li>
+			</ul>
+		</li>
 				
-			<li><a class="aTab" href="#sysSetting"><span class="glyphicon glyphicon-wrench"></span>&nbsp;系统设置</a></li>
-		</ul>
+		<li><a class="aTab" href="#sysSetting"><span class="glyphicon glyphicon-wrench"></span>&nbsp;系统设置</a></li>
+	</ul>
+</div>
 
-  
-	</div>
+<div id="divContainer" class="container-fluid">
 	
-	<div id="main">
-  		<button id="openBtn" type="button" class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-chevron-right"></span></button>
-		
-		<button id="closeBtn" type="button" class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-chevron-left"></span></button>
+  	<button id="openBtn" type="button" class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-chevron-right"></span><span style="font-size:16px;">显示</span></button>
   
-  		<div id="content"><p class="text-center" style="font-size:28px;">加载中……</p></div>
-		
-	</div>
+  	<div id="content" style="padding-top:5px;"><p class="text-center" style="font-size:28px;">加载中……</p></div>
 	
 </div>
 		
 <div id="footer" class="text-center">
-	<p >Powered by HY Copyright © {$year-1}-{$year}。推荐使用<a href="#">Chrome</a>、<a href="#">Firefox</a>浏览器<br>广州市光机电技术研究院（GZOME）. All rights reserved</p>
+	<p style="margin-top:10px;">Powered by HY Copyright © {$year-1}-{$year}。推荐使用<a href="#">Chrome</a>、<a href="#">Firefox</a>浏览器<br>广州市光机电技术研究院（GZOME）. All rights reserved</p>
 </div>
 <!-- //pagewrap  -->
 
 
 <script>
-$(document).ready(function(){
-//Tooltips must be initialized with jQuery: select the specified element and call the tooltip() method.
-    $('[data-toggle="tooltip"]').tooltip();   
+var showSideNavbar=(y)=>{
+	if(y){
+		//show
+		$('#openBtn').hide();
+		$('#mySidenav').addClass('sidenav-show');
+		$('#divContainer').addClass('sidenav-show');
+	}else{
+		$('#openBtn').show();
+		$('#mySidenav').removeClass('sidenav-show');
+		$('#divContainer').removeClass('sidenav-show');
+	}
+};
+//利用自调用匿名函数立即执行的特点， 页面初始化
+(function($){
+	$('[data-toggle="tooltip"]').tooltip();   
 
 	loadTplFile(window.location.hash);
 	
-	$('#closeBtn').hide();	
-	
+	showSideNavbar(true);	
+
+})(jQuery);
+
+$(document).ready(function(){
+
 	<!-- //点击nav-pills中的各个按钮后，显示对应的页面-->
 	$('.aTab').click(function(){
         var sId = $(this).attr('href');  //a的href属性值即是页面的锚点值
@@ -153,26 +187,16 @@ $(document).ready(function(){
 			$(this).tab('show');
 		}
     });	
+	
 	//显示SideNavbar
 	$('#openBtn').click(function(){
-		//隐藏
-		$(this).hide();
-		$('#closeBtn').show();
-		
-		$('#mySidenav').css('width','150px');
-		//#main的内容不被遮蔽就需要修改'margin-left'与#mySidenav的'width'相同
-    	$('#main').css('margin-left','150px');
-    	$('#footer').css('margin-left','150px');
+		showSideNavbar(true);		
     });	
 	//关闭SideNavbar
 	$('#closeBtn').click(function(){
-        //隐藏
-		$(this).hide();
-		$('#openBtn').show();
-		$('#mySidenav').css('width','0');
-    	$('#main').css('margin-left','0');
-    	$('#footer').css('margin-left','0');
-    });		
+        showSideNavbar(false);		
+    });			
+});	
 	
 <!-- function -->
 	// 作用：提交锚点值给后端，由后端返回需加载的页面文件
@@ -184,9 +208,6 @@ $(document).ready(function(){
     }
 	
 <!-- function -->
-
-
-});
 
 </script>
 
