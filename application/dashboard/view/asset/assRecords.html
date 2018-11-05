@@ -2,7 +2,7 @@
 
 <div id="divAssRecords">
 	<h4><span class="label label-info" style="font-size:16px;">固定资产现状</span><span class="small pull-right">{$assSet.update_time}</span></h4>
-	<div class="row" style="margin-top:10px;">	
+	<div class="row">	
 		<div class="col-sm-5" >
 			<label for="brand_model">名称（含品牌、型号）：</label>{$assSet.brand_model}
 		</div>
@@ -42,18 +42,18 @@
 	</table>
 	</div>
 	
-	<a id="aCollapse" class="label label-info" style="font-size:16px;" data-toggle="popover" title="状态变化过程记录">状态历史记录<span class="glyphicon glyphicon-menu-up"></span></a>
+	<a id="aCollapse" class="label label-info" style="font-size:16px;" data-toggle="popover" title="状态全过程记录">状态历史记录<span class="glyphicon glyphicon-menu-up"></span></a>
 	
 	<div id="divPanel" class="panel-group collaps in" style="margin-top:10px;">
 		{volist name="assRdSet" id="vo" empty="暂无信息"}
 		<div class="panel panel-info">
-			<div class="panel-heading" style="padding:10px;">
-				<h4 class="panel-title" style="height:22px;">
-					<div class="pull-left">{$totalNum-$i+1}
+			<div class="panel-heading">
+				<div class="row panel-title ">
+					<div class="panel-title col-sm-8 text-left">{$totalNum-$i+1}
 						<strong class="text-primary">{$vo.status_now_user_name}</strong>【{$vo.oprt}】完成，状态为<a class="aPanelCollapse" data-toggle="collapse" href="#collapse{$i}" title="查看详情"><span class="spStatus">{$vo.status_now}</span></a>
 					</div>
-					<div class="pull-right" style="font-size:14px;">{$vo.create_time}</div>
-				</h4>
+					<div class="col-sm-4 text-right" style="font-size:14px;">{$vo.create_time}</div>
+				</div>
 			</div>
 			<div id="collapse{$i}" class="panel-collapse collapse">
 			
@@ -101,7 +101,7 @@ var glyphiconChange=(obj,icon1,icon2)=>{
 		var status=$(this).text();
 		var index=0;
 		index=conStatusArr.indexOf(status);
-		$(this).addClass('label label-'+conLabelArr[index]).css('padding','1px 5px');
+		$(this).addClass('label label-'+conLabelArr[index]);
 	});
 	$('.modal-footer').attr('hidden',false);
 	
@@ -109,7 +109,7 @@ var glyphiconChange=(obj,icon1,icon2)=>{
 
 $(document).ready(function(){
 	//激活popover
-	$('#aCollapse').popover({content:'固定资产状态变化摘要记录',trigger:'hover',delay:{show:500, hide: 10}}); 
+	$('#aCollapse').popover({content:'固定资产的状态变化全过程记录',trigger:'hover',delay:{show:500, hide: 10}}); 
 	//激活tooltip
 	$('.aPanelCollapse').tooltip({toggle:'true',trigger:'hover'});
 	
