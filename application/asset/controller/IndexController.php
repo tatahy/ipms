@@ -32,6 +32,8 @@ class IndexController extends \think\Controller
         $this->roles=Session::get('role');
         $this->dept=Session::get('dept');
         $this->auth=Session::get('authArr')['ass'];
+        //为模型内部使用的变量赋初值
+        AssinfoModel::setAccessUser($this->userName,$this->dept,$this->auth); 
     }
     
     //
@@ -42,11 +44,11 @@ class IndexController extends \think\Controller
             //$this->redirect($request->domain());
         }
     }
-       
+    //控制器注入2个实例化后的对象$request，$assMdl   
     public function index(Request $request,AssinfoModel $assMdl)
     {
         $this->priLogin();
-        
+    
         $sortData=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1);
         
         $searchData=array('brand_model'=>'','assnum'=>'','code'=>'','bar_code'=>'','dept_now'=>'','place_now'=>'','keeper_now'=>'');
@@ -54,7 +56,7 @@ class IndexController extends \think\Controller
         $this->assign([
           'read'=>$this->auth['read'],
                    
-          'assNum'=>$assMdl->countAssNum($this->auth,$this->userName),
+          'assNum'=>$assMdl->getAssTypeNumArr(),
           'assType'=>'_USUAL',
                     
           'home'=>$request->domain(),
@@ -63,8 +65,12 @@ class IndexController extends \think\Controller
           
           'sortData'=>$sortData,
           'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
-          'auth'=>json_encode($this->auth,JSON_UNESCAPED_UNICODE)
-          
+          'auth'=>json_encode($this->auth,JSON_UNESCAPED_UNICODE),
+          // 获取当前数据表字段信息
+          //'fields'=>json_encode($assMdl->getTableFields(),JSON_UNESCAPED_UNICODE),
+          // 获取当前数据表字段类型
+          //'fieldsType'=>json_encode($assMdl->getFieldsType(),JSON_UNESCAPED_UNICODE),
+          //'mdlSt'=>json_encode($assMdl->getAccessUser(),JSON_UNESCAPED_UNICODE)
         ]);
         return view();
         //return '<style type="text/css">*{ padding: 0; margin: 0; } div{ padding: 4px 48px;} a{color:#2E5CD5;cursor: pointer;text-decoration: none} a:hover{text-decoration:underline; } body{ background: #fff; font-family: "Century Gothic","Microsoft yahei"; color: #333;font-size:18px;} h1{ font-size: 100px; font-weight: normal; margin-bottom: 12px; } p{ line-height: 1.6em; font-size: 42px }</style><div style="padding: 24px 48px;"> <h1>:)</h1><p> ThinkPHP V5<br/><span style="font-size:30px">十年磨一剑 - 为API开发设计的高性能框架</span></p><span style="font-size:22px;">[ V5.0 版本由 <a href="http://www.qiniu.com" target="qiniu">七牛云</a> 独家赞助发布 ]</span></div><script type="text/javascript" src="http://tajs.qq.com/stats?sId=9347272" charset="UTF-8"></script><script type="text/javascript" src="http://ad.topthink.com/Public/static/client.js"></script><thinkad id="ad_bd568ce7058a1091"></thinkad>';
@@ -122,7 +128,7 @@ class IndexController extends \think\Controller
         }
         
         //分页,每页$listRows条记录
-        $assSet=$assMdl->assTypeQuery($this->auth,$assType,$this->userName)->where($whereArr)
+        $assSet=$assMdl->assTypeQuery($assType)->where($whereArr)
                       ->order($sortData['sortName'], $sortData['sortOrder'])
                       ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
                         'query'=>['listRows'=>$sortData['listRows']]]);
@@ -131,10 +137,10 @@ class IndexController extends \think\Controller
         
         //记录总数
         //$searchResultNum=count($this->priAssQueryObj($assType)->where($whereArr)->select()); 
-        $searchResultNum=count($assMdl->assTypeQuery($this->auth,$assType,$this->userName)->where($whereArr)->select()); 
+        $searchResultNum=count($assMdl->assTypeQuery($assType)->where($whereArr)->select()); 
                
         //数量总计
-        $quanCount=$assMdl->assTypeQuery($this->auth,$assType,$this->userName)->where($whereArr)->sum('quantity');
+        $quanCount=$assMdl->assTypeQuery($assType)->where($whereArr)->sum('quantity');
         
         $this->assign([
           'home'=>$request->domain(),
@@ -169,7 +175,7 @@ class IndexController extends \think\Controller
       $assType = empty($request->param('assType'))?0:$request->param('assType');
       
       if($assType){
-        $res=$assMdl->assTypeQuery($this->auth,$assType,$this->userName)->field($req)->group($req)->select();
+        $res=$assMdl->assTypeQuery($assType)->field($req)->group($req)->select();
       }else{
         $res=$assMdl->field($req)->group($req)->select();
       }
