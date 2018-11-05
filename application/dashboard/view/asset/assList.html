@@ -348,20 +348,19 @@ var tblColshowChange=(objArr)=>{
 	<!-- //对index.html中定义的tblColObjArr进行赋值 -->	
 	tblColObjArr=(function($,arr){
 		if(arr.length==0){
-		
-		$('#tblAssList').find('th').each(function(){
-			<!-- tblColObjArr.push($(this).text()); -->
-			let nameEn=$(this).children('a').data('sortName');
-			let nameChi=$(this).text();
-			<!-- let nameChi=$(this).children('a').html(); -->
-			if(nameEn){
-				arr.push({'nameChi':nameChi,'val':nameEn,'showFlag':true});
-			}else{
-				arr.push({'nameChi':nameChi,'val':0,'showFlag':false});
-			}
-		});
-		//附加value="all"的input复选框信息
-		arr.push({'nameChi':'全选','val':'all','showFlag':$('#tblAssList ul input').eq(0).prop('checked')});
+			$('#tblAssList').find('th').each(function(){
+				<!-- tblColObjArr.push($(this).text()); -->
+				let nameEn=$(this).children('a').data('sortName');
+				let nameChi=$(this).text();
+				<!-- let nameChi=$(this).children('a').html(); -->
+				if(nameEn){
+					arr.push({'nameChi':nameChi,'val':nameEn,'showFlag':true});
+				}else{
+					arr.push({'nameChi':nameChi,'val':0,'showFlag':false});
+				}
+			});
+			//附加value="all"的input复选框信息
+			arr.push({'nameChi':'全选','val':'all','showFlag':$('#tblAssList ul input').eq(0).prop('checked')});
 		}
 		return arr;
 	})(jQuery,tblColObjArr);
