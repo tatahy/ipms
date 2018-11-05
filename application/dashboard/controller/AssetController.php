@@ -398,7 +398,7 @@ class AssetController extends \think\Controller
           $assRdMdl::create($rdDataArr,true);    
           break;
       }
-      //返回各类asset的数量
+      //返回操作结果'res'、各类asset的记录数'num'、asset数量总计'quanTotal'
       return ['res'=>$res,'num'=>$this->priGetAssNum(),'quanTotal'=>$assMdl::sum('quantity')+$assMdl::onlyTrashed()->sum('quantity')];
     }
     
