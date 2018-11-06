@@ -1,0 +1,138 @@
+<!-- decodeBarcode.html -->
+
+<div style="border:1px solid #eee;padding:10px 5px;margin-top:2px;">
+	<form id="fmRun" >	
+	<div class="form-horizontal col-sm-6">
+	  	<div class="form-group">
+			<label class="col-sm-2 control-label">待识别文件</label>
+			<div class="col-sm-10">
+			<input class=" form-control" type="file" accept="image/*;capture=camera">
+			</div>
+		</div>
+		
+	</div>
+	  
+    <div class="form-horizontal col-sm-6">
+	  	<div class="form-group">
+      		<label class="col-sm-6 control-label">Barcode-Type</label>
+      		<div class="col-sm-6">
+        	<select class="form-control" name="decoder_readers">
+                  <option value="code_128" selected="selected">Code 128</option>
+                  <option value="code_39">Code 39</option>
+                  <option value="code_39_vin">Code 39 VIN</option>
+                  <option value="ean">EAN</option>
+                  <option value="ean_extended">EAN-extended</option>
+                  <option value="ean_8">EAN-8</option>
+                  <option value="upc">UPC</option>
+                  <option value="upc_e">UPC-E</option>
+                  <option value="codabar">Codabar</option>
+                  <option value="i2of5">ITF</option>
+                  <option value="2of5">Standard 2 of 5</option>
+                  <option value="code_93">Code 93</option>
+              </select>
+      		</div>
+    	</div>
+		
+		<div class="form-group">
+      		<label class="col-sm-6 control-label">Resolution (long side)</label>
+      		<div class="col-sm-6">
+        	<select class="form-control" name="input-stream_size">
+                <option value="320">320px</option>
+                  <option value="640">640px</option>
+                  <option selected="selected" value="800">800px</option>
+                  <option value="1280">1280px</option>
+                  <option value="1600">1600px</option>
+                  <option value="1920">1920px</option>
+              </select>
+      		</div>
+    	</div>
+		
+		<div class="form-group">
+      		<label class="col-sm-6 control-label">Patch-Size</label>
+      		<div class="col-sm-6">
+        		<select class="form-control" name="locator_patch-size">
+                	<option value="x-small">x-small</option>
+                  	<option value="small">small</option>
+                  	<option selected="selected" value="medium">medium</option>
+                  	<option value="large">large</option>
+                  	<option value="x-large">x-large</option>
+              	</select>
+      		</div>
+    	</div>
+	  
+        <div class="form-group">
+      		<label class="col-sm-6 control-label">Half-Sample</label>
+      		<div class="col-sm-6">
+        		<input type="checkbox" name="locator_half-sample">
+      		</div>
+    	</div>  
+        
+        <div class="form-group">
+      		<label class="col-sm-6 control-label">Workers</label>
+      		<div class="col-sm-6">
+        		<select class="form-control" name="numOfWorkers">
+                	<option value="0">0</option>
+                  	<option value="1" selected="selected">1</option>
+                  	<option value="2">2</option>
+                  	<option value="4">4</option>
+                  	<option value="8">8</option>
+              	</select>
+      		</div>
+    	</div>
+	</div>
+	<div class="form-group text-right">			
+		<button class="btn btn-sm btn-primary" id="btnRun"><span class="glyphicon glyphicon-equalizer"></span>开始识别</button>
+		<button type="reset" class="btn btn-primary btn-sm">参数重置</button>
+	</div>
+    </form>
+	<div class="row myRow"></div>
+
+</div>
+
+<div id="result_strip" class="row myRow">
+    <ul class="thumbnails">1</ul>
+</div>
+<div id="interactive" class="row myRow">11</div>
+
+{// TP5中的模板注释格式，单行，相对路径。<!-- //引入条形码识别插件 -->}  
+  {js href="/home/res/js/quagga.min.js" }
+<script>
+
+
+//利用自调用匿名函数立即执行的特点， 页面初始化
+(function($){
+	console.log('hello');
+		
+})(jQuery);
+
+$(document).ready(function(){
+	
+	$('#fmRun').submit(function(evt){
+		evt.preventDefault();
+		<!-- var formData = $(this).serialize(); -->
+		var formData = new FormData($(this)[0]);
+		for(var pair of formData.entries()){
+			console.log(pair[0]+','+pair[1]);
+		}
+		
+		
+		<!-- Quagga.decodeSingle({ -->
+    		<!-- decoder: { -->
+        		<!-- readers: ["code_128_reader"] // List of active readers -->
+    		<!-- }, -->
+    		<!-- locate: true, // try to locate the barcode in the image -->
+    		<!-- src: '/test/fixtures/code_128/image-001.jpg' // or 'data:image/jpg;base64,' + data -->
+		<!-- }, function(result){ -->
+    		<!-- if(result.codeResult) { -->
+        		<!-- console.log("result", result.codeResult.code); -->
+    		<!-- } else { -->
+        		<!-- console.log("not detected"); -->
+    		<!-- } -->
+		<!-- }); -->
+	});
+	
+
+});
+
+</script>
+

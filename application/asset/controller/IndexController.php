@@ -219,4 +219,17 @@ class IndexController extends \think\Controller
         ]);
       return view();
     }
+    
+     public function decodeBarcode(Request $request,AssinfoModel $assMdl)
+    {
+      $this->priLogin();
+      $assSet=$assMdl::get($request->param('id'));
+           
+      $this->assign([
+          'assSet'=>$assSet,
+          'conAssStatusArr'=>json_encode(conAssStatusArr,JSON_UNESCAPED_UNICODE), 
+          'conAssStatusLabelArr'=>json_encode(conAssStatusLabelArr,JSON_UNESCAPED_UNICODE),     
+        ]);
+      return view();
+    }
 }
