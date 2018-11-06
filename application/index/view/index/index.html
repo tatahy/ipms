@@ -3,33 +3,14 @@
 <!-- pagewrap  -->
 <div id="main" class="container-fluid">	
 	<div class="row">
-		<div class="col-sm-12">
-			<div class="panel-group">
-				<div class="panel panel-default">
-					<div class="panel-heading"><span class="glyphicon glyphicon-inbox"></span>&nbsp;<strong>项目概况</strong>&nbsp;<span class="label label-info">(开发中)</span></div>
-					
-					<div class="panel-body">
-						<a href="{$home}/project/index/prolist#plan"><span class="label label-default">拟申报项目数：<span class="badge">6</span></span></a>
-						<a href="{$home}/project/index/prolist#apply"><span class="label label-info" >申报项目数：<span class="badge">5</span></span></a>
-						<a href="{$home}/project/index/prolist#approve"><span class="label label-warning" >立项项目数：<span class="badge">8</span></span></a>
-						<a href="{$home}/project/index/prolist#process"><span class="label label-primary" >在研项目数：<span class="badge">10</span></span></a>
-						<!-- <a href="{$home}/project/index/prolist#terminate"><span class="label label-danger">终止项目数：<span class="badge">6</span></span></a> -->
-						
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="row">
 		<div class="col-sm-6">
 			<div class="panel-group">
 				<div class="panel panel-default">
 					<div class="panel-heading"><span class="glyphicon glyphicon-wrench"></span>&nbsp;<strong>专利概况</strong></div>
 					<div class="panel-body">
-						<a href="{$home}/patent/index/patlist#newAdd"><span class="label label-default" >拟申报专利数：<span class="badge">{$numpatadd}</span></span></a>
-						<a href="{$home}/patent/index/patlist#apply"><span class="label label-info" >申报专利数：<span class="badge">{$numpatapp}</span></span></a>
-						<a href="{$home}/patent/index/patlist#authorize"><span class="label label-success" >有效专利数：<span class="badge">{$numpataut}</span></span></a>
+						<a href="{$home}/patent/index/patlist#newAdd" class="btn-info">拟申报专利数：<span class="badge">{$numpatadd}</span></a>
+						<a href="{$home}/patent/index/patlist#apply" class="btn-primary">申报专利数：<span class="badge">{$numpatapp}</span></a>
+						<a href="{$home}/patent/index/patlist#authorize" class="btn-success">有效专利数：<span class="badge">{$numpataut}</span></a>
 					</div>
 					
 				</div>
@@ -39,11 +20,47 @@
 		<div class="col-sm-6">
 			<div class="panel-group">
 				<div class="panel panel-default">
-					<div class="panel-heading"><span class="glyphicon glyphicon-list"></span>&nbsp;<strong>论文概况</strong>&nbsp;<span class="label label-info">(开发中)</span></div>
+					<div class="panel-heading"><span class="glyphicon glyphicon-oil"></span>&nbsp;<strong>固定资产</strong></div>
+						<div class="panel-body">
+							<a href="{$home}/asset/index/index#_ASSS1" class="btn-info">待定数：<span class="badge">{$assNum['_ASSS1']}</span></a>
+							<a href="{$home}/asset/index/index#_ASSS2" class="btn-success">正常数：<span class="badge">{$assNum['_ASSS2']}</span></a>
+							{neq name="assNum['_ASSS3']" value="0"}
+							<a href="{$home}/asset/index/index#_ASSS3" class="btn-warning">异常数：<span class="badge">{$assNum['_ASSS3']}</span></a>
+							<a href="{$home}/asset/index/index#_ASSS4" class="btn-default">停用数：<span class="badge">{$assNum['_ASSS4']}</span></a>
+							{/neq}	
+						</div>
+				</div>
+			</div>
+		</div>
+			
+	</div>
+	
+	<div class="row">
+		<div class="col-sm-6">
+			<div class="panel-group">
+				<div class="panel panel-default">
+					<div class="panel-heading"><span class="bg-primary">&nbsp;<span class="glyphicon glyphicon-inbox"></span>&nbsp;<strong>项目概况</strong>&nbsp;(开发中)&nbsp;</span></div>
+					
 					<div class="panel-body">
-						<a href="{$home}/thesis/index/thelist#plan"><span class="label label-default" >拟发表论文数：<span class="badge">3</span></span></a>
-						<a href="{$home}/thesis/index/thelist#apply"><span class="label label-info" >投稿论文数：<span class="badge">6</span></span></a>
-						<a href="{$home}/thesis/index/thelist#publish"><span class="label label-success" >发表论文数：<span class="badge">3</span></span></a>
+						<a href="{$home}/project/index/prolist#plan" class="btn-info">拟申报项目数：<span class="badge">x</span></a>
+						<a href="{$home}/project/index/prolist#apply" class="btn-primary">申报项目数：<span class="badge">x</span></a>
+						<a href="{$home}/project/index/prolist#approve" class="btn-warning">立项项目数：<span class="badge">x</span></a>
+						<a href="{$home}/project/index/prolist#process" class="btn-primary">在研项目数：<span class="badge">x</span></a>
+						<a href="{$home}/project/index/prolist#terminate" class="btn-default">终止项目数：<span class="badge">x</span></a>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="col-sm-6">
+			<div class="panel-group">
+				<div class="panel panel-default">
+					<div class="panel-heading"><span class="bg-primary">&nbsp;<span class="glyphicon glyphicon-list"></span>&nbsp;<strong>论文概况</strong>&nbsp;(开发中)&nbsp;</span></div>
+					<div class="panel-body">
+						<a href="{$home}/thesis/index/thelist#plan" class="btn-info">拟发表论文数：<span class="badge">x</span></a>
+						<a href="{$home}/thesis/index/thelist#apply" class="btn-primary">投稿论文数：<span class="badge">x</span></a>
+						<a href="{$home}/thesis/index/thelist#publish"class="btn-success">发表论文数：<span class="badge">x</span></a>
 					</div>
 					<!-- <div class="panel-footer"> -->
 						<!-- <p>issPatFSM:{ $fsm}</p> -->
@@ -54,27 +71,16 @@
 		
 	</div>
 
-
-	<div class="row">
-		<div class="col-sm-6">
-			<div class="panel-group">
-				<div class="panel panel-default">
-					<div class="panel-heading"><span class="glyphicon glyphicon-oil"></span>&nbsp;<strong>固定资产</strong></div>
-						<div class="panel-body">
-							<a href="{$home}/asset/index/index#_ASSS4"><span class="label label-default">停用数：<span class="badge">{$assNum['_ASSS4']}</span></span></a>
-							<a href="{$home}/asset/index/index#_ASSS1"><span class="label label-info">待定数：<span class="badge">{$assNum['_ASSS1']}</span></span></a>
-							<a href="{$home}/asset/index/index#_ASSS2"><span class="label label-success">正常数：<span class="badge">{$assNum['_ASSS2']}</span></span></a>
-						</div>
-				</div>
-			</div>
-		</div>
-		
-		
-	</div>	  
 </div>
 <!-- /pagewrap -->
 
 <script>
+
+//利用自调用匿名函数立即执行的特点，页面初始化
+(function($){
+	$('.panel-body').find('a').css('margin','2px').addClass('btn btn-sm').tooltip({title: "查看详情", placement: "bottom"});
+})(jQuery);
+
 $(document).ready(function(){
 	<!-- 选中id为"nav_index"的标签（li标签）,添加.active -->
 	$("#nav_index").addClass("active");

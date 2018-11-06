@@ -29,23 +29,40 @@ class Assinfo extends Model
     // 时间字段输出格式
     protected $dateFormat = 'Y/m/d H:i:s';
 
+    //引用app\common中定义的常量：conAssTypeArr
     const ASSTYPE=conAssTypeArr;
-    static private $stUserName='';
-    static private $stUserDept='';
-    static private $stAuth=[];
-    static private $stNumArr=[];
-       
-    static function setAccessUser($userName,$userDept,$auth)
+    //本类的静态方法中用于访问非静态方法时实例化本类对象
+    static private $obj=null;
+    //本类的5个私有静态变量
+    static private $userName='';
+    static private $userDept='';
+    static private $auth=[];
+    static private $aTypeArr=[];
+    static private $numArr=[];
+    
+    
+    private $aType='';
+    private $errStr='not initiate Model Assinfo';
+    //本类的5个私有静态变量赋初值  
+    static function initModel($userName,$userDept,$auth)
     {
-      //使用静态变量的好处就是一次赋初值，所有实例化的对象都可以用到。
-      self::$stUserName=$userName;
-      self::$stUserDept=$userDept;
-      self::$stAuth=$auth;
+      //使用静态变量的好处就是一次赋初值，本类中和所有实例化的对象都可以用到。
+      self::$userName=$userName;
+      self::$userDept=$userDept;
+      self::$auth=$auth;
+      self::$aTypeArr=array_keys(self::ASSTYPE);
+      
+      self::$obj=new self();
+      foreach(self::$aTypeArr as $val){
+        self::$numArr[$val]=self::$obj->assTypeQuery($val)->count();
+      }     
+      self::$obj=null;
     }
     
     static function getAccessUser()
     {
-      return ['userName'=>self::$stUserName,'dept'=>self::$stUserDept,'auth'=>self::$stAuth,'assType'=>self::ASSTYPE];
+      return ['userName'=>self::$userName,'dept'=>self::$userDept,
+              'auth'=>self::$auth,'numArr'=>self::$numArr,'ATypeArr'=>self::$aTypeArr];
     }
     
    //获取器，获取数据表assinfo中status_now字段值，转换为中文输出
@@ -89,54 +106,60 @@ class Assinfo extends Model
       }
       
     }
-    //待完善
-    protected function checkAssTypeStr($assType='')
-    {
-      $assType=!empty($assType)?$assType:'_USUAL';
+    //检查输入的$assType是否合法
+    protected function checkAssTypeStr()
+    {    
+      $assType=!empty($this->aType)?$this->aType:'_USUAL';
       $res='';
-      if(array_key_exists($assType,self::ASSTYPE)){
-        $res=$assType;
+      if(in_array($assType,self::$aTypeArr,true)){
+        $this->aType=$assType;
+        $res=true;
       }else{
-        $res='wrong $assType value! It should be in array'.json_encode(array_keys(self::ASSTYPE));
+        $this->errStr='Wrong assType value! It should be empty or in array:</br>'.json_encode(self::$aTypeArr);
+        $res=false;
       }
       return $res;
     }
     
-    //获得各类asset数量
-    public function getAssTypeNumArr($assType='')
-    {
-      $numArr=[];
-      foreach(self::ASSTYPE as $key=>$val){
-        self::$stNumArr[$key]=$this->assTypeNum($key);
-      }
-      if($assType){
-        $numArr=self::$stNumArr[$assType];
+    //获得各类asset数量的关联数组
+    public function getAssTypeNumArr()
+    {    
+      if(count(self::$numArr)){
+        $res=self::$numArr;
       }else{
-        $numArr=self::$stNumArr;
+        $res=$this->errStr;
       }
-      return $numArr;
+      
+      return $res;
     }
         
-    //asset数量
+    //获得各类asset的数量
     public function assTypeNum($assType='')
     {
-      $result=$this->checkAssTypeStr();
-      $res='';
-      if($result){
-        $res=$this->assTypeQuery($assType)->count();
+      $this->aType=$assType;
+      if(!$this->checkAssTypeStr()){
+        return $this->errStr;
+      }      
+      
+      if(count(self::$numArr)){
+        $res=self::$numArr[$this->aType];
       }else{
-        $res=$result;
+        $res=$this->assTypeQuery($this->aType)->count();
       }
-      //return $res;
-      return $this->assTypeQuery($assType)->count();
+      
+      return $res;
     }
     
     //asset查询对象
     public function assTypeQuery($assType='')
     {
-      $auth=self::$stAuth;
-      $assType=!empty($assType)?$assType:'_USUAL';
+      $auth=self::$auth;
+      $this->aType=$assType;
       $authNum=0;
+      
+      if(!$this->checkAssTypeStr()){
+        return $this->errStr;
+      }
       
       foreach($auth as $val){
         $authNum+=$val;
@@ -144,10 +167,10 @@ class Assinfo extends Model
       
       if($auth['read']==1 && $authNum<=1){
         //登录用户的asset权限有且仅有read，仅能查阅自己名下的asset，
-        $query=$this->scope('assType',$assType)->where('keeper_now',self::$stUserName);
+        $query=$this->scope('assType',$assType)->where('keeper_now',self::$userName);
       }else if($auth['read']==1 && $auth['edit']==1 && $authNum<=2){
         //登录用户的asset权限有且仅有read，仅能查阅自己部门的asset，
-        $query=$this->scope('assType',$assType)->where('dept_now',self::$stUserDept);
+        $query=$this->scope('assType',$assType)->where('dept_now',self::$userDept);
       }
       else{
         $query=$this->scope('assType',$assType);

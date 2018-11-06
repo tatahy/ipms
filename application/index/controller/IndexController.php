@@ -82,7 +82,7 @@ class IndexController extends Controller
       Session::set('log', 1);
       Session::set('dept', $user->dept);
       Session::set('authArr', $authority);
-      $assMdl::setAccessUser($username,$user->dept,$authority['ass']);
+      $assMdl::initModel($username,$user->dept,$authority['ass']);
       //--在index.html页面输出自定义信息的HTML代码块
       $destr = "请求方法:" . $request->method() . "</br>" . "username:" . $username .
         "</br>" . //"pwd:".sizeof($pwd);

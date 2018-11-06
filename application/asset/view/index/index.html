@@ -8,7 +8,8 @@
 		<p class="text-center">无“固定资产”【查阅】权限，请与系统管理员联系。</p>
 	</div>
 	{else/}
-	<ul id="ulAssType" class="nav nav-pills nav-justified" style="border-bottom:solid 0.1px #ddd;">
+	<!-- <p>{$mdlSt}</p> -->
+	<ul id="ulAssType" class="nav nav-pills" style="border-bottom:1px solid #eee;">
 		<li class="active">
 			<a class="aPill" href="#_USUAL" data-ass-type="_USUAL">固定资产<span class="spTitle">总计</span>
 			{neq name="assNum['_USUAL']" value="0"}
@@ -128,7 +129,7 @@
 			</div>	
 			
 			<div class="row myRow">
-			<div class="pull-right">
+			<div class="text-right">
 				<button id="btnSearch" type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>搜索</button>
 			
 				<button id="btnSearchReset" type="button" class="btn btn-primary btn-sm">条件重置</button>
@@ -382,13 +383,16 @@ var fmReset=()=>{
 	assType=sId.substring(1);
 	loadAssList({'assType':assType});
 	
-	$('.aPill').each(function(){
-		// 显示边框
-		$(this).css("border","solid 1px #ddd");	
-		if(sId==$(this).attr('href')){
-			$(this).tab('show');
-		}
-	});	
+	//ul.nav调整.aPill
+	$('#ulAssType.nav-pills').find('a').each(function(){
+		//缩小padding
+		$(this).css('padding','5px 10px');
+		//去掉底部边框圆角
+		$(this).css({'border-bottom-right-radius':'0px','border-bottom-left-radius':'0px'});
+		//调整内部span.label的大小
+		$(this).find('.spClass').css({'padding-bottom':'1px','margin-bottom':'2px'});
+	});
+	
 })(jQuery);
 
 $(document).ready(function(){
