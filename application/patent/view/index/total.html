@@ -58,6 +58,13 @@
 	</div>
 	
 	<br>
+	{neq name="numTotal" value="0"}
+	<div class="row myRow">
+		<div class="text-right">
+			<strong class="assType"></strong><span id="spSearchResult" class="label label-info">列表记录总数</span>：<span class="badge">{$numTotal}</span></span>
+		</div>
+	</div>
+	{/neq}
 	<div class="table-responsive">
 		<table class="table table-bordered table-striped table-hover">
 			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>专利信息列表&nbsp;<strong class="assType"></strong></h4></caption>
@@ -107,14 +114,8 @@
 			</tbody>
 		</table>
 	</div>
-	{neq name="numTotal" value="0"}
-	<div class="row myRow">
-		<div class="text-right">
-			<strong class="assType"></strong><span id="spSearchResult" class="label label-info">列表记录总数</span>：<span class="badge">{$numTotal}</span></span>
-		</div>
-	</div>
-	{/neq}
-	<div id="divTotalTableRows" class="col-sm-12 text-right search" style="padding-top:10px;">
+	
+	<div id="divTotalTableRows" class="col-sm-12 text-right search">
 		<!-- // 分页变量 -->
 		<div class="col-sm-10 text-right">{$pageTotal}</div>
 						

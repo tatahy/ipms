@@ -1,138 +1,262 @@
-<!-- decodeBarcode.html -->
+    <div class="controls">
+        <fieldset class="input-group">
+            <input type="file" accept="image/*;capture=camera" />
+            <button>Rerun</button>
+        </fieldset>
+        <fieldset class="reader-config-group">
+            <label>
+                <span>Barcode-Type</span>
+                <select name="decoder_readers">
+                    <option value="code_128" selected="selected">Code 128</option>
+                    <option value="code_39">Code 39</option>
+                    <option value="code_39_vin">Code 39 VIN</option>
+                    <option value="ean">EAN</option>
+                    <option value="ean_extended">EAN-extended</option>
+                    <option value="ean_8">EAN-8</option>
+                    <option value="upc">UPC</option>
+                    <option value="upc_e">UPC-E</option>
+                    <option value="codabar">Codabar</option>
+                    <option value="i2of5">Interleaved 2 of 5</option>
+                    <option value="2of5">Standard 2 of 5</option>
+                    <option value="code_93">Code 93</option>
+                </select>
+            </label>
+            <label>
+                <span>Resolution (long side)</span>
+                <select name="input-stream_size">
+                    <option value="320">320px</option>
+                    <option value="640">640px</option>
+                    <option selected="selected" value="800">800px</option>
+                    <option value="1280">1280px</option>
+                    <option value="1600">1600px</option>
+                    <option value="1920">1920px</option>
+                </select>
+            </label>
+            <label>
+                <span>Patch-Size</span>
+                <select name="locator_patch-size">
+                    <option value="x-small">x-small</option>
+                    <option value="small">small</option>
+                    <option value="medium">medium</option>
+                    <option selected="selected" value="large">large</option>
+                    <option value="x-large">x-large</option>
+                </select>
+            </label>
+            <label>
+                <span>Half-Sample</span>
+                <input type="checkbox" name="locator_half-sample" />
+            </label>
+            <label>
+                <span>Single Channel</span>
+                <input type="checkbox" name="input-stream_single-channel" />
+            </label>
+            <label>
+                <span>Workers</span>
+                <select name="numOfWorkers">
+                    <option value="0">0</option>
+                    <option selected="selected" value="1">1</option>
+                </select>
+            </label>
+        </fieldset>
+    </div>
+    <div id="result_strip">
+        <ul class="thumbnails"></ul>
+    </div>
+    <div id="interactive" class="viewport"></div>
+    <div id="debug" class="detection"></div>
+	<div id="xx">222</div>
 
-<div style="border:1px solid #eee;padding:10px 5px;margin-top:2px;">
-	<form id="fmRun" >	
-	<div class="form-horizontal col-sm-6">
-	  	<div class="form-group">
-			<label class="col-sm-2 control-label">待识别文件</label>
-			<div class="col-sm-10">
-			<input class=" form-control" type="file" accept="image/*;capture=camera">
-			</div>
-		</div>
-		
-	</div>
-	  
-    <div class="form-horizontal col-sm-6">
-	  	<div class="form-group">
-      		<label class="col-sm-6 control-label">Barcode-Type</label>
-      		<div class="col-sm-6">
-        	<select class="form-control" name="decoder_readers">
-                  <option value="code_128" selected="selected">Code 128</option>
-                  <option value="code_39">Code 39</option>
-                  <option value="code_39_vin">Code 39 VIN</option>
-                  <option value="ean">EAN</option>
-                  <option value="ean_extended">EAN-extended</option>
-                  <option value="ean_8">EAN-8</option>
-                  <option value="upc">UPC</option>
-                  <option value="upc_e">UPC-E</option>
-                  <option value="codabar">Codabar</option>
-                  <option value="i2of5">ITF</option>
-                  <option value="2of5">Standard 2 of 5</option>
-                  <option value="code_93">Code 93</option>
-              </select>
-      		</div>
-    	</div>
-		
-		<div class="form-group">
-      		<label class="col-sm-6 control-label">Resolution (long side)</label>
-      		<div class="col-sm-6">
-        	<select class="form-control" name="input-stream_size">
-                <option value="320">320px</option>
-                  <option value="640">640px</option>
-                  <option selected="selected" value="800">800px</option>
-                  <option value="1280">1280px</option>
-                  <option value="1600">1600px</option>
-                  <option value="1920">1920px</option>
-              </select>
-      		</div>
-    	</div>
-		
-		<div class="form-group">
-      		<label class="col-sm-6 control-label">Patch-Size</label>
-      		<div class="col-sm-6">
-        		<select class="form-control" name="locator_patch-size">
-                	<option value="x-small">x-small</option>
-                  	<option value="small">small</option>
-                  	<option selected="selected" value="medium">medium</option>
-                  	<option value="large">large</option>
-                  	<option value="x-large">x-large</option>
-              	</select>
-      		</div>
-    	</div>
-	  
-        <div class="form-group">
-      		<label class="col-sm-6 control-label">Half-Sample</label>
-      		<div class="col-sm-6">
-        		<input type="checkbox" name="locator_half-sample">
-      		</div>
-    	</div>  
-        
-        <div class="form-group">
-      		<label class="col-sm-6 control-label">Workers</label>
-      		<div class="col-sm-6">
-        		<select class="form-control" name="numOfWorkers">
-                	<option value="0">0</option>
-                  	<option value="1" selected="selected">1</option>
-                  	<option value="2">2</option>
-                  	<option value="4">4</option>
-                  	<option value="8">8</option>
-              	</select>
-      		</div>
-    	</div>
-	</div>
-	<div class="form-group text-right">			
-		<button class="btn btn-sm btn-primary" id="btnRun"><span class="glyphicon glyphicon-equalizer"></span>开始识别</button>
-		<button type="reset" class="btn btn-primary btn-sm">参数重置</button>
-	</div>
-    </form>
-	<div class="row myRow"></div>
 
-</div>
-
-<div id="result_strip" class="row myRow">
-    <ul class="thumbnails">1</ul>
-</div>
-<div id="interactive" class="row myRow">11</div>
-
-{// TP5中的模板注释格式，单行，相对路径。<!-- //引入条形码识别插件 -->}  
-  {js href="/home/res/js/quagga.min.js" }
+{js href="/home/res/js/jquery1.12.4.min.js" }
+{js href="/plugins/quaggaJs/quagga.min.js" }
+<!-- {js href="/plugins/quaggaJs/file_input.js" } -->
+{css href="/plugins/quaggaJs/quagga.css" }
 <script>
+$(function() {
+    var App = {
+        init: function() {
+            App.attachListeners();
+        },
+        attachListeners: function() {
+            var self = this;
 
+            $(".controls input[type=file]").on("change", function(e) {
+                if (e.target.files && e.target.files.length) {
+                    App.decode(URL.createObjectURL(e.target.files[0]));
+                }
+            });
 
-//利用自调用匿名函数立即执行的特点， 页面初始化
-(function($){
-	console.log('hello');
-		
-})(jQuery);
+            $(".controls button").on("click", function(e) {
+                var input = document.querySelector(".controls input[type=file]");
+                if (input.files && input.files.length) {
+                    App.decode(URL.createObjectURL(input.files[0]));
+                }
+            });
 
-$(document).ready(function(){
-	
-	$('#fmRun').submit(function(evt){
-		evt.preventDefault();
-		<!-- var formData = $(this).serialize(); -->
-		var formData = new FormData($(this)[0]);
-		for(var pair of formData.entries()){
-			console.log(pair[0]+','+pair[1]);
-		}
-		
-		
-		<!-- Quagga.decodeSingle({ -->
-    		<!-- decoder: { -->
-        		<!-- readers: ["code_128_reader"] // List of active readers -->
-    		<!-- }, -->
-    		<!-- locate: true, // try to locate the barcode in the image -->
-    		<!-- src: '/test/fixtures/code_128/image-001.jpg' // or 'data:image/jpg;base64,' + data -->
-		<!-- }, function(result){ -->
-    		<!-- if(result.codeResult) { -->
-        		<!-- console.log("result", result.codeResult.code); -->
-    		<!-- } else { -->
-        		<!-- console.log("not detected"); -->
-    		<!-- } -->
-		<!-- }); -->
-	});
-	
+            $(".controls .reader-config-group").on("change", "input, select", function(e) {
+                e.preventDefault();
+                var $target = $(e.target),
+                    value = $target.attr("type") === "checkbox" ? $target.prop("checked") : $target.val(),
+                    name = $target.attr("name"),
+                    state = self._convertNameToState(name);
 
+                console.log("Value of "+ state + " changed to " + value);
+                self.setState(state, value);
+            });
+        },
+        _accessByPath: function(obj, path, val) {
+            var parts = path.split('.'),
+                depth = parts.length,
+                setter = (typeof val !== "undefined") ? true : false;
+
+            return parts.reduce(function(o, key, i) {
+                if (setter && (i + 1) === depth) {
+                    o[key] = val;
+                }
+                return key in o ? o[key] : {};
+            }, obj);
+        },
+        _convertNameToState: function(name) {
+            return name.replace("_", ".").split("-").reduce(function(result, value) {
+                return result + value.charAt(0).toUpperCase() + value.substring(1);
+            });
+        },
+        detachListeners: function() {
+            $(".controls input[type=file]").off("change");
+            $(".controls .reader-config-group").off("change", "input, select");
+            $(".controls button").off("click");
+        },
+        decode: function(src) {
+            var self = this,
+                config = $.extend({}, self.state, {src: src});
+
+            Quagga.decodeSingle(config, function(result) {});
+        },
+        setState: function(path, value) {
+            var self = this;
+
+            if (typeof self._accessByPath(self.inputMapper, path) === "function") {
+                value = self._accessByPath(self.inputMapper, path)(value);
+            }
+
+            self._accessByPath(self.state, path, value);
+
+            console.log(JSON.stringify(self.state));
+            App.detachListeners();
+            App.init();
+        },
+        inputMapper: {
+            inputStream: {
+                size: function(value){
+                    return parseInt(value);
+                }
+            },
+            numOfWorkers: function(value) {
+                return parseInt(value);
+            },
+            decoder: {
+                readers: function(value) {
+                    if (value === 'ean_extended') {
+                        return [{
+                            format: "ean_reader",
+                            config: {
+                                supplements: [
+                                    'ean_5_reader', 'ean_2_reader'
+                                ]
+                            }
+                        }];
+                    }
+                    return [{
+                        format: value + "_reader",
+                        config: {}
+                    }];
+                }
+            }
+        },
+        state: {
+            inputStream: {
+                size: 800,
+                singleChannel: false
+            },
+            locator: {
+                patchSize: "medium",
+                halfSample: true
+            },
+            decoder: {
+                readers: [{
+                    format: "code_128_reader",
+                    config: {}
+                }]
+            },
+            locate: true,
+            src: null
+        }
+    };
+
+    App.init();
+
+    function calculateRectFromArea(canvas, area) {
+        var canvasWidth = canvas.width,
+            canvasHeight = canvas.height,
+            top = parseInt(area.top)/100,
+            right = parseInt(area.right)/100,
+            bottom = parseInt(area.bottom)/100,
+            left = parseInt(area.left)/100;
+
+        top *= canvasHeight;
+        right = canvasWidth - canvasWidth*right;
+        bottom = canvasHeight - canvasHeight*bottom;
+        left *= canvasWidth;
+
+        return {
+            x: left,
+            y: top,
+            width: right - left,
+            height: bottom - top
+        };
+    }
+
+    Quagga.onProcessed(function(result) {
+        var drawingCtx = Quagga.canvas.ctx.overlay,
+            drawingCanvas = Quagga.canvas.dom.overlay,
+            area;
+
+        if (result) {
+            if (result.boxes) {
+                drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
+                result.boxes.filter(function (box) {
+                    return box !== result.box;
+                }).forEach(function (box) {
+                    Quagga.ImageDebug.drawPath(box, {x: 0, y: 1}, drawingCtx, {color: "green", lineWidth: 2});
+                });
+            }
+
+            if (result.box) {
+                Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, drawingCtx, {color: "#00F", lineWidth: 2});
+            }
+
+            if (result.codeResult && result.codeResult.code) {
+                Quagga.ImageDebug.drawPath(result.line, {x: 'x', y: 'y'}, drawingCtx, {color: 'red', lineWidth: 3});
+            }
+			
+            if (App.state.inputStream.area) {
+                area = calculateRectFromArea(drawingCanvas, App.state.inputStream.area);
+                drawingCtx.strokeStyle = "#0F0";
+                drawingCtx.strokeRect(area.x, area.y, area.width, area.height);
+            }
+    	}
+    });
+
+    Quagga.onDetected(function(result) {
+        var code = result.codeResult.code,
+            $node,
+            canvas = Quagga.canvas.dom.image;
+
+        $node = $('<li><div class="thumbnail"><div class="imgWrapper"><img /></div><div class="caption"><h4 class="code"></h4></div></div></li>');
+        $node.find("img").attr("src", canvas.toDataURL());
+        $node.find("h4.code").html(code);
+        $("#result_strip ul.thumbnails").prepend($node);
+		$('#xx').html('<strong>条形码识别为</strong><span class="label label-info">'+code+'</span>');
+    });
 });
-
 </script>
-

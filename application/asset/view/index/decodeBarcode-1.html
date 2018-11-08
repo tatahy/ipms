@@ -1,0 +1,374 @@
+<!-- decodeBarcode.html -->
+<style>
+interactive.viewport {
+  width: 640px;
+  height: 480px;
+}
+
+
+#interactive.viewport canvas, video {
+  float: left;
+  width: 640px;
+  height: 480px;
+}
+
+#interactive.viewport canvas.drawingBuffer, video.drawingBuffer {
+  margin-left: -640px;
+}
+
+@media screen and (max-width: 1400px) {
+#interactive.viewport {
+    width: 300px;
+    height: 300px;
+    overflow: hidden;
+  }
+
+
+  #interactive.viewport canvas, video {
+    margin-top: -50px;
+    width: 300px;
+    height: 400px;
+  }
+
+  #interactive.viewport canvas.drawingBuffer, video.drawingBuffer {
+    margin-left: -300px;
+  }
+
+}
+
+</style>
+
+
+<div style="border:1px solid #eee;padding:10px 5px;margin-top:3px;">
+	<div class="row myRow">
+	<form id="fmRun" class="form-horizontal col-sm-6">	
+	
+	 	<div class="form-group">
+			<label class="col-sm-4 control-label">条形码图片</label>
+			<div class="col-sm-8">
+			<input class="form-control" type="file" accept="image/*;capture=camera">
+			</div>
+		</div>
+	  
+    	<fieldset class="reader-config-group">
+	  	<div class="form-group">
+      		<label class="col-sm-4 control-label">Barcode-Type</label>
+      		<div class="col-sm-8">
+        	<select class="form-control" name="decoder_readers">
+                  <option value="code_128" selected="selected">Code 128</option>
+                  <option value="code_39">Code 39</option>
+                  <option value="code_39_vin">Code 39 VIN</option>
+                  <option value="ean">EAN</option>
+                  <option value="ean_extended">EAN-extended</option>
+                  <option value="ean_8">EAN-8</option>
+                  <option value="upc">UPC</option>
+                  <option value="upc_e">UPC-E</option>
+                  <option value="codabar">Codabar</option>
+                  <option value="i2of5">ITF</option>
+                  <option value="2of5">Standard 2 of 5</option>
+                  <option value="code_93">Code 93</option>
+              </select>
+      		</div>
+    	</div>
+		
+		<div class="form-group">
+      		<label class="col-sm-4 control-label">Resolution (long side)</label>
+      		<div class="col-sm-8">
+        	<select class="form-control" name="input-stream_size">
+                <option value="320">320px</option>
+                  <option value="640">640px</option>
+                  <option selected="selected" value="800">800px</option>
+                  <option value="1280">1280px</option>
+                  <option value="1600">1600px</option>
+                  <option value="1920">1920px</option>
+              </select>
+      		</div>
+    	</div>
+		
+		<div class="form-group">
+      		<label class="col-sm-4 control-label">Patch-Size</label>
+      		<div class="col-sm-8">
+        		<select class="form-control" name="locator_patch-size">
+                	<option value="x-small">x-small</option>
+                  	<option value="small">small</option>
+                  	<option selected="selected" value="medium">medium</option>
+                  	<option value="large">large</option>
+                  	<option value="x-large">x-large</option>
+              	</select>
+      		</div>
+    	</div>
+	  
+        <div class="form-group">
+      		<label class="col-sm-6 control-label">Half-Sample</label>
+      		<div class="col-sm-6">
+        		<input type="checkbox" name="locator_half-sample">
+      		</div>
+    	</div>
+
+		<div class="form-group">
+      		<label class="col-sm-6 control-label">Single Channel</label>
+      		<div class="col-sm-6">
+        		<input type="checkbox" name="input-stream_single-channel">
+      		</div>
+    	</div>  		
+        
+        <div class="form-group">
+      		<label class="col-sm-6 control-label">Workers</label>
+      		<div class="col-sm-6">
+        		<select class="form-control" name="numOfWorkers">
+                	<option value="0">0</option>
+                  	<option value="1" selected="selected">1</option>
+                  	<option value="2">2</option>
+                  	<option value="4">4</option>
+                  	<option value="8">8</option>
+              	</select>
+      		</div>
+    	</div>
+		</fieldset>
+		<div class="form-group text-right">			
+			<button class="btn btn-sm btn-primary" id="btnRun" type="button"><span class="glyphicon glyphicon-equalizer"></span>识别</button>
+			<button type="reset" class="btn btn-primary btn-sm">参数重置</button>
+		</div>
+	
+    </form>
+	<div class="col-sm-6">
+		<!-- <div id="result_strip"><ul class="thumbnails"></ul></div> -->
+    	<div id="interactive" class="viewport"></div>
+    	<!-- <div id="debug" class="detection"></div> -->
+	</div>
+	</div>
+	<div class="row myRow"></div>
+
+</div>
+
+{// TP5中的模板注释格式，单行，绝对路径。<!-- //引入条形码识别插件 -->}  
+{js href="/plugins/quaggaJs/quagga.min.js" }
+
+<script>
+//封装对条形码进行识别所需参数的预处理过程，识别过程。
+var App={
+	//将形如aaa_bb-cc-dd的字符串转换为aaa.bbCcDd
+	convertNameToState:function(name) {
+		return name.replace('_','.').split('-').reduce(function(result,val){
+			return result+val.charAt(0).toUpperCase()+val.substring(1);
+		});
+	},
+    _accessByPath: function(obj, path, val) {
+            var parts = path.split('.'),
+                depth = parts.length,
+                setter = (typeof val !== "undefined") ? true : false;
+			
+			console.log('_accessByPath | parts:'+parts+' depth:'+depth+' setter:'+setter+' val:'+val);
+			console.log('_accessByPath |'+typeof obj);
+            return parts.reduce(function(o, key, i) {
+                if (setter && (i + 1) === depth) {
+                    o[key] = val;
+                }
+                return key in o ? o[key] : {};
+            }, obj);
+    },
+	decode: function(src) {
+        var self = this,
+        config = $.extend({}, self.state, {src: src});
+		Quagga.decodeSingle(config, function(result) {});
+    },
+	setState: function(path, val) {
+		var self=this;
+		var typeStr = typeof self._accessByPath(self.inputMapper,path);
+		
+		<!-- console.log('func setState() recieved: '+path+':'+val); -->
+		<!-- console.log('**1 self.inputMapper: '+JSON.stringify(self.inputMapper)); -->
+		
+		<!-- console.log('**2 self._accessByPath: '+typeStr); -->
+		<!-- console.log(self._accessByPath(self.inputMapper,path)); -->
+		
+		if(typeStr==='function'){
+			//通过self._accessByPath(self.inputMapper,path)函数转换val
+			val=self._accessByPath(self.inputMapper,path)(val);
+		}
+	
+		self._accessByPath(self.state,path,val);
+		
+		<!-- console.log('**3 '+JSON.stringify(self.state)); -->
+	},
+	inputMapper: {
+            inputStream: {
+                size: function(v){
+                    return parseInt(v);
+                }
+            },
+            numOfWorkers: function(v) {
+                return parseInt(v);
+            },
+            decoder: {
+                readers: function(v) {
+                    if (v === 'ean_extended') {
+                        return [{
+                            format: 'ean_reader',
+                            config: {
+                                supplements: [
+                                    'ean_5_reader', 'ean_2_reader'
+                                ]
+                            }
+                        }];
+                    }
+                    return [{
+                        format: v + '_reader',
+                        config: {}
+                    }];
+                }
+            }
+        },
+	state: {
+		inputStream:{
+			size:800,
+			singleChannel:false
+		},
+		locator:{
+			patchSize:'medium',
+			halfSample:true	
+		},
+		decoder:{
+			readers:[{
+				format:'code_128_reader',
+				config:{}
+			}]
+		},
+		locate:true,
+		src:null
+	}
+};
+
+function calculateRectFromArea(canvas,area){
+	var canvasWidth=canvas.width,
+		canvasHeight=canvas.height,
+		top=parseInt(area.top)/100,
+		right=parseInt(area.right)/100,
+		bottom=parseInt(area.bottom)/100,
+		left=parseInt(area.left)/100;
+	
+	top *= canvasHeight;
+    right = canvasWidth - canvasWidth*right;
+    bottom = canvasHeight - canvasHeight*bottom;
+    left *= canvasWidth;
+
+	return {
+		x:left,	
+		y:top,
+		width:right-left,
+		height:bottom-top
+	};
+}
+//利用自调用匿名函数立即执行的特点， 页面初始化
+(function($){
+	
+		
+})(jQuery);
+
+//$(document).ready(function(){});可简写为$(function(){});
+$(function() {
+
+	$('#fmRun input[type=file]').on('change',function(el){
+		var fileObj=$(this)[0];
+		$('#fmRun .form-control').removeClass('alert-info');
+		$('#interactive canvas').show();
+		if(fileObj.files && fileObj.files.length){
+			App.decode(URL.createObjectURL(fileObj.files[0]));
+			$(this).addClass('alert-info');
+		}else{
+			$(this).removeClass('alert-info');
+			
+		}
+		<!-- console.table(fileObj.files[0]); -->
+	});
+		
+	$('#btnRun').on('click',function(){
+		var input=$('#fmRun input[type=file]')[0];
+			
+		if(input.files && input.files.length){
+			let src=URL.createObjectURL(input.files[0])
+			App.decode(src);
+		}else{
+			$.alert('<p class="text-center">请选择需识别的条形码<p>');
+		}
+	});
+		
+	$('#fmRun .reader-config-group').on('change','input,select',function(){
+		var val=$(this).attr('type')==='checkbox'?$(this).prop('checked'):$(this).val(),
+			name=$(this).attr('name'),
+			state=App.convertNameToState(name); 
+		$(this).addClass('alert-info');	
+		console.log("Value of "+ state + " changed to " + val);
+        App.setState(state, val);
+	});
+	//表单重置
+	$('#fmRun button:reset').click(function(){
+		var obj=$('#fmRun .form-control');
+		obj.removeClass('alert-info');
+		$('#interactive canvas').hide();
+	});
+		
+
+	//识别处理过程		
+	Quagga.onProcessed(function(result){
+		console.table(result);
+		var drawingCtx=Quagga.canvas.ctx.overlay,
+        	drawingCanvas = Quagga.canvas.dom.overlay,
+        	area,
+			htmlStr='<span class="text-primary"><span class="glyphicon glyphicon-equalizer"></span>识别</span>';
+		
+		if (result) {
+        	//绿色方框标识出条形码区域
+			if (result.boxes) {
+            	drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
+            	result.boxes.filter(function (box) {
+                	return box !== result.box;
+            	}).forEach(function (box) {
+                	Quagga.ImageDebug.drawPath(box, {x: 0, y: 1}, drawingCtx, {color: "green", lineWidth: 2});
+            	});
+        	}
+			//识别出条形码值，条形码区域方框为蓝色
+        	if (result.box) {
+            	Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, drawingCtx, {color: "#00F", lineWidth: 2});
+        	}
+			//识别出条形码值，条形码上添加红色横线
+        	if (result.codeResult && result.codeResult.code) {
+            	Quagga.ImageDebug.drawPath(result.line, {x: 'x', y: 'y'}, drawingCtx, {color: 'red', lineWidth: 3});
+        	}
+			//若已定义App.state.inputStream.area，则由calculateRectFromArea()函数计算方框4个点的像素坐标
+        	if (App.state.inputStream.area) {
+            	area = calculateRectFromArea(drawingCanvas, App.state.inputStream.area);
+           	 	drawingCtx.strokeStyle = "#0F0";
+            	drawingCtx.strokeRect(area.x, area.y, area.width, area.height);
+        	}
+			if(!(result.hasOwnProperty('codeResult'))){
+				$.alert('<h4 class="text-center">调整参数，再点击【'+htmlStr+'】按钮。</h4>');
+			}
+    	}else{
+			$.alert('<h4 class="text-center">调整参数，再点击【'+htmlStr+'】按钮。</h4>');
+		}
+		
+		//没有识别结果：
+		<!-- if(result.codeResult=='' || result.codeResult==null || result.codeResult=='undefined'){ -->
+		
+		
+	});
+	//成功识别后是否进行记录查询
+	Quagga.onDetected(function(result){
+		var code=result.codeResult.code,
+			htmlStr='条形码为：'+'<h4 class="text-center"><span class="alert-info">&nbsp;'+code+'&nbsp;</span></h4><p class="text-right">查询对应的固定资产信息？</p>';
+		$('#fmAssSearch input[name="bar_code"]').val(code).addClass('alert-info');
+		$.confirm(htmlStr,function(e){
+			con=e;
+			if(true==con){
+				loadAssList();
+			}else{
+				//$('#modalAssSingle').modal('show');
+			}
+		}).cancel('否(N)').ok('是(Y)');		
+	});
+
+});
+
+</script>
+

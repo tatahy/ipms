@@ -56,18 +56,18 @@
 	<div id="divTopBtn" class="pull-right">
 		<!-- <span class="label label-info" style="font-size:16px;">固定资产 -->
 		<!-- </span> -->
-		<button id="btnSearchInfo" type="button" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏搜索条件"><span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span></button>
-				
-		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+		<button id="btnSearchInfo" type="button" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏一般查询区"><span class="glyphicon glyphicon-search"></span><span>一般查询</span></button>
+					
+		<button id="btnDecodeBarcode" type="button" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏条形码识别区"><span class="glyphicon glyphicon-barcode"></span><span>条形码查询</span></button>
 		
-		<button id="btnDecodeBarcode" type="button" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏条形码识别区"><span class="glyphicon glyphicon-barcode"></span><span>识别条形码</span></button>
+		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 	</div>
 	</div>
 	
-	<!-- // 搜索区域-->
-	<div id="divSearchData" class="collapse">
-		<div class="label label-info" style="font-size:14px;">搜索条件</div>
-		<form id="fmAssSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;">
+	<!-- // 一般查询区域-->
+	<div id="divSearchData" class="collapse" >
+		<div class="label label-info" style="font-size:14px;">一般查询条件</div>
+		<form id="fmAssSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:3px;">
 			
 			<div class="row myRow">
 			<div class="form-group col-sm-4">
@@ -132,36 +132,26 @@
 			
 			<div class="row myRow">
 			<div class="text-right">
-				<button id="btnSearch" type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>搜索</button>
+				<button id="btnSearch" type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>查询</button>
 			
 				<button id="btnSearchReset" type="button" class="btn btn-primary btn-sm">条件重置</button>
 			</div>
 			</div>
 			
-			<!-- <button id="btnAssSearch" type="button" class="btn btn-primary btn-sm">搜索&nbsp;<span class="glyphicon glyphicon-search"></span></button> -->
+			<!-- <button id="btnAssSearch" type="button" class="btn btn-primary btn-sm">查询&nbsp;<span class="glyphicon glyphicon-search"></span></button> -->
 		
 		</form>
 		</br>
 	</div>
 	
-	<!-- // 条形码搜索区域-->
+	<!-- // 条形码查询区域-->
 	<div id="divSearchByBarcode" class="collapse">
 		<div class="label label-info" style="font-size:14px;">条形码识别区</div>
 		
 		<div id="divBarcodeArea_load"><p class="text-center" style="font-size:20px;">加载中……</p></div>
 		
-		<form id="fmSearchByBarcode" style="border:1px solid #eee;padding:10px 0px 10px 0px;">
-			
-			<div class="row myRow">
-			11
-			</div>
-			
-			
-		
-		</form>
-		</br>
 	</div>
-	
+	</br>
 	<div class="tab-content">
 		<div id="divLoadAssList">
 			<p class="text-center" style="font-size:20px;">加载中……</p>
@@ -286,7 +276,7 @@ var ajaxShowSelect=(options)=>{
 	//* 参数2：sortName，String。值：可为空，排序字段名称。默认为‘_TOPIC’。
 	//* 参数3：sortOrder，String。值：可为空，排序方式。默认为'_ASC'。
 	//* 参数4：pageNum，Int。值：可为空，当前页数。默认为1。
-	//* 参数6：serchWord，Array。值：可为空，用户搜索关键词键值对。默认为空。
+	//* 参数6：serchWord，Array。值：可为空，用户查询关键词键值对。默认为空。
 var loadAssList=(sortData)=>{
 	
 	//排序有关的参数默认值
@@ -296,7 +286,7 @@ var loadAssList=(sortData)=>{
 	var statusNowArr=$('#selectStatusNow').val();
 	var placeNowArr=$('#selectPlaceNow').val();
 	
-	//用户搜索有关键值对从表单$('#fmIssPatSearch')获取
+	//用户查询有关键值对从表单$('#fmIssPatSearch')获取
 	var formData=new FormData($('#fmAssSearch')[0]);
 	<!-- for(var pair of formData.entries()){ -->
 		<!-- console.log(pair[0]+','+pair[1]); -->
@@ -403,6 +393,8 @@ var fmReset=()=>{
 	assType=sId.substring(1);
 	loadAssList({'assType':assType});
 	
+	$('.aPill[href="'+sId+'"]').tab('show');
+	
 	//ul.nav调整.aPill
 	$('#ulAssType.nav-pills').find('a').each(function(){
 		//缩小padding
@@ -413,50 +405,46 @@ var fmReset=()=>{
 		$(this).find('.spClass').css({'padding-bottom':'1px','margin-bottom':'2px'});
 	});
 	
+	// 设置各类tooltip
+	$('#divTopBtn [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});
+
+<!-- 选中id为"nav_pat"的标签（header.html文件中的li标签）,添加.active -->
+	$('#nav_ass').addClass('active');	
+	
 })(jQuery);
 
 $(document).ready(function(){
-	// 设置各类tooltip
-	$('#divTopBtn [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
-	
+		
 	$('.aPill').click(function(){
 		assType=$(this).data('assType');
 		$(this).tab('show');
-		//搜索表单重置
+		//一般查询表单重置
 		fmReset();
 		loadAssList();
 
     });
-	<!-- 选中id为"nav_pat"的标签（header.html文件中的li标签）,添加.active -->
-	$('#nav_ass').addClass('active');
-	
+		
 	$('#btnSearchInfo').click(function(){
-		//变换图标和内容
-		glyphiconTextChange($(this));
 		//显示、隐藏#divSearchData
-		$('#divSearchData').collapse('toggle');
-			
+		$('#divSearchData').collapse('toggle');	
 	});
 	
 	$('#btnDecodeBarcode').click(function(){
 		//显示、隐藏#divSearchByBarcode
-		
 		$('#divSearchByBarcode').collapse('toggle');
-			
 	});
 	
 	$('#divSearchByBarcode').on('show.bs.collapse', function(){
         $('#divBarcodeArea_load').load('decodeBarcode');
-		$.alert('条形码识别区已刷新。');
+		<!-- $.alert('条形码识别区已刷新。'); -->
     });
 	
 	<!-- // 页面刷新 -->
 	$('#btnRefresh').click(function(){
-		//搜索表单重置
+		//一般查询表单重置
 		fmReset();
-		//$('#btnSearchInfo')恢复初始html
-		$('#btnSearchInfo').html('<span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span>');
-		//隐藏搜索条件
+		
+		//隐藏一般查询条件
 		$('#divSearchData').collapse('hide');
 		loadAssList();
 	});
@@ -476,7 +464,7 @@ $(document).ready(function(){
 		}
 	});
 	
-	//表单提交，开始asset搜索
+	//表单提交，开始asset一般查询
 	$('#btnSearch').click(function(){
 		loadAssList();
 	});
