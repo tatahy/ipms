@@ -230,6 +230,6 @@ class IndexController extends \think\Controller
           'conAssStatusArr'=>json_encode(conAssStatusArr,JSON_UNESCAPED_UNICODE), 
           'conAssStatusLabelArr'=>json_encode(conAssStatusLabelArr,JSON_UNESCAPED_UNICODE),     
         ]);
-      return view('decodeBarcode-1');
+      return view();
     }
 }

@@ -1,17 +1,4 @@
 <!-- assList.html -->
-<style>
-
-
-@media screen and (max-width: 767px) {
-.dropdown-menu{
-	<!-- z-index: 1; -->
-	<!-- border-radius: 3px; -->
-	<!-- box-shadow:0px 0px 5px 2px #aaa; -->
-	<!-- overflow-y: scroll; -->
-}
-
-}
-</style>
 
 <!-- pagewrap  -->	
 <div id="divAssList">
@@ -20,7 +7,12 @@
 	<!-- <p id="pSearchResultNum" class="text-center"> -->
 		<!-- <strong class="spAssType"></strong>记录数：<span id="spAssNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span> -->
 	<!-- </p> -->
-		
+	<div class="row myRow">
+		<div class="text-right">
+			<strong class="spAssType"></strong><span id="spSearchResult" class="label label-info">搜索结果</span>&nbsp;记录数：<span id="spAssNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span>
+		</div>
+		<P></P>
+	</div>	
 	<div class="table-responsive" style="overflow: auto;"> 
 		<table id="tblAssList" class="table table-bordered table-hover table-condensed" >
 			<caption class="text-center" style="border-bottom:1px solid #eee;">
@@ -84,11 +76,7 @@
 		</table>
 		
 	</div>
-	<div class="row myRow">
-		<div class="pull-right">
-			<strong class="spAssType"></strong><span id="spSearchResult" class="label label-info">搜索结果</span>&nbsp;记录数：<span id="spAssNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span>
-		</div>
-	</div>
+	
 	
 	<div id="divListRows" class="row text-right" style="padding-top:10px;">
 		<!-- // 分页变量 -->
@@ -107,7 +95,7 @@
 	
 	</div>
 {else/}
-	<p class="text-center" ><span class="label label-default" style="font-size:14px;">无符合条件信息</span></p>
+	<p class="text-center" ><span class="label label-default" style="font-size:16px;">无符合条件信息</span></p>
 {/neq}
 	
 </div>

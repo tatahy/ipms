@@ -1,8 +1,8 @@
 {include file="../application/common/header.html" title="固定资产信息" }
 
 <!-- pagewrap  -->
-
-<div class="container-fluid" style="padding-top: 55px;">
+<div class="mainFrame">
+<div class="container-fluid">
 	{eq name="read" value="0"}
 	<div style="padding: 50px 0px;font-size:20px;">
 		<p class="text-center">无“固定资产”【查阅】权限，请与系统管理员联系。</p>
@@ -67,7 +67,7 @@
 	<!-- // 一般查询区域-->
 	<div id="divSearchData" class="collapse" >
 		<div class="label label-info" style="font-size:14px;">一般查询条件</div>
-		<form id="fmAssSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:3px;">
+		<form id="fmAssSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:2px;">
 			
 			<div class="row myRow">
 			<div class="form-group col-sm-4">
@@ -141,17 +141,17 @@
 			<!-- <button id="btnAssSearch" type="button" class="btn btn-primary btn-sm">查询&nbsp;<span class="glyphicon glyphicon-search"></span></button> -->
 		
 		</form>
-		</br>
+		<br>
 	</div>
 	
 	<!-- // 条形码查询区域-->
 	<div id="divSearchByBarcode" class="collapse">
-		<div class="label label-info" style="font-size:14px;">条形码识别区</div>
+		<div class="label label-info" style="font-size:14px;">条形码查询</div>
 		
 		<div id="divBarcodeArea_load"><p class="text-center" style="font-size:20px;">加载中……</p></div>
-		
+		<br>
 	</div>
-	</br>
+	
 	<div class="tab-content">
 		<div id="divLoadAssList">
 			<p class="text-center" style="font-size:20px;">加载中……</p>
@@ -159,7 +159,7 @@
 	</div>
 	{/eq}	
 </div>
-
+</div>
 <!-- Modal "modalAssSingle" -->
 <div class="modal fade" id="modalAssSingle" role="dialog">
 	<div class="modal-dialog modal-lg">

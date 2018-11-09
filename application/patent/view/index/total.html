@@ -55,14 +55,16 @@
 				<button type="reset" class="btn btn-primary btn-sm">条件重置</button>
 			</div>					
 		</form>
+			
 	</div>
 	
-	<br>
 	{neq name="numTotal" value="0"}
 	<div class="row myRow">
+		<p></p>
 		<div class="text-right">
 			<strong class="assType"></strong><span id="spSearchResult" class="label label-info">列表记录总数</span>：<span class="badge">{$numTotal}</span></span>
 		</div>
+		<p></p>
 	</div>
 	{/neq}
 	<div class="table-responsive">
