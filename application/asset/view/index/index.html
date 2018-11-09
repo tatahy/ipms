@@ -432,12 +432,17 @@ $(document).ready(function(){
 	$('#btnDecodeBarcode').click(function(){
 		//显示、隐藏#divSearchByBarcode
 		$('#divSearchByBarcode').collapse('toggle');
+		//若没有load文件就进行load
+		if(!$('#fmRun [name="decoder_readers"]').val()){
+			
+			$('#divBarcodeArea_load').load('decodeBarcode');
+		}
+		
 	});
 	
-	$('#divSearchByBarcode').on('show.bs.collapse', function(){
-        $('#divBarcodeArea_load').load('decodeBarcode');
-		<!-- $.alert('条形码识别区已刷新。'); -->
-    });
+	<!-- $('#divSearchByBarcode').on('shown.bs.collapse', function(){ -->
+        <!-- $('#divBarcodeArea_load').load('decodeBarcode'); -->
+    <!-- }); -->
 	
 	<!-- // 页面刷新 -->
 	$('#btnRefresh').click(function(){

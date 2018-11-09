@@ -54,7 +54,7 @@ interactive.viewport {
 	  
     	<fieldset class="reader-config-group">
 	  	<div class="form-group">
-      		<label class="col-sm-4 control-label">Barcode-Type(编码类型)</label>
+      		<label class="col-sm-4 control-label">编码类型</label>
       		<div class="col-sm-8">
         	<select class="form-control" name="decoder_readers">
                   <option value="code_93" selected="selected">Code 93</option>
@@ -71,12 +71,12 @@ interactive.viewport {
                   <option value="2of5">Standard 2 of 5</option>
                   
               </select>
-			  <span class="help-block">条形码编码类别</span>
+			  <span class="help-block">研究院固定资产默认使用“Code 93”</span>
       		</div>
     	</div>
 		
 		<div class="form-group">
-      		<label class="col-sm-4 control-label">Resolution (long side)</label>
+      		<label class="col-sm-4 control-label">识别精度</label>
       		<div class="col-sm-8">
         	<select class="form-control" name="input-stream_size">
                 <option value="320">320px</option>
@@ -91,7 +91,7 @@ interactive.viewport {
     	</div>
 		
 		<div class="form-group">
-      		<label class="col-sm-4 control-label">Patch-Size</label>
+      		<label class="col-sm-4 control-label">识别框大小</label>
       		<div class="col-sm-8">
         		<select class="form-control" name="locator_patch-size">
                 	<option value="x-small">x-small</option>
@@ -103,8 +103,11 @@ interactive.viewport {
 				<span class="help-block">条形码识别框的大小</span>
       		</div>
     	</div>
-	  
-        <div class="form-group">
+	  	
+		<div class="form-group text-right"><button id="btnAdvancedParam" class="btn btn-link" type="button">高级选项</button>
+		</div>
+        <div id="divAdvancedParam" class="collapse">
+		<div class="form-group">
       		<label class="col-sm-6 control-label">Half-Sample</label>
       		<div class="col-sm-6">
         		<input type="checkbox" name="locator_half-sample">
@@ -133,6 +136,7 @@ interactive.viewport {
 				<span class="help-block">条形码识别进程数。默认为1。</span>
       		</div>
     	</div>
+		</div >
 		</fieldset>
 		<div class="form-group text-right">			
 			<button class="btn btn-sm btn-primary" id="btnRun" type="button"><span class="glyphicon glyphicon-equalizer"></span>识别</button>
@@ -287,7 +291,6 @@ function calculateRectFromArea(canvas,area){
 
 //$(document).ready(function(){});可简写为$(function(){});
 $(function() {
-	var onProcessedFlag=1;
 	$('#fmRun input[type=file]').on('change',function(){
 		var fileObj=$(this)[0];
 		$('#fmRun .form-control').removeClass('alert-info');
@@ -303,6 +306,10 @@ $(function() {
 			onProcessedFlag=0;
 		}
 		<!-- console.table(fileObj.files[0]); -->
+	});
+	//显示、隐藏#divAdvancedParam
+	$('#btnAdvancedParam').click(function(){
+		$('#divAdvancedParam').collapse('toggle');
 	});
 		
 	$('#btnRun').on('click',function(){
