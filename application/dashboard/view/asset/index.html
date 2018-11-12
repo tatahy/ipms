@@ -50,21 +50,26 @@
 </div>
 
 <div class="content-body">
-	<div id="divTopBtn" class="row myRow" style="margin:10px 0px;">
-		<div  class="pull-right" >
-		<button id="btnSearchInfo" type="button" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏搜索条件"><span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span></button>
+	<div id="divTopBtn" class="row myRow text-right" style="margin:10px 0px;">		
+		<div class="btn-group">
+			<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" title="选择查询方式"><span class="glyphicon glyphicon-search"></span>查询<span class="caret"></span></button>
+      		<ul class="dropdown-menu" role="menu">
+				<li><a id="aSearchData" href="#divSearchData" data-toggle="collapse" title="根据输入信息查询"><span class="glyphicon glyphicon-edit"></span>一般查询</a></li>
+    			<li role="separator" class="divider"></li>
+    			<li><a id="aSearchByBarcode" href="#divSearchByBarcode"  data-toggle="collapse" title="输入/ 拍摄条形码图片<br>识别后查询"><span class="glyphicon glyphicon-barcode"></span>条形码查询</a></li>
+      		</ul>
+    	</div>
 				
-		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="刷新固定资产信息表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新固定资产信息表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 		
-		<button class="btn btn-primary btn-sm btnAssOprt" data-ass-id="0" data-ass-oprt="_CREATE" data-toggle="tooltip" data-placement="bottom" title="新增固定资产记录"><span class="glyphicon glyphicon-modal-window"></span>新增</button>
-		</div>
+		<button class="btn btn-primary btn-sm btnAssOprt" data-ass-id="0" data-ass-oprt="_CREATE" title="新增固定资产记录"><span class="glyphicon glyphicon-modal-window"></span>新增</button>
 	</div>
 	
-	<!-- // 搜索区域-->
+	<!-- // 一般查询区域-->
 	<div id="divSearchData" class="collapse">
-		<div class="label label-info" style="font-size:14px;">搜索条件</div>
+		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchData"  data-toggle="collapse" title="点击隐藏">一般查询条件</a>
 		<form id="fmAssSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;">
-			
+			<input class="sr-only" name="reqObj" type="text" value="" />
 			<div class="row myRow">
 			<div class="form-group col-sm-4">
 				<label class="" for="brand_model">名称（品牌型号）</label>
@@ -125,7 +130,7 @@
 			
 			<div class="row myRow">
 			<div class="pull-right">
-				<button id="btnSearch" type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>搜索</button>
+				<button id="btnSearch" type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>查询</button>
 			
 				<button id="btnSearchReset" type="button" class="btn btn-primary btn-sm">条件重置</button>
 			</div>
@@ -133,6 +138,14 @@
 		
 		</form>
 		</br>
+	</div>
+	
+	<!-- // 条形码查询区域-->
+	<div id="divSearchByBarcode" class="collapse">
+		<a class="label label-primary" style="font-size:14px;border-bottom-radius:0px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchByBarcode"  data-toggle="collapse" title="点击隐藏">条形码查询</a>
+		
+		{include file="../application/common/decodeBarcode.html"}
+		<br>
 	</div>
 	<!-- // AssList表格排序信息汇总组件 -->
 	<div id="divTblSortData" data-ass-type="{$assType}" data-sort-name="{$sortData.sortName}" data-sort-order="{$sortData.sortOrder}" data-list-rows="{$sortData.listRows}" data-page-num="{$sortData.pageNum}" data-show-ass-id="{$sortData.showAssId}" class="sr-only"></div>
@@ -419,27 +432,34 @@ var sortOrderToggle=()=>{
 			$(this).tooltip({placement: 'bottom'});
 		}
 	});
-		
-	obj.addClass('label label-primary');
 	
-	if(sortOrder == 'asc'){
-		//当前为升序
-		obj.append(glyAsc);
-		obj.tooltip({title:'当前为升序。点击后降序',placement: 'top'});
-		obj.data('sortOrder','desc');
-	}else{
-		//当前为降序
-		obj.append(glyDesc);
-		obj.tooltip({title:'当前为降序。点击后升序',placement: 'top'});
-		obj.data('sortOrder','asc');
-	}
+	if(obj.length){
+		obj.addClass('label label-primary');
+		if(sortOrder == 'asc'){
+			//当前为升序
+			obj.append(glyAsc);
+			obj.tooltip({title:'当前为升序。点击后降序',placement: 'top'});
+			obj.data('sortOrder','desc');
+		}else{
+			//当前为降序
+			obj.append(glyDesc);
+			obj.tooltip({title:'当前为降序。点击后升序',placement: 'top'});
+			obj.data('sortOrder','asc');
+		}
+	}		
 };
 
-//搜索表单重置
+//所有查询表单重置
 var fmReset=()=>{
-	var fm=$('#fmAssSearch');
-	fm[0].reset();
-	fm.find('.form-control').removeClass('alert-info');
+	var fm=$('form');
+	
+	fm.each(function(){
+		$(this)[0].reset();
+		$(this).find('.form-control').removeClass('alert-info');
+		if($(this).attr('id')=='fmRun'){
+			$(this).next().hide().find('span.alert-info').text('');
+		}
+	});
 };
 
 
@@ -466,15 +486,15 @@ var fmReset=()=>{
 		$(this).find('.spClass').css({'padding-bottom':'1px','margin-bottom':'2px'});
 	});
 	// 设置各类tooltip
-	$('#divTopBtn [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
+	$('#divTopBtn').tooltip({selector:'[title]',triger:'hover click',placement: 'auto left',delay: {show: 200, hide: 100},html: true });
+	
 	$('a[href="#divAssTotal"]').tooltip({triger:'hover',placement: 'auto right',title:'显示/隐藏固定资产总数'});	
 	
 })(jQuery);
 
 $(document).ready(function(){
 	var searchDataChanged=false;
-	
-	
+		
 	//点击.aPill中的各个按钮后，load相应的assList-->
 	$('.aPill').click(function(){
 		assType=$(this).data('assType');
@@ -485,21 +505,26 @@ $(document).ready(function(){
 		loadAssList();
     });
 	
-	$('#btnSearchInfo').click(function(){
-		//变换图标和内容
-		glyphiconTextChange($(this));
-		//显示、隐藏#divSearchData
-		$('#divSearchData').collapse('toggle');
+	$('#aSearchByBarcode').click(function(){
+		$('#divSearchByBarcode').collapse('show');
+		$('#divSearchData').collapse('hide');
+	});
+	
+	$('#aSearchData').click(function(){
+		$('#divSearchByBarcode').collapse('hide');
+		$('#divSearchData').collapse('show');
+		
 	});
 	
 	<!-- // 页面刷新 -->
 	$('#btnRefresh').click(function(){
-		//搜索表单重置
+		//所有表单重置
 		fmReset();
-		//$('#btnSearchInfo')恢复初始html
-		$('#btnSearchInfo').html('<span class="glyphicon glyphicon-collapse-down"></span><span>显示搜索</span>');
+		
 		//隐藏搜索条件
-		$('#divSearchData').collapse('hide');
+		<!-- $('#divSearchData').collapse('hide'); -->
+		$('.collapse').collapse('hide');
+		//
 		loadAssList();
 	});
 	
@@ -518,6 +543,7 @@ $(document).ready(function(){
 	//表单提交，显示asset结果
 	$('#btnSearch').click(function(){
 		var assType=$('#divTblSortData').data('assType');
+		$('#fmAssSearch [name="reqObj"]').val('form');
 		//检查搜索表单的值是否有变化，若有变化，排序参数pageNum要重设为1，避免出现在当前分页无法显示查询结果的情况
 		if(searchDataChanged){
 			$('#divTblSortData').data('pageNum',1);

@@ -134,6 +134,7 @@ class AssetController extends \think\Controller
         // 接收前端的搜索参数数组，由前端保证传来的搜索参数值非0，非空。
         $searchData=!empty($request->param('searchData/a'))?$request->param('searchData/a'):$searchDefaults;
         $searchData=array_merge($searchDefaults,$searchData);
+        $reqObj=!empty($searchData['reqObj'])?$searchData['reqObj']:'';
         //基础搜索条件
         //$whereArr['id']=['>',0];
         
@@ -194,6 +195,7 @@ class AssetController extends \think\Controller
           'searchData'=>$searchData,
           
           'searchResultNum'=>$searchResultNum,
+          'reqObj'=>$reqObj,
           
           'authAss'=>$this->auth['ass'],
           'authAssObj'=>json_encode($this->auth['ass'],JSON_UNESCAPED_UNICODE),

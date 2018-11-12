@@ -87,10 +87,12 @@ class IndexController extends \think\Controller
         $sortData=array_merge($sortDefaults,$sortData);
         $assType=$sortData['assType'];
         
+        
         $searchDefaults=array();
         // 接收前端的搜索参数（json字符串），由前端保证传来的搜索参数值非0，非空。
         $searchData=!empty($request->param('searchData/a'))?$request->param('searchData/a'):$searchDefaults;
         $searchData=array_merge($searchDefaults,$searchData);
+        $reqObj=!empty($searchData['reqObj'])?'form':'';
         //搜索查询条件数组
         $whereArr=[];
         $statusArr=[];
@@ -149,6 +151,7 @@ class IndexController extends \think\Controller
           
           'searchResultNum'=>$searchResultNum,
           'quanCount'=>$quanCount,
+          'reqObj'=>$reqObj,
           
           //排序数组
           'sortData'=>$sortData,

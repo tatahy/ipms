@@ -1,0 +1,424 @@
+<!-- decodeBarcode.html -->
+<style>
+interactive.viewport {
+  width: 640px;
+  height: 480px;
+}
+
+
+#interactive.viewport canvas, video {
+  float: left;
+  width: 640px;
+  height: 480px;
+}
+
+#interactive.viewport canvas.drawingBuffer, video.drawingBuffer {
+  margin-left: -640px;
+}
+
+@media screen and (max-width: 1400px) {
+#interactive.viewport {
+    width: 300px;
+    height: 300px;
+    overflow: hidden;
+  }
+
+
+  #interactive.viewport canvas, video {
+    margin-top: -50px;
+    width: 300px;
+    height: 400px;
+  }
+
+  #interactive.viewport canvas.drawingBuffer, video.drawingBuffer {
+    margin-left: -300px;
+  }
+
+}
+
+</style>
+
+
+<div style="border:1px solid #eee;padding:10px 5px;margin-top:2px;">
+	<div class="row myRow">
+	<form id="fmRun" class="form-horizontal col-sm-6">	
+	 	<div class="form-group">
+			<label class="col-sm-4 control-label">条形码图片</label>
+			<div class="col-sm-8">
+			<input class="form-control" type="file" accept="image/*" >
+			<!-- //调用摄像头-->
+			<!-- <input class="form-control" type="file" accept="image/*" capture="camera"> -->
+			</div>
+		</div>
+	  
+    	<fieldset class="reader-config-group">
+	  	<div class="form-group">
+      		<label class="col-sm-4 control-label">编码类型</label>
+      		<div class="col-sm-8">
+        	<select class="form-control" name="decoder_readers">
+                  <option value="code_93" selected="selected">Code 93 (研究院固定资产使用)</option>
+				  <option value="code_128" >Code 128</option>
+                  <option value="code_39">Code 39</option>
+                  <option value="code_39_vin">Code 39 VIN</option>
+                  <option value="ean">EAN</option>
+                  <option value="ean_extended">EAN-extended</option>
+                  <option value="ean_8">EAN-8</option>
+                  <option value="upc">UPC</option>
+                  <option value="upc_e">UPC-E</option>
+                  <option value="codabar">Codabar</option>
+                  <option value="i2of5">ITF</option>
+                  <option value="2of5">Standard 2 of 5</option>
+                  
+              </select>
+      		</div>
+    	</div>
+		
+		<div class="form-group">
+      		<label class="col-sm-4 control-label">识别精度</label>
+      		<div class="col-sm-8">
+        	<select class="form-control" name="input-stream_size">
+                <option value="320">320px</option>
+                  <option value="640">640px</option>
+                  <option selected="selected" value="800">800px</option>
+                  <option value="1280">1280px</option>
+                  <option value="1600">1600px</option>
+                  <option value="1920">1920px</option>
+              </select>
+      		</div>
+    	</div>
+		
+		<div class="form-group">
+      		<label class="col-sm-4 control-label">识别框大小</label>
+      		<div class="col-sm-8">
+        		<select class="form-control" name="locator_patch-size">
+                	<option value="x-small">x-small</option>
+                  	<option value="small">small</option>
+                  	<option selected="selected" value="medium">medium</option>
+                  	<option value="large">large</option>
+                  	<option value="x-large">x-large</option>
+              	</select>
+      		</div>
+    	</div>
+	  	
+		<div class="form-group text-right"><button id="btnAdvancedParam" class="btn btn-link" type="button">高级选项</button>
+		</div>
+        <div id="divAdvancedParam" class="collapse">
+		<div class="form-group">
+      		<label class="col-sm-6 control-label">Half-Sample</label>
+      		<div class="col-sm-6">
+        		<input type="checkbox" name="locator_half-sample">
+				<span class="help-block">条形码很大时选中，节省识别时间。</span>
+      		</div>
+    	</div>
+
+		<div class="form-group">
+      		<label class="col-sm-6 control-label">Single Channel</label>
+      		<div class="col-sm-6">
+        		<input type="checkbox" name="input-stream_single-channel">
+				<span class="help-block">条形码单通道识别。调试时常用，默认不选中。</span>
+      		</div>
+    	</div>  		
+        
+        <div class="form-group">
+      		<label class="col-sm-6 control-label">Workers</label>
+      		<div class="col-sm-6">
+        		<select class="form-control" name="numOfWorkers">
+                	<option value="0">0</option>
+                  	<option value="1" selected="selected">1</option>
+                  	<option value="2">2</option>
+                  	<option value="4">4</option>
+                  	<option value="8">8</option>
+              	</select>
+				<span class="help-block">条形码识别进程数。默认为1。</span>
+      		</div>
+    	</div>
+		</div >
+		</fieldset>
+		<div class="form-group text-right">			
+			<button class="btn btn-sm btn-primary" id="btnRun" type="button"><span class="glyphicon glyphicon-equalizer"></span>识别</button>
+			<button type="reset" class="btn btn-primary btn-sm">参数重置</button>
+		</div>
+	
+    </form>
+	<div id="divBarcodeImg" class="col-sm-6">
+		<div class="alert alert-success">
+    		<strong>识别成功！</strong>条形码识别结果：<span class="alert-info" style="font-size:16px;"></span>&nbsp;&nbsp;<button id="btnBarcodeQuery" class="btn btn-sm btn-primary" type="button" title="点击查询固定资产信息"><span class="glyphicon glyphicon-search"></span>查询</button>
+  		</div>
+		
+		<div class="alert alert-warning fade in">
+    		<a href="#" class="close">&times;</a>
+    		<strong>识别失败！</strong> 调整参数，再点击【<span class="text-primary"></span>】按钮。
+  		</div>
+		
+    	<div id="interactive" class="viewport"></div>
+    	<!-- <div id="debug" class="detection"></div> -->
+	</div>
+	</div>
+	<div class="row myRow"></div>
+
+</div>
+
+{// TP5中的模板注释格式，单行，绝对路径。<!-- //引入条形码识别插件 -->}  
+{js href="/plugins/quaggaJs/quagga.min.js" }
+
+<script>
+//封装对条形码进行识别所需参数的预处理过程，识别过程。
+var App={
+	//将形如aaa_bb-cc-dd的字符串转换为aaa.bbCcDd
+	convertNameToState:function(name) {
+		return name.replace('_','.').split('-').reduce(function(result,val){
+			return result+val.charAt(0).toUpperCase()+val.substring(1);
+		});
+	},
+    _accessByPath: function(obj, path, val) {
+            var parts = path.split('.'),
+                depth = parts.length,
+                setter = (typeof val !== "undefined") ? true : false;
+			
+			console.log('_accessByPath | parts:'+parts+' depth:'+depth+' setter:'+setter+' val:'+val);
+			console.log('_accessByPath |'+typeof obj);
+            return parts.reduce(function(o, key, i) {
+                if (setter && (i + 1) === depth) {
+                    o[key] = val;
+                }
+                return key in o ? o[key] : {};
+            }, obj);
+    },
+	decode: function(src) {
+        var self = this,
+        config = $.extend({}, self.state, {src: src});
+		Quagga.decodeSingle(config, function(result) {});
+    },
+	setState: function(path, val) {
+		var self=this;
+		var typeStr = typeof self._accessByPath(self.inputMapper,path);
+		
+		<!-- console.log('func setState() recieved: '+path+':'+val); -->
+		<!-- console.log('**1 self.inputMapper: '+JSON.stringify(self.inputMapper)); -->
+		
+		<!-- console.log('**2 self._accessByPath: '+typeStr); -->
+		<!-- console.log(self._accessByPath(self.inputMapper,path)); -->
+		
+		if(typeStr==='function'){
+			//通过self._accessByPath(self.inputMapper,path)函数转换val
+			val=self._accessByPath(self.inputMapper,path)(val);
+		}
+	
+		self._accessByPath(self.state,path,val);
+		
+		<!-- console.log('**3 '+JSON.stringify(self.state)); -->
+	},
+	inputMapper: {
+            inputStream: {
+                size: function(v){
+                    return parseInt(v);
+                }
+            },
+            numOfWorkers: function(v) {
+                return parseInt(v);
+            },
+            decoder: {
+                readers: function(v) {
+                    if (v === 'ean_extended') {
+                        return [{
+                            format: 'ean_reader',
+                            config: {
+                                supplements: [
+                                    'ean_5_reader', 'ean_2_reader'
+                                ]
+                            }
+                        }];
+                    }
+                    return [{
+                        format: v + '_reader',
+                        config: {}
+                    }];
+                }
+            }
+        },
+	state: {
+		inputStream:{
+			size:800,
+			singleChannel:false
+		},
+		locator:{
+			patchSize:'medium',
+			halfSample:true	
+		},
+		decoder:{
+			readers:[{
+				format:'code_93_reader',
+				config:{}
+			}]
+		},
+		locate:true,
+		src:null
+	}
+};
+
+var appendCode=code=>{
+	let objSuccess=$('#divBarcodeImg div.alert-success');
+	let objWarning=$('#divBarcodeImg div.alert-warning');
+	objSuccess.find('span.alert-info').text(code);
+	
+	if(code){
+		objSuccess.show().find('button').focus();
+		objWarning.hide();
+	}else{
+		objSuccess.hide();
+		objWarning.find('span.text-primary').html('<span class="glyphicon glyphicon-equalizer"></span>识别');
+		objWarning.show();
+	}	
+};
+
+function calculateRectFromArea(canvas,area){
+	var canvasWidth=canvas.width,
+		canvasHeight=canvas.height,
+		top=parseInt(area.top)/100,
+		right=parseInt(area.right)/100,
+		bottom=parseInt(area.bottom)/100,
+		left=parseInt(area.left)/100;
+	
+	top *= canvasHeight;
+    right = canvasWidth - canvasWidth*right;
+    bottom = canvasHeight - canvasHeight*bottom;
+    left *= canvasWidth;
+
+	return {
+		x:left,	
+		y:top,
+		width:right-left,
+		height:bottom-top
+	};
+}
+//利用自调用匿名函数立即执行的特点， 页面初始化
+(function($){
+	$('#divBarcodeImg').hide();
+	// 设置tooltip
+	$('#divBarcodeImg [title]').tooltip({triger:'focus hover',placement: 'auto bottom'});
+	$('#interactive').prevAll().hide(); 
+})(jQuery);
+
+//$(document).ready(function(){});可简写为$(function(){});
+$(function() {
+	$('#fmRun input[type=file]').on('change',function(){
+		var fileObj=$(this)[0];
+		$('#fmRun .form-control').removeClass('alert-info');
+		
+		if(fileObj.files && fileObj.files.length){
+			App.decode(URL.createObjectURL(fileObj.files[0]));
+			$(this).addClass('alert-info');
+			$('#divBarcodeImg').show();
+			onProcessedFlag=1;
+		}else{
+			$(this).removeClass('alert-info');
+			$('#divBarcodeImg').hide();
+			onProcessedFlag=0;
+		}
+		<!-- console.table(fileObj.files[0]); -->
+	});
+	//显示、隐藏#divAdvancedParam
+	$('#btnAdvancedParam').click(function(){
+		$('#divAdvancedParam').collapse('toggle');
+	});
+		
+	$('#btnRun').on('click',function(){
+		var input=$('#fmRun input[type=file]')[0];
+			
+		if(input.files && input.files.length){
+			let src=URL.createObjectURL(input.files[0])
+			App.decode(src);
+		}else{
+			$.alert('<p class="text-center">请选择需识别的条形码<p>');
+		}
+	});
+	
+	 $('#divBarcodeImg').find('a.close').click(function(){
+        $(this).closest('div').hide();
+    });
+		
+	$('#fmRun .reader-config-group').on('change','input,select',function(){
+		var val=$(this).attr('type')==='checkbox'?$(this).prop('checked'):$(this).val(),
+			name=$(this).attr('name'),
+			state=App.convertNameToState(name); 
+		$(this).addClass('alert-info');	
+		console.log("Value of "+ state + " changed to " + val);
+        App.setState(state, val);
+	});
+	//表单重置
+	$('#fmRun button:reset').click(function(){
+		var obj=$('#fmRun .form-control');
+		obj.removeClass('alert-info');
+		$('#divBarcodeImg span').html('');
+		$('#divBarcodeImg').hide();
+		
+	});
+	//查询条形码值对应的记录
+	$('#btnBarcodeQuery').click(function(){
+		let code=$(this).prev().text();
+		let fm=$('#fmAssSearch');
+		//一般查询表单重置
+		fm[0].reset();
+		fm.find('.form-control').removeClass('alert-info');
+
+		//一般查询表单里输入框input[name="bar_code"]填入code
+		fm.find('[name="reqObj"]').val('barCode');
+		fm.find('[name="bar_code"]').val(code).addClass('alert-info');
+		loadAssList();	
+	});
+
+	//识别处理过程		
+	Quagga.onProcessed(function(result){
+		console.table(result);
+		var drawingCtx=Quagga.canvas.ctx.overlay,
+        	drawingCanvas = Quagga.canvas.dom.overlay,
+        	area,
+			htmlStr='<span class="text-primary"><span class="glyphicon glyphicon-equalizer"></span>识别</span>';
+		//有识别结果数据
+		if (result) {
+        	//绿色方框标识出条形码区域
+			if (result.boxes) {
+            	drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
+            	result.boxes.filter(function (box) {
+                	return box !== result.box;
+            	}).forEach(function (box) {
+                	Quagga.ImageDebug.drawPath(box, {x: 0, y: 1}, drawingCtx, {color: "green", lineWidth: 2});
+            	});
+        	}
+			//识别出条形码值，条形码区域方框为蓝色
+        	if (result.box) {
+            	Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, drawingCtx, {color: "#00F", lineWidth: 2});
+        	}
+			//识别出条形码值，条形码上添加红色横线
+        	if (result.codeResult && result.codeResult.code) {
+            	Quagga.ImageDebug.drawPath(result.line, {x: 'x', y: 'y'}, drawingCtx, {color: 'red', lineWidth: 3});
+        	}
+			//若已定义App.state.inputStream.area，则由calculateRectFromArea()函数计算方框4个点的像素坐标
+        	if (App.state.inputStream.area) {
+            	area = calculateRectFromArea(drawingCanvas, App.state.inputStream.area);
+           	 	drawingCtx.strokeStyle = "#0F0";
+            	drawingCtx.strokeRect(area.x, area.y, area.width, area.height);
+        	}
+			//没有识别出条形码值
+			if(!(result.hasOwnProperty('codeResult'))){
+				appendCode();				
+			}
+    	}else{
+			//没有识别结果数据
+			appendCode();	
+		}
+	});
+	
+	//成功识别条形码值后的处理
+	Quagga.onDetected(function(result){
+		var code=result.codeResult.code;
+		//一般查询表单里对应输入框填入code
+		$('#fmAssSearch input[name="bar_code"]').val(code).addClass('alert-info');
+		appendCode(code);
+	});
+	
+
+});
+
+</script>
+

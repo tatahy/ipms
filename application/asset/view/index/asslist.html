@@ -1,12 +1,5 @@
 <!-- pagewrap  -->	
 <div>
-	<!-- <p>{ $display}</p> -->
-	<!-- <p>{ $whereArr}</p> -->
-{neq name="searchResultNum" value="0"}
-	<!-- <p id="pSearchResultNum"> -->
-		<!-- <span class="label label-primary assType"></span>记录数：<span id="spNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span> -->
-	<!-- </p> -->
-	<!-- <br> -->
 	<div class="row myRow">
 		<div class="text-right">
 			<strong class="assType"></strong>&nbsp;<span id="spSearchResult" class="label label-info">查询结果</span>记录数：<span id="spNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span>
@@ -74,9 +67,9 @@
 		</div>
 	
 	</div>
-{else/}
-	<p class="text-center" ><span class="label label-default" style="font-size:16px;">无符合条件信息</span></p>
-{/neq}	
+
+	<p id="pAssNone" class="text-center" ><span class="label label-default" style="font-size:16px;">无符合条件信息</span></p>
+	
 </div>
 
 <!-- /pagewrap  -->
@@ -87,8 +80,25 @@ var urlPrefix='{$home}/asset/index/';
 const conStatusArr=Object.values({$conAssStatusArr});
 const conLabelArr=Object.values({$conAssStatusLabelArr});
 
+//根据查询记录数决定页面的组件显示
+var pageShowCom=(num,reqObj)=>{
+	if(num!=0){
+		$('#pAssNone').hide();
+		$('#pAssNone').prevAll().show();
+	}else{
+		$('#pAssNone').show();
+		$('#pAssNone').prevAll().hide();
+	}
+	
+	if(reqObj=='form'){
+		$.alert('<span class="label label-info">查询结果</span>&nbsp;记录数：<span>'+num+'</span>');
+	}
+};
+
 //利用自调用匿名函数立即执行的特点，页面初始化
 (function($){
+	pageShowCom({$searchResultNum},'{$reqObj}');
+	
 	let sId=window.location.hash;
 	//传递锚点值,添加tooltip
 	$('.aTblAssSingle').attr('href',sId).tooltip({title: "资产详情", placement: "bottom"});

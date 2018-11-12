@@ -56,9 +56,9 @@
 		<div class="btn-group">
 			<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" title="选择查询方式"><span class="glyphicon glyphicon-search"></span>查询<span class="caret"></span></button>
       		<ul class="dropdown-menu" role="menu">
-				<li><a href="#divSearchData" data-toggle="collapse" title="根据输入信息查询"><span class="glyphicon glyphicon-edit"></span>一般查询</a></li>
+				<li><a id="aSearchData" href="#divSearchData" data-toggle="collapse" title="根据输入信息查询"><span class="glyphicon glyphicon-edit"></span>一般查询</a></li>
     			<li role="separator" class="divider"></li>
-    			<li><a id="aDecodeBarcode" href="#divSearchByBarcode"  data-toggle="collapse" title="输入/ 拍摄条形码图片<br>识别后查询"><span class="glyphicon glyphicon-barcode"></span>条形码查询</a></li>
+    			<li><a id="aSearchByBarcode" href="#divSearchByBarcode"  data-toggle="collapse" title="输入/ 拍摄条形码图片<br>识别后查询"><span class="glyphicon glyphicon-barcode"></span>条形码查询</a></li>
       		</ul>
     	</div>
   		
@@ -69,7 +69,7 @@
 	<div id="divSearchData" class="collapse" >
 		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchData"  data-toggle="collapse" title="点击隐藏">一般查询条件</a>
 		<form id="fmAssSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:2px;">
-			
+			<input class="sr-only" name="reqObj" type="text" value="" />
 			<div class="row myRow">
 			<div class="form-group col-sm-4">
 				<label class="control-label" for="brand_model">名称（品牌型号）</label>
@@ -149,7 +149,10 @@
 	<div id="divSearchByBarcode" class="collapse">
 		<a class="label label-primary" style="font-size:14px;border-bottom-radius:0px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchByBarcode"  data-toggle="collapse" title="点击隐藏">条形码查询</a>
 		
-		<div id="divBarcodeArea_load"><p class="text-center" style="font-size:20px;">加载中……</p></div>
+		<!-- <div id="divBarcodeArea_load"><p class="text-center" style="font-size:20px;">加载中……</p></div> -->
+		
+		
+		{include file="../application/common/decodeBarcode.html"}
 		<br>
 	</div>
 	
@@ -367,25 +370,33 @@ var sortOrderToggle=(sortName)=>{
 		}
 	});
 		
-	obj.addClass('label label-primary');
-	
-	if(sortOrder == 'asc'){
-		//当前为升序
-		obj.append(glyAsc);
-		obj.tooltip({title:'当前为升序。点击后降序',placement: 'top'});
-		obj.data('sortOrder','desc');
-	}else{
-		//当前为降序
-		obj.append(glyDesc);
-		obj.tooltip({title:'当前为降序。点击后升序',placement: 'top'});
-		obj.data('sortOrder','asc');
-	}
+	if(obj.length){
+		obj.addClass('label label-primary');
+		if(sortOrder == 'asc'){
+			//当前为升序
+			obj.append(glyAsc);
+			obj.tooltip({title:'当前为升序。点击后降序',placement: 'top'});
+			obj.data('sortOrder','desc');
+		}else{
+			//当前为降序
+			obj.append(glyDesc);
+			obj.tooltip({title:'当前为降序。点击后升序',placement: 'top'});
+			obj.data('sortOrder','asc');
+		}
+	}		
 };
 
+//所有查询表单重置
 var fmReset=()=>{
-	var fm=$('#fmAssSearch');
-	fm[0].reset();
-	fm.find('.form-control').removeClass('alert-info');
+	var fm=$('form');
+	
+	fm.each(function(){
+		$(this)[0].reset();
+		$(this).find('.form-control').removeClass('alert-info');
+		if($(this).attr('id')=='fmRun'){
+			$(this).next().hide().find('span.alert-info').text('');
+		}
+	});
 };
 
 //自调用匿名函数立即执行的特点，进行页面初始化。
@@ -407,7 +418,7 @@ var fmReset=()=>{
 	});
 	
 	// 设置各类tooltip
-	$('.mainFrame').tooltip({triger:'hover click',placement: 'auto left',selector:'[title]',delay: {show: 200, hide: 100},html: true });
+	$('.mainFrame').tooltip({selector:'[title]',triger:'hover click',placement: 'auto left',delay: {show: 200, hide: 100},html: true });
 
 <!-- 选中id为"nav_pat"的标签（header.html文件中的li标签）,添加.active -->
 	$('#nav_ass').addClass('active');	
@@ -425,19 +436,16 @@ $(document).ready(function(){
 
     });
 	
-	$('#aDecodeBarcode').click(function(){
-		//显示、隐藏#divSearchByBarcode
-		$('#divSearchByBarcode').collapse('toggle');
-		//若没有load文件就进行load
-		if(!$('#fmRun [name="decoder_readers"]').val()){
-			
-			$('#divBarcodeArea_load').load('decodeBarcode');
-		}
+	$('#aSearchByBarcode').click(function(){
+		$('#divSearchByBarcode').collapse('show');
+		$('#divSearchData').collapse('hide');
+	});
+	
+	$('#aSearchData').click(function(){
+		$('#divSearchByBarcode').collapse('hide');
+		$('#divSearchData').collapse('show');
 		
 	});
-	<!-- $('#divSearchByBarcode').on('shown.bs.collapse', function(){ -->
-        <!-- $('#divBarcodeArea_load').load('decodeBarcode'); -->
-    <!-- }); -->
 	
 	<!-- // 页面刷新 -->
 	$('#btnRefresh').click(function(){
@@ -445,7 +453,7 @@ $(document).ready(function(){
 		fmReset();
 		
 		//隐藏一般查询条件
-		$('#divSearchData').collapse('hide');
+		$('.collapse').collapse('hide');
 		loadAssList();
 	});
 	
@@ -466,6 +474,7 @@ $(document).ready(function(){
 	
 	//表单提交，开始asset一般查询
 	$('#btnSearch').click(function(){
+		$('#fmAssSearch [name="reqObj"]').val('form');
 		loadAssList();
 	});
 	

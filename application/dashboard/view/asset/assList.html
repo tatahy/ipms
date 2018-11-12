@@ -2,14 +2,9 @@
 
 <!-- pagewrap  -->	
 <div id="divAssList">
-	<!-- <p>{$authAss.edit}</p> -->
-{neq name="searchResultNum" value="0"}
-	<!-- <p id="pSearchResultNum" class="text-center"> -->
-		<!-- <strong class="spAssType"></strong>记录数：<span id="spAssNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span> -->
-	<!-- </p> -->
 	<div class="row myRow">
 		<div class="text-right">
-			<strong class="spAssType"></strong><span id="spSearchResult" class="label label-info">搜索结果</span>&nbsp;记录数：<span id="spAssNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span>
+			<strong class="spAssType"></strong><span id="spSearchResult" class="label label-info">查询结果</span>&nbsp;记录数：<span id="spAssNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span>
 		</div>
 		<P></P>
 	</div>	
@@ -94,10 +89,7 @@
 		</div>
 	
 	</div>
-{else/}
-	<p class="text-center" ><span class="label label-default" style="font-size:16px;">无符合条件信息</span></p>
-{/neq}
-	
+	<p id="pAssNone" class="text-center" data-ass-num=""><span class="label label-default" style="font-size:16px;">无符合条件信息</span></p>	
 </div>
 
 <!-- /pagewrap  -->
@@ -290,9 +282,73 @@ var tblColshowChange=(objArr)=>{
 	});	
 };
 
+//btnClickShowModel(url,data);
+var btnClickShowModel=(url,data)=>{		
+	//$('#modalAssSingle')标题上的span组件生成函数
+	var spanStr=(oprt)=>{
+		var strHtml='';
+		conOprtComAttr.forEach(function(e){
+			if(oprt==e.val){
+				strHtml='<span class="text-'+e.color+'"><span class="glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'</span>';
+			}
+		});
+		//console.log(strHtml);
+		return strHtml;
+	};
+	var oprt=data.oprt;
+	$('#divLoadAssSingle').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(url,data,function(){
+			let barCode=$('#divBarcodeImg span.alert-info').text();
+			if(oprt=="_CREATE" && $('#pAssNone').data('assNum')==0 && barCode && data.reqObj=="barCode"){
+				$('#modalAssSingle [name="bar_code"]').val(barCode).addClass('alert-info').attr('readonly',true);
+			}
+		});
+		
+	$('#modalAssSingle').find('.title').html('【'+spanStr(oprt)+'】固定资产记录');
+	//显示modal
+	$('#modalAssSingle').modal();
+};
+
+//根据查询记录数决定页面的组件显示
+var pageShowCom=(num,reqObj)=>{
+	let obj=$('#pAssNone');
+	obj.data('assNum',num);
+	if(num!=0){
+		obj.hide();
+		obj.prevAll().show();
+	}else{
+		obj.show();
+		obj.prevAll().hide();
+	}
+	
+	switch(reqObj){
+		case 'form':
+			$.alert('<span class="label label-info">查询结果</span>&nbsp;记录数：<span>'+num+'</span>');
+			break;
+		case 'barCode':
+			let barCode=$('#divBarcodeImg span.alert-info').text();
+			console.log($('#pAssNone').data('assNum'));
+			//如果识别出条形码并且对条形码的查询结果为0
+			if($('#pAssNone').data('assNum')==0 && barCode){
+				//新增页面弹出				
+				let htmlStr='<p>无条形码【'+barCode+'】对应的记录。</p><p class="text-center">【<span class="text-primary"><span class="glyphicon glyphicon-modal-window">新增</span></span>】记录？</p>'
+				$.confirm(htmlStr,function(e){
+					con=e;
+					if(true==con){
+						btnClickShowModel('{$home}/dashboard/asset/fmAssSingle',{'oprt':'_CREATE','id':0,'reqObj':reqObj});
+					}
+				}).cancel('否(N)').ok('是(Y)');	
+						
+			}
+			break;
+	}
+	
+};
+
+
 //利用自调用匿名函数立即执行的特点， 页面初始化
 (function($){
-	
+	pageShowCom({$searchResultNum},'{$reqObj}');
+	console.log('{$reqObj}');
 	let sId=window.location.hash;
 	//传递锚点值,添加tooltip
 	$('.aTblAssSingle').attr('href',sId).tooltip({title: "资产详情", placement: "bottom"});
@@ -496,31 +552,18 @@ $(document).ready(function(){
 	$('.btnAssOprt').click(function(){
 		var dataFromObj=$(this).closest('td');
 		var oprt=$(this).data('assOprt');
+		//向后端请求具体内容所需数据
+		var data={'oprt':oprt,'id':dataFromObj.data('assId'),'reqObj':'btn'};
+		
 		//去掉所有行的底色
 		$('tr').removeClass('bg-warning');
 		//给本行上底色
 		$(this).closest('tr').addClass('bg-warning');
 		//排序有关的值向$('#divTblSortData')汇集。发送本行的assId，便于刷新后本行继续加底色
 		$('#divTblSortData').data('showAssId',dataFromObj.data('assId'));
-		//向后端请求具体内容
-		var data={'oprt':oprt,'id':dataFromObj.data('assId')}
-		$('#divLoadAssSingle').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(urlPrefix+'fmAssSingle',data);
 		
-		//$('#modalAssSingle')标题上的span组件生成函数
-		var spanStr=(oprt)=>{
-			var strHtml='';
-			conOprtComAttr.forEach(function(e){
-				if(oprt==e.val){
-					strHtml='<span class="text-'+e.color+'"><span class="glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'</span>';
-				}
-			});
-			//console.log(strHtml);
-			return strHtml;
-		};
-		$('#modalAssSingle').find('.title').html('【'+spanStr(oprt)+'】固定资产记录');
-		//显示modal
-		$('#modalAssSingle').modal();
-		
+		btnClickShowModel(urlPrefix+'fmAssSingle',data);
+
 	});
 	
 });
