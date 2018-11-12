@@ -67,7 +67,7 @@
 
 	<!-- // 一般查询区域-->
 	<div id="divSearchData" class="collapse" >
-		<div class="label label-info" style="font-size:14px;">一般查询条件</div>
+		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchData"  data-toggle="collapse" title="点击隐藏">一般查询条件</a>
 		<form id="fmAssSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:2px;">
 			
 			<div class="row myRow">
@@ -147,7 +147,7 @@
 	
 	<!-- // 条形码查询区域-->
 	<div id="divSearchByBarcode" class="collapse">
-		<div class="label label-info" style="font-size:14px;">条形码查询</div>
+		<a class="label label-primary" style="font-size:14px;border-bottom-radius:0px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchByBarcode"  data-toggle="collapse" title="点击隐藏">条形码查询</a>
 		
 		<div id="divBarcodeArea_load"><p class="text-center" style="font-size:20px;">加载中……</p></div>
 		<br>
@@ -407,7 +407,7 @@ var fmReset=()=>{
 	});
 	
 	// 设置各类tooltip
-	$('#divTopBtn').tooltip({triger:'hover click',placement: 'auto left',selector:'[title]',delay: {show: 500, hide: 100},html: true });
+	$('.mainFrame').tooltip({triger:'hover click',placement: 'auto left',selector:'[title]',delay: {show: 200, hide: 100},html: true });
 
 <!-- 选中id为"nav_pat"的标签（header.html文件中的li标签）,添加.active -->
 	$('#nav_ass').addClass('active');	
