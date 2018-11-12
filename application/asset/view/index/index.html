@@ -52,18 +52,19 @@
 			</a>
 		</li>
 	</ul>
-	<div class="row" style="margin:10px 0px;">
-	<div id="divTopBtn" class="pull-right">
-		<!-- <span class="label label-info" style="font-size:16px;">固定资产 -->
-		<!-- </span> -->
-		<button id="btnSearchInfo" type="button" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏一般查询区"><span class="glyphicon glyphicon-search"></span><span>一般查询</span></button>
-					
-		<button id="btnDecodeBarcode" type="button" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="显示/隐藏条形码识别区"><span class="glyphicon glyphicon-barcode"></span><span>条形码查询</span></button>
-		
-		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+	<div id="divTopBtn" class="row text-right" style="margin:10px 0px;">
+		<div class="btn-group">
+			<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" title="选择查询方式"><span class="glyphicon glyphicon-search"></span>查询<span class="caret"></span></button>
+      		<ul class="dropdown-menu" role="menu">
+				<li><a href="#divSearchData" data-toggle="collapse" title="根据输入信息查询"><span class="glyphicon glyphicon-edit"></span>一般查询</a></li>
+    			<li role="separator" class="divider"></li>
+    			<li><a id="aDecodeBarcode" href="#divSearchByBarcode"  data-toggle="collapse" title="输入/ 拍摄条形码图片<br>识别后查询"><span class="glyphicon glyphicon-barcode"></span>条形码查询</a></li>
+      		</ul>
+    	</div>
+  		
+		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新信息列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 	</div>
-	</div>
-	
+
 	<!-- // 一般查询区域-->
 	<div id="divSearchData" class="collapse" >
 		<div class="label label-info" style="font-size:14px;">一般查询条件</div>
@@ -131,7 +132,7 @@
 			</div>	
 			
 			<div class="row myRow">
-			<div class="text-right">
+			<div class="text-right">	
 				<button id="btnSearch" type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>查询</button>
 			
 				<button id="btnSearchReset" type="button" class="btn btn-primary btn-sm">条件重置</button>
@@ -406,7 +407,7 @@ var fmReset=()=>{
 	});
 	
 	// 设置各类tooltip
-	$('#divTopBtn [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});
+	$('#divTopBtn').tooltip({triger:'hover click',placement: 'auto left',selector:'[title]',delay: {show: 500, hide: 100},html: true });
 
 <!-- 选中id为"nav_pat"的标签（header.html文件中的li标签）,添加.active -->
 	$('#nav_ass').addClass('active');	
@@ -423,13 +424,8 @@ $(document).ready(function(){
 		loadAssList();
 
     });
-		
-	$('#btnSearchInfo').click(function(){
-		//显示、隐藏#divSearchData
-		$('#divSearchData').collapse('toggle');	
-	});
 	
-	$('#btnDecodeBarcode').click(function(){
+	$('#aDecodeBarcode').click(function(){
 		//显示、隐藏#divSearchByBarcode
 		$('#divSearchByBarcode').collapse('toggle');
 		//若没有load文件就进行load
@@ -439,7 +435,6 @@ $(document).ready(function(){
 		}
 		
 	});
-	
 	<!-- $('#divSearchByBarcode').on('shown.bs.collapse', function(){ -->
         <!-- $('#divBarcodeArea_load').load('decodeBarcode'); -->
     <!-- }); -->

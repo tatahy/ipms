@@ -39,7 +39,7 @@ class IndexController extends \think\Controller
     //
     private function priLogin(){
         //通过$log判断是否是登录用户，非登录用户退回到登录页面
-        if(1!==$this->log){
+        if(1!==$this->log && count($this->auth)){
             $this->error('未登录用户，请先登录系统');
             //$this->redirect($request->domain());
         }
