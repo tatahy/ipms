@@ -48,6 +48,7 @@
 						<a href="{$home}/project/index/prolist#apply" class="btn-primary">申报项目数：<span class="badge">x</span></a>
 						<a href="{$home}/project/index/prolist#approve" class="btn-warning">立项项目数：<span class="badge">x</span></a>
 						<a href="{$home}/project/index/prolist#process" class="btn-primary">在研项目数：<span class="badge">x</span></a>
+						<a href="{$home}/project/index/prolist#done" class="btn-success">结题项目数：<span class="badge">x</span></a>
 						<a href="{$home}/project/index/prolist#terminate" class="btn-default">终止项目数：<span class="badge">x</span></a>
 						
 					</div>
@@ -81,7 +82,7 @@
 
 //利用自调用匿名函数立即执行的特点，页面初始化
 (function($){
-	$('.panel-body').find('a').css('margin','2px').addClass('btn btn-sm').tooltip({title: "查看详情", placement: "bottom"});
+	$('.panel-body').find('a').css({'margin':'2px','font-size':'14px'}).addClass('btn btn-sm').tooltip({title: "查看详情", placement: "bottom"});
 })(jQuery);
 
 $(document).ready(function(){

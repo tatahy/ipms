@@ -3,7 +3,6 @@
 <form id="fmAssInfo" role="form" action="{$home}/dashboard/asset/assOprt"  method="post">
 	<input id="id" type="text" name="id" value="{$assSet.id}" class="sr-only">
 	<input id="oprt" type="text" name="oprt" value="{$oprt}" class="sr-only">
-	
 	<div class="row">
 	<div class="form-group col-sm-4">
 		<label class="control-label" for="brand_model">名称（含品牌、型号）<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
@@ -303,10 +302,14 @@ $(document).ready(function(){
 						//对asset的总数进行更新
 						$('#assNumTotal').text(data.num._TOTAL);
 						$('#assQuanTotal').text(data.quanTotal);
+						
 					}else{
 						$.alert(comHtml(topic,oprt,'fail'));
 					}
-			
+					//改变控制弹出窗（$.alert）的标志
+					if(oprt=='_CREATE' || oprt=='_DELETE'){
+						$('#fmAssSearch [name="reqObj"]').val('btn');
+					}
 					loadAssList();
 				});
 			}else{

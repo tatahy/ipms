@@ -436,15 +436,10 @@ $(document).ready(function(){
 
     });
 	
-	$('#aSearchByBarcode').click(function(){
-		$('#divSearchByBarcode').collapse('show');
-		$('#divSearchData').collapse('hide');
-	});
-	
-	$('#aSearchData').click(function(){
-		$('#divSearchByBarcode').collapse('hide');
-		$('#divSearchData').collapse('show');
-		
+	//控制collapse
+	$('#divTopBtn').find('a[data-toggle="collapse"]').click(function(){
+		//关闭所有与a[data-toggle="collapse"]有关的div块。与a 中的collapse属性配合，实现点击a时只出现a控制的div块。
+		$('.container-fluid').children('div.collapse').collapse('hide');
 	});
 	
 	<!-- // 页面刷新 -->

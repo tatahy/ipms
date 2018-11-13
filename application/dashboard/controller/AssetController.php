@@ -337,10 +337,11 @@ class AssetController extends \think\Controller
       $id=$data['id'];
       $oprt=$data['oprt'];
       $statusNow=!empty($data['status_now'])?$data['status_now']:'';
+      $statusNowUserName=!empty($data['status_now_user_name'])?$data['status_now_user_name']:'';
       $res=0;
       
       $rdDataArr=['status_now'=>$statusNow,
-                  'status_now_user_name'=>$data['status_now_user_name'],
+                  'status_now_user_name'=>$statusNowUserName,
                   'oprt'=>$data['oprt'],
                   'oprt_detail'=>$data['status_now_desc'],
                   'oprt_detail_json'=>'{}',
@@ -350,9 +351,17 @@ class AssetController extends \think\Controller
                   'place_now'=>$data['place_now'],
                   ];
       
+      //将空白元素删除
+      foreach($rdDataArr as $key=>$val){
+        if(empty($val)){
+          unset($rdDataArr[$key]);
+        }
+      }
+      
       switch($oprt){
         case '_CREATE':
             //数据库create
+            unset($data['id']);
             $res=$assMdl::create($data,true)->id;
             //新状态写入assRecord表
             $rdDataArr['assinfo_id']=$res;

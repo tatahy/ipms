@@ -89,7 +89,7 @@
 		</div>
 	
 	</div>
-	<p id="pAssNone" class="text-center" data-ass-num=""><span class="label label-default" style="font-size:16px;">无符合条件信息</span></p>	
+	<p id="pAssNone" class="text-center" data-show="false"><span class="label label-default" style="font-size:16px;">无符合条件信息</span></p>	
 </div>
 
 <!-- /pagewrap  -->
@@ -298,10 +298,13 @@ var btnClickShowModel=(url,data)=>{
 	var oprt=data.oprt;
 	$('#divLoadAssSingle').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(url,data,function(){
 			let barCode=$('#divBarcodeImg span.alert-info').text();
-			if(oprt=="_CREATE" && $('#pAssNone').data('assNum')==0 && barCode && data.reqObj=="barCode"){
-				$('#modalAssSingle [name="bar_code"]').val(barCode).addClass('alert-info').attr('readonly',true);
+			
+			console.log($('#pAssNone').data('show'));
+			
+			if(oprt=="_CREATE" && $('#pAssNone').data('show')==true && barCode && data.reqObj=="barCode"){
+				$('#modalAssSingle [name="bar_code"]').val(barCode).addClass('alert-info').attr('readonly','true');
 			}
-		});
+	});
 		
 	$('#modalAssSingle').find('.title').html('【'+spanStr(oprt)+'】固定资产记录');
 	//显示modal
@@ -311,34 +314,42 @@ var btnClickShowModel=(url,data)=>{
 //根据查询记录数决定页面的组件显示
 var pageShowCom=(num,reqObj)=>{
 	let obj=$('#pAssNone');
-	obj.data('assNum',num);
-	if(num!=0){
+	
+	if(num){
 		obj.hide();
+		obj.data('show',false);
 		obj.prevAll().show();
+		
 	}else{
 		obj.show();
+		obj.data('show',true);
 		obj.prevAll().hide();
 	}
-	
+	//根据reqObj实现不同的弹出窗
 	switch(reqObj){
 		case 'form':
 			$.alert('<span class="label label-info">查询结果</span>&nbsp;记录数：<span>'+num+'</span>');
 			break;
 		case 'barCode':
-			let barCode=$('#divBarcodeImg span.alert-info').text();
-			console.log($('#pAssNone').data('assNum'));
-			//如果识别出条形码并且对条形码的查询结果为0
-			if($('#pAssNone').data('assNum')==0 && barCode){
-				//新增页面弹出				
-				let htmlStr='<p>无条形码【'+barCode+'】对应的记录。</p><p class="text-center">【<span class="text-primary"><span class="glyphicon glyphicon-modal-window">新增</span></span>】记录？</p>'
+			let code=$('#divBarcodeImg span.alert-info').text();
+			console.log($('#pAssNone').data('show'));
+			
+			if(code && obj.data('show')==false){
+				$.alert('<span class="label label-info">查询结果</span>&nbsp;记录数：<span>'+num+'</span>');
+			}else if(code && obj.data('show')){
+				//如果识别出条形码并且对条形码的查询结果为0			
+				let htmlStr='<p>无条形码【'+code+'】对应的信息记录。</p><p class="text-center">【<span class="text-primary"><span class="glyphicon glyphicon-modal-window">新增</span></span>】信息记录？</p>'
 				$.confirm(htmlStr,function(e){
 					con=e;
 					if(true==con){
+						//新增页面弹出	
 						btnClickShowModel('{$home}/dashboard/asset/fmAssSingle',{'oprt':'_CREATE','id':0,'reqObj':reqObj});
 					}
 				}).cancel('否(N)').ok('是(Y)');	
-						
-			}
+			}else{}
+			break;
+		default:
+		
 			break;
 	}
 	
@@ -349,6 +360,7 @@ var pageShowCom=(num,reqObj)=>{
 (function($){
 	pageShowCom({$searchResultNum},'{$reqObj}');
 	console.log('{$reqObj}');
+	
 	let sId=window.location.hash;
 	//传递锚点值,添加tooltip
 	$('.aTblAssSingle').attr('href',sId).tooltip({title: "资产详情", placement: "bottom"});
