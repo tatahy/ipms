@@ -169,7 +169,7 @@ class Assinfo extends Model
         //登录用户的asset权限有且仅有read，仅能查阅自己名下的asset，
         $query=$this->scope('assType',$assType)->where('keeper_now',self::$userName);
       }else if($auth['read']==1 && $auth['edit']==1 && $authNum<=2){
-        //登录用户的asset权限有且仅有read，仅能查阅自己部门的asset，
+        //登录用户的asset权限有且仅有read和edit，仅能查阅自己部门的asset，
         $query=$this->scope('assType',$assType)->where('dept_now',self::$userDept);
       }
       else{

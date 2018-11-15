@@ -82,7 +82,7 @@ class IndexController extends \think\Controller
         
     }
 
-    public function index(Request $request, IssinfoModel $issMdl, $auth = '')
+    public function index(Request $request, IssinfoModel $issMdl,UserModel $userMdl, $auth = '',$item='')
     {
         $this->_loginUser();
 
@@ -92,6 +92,7 @@ class IndexController extends \think\Controller
 
         // $auth接收前端页面传来的auth值,表示rolename（映射“用户组名”）
         $auth = !empty($request->param('auth'))?$request->param('auth'):'done';
+        $item=!empty($request->param('item'))?$request->param('item'):'userInfo';
         
         //调用issinfo模型定义查询方法issPatProcess()得到查询结果数据集
         $num=$issMdl->issPatProcess($this->logUser,'_NUM');
@@ -137,7 +138,10 @@ class IndexController extends \think\Controller
           
         }
         
-
+        $user=$userMdl::get($this->userId);
+        
+        $userGroup=$userMdl->userGroupArr($this->userId);
+        
         // 模板变量赋值
         $this->assign([
             'home' => $request->domain(), 
@@ -152,12 +156,15 @@ class IndexController extends \think\Controller
             'theEn'=> $theEn,
             'attEn'=> $attEn,
             'assEn'=> $assEn,
-            
+            'user' => $user,
+            'userGroup' => $userGroup,
+            'userMobile'=>$user->getData('mobile'),
             'year' => date('Y')
             ]);
 
         // 模板输出
-        return $this->fetch();
+        //return $this->fetch();
+        return view();
     }
 
     //上传附件文件到temp目录

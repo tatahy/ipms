@@ -24,13 +24,18 @@
 				<div class="panel panel-default">
 					<div class="panel-heading"><span class="glyphicon glyphicon-oil"></span>&nbsp;<strong>固定资产</strong></div>
 						<div class="panel-body">
+						{neq name="assNum" value="0"}
 							<a href="{$home}/asset/index/index#_ASSS1" class="btn-info">待定数：<span class="badge">{$assNum['_ASSS1']}</span></a>
 							<a href="{$home}/asset/index/index#_ASSS2" class="btn-success">正常数：<span class="badge">{$assNum['_ASSS2']}</span></a>
 							{neq name="assNum['_ASSS3']" value="0"}
 							<a href="{$home}/asset/index/index#_ASSS3" class="btn-warning">异常数：<span class="badge">{$assNum['_ASSS3']}</span></a>
+							{/neq}
 							<a href="{$home}/asset/index/index#_ASSS4" class="btn-default">停用数：<span class="badge">{$assNum['_ASSS4']}</span></a>
-							{/neq}	
+						{else/}
+						<p class="text-center">无“固定资产”【查阅】权限，请与系统管理员联系。</p>
+						{/neq}								
 						</div>
+						
 				</div>
 			</div>
 		</div>

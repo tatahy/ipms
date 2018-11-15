@@ -82,7 +82,14 @@ class IndexController extends Controller
       Session::set('log', 1);
       Session::set('dept', $user->dept);
       Session::set('authArr', $authority);
-      $assMdl::initModel($username,$user->dept,$authority['ass']);
+      
+      //根据ass是否有read权限进行赋值
+      if($authority['ass']['read']){
+        $assMdl::initModel($username,$user->dept,$authority['ass']);
+        $assNum=$assMdl->getAssTypeNumArr();
+      }else{
+        $assNum=0;
+      }
       //--在index.html页面输出自定义信息的HTML代码块
       $destr = "请求方法:" . $request->method() . "</br>" . "username:" . $username .
         "</br>" . //"pwd:".sizeof($pwd);
@@ -97,7 +104,7 @@ class IndexController extends Controller
         //patent数据
         'numpatadd' => $numpatadd, 'numpatapp' => $numpatapp, 'numpataut' => $numpataut,
         //asset数据
-        'assNum'=>$assMdl->getAssTypeNumArr(),
+        'assNum'=>$assNum,
         'year' => date('Y'), 
         ]);
       //return view();

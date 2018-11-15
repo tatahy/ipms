@@ -135,8 +135,6 @@ footer {
 				<!-- </form> -->
 				<!-- </li> -->
 				<li><a href="{$home}/index/index/index"><span class="glyphicon glyphicon-home"></span>&nbsp;首页</a></li>
-				<!-- <li><a href="{$home}/user/index/index"><span class="glyphicon glyphicon-pushpin"></span>个人事务中心（旧版）</a></li> -->
-				
 				<li id="liQuit"><a href="{$home}/index/index/logout"><span class="glyphicon glyphicon-log-out"></span>&nbsp;退出</a></li>
 			</ul>
 		</div>
@@ -147,23 +145,21 @@ footer {
 	<div style="height:30px;border-bottom:1px solid #e3e3e3;"><button id="closeBtn" type="button" class="btn btn-link btn-lg pull-right" style="padding:0px 10px 0px 0px;"><span class="glyphicon glyphicon-chevron-left"></span><span style="font-size:16px;">隐藏</span></button>
 	</div>
 	<!-- nav 与 jQuery结合实现菜单栏导航效果-->
-	<ul class="nav nav-pills nav-stacked">
-		<li class="active"><a class="aTab" href="#userInfo"><span class="glyphicon glyphicon-user"></span>&nbsp;个人信息</a></li>
-		{neq name="proEn" value="0"}
-		<li><a class="aTab" href="#issPro"><span class="glyphicon glyphicon-inbox"></span>&nbsp;项目事务<span class="badge">{$numIssPro}</span></a></li>
-		{/neq}
-		{neq name="issEn" value="0"}
-		<li ><a class="aTab" href="#issPat2"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利事务<span class="badge">{$numIssPat}</span></a></li>
-		{/neq}
-		{neq name="theEn" value="0"}
-		<li><a class="aTab" href="#issThe"><span class="glyphicon glyphicon-list"></span>&nbsp;论文事务<span class="badge">{$numIssThe}</span></a></li>
-		{/neq}
-		{neq name="attEn" value="0"}
-		<li><a class="aTab" href="#attManage"><span class="glyphicon glyphicon-bookmark"></span>&nbsp;附件管理</a></li>
-		{/neq}
-		{neq name="assEn" value="0"}
-		<li><a class="aTab" href="#assInfo"><span class="glyphicon glyphicon-oil"></span>&nbsp;固定资产管理</a></li>
-		{/neq}			
+	<ul class="nav nav-pills nav-stacked">		
+		<li class="active"><a class="aAnchor" href="#" data-url="{$home}/dashboard/index/userInfo" data-anchor="#userInfo"><span class="glyphicon glyphicon-user"></span>&nbsp;个人信息<span class="badge">55</span></a></li>
+		
+		<li class="dropdown">
+			<a class="dropdown-toggle" href="#" data-toggle="dropdown"><span class="glyphicon glyphicon-th-list"></span>&nbsp;事务管理<span class="badge">33</span><span class="caret"></span></a>
+			<ul class="dropdown-menu nav nav-pills nav-stacked pull-right">
+				<li class="text-right"><a class="aAnchor" href="#"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利事务<span class="badge">10</span></a></li>
+				<li class="text-right"><a class="aAnchor" href="#"><span class="glyphicon glyphicon-list"></span>&nbsp;论文事务<span class="badge">13</span></a></li>
+				<li class="text-right"><a class="aAnchor" href="#"><span class="glyphicon glyphicon-inbox"></span>&nbsp;项目事务<span class="badge"></span></a></li>
+			</ul>
+		
+		</li>	
+		
+		<li><a class="aAnchor" href="#" data-url="{$home}/dashboard/asset/index" data-anchor="#_USUAL"><span class="glyphicon glyphicon-oil"></span>&nbsp;固定资产管理<span class="badge">5</span></a></li>			
+		
 	</ul>
 		
 </div>
@@ -174,7 +170,7 @@ footer {
 	<button id="openBtn" type="button" class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-chevron-right"></span><span style="font-size:16px;">显示菜单栏</span></button>
   
   	<div id="divContent_load">
-		<p class="text-center" style="font-size:28px;">加载中……</p>
+		{include file="../application/dashboard/view/index/userInfo.html"}
 	</div>
 	
 </div>
@@ -204,82 +200,53 @@ var showSideNavbar=(y)=>{
 		$('#main').removeClass('sidenav-show');
 	}
 };
-//**函数名：loadTplFile
- 	//* 作用：提交锚点值给后端，由后端返回需加载的页面文件
-function loadTplFile(){
-	var sId=window.location.hash;
-	var assType='';
-	var url='';
-	if(sId=='' || sId=='#undefined'){
-		sId='#issPat2';
-	}
-	$('#divContent_load').html('<p class="text-center" style="font-size:24px;">加载中……</p>');
-    //提交锚点值给后端，由后端返回需加载的页面文件
-	switch(sId){
-		case '#assInfo':
-			url='{$home}/dashboard/asset/index';
-			assType='_USUAL';
-			break;
-		case '#_ASSS1':
-			url='{$home}/dashboard/asset/index';
-			assType='_ASSS1';
-			break;
-		case '#_ASSS2':
-			url='{$home}/dashboard/asset/index';
-			assType='_ASSS2';
-			break;
-		case '#_ASSS3':
-			url='{$home}/dashboard/asset/index';
-			assType='_ASSS3';
-			break;
-		case '#_ASSS4':
-			url='{$home}/dashboard/asset/index';
-			assType='_ASSS4';
-			break;
-		case '#_ASSS5':
-			url='{$home}/dashboard/asset/index';
-			assType='_ASSS5';
-			break;			
-			
-		case '#_ASSS6':
-			url='{$home}/dashboard/asset/index';
-			assType='_ASSS6';
-			break;
-		default:
-			url='tplFile';
-			break;
-	}
-	
-	$('#divContent_load').load(url,{'sId':sId,'assType':assType},function(){
-		//load的回调函数改变样式
-		$('.nav a[href="'+sId+'"]').tab('show').find('.badge').css('color','red');
+
+function loadFile(obj){
+	var sId=obj.data('anchor')?obj.data('anchor'):'#';
+	var	url=obj.data('url');
+	var	assType=sId.slice(1);	
+		<!-- console.log(url);  -->
 		
-	}); 
-};
+		
+		//改变页面的锚点值为a的href属性值
+		window.location.hash=sId;
+		console.log(sId+obj.text()); 
+		<!-- window.location.search='item=xx'; -->
+		
+		
+		//各个badge恢复初始颜色
+		<!-- $('.nav').find('.badge').css('color','#fff'); -->
+		
+		$('#divContent_load').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(url,{'sId':sId,'assType':assType},function(){
+		
+			<!-- window.location.hash=sId; -->
+			console.log(window.location.hash ); 
+			
+			<!-- obj.closest('li').addClass('active'); -->
+
+		
+		});  
+}
 
 //利用自调用匿名函数立即执行的特点， 页面初始化
 (function($){
+	var text=$('#mySidenav li.active').find('.aAnchor').text();
 	$('[data-toggle="tooltip"]').tooltip();
 	
-	loadTplFile();
+	console.log(text);
 	
 	showSideNavbar(true);	
 
 })(jQuery);
 
 $(document).ready(function(){
-	<!-- //点击nav-pills中的各个按钮后，加载对应的页面-->
-	$('.aTab').click(function(){
-        //改变页面的锚点值为a的href属性值
-		window.location.hash = $(this).attr('href');  
-		
+	
+	$('.aAnchor').click(function(el){
+        el.preventDefault();
 		//a所在li高亮
 		$(this).tab('show');
-		//各个badge恢复初始颜色
-		$('.nav').find('.badge').css('color','#fff');
-		
-		//加载锚点对应的页面文件
-        loadTplFile();              
+		loadFile($(this));
+		            
     });	
 	
 	//显示SideNavbar
