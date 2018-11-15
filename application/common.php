@@ -8,7 +8,7 @@
  */
 //asset的状态数组大类7类17个
 const conAssTypeArr=[
-                    '_USUAL'=>'除"回收站"以外的其它5类状态',
+                    '_ASSS_USUAL'=>'除"回收站"以外的其它5类状态',
                     '_ASSS1'=>'待定',
                     '_ASSS2'=>'正常',
                     '_ASSS3'=>'异常',

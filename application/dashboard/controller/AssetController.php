@@ -50,8 +50,8 @@ class AssetController extends \think\Controller
     //获得各类asset数量
     private function priGetAssNum()
     {
-      $this->assNum=['_TOTAL'=>$this->priAssNum('_USUAL')+$this->priAssNum('_ASSS6'),
-                        '_USUAL'=>$this->priAssNum('_USUAL'),
+      $this->assNum=['_TOTAL'=>$this->priAssNum('_ASSS_USUAL')+$this->priAssNum('_ASSS6'),
+                        '_ASSS_USUAL'=>$this->priAssNum('_ASSS_USUAL'),
                         '_ASSS1'=>$this->priAssNum('_ASSS1'),
                         '_ASSS2'=>$this->priAssNum('_ASSS2'),
                         '_ASSS3'=>$this->priAssNum('_ASSS3'),
@@ -64,14 +64,14 @@ class AssetController extends \think\Controller
     //计算各类asset数量
     private function priAssNum($assType='')
     {
-      $assType=!empty($assType)?$assType:'_USUAL';
+      $assType=!empty($assType)?$assType:'_ASSS_USUAL';
       return $this->priAssQueryObj($assType)->count();
     }
     //各类asset查询语句对象
     private function priAssQueryObj($assType)
     {
       switch($assType){
-        case '_USUAL':
+        case '_ASSS_USUAL':
           $query=AssinfoModel::where('id','>',0);
           break;
         case '_ASSS6':
@@ -88,7 +88,7 @@ class AssetController extends \think\Controller
     {
         $this->priLogin();
         
-        $assType=!empty($request->param('assType'))?$request->param('assType'):'_USUAL';
+        $assType=!empty($request->param('assType'))?$request->param('assType'):'_ASSS_USUAL';
         $sortData=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1,'showAssId'=>0,'assType'=>$assType);
         
         $quantityNormal=$assMdl::sum('quantity');
@@ -124,7 +124,7 @@ class AssetController extends \think\Controller
         
         //搜索查询条件数组
         $whereArr=[];
-        $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1,'showAssId'=>0,'assType'=>'_USUAL');
+        $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1,'showAssId'=>0,'assType'=>'_ASSS_USUAL');
         // 接收前端的排序参数数组
         $sortData=!empty($request->param('sortData/a'))?$request->param('sortData/a'):$sortDefaults;
         $sortData=array_merge($sortDefaults,$sortData);
@@ -213,14 +213,14 @@ class AssetController extends \think\Controller
     }
     
     //响应前端请求，返回信息
-    public function selectRes(Request $request,AssinfoModel $assMdl,$req='',$source='db',$assType='_USUAL')
+    public function selectRes(Request $request,AssinfoModel $assMdl,$req='',$source='db',$assType='_ASSS_USUAL')
     {
       $this->priLogin();
       
       $req = !empty($request->param('req'))?$request->param('req'):0;
       $source = !empty($request->param('source'))?$request->param('source'):0;
       $oprt=!empty($request->param('oprt'))?$request->param('oprt'):0;
-      $assType=!empty($request->param('assType'))?$request->param('assType'):'_USUAL';
+      $assType=!empty($request->param('assType'))?$request->param('assType'):'_ASSS_USUAL';
       $statusNow=!empty($request->param('statusNow'))?$request->param('statusNow'):'';
       //$arr=conAssOprtChangeStatusArr;
       $arr=conAssStatusOprtArr;

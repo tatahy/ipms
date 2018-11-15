@@ -146,19 +146,20 @@ footer {
 	</div>
 	<!-- nav 与 jQuery结合实现菜单栏导航效果-->
 	<ul class="nav nav-pills nav-stacked">		
-		<li class="active"><a class="aAnchor" href="#" data-url="{$home}/dashboard/index/userInfo" data-anchor="#userInfo"><span class="glyphicon glyphicon-user"></span>&nbsp;个人信息<span class="badge">55</span></a></li>
+		<li class="active"><a class="aAnchor" href="#userInfo"><span class="glyphicon glyphicon-user"></span>&nbsp;个人信息<span class="badge">55</span></a></li>
 		
 		<li class="dropdown">
 			<a class="dropdown-toggle" href="#" data-toggle="dropdown"><span class="glyphicon glyphicon-th-list"></span>&nbsp;事务管理<span class="badge">33</span><span class="caret"></span></a>
 			<ul class="dropdown-menu nav nav-pills nav-stacked pull-right">
-				<li class="text-right"><a class="aAnchor" href="#"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利事务<span class="badge">10</span></a></li>
-				<li class="text-right"><a class="aAnchor" href="#"><span class="glyphicon glyphicon-list"></span>&nbsp;论文事务<span class="badge">13</span></a></li>
-				<li class="text-right"><a class="aAnchor" href="#"><span class="glyphicon glyphicon-inbox"></span>&nbsp;项目事务<span class="badge"></span></a></li>
+				<li ><a class="aAnchor" href="#_ISSS_PATS0"><span class="glyphicon glyphicon-wrench" ></span>&nbsp;专利事务<span class="badge">10</span></a></li>
+				<li ><a class="aAnchor" href="#_ISSS_THES0"><span class="glyphicon glyphicon-list"></span>&nbsp;论文事务<span class="badge">13</span></a></li>
+				<li ><a class="aAnchor" href="#_ISSS_PROS0"><span class="glyphicon glyphicon-inbox"></span>&nbsp;项目事务<span class="badge"></span></a></li>
 			</ul>
 		
 		</li>	
+		<li><a class="aAnchor" href="#_ATTS"><span class="glyphicon glyphicon-bookmark"></span>&nbsp;附件管理<span class="badge"></span></a></li>	
+		<li><a class="aAnchor" href="#_ASSS"><span class="glyphicon glyphicon-oil"></span>&nbsp;固定资产管理<span class="badge"></span></a></li>
 		
-		<li><a class="aAnchor" href="#" data-url="{$home}/dashboard/asset/index" data-anchor="#_USUAL"><span class="glyphicon glyphicon-oil"></span>&nbsp;固定资产管理<span class="badge">5</span></a></li>			
 		
 	</ul>
 		
@@ -170,14 +171,11 @@ footer {
 	<button id="openBtn" type="button" class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-chevron-right"></span><span style="font-size:16px;">显示菜单栏</span></button>
   
   	<div id="divContent_load">
-		{include file="../application/dashboard/view/index/userInfo.html"}
+		<!-- {include file="../application/dashboard/view/index/userInfo.html"} -->
+		<p class="text-center" style="font-size:28px;">加载中……</p>
 	</div>
 	
 </div>
-
-<!-- <div id="footer" class="text-center"> -->
-	<!-- <p style="margin-top:10px;">Powered by HY Copyright © {$year-1}-{$year}。推荐使用<a href="#">Chrome</a>、<a href="#">Firefox</a>浏览器<br>广州市光机电技术研究院（GZOME）. All rights reserved</p> -->
-<!-- </div> -->
 
 <footer>
     <div class="text-center">
@@ -201,40 +199,48 @@ var showSideNavbar=(y)=>{
 	}
 };
 
-function loadFile(obj){
-	var sId=obj.data('anchor')?obj.data('anchor'):'#';
-	var	url=obj.data('url');
-	var	assType=sId.slice(1);	
-		<!-- console.log(url);  -->
-		
-		
-		//改变页面的锚点值为a的href属性值
-		window.location.hash=sId;
-		console.log(sId+obj.text()); 
-		<!-- window.location.search='item=xx'; -->
-		
-		
-		//各个badge恢复初始颜色
-		<!-- $('.nav').find('.badge').css('color','#fff'); -->
-		
-		$('#divContent_load').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(url,{'sId':sId,'assType':assType},function(){
-		
-			<!-- window.location.hash=sId; -->
-			console.log(window.location.hash ); 
-			
-			<!-- obj.closest('li').addClass('active'); -->
+var loadAssList=()=>{
+	
+};
 
+function loadFile(anchor){
+	let	url='{$home}/dashboard/index/userInfo';
+	let	typeStr=anchor.slice(1);
+	let enType=anchor.slice(1,5);
+	let aObj=$('a.aAnchor[href*='+enType+']');
+	let loadFn='';
+	<!-- console.log(anchor+' | '+url+' | '+enType+' | '+typeStr); -->
+	
+	aObj.tab('show');
+	
+	switch(enType){
+		case '_ASS':
+			url='{$home}/dashboard/asset/index';
+			loadFn=loadAssList();
+			break;
+		case '_ISS':
+			url='{$home}/dashboard/issue/index';
+			break;	
+		case '_ATT':
+			url='{$home}/dashboard/attachment/index';
+			break;
 		
-		});  
+		default:
+			
+			break;
+	
+	}
+	
+	$('#divContent_load').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(url,{'sId':anchor,'assType':typeStr},function(){
+		loadFn;
+		
+	}); 
 }
 
 //利用自调用匿名函数立即执行的特点， 页面初始化
 (function($){
-	var text=$('#mySidenav li.active').find('.aAnchor').text();
+	loadFile(window.location.hash);
 	$('[data-toggle="tooltip"]').tooltip();
-	
-	console.log(text);
-	
 	showSideNavbar(true);	
 
 })(jQuery);
@@ -243,10 +249,12 @@ $(document).ready(function(){
 	
 	$('.aAnchor').click(function(el){
         el.preventDefault();
+		let anchor=$(this).attr('href');
 		//a所在li高亮
 		$(this).tab('show');
-		loadFile($(this));
-		            
+		//改变页面的锚点值为a的href属性值
+		window.location.hash=anchor;
+		loadFile(anchor);    
     });	
 	
 	//显示SideNavbar

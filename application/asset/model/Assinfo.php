@@ -99,7 +99,7 @@ class Assinfo extends Model
     //查询asset的类别
     protected function scopeAssType($query,$assType)
     {
-      if($assType=='_USUAL'){
+      if($assType=='_ASSS_USUAL'){
         $query->where('id','>',0);
       }else{
         $query->where('status_now','like','%'.$assType.'%');
@@ -109,7 +109,7 @@ class Assinfo extends Model
     //检查输入的$assType是否合法
     protected function checkAssTypeStr()
     {    
-      $assType=!empty($this->aType)?$this->aType:'_USUAL';
+      $assType=!empty($this->aType)?$this->aType:'_ASSS_USUAL';
       $res='';
       if(in_array($assType,self::$aTypeArr,true)){
         $this->aType=$assType;

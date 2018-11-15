@@ -11,9 +11,9 @@
 	<!-- <p>{$mdlSt}</p> -->
 	<ul id="ulAssType" class="nav nav-pills" style="border-bottom:1px solid #eee;">
 		<li class="active">
-			<a class="aPill" href="#_USUAL" data-ass-type="_USUAL">固定资产<span class="spTitle">总计</span>
-			{neq name="assNum['_USUAL']" value="0"}
-			<span class="label label-primary spClass">{$assNum['_USUAL']}</span>
+			<a class="aPill" href="#_ASSS_USUAL" data-ass-type="_ASSS_USUAL">固定资产<span class="spTitle">总计</span>
+			{neq name="assNum['_ASSS_USUAL']" value="0"}
+			<span class="label label-primary spClass">{$assNum['_ASSS_USUAL']}</span>
 			{/neq}
 			</a>
 		</li>
@@ -402,7 +402,7 @@ var fmReset=()=>{
 //自调用匿名函数立即执行的特点，进行页面初始化。
 (function($){
 	var sId=window.location.hash;	
-	assType=sId.substring(1);
+	assType=sId.slice(1);
 	loadAssList({'assType':assType});
 	
 	$('.aPill[href="'+sId+'"]').tab('show');
@@ -428,7 +428,8 @@ var fmReset=()=>{
 $(document).ready(function(){
 		
 	$('.aPill').click(function(){
-		assType=$(this).data('assType');
+		<!-- assType=$(this).data('assType'); -->
+		assType=$(this).attr('href').slice(1);
 		$(this).tab('show');
 		//一般查询表单重置
 		fmReset();

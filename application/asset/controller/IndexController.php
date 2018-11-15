@@ -57,7 +57,7 @@ class IndexController extends \think\Controller
           'read'=>$this->auth['read'],
                    
           'assNum'=>$assMdl->getAssTypeNumArr(),
-          'assType'=>'_USUAL',
+          'assType'=>'_ASSS_USUAL',
                     
           'home'=>$request->domain(),
           'username'=>$this->userName,
@@ -81,7 +81,7 @@ class IndexController extends \think\Controller
     {
         $this->priLogin();
                           
-        $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1,'assType'=>'_USUAL');
+        $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1,'assType'=>'_ASSS_USUAL');
         // 接收前端的排序参数数组
         $sortData=!empty($request->param('sortData/a'))?$request->param('sortData/a'):$sortDefaults;
         $sortData=array_merge($sortDefaults,$sortData);

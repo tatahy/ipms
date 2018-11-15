@@ -1,4 +1,4 @@
-<!-- // view/index.html 对应AssetController.php的index操作 -->
+<!-- // dashboard\view\asset\index.html, 对应AssetController.php的index操作 -->
 
 <div class="content-header">
 	<h4>
@@ -11,39 +11,39 @@
 	
 	<ul id="ulAssType" class="nav nav-pills" style="margin-top:10px;border-bottom: 1px solid #eee;">
 		<li class="active dropdown">			
-			 <a class="dropdown-toggle" data-toggle="dropdown"  href="#assInfo">
+			 <a class="dropdown-toggle" data-toggle="dropdown"  href="#_ASSS_USUAL">
 			 	<span class="spType">概况&nbsp;</span>
 				<span class="caret"></span>
 			 </a>
       			<ul class="dropdown-menu">
-        			<li>
-						<a class="aPill" href="#assInfo" data-ass-type="_USUAL"><span class="spType">[总计]&nbsp;</span></a>
+        			<li class="active">
+						<a class="aPill" href="#_ASSS_USUAL" data-ass-type="_ASSS_USUAL" data-layer="asset"><span class="spType">[总计]&nbsp;</span></a>
 					</li>
 					<li class="divider"></li>
 					
 					<li>
-						<a class="aPill" href="#_ASSS1" data-ass-type="_ASSS1"><span class="spType">[待定]&nbsp;</span></a>
+						<a class="aPill" href="#_ASSS1" data-ass-type="_ASSS1" data-layer="asset"><span class="spType">[待定]&nbsp;</span></a>
 					</li>
 				
 					<li>
-						<a class="aPill" href="#_ASSS2" data-ass-type="_ASSS2"><span class="spType">[正常]&nbsp;</span></a>
+						<a class="aPill" href="#_ASSS2" data-ass-type="_ASSS2" data-layer="asset"><span class="spType">[正常]&nbsp;</span></a>
 					</li>
 					
         			<li>
-						<a class="aPill" href="#_ASSS3" data-ass-type="_ASSS3"><span class="spType">[异常]&nbsp;</span></a>
+						<a class="aPill" href="#_ASSS3" data-ass-type="_ASSS3" data-layer="asset"><span class="spType">[异常]&nbsp;</span></a>
 					</li>
 					<li>
-						<a class="aPill" href="#_ASSS4" data-ass-type="_ASSS4"><span class="spType">[停用]&nbsp;</span></a>
+						<a class="aPill" href="#_ASSS4" data-ass-type="_ASSS4" data-layer="asset"><span class="spType">[停用]&nbsp;</span></a>
 					</li>  
 					<li>
-						<a class="aPill" href="#_ASSS5" data-ass-type="_ASSS5"><span class="spType">[销账]&nbsp;</span></a>
+						<a class="aPill" href="#_ASSS5" data-ass-type="_ASSS5" data-layer="asset"><span class="spType">[销账]&nbsp;</span></a>
 					</li>  					
       			</ul>
 			
 		</li>
 		
 		<li>
-			<a class="aPill text-danger" href="#_ASSS6" data-ass-type="_ASSS6"><span class="glyphicon glyphicon-trash"></span><span class="spType">[回收站]&nbsp;</span></a>
+			<a class="aPill text-danger" href="#_ASSS6" data-ass-type="_ASSS6"  data-layer="asset"><span class="glyphicon glyphicon-trash"></span><span class="spType">[回收站]&nbsp;</span></a>
 		</li>
 	
 	</ul>
@@ -345,7 +345,7 @@ var loadAssList=()=>{
 	var statusNowArr=$('#selectStatusNow').val();
 	var placeNowArr=$('#selectPlaceNow').val();
 	//排序有关的参数默认值
-	var sortDataDefault={'listRows':10,'sortName':'assnum','sortOrder':'asc','pageNum':1,'assType':'_USUAL','showAssId':0};
+	var sortDataDefault={'listRows':10,'sortName':'assnum','sortOrder':'asc','pageNum':1,'assType':'_ASSS_USUAL','showAssId':0};
 	sortData=$.extend({},sortDataDefault,sortData);
 	
 	var assType=sortData.assType;
@@ -411,6 +411,22 @@ var loadAssList=()=>{
 			
 			//根据tblColObjArr显示、隐藏col
 			tblColshowChange(tblColObjArr);	
+			
+			//assList.html页面的一些初始化
+			let aObj=$('a[href="'+window.location.hash+'"]').filter('.aPill'),
+				htmlStr=aObj.find('.spType').html(),
+				spClass=aObj.find('.spClass').attr('class');
+			<!-- console.log('loadAssList func'); -->
+			aObj.tab('show');
+			$('.spAssType').html(htmlStr);
+			$('#spAssNum').attr('class','');
+			if(spClass){
+				$('#spAssNum').addClass(spClass);
+			}else{
+				$('#spAssNum').addClass('label label-info');
+			}
+			<!-- console.dir($('a.aAnchor[href="#_ASSS_USUAL"]')); -->
+			<!-- console.dir(aObj.find('.spClass').attr('class')); -->
 		}
 	);
 };
@@ -500,6 +516,7 @@ $(document).ready(function(){
 		assType=$(this).data('assType');
 		$('#divTblSortData').data('assType',assType);
 		$(this).tab('show');
+		<!-- window.location.href=urlPrefix+'assList'; -->
 		//搜索表单重置
 		fmReset();
 		loadAssList();

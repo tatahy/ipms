@@ -366,21 +366,6 @@ var pageShowCom=(num,reqObj)=>{
 	$('.aTblAssSingle').attr('href',sId).tooltip({title: "资产详情", placement: "bottom"});
 	$('.aAssRecords').attr('href',sId).tooltip({title: "状态历史记录", placement: "bottom"});
 	
-	let spType=$('#ulAssType .dropdown-menu li.active a').find('.spType').html();
-	//.spAssType内容随$('#ulAssType li.active a').find('.spType')变化
-	$('.spAssType').html(spType);
-	//#spNum的class跟随$('#ulAssType li.active a').find('.spClass')变化
-	let spClass=$('#ulAssType .dropdown-menu li.active a').find('.spClass').attr('class');
-	if(spClass){
-		$('#spAssNum').addClass(spClass);
-	}else{
-		$('#spAssNum').addClass('label label-info');
-	}
-	var trashObj=$('#ulAssType li.active a');
-	if(trashObj.data('assType')=='_ASSS6'){
-		$('.spAssType').html(trashObj.find('.spType').text());
-		$('#spAssNum').addClass('label label-danger');
-	}
 	//每个.tdAssOprt根据该行记录的data-ass-status="{$ vo.status_now}"添加相应的a标签
 	$('.tdAssOprt').each(function(){
 		<!-- var ahtml=getOprtHtmlStr($(this).data('assStatus')); -->
