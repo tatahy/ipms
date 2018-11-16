@@ -11,8 +11,8 @@
 	
 	<ul id="ulAssType" class="nav nav-pills" style="margin-top:10px;border-bottom: 1px solid #eee;">
 		<li class="active dropdown">			
-			 <a class="dropdown-toggle" data-toggle="dropdown"  href="#_ASSS_USUAL">
-			 	<span class="spType">概况&nbsp;</span>
+			 <a class="dropdown-toggle aPill" data-toggle="dropdown"  href="#_ASSS_USUAL">
+			 	<span>概况&nbsp;</span>
 				<span class="caret"></span>
 			 </a>
       			<ul class="dropdown-menu">
@@ -242,9 +242,9 @@ var buildAssNumSpan=(type,numArr)=>{
 		}
 	}
 	if(num){
-		htmlStr='<span class="label label-'+label+' spClass">'+num+'</span>';
+		htmlStr='<span class="label label-'+label+' spLabel">'+num+'</span>';
 	}else{
-		htmlStr='<span class="spClass">'+num+'</span>';
+		htmlStr='<span class="spLabel">'+num+'</span>';
 		$(this).removeClass('aPill');
 		$(this).closest('li').addClass('disabled');
 	}
@@ -415,18 +415,18 @@ var loadAssList=()=>{
 			//assList.html页面的一些初始化
 			let aObj=$('a[href="'+window.location.hash+'"]').filter('.aPill'),
 				htmlStr=aObj.find('.spType').html(),
-				spClass=aObj.find('.spClass').attr('class');
+				spLabel=aObj.find('.spLabel').attr('class');
 			<!-- console.log('loadAssList func'); -->
 			aObj.tab('show');
 			$('.spAssType').html(htmlStr);
 			$('#spAssNum').attr('class','');
-			if(spClass){
-				$('#spAssNum').addClass(spClass);
+			if(spLabel){
+				$('#spAssNum').addClass(spLabel);
 			}else{
-				$('#spAssNum').addClass('label label-info');
+				$('#spAssNum').addClass('label label-info spLabel');
 			}
 			<!-- console.dir($('a.aAnchor[href="#_ASSS_USUAL"]')); -->
-			<!-- console.dir(aObj.find('.spClass').attr('class')); -->
+			<!-- console.dir(aObj.find('.spLabel').attr('class')); -->
 		}
 	);
 };
@@ -489,18 +489,10 @@ var fmReset=()=>{
 	$('.aPill').each(function(){
 		var type=$(this).data('assType');
 		var htmlStr=buildAssNumSpan(type,conAssNumArr);
-		$(this).find('.spClass').remove();
+		$(this).find('.spLabel').remove();
 		$(this).find('.spType').after(htmlStr);
 	});
-	//ul.nav调整.aPill
-	$('#ulAssType.nav-pills').find('a').each(function(){
-		//缩小padding
-		$(this).css('padding','5px 10px');
-		//去掉底部边框圆角
-		$(this).css({'border-bottom-right-radius':'0px','border-bottom-left-radius':'0px'});
-		//调整内部span.label的大小
-		$(this).find('.spClass').css({'padding-bottom':'1px','margin-bottom':'2px'});
-	});
+	
 	// 设置各类tooltip
 	$('#divTopBtn').tooltip({selector:'[title]',triger:'hover click',placement: 'auto left',delay: {show: 200, hide: 100},html: true });
 	

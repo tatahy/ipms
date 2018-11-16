@@ -13,41 +13,41 @@
 		<li class="active">
 			<a class="aPill" href="#_ASSS_USUAL" data-ass-type="_ASSS_USUAL">固定资产<span class="spTitle">总计</span>
 			{neq name="assNum['_ASSS_USUAL']" value="0"}
-			<span class="label label-primary spClass">{$assNum['_ASSS_USUAL']}</span>
+			<span class="label label-primary spLabel">{$assNum['_ASSS_USUAL']}</span>
 			{/neq}
 			</a>
 		</li>
 		<li>
 			<a class="aPill" href="#_ASSS1" data-ass-type="_ASSS1"><span class="spTitle">待定</span>
 			{neq name="assNum['_ASSS1']" value="0"}
-			<span class="label label-info spClass">{$assNum['_ASSS1']}</span>{/neq}
+			<span class="label label-info spLabel">{$assNum['_ASSS1']}</span>{/neq}
 			</a>
 		</li>
 		<li>
 			<a class="aPill" href="#_ASSS2" data-ass-type="_ASSS2"><span class="spTitle">正常</span>
 			{neq name="assNum['_ASSS2']" value="0"}
-			<span class="label label-success spClass">{$assNum['_ASSS2']}</span>
+			<span class="label label-success spLabel">{$assNum['_ASSS2']}</span>
 			{/neq}
 			</a>
 		</li>
 		<li>
 			<a class="aPill" href="#_ASSS3" data-ass-type="_ASSS3"><span class="spTitle">异常</span>
 			{neq name="assNum['_ASSS3']" value="0"}
-			<span class="label label-warning spClass">{$assNum['_ASSS3']}</span>
+			<span class="label label-warning spLabel">{$assNum['_ASSS3']}</span>
 			{/neq}
 			</a>
 		</li>
 		<li>
 			<a class="aPill" href="#_ASSS4" data-ass-type="_ASSS4"><span class="spTitle">停用</span>
 			{neq name="assNum['_ASSS4']" value="0"}
-			<span class="label label-default spClass">{$assNum['_ASSS4']}</span>
+			<span class="label label-default spLabel">{$assNum['_ASSS4']}</span>
 			{/neq}
 			</a>
 		</li>
 		<li>
 			<a class="aPill" href="#_ASSS5" data-ass-type="_ASSS5"><span class="spTitle">销账</span>
 			{neq name="assNum['_ASSS5']" value="0"}
-			<span class="badge spClass">{$assNum['_ASSS5']}</span>
+			<span class="badge spLabel">{$assNum['_ASSS5']}</span>
 			{/neq}
 			</a>
 		</li>
@@ -406,16 +406,6 @@ var fmReset=()=>{
 	loadAssList({'assType':assType});
 	
 	$('.aPill[href="'+sId+'"]').tab('show');
-	
-	//ul.nav调整.aPill
-	$('#ulAssType.nav-pills').find('a').each(function(){
-		//缩小padding
-		$(this).css('padding','5px 10px');
-		//去掉底部边框圆角
-		$(this).css({'border-bottom-right-radius':'0px','border-bottom-left-radius':'0px'});
-		//调整内部span.label的大小
-		$(this).find('.spClass').css({'padding-bottom':'1px','margin-bottom':'2px'});
-	});
 	
 	// 设置各类tooltip
 	$('.mainFrame').tooltip({selector:'[title]',triger:'hover click',placement: 'auto left',delay: {show: 200, hide: 100},html: true });

@@ -70,6 +70,8 @@
 
 	<p id="pAssNone" class="text-center" ><span class="label label-default" style="font-size:16px;">无符合条件信息</span></p>
 	
+	<!-- //调试用 -->
+	<!-- <p>{$display}</p> -->
 </div>
 
 <!-- /pagewrap  -->
@@ -108,10 +110,10 @@ var pageShowCom=(num,reqObj)=>{
 	let spTitle='['+$('#ulAssType li.active a').find('.spTitle').html()+']';
 	//.assType内容随$('#ulAssType li.active a').find('.spTitle')变化
 	$('.assType').html(spTitle);
-	//#spNum的class跟随$('#ulAssType li.active a').find('.spClass')变化
-	let spClass=$('#ulAssType li.active a').find('.spClass').attr('class');
-	if(spClass){
-		$('#spNum').addClass(spClass);
+	//#spNum的class跟随$('#ulAssType li.active a').find('.spLabel')变化
+	let spLabel=$('#ulAssType li.active a').find('.spLabel').attr('class');
+	if(spLabel){
+		$('#spNum').addClass(spLabel);
 	}else{
 		$('#spNum').addClass('label label-info');
 	}

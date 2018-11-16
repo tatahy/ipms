@@ -151,12 +151,14 @@ class Assinfo extends Model
     }
     
     //asset查询对象
-    public function assTypeQuery($assType='')
+    public function assTypeQuery($assType='',$whereArr=[])
     {
-      $auth=self::$auth;
-      $this->aType=$assType;
-      $authNum=0;
       
+      $this->aType=$assType;
+      $auth=self::$auth;
+      $dept=self::$userDept;
+      $userName=self::$userName;
+      $authNum=0;
       if(!$this->checkAssTypeStr()){
         return $this->errStr;
       }
@@ -164,18 +166,34 @@ class Assinfo extends Model
       foreach($auth as $val){
         $authNum+=$val;
       }
+      //前置查询范围
+      $scopeQ=$this->scope('assType',$assType);
       
       if($auth['read']==1 && $authNum<=1){
         //登录用户的asset权限有且仅有read，仅能查阅自己名下的asset，
-        $query=$this->scope('assType',$assType)->where('keeper_now',self::$userName);
+        $query=$scopeQ->where('keeper_now',$userName)->where($whereArr);
       }else if($auth['read']==1 && $auth['edit']==1 && $authNum<=2){
-        //登录用户的asset权限有且仅有read和edit，仅能查阅自己部门的asset，
-        $query=$this->scope('assType',$assType)->where('dept_now',self::$userDept);
+        //登录用户的asset权限有且仅有read和edit，仅能查阅自己部门和自己名下的asset，
+        $scopeArr=($assType=='_ASSS_USUAL')?$scopeArr=array('id'=>['>',0]):$scopeArr=array('status_now'=>['like','%'.$assType.'%']);
+        //不能使用已定义的前置查询范围，因为查询的条件是需要在一个前置查询范围内分为2个不同的查询。使用闭包实现
+        $query=$this->where(function($query) use($dept,$scopeArr,$whereArr){
+                      $query->where($scopeArr)->where('dept_now',$dept)->where($whereArr);
+                    })
+                    ->whereOr(function($query) use($dept,$userName,$scopeArr,$whereArr){
+                      $query->where($scopeArr)->where('keeper_now',$userName)->where('dept_now','<>',$dept)->where($whereArr);
+                    });
+        
+       // $query=$scopeQ->where('dept_now',$dept);
+        //$query=$this->where(function($query) use(&$scopeQu,$dept,$scopeArr){
+//                      $query->$scopeQu->where('dept_now',$dept)->where($whereArr);
+//                    })
+//                    ->whereOr(function($query) use(&$scopeQu,$dept,$userName,$scopeArr){
+//                      $query->$scopeQu->where('keeper_now',$userName)->where('dept_now','<>',$dept)->where($whereArr);
+//                    });
       }
       else{
-        $query=$this->scope('assType',$assType);
+        $query=$scopeQ->where($whereArr);
       }
-      
       return $query;
     }
     

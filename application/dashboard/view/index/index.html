@@ -146,18 +146,19 @@ footer {
 	</div>
 	<!-- nav 与 jQuery结合实现菜单栏导航效果-->
 	<ul class="nav nav-pills nav-stacked">		
-		<li class="active"><a class="aAnchor" href="#userInfo"><span class="glyphicon glyphicon-user"></span>&nbsp;个人信息<span class="badge">55</span></a></li>
+		<li class="active"><a class="aAnchor" href="#userInfo"><span class="glyphicon glyphicon-user"></span>&nbsp;个人信息管理</a></li>
 		
 		<li class="dropdown">
 			<a class="dropdown-toggle" href="#" data-toggle="dropdown"><span class="glyphicon glyphicon-th-list"></span>&nbsp;事务管理<span class="badge">33</span><span class="caret"></span></a>
 			<ul class="dropdown-menu nav nav-pills nav-stacked pull-right">
-				<li ><a class="aAnchor" href="#_ISSS_PATS0"><span class="glyphicon glyphicon-wrench" ></span>&nbsp;专利事务<span class="badge">10</span></a></li>
-				<li ><a class="aAnchor" href="#_ISSS_THES0"><span class="glyphicon glyphicon-list"></span>&nbsp;论文事务<span class="badge">13</span></a></li>
-				<li ><a class="aAnchor" href="#_ISSS_PROS0"><span class="glyphicon glyphicon-inbox"></span>&nbsp;项目事务<span class="badge"></span></a></li>
+				<li ><a class="aAnchor" href="#_ISSS_PATS"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利事务<span class="badge">10</span></a></li>
+				<li ><a class="aAnchor" href="#_ISSS_THES"><span class="glyphicon glyphicon-list"></span>&nbsp;论文事务<span class="badge">13</span></a></li>
+				<li ><a class="aAnchor" href="#_ISSS_PROS"><span class="glyphicon glyphicon-inbox"></span>&nbsp;项目事务<span class="badge"></span></a></li>
 			</ul>
 		
 		</li>	
 		<li><a class="aAnchor" href="#_ATTS"><span class="glyphicon glyphicon-bookmark"></span>&nbsp;附件管理<span class="badge"></span></a></li>	
+		<!-- <li><a class="aAnchor" href="#_ASSS"><span class="glyphicon glyphicon-oil"></span>&nbsp;固定资产管理<span class="badge"></span></a></li> -->
 		<li><a class="aAnchor" href="#_ASSS"><span class="glyphicon glyphicon-oil"></span>&nbsp;固定资产管理<span class="badge"></span></a></li>
 		
 		
@@ -168,20 +169,19 @@ footer {
 <!-- pagewrap  -->
 <div id="main" class="container-fluid">
 	
-	<button id="openBtn" type="button" class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-chevron-right"></span><span style="font-size:16px;">显示菜单栏</span></button>
+	<button id="openBtn" type="button" class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-dashboard"></span><span style="font-size:16px;">管理菜单</span></button>
   
   	<div id="divContent_load">
-		<!-- {include file="../application/dashboard/view/index/userInfo.html"} -->
 		<p class="text-center" style="font-size:28px;">加载中……</p>
 	</div>
 	
 </div>
 
-<footer>
-    <div class="text-center">
-		<p style="margin-top:10px;">Powered by HY Copyright © {$year-1}-{$year}。推荐使用<a href="#">Chrome</a>、<a href="#">Firefox</a>浏览器<br>广州市光机电技术研究院（GZOME）. All rights reserved</p>
-	</div>
-</footer>
+<!-- <footer> -->
+    <!-- <div class="text-center"> -->
+		<!-- <p style="margin-top:10px;">Powered by HY Copyright © {$year-1}-{$year}。推荐使用<a href="#">Chrome</a>、<a href="#">Firefox</a>浏览器<br>广州市光机电技术研究院（GZOME）. All rights reserved</p> -->
+	<!-- </div> -->
+<!-- </footer> -->
 
 <!-- /pagewrap  -->
 
@@ -198,43 +198,32 @@ var showSideNavbar=(y)=>{
 		$('#main').removeClass('sidenav-show');
 	}
 };
-
-var loadAssList=()=>{
-	
-};
-
+//根据anchor值选择加载的文件
 function loadFile(anchor){
-	let	url='{$home}/dashboard/index/userInfo';
-	let	typeStr=anchor.slice(1);
-	let enType=anchor.slice(1,5);
-	let aObj=$('a.aAnchor[href*='+enType+']');
-	let loadFn='';
-	<!-- console.log(anchor+' | '+url+' | '+enType+' | '+typeStr); -->
+	let	url='',
+		typeStr=anchor.slice(1),
+		enType=anchor.slice(1,5),
+		aObj=$('a.aAnchor[href="'+anchor+'"]');
 	
-	aObj.tab('show');
-	
+	aObj.length?aObj.tab('show'):$('a.aAnchor[href*='+enType+']').tab('show');
+		
 	switch(enType){
 		case '_ASS':
 			url='{$home}/dashboard/asset/index';
-			loadFn=loadAssList();
 			break;
 		case '_ISS':
-			url='{$home}/dashboard/issue/index';
+			url='{$home}/dashboard/issue/index/issType/'+anchor.slice(6,10);
 			break;	
 		case '_ATT':
 			url='{$home}/dashboard/attachment/index';
 			break;
 		
 		default:
-			
+			url='{$home}/dashboard/index/userInfo';
 			break;
-	
 	}
 	
-	$('#divContent_load').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(url,{'sId':anchor,'assType':typeStr},function(){
-		loadFn;
-		
-	}); 
+	$('#divContent_load').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(url,{'sId':anchor,'assType':typeStr}); 
 }
 
 //利用自调用匿名函数立即执行的特点， 页面初始化

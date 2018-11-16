@@ -92,7 +92,9 @@ class IndexController extends \think\Controller
         // 接收前端的搜索参数（json字符串），由前端保证传来的搜索参数值非0，非空。
         $searchData=!empty($request->param('searchData/a'))?$request->param('searchData/a'):$searchDefaults;
         $searchData=array_merge($searchDefaults,$searchData);
+        //全部都统一为form
         $reqObj=!empty($searchData['reqObj'])?'form':'';
+    
         //搜索查询条件数组
         $whereArr=[];
         $statusArr=[];
@@ -130,19 +132,20 @@ class IndexController extends \think\Controller
         }
         
         //分页,每页$listRows条记录
-        $assSet=$assMdl->assTypeQuery($assType)->where($whereArr)
+        $assSet=$assMdl->assTypeQuery($assType,$whereArr)
                       ->order($sortData['sortName'], $sortData['sortOrder'])
                       ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
                         'query'=>['listRows'=>$sortData['listRows']]]);
+        
         // 获取分页显示
         $assList=$assSet->render(); 
         
         //记录总数
         //$searchResultNum=count($this->priAssQueryObj($assType)->where($whereArr)->select()); 
-        $searchResultNum=count($assMdl->assTypeQuery($assType)->where($whereArr)->select()); 
+        $searchResultNum=count($assMdl->assTypeQuery($assType,$whereArr)->select()); 
                
         //数量总计
-        $quanCount=$assMdl->assTypeQuery($assType)->where($whereArr)->sum('quantity');
+        $quanCount=$assMdl->assTypeQuery($assType,$whereArr)->sum('quantity');
         
         $this->assign([
           'home'=>$request->domain(),
@@ -162,7 +165,7 @@ class IndexController extends \think\Controller
           'conAssStatusLabelArr'=>json_encode(conAssStatusLabelArr,JSON_UNESCAPED_UNICODE), 
           //调试用
           'whereArr'=>json_encode($whereArr,JSON_UNESCAPED_UNICODE),
-          'display'=>$this->userName, 
+          'display'=>json_encode($assMdl->getFieldsBind(),JSON_UNESCAPED_UNICODE), 
 		  
         ]);
         return view();

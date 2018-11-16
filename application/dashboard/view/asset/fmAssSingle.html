@@ -306,10 +306,9 @@ $(document).ready(function(){
 					}else{
 						$.alert(comHtml(topic,oprt,'fail'));
 					}
-					//改变控制弹出窗（$.alert）的标志
-					if(oprt=='_CREATE' || oprt=='_DELETE'){
-						$('#fmAssSearch [name="reqObj"]').val('btn');
-					}
+				
+					//改变控制弹出窗（$.alert）的标志为btn
+					$('#fmAssSearch [name="reqObj"]').val('btn');
 					loadAssList();
 				});
 			}else{

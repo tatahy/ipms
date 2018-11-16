@@ -185,5 +185,18 @@
 	
 }
 
+/* 微调.nav-pills里的a标签 */
+.aPill{
+	/* 缩小padding*/
+	padding: 5px 10px !important;
+	/*去掉底部边框圆角 */
+	border-bottom-right-radius: 0px !important;
+	border-bottom-left-radius: 0px !important;
+}
 
+/* 微调span里的label标签 */
+.spLabel{
+	padding-bottom:1px;
+	margin-bottom:2px;
+}
 
