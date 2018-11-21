@@ -149,17 +149,16 @@ footer {
 		<li class="active"><a class="aAnchor" href="#userInfo"><span class="glyphicon glyphicon-user"></span>&nbsp;个人信息管理</a></li>
 		
 		<li class="dropdown">
-			<a class="dropdown-toggle" href="#" data-toggle="dropdown"><span class="glyphicon glyphicon-th-list"></span>&nbsp;事务管理<span class="badge">33</span><span class="caret"></span></a>
+			<a class="dropdown-toggle" href="#" data-toggle="dropdown"><span class="glyphicon glyphicon-th-list"></span>&nbsp;事务处理<span class="badge">{ $issNumInprocess}</span><span class="caret"></span></a>
 			<ul class="dropdown-menu nav nav-pills nav-stacked pull-right">
-				<li ><a class="aAnchor" href="#_ISSS_PATS"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利事务<span class="badge">10</span></a></li>
-				<li ><a class="aAnchor" href="#_ISSS_THES"><span class="glyphicon glyphicon-list"></span>&nbsp;论文事务<span class="badge">13</span></a></li>
-				<li ><a class="aAnchor" href="#_ISSS_PROS"><span class="glyphicon glyphicon-inbox"></span>&nbsp;项目事务<span class="badge"></span></a></li>
+				<li ><a class="aAnchor" href="#_ISST_PATS_INPROCESS"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利事务<span class="badge">{ $patNumInprocess}</span></a></li>
+				<li ><a class="aAnchor" href="#_ISST_THES_INPROCESS"><span class="glyphicon glyphicon-list"></span>&nbsp;论文事务<span class="badge">{ $theNumInprocess}</span></a></li>
+				<li ><a class="aAnchor" href="#_ISST_PROS_INPROCESS"><span class="glyphicon glyphicon-inbox"></span>&nbsp;项目事务<span class="badge">{ $proNumInprocess}</span></a></li>
 			</ul>
-		
 		</li>	
+		
 		<li><a class="aAnchor" href="#_ATTS"><span class="glyphicon glyphicon-bookmark"></span>&nbsp;附件管理<span class="badge"></span></a></li>	
-		<!-- <li><a class="aAnchor" href="#_ASSS"><span class="glyphicon glyphicon-oil"></span>&nbsp;固定资产管理<span class="badge"></span></a></li> -->
-		<li><a class="aAnchor" href="#_ASSS"><span class="glyphicon glyphicon-oil"></span>&nbsp;固定资产管理<span class="badge"></span></a></li>
+		<li><a class="aAnchor" href="#_ASSS_USUAL"><span class="glyphicon glyphicon-oil"></span>&nbsp;固定资产管理<span class="badge"></span></a></li>
 		
 		
 	</ul>
@@ -169,7 +168,7 @@ footer {
 <!-- pagewrap  -->
 <div id="main" class="container-fluid">
 	
-	<button id="openBtn" type="button" class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-dashboard"></span><span style="font-size:16px;">管理菜单</span></button>
+	<button id="openBtn" type="button" class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-dashboard"></span><span style="font-size:16px;">控制台</span></button>
   
   	<div id="divContent_load">
 		<p class="text-center" style="font-size:28px;">加载中……</p>
@@ -203,27 +202,34 @@ function loadFile(anchor){
 	let	url='',
 		typeStr=anchor.slice(1),
 		enType=anchor.slice(1,5),
-		aObj=$('a.aAnchor[href="'+anchor+'"]');
+		aObj=$('a.aAnchor[href="'+anchor+'"]'),
+		data='';
 	
-	aObj.length?aObj.tab('show'):$('a.aAnchor[href*='+enType+']').tab('show');
+	if(aObj.length){
+		aObj.tab('show');
+	}else{
+		$('a.aAnchor[href*='+anchor.slice(1,11)+']').tab('show');
+	}
+	<!-- aObj.length?aObj.tab('show'):$('a.aAnchor[href*='+enType+']').tab('show'); -->
 		
 	switch(enType){
 		case '_ASS':
 			url='{$home}/dashboard/asset/index';
+			data={'sId':anchor,'assType':typeStr};
 			break;
 		case '_ISS':
-			url='{$home}/dashboard/issue/index/issType/'+anchor.slice(6,10);
+			url='{$home}/dashboard/issue/index';
+			data={'issType':anchor.slice(6,10)};
 			break;	
 		case '_ATT':
 			url='{$home}/dashboard/attachment/index';
 			break;
-		
 		default:
 			url='{$home}/dashboard/index/userInfo';
 			break;
 	}
 	
-	$('#divContent_load').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(url,{'sId':anchor,'assType':typeStr}); 
+	$('#divContent_load').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(url,data); 
 }
 
 //利用自调用匿名函数立即执行的特点， 页面初始化

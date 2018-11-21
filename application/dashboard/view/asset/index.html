@@ -2,7 +2,7 @@
 
 <div class="content-header">
 	<h4>
-		<a href="#divAssTotal" data-toggle="collapse"><span class="glyphicon glyphicon-oil"></span>固定资产管理</a>
+		<a href="#divAssTotal" data-toggle="collapse" title="显示/隐藏固定资产总数"><span class="glyphicon glyphicon-oil"></span>固定资产管理</a>
 	</h4>
 	
 	<div id="divAssTotal" class="collapse text-center" style="font-size:18px;padding:10px;">
@@ -11,9 +11,7 @@
 	
 	<ul id="ulAssType" class="nav nav-pills" style="margin-top:10px;border-bottom: 1px solid #eee;">
 		<li class="active dropdown">			
-			 <a class="dropdown-toggle aPill" data-toggle="dropdown"  href="#_ASSS_USUAL">
-			 	<span>概况&nbsp;</span>
-				<span class="caret"></span>
+			 <a class="dropdown-toggle" style="padding: 5px 10px;border-radius:4px 4px 0px 0px;" data-toggle="dropdown"  href="#_ASSS_USUAL">概况<span class="caret"></span>
 			 </a>
       			<ul class="dropdown-menu">
         			<li class="active">
@@ -494,9 +492,9 @@ var fmReset=()=>{
 	});
 	
 	// 设置各类tooltip
-	$('#divTopBtn').tooltip({selector:'[title]',triger:'hover click',placement: 'auto left',delay: {show: 200, hide: 100},html: true });
+	$('#divContent_load').tooltip({selector:'[title]',triger:'hover click',placement: 'auto left',delay: {show: 200, hide: 100},html: true });
 	
-	$('a[href="#divAssTotal"]').tooltip({triger:'hover',placement: 'auto right',title:'显示/隐藏固定资产总数'});	
+	<!-- $('a[href="#divAssTotal"]').tooltip({triger:'hover',placement: 'auto right',title:'显示/隐藏固定资产总数'});	 -->
 	
 })(jQuery);
 

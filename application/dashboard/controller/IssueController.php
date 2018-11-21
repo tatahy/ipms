@@ -4,6 +4,7 @@ namespace app\dashboard\controller;
 use think\Request;
 use think\Session;
 use think\View;
+use think\Controller;
 
 use app\dashboard\model\Issinfo as IssinfoModel;
 use app\dashboard\model\Issrecord as IssrecordModel;
@@ -11,7 +12,7 @@ use app\dashboard\model\Assinfo as AssinfoModel;
 use app\dashboard\model\Assrecord as AssrecordModel;
 use app\dashboard\model\User as UserModel;
 
-class IssueController extends \think\Controller
+class IssueController extends Controller
 {
      //用户名
     private $username = null;
@@ -21,13 +22,17 @@ class IssueController extends \think\Controller
     private $log = null;
     //用户角色
     private $roles=array();
+    //请求对象实例
+    private $home = '';
     //用户所在部门
     private $dept = null;
     //登录用户的权限。
     private $auth=[];
-    //asset分类汇总记录数据
-    private $assNum=[];
-    
+  
+    //public function __construct(Request $request)
+//    {
+//      $this->priLogin();
+//    }
     // 初始化
     protected function _initialize()
     {
@@ -38,7 +43,7 @@ class IssueController extends \think\Controller
         $this->dept=Session::get('dept');
         
         $this->auth=UserModel::where(['username'=>$this->username,'pwd'=>$this->pwd])->find()->authority;
-        $this->assNum=$this->priGetAssNum();
+       
     }
     //
     private function priLogin()
@@ -47,28 +52,83 @@ class IssueController extends \think\Controller
         if(1!==$this->log){
             $this->error('未登录用户，请先登录系统');
             //$this->redirect($request->domain());
+        }else{
+          //继承了控制器基类Controller后，直接可使用其request属性来使用Request类的实例。
+          $this->home=$this->request->domain();
         }
     }
         
     public function index(Request $request,AssinfoModel $assMdl,$sortData=[],$searchData=[])
     {
-        $this->priLogin();
-        $issType=!empty($request->param('issType'))?$request->param('issType'):'';
-        
-       
-               
-        $this->assign([
-          'home'=>$request->domain(),
-          
-          
-          
-        ]);
-        //return view();
-        return '开发中……<br>'.$issType.'<br>'.json_encode($this->auth,JSON_UNESCAPED_UNICODE);
-        
+      $this->priLogin();
+      $issType=!empty($request->param('issType'))?$request->param('issType'):'';
+      
+      switch($issType){
+        case '_PAT':
+         // $showObj='issPat';
+          $showObj=$this->issPat();
+          break;
+        case '_THE':
+          $showObj=$this->issThe();
+          //$showObj='issThe';
+          break;
+        case '_PRO':
+          $showObj=$this->issPro();
+          //$showObj='issPro';
+          break;
+      } 
+      //return view($showObj);
+      //return json_encode($this->auth,JSON_UNESCAPED_UNICODE); 
+      return $showObj;        
     }
     
    
+    public function issPat()
+    {
+      $this->priLogin();
+    
+      $this->assign([
+        'home'=>$this->home,
+          
+      ]);
+      //return view();
+      return json_encode($this->auth,JSON_UNESCAPED_UNICODE);
+    }
+    
+    public function issThe()
+    {
+      $this->priLogin();
+      
+      $this->assign([
+        'home'=>$this->home,
+          
+      ]);
+      //return view();
+      return view('issue/issThe');
+    }
+    
+    public function issTheList()
+    {
+      $this->priLogin();
+      
+      $this->assign([
+        'home'=>$this->home,
+          
+      ]);
+      //return view();
+      return view('issue/issTheList/issTheList');
+    }
+    
+    public function issPro()
+    {
+      $this->priLogin();
+      
+      $this->assign([
+        'home'=>$this->home,
+          
+      ]);
+      return view('issue/issPro');
+    }
     
     //响应前端请求，返回信息
     public function selectRes(Request $request,AssinfoModel $assMdl,$req='',$source='db',$assType='_ASSS_USUAL')

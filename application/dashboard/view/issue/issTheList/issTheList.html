@@ -1,0 +1,568 @@
+<!-- assList.html -->
+
+<!-- pagewrap  -->	
+<div id="divAssList">
+	<div class="row myRow">
+		<div class="text-right">
+			<strong class="spAssType"></strong><span id="spSearchResult" class="label label-info">查询结果</span>&nbsp;记录数：<span id="spAssNum">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span>
+		</div>
+		<P></P>
+	</div>	
+	<div class="table-responsive" style="overflow: auto;"> 
+		<table id="tblAssList" class="table table-bordered table-hover table-condensed" >
+			<caption class="text-center" style="border-bottom:1px solid #eee;">
+			<h4>固定资产信息列表&nbsp;<strong class="spAssType"></strong>
+			   	<div class="btn-group">
+      				<button type="button" class="btn btn-xs btn-primary dropdown-toggle" data-toggle="dropdown" >选择显示字段<span class="caret"></span></button>
+      				<ul class="dropdown-menu" >
+						<li><div class="checkbox"><label><input type="checkbox" value="all" checked><span class="text-primary">全选</span></label></div></li>
+						<li class="divider"></li>
+					</ul>
+    			</div>
+			</h4>
+			</caption>
+			<colgroup></colgroup>
+			<thead>
+				<tr>
+					<th class="text-center">序号</th>
+					<th><a data-sort-name="brand_model">名称</a></th>
+					<th class="assnum"><a data-sort-name="assnum">编号</a></th>
+					<th><a data-sort-name="code">卡号</a></th>
+					<th><a data-sort-name="bar_code">条形码号</a></th>
+					<th><a data-sort-name="quantity">数量</a></th>
+					<th><a data-sort-name="place_now">现放置地点</a></th>
+					<th><a data-sort-name="dept_now">现使用部门</a></th>
+					<th><a data-sort-name="keeper_now">现保管人</a></th>
+					<th><a data-sort-name="status_now">状态</a></th>
+					<th><a data-sort-name="status_now_desc">状态说明</a></th>
+					<th><a data-sort-name="status_now_user_name">登记人</a></th>
+					<th><a data-sort-name="create_time">创建时间</a></th>
+					<th><a data-sort-name="update_time">登记时间</a></th>
+					<th class="text-center">操作</th>
+				</tr>
+			
+			</thead>
+			<tbody><!-- 此处显示数据库查询后的数据集 -->
+				{volist name="assSet" id="vo" empty=""}
+				<tr>
+					<td class="text-center">{$i+($sortData.pageNum-1)*$sortData.listRows}</td>
+					<td class="text-center"><a class="aTblAssSingle" href="#assInfo" data-ass-id="{$vo.id}">{$vo.brand_model}</a></td>
+					<td class="text-right">{$vo.assnum}</td>
+					<td>{$vo.code}</td>
+					<td class="text-right">{$vo.bar_code}</td>
+					<td class="text-right">{$vo.quantity}</td>
+					<td class="text-right">{$vo.place_now}</td>
+					<td class="text-right">{$vo.dept_now}</td>
+					<td class="text-right">{$vo.keeper_now}</td>
+					<td class="text-right"><a class="aAssRecords" href="#assInfo" data-ass-id="{$vo.id}"><span class="spStatus">{$vo.status_now}</span></a></td>
+					<td class="text-right">{$vo.status_now_desc}</td>
+					<td class="text-right">{$vo.status_now_user_name}</td>
+					<td class="text-right">{$vo.create_time}</td>
+					<td class="text-right">{$vo.update_time}</td>
+					<td class="tdAssOprt text-right" data-ass-status="{$vo.status_now}" data-ass-id="{$vo.id}" data-ass-topic="{$vo.brand_model}" >
+						
+					</td>
+				
+				</tr>
+				{/volist}
+			
+			</tbody>
+			
+		</table>
+		
+	</div>
+	
+	
+	<div id="divListRows" class="row text-right" style="padding-top:10px;">
+		<!-- // 分页变量 -->
+		<div class="col-sm-10">{$assList}</div>
+		
+		<div class="form-group form-group-sm col-sm-2">
+			<span class="">每页显示记录数：</span>
+			<select class="form-control" id="listRows">
+				<option value="5">5</option>
+				<option value="10">10</option>
+				<option value="20">20</option>
+				<option value="50">50</option>
+			</select>
+						
+		</div>
+	
+	</div>
+	<p id="pAssNone" class="text-center" data-show="false"><span class="label label-default" style="font-size:16px;">无符合条件信息</span></p>	
+</div>
+
+<!-- /pagewrap  -->
+
+<script type="text/javascript">
+//输入JSON对象：{$ authAssObj}={edit:1,audit:1,approve:0,maintain:0}
+//转成键值对数组形式输出authAssArr=[{name:'edit',val:'1'},{name:'audit',val:'1'},{name:'approve',val:'0'},{name:'maintain',val:'0'}]
+//便于应用数组的.forEach等函数进行自定义处理
+var fnJsonToArr=(jsonObj)=>{
+	var nameArr=Object.keys(jsonObj);
+	var valArr=Object.values(jsonObj);
+	var arr=[]
+	for(var i=0;i<nameArr.length;i++){
+		arr[i]={name:nameArr[i],val:valArr[i]};
+	}
+	return arr;
+};
+
+//console.log($('#divTblSortData').data('assType'));
+
+//定义常量，asset状态与操作对应关系conAssStatusOprtArr
+<!-- const conAssStatusOprtArr={$conAssStatusOprtArr}; -->
+var conAssStatusOprtArr={$conAssStatusOprtArr};
+<!-- console.log('conAssStatusOprtArr:'); -->
+<!-- console.log(conAssStatusOprtArr); -->
+
+//定义常量，asset权限与操作的对应关系
+<!-- const conAssAuthOprtArr={$conAssAuthOprtArr}; -->
+var conAssAuthOprtArr={$conAssAuthOprtArr};
+<!-- console.log('conAssAuthOprtArr:'); -->
+<!-- console.log(conAssAuthOprtArr); -->
+
+//定义常量，asset权限数组
+<!-- const conAssAuthArr= fnJsonToArr({$authAssObj}); -->
+var conAssAuthArr= fnJsonToArr({$authAssObj});
+<!-- console.log('conAssAuthArr:'); -->
+<!-- console.table(conAssAuthArr); -->
+
+//定义常量，操作组件的重要属性
+<!-- const conOprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'info',title:'新增固定资产记录'}, -->
+			<!-- {name:'提交',val:'_SUBMIT',gly:'send',color:'info',title:'提交记录'}, -->
+			<!-- {name:'审核',val:'_AUDIT',gly:'check',color:'warning',title:'审核记录'}, -->
+			<!-- {name:'审批',val:'_APPROVE',gly:'ok',color:'danger',title:'审批记录'}, -->
+			<!-- {name:'维护',val:'_MAINTAIN',gly:'list-alt',color:'primary',title:'维护记录'}, -->
+			<!-- {name:'更新',val:'_UPDATE',gly:'save-file',color:'primary',title:'更新记录'}, -->
+			<!-- {name:'查询',val:'_READ',gly:'search',color:'primary',title:'查询记录'}, -->
+			<!-- {name:'删除',val:'_DELETE',gly:'remove',color:'danger',title:'删除记录'}, -->
+			<!-- {name:'回收',val:'_TRASH',gly:'trash',color:'danger',title:'记录放入回收站'}, -->
+			<!-- {name:'还原',val:'_RESTORE',gly:'retweet',color:'success',title:'记录还原'} -->
+			<!-- ]; -->
+			
+var conOprtComAttr=[{name:'新增',val:'_CREATE',gly:'modal-window',color:'info',title:'新增固定资产记录'},
+			{name:'送审',val:'_SUBMIT',gly:'send',color:'info',title:'送审记录'},
+			{name:'审核',val:'_AUDIT',gly:'check',color:'warning',title:'审核记录'},
+			{name:'审批',val:'_APPROVE',gly:'ok',color:'danger',title:'审批记录'},
+			{name:'维护',val:'_MAINTAIN',gly:'list-alt',color:'primary',title:'维护记录'},
+			{name:'更新',val:'_UPDATE',gly:'save-file',color:'primary',title:'更新记录'},
+			{name:'查询',val:'_READ',gly:'search',color:'primary',title:'查询记录'},
+			{name:'删除',val:'_DELETE',gly:'remove',color:'danger',title:'删除记录'},
+			{name:'回收',val:'_TRASH',gly:'trash',color:'danger',title:'记录放入回收站'},
+			{name:'还原',val:'_RESTORE',gly:'retweet',color:'success',title:'记录还原'}
+			];
+
+const conStatusArr=Object.values({$conAssStatusArr});
+<!-- var conStatusArr=Object.values({$conAssStatusArr}); -->
+const conLabelArr=Object.values({$conAssStatusLabelArr});
+<!-- var conLabelArr=Object.values({$conAssStatusLabelArr}); -->
+
+<!-- //由表格头字段创建数组 -->
+<!-- var tblColObjArr=[]; -->
+	
+//某个值是否在数组内
+var fnInArr=(item, arr)=>{
+	for (var i = 0; i < arr.length; i++) {
+		if (arr[i] == item) {
+			return true
+		}
+	}
+	return false
+};
+
+//根据登录用户的权限(auth)，权限与操作的对应关系(conAuthOprtArr)，固定资产的状态(assStatus)，得到固定资产的操作组件的html字符串
+//1.要产生多少个组件？
+//2.决定产生组件的条件？auth,status,??
+//status决定产生的操作组件数量，auth结合authVSoprt来决定显示给登录用户的操作组件数量。
+var getOprtHtmlStr=(status)=>{
+	var btnHtml='';
+	var authOprtArr=[];
+	var statusOprtArr=[];
+	var oprtArr=[];
+	// 360浏览器9.0，极速模式下的兼容问题：箭头函数内部无法使用函数外部已定义的const常量conAssAuthArr，提示该常量未定义。将const定义改为var定义解决。
+	//console.table(conAssAuthArr);
+	//由auth决定authOprtArr中的值。authOprtArr：登录用户所有asset权限下的操作值数组(去掉重复值的数组)
+	
+	for(var i=0;i<conAssAuthArr.length;i++){
+		if(conAssAuthArr[i].val){
+			var name=conAssAuthArr[i].name;
+			for(var n=0;n<conAssAuthOprtArr.length;n++){
+					if(name==conAssAuthOprtArr[n].auth){
+						authOprtArr=arrMerge(authOprtArr,conAssAuthOprtArr[n].oprt)
+						break;
+					}
+			}
+		}
+	}
+		
+	//由status决定statusOprtArr中的值。statusOprtArr：状态对应的操作值数组
+	for(var i=0;i<conAssStatusOprtArr.length;i++){
+		if(conAssStatusOprtArr[i].statusChi==status){
+			statusOprtArr=conAssStatusOprtArr[i].oprt;
+			
+		}
+	}
+	//authOprtArr与statusOprtArr取交集得到oprtArr
+	authOprtArr.forEach(function(e){
+		for(var i=0;i<statusOprtArr.length;i++){
+			if(e==statusOprtArr[i]){
+				oprtArr.push(e);
+			}
+		}
+	});
+	<!-- console.log('authOprtArr:'+authOprtArr); -->
+	<!-- console.log('statusOprtArr:'+statusOprtArr); -->
+	<!-- console.log('oprtArr:'+oprtArr); -->
+	if(oprtArr.length){
+		oprtArr.forEach(function(el){		
+			conOprtComAttr.forEach(function(e){
+				if(el==e.val){
+					btnHtml+='<button class="btn btn-'+e.color+' btn-xs btnAssOprt" data-ass-oprt="'+e.val+'" data-toggle="tooltip" title="'+e.title+'" style="margin:2px;"><span class="glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'</button>'
+				}
+			});
+		});
+	}else{
+		btnHtml='无';
+	}
+		
+	return btnHtml;
+};
+
+
+var urlPrefix='{$home}/dashboard/asset/';
+
+
+//2个数组合并后去掉重复值
+var arrMerge=(arr1,arr2)=>{ 
+	var result = []; 
+	var arr = []; 
+	//将arr1和arr2合并入新数组arr.
+	arr = arr2.reduce(function(prev, curr){ 
+				prev.push(curr); 
+				return prev; 
+			}
+			,arr1
+		); 
+	//arr是否为2个数组的简单连接？？	
+	//console.log(arr);
+	//将arr数组中的值挨个推入result数组，推入前检查result中是否已经存在，不存在才推入result数组。从而达到对arr数组去掉重复值的目的。
+	for (var i = 0; i < arr.length; i++) { 
+		var index = arr[i]; 
+		if (result.indexOf(index) === -1) { 
+			result.push(index); 
+		} 
+	} 
+		
+	return result; 
+};
+
+//根据tblColObjArr的值，改变复选框，显示/隐藏col
+var tblColshowChange=(objArr)=>{
+	//col，一个([data-hide-val="'+el.val+'"]的th、td集合
+	objArr.forEach(function(el){		
+		//复选框
+		$('#tblAssList input').each(function(){
+			if($(this).val()==el.val){
+				//改变复选框的值
+				$(this).prop('checked',el.showFlag);
+				//改变复选框的字体颜色
+				$(this).next().removeClass('text-primary text-muted');
+				if(el.showFlag){
+					$(this).next().addClass('text-primary');
+					//显示col
+					$('#tblAssList').find('[data-hide-val="'+el.val+'"]').show();
+				}else{
+					$(this).next().addClass('text-muted');
+					//隐藏col
+					$('#tblAssList').find('[data-hide-val="'+el.val+'"]').hide();
+				}
+			}
+		});
+	});	
+};
+
+//btnClickShowModel(url,data);
+var btnClickShowModel=(url,data)=>{		
+	//$('#modalAssSingle')标题上的span组件生成函数
+	var spanStr=(oprt)=>{
+		var strHtml='';
+		conOprtComAttr.forEach(function(e){
+			if(oprt==e.val){
+				strHtml='<span class="text-'+e.color+'"><span class="glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'</span>';
+			}
+		});
+		//console.log(strHtml);
+		return strHtml;
+	};
+	var oprt=data.oprt;
+	$('#divLoadAssSingle').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(url,data,function(){
+			let barCode=$('#divBarcodeImg span.alert-info').text();
+			
+			console.log($('#pAssNone').data('show'));
+			
+			if(oprt=="_CREATE" && $('#pAssNone').data('show')==true && barCode && data.reqObj=="barCode"){
+				$('#modalAssSingle [name="bar_code"]').val(barCode).addClass('alert-info').attr('readonly','true');
+			}
+	});
+		
+	$('#modalAssSingle').find('.title').html('【'+spanStr(oprt)+'】固定资产记录');
+	//显示modal
+	$('#modalAssSingle').modal();
+};
+
+//根据查询记录数决定页面的组件显示
+var pageShowCom=(num,reqObj)=>{
+	let obj=$('#pAssNone');
+	
+	if(num){
+		obj.hide();
+		obj.data('show',false);
+		obj.prevAll().show();
+		
+	}else{
+		obj.show();
+		obj.data('show',true);
+		obj.prevAll().hide();
+	}
+	//根据reqObj实现不同的弹出窗
+	switch(reqObj){
+		case 'form':
+			$.alert('<span class="label label-info">查询结果</span>&nbsp;记录数：<span>'+num+'</span>');
+			break;
+		case 'barCode':
+			let code=$('#divBarcodeImg span.alert-info').text();
+			console.log($('#pAssNone').data('show'));
+			
+			if(code && obj.data('show')==false){
+				$.alert('<span class="label label-info">查询结果</span>&nbsp;记录数：<span>'+num+'</span>');
+			}else if(code && obj.data('show')){
+				//如果识别出条形码并且对条形码的查询结果为0			
+				let htmlStr='<p>无条形码【'+code+'】对应的信息记录。</p><p class="text-center">【<span class="text-primary"><span class="glyphicon glyphicon-modal-window">新增</span></span>】信息记录？</p>'
+				$.confirm(htmlStr,function(e){
+					con=e;
+					if(true==con){
+						//新增页面弹出	
+						btnClickShowModel('{$home}/dashboard/asset/fmAssSingle',{'oprt':'_CREATE','id':0,'reqObj':reqObj});
+					}
+				}).cancel('否(N)').ok('是(Y)');	
+			}else{}
+			break;
+		default:
+		
+			break;
+	}
+	
+};
+
+
+//利用自调用匿名函数立即执行的特点， 页面初始化
+(function($){
+	pageShowCom({$searchResultNum},'{$reqObj}');
+	console.log('{$reqObj}');
+	
+	let sId=window.location.hash;
+	//传递锚点值,添加tooltip
+	$('.aTblAssSingle').attr('href',sId).tooltip({title: "资产详情", placement: "bottom"});
+	$('.aAssRecords').attr('href',sId).tooltip({title: "状态历史记录", placement: "bottom"});
+	
+	//每个.tdAssOprt根据该行记录的data-ass-status="{$ vo.status_now}"添加相应的a标签
+	$('.tdAssOprt').each(function(){
+		<!-- var ahtml=getOprtHtmlStr($(this).data('assStatus')); -->
+		<!-- $(this).append(ahtml); -->
+		var btnHtml=getOprtHtmlStr($(this).data('assStatus'));
+		$(this).append(btnHtml);
+	});
+	// 设置$('.tdAssOprt')的tooltip
+	$('.tdAssOprt [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	
+	//每个$('thead a')添加属性
+	$('thead a').attr({'href':'#assInfo','data-title':'点击排序','data-toggle':'tooltip'}).closest('th').addClass('text-center');
+
+	<!-- // status单元格内容上色-->
+	$('.spStatus').each(function(){
+		var status=$(this).text();
+		var index=0;
+		index=conStatusArr.indexOf(status);
+		$(this).addClass('label label-'+conLabelArr[index]);
+	});
+	
+	<!-- //对index.html中定义的tblColObjArr进行赋值 -->	
+	tblColObjArr=(function($,arr){
+		if(arr.length==0){
+			$('#tblAssList').find('th').each(function(){
+				<!-- tblColObjArr.push($(this).text()); -->
+				let nameEn=$(this).children('a').data('sortName');
+				let nameChi=$(this).text();
+				<!-- let nameChi=$(this).children('a').html(); -->
+				if(nameEn){
+					arr.push({'nameChi':nameChi,'val':nameEn,'showFlag':true});
+				}else{
+					arr.push({'nameChi':nameChi,'val':0,'showFlag':false});
+				}
+			});
+			//附加value="all"的input复选框信息
+			arr.push({'nameChi':'全选','val':'all','showFlag':$('#tblAssList ul input').eq(0).prop('checked')});
+		}
+		return arr;
+	})(jQuery,tblColObjArr);
+	
+	<!-- console.table(tblColObjArr); -->
+	
+	tblColObjArr.forEach(function(el,index){
+		let obj=$('#tblAssList');
+		let trObj=$('#tblAssList').find('tr');
+		//添加col标签
+		obj.find('colgroup').append('<col data-col-index="'+index+'">');
+			
+		//生成显示字段的多选框内容，
+		if(el.val && el.val!='all'){
+			obj.find('ul').append('<li><div class="checkbox"><label><input type="checkbox" value="'+el.val+'" checked><span class="text-primary">'+el.nameChi+'</span></label></div></li>');
+		}
+		//每个th、td添加data-hide-val=""，相同的data-hide-val=""用于组合成一个col
+		trObj.each(function(){
+			if(el.val){
+				$(this).children().eq(index).attr('data-hide-val',el.val);
+			}
+		});	
+	});
+	
+	//对生成的显示字段的多选框格式进行微调
+	$('#tblAssList caption div.checkbox').css('padding-left','10px').find('input').css('margin-top','0');
+	
+})(jQuery);
+
+
+$(document).ready(function(){
+		
+	$('#tblAssList ul input').click(function(){
+		//复选框点击后的值
+		var checkVal=$(this).prop('checked');
+		var val=$(this).val();
+		
+		//修改tblColObjArr
+		if(val=='all'){
+			tblColObjArr.forEach(function(el,index){
+				el.showFlag=checkVal;
+			});
+		}else{
+			for(var i=0;i<tblColObjArr.length;i++){
+				if(val==tblColObjArr[i].val){
+					tblColObjArr[i].showFlag=checkVal;
+				}
+			}
+		}
+		//根据tblColObjArr进行操作
+		tblColshowChange(tblColObjArr);	
+	});
+	
+	<!-- //表格每页显示记录行数 -->
+	$('#listRows').val('{$sortData.listRows}'); 
+	
+	$('#listRows').change(function(){
+		var listRows=$(this).val()*1;
+		//排序有关的值向$('#divTblSortData')汇集
+		if(listRows){
+			$('#divTblSortData').data('listRows',listRows);
+			//分页从第一页开始
+			$('#divTblSortData').data('pageNum',1);
+		}
+		//调用index.html中的loadAssList()
+		loadAssList();
+	});	
+	
+	$('thead a').click(function(){
+		var sortName=$(this).data('sortName');
+		var sortOrder=$(this).data('sortOrder');
+		//排序有关的值向$('#divTblSortData')汇集
+		if(sortName){
+			$('#divTblSortData').data('sortName',sortName);
+		}
+		if(sortOrder){
+			$('#divTblSortData').data('sortOrder',sortOrder);
+		}
+		//调用index.html中的loadAssList()
+		loadAssList();
+		
+	});	
+	
+	$('.aTblAssSingle').click(function(){
+		//去掉所有行的底色
+		$('tr').removeClass('bg-warning');
+		//给本行上底色
+		$(this).closest('tr').addClass('bg-warning');
+		
+		$('#divLoadAssSingle').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(urlPrefix+'tblAssSingle',{'id':$(this).data('assId')});
+		
+		$('#modalAssSingle').find('.title').html('固定资产详情');
+		$('#modalAssSingle').modal();
+	});
+	
+	$('.aAssRecords').click(function(){
+		//去掉所有行的底色
+		$('tr').removeClass('bg-warning');
+		//给本行上底色
+		$(this).closest('tr').addClass('bg-warning');
+		
+		$('#divLoadAssSingle').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(urlPrefix+'assRecords',{'id':$(this).data('assId')});
+		
+		$('#modalAssSingle').find('.title').html('固定资产状态变化详情');
+		$('#modalAssSingle').modal();
+	});
+	
+	<!-- // 点击分页中的a，表格中的内容根据a中的属性值进行排序 -->
+	$('#divListRows a').click(function(evt){
+		// a所在分页页数
+		var pageStr=$(this).text();
+		var pageNum;
+		//(li.active)所代表的页数
+		var pageNumActive=$('#divListRows li.active').children('span').text();
+		var sortName=$('thead').find('.label').data('sortName');
+
+		evt.preventDefault();
+		
+		switch(pageStr){
+			case'»':
+				//用"*"确保得到的是加法运算结果，而不是字符串
+				pageNum=(pageNumActive*1+1);
+			break;
+			
+			case'«':
+				pageNum=(pageNumActive*1-1);
+			break;
+			
+			default:
+				pageNum=pageStr*1;
+			break;
+		
+		}
+		
+		//排序有关的值向$('#divTblSortData')汇集
+		if(pageNum){
+			$('#divTblSortData').data('pageNum',pageNum);
+		}
+		//调用index.html中的loadAssList()
+		loadAssList();
+		
+	});
+	
+	//页面内所有'.btnAssOprt'的click事件
+	$('.btnAssOprt').click(function(){
+		var dataFromObj=$(this).closest('td');
+		var oprt=$(this).data('assOprt');
+		//向后端请求具体内容所需数据
+		var data={'oprt':oprt,'id':dataFromObj.data('assId'),'reqObj':'btn'};
+		
+		//去掉所有行的底色
+		$('tr').removeClass('bg-warning');
+		//给本行上底色
+		$(this).closest('tr').addClass('bg-warning');
+		//排序有关的值向$('#divTblSortData')汇集。发送本行的assId，便于刷新后本行继续加底色
+		$('#divTblSortData').data('showAssId',dataFromObj.data('assId'));
+		
+		btnClickShowModel(urlPrefix+'fmAssSingle',data);
+
+	});
+	
+});
+</script>
+

@@ -1,138 +1,99 @@
 <!-- // issPat.html： -->
-<div>
+<div class="content-header">
 <!-- <h4 class="label label-default" style="font-size:16px;"><span class="glyphicon glyphicon-list"></span>&nbsp;论文事务 -->
-<h4><span class="label label-info"><span class="glyphicon glyphicon-list"></span></span>&nbsp;论文事务
-   	{eq name=" $numTotal" value="0"}
-		<span class="span0"></span>
-	{else/}
-		<span class="span0 badge" style="font-size:14px;">{$numTotal}</span>
-	{/eq}
-</h4>
+<h4 class="text-primary"><span class="glyphicon glyphicon-list"></span>论文事务</h4>
 
 	<ul class="nav nav-pills" style="margin-top:10px;border-bottom: 1px solid #faebcc;">
-	<!-- <ul class="nav nav-tabs" > -->
-		{eq name="$authArray.iss.edit" value="1"}
-		<li class="" ><a class="aPill" href="#" data-issue-type="_PATENT" data-issue-authority="edit" ><span class="glyphicon glyphicon-pencil"></span>编辑
-			{eq name="$numIssTheEdit" value="0"}
-			<span class="badge">{$numIssTheEdit}</span>
-			{else/}
-			<span class="label label-info"><span class="numSingle">{$numIssTheEdit}</span>/{$numTotal}</span>
-			{/eq}
-		</a></li>
-		{/eq}
-					
-		{eq name="$authArray.iss.audit" value="1"}
-		<li style="marging-left:0px;"><a class="aPill" href="#"  data-issue-type="_PATENT" data-issue-authority="audit"><span class="glyphicon glyphicon-check"></span>审核
-			{eq name="$numIssTheAudit" value="0"}
-			<span class="badge ">{$numIssTheAudit}</span>
-			{else/}
-			<span class="label label-warning "><span class="numSingle">{$numIssTheAudit}</span>/{$numTotal}</span>
-			{/eq}
-		</a></li>
-		{/eq}
-					
-		{eq name="$authArray.iss.approve" value="1"}
-		<li><a class="aPill" href="#" data-issue-type="_PATENT" data-issue-authority="approve"><span class="glyphicon glyphicon-ok"></span>审批
-			{eq name="$numIssTheApprove" value="0"}
-			<span class="badge">{$numIssTheApprove}</span>
-			{else/}
-			<span class="label label-danger"><span class="numSingle">{$numIssTheApprove}</span>/{$numTotal}</span>
-			{/eq}
-		</a></li>
-		{/eq}
-					
-		{eq name="$authArray.iss.execute" value="1"}
-		<li><a class="aPill" href="#" data-issue-type="_PATENT" data-issue-authority="execute"><span class="glyphicon glyphicon-random"></span>&nbsp;执行
-			{eq name="$numIssTheExecute" value="0"}
-			<span class="badge">{$numIssTheExecute}</span>
-			{else/}
-			<span class="label label-info"><span class="numSingle">{$numIssTheExecute}</span>/{$numTotal}</span>
-			{/eq}
-		</a></li>
-		{/eq}
-					
-		{eq name="$authArray.iss.maintain" value="1"}
-		<li><a class="aPill" href="#" data-issue-type="_PATENT" data-issue-authority="maintain"><span class="glyphicon glyphicon-calendar"></span>维护
-			{eq name="$numIssTheMaintain" value="0"}
-			<span class="badge">{$numIssTheMaintain}</span>
-			{else/}
-			<span class="label label-info"><span class="numSingle">{$numIssTheMaintain}</span>/{$numTotal}</span>
-			{/eq}
-		</a></li>
-		{/eq}
+		<li class="active dropdown">
+			<a class="dropdown-toggle aPill" data-toggle="dropdown"  href="#_ISST_THES_INPROCESS">处理中
+				<span class="caret"></span>
+			 </a>
+			<ul class="dropdown-menu">
+				<li class="active">
+					<a class="aIss" href="##_ISST_THES_INPROCESS" data-status="_THES_INPROCESS"><span class="spType">[总计]&nbsp;</span><span class="label label-info spLabel">22</span></a>
+				</li>
+				<li class="divider"></li>
+				<li>
+					<a class="aIss" href="#_ISST_THES1" data-status="_THES1"><span class="glyphicon glyphicon-send"></span>&nbsp;送审&nbsp;<span class="label label-info spLabel"></span></a>
+				</li>
+				<li>
+					<a class="aIss" href="#_ISST_THES2" data-status="_THES2"><span class="glyphicon glyphicon-check"></span>&nbsp;审核&nbsp;<span class="label label-warning spLabel">3</span></a>
+				</li>
+				<li>
+					<a class="aIss" href="#_ISST_THES3" data-status="_THES3"><span class="glyphicon glyphicon-ok"></span>&nbsp;审批&nbsp;<span class="label label-danger spLabel">1</span></a>
+				</li>
+				<li>
+					<a class="aIss" href="#_ISST_THES4" data-status="_THES4"><span class="glyphicon glyphicon-random "></span>&nbsp;执行&nbsp;<span class="label label-primary spLabel">2</span></a>
+				</li>
 		
-		<li><a class="aPill" href="#" data-issue-type="_PATENT" data-issue-authority="done"><span class="glyphicon glyphicon-off"></span>完结
-			{eq name="$numIssTheDone" value="0"}
-			<span class="badge">{$numIssTheDone}</span>
-			{else/}
-			<span class="label label-default">{$numIssTheDone}</span>
-			{/eq}
-		</a></li>			
-	</ul>
-			
-	<div class="tab-content">
-		<div>
-			<!-- <P>前端模板变量$userlg={ $userlg}<br> -->
-			<!-- $userlg.0={ $userlg.0},&nbsp;$userlg.id={ $userlg.id}<br> -->
-			<!-- 后端赋值语句'userlg'=>$userlg -->
-			<!-- </P> -->
 					
-		</div>
+			</ul>
+		</li>
+		<li>
+			<a class="aIss aPill text-muted" href="#_ISST_THES6" data-status="_THES5"><span class="glyphicon glyphicon-off"></span>&nbsp;完结&nbsp;<span class="numSingle">x</span></a>
+		</li>		
+	</ul>
+</div>
+			
+<div class="content-body">
+	<div id="divTopBtn" class="row myRow text-right" style="margin:10px 0px;">		
+		<a id="aSearchData" class="btn btn-primary btn-sm" href="#divSearchData" data-toggle="collapse" title="根据输入信息查询"><span class="glyphicon glyphicon-search"></span>查询</a>		
+		
+		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新固定资产信息表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+			
+		<button class="btn btn-primary btn-sm btnAssOprt" data-ass-id="0" data-ass-oprt="_CREATE" title="新增论文事务"><span class="glyphicon glyphicon-modal-window"></span>新增</button>
+			
+	</div>
+		
+		
+		<!-- // 一般查询区域-->
+	<div id="divSearchData" class="collapse">
+		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchData"  data-toggle="collapse" title="点击隐藏">查询条件</a>
+		<form id="fmSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;">
+		
+		</form>
+		</br>
+	</div>
+	
+	
+		
 		<!-- //需load其他模板文件的div -->
-		<div id="divIssTheAuth_load"><h4 style="margin:50px;">开发中……</h4></div>
+	<div id="divIssTheList_load">
+		<p class="text-center" style="font-size:20px;">开发中……{$home}</p>
 	</div>
 </div>
+
 <!-- /pagewrap  -->
 
 
 <script>
-$(document).ready(function(){
-	//侧边栏消除li的active
-	$('.nav .active').removeClass('active');
-	//侧边栏本页对应a添加数字,其所在li加acitve
-	$('.nav a[href="'+window.location.hash+'"]').find('.badge').text({$numTotal}).css('color','red').closest('li').addClass('active');
-	
-	$('.span0').addClass('mycolorred-bgwhite');
-	
-	<!-- showIssPatList('issPatAuth','{$auth}','{$issId}'); -->
-		
-	//ul.nav-tabs调整.aPill
-	//1.缩小padding
-	$('.aPill').each(function(){
-		$(this).css('padding','5px 10px');
-		
-		//去掉底部边框圆角
-		<!-- $(this).css({'border-bottom-right-radius':'0px','border-bottom-left-radius':'0px'}); -->
 
-	});
+//自调用匿名函数立即执行的特点，进行页面初始化。
+(function($){
+	$('a.aIss[href="'+window.location.hash+'"]').tab('show');
 	
-	//调整span.label
-	$('span.label').css({'padding-bottom':'1px','margin-bottom':'2px'});	
+})(jQuery);
+
+$(document).ready(function(){
 	
-	<!-- //点击.aTab中的各个按钮后，改变显示格式，默认显示相应状态的issPat内容-->
-	$('.aPill').click(function(){
-		<!-- //bootstap下用.data('*')获得data-*属性值 -->
-		var authority=$(this).data('issue-authority');
-		var oprt='';
-		
-		<!-- $(this).tab('show'); -->
-		<!-- if($(this).data('oprt')=='_RENEW'){ -->
-			<!-- showIssPatList('patRenew','_RENEW','{$issId}'); -->
-		<!-- }else{ -->
-			<!-- showIssPatList('issPatAuth',authority,'{$issId}'); -->
-		<!-- } -->
-	
+	<!-- //点击.aIss中的各个按钮后，改变显示格式，默认显示相应状态的issPat内容-->
+	$('.aIss').click(function(){
+		$(this).tab('show');
+		loadIssTheList(window.location.hash);
     });	
 	
 <!-- function  -->
-//**函数名：showIssPatList
- 	//* 作用：本页面加载issPatlist；设置各个‘aPill’中数字的显示格式，并设置其所在li为“active”。
-	//* 参数url，类型：字符串。值：不为空。说明：load操作的URL。
-	//* 参数auth，类型：字符串。值：不为空。说明：load操作的issPat的权限值。
-	//* 参数issId，类型：s数值。值：可为空。说明：要上色的行信息。
-	//* 返回值：无
-function showIssPatList(url,auth,issId){
-	$('#divIssPatAuth_load').load(url,{'auth':auth,'issId':issId},function(){
+//**函数名：loadIssTheList，根据锚点值加载issTheList
+ 	//* 作用：本页面加载issThelist；
+
+function loadIssTheList(anchor){
+	let aObj=$('a.aIss[href="'+window.location.hash+'"]'),
+		theStatus=aObj.data('status'),
+		url='{$home}/dashboard/issue/issTheList',
+		data={'status':theStatus};
+	aObj.tab('show');
+	
+	$('#divIssTheList_load').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(url,data,function(){
 		var obj='';
 		
 		if(auth=='_RENEW'){
