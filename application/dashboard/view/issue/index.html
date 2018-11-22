@@ -1,35 +1,15 @@
 <!-- // issPat.html： -->
 <div class="content-header">
 <!-- <h4 class="label label-default" style="font-size:16px;"><span class="glyphicon glyphicon-list"></span>&nbsp;论文事务 -->
-<h4 class="text-primary"><span class="glyphicon glyphicon-list"></span>论文事务</h4>
+<h4 id="h4Title" class="text-primary">事务</h4>
 
 	<ul class="nav nav-pills" style="margin-top:10px;border-bottom: 1px solid #faebcc;">
 		<li class="active dropdown">
 			<a class="dropdown-toggle aPill" data-toggle="dropdown"  href="#">处理中
 				<span class="caret"></span>
 			 </a>
-			<ul id="ulIssStatusMenu" class="dropdown-menu">
-				<!-- <li class="active"> -->
-					<!-- <a class="aIss" href="#_ISST_THES_INPROCESS" data-status="_THES_INPROCESS"><span class="spType">[总计]&nbsp;</span><span class="label label-info spLabel">22</span></a> -->
-				<!-- </li> -->
-				<!-- <li class="divider"></li> -->
-				<!-- <li> -->
-					<!-- <a class="aIss" href="#_ISST_THES1" data-status="_THES1"><span class="glyphicon glyphicon-send"></span><span class="spType">&nbsp;[送审]&nbsp;</span><span class="label label-info spLabel"></span></a> -->
-				<!-- </li> -->
-				<!-- <li> -->
-					<!-- <a class="aIss" href="#_ISST_THES2" data-status="_THES2"><span class="glyphicon glyphicon-check"></span>&nbsp;[审核]&nbsp;<span class="label label-warning spLabel">3</span></a> -->
-				<!-- </li> -->
-				<!-- <li> -->
-					<!-- <a class="aIss" href="#_ISST_THES3" data-status="_THES3"><span class="glyphicon glyphicon-ok"></span>&nbsp;[审批]&nbsp;<span class="label label-danger spLabel">1</span></a> -->
-				<!-- </li> -->
-				<!-- <li> -->
-					<!-- <a class="aIss" href="#_ISST_THES4" data-status="_THES4"><span class="glyphicon glyphicon-random"></span>&nbsp;[执行]&nbsp;<span class="label label-primary spLabel">2</span></a> -->
-				<!-- </li> -->
-			</ul>
+			<ul id="ulIssStatusMenu" class="dropdown-menu"></ul>
 		</li>
-		<!-- <li> -->
-			<!-- <a class="aIss aPill text-muted" href="#_ISST_THES5" data-status="_THES5"><span class="glyphicon glyphicon-off"></span>&nbsp;完结&nbsp;<span class="spLabel">x</span></a> -->
-		<!-- </li>		 -->
 	</ul>
 </div>
 			
@@ -48,7 +28,7 @@
 	<div id="divSearchData" class="collapse">
 		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchData"  data-toggle="collapse" title="点击隐藏">查询条件</a>
 		
-		<div style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:2px;">
+		<div id="divSearchForm_Load" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:2px;">
 		<form id="fmSearch" >
 			
 		</form>
@@ -56,9 +36,11 @@
 		
 		</br>
 	</div>
+	
+	
 		
 		<!-- //需load其他模板文件的div -->
-	<div id="divIssTheList_load">
+	<div id="divIssList_load">
 		<p class="text-center" style="font-size:20px;">开发中……{$home}</p>
 	</div>
 </div>
@@ -68,6 +50,17 @@
 
 <script>
 var issType='';
+var loadStr='<p class="text-center" style="font-size:28px;">加载中……</p>';
+
+// 根据锚点值得到issType
+var anchorToIssType=()=>{
+	let arr=window.location.hash.slice(2,-1).split('_'),	
+		issTypeStr='';
+	if(arr.length && arr[0].includes('ISST')){
+		issTypeStr='_'+arr[1].slice(0,-1);;
+	}
+	return issTypeStr;
+};
 
 //完善nav nav-pills的内容，以#ulIssStatusMenu为基础生成所有的组件。
 var completeUlDropMenu=(issType)=>{
@@ -82,6 +75,9 @@ var completeUlDropMenu=(issType)=>{
 			{aClass:'aIss',dataStatus:issType+'S4',gly:'random',spTypeText:'&nbsp;[执行]&nbsp;',spLabel:'label label-primary spLabel',spLabelText:'2'},
 			{aClass:'aIss aPill text-muted',dataStatus:issType+'S5',gly:'off',spTypeText:'&nbsp;完结&nbsp;',spLabel:'spLabel',spLabelText:'x'}
 		];
+	
+	obj.empty();
+	obj.closest('li').nextAll().remove();
 	
 	aPropArr.forEach(function(item,index){
 		if(item.gly){
@@ -112,49 +108,61 @@ var completeUlDropMenu=(issType)=>{
 	});
 };
 
-//**函数名：loadIssTheList，根据锚点值加载issTheList
+//改变标题
+var h4TitleChange=(issType)=>{
+	let obj=$('#h4Title'),
+		htmlStr='',
+		arr=[{type:'_PAT',text:'专利事务',gly:'wrench'},
+			{type:'_THE',text:'论文事务',gly:'list'},
+			{type:'_PRO',text:'项目事务',gly:'inbox'}
+		];
+	for(var i=0;i<arr.length;i++){
+		if(issType==arr[i].type){
+			htmlStr='<span class="glyphicon glyphicon-'+arr[i].gly+'"></span>'+arr[i].text;
+			break;
+		}	
+	}
+	
+	obj.html(htmlStr);
+};
+
+//**函数名：loadIssList，根据锚点值加载index.html
  	//* 作用：本页面加载issThelist；
-var loadIssTheList=(anchor)=>{
+var loadIssList=()=>{
 	let aObj=$('a.aIss[href="'+window.location.hash+'"]'),
-		theStatus=aObj.data('status'),
-		url='{$home}/dashboard/issue/issTheList',
-		data={'status':theStatus,'issType':issType};
+		status=aObj.data('status'),
+		urlList='{$home}/dashboard/issue/issList',
+		urlSearchForm='{$home}/dashboard/issue/searchForm',
 		
+		data={'status':status,'issType':issType};
+	
+	console.log(window.location.hash);
+	console.log(data);	
 	aObj.tab('show');
 	
-	$('#divIssTheList_load').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(url,data,function(){
-		var obj='';
-		
-		<!-- if(auth=='_RENEW'){ -->
-			<!-- obj=$('a[data-oprt="'+auth+'"]'); -->
-		<!-- }else{ -->
-			<!-- obj=$('a[data-issue-authority="'+auth+'"]'); -->
-		<!-- } -->
-		
-		<!-- //恢复数字显示的初始格式 -->
-		<!-- $('.numSingle').removeClass('badge').removeClass('mycolorred-bgwhite').addClass('mycolorwhite-bgtransparent'); -->
-		<!-- //设置a所在li为“active” -->
-		<!-- obj.closest('li').addClass('active'); -->
-		<!-- //设置a所含数字的显示格式 -->
-		<!-- obj.find('.numSingle').addClass('badge mycolorred-bgwhite'); -->
-	});
+	$.when(
+		$('#divIssList_load').html(loadStr).load(urlList,data,function(){}),
+		$('#divSearchForm_Load').html(loadStr).load(urlSearchForm,data,function(){})
+	).then(
+		function(data, textStatus, jqXHR){
+			//ajax成功,
+					
+		},
+		function(){
+			//ajax失败
+			$.alert('加载失败，请稍后再试！');
+		}
+	);
+
 };
-// 根据锚点值得到issType
-var anchorToIssType=()=>{
-	let issTypeArr=window.location.hash.slice(2,-1).split('_');
-	let issTypeStr='';
-	if(issTypeArr.length && issTypeArr[0].includes('ISST')){
-		issTypeStr='_'+issTypeArr[1].slice(0,-1);
-	}
-	return issTypeStr;
-};
-//自调用匿名函数立即执行的特点，进行页面初始化，有顺序。
+//自调用匿名函数立即执行的特点，进行页面初始化。
 (function($){
 	issType=anchorToIssType();
 	completeUlDropMenu(issType);
-	loadIssTheList(window.location.hash);
+	h4TitleChange(issType);
+	loadIssList();
 	
-	$.alert('issType:'+issType);
+	
 })(jQuery);
 
 $(document).ready(function(){
@@ -163,7 +171,7 @@ $(document).ready(function(){
 	$('.aIss').click(function(){
 		$(this).tab('show');
 		window.location.hash=$(this).attr('href');
-		loadIssTheList(window.location.hash);
+		loadIssList();
     });	
 	
 <!-- function  -->

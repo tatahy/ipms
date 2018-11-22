@@ -20,9 +20,7 @@ class IssueController extends Controller
     private $pwd = null;
     //用户登录状态
     private $log = null;
-    //用户角色
-    private $roles=array();
-    //请求对象实例
+    //请求对象域名
     private $home = '';
     //用户所在部门
     private $dept = null;
@@ -39,11 +37,11 @@ class IssueController extends Controller
         $this->username=Session::get('username');
         $this->pwd=Session::get('pwd');
         $this->log=Session::get('log');
-        $this->roles=Session::get('role');
         $this->dept=Session::get('dept');
         
         $this->auth=UserModel::where(['username'=>$this->username,'pwd'=>$this->pwd])->find()->authority;
-       
+        //继承了控制器基类Controller后，直接可使用其request属性来使用Request类的实例。
+        $this->home=$this->request->domain();
     }
     //
     private function priLogin()
@@ -52,34 +50,36 @@ class IssueController extends Controller
         if(1!==$this->log){
             $this->error('未登录用户，请先登录系统');
             //$this->redirect($request->domain());
-        }else{
-          //继承了控制器基类Controller后，直接可使用其request属性来使用Request类的实例。
-          $this->home=$this->request->domain();
         }
     }
         
     public function index(Request $request,AssinfoModel $assMdl,$sortData=[],$searchData=[])
     {
       $this->priLogin();
-      $issType=!empty($request->param('issType'))?$request->param('issType'):'';
+      $issType=!empty($this->request->param('issType'))?$this->request->param('issType'):'';
       
-      switch($issType){
-        case '_PAT':
-         // $showObj='issPat';
-          $showObj=$this->issPat();
-          break;
-        case '_THE':
-          $showObj=$this->issThe();
-          //$showObj='issThe';
-          break;
-        case '_PRO':
-          $showObj=$this->issPro();
-          //$showObj='issPro';
-          break;
-      } 
-      //return view($showObj);
+      
+      $this->assign([
+        'home'=>$this->home,
+          
+      ]); 
+      return view();
       //return json_encode($this->auth,JSON_UNESCAPED_UNICODE); 
-      return $showObj;        
+     // switch($issType){
+//        case '_PAT':
+//         // $showObj='issPat';
+//          $showObj=$this->issPat();
+//          break;
+//        case '_THE':
+//          $showObj=$this->issThe();
+//          //$showObj='issThe';
+//          break;
+//        case '_PRO':
+//          $showObj=$this->issPro();
+//          //$showObj='issPro';
+//          break;
+//      }
+//      return $showObj;        
     }
     
    
@@ -92,7 +92,7 @@ class IssueController extends Controller
           
       ]);
       //return view();
-      return json_encode($this->auth,JSON_UNESCAPED_UNICODE);
+      return json_encode($this->auth,JSON_UNESCAPED_UNICODE).'<br>'.$this->home.'<br>Issue.issPat';
     }
     
     public function issThe()
@@ -116,7 +116,7 @@ class IssueController extends Controller
           
       ]);
       //return view();
-      return view('issue/issTheList/issTheList');
+      return view('issue/issThe/issTheList');
     }
     
     public function issPro()
@@ -128,6 +128,47 @@ class IssueController extends Controller
           
       ]);
       return view('issue/issPro');
+    }
+    
+    public function issList($issType='',$status='')
+    {
+      $this->priLogin();
+      $issType=!empty($this->request->param('issType'))?$this->request->param('issType'):'';
+      $status=!empty($this->request->param('status'))?$this->request->param('status'):'';
+      $listPath='';
+      switch($issType){
+        case'_THE':
+          $listPath='issue/issThe/issTheList';
+          break;
+        case'_PAT':
+          $listPath='issue/issPat/issPatList';
+          break;
+        case'_PRO':
+          $listPath='issue/issPro/issProList';
+          break;  
+        
+      }
+      
+      $this->assign([
+        'home'=>$this->home,
+          
+      ]);
+      
+      //return $listPath;
+      return view($listPath);
+      //return $this->fetch($listPath);
+    }
+    
+    public function searchForm($issType='',$status='')
+    {
+      $this->priLogin();
+      $issType=!empty($this->request->param('issType'))?$this->request->param('issType'):'';
+      $status=!empty($this->request->param('status'))?$this->request->param('status'):'';
+      $this->assign([
+        'home'=>$this->home,
+          
+      ]);
+      return $issType.' | '.$status;
     }
     
     //响应前端请求，返回信息

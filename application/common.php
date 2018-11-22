@@ -89,6 +89,55 @@ const conAssOprtArr=['_CREATE'=>'新增',
                     '_READ'=>'查阅',
                     '_DELETE'=>'删除',
                     ];
+
+//issue的操作数组,4类（CURD）10个
+const conIssOprtArr=['_CREATE'=>'新增',
+                    '_SUBMIT'=>'送审',
+                    '_AUDIT'=>'审核',
+                    '_APPROVE'=>'审批',
+                    '_MAINTAIN'=>'维护',
+                    '_UPDATE'=>'更新',
+                    '_TRASH'=>'回收',
+                    '_RESTORE'=>'还原',
+                    '_READ'=>'查阅',
+                    '_DELETE'=>'删除',
+                    ];
+//issue的the状态数组细分共6类21个，大类间用下划线“_”分隔，大类里的小项用连字符“-”分隔
+const conIssTheStatusArr=[//除‘完结’以外的其它状态
+                    '_ISST_THES'=>'*',
+                    //label-info，送审
+                    '_THES1'=>'送审',
+                    '_THES1-1'=>'填报中',
+                    '_THES1-2'=>'审核-需修改',
+                    '_THES1-3'=>'审批-需完善',
+                    //label-success，审核
+                    '_THES2'=>'审核',
+                    '_THES2-1'=>'新增-论文发表申请',
+                    '_THES2-2'=>'审核-已修改',
+                    '_THES2-3'=>'审批-已完善',
+                    '_THES2-END'=>'审核-拒绝',
+                    //label-warning，审批
+                    '_THES3'=>'审批',
+                    '_THES3-1'=>'审核-通过',
+                    '_THES3-END'=>'审批-否决',
+                    //label-primary，执行
+                    '_THES4'=>'执行',
+                    '_THES4-1'=>'审批-批准',
+                    '_THES4-2'=>'执行中',
+                    '_THES4-3'=>'复核-修改',
+                    '_THES4-4'=>'复核-通过',
+                    '_THES4-5'=>'投稿-提交',
+                    '_THES4-6'=>'投稿-修改',
+                    '_THES4-7'=>'投稿-接受',
+                    '_THES4-8'=>'投稿-复核',
+                    '_THES4-END1'=>'投稿-发表',
+                    '_THES4-END2'=>'投稿-被拒',
+                    //label-default，完结
+                    '_THES_END'=>'完结'
+                    ];
+
+
+
   /**
      * 各个模块权限设置初始值
      * 参数$module，类型：字符串。值：可为空。说明：模块名称。默认值：'_ALL'
