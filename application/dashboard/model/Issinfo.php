@@ -30,6 +30,77 @@ class Issinfo extends Model
 
     //指定字段类型
     protected $type = ['auth_time' => 'json', 'oprt_user' => 'json', ];
+    
+    //引用app\common中定义的常量
+    const ISSCAT=conIssTypeArr;
+    const PATSTATUS=conIssPatStatusArr;
+    const THESTATUS=conIssTheStatusArr;
+    //本类的静态方法中用于访问非静态方法时实例化本类对象
+    static private $obj=null;
+    //本类的7个私有静态变量
+    static private $userName='';
+    static private $userDept='';
+    static private $auth=[];
+    static private $issType='';
+    static private $issCatArr=[];
+    static private $numArr=[];
+    static private $statusArr=[];
+    //$numArr=['_PATS1'=>?,'_PATS2'=>?,'_PATS3'=>?,'_PATS4'=>?,'_PATS_END'=>?,
+    //            '_THES1'=>?,'_THES2'=>?,'THES3'=>?,'THES4'=>?,'_THES_END'=>?,
+//                '_PROS1'=>?,'_PROS2'=>?,'_PROS3'=>?,'_PROS4'=>?,'_PROS_END'=>?,
+//                ];
+    
+    
+    
+    private $status='';
+    private $errStr='not initiate Model Issinfo';
+    
+    //本类的5个私有静态变量赋初值  
+    static function initModel($userName,$userDept,$auth,$issType)
+    {
+      
+      
+      //使用静态变量的好处就是一次赋初值，本类中和所有实例化的对象都可以用到。
+      self::$userName=$userName;
+      self::$userDept=$userDept;
+      self::$auth=$auth;
+      self::$issType=$issType;
+      //self::$issCatArr数组赋值
+      foreach(array_values(self::ISSCAT) as $val){
+          foreach($val['typeValue'] as $v){
+            array_push(self::$issCatArr,$v);
+          }
+      }
+      //将数组self::$issCatArr由低到高排序。
+      sort(self::$issCatArr);
+      
+     // switch(self::$issType){
+//        case '_THE':
+//          self::$statusArr=self::THESTATUS;
+//          break;
+//        case '_PAT':
+//          self::$statusArr=self::PATSTATUS;
+//          break;
+//        case '_PRO':
+//        
+//          break;
+//        
+//      }
+
+      self::$statusArr=array_merge(self::PATSTATUS,self::THESTATUS);
+      
+      self::$obj=new self();
+      foreach(self::$issCatArr as $val){
+        self::$numArr[$val]=self::$obj->issStatusQuery($val)->count(); 
+      }     
+      self::$obj=null;
+    }
+    
+    static function getAccessUser()
+    {
+      return ['issType'=>self::$issType,'userName'=>self::$userName,'dept'=>self::$userDept,
+              'auth'=>self::$auth,'numArr'=>self::$numArr,'issCatArr'=>self::$issCatArr];
+    }
 
     //修改器，设置issnum字段的值为iss+yyyy+0000的形式，即是在当年进行流水编号
     protected function setIssnumAttr()
@@ -90,11 +161,101 @@ class Issinfo extends Model
         return $value;
     }
     
+    //获取器，获取数据表中status字段值，转换为中文输出
+    protected function getStatusAttr($dBStrEn)
+    {
+        $output = $dBStrEn;        
+        if (array_key_exists($dBStrEn,self::$statusArr)) {
+            $output = self::$statusArr[$dBStrEn];
+        }
+        return $output;
+    }
+
+    //修改器，修改存入数据表中status字段值，转换为类型编码。
+    protected function setStatusAttr($strChi)
+    {
+        $output = $strChi;
+        //引用本模块公共文件（dashboard/common.php）中定义的数组常量conIssTypeArr
+        foreach(self::$statusArr as $key => $val){
+            if($strChi==$val){
+                $output=$key;
+            }
+        }
+        return $output;
+    }
+    
+    //全局查询范围，框架在查询时会自动调用
+    protected static function base($query)
+    {
+      //$query->whereNull('delete_time')->where('id','>',0);
+      $query->where('id','>',0);
+        //$query->where('delete_time',0)->where('id','>',0);
+    }
+    
     // iss基础查询
     protected function scopeIssmapType($query, $issType = '')
     {
         //$issType='_ISST_PAT'确保查询的是isspat
         $query->where('issmap_type', 'like', '%'.$issType.'%');
+    }
+    
+     //查询issue的状态类别
+    protected function scopeIssStatus($query,$status)
+    {
+        $query->where('status','like','%'.$status.'%');
+    }
+    //检查输入的$status是否合法
+    protected function checkIssStatus()
+    {    
+      $status=!empty($this->status)?$this->status:'';
+      
+      $statusArr=array_keys(self::$statusArr);
+//      
+//      switch(self::$issType){
+//        case '_THE':
+//          $statusArr=array_keys(self::THESTATUS);
+//          break;
+//        case '_PAT':
+//          $statusArr=array_keys(self::PATSTATUS);
+//          break;
+//        case '_PRO':
+//        
+//          break;
+//      }
+      
+      $res='';
+      if(in_array($status,$statusArr,true)){
+        $res=true;
+      }else{
+        $this->errStr='Wrong status value! It should be in array:</br>'.json_encode($statusArr);
+        $res=false;
+      }
+      return $res;
+    }
+    //issue查询对象
+    public function issStatusQuery($status='',$whereArr=[])
+    {
+      
+      $this->status=$status;
+      $auth=self::$auth;
+      $dept=self::$userDept;
+      $userName=self::$userName;
+      $authNum=0;
+      if(!$this->checkIssStatus()){
+        return $this->errStr;
+      }
+      
+      if(count($auth)){
+        foreach($auth as $val){
+          $authNum+=$val;
+        }
+      }else{
+        return '无授权，请重新登录。';
+      }
+    
+      $query=$this->scope('issStatus',$status);
+      
+      return $query;
     }
 
     /**

@@ -163,9 +163,14 @@ class Assinfo extends Model
         return $this->errStr;
       }
       
-      foreach($auth as $val){
-        $authNum+=$val;
+      if(count($auth)){
+        foreach($auth as $val){
+          $authNum+=$val;
+        }
+      }else{
+        return '无授权，请重新登录。';
       }
+      
       //前置查询范围
       $scopeQ=$this->scope('assType',$assType);
       

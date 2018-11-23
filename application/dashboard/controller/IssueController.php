@@ -15,17 +15,19 @@ use app\dashboard\model\User as UserModel;
 class IssueController extends Controller
 {
      //用户名
-    private $username = null;
+    private $userName = null;
     //用户密码
     private $pwd = null;
     //用户登录状态
     private $log = null;
-    //请求对象域名
-    private $home = '';
     //用户所在部门
     private $dept = null;
     //登录用户的权限。
     private $auth=[];
+    //请求对象域名
+    private $home = '';
+    //请求的issType
+    private $issType = '';
   
     //public function __construct(Request $request)
 //    {
@@ -34,14 +36,17 @@ class IssueController extends Controller
     // 初始化
     protected function _initialize()
     {
-        $this->username=Session::get('username');
+        $this->userName=Session::get('username');
         $this->pwd=Session::get('pwd');
         $this->log=Session::get('log');
         $this->dept=Session::get('dept');
-        
-        $this->auth=UserModel::where(['username'=>$this->username,'pwd'=>$this->pwd])->find()->authority;
-        //继承了控制器基类Controller后，直接可使用其request属性来使用Request类的实例。
+         //继承了控制器基类Controller后，直接可使用其request属性来使用Request类的实例。
         $this->home=$this->request->domain();
+        $this->issType=$this->request->param('issType');
+        $this->auth=UserModel::where(['userName'=>$this->userName,'pwd'=>$this->pwd])->find()->authority['iss'];
+        //使用模型前的初始化，为模型内部使用的变量赋初值，后续的各个方法中无需再初始化，但可以进行修改
+        IssinfoModel::initModel($this->userName,$this->dept,$this->auth,$this->issType); 
+       
     }
     //
     private function priLogin()
@@ -82,55 +87,7 @@ class IssueController extends Controller
 //      return $showObj;        
     }
     
-   
-    public function issPat()
-    {
-      $this->priLogin();
-    
-      $this->assign([
-        'home'=>$this->home,
-          
-      ]);
-      //return view();
-      return json_encode($this->auth,JSON_UNESCAPED_UNICODE).'<br>'.$this->home.'<br>Issue.issPat';
-    }
-    
-    public function issThe()
-    {
-      $this->priLogin();
-      
-      $this->assign([
-        'home'=>$this->home,
-          
-      ]);
-      //return view();
-      return view('issue/issThe');
-    }
-    
-    public function issTheList()
-    {
-      $this->priLogin();
-      
-      $this->assign([
-        'home'=>$this->home,
-          
-      ]);
-      //return view();
-      return view('issue/issThe/issTheList');
-    }
-    
-    public function issPro()
-    {
-      $this->priLogin();
-      
-      $this->assign([
-        'home'=>$this->home,
-          
-      ]);
-      return view('issue/issPro');
-    }
-    
-    public function issList($issType='',$status='')
+    public function issList(IssinfoModel $issMdl,$issType='',$status='')
     {
       $this->priLogin();
       $issType=!empty($this->request->param('issType'))?$this->request->param('issType'):'';
@@ -139,6 +96,7 @@ class IssueController extends Controller
       switch($issType){
         case'_THE':
           $listPath='issue/issThe/issTheList';
+          
           break;
         case'_PAT':
           $listPath='issue/issPat/issPatList';
@@ -149,9 +107,10 @@ class IssueController extends Controller
         
       }
       
+      $issSet=$issMdl->issStatusQuery($issType,$status);
       $this->assign([
         'home'=>$this->home,
-          
+        'issSet'=>$issSet  
       ]);
       
       //return $listPath;
@@ -168,7 +127,8 @@ class IssueController extends Controller
         'home'=>$this->home,
           
       ]);
-      return $issType.' | '.$status;
+      
+      return [$issType,$status,IssinfoModel::getAccessUser()];
     }
     
     //响应前端请求，返回信息
@@ -235,7 +195,7 @@ class IssueController extends Controller
                         'dept_now'=>'',
                         'status_now'=>'*',
                         'status_now_desc'=>'新固定资产填报',
-                        'status_now_user_name'=>$this->username,
+                        'status_now_user_name'=>$this->userName,
                         );
       //$assSet=($id*1)?$assMdl::get($id):$assSetArr;
       if($oprt=='_RESTORE' || $oprt=='_DELETE'){
@@ -248,7 +208,7 @@ class IssueController extends Controller
           'home'=>$request->domain(),
           'oprt'=>$oprt,
           'assSet'=>$assSet,
-          'userName'=>$this->username,
+          'userName'=>$this->userName,
           'authAss'=>$authAss
         ]);
       return view();

@@ -94,13 +94,55 @@ const conAssOprtArr=['_CREATE'=>'新增',
 const conIssOprtArr=['_CREATE'=>'新增',
                     '_SUBMIT'=>'送审',
                     '_AUDIT'=>'审核',
+                    '_REVIEW'=>'复核',
                     '_APPROVE'=>'审批',
                     '_MAINTAIN'=>'维护',
                     '_UPDATE'=>'更新',
-                    '_TRASH'=>'回收',
-                    '_RESTORE'=>'还原',
+                    '_EXECUTE'=>'执行',
                     '_READ'=>'查阅',
                     '_DELETE'=>'删除',
+                    ];
+//issue的状态数组大类：5类
+const conIssTypeArr=['submit'=>['typeChi'=>'送审','typeValue'=>['_PATS1','_THES1']],
+                      'audit'=>['typeChi'=>'审核','typeValue'=>['_PATS2','_THES2']],
+                      'approve'=>['typeChi'=>'审批','typeValue'=>['_PATS3','_THES3']],
+                      'execute'=>['typeChi'=>'执行','typeValue'=>['_PATS4','_THES4']],
+                      'end'=>['typeChi'=>'完结','typeValue'=>['_PATS_END','_THES_END']]
+                    ];
+//issue的pat状态数组细分共5类23个，大类间用下划线“_”分隔，大类里的小项用连字符“-”分隔
+const conIssPatStatusArr=[//除‘完结’以外的其它状态
+                    '_ISST_PATS'=>'*',
+                    //label-info，待定
+                    '_PATS1'=>'送审',
+                    '_PATS1-1'=>'填报中',
+                    '_PATS1-2'=>'审核-需修改',
+                    '_PATS1-3'=>'审批-需完善',
+                    //label-success，正常
+                    '_PATS2'=>'',
+                    '_PATS2-1'=>'新增-专利申请',
+                    '_PATS2-2'=>'送审-已修改',
+                    '_PATS2-3'=>'送审-已完善',
+                    '_PATS2-END'=>'审核-拒绝',
+                    //label-warning，异常
+                    '_PATS3'=>'',
+                    '_PATS3-1'=>'审核-通过',
+                    '_PATS3-2'=>'新增-续费申请',
+                    '_PATS3-END1'=>'审批-否决',
+                    '_PATS3-END2'=>'续费-放弃',
+                    //label-default，停用
+                    '_PATS4'=>'',
+                    '_PATS4-1'=>'审批-批准',
+                    '_PATS4-2'=>'执行中',
+                    '_PATS4-3'=>'申报-复核',
+                    '_PATS4-4'=>'申报-提交',
+                    '_PATS4-5'=>'申报-修改',
+                    '_PATS4-6'=>'续费-批准',
+                    '_PATS4-7'=>'续费-提交',
+                    '_PATS4-END1'=>'申报-授权',
+                    '_PATS4-END2'=>'申报-驳回',
+                    '_PATS4-END3'=>'续费-授权',
+                    //label-default，销账
+                    '_PATS_END'=>'完结'
                     ];
 //issue的the状态数组细分共6类21个，大类间用下划线“_”分隔，大类里的小项用连字符“-”分隔
 const conIssTheStatusArr=[//除‘完结’以外的其它状态
@@ -113,8 +155,8 @@ const conIssTheStatusArr=[//除‘完结’以外的其它状态
                     //label-success，审核
                     '_THES2'=>'审核',
                     '_THES2-1'=>'新增-论文发表申请',
-                    '_THES2-2'=>'审核-已修改',
-                    '_THES2-3'=>'审批-已完善',
+                    '_THES2-2'=>'送审-已修改',
+                    '_THES2-3'=>'送审-已完善',
                     '_THES2-END'=>'审核-拒绝',
                     //label-warning，审批
                     '_THES3'=>'审批',
