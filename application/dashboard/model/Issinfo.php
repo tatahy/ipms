@@ -32,21 +32,23 @@ class Issinfo extends Model
     protected $type = ['auth_time' => 'json', 'oprt_user' => 'json', ];
     
     //引用app\common中定义的常量
+    const ISSNAME=conIssNameArr;
     const ISSCAT=conIssTypeArr;
     const PATSTATUS=conIssPatStatusArr;
     const THESTATUS=conIssTheStatusArr;
+    const PROSTATUS=conIssProStatusArr;
     //本类的静态方法中用于访问非静态方法时实例化本类对象
     static private $obj=null;
     //本类的7个私有静态变量
     static private $userName='';
     static private $userDept='';
     static private $auth=[];
-    static private $issType='';
-    static private $issCatArr=[];
-    static private $numArr=[];
+    static private $issEntName='';
+    static private $issEntCatArr=[];
+    static $numArr=[];
     static private $statusArr=[];
     //$numArr=['_PATS1'=>?,'_PATS2'=>?,'_PATS3'=>?,'_PATS4'=>?,'_PATS_END'=>?,
-    //            '_THES1'=>?,'_THES2'=>?,'THES3'=>?,'THES4'=>?,'_THES_END'=>?,
+    //            '_THES1'=>?,'_THES2'=>?,'_THES3'=>?,'_THES4'=>?,'_THES_END'=>?,
 //                '_PROS1'=>?,'_PROS2'=>?,'_PROS3'=>?,'_PROS4'=>?,'_PROS_END'=>?,
 //                ];
     
@@ -56,7 +58,7 @@ class Issinfo extends Model
     private $errStr='not initiate Model Issinfo';
     
     //本类的5个私有静态变量赋初值  
-    static function initModel($userName,$userDept,$auth,$issType)
+    static function initModel($userName,$userDept,$auth,$issEntName)
     {
       
       
@@ -64,17 +66,17 @@ class Issinfo extends Model
       self::$userName=$userName;
       self::$userDept=$userDept;
       self::$auth=$auth;
-      self::$issType=$issType;
-      //self::$issCatArr数组赋值
+      self::$issEntName=in_array($issEntName,self::ISSNAME)?$issEntName:'_PAT';
+      //self::$issEntCatArr数组赋值
       foreach(array_values(self::ISSCAT) as $val){
           foreach($val['typeValue'] as $v){
-            array_push(self::$issCatArr,$v);
+            array_push(self::$issEntCatArr,$v);
           }
       }
-      //将数组self::$issCatArr由低到高排序。
-      sort(self::$issCatArr);
+      //将数组self::$issEntCatArr由低到高排序。
+      sort(self::$issEntCatArr);
       
-     // switch(self::$issType){
+     // switch(self::$issEntName){
 //        case '_THE':
 //          self::$statusArr=self::THESTATUS;
 //          break;
@@ -87,10 +89,10 @@ class Issinfo extends Model
 //        
 //      }
 
-      self::$statusArr=array_merge(self::PATSTATUS,self::THESTATUS);
+      self::$statusArr=array_merge(['_INPROCESS'=>'处理中'],self::PATSTATUS,self::THESTATUS,self::PROSTATUS);
       
       self::$obj=new self();
-      foreach(self::$issCatArr as $val){
+      foreach(self::$issEntCatArr as $val){
         self::$numArr[$val]=self::$obj->issStatusQuery($val)->count(); 
       }     
       self::$obj=null;
@@ -98,8 +100,8 @@ class Issinfo extends Model
     
     static function getAccessUser()
     {
-      return ['issType'=>self::$issType,'userName'=>self::$userName,'dept'=>self::$userDept,
-              'auth'=>self::$auth,'numArr'=>self::$numArr,'issCatArr'=>self::$issCatArr];
+      return ['issEntName'=>self::$issEntName,'statusArr'=>self::$statusArr,'auth'=>self::$auth,
+              'numArr'=>self::$numArr,'issEntCatArr'=>self::$issEntCatArr];
     }
 
     //修改器，设置issnum字段的值为iss+yyyy+0000的形式，即是在当年进行流水编号
@@ -193,25 +195,30 @@ class Issinfo extends Model
     }
     
     // iss基础查询
-    protected function scopeIssmapType($query, $issType = '')
+    protected function scopeIssmapType($query, $issEntName = '')
     {
-        //$issType='_ISST_PAT'确保查询的是isspat
-        $query->where('issmap_type', 'like', '%'.$issType.'%');
+        //$issEntName='_ISST_PAT'确保查询的是isspat
+        $query->where('issmap_type', 'like', '%'.$issEntName.'%');
     }
     
      //查询issue的状态类别
     protected function scopeIssStatus($query,$status)
     {
+      if($status=='_INPROCESS'){
+        $query->where('status','like','%'.self::$issEntName.'%')->where('status','<>',self::$issEntName.'S_END');
+      }else{
         $query->where('status','like','%'.$status.'%');
+      }
+      
     }
     //检查输入的$status是否合法
     protected function checkIssStatus()
     {    
-      $status=!empty($this->status)?$this->status:'';
+      $status=!empty($this->status)?$this->status:'_INPROCESS';
       
       $statusArr=array_keys(self::$statusArr);
 //      
-//      switch(self::$issType){
+//      switch(self::$issEntName){
 //        case '_THE':
 //          $statusArr=array_keys(self::THESTATUS);
 //          break;
@@ -227,19 +234,21 @@ class Issinfo extends Model
       if(in_array($status,$statusArr,true)){
         $res=true;
       }else{
-        $this->errStr='Wrong status value! It should be in array:</br>'.json_encode($statusArr);
+        $this->errStr='Wrong IssStatus value! It should be in array:</br>'.json_encode($statusArr);
         $res=false;
       }
       return $res;
     }
+
     //issue查询对象
-    public function issStatusQuery($status='',$whereArr=[])
+    public function issStatusQuery($status='',$issEntName='',$whereArr=[])
     {
       
       $this->status=$status;
       $auth=self::$auth;
       $dept=self::$userDept;
       $userName=self::$userName;
+      self::$issEntName=in_array($issEntName,self::ISSNAME)?$issEntName:'_PAT';
       $authNum=0;
       if(!$this->checkIssStatus()){
         return $this->errStr;
@@ -252,7 +261,7 @@ class Issinfo extends Model
       }else{
         return '无授权，请重新登录。';
       }
-    
+      
       $query=$this->scope('issStatus',$status);
       
       return $query;
@@ -599,21 +608,6 @@ class Issinfo extends Model
         return $this->morphMany('Attinfo', 'attmap', '_ATTO1');
     }
 
-    /**
-     * 新增一个issue。
-     * @param  array $data 新增issue的各项信息
-     * @return integer|bool  新增成功返回主键，新增失败返回false
-     * 要求：传入的数组下标名与模型属性名（数据表字段名）一模一样。
-     */
-    public function myCreate($data = [])
-    {
-        $result = $this->allowField(true)->save($data);
-        if ($result) {
-            return $this->getData('id');
-        } else {
-            return false;
-        }
-    }
 
     /**
      * 新增一个issue。

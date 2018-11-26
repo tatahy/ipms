@@ -102,13 +102,21 @@ const conIssOprtArr=['_CREATE'=>'新增',
                     '_READ'=>'查阅',
                     '_DELETE'=>'删除',
                     ];
+//issue的类型大类：3类
+const conIssNameArr=['_PAT','_THE','_PRO'];
 //issue的状态数组大类：5类
-const conIssTypeArr=['submit'=>['typeChi'=>'送审','typeValue'=>['_PATS1','_THES1']],
-                      'audit'=>['typeChi'=>'审核','typeValue'=>['_PATS2','_THES2']],
-                      'approve'=>['typeChi'=>'审批','typeValue'=>['_PATS3','_THES3']],
-                      'execute'=>['typeChi'=>'执行','typeValue'=>['_PATS4','_THES4']],
-                      'end'=>['typeChi'=>'完结','typeValue'=>['_PATS_END','_THES_END']]
+const conIssTypeArr=['submit'=>['typeChi'=>'送审','typeValue'=>['_PATS1','_THES1','_PROS1']],
+                      'audit'=>['typeChi'=>'审核','typeValue'=>['_PATS2','_THES2','_PROS2']],
+                      'approve'=>['typeChi'=>'审批','typeValue'=>['_PATS3','_THES3','_PROS3']],
+                      'execute'=>['typeChi'=>'执行','typeValue'=>['_PATS4','_THES4','_PROS4']],
+                      'end'=>['typeChi'=>'完结','typeValue'=>['_PATS_END','_THES_END','_PROS_END']]
                     ];
+//const conIssTypeArr=['submit'=>['typeChi'=>'送审','typeValue'=>['_PATS1','_THES1']],
+//                      'audit'=>['typeChi'=>'审核','typeValue'=>['_PATS2','_THES2']],
+//                      'approve'=>['typeChi'=>'审批','typeValue'=>['_PATS3','_THES3']],
+//                      'execute'=>['typeChi'=>'执行','typeValue'=>['_PATS4','_THES4']],
+//                      'end'=>['typeChi'=>'完结','typeValue'=>['_PATS_END','_THES_END']]
+//                    ];
 //issue的pat状态数组细分共5类23个，大类间用下划线“_”分隔，大类里的小项用连字符“-”分隔
 const conIssPatStatusArr=[//除‘完结’以外的其它状态
                     '_ISST_PATS'=>'*',
@@ -177,7 +185,28 @@ const conIssTheStatusArr=[//除‘完结’以外的其它状态
                     //label-default，完结
                     '_THES_END'=>'完结'
                     ];
-
+//issue的Pro状态数组细分共6类?个，大类间用下划线“_”分隔，大类里的小项用连字符“-”分隔
+const conIssProStatusArr=[//除‘完结’以外的其它状态
+                    '_PROT_THES'=>'*',
+                    //label-info，送审
+                    '_PROS1'=>'送审',
+                    '_PROS1-1'=>'',
+                    //label-success，审核
+                    '_PROS2'=>'审核',
+                    '_PROS2-1'=>'',
+                    '_THES2-2'=>'送审-已修改',
+                    '_THES2-3'=>'送审-已完善',
+                    '_THES2-END'=>'审核-拒绝',
+                    //label-warning，审批
+                    '_PROS3'=>'审批',
+                    '_PROS3-1'=>'审核-通过',
+                    '_PROS3-END'=>'审批-否决',
+                    //label-primary，执行
+                    '_PROS4'=>'执行',
+                    '_PROS4-1'=>'审批-批准',
+                    //label-default，完结
+                    '_PROS_END'=>'完结'
+                    ];
 
 
   /**

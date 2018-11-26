@@ -1,7 +1,7 @@
 <!-- // issPat.html： -->
 <div class="content-header">
 <!-- <h4 class="label label-default" style="font-size:16px;"><span class="glyphicon glyphicon-list"></span>&nbsp;论文事务 -->
-<h4 id="h4Title">事务</h4>
+<h4 id="h4Title"></h4>
 
 	<ul class="nav nav-pills" style="margin-top:10px;border-bottom: 1px solid #faebcc;">
 		<li class="active dropdown">
@@ -29,19 +29,19 @@
 		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchData"  data-toggle="collapse" title="点击隐藏">查询条件</a>
 		
 		<div id="divSearchForm_Load" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:2px;">
-		<form id="fmSearch" >
+			<form id="fmSearch" >
 			
-		</form>
+			</form>
 		</div>
 		
 		</br>
 	</div>
+
+	<!-- // IssList表格排序信息汇总组件 -->
+	<div id="divTblSortData" data-iss-ent-name="{$sortData.issEntName}" data-iss-status="{$sortData.issStatus}" data-sort-name="{$sortData.sortName}" data-sort-order="{$sortData.sortOrder}" data-list-rows="{$sortData.listRows}" data-page-num="{$sortData.pageNum}" data-show-ass-id="{$sortData.showIssId}" class="sr-only"></div>
 	
-	
-		
-		<!-- //需load其他模板文件的div -->
-	<div id="divIssList_load">
-		<p class="text-center" style="font-size:20px;">开发中……{$home}</p>
+	<div id="divIssList_Load">
+		<p class="text-center" style="font-size:28px;">加载中……</p>
 	</div>
 </div>
 
@@ -49,31 +49,32 @@
 
 
 <script>
-var issType='';
+
 var loadStr='<p class="text-center" style="font-size:28px;">加载中……</p>';
 
-// 根据锚点值得到issType
-var anchorToIssType=()=>{
+// 根据锚点值得到issEntName
+var anchorToIssEntName=()=>{
 	let arr=window.location.hash.slice(2,-1).split('_'),	
-		issTypeStr='';
+		name='';
 	if(arr.length && arr[0].includes('ISST')){
-		issTypeStr='_'+arr[1].slice(0,-1);;
+		name='_'+arr[1].slice(0,-1);;
 	}
-	return issTypeStr;
+	return name;
 };
 
 //完善nav nav-pills的内容，以#ulIssStatusMenu为基础通过DOM操作，生成所需的li组件。
-var completeUlDropMenu=(issType)=>{
+var completeUlDropMenu=(numArr)=>{
 	
 	let obj=$('#ulIssStatusMenu'),liObj='',aObj='',
+		name=anchorToIssEntName(),
 		aPropArr=[
-			{aClass:'aIss',dataStatus:issType+'S_INPROCESS',gly:'',spTypeText:'[总计]&nbsp;',spLabel:'label label-info spLabel',spLabelText:'22'},
+			{aClass:'aIss',dataStatus:name+'S_INPROCESS',gly:'',spTypeText:'[总计]&nbsp;',spLabel:'badge',spLabelText:numArr.S_INPROCESS},
 			{aClass:'divider'},
-			{aClass:'aIss',dataStatus:issType+'S1',gly:'glyphicon glyphicon-send',spTypeText:'&nbsp;[送审]&nbsp;',spLabel:'label label-info spLabel',spLabelText:'0'},
-			{aClass:'aIss',dataStatus:issType+'S2',gly:'glyphicon glyphicon-check',spTypeText:'&nbsp;[审核]&nbsp;',spLabel:'label label-warning spLabel',spLabelText:'3'},
-			{aClass:'aIss',dataStatus:issType+'S3',gly:'glyphicon glyphicon-ok',spTypeText:'&nbsp;[审批]&nbsp;',spLabel:'label label-danger spLabel',spLabelText:'1'},
-			{aClass:'aIss',dataStatus:issType+'S4',gly:'glyphicon glyphicon-random',spTypeText:'&nbsp;[执行]&nbsp;',spLabel:'label label-primary spLabel',spLabelText:'2'},
-			{aClass:'aIss aPill text-muted',dataStatus:issType+'S_END',gly:'glyphicon glyphicon-off',spTypeText:'&nbsp;完结&nbsp;',spLabel:'spLabel',spLabelText:'x'}
+			{aClass:'aIss',dataStatus:name+'S1',gly:'glyphicon glyphicon-send',spTypeText:'&nbsp;[送审]&nbsp;',spLabel:'label label-info spLabel',spLabelText:numArr.S1},
+			{aClass:'aIss',dataStatus:name+'S2',gly:'glyphicon glyphicon-check',spTypeText:'&nbsp;[审核]&nbsp;',spLabel:'label label-warning spLabel',spLabelText:numArr.S2},
+			{aClass:'aIss',dataStatus:name+'S3',gly:'glyphicon glyphicon-ok',spTypeText:'&nbsp;[审批]&nbsp;',spLabel:'label label-danger spLabel',spLabelText:numArr.S3},
+			{aClass:'aIss',dataStatus:name+'S4',gly:'glyphicon glyphicon-random',spTypeText:'&nbsp;[执行]&nbsp;',spLabel:'label label-primary spLabel',spLabelText:numArr.S4},
+			{aClass:'aIss aPill text-muted',dataStatus:name+'S_END',gly:'glyphicon glyphicon-off',spTypeText:'&nbsp;完结&nbsp;',spLabel:'spLabel',spLabelText:numArr.S_END}
 		];
 	
 	obj.empty();
@@ -111,17 +112,23 @@ var completeUlDropMenu=(issType)=>{
 };
 
 //改变标题
-var h4TitleChange=(issType)=>{
+var issEntNameChange=()=>{
 	let obj=$('#h4Title'),
+		spObj=$('.spIssEntName'),
 		htmlStr='',
-		arr=[{hClass:'text-warning',type:'_PAT',text:'专利事务',gly:'glyphicon glyphicon-wrench'},
-			{hClass:'text-info',type:'_THE',text:'论文事务',gly:'glyphicon glyphicon-list'},
-			{hClass:'text-danger',type:'_PRO',text:'项目事务',gly:'glyphicon glyphicon-inbox'}
-		];
+		arr=[{hClass:'text-warning',type:'_PAT',text:'专利',gly:'glyphicon glyphicon-wrench'},
+			{hClass:'text-info',type:'_THE',text:'论文',gly:'glyphicon glyphicon-list'},
+			{hClass:'text-danger',type:'_PRO',text:'项目',gly:'glyphicon glyphicon-inbox'}
+		],
+		
+		name=anchorToIssEntName();
+		
 	obj.empty();
 	for(var i=0;i<arr.length;i++){
-		if(issType==arr[i].type){			
-			obj.prepend($('<span></span>').addClass(arr[i].hClass).text(arr[i].text).prepend($('<span></span>').addClass(arr[i].gly)));
+		if(name==arr[i].type){			
+			$('.spIssEntName').text(arr[i].text);
+			obj.prepend($('<span></span>').addClass(arr[i].hClass).text(arr[i].text+'事务').prepend($('<span></span>').addClass(arr[i].gly)));
+			
 			break;
 		}	
 	}
@@ -131,40 +138,102 @@ var h4TitleChange=(issType)=>{
 //**根据锚点值加载不同的issList
 var loadIssList=()=>{
 	let aObj=$('a.aIss[href="'+window.location.hash+'"]'),
-		status=aObj.data('status'),
+		issStatus=aObj.data('status'),
+		issEntName=anchorToIssEntName(),
 		urlList='{$home}/dashboard/issue/issList',
 		urlSearchForm='{$home}/dashboard/issue/searchForm',
-		data={'status':status,'issType':issType};
-		
+		data={'sortData':{},};
+	
+	//排序有关的参数都从$('#divTblSortData')获取
+	let obj=$('#divTblSortData'),
+		sortData={
+		'listRows':obj.data('listRows'),
+		'sortName':obj.data('sortName'),
+		'sortOrder':obj.data('sortOrder'),
+		'pageNum':obj.data('pageNum'),
+		'issEntName':obj.data('issEntName',issEntName).data('issEntName'),
+		'issStatus':obj.data('issStatus',issStatus).data('issStatus'),
+		'showIssId':obj.data('showIssId')
+		};
+	
+	//排序有关的参数默认值
+	let sortDataDefault={'listRows':10,'sortName':'issnum','sortOrder':'asc','pageNum':1,'issEntName':'_PAT','showIssId':0,'issStatus':'_INPROCESS'};
+	
+	sortData=$.extend({},sortDataDefault,sortData);
+	data.sortData=sortData;
+	
 	aObj.tab('show');
+	
+	<!-- $('#divIssList_Load').html(loadStr).load(urlList,data,function(){issEntNameChange();}); -->
+	<!-- $('#divSearchForm_Load').html(loadStr).load(urlSearchForm,data); -->
 	
 	//想利用$.when来保证，2个ajax加载都能成功得到处理。
 	$.when(
-		$('#divIssList_load').html(loadStr).load(urlList,data),
+		$('#divIssList_Load').html(loadStr).load(urlList,data,function(){issEntNameChange();}),
 		$('#divSearchForm_Load').html(loadStr).load(urlSearchForm,data)
-		<!-- $.post(urlSearchForm,data) -->
-	).then(
-		function(v1, v2){
-			//ajax成功,v1,v2分别对应为前2个load方法执行后得到的返回结果（V1为jQuery对象，v2为ajax返回的数组）
-			console.dir(v1.length);	
-			console.dir(v2);
-			<!-- $('#divIssList_load').html(JSON.stringify(v2[0]))			 -->
+		//$.post(urlSearchForm,data)
+	).then(	
+		function(v1,v2){
+			//ajax成功,v对应为前2个load方法执行后得到的返回结果（V为jQuery对象）
+			if(v1.length){
+				//issEntNameChange();		
+			}
+			<!-- console.dir(v1.length);	 -->
+			<!-- console.dir(v2.length); -->
+				
+			//$('#divIssList_load').html(JSON.stringify(v2[0]))			
 		},
 		function(){
 			//ajax失败
 			$.alert('加载失败，请稍后再试！');
 		}
 	);
-
 };
+//将numObj中选择issEntName对应的部分
+var selectNumObj=(numObj)=>{
+	let issEntName=anchorToIssEntName(),
+		nameArr=Object.keys(numObj),
+		valArr=Object.values(numObj),
+		numInprocess=0;
+		arr=[],
+		obj={};
+	
+	for(let i=0;i<nameArr.length;i++){
+		arr[i]={'name':nameArr[i],'val':valArr[i]};
+	}
+	
+	arr.forEach(function(item,index){
+		//含有issEntName的才截取到numArr中
+		if(item.name.includes(issEntName)){
+			if(item.val){
+				let n=item.name.indexOf(issEntName);
+				if(n==0){
+					obj[item.name.substring(n+4)]=item.val;
+				}else{
+					obj[item.name]=item.val;
+				}
+				
+			}else{
+				obj[item.name]='';
+			}
+			numInprocess+=item.val*1;
+		}
+
+	});
+	
+	obj['S_INPROCESS']=(numInprocess-obj['S_END'])?(numInprocess-obj['S_END']):'';
+	
+	return obj;
+};
+
+
 //自调用匿名函数立即执行的特点，进行页面初始化。
 (function($){
-	issType=anchorToIssType();
-	completeUlDropMenu(issType);
-	h4TitleChange(issType);
+	let numObj=selectNumObj({$numArr});
+	console.table(numObj);
+	completeUlDropMenu(numObj);
+	issEntNameChange();
 	loadIssList();
-	
-	
 })(jQuery);
 
 $(document).ready(function(){

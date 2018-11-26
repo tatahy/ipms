@@ -219,7 +219,7 @@ function loadFile(anchor){
 			break;
 		case '_ISS':
 			url='{$home}/dashboard/issue/index';
-			data={'issType':anchor.slice(6,10)};
+			data={'issEntName':anchor.slice(6,10),'IssStatus':'_INPROCESS'};
 			break;	
 		case '_ATT':
 			url='{$home}/dashboard/attachment/index';

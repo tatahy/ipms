@@ -26,8 +26,8 @@ class IssueController extends Controller
     private $auth=[];
     //请求对象域名
     private $home = '';
-    //请求的issType
-    private $issType = '';
+    //请求的issEntName
+    private $issEntName = '';
   
     //public function __construct(Request $request)
 //    {
@@ -42,10 +42,10 @@ class IssueController extends Controller
         $this->dept=Session::get('dept');
          //继承了控制器基类Controller后，直接可使用其request属性来使用Request类的实例。
         $this->home=$this->request->domain();
-        $this->issType=$this->request->param('issType');
+        $this->issEntName=$this->request->param('issEntName');
         $this->auth=UserModel::where(['userName'=>$this->userName,'pwd'=>$this->pwd])->find()->authority['iss'];
         //使用模型前的初始化，为模型内部使用的变量赋初值，后续的各个方法中无需再初始化，但可以进行修改
-        IssinfoModel::initModel($this->userName,$this->dept,$this->auth,$this->issType); 
+        IssinfoModel::initModel($this->userName,$this->dept,$this->auth,$this->issEntName); 
        
     }
     //
@@ -58,19 +58,28 @@ class IssueController extends Controller
         }
     }
         
-    public function index(Request $request,AssinfoModel $assMdl,$sortData=[],$searchData=[])
+    public function index(Request $request,IssinfoModel $issMdl,AssinfoModel $assMdl,$sortData=[],$searchData=[])
     {
       $this->priLogin();
-      $issType=!empty($this->request->param('issType'))?$this->request->param('issType'):'';
+      $issEntName=!empty($this->request->param('issEntName'))?$this->request->param('issEntName'):'';
+      $issStatus=!empty($this->request->param('issStatus'))?$this->request->param('issStatus'):'_INPROCESS';
+      
+      
+      $sortData=array('listRows'=>10,'sortName'=>'issnum','sortOrder'=>'asc','pageNum'=>1,
+                      'showIssId'=>0,'issEntName'=>$issEntName,'issStatus'=>$issStatus);
+      
       
       
       $this->assign([
         'home'=>$this->home,
-          
-      ]); 
+        'issEntName'=>$issEntName,
+        'sortData'=>$sortData,
+        'numArr'=>json_encode($issMdl::$numArr)
+      ]);
+      
       return view();
       //return json_encode($this->auth,JSON_UNESCAPED_UNICODE); 
-     // switch($issType){
+     // switch($issEntName){
 //        case '_PAT':
 //         // $showObj='issPat';
 //          $showObj=$this->issPat();
@@ -87,48 +96,52 @@ class IssueController extends Controller
 //      return $showObj;        
     }
     
-    public function issList(IssinfoModel $issMdl,$issType='',$status='')
+    public function issList(IssinfoModel $issMdl)
     {
       $this->priLogin();
-      $issType=!empty($this->request->param('issType'))?$this->request->param('issType'):'';
-      $status=!empty($this->request->param('status'))?$this->request->param('status'):'';
-      $listPath='';
-      switch($issType){
-        case'_THE':
-          $listPath='issue/issThe/issTheList';
-          
-          break;
-        case'_PAT':
-          $listPath='issue/issPat/issPatList';
-          break;
-        case'_PRO':
-          $listPath='issue/issPro/issProList';
-          break;  
-        
-      }
+      $request=$this->request;
       
-      $issSet=$issMdl->issStatusQuery($issType,$status);
+      $sortDefaults=array('listRows'=>10,'sortName'=>'issnum','sortOrder'=>'asc','pageNum'=>1,
+                          'showIssId'=>0,'issEntName'=>'_PAT','issStatus'=>'_INPROCESS');
+      // 接收前端的排序参数数组
+      $sortData=!empty($request->param('sortData/a'))?$request->param('sortData/a'):$sortDefaults;
+      $sortData=array_merge($sortDefaults,$sortData);
+      $issEntName=$sortData['issEntName'];
+      $issStatus=substr_count($sortData['issStatus'],'_INPROCESS')?'_INPROCESS':$sortData['issStatus'];
+      //分页,每页$listRows条记录
+      $issSet=$issMdl->issStatusQuery($issStatus,$issEntName)
+                      ->order($sortData['sortName'], $sortData['sortOrder'])
+                      ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
+                        'query'=>['listRows'=>$sortData['listRows']]]);
+      // 获取分页显示
+      $issList=$issSet->render(); 
+      
       $this->assign([
         'home'=>$this->home,
-        'issSet'=>$issSet  
+        'issEntName'=>$issEntName,
+        'issSet'=>$issSet,
+        'issList'=>$issList, 
+        
+        //排序数组
+        'sortData'=>$sortData, 
       ]);
       
-      //return $listPath;
-      return view($listPath);
+      return view();
+      //return view($listPath);
       //return $this->fetch($listPath);
     }
     
-    public function searchForm($issType='',$status='')
+    public function searchForm(IssinfoModel $issMdl,$issEntName='',$issStatus='')
     {
       $this->priLogin();
-      $issType=!empty($this->request->param('issType'))?$this->request->param('issType'):'';
-      $status=!empty($this->request->param('status'))?$this->request->param('status'):'';
+      $issEntName=!empty($this->request->param('issEntName'))?$this->request->param('issEntName'):'';
+      $issStatus=!empty($this->request->param('issStatus'))?$this->request->param('issStatus'):'';
       $this->assign([
         'home'=>$this->home,
-          
+        $issSet=$issMdl->issStatusQuery($issStatus)
       ]);
       
-      return [$issType,$status,IssinfoModel::getAccessUser()];
+      return [IssinfoModel::getAccessUser(),$issSet];
     }
     
     //响应前端请求，返回信息

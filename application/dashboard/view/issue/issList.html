@@ -1,17 +1,17 @@
 <!-- issPatList.html -->
 
 <!-- pagewrap  -->	
-<div id="divAssList">
+<div id="divIssList">
 	<div class="row myRow">
 		<div class="text-right">
-			<strong class="spAssType"></strong><span id="spSearchResult" class="label label-info">查询结果</span>&nbsp;记录数：<span id="spAssNum">{ $searchResultNum}</span>
+			<strong class="spIssStatus"></strong><span id="spSearchResult" class="label label-info">查询结果</span>&nbsp;记录数：<span id="spAssNum">{ $searchResultNum}</span>
 		</div>
-		<P>{ $issSet}</P>
+		<!-- <P>调试输出</P> -->
 	</div>	
 	<div class="table-responsive" style="overflow: auto;"> 
 		<table id="tblAssList" class="table table-bordered table-hover table-condensed" >
 			<caption class="text-center" style="border-bottom:1px solid #eee;">
-			<h4><span class="spIssEntName"></span>信息列表&nbsp;<strong class="spAssType"></strong>
+			<h4><span class="spIssEntName"></span>事务信息列表&nbsp;<strong class="spIssStatus"></strong>
 			   	<div class="btn-group">
       				<button type="button" class="btn btn-xs btn-primary dropdown-toggle" data-toggle="dropdown" >选择显示字段<span class="caret"></span></button>
       				<ul class="dropdown-menu" >
@@ -36,7 +36,7 @@
 					<th><a data-sort-name="issEntStatus"><span class="spIssEntName"></span>状态</a></th>
 					<th><a data-sort-name="dept">所属部门</a></th>
 					<th><a data-sort-name="writer">事务撰写人</a></th>
-					<th><a data-sort-name="executer">事务执行人</a></th>
+					<th><a data-sort-name="registrar">事务登记人</a></th>
 					<th class="text-center">操作</th>
 				</tr>
 			
@@ -58,7 +58,7 @@
 					<td>{ $vo.issEntStatus}</td>
 					<td>{$vo.dept}</td>
 					<td>{$vo.writer}</td>
-					<td>{$vo.executer}</td>
+					<td>{$vo.registrar}</td>
 					<td>操作</td>				
 				</tr>
 				{/volist}
@@ -71,7 +71,7 @@
 	
 	<div id="divListRows" class="row text-right" style="padding-top:10px;">
 		<!-- // 分页变量 -->
-		<div class="col-sm-10">{ $issList}</div>
+		<div class="col-sm-10">{$issList}</div>
 		
 		<div class="form-group form-group-sm col-sm-2">
 			<span class="">每页显示记录数：</span>
@@ -90,6 +90,14 @@
 
 <!-- /pagewrap  -->
 <script>
+//var issEntName='{ $issEntName}'; -->
+
+
+//自调用匿名函数立即执行的特点，进行页面初始化。
+(function($){
+	
+	
+})(jQuery);
 
 </script>
 
