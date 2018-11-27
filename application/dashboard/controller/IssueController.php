@@ -68,53 +68,60 @@ class IssueController extends Controller
       $sortData=array('listRows'=>10,'sortName'=>'issnum','sortOrder'=>'asc','pageNum'=>1,
                       'showIssId'=>0,'issEntName'=>$issEntName,'issStatus'=>$issStatus);
       
-      
+      $numArr=$issMdl::getNumArr();
       
       $this->assign([
         'home'=>$this->home,
         'issEntName'=>$issEntName,
         'sortData'=>$sortData,
-        'numArr'=>json_encode($issMdl::$numArr)
+        'numArr'=>json_encode($numArr)
       ]);
       
       return view();
-      //return json_encode($this->auth,JSON_UNESCAPED_UNICODE); 
-     // switch($issEntName){
-//        case '_PAT':
-//         // $showObj='issPat';
-//          $showObj=$this->issPat();
-//          break;
-//        case '_THE':
-//          $showObj=$this->issThe();
-//          //$showObj='issThe';
-//          break;
-//        case '_PRO':
-//          $showObj=$this->issPro();
-//          //$showObj='issPro';
-//          break;
-//      }
-//      return $showObj;        
     }
     
     public function issList(IssinfoModel $issMdl)
     {
       $this->priLogin();
       $request=$this->request;
-      
+      //搜索查询条件数组
+      $whereArr=[];
+      $searchDefaults=array();
       $sortDefaults=array('listRows'=>10,'sortName'=>'issnum','sortOrder'=>'asc','pageNum'=>1,
                           'showIssId'=>0,'issEntName'=>'_PAT','issStatus'=>'_INPROCESS');
+      
       // 接收前端的排序参数数组
       $sortData=!empty($request->param('sortData/a'))?$request->param('sortData/a'):$sortDefaults;
       $sortData=array_merge($sortDefaults,$sortData);
       $issEntName=$sortData['issEntName'];
+      //'_INPROCESS'字符串出现在$sortData['issStatus']中的次数
       $issStatus=substr_count($sortData['issStatus'],'_INPROCESS')?'_INPROCESS':$sortData['issStatus'];
+      
+      // 接收前端的搜索参数数组，由前端保证传来的搜索参数值非0，非空。
+      $searchData=!empty($request->param('searchData/a'))?$request->param('searchData/a'):$searchDefaults;
+      $searchData=array_merge($searchDefaults,$searchData);
+      
+      //前端输入的关键字搜索,like关键字
+      
+      //前端select值搜索，=select值
+       
+      //将空白元素删除
+      foreach($whereArr as $key=>$val){
+        if(empty($val)){
+          unset($whereArr[$key]);
+        }
+      }
+      
       //分页,每页$listRows条记录
-      $issSet=$issMdl->issStatusQuery($issStatus,$issEntName)
+      $issSet=$issMdl->issStatusQuery($issStatus,$issEntName)->where($whereArr)
                       ->order($sortData['sortName'], $sortData['sortOrder'])
                       ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
                         'query'=>['listRows'=>$sortData['listRows']]]);
       // 获取分页显示
       $issList=$issSet->render(); 
+      
+      //搜索记录总数
+      $searchResultNum=$issMdl->issStatusQuery($issStatus,$issEntName)->where($whereArr)->count();
       
       $this->assign([
         'home'=>$this->home,
@@ -123,12 +130,12 @@ class IssueController extends Controller
         'issList'=>$issList, 
         
         //排序数组
-        'sortData'=>$sortData, 
+        'sortData'=>$sortData,
+        //记录总数
+        'searchResultNum'=>$searchResultNum 
       ]);
       
       return view();
-      //return view($listPath);
-      //return $this->fetch($listPath);
     }
     
     public function searchForm(IssinfoModel $issMdl,$issEntName='',$issStatus='')

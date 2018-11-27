@@ -432,11 +432,12 @@ var loadAssList=()=>{
 //函数名：sortOrderToggle
 //作用：对选定的assList列表字段进行升序降序转换，改变该字段表头显示格式
 var sortOrderToggle=()=>{
-	var obj='';
-	var glyAsc='&nbsp;<span class="small glyphicon glyphicon-sort-by-attributes"></span>';
-	var glyDesc='&nbsp;<span class="small glyphicon glyphicon-sort-by-order-alt"></span>';
-	var sortOrder=$('#divTblSortData').data('sortOrder');
-	var sortName=$('#divTblSortData').data('sortName');
+	let obj='',
+		glyAsc='&nbsp;<span class="small glyphicon glyphicon-sort-by-attributes"></span>',
+		glyDesc='&nbsp;<span class="small glyphicon glyphicon-sort-by-order-alt"></span>',
+		sortOrder=$('#divTblSortData').data('sortOrder'),
+		sortName=$('#divTblSortData').data('sortName');
+		
 	$('thead a').removeClass('label label-primary');
 	
 	$('thead a').each(function(){
@@ -451,14 +452,10 @@ var sortOrderToggle=()=>{
 		obj.addClass('label label-primary');
 		if(sortOrder == 'asc'){
 			//当前为升序
-			obj.append(glyAsc);
-			obj.tooltip({title:'当前为升序。点击后降序',placement: 'top'});
-			obj.data('sortOrder','desc');
+			obj.append(glyAsc).data('sortOrder','desc').tooltip({title:'当前为升序。点击后降序',placement: 'top'});
 		}else{
 			//当前为降序
-			obj.append(glyDesc);
-			obj.tooltip({title:'当前为降序。点击后升序',placement: 'top'});
-			obj.data('sortOrder','asc');
+			obj.append(glyDesc).data('sortOrder','asc').tooltip({title:'当前为降序。点击后升序',placement: 'top'});
 		}
 	}		
 };

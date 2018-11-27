@@ -141,7 +141,7 @@ footer {
 	</div>
 </nav>
 
-<div id="mySidenav" class="sidenav">
+<div id="mySideNav" class="sidenav">
 	<div style="height:30px;border-bottom:1px solid #e3e3e3;"><button id="closeBtn" type="button" class="btn btn-link btn-lg pull-right" style="padding:0px 10px 0px 0px;"><span class="glyphicon glyphicon-chevron-left"></span><span style="font-size:16px;">隐藏</span></button>
 	</div>
 	<!-- nav 与 jQuery结合实现菜单栏导航效果-->
@@ -149,11 +149,11 @@ footer {
 		<li class="active"><a class="aAnchor" href="#userInfo"><span class="glyphicon glyphicon-user"></span>&nbsp;个人信息管理</a></li>
 		
 		<li class="dropdown">
-			<a class="dropdown-toggle" href="#" data-toggle="dropdown"><span class="glyphicon glyphicon-th-list"></span>&nbsp;事务处理<span class="badge">{ $issNumInprocess}</span><span class="caret"></span></a>
+			<a class="dropdown-toggle" href="#" data-toggle="dropdown"><span class="glyphicon glyphicon-th-list"></span>&nbsp;事务处理<span id="issNumInprocess" class="badge"></span><span class="caret"></span></a>
 			<ul class="dropdown-menu nav nav-pills nav-stacked pull-right">
-				<li ><a class="aAnchor" href="#_ISST_PATS_INPROCESS"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利事务<span class="badge">{ $patNumInprocess}</span></a></li>
-				<li ><a class="aAnchor" href="#_ISST_THES_INPROCESS"><span class="glyphicon glyphicon-list"></span>&nbsp;论文事务<span class="badge">{ $theNumInprocess}</span></a></li>
-				<li ><a class="aAnchor" href="#_ISST_PROS_INPROCESS"><span class="glyphicon glyphicon-inbox"></span>&nbsp;项目事务<span class="badge">{ $proNumInprocess}</span></a></li>
+				<li ><a class="aAnchor" href="#_ISST_PATS_INPROCESS"><span class="glyphicon glyphicon-wrench"></span>&nbsp;专利事务<span id="issPatNumInprocess" class="badge"></span></a></li>
+				<li ><a class="aAnchor" href="#_ISST_THES_INPROCESS"><span class="glyphicon glyphicon-list"></span>&nbsp;论文事务<span id="issTheNumInprocess" class="badge"></span></a></li>
+				<li ><a class="aAnchor" href="#_ISST_PROS_INPROCESS"><span class="glyphicon glyphicon-inbox"></span>&nbsp;项目事务<span id="issProNumInprocess" class="badge"></span></a></li>
 			</ul>
 		</li>	
 		
@@ -189,11 +189,11 @@ var showSideNavbar=(y)=>{
 	if(y){
 		//show
 		$('#openBtn').hide();
-		$('#mySidenav').addClass('sidenav-show');
+		$('#mySideNav').addClass('sidenav-show');
 		$('#main').addClass('sidenav-show');
 	}else{
 		$('#openBtn').show();
-		$('#mySidenav').removeClass('sidenav-show');
+		$('#mySideNav').removeClass('sidenav-show');
 		$('#main').removeClass('sidenav-show');
 	}
 };

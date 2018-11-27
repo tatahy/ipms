@@ -316,14 +316,9 @@ var pageShowCom=(num,reqObj)=>{
 	let obj=$('#pAssNone');
 	
 	if(num){
-		obj.hide();
-		obj.data('show',false);
-		obj.prevAll().show();
-		
+		obj.hide().data('show',false).prevAll().show();
 	}else{
-		obj.show();
-		obj.data('show',true);
-		obj.prevAll().hide();
+		obj.show().data('show',true).prevAll().hide();
 	}
 	//根据reqObj实现不同的弹出窗
 	switch(reqObj){
@@ -352,7 +347,6 @@ var pageShowCom=(num,reqObj)=>{
 		
 			break;
 	}
-	
 };
 
 
@@ -433,7 +427,7 @@ var pageShowCom=(num,reqObj)=>{
 
 
 $(document).ready(function(){
-		
+	//选择显示字段	
 	$('#tblAssList ul input').click(function(){
 		//复选框点击后的值
 		var checkVal=$(this).prop('checked');

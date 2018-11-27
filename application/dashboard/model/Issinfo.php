@@ -45,23 +45,18 @@ class Issinfo extends Model
     static private $auth=[];
     static private $issEntName='';
     static private $issEntCatArr=[];
-    static $numArr=[];
+    static private $numArr=[];
     static private $statusArr=[];
     //$numArr=['_PATS1'=>?,'_PATS2'=>?,'_PATS3'=>?,'_PATS4'=>?,'_PATS_END'=>?,
     //            '_THES1'=>?,'_THES2'=>?,'_THES3'=>?,'_THES4'=>?,'_THES_END'=>?,
 //                '_PROS1'=>?,'_PROS2'=>?,'_PROS3'=>?,'_PROS4'=>?,'_PROS_END'=>?,
 //                ];
-    
-    
-    
     private $status='';
     private $errStr='not initiate Model Issinfo';
     
     //本类的5个私有静态变量赋初值  
     static function initModel($userName,$userDept,$auth,$issEntName)
     {
-      
-      
       //使用静态变量的好处就是一次赋初值，本类中和所有实例化的对象都可以用到。
       self::$userName=$userName;
       self::$userDept=$userDept;
@@ -75,33 +70,56 @@ class Issinfo extends Model
       }
       //将数组self::$issEntCatArr由低到高排序。
       sort(self::$issEntCatArr);
-      
-     // switch(self::$issEntName){
-//        case '_THE':
-//          self::$statusArr=self::THESTATUS;
-//          break;
-//        case '_PAT':
-//          self::$statusArr=self::PATSTATUS;
-//          break;
-//        case '_PRO':
-//        
-//          break;
-//        
-//      }
 
       self::$statusArr=array_merge(['_INPROCESS'=>'处理中'],self::PATSTATUS,self::THESTATUS,self::PROSTATUS);
       
       self::$obj=new self();
       foreach(self::$issEntCatArr as $val){
         self::$numArr[$val]=self::$obj->issStatusQuery($val)->count(); 
-      }     
+      }
+      self::$obj->setNumArr();     
       self::$obj=null;
+      
     }
     
     static function getAccessUser()
     {
       return ['issEntName'=>self::$issEntName,'statusArr'=>self::$statusArr,'auth'=>self::$auth,
               'numArr'=>self::$numArr,'issEntCatArr'=>self::$issEntCatArr];
+    }
+    
+    static function getNumArr()
+    {
+      return self::$numArr;
+    }
+    //将self::$numArr重组成['_PAT'=>['S_INPROCESS'=>,'S1'=>,'S2'=>,'S3'=>,'S4'=>,'S_END'=>,],'_PRO'=>[],'_THE'=>[]]的数组
+    private function setNumArr()
+    {
+      //self::ISSNAME==['_PAT','_THE','_PRO']
+      $arr=[];
+      $subArr=[];
+      $numTotal=0;
+      
+      foreach(self::ISSNAME as $val){
+        $subArr=[];
+        $numTotal=0;
+        //含有$val值的$k项才进行处理
+        foreach(self::$numArr as $k=>$v){
+          //$val首次出现在$k里的位置
+          if(strpos($k,$val)===0){
+            $subArr[substr($k,strlen($val))]=$v;
+            $numTotal+=$v;
+          }
+        }
+        $subArr['S_INPROCESS']=$numTotal-$subArr['S_END'];
+        //将0替换为''
+        foreach($subArr as $ks=>$vs){
+          if($vs===0){$subArr[$ks]='';}
+        }
+        $arr[$val]=$subArr;        
+      }
+      
+      self::$numArr=$arr;
     }
 
     //修改器，设置issnum字段的值为iss+yyyy+0000的形式，即是在当年进行流水编号

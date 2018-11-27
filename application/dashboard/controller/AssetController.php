@@ -172,7 +172,7 @@ class AssetController extends \think\Controller
         $assList=$assSet->render(); 
         
         //记录总数
-        $searchResultNum=count($this->priAssQueryObj($assType)->where($whereArr)->select());        
+        $searchResultNum=$this->priAssQueryObj($assType)->where($whereArr)->count();        
         //数量总计
         $quanCount=$this->priAssQueryObj($assType)->where($whereArr)->sum('quantity');
                        

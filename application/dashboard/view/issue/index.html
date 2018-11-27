@@ -17,9 +17,9 @@
 	<div id="divTopBtn" class="row myRow text-right" style="margin:10px 0px;">		
 		<a id="aSearchData" class="btn btn-primary btn-sm" href="#divSearchData" data-toggle="collapse" title="根据输入信息查询"><span class="glyphicon glyphicon-search"></span>查询</a>		
 		
-		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新固定资产信息表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新事务信息表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 			
-		<button class="btn btn-primary btn-sm btnAssOprt" data-iss-id="0" data-iss-oprt="_CREATE" title="新增论文事务"><span class="glyphicon glyphicon-modal-window"></span>新增</button>
+		<button class="btn btn-primary btn-sm btnAssOprt" data-iss-id="0" data-iss-oprt="_CREATE" title="新增事务"><span class="glyphicon glyphicon-modal-window"></span>新增</button>
 			
 	</div>
 		
@@ -49,8 +49,9 @@
 
 
 <script>
-
 var loadStr='<p class="text-center" style="font-size:28px;">加载中……</p>';
+//控制显示/隐藏字段的组件的属性数组
+var columnToggleArr=[];
 
 // 根据锚点值得到issEntName
 var anchorToIssEntName=()=>{
@@ -63,18 +64,18 @@ var anchorToIssEntName=()=>{
 };
 
 //完善nav nav-pills的内容，以#ulIssStatusMenu为基础通过DOM操作，生成所需的li组件。
-var completeUlDropMenu=(numArr)=>{
+var completeUlDropMenu=(numObj)=>{
 	
 	let obj=$('#ulIssStatusMenu'),liObj='',aObj='',
 		name=anchorToIssEntName(),
 		aPropArr=[
-			{aClass:'aIss',dataStatus:name+'S_INPROCESS',gly:'',spTypeText:'[总计]&nbsp;',spLabel:'badge',spLabelText:numArr.S_INPROCESS},
+			{aClass:'aIss',dataStatus:name+'S_INPROCESS',gly:'',spTypeText:'[总计]&nbsp;',spLabel:'badge spLabel',spLabelText:numObj.S_INPROCESS},
 			{aClass:'divider'},
-			{aClass:'aIss',dataStatus:name+'S1',gly:'glyphicon glyphicon-send',spTypeText:'&nbsp;[送审]&nbsp;',spLabel:'label label-info spLabel',spLabelText:numArr.S1},
-			{aClass:'aIss',dataStatus:name+'S2',gly:'glyphicon glyphicon-check',spTypeText:'&nbsp;[审核]&nbsp;',spLabel:'label label-warning spLabel',spLabelText:numArr.S2},
-			{aClass:'aIss',dataStatus:name+'S3',gly:'glyphicon glyphicon-ok',spTypeText:'&nbsp;[审批]&nbsp;',spLabel:'label label-danger spLabel',spLabelText:numArr.S3},
-			{aClass:'aIss',dataStatus:name+'S4',gly:'glyphicon glyphicon-random',spTypeText:'&nbsp;[执行]&nbsp;',spLabel:'label label-primary spLabel',spLabelText:numArr.S4},
-			{aClass:'aIss aPill text-muted',dataStatus:name+'S_END',gly:'glyphicon glyphicon-off',spTypeText:'&nbsp;完结&nbsp;',spLabel:'spLabel',spLabelText:numArr.S_END}
+			{aClass:'aIss',dataStatus:name+'S1',gly:'glyphicon glyphicon-send',spTypeText:'&nbsp;[送审]&nbsp;',spLabel:'label label-info spLabel',spLabelText:numObj.S1},
+			{aClass:'aIss',dataStatus:name+'S2',gly:'glyphicon glyphicon-check',spTypeText:'&nbsp;[审核]&nbsp;',spLabel:'label label-warning spLabel',spLabelText:numObj.S2},
+			{aClass:'aIss',dataStatus:name+'S3',gly:'glyphicon glyphicon-ok',spTypeText:'&nbsp;[审批]&nbsp;',spLabel:'label label-danger spLabel',spLabelText:numObj.S3},
+			{aClass:'aIss',dataStatus:name+'S4',gly:'glyphicon glyphicon-random',spTypeText:'&nbsp;[执行]&nbsp;',spLabel:'label label-primary spLabel',spLabelText:numObj.S4},
+			{aClass:'aIss aPill text-muted',dataStatus:name+'S_END',gly:'glyphicon glyphicon-off',spTypeText:'&nbsp;[完结]&nbsp;',spLabel:'spLabel',spLabelText:numObj.S_END}
 		];
 	
 	obj.empty();
@@ -169,7 +170,13 @@ var loadIssList=()=>{
 	
 	//想利用$.when来保证，2个ajax加载都能成功得到处理。
 	$.when(
-		$('#divIssList_Load').html(loadStr).load(urlList,data,function(){issEntNameChange();}),
+		$('#divIssList_Load').html(loadStr)
+		.load(urlList,data,
+			function(){
+				issEntNameChange();
+				
+			}
+		),
 		$('#divSearchForm_Load').html(loadStr).load(urlSearchForm,data)
 		//$.post(urlSearchForm,data)
 	).then(	
@@ -188,60 +195,51 @@ var loadIssList=()=>{
 			$.alert('加载失败，请稍后再试！');
 		}
 	);
+	
 };
-//将numObj中选择issEntName对应的部分
-var selectNumObj=(numObj)=>{
-	let issEntName=anchorToIssEntName(),
-		nameArr=Object.keys(numObj),
-		valArr=Object.values(numObj),
-		numInprocess=0;
-		arr=[],
-		obj={};
-	
-	for(let i=0;i<nameArr.length;i++){
-		arr[i]={'name':nameArr[i],'val':valArr[i]};
-	}
-	
-	arr.forEach(function(item,index){
-		//含有issEntName的才截取到numArr中
-		if(item.name.includes(issEntName)){
-			if(item.val){
-				let n=item.name.indexOf(issEntName);
-				if(n==0){
-					obj[item.name.substring(n+4)]=item.val;
-				}else{
-					obj[item.name]=item.val;
-				}
-				
-			}else{
-				obj[item.name]='';
-			}
-			numInprocess+=item.val*1;
-		}
 
-	});
+var setSideNavIssNumInprocess=(obj)=>{
+	let issNum='',issPatNum='',issProNum='',issTheNum='';
 	
-	obj['S_INPROCESS']=(numInprocess-obj['S_END'])?(numInprocess-obj['S_END']):'';
+	issPatNum=obj._PAT.S_INPROCESS;
+	issProNum=obj._PRO.S_INPROCESS;
+	issTheNum=obj._THE.S_INPROCESS;
+	issNum=issPatNum+issProNum+issTheNum;
+	$('#issNumInprocess').text(issNum);
+	$('#issPatNumInprocess').text(issPatNum);
+	$('#issTheNumInprocess').text(issProNum);
+	$('#issProNumInprocess').text(issTheNum);
 	
-	return obj;
 };
+
 
 
 //自调用匿名函数立即执行的特点，进行页面初始化。
 (function($){
-	let numObj=selectNumObj({$numArr});
-	console.table(numObj);
+	let obj={$numArr},name=anchorToIssEntName()
+		numObj=Object.getOwnPropertyDescriptor(obj,name).value;
+	<!-- console.log(name); -->
+	<!-- console.table(obj); -->
+	setSideNavIssNumInprocess(obj);
 	completeUlDropMenu(numObj);
 	issEntNameChange();
+	// 设置各类tooltip
+	$('[title]').tooltip();
 	loadIssList();
 })(jQuery);
 
 $(document).ready(function(){
+	//
+	
 	
 	<!-- //点击.aIss中的各个按钮后，改变显示格式，默认显示相应状态的issPat内容-->
 	$('.aIss').click(function(){
 		$(this).tab('show');
-		window.location.hash=$(this).attr('href');
+		window.location.hash=$(this).attr('href');	//排序有关的值向$('#divTblSortData')汇集，置为1是为了让每一项都从第一页开始
+		$('#divTblSortData').data('pageNum',1);
+		
+		
+		console.log($(this).find('span .spType').html());
 		loadIssList();
     });	
 	
