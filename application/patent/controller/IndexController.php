@@ -544,7 +544,7 @@ class IndexController extends \think\Controller
             
             'id'=>$pat->id,
             'topic'=>$pat->topic,
-            'pattype'=>$pat->pattype,
+            'type'=>$pat->type,
             'inventor'=>$pat->inventor,
             'otherinventor'=>$pat->otherinventor,
             'issnum'=>$issnum,
@@ -740,7 +740,7 @@ class IndexController extends \think\Controller
             //专利信息
             'id'=>$id,
             'topic'=>$pat->topic, 
-            'pattype'=>$pat->pattype, 
+            'type'=>$pat->type, 
             'author'=>$pat->author, 
             'dept'=>$pat->dept, 
             'keyword'=>$pat->keyword, 
@@ -932,7 +932,7 @@ class IndexController extends \think\Controller
             'author'=>$pat->author,
             'dept'=>$pat->dept,
             'patowner'=>$pat->patowner,
-            'pattype'=>$pat->pattype,
+            'type'=>$pat->type,
             'inventor'=>$pat->inventor,
             'otherinventor'=>$pat->otherinventor,
             'issnum'=>$issnum,
@@ -1122,7 +1122,7 @@ class IndexController extends \think\Controller
         break;
             
         case '_PATTYPE':
-          $strOrder='pattype';
+          $strOrder='type';
         break;
         
         case '_AUTHOR':
@@ -1187,7 +1187,7 @@ class IndexController extends \think\Controller
           }
           
           if($searchPatType){
-            $map['pattype']=$searchPatType;
+            $map['type']=$searchPatType;
           }
           
           if($searchWriter){
@@ -1316,7 +1316,7 @@ class IndexController extends \think\Controller
             $this->error('未登录用户，请先登录系统');
             //$this->redirect($request->domain());
         }else{
-            $patType=PatinfoModel::field('pattype')->group('pattype')->select();
+            $patType=PatinfoModel::field('type')->group('type')->select();
             return $patType;
         }
     }

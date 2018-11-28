@@ -6,6 +6,106 @@
  * 所有的公共函数都以"_common"开头，再遵循驼峰命名法。
  * 所有的公共常量都以"con"开头，再遵循驼峰命名法。
  */
+//patent的类型数组
+const conPatTypeArr=[
+                    '_PATT1'=>'发明专利',
+                    '_PATT2'=>'实用新型专利',
+                    '_PATT3'=>'外观设计专利',
+                    '_PATT4'=>'软件版权专利',
+                    '_PATT5'=>'著作权专利',
+                    '_PATT6'=>'集成电路专利',
+                    '_PATT7'=>'其他',
+                    ];
+//patent的状态数组
+const conPatStatusArr=[
+                    '_PATS1'=>'填报',
+                    '_PATS2'=>'内审',
+                    '_PATS2-1'=>'内审-审核',
+                    '_PATS2-2'=>'内审-修改',
+                    '_PATS2-END1'=>'内审-同意申报',
+                    '_PATS2-END2'=>'内审-否决',
+                    '_PATS3'=>'申报',
+                    '_PATS3-1'=>'申报中',
+                    '_PATS3-2'=>'申报-修改',
+                    '_PATS3-END1'=>'申报-授权',
+                    '_PATS3-END2'=>'申报-驳回',
+                    '_PATS4'=>'续费',
+                    '_PATS4-1'=>'续费中',
+                    '_PATS4-2'=>'续费-同意续费',
+                    '_PATS4-END1'=>'续费-放弃',
+                    '_PATS4-END2'=>'续费-授权',
+                    '_PATS5'=>'超期无效',
+               
+                    ];
+                    
+//thesis的类型数组
+const conTheTypeArr=[
+                    '_THET1'=>'市级出版物',
+                    '_THET2'=>'省级出版物',
+                    '_THET3'=>'国家级出版物',
+                    '_THET4'=>'境外出版物',
+                    '_THET5'=>'会议文集',
+
+                    ];
+//thesis的状态数组
+const conTheStatusArr=[
+                    '_THES1'=>'拟发表',
+                    '_THES2'=>'投稿',
+                    '_THES3'=>'收录',
+                    '_THES4'=>'发表',
+                    '_THES5'=>'拒稿',
+               
+                    ];
+//projec的类型数组
+const conProTypeArr=[
+                    '_PROT1'=>'市级',
+                    '_PROT2'=>'省级',
+                    '_PROT3'=>'国家级',
+                    '_PROT4'=>'客户委托',
+                    '_PROT5'=>'外包',
+                    '_PROT6'=>'自研',
+
+                    ];
+//thesis的状态数组
+const conProStatusArr=[
+                    '_PROS1'=>'申报',
+                    '_PROS1-1'=>'申报-准备',
+                    '_PROS1-2'=>'申报-提交',
+                    '_PROS1-END1'=>'申报-受理',
+                    '_PROS1-END2'=>'申报-驳回',
+                    '_PROS2'=>'立项',
+                    '_PROS3'=>'在研',
+                    '_PROS4'=>'验收',
+                    '_PROS5'=>'结题',
+                    '_PROS6'=>'终止',
+               
+                    ];
+//attachment的类型数组
+const conAttTypeArr=[
+                    '_ATTT1'=>'申请',
+                    '_ATTT2'=>'请示',
+                    '_ATTT3'=>'报告',
+                    '_ATTT3-1'=>'经费报告',
+                    '_ATTT3-2'=>'技术报告',
+                    '_ATTT4'=>'合同',
+                    '_ATTT4-1'=>'技术合同',
+                    '_ATTT4-2'=>'商务合同',
+                    '_ATTT4-3'=>'项目合同',
+                    '_ATTT5'=>'协议',
+                    '_ATTT5-1'=>'技术协议',
+                    '_ATTT5-2'=>'合作协议',
+                    '_ATTT5'=>'说明',
+
+                    ];
+//attachment的依附对象
+const conAttObjectArr=[
+                    '_ATTO1'=>'_ISS',
+                    '_ATTO2'=>'_PAT',
+                    '_ATTO3'=>'_PRO',
+                    '_ATTO4'=>'_THE',
+                    
+                    ];
+
 //asset的状态数组大类7类
 const conAssTypeArr=[
                     '_ASSS_USUAL'=>'除"回收站"以外的其它5类状态',

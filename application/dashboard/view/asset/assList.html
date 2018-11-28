@@ -313,35 +313,48 @@ var btnClickShowModel=(url,data)=>{
 
 //根据查询记录数决定页面的组件显示
 var pageShowCom=(num,reqObj)=>{
-	let obj=$('#pAssNone');
+	let obj=$('#pAssNone'),assType=$('#divTblSortData').data('assType'),
+		resultStr='';
 	
 	if(num){
 		obj.hide().data('show',false).prevAll().show();
+		resultStr='<p><span class="label label-info">查询结果</span>&nbsp;记录数：'+num+'</p>';
 	}else{
 		obj.show().data('show',true).prevAll().hide();
+		resultStr='<p><span class="label label-default">查询结果</span>&nbsp;记录数：0</p>';
 	}
+	
+	if(assType!='_ASSS_USUAL'){
+		resultStr+='<p class="text-center">可到&nbsp;<strong>[总计]</strong>&nbsp;页面扩大查询范围</p>';
+	}
+	
+	
 	//根据reqObj实现不同的弹出窗
 	switch(reqObj){
 		case 'form':
-			$.alert('<span class="label label-info">查询结果</span>&nbsp;记录数：<span>'+num+'</span>');
+			$.alert(resultStr);
 			break;
 		case 'barCode':
 			let code=$('#divBarcodeImg span.alert-info').text();
-			console.log($('#pAssNone').data('show'));
+			<!-- console.log($('#pAssNone').data('show')); -->
 			
 			if(code && obj.data('show')==false){
-				$.alert('<span class="label label-info">查询结果</span>&nbsp;记录数：<span>'+num+'</span>');
+				$.alert(resultStr);
 			}else if(code && obj.data('show')){
 				//如果识别出条形码并且对条形码的查询结果为0			
 				let htmlStr='<p>无条形码【'+code+'】对应的信息记录。</p><p class="text-center">【<span class="text-primary"><span class="glyphicon glyphicon-modal-window">新增</span></span>】信息记录？</p>'
-				$.confirm(htmlStr,function(e){
-					con=e;
-					if(true==con){
-						//新增页面弹出	
-						btnClickShowModel('{$home}/dashboard/asset/fmAssSingle',{'oprt':'_CREATE','id':0,'reqObj':reqObj});
-					}
-				}).cancel('否(N)').ok('是(Y)');	
-			}else{}
+				if(assType!='_ASSS_USUAL'){
+					$.alert(resultStr);
+				}else{
+					$.confirm(htmlStr,function(e){
+						con=e;
+						if(true==con){
+							//新增页面弹出	
+							btnClickShowModel('{$home}/dashboard/asset/fmAssSingle',{'oprt':'_CREATE','id':0,'reqObj':reqObj});
+						}
+					}).cancel('否(N)').ok('是(Y)');	
+				}
+			}
 			break;
 		default:
 		

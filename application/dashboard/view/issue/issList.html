@@ -6,7 +6,7 @@
 		<div class="text-right">
 			<strong class="spIssStatus"></strong><span id="spSearchResult" class="label label-info">查询结果</span>&nbsp;记录数：<span id="spIssNum">{$searchResultNum}</span>
 		</div>
-		<!-- <P>调试输出</P> -->
+		<P id="pDis"></P>
 	</div>	
 	<div class="table-responsive" style="overflow: auto;"> 
 		<table id="tblIssList" class="table table-bordered table-hover table-condensed" >
@@ -51,9 +51,9 @@
 					<td>{$vo.statusdescription}</td>
 					<td>{$vo.create_time}</td>
 					<td>{$vo.update_time}</td>
-					<td>{ $vo.issEntName}</td>
-					<td>{ $vo.issEntType}</td>
-					<td>{ $vo.issEntStatus}</td>
+					<td>{$vo[$issEntMdl]['topic']}</td>
+					<td>{$vo[$issEntMdl]['type']}</td>
+					<td>{$vo[$issEntMdl]['status']}</td>
 					<td>{$vo.dept}</td>
 					<td>{$vo.writer}</td>
 					<td>{$vo.registrar}</td>
@@ -68,8 +68,9 @@
 	
 	
 	<div id="divListRows" class="row text-right" style="padding-top:10px;">
-		<!-- // 分页变量 -->
-		<div class="col-sm-10">{$issList}</div>
+		<!-- // 分页组件渲染 -->
+		<div class="col-sm-10">{$issSet->render()}</div>
+		<!-- <div class="col-sm-10">{$issList}</div> -->
 		
 		<div class="form-group form-group-sm col-sm-2">
 			<span class="">每页显示记录数：</span>
@@ -146,16 +147,18 @@ var sortOrderToggle=()=>{
 
 //根据查询记录数决定页面的组件显示
 var pageShowCom=(num,reqObj)=>{
-	let obj=$('#pIssNone'),
+	let obj=$('#pIssNone'),resultStr='',
 		classStr=$('ul.nav-pills li.active').children('.aIss').find('.spLabel').attr('class');
 	
 	if(num){
 		obj.hide().data('show',false).prevAll().show();
 		$('#spSearchResult').hide();
 		$('#spIssNum').addClass(classStr);
+		resultStr='<p><span class="label label-info">查询结果</span>&nbsp;记录数：'+num+'</p>';
 	}else{
 		obj.show().data('show',true).prevAll().hide();
 		$('#spSearchResult').show();
+		resultStr='<p><span class="label label-default">查询结果</span>&nbsp;记录数：0</p>';
 	}
 	//根据reqObj实现不同的弹出窗
 	switch(reqObj){
@@ -199,6 +202,9 @@ var pageShowCom=(num,reqObj)=>{
 	buildColumnToggleCom();
 	columnToggle();
 	sortOrderToggle();
+	
+	$('#pDis').html('{$issTest}');
+	
 })(jQuery);
 
 $(document).ready(function(){
@@ -294,7 +300,7 @@ function buildColumnToggleCom(){
 		$('#tblIssList').find('th').each(function(){
 			<!-- tblColObjArr.push($(this).text()); -->
 			let nameEn=$(this).children('a').data('sortName'),
-				nameChi=$(this).text();
+				nameChi=$(this).html();
 			<!-- let nameChi=$(this).children('a').html(); -->
 			if(nameEn){
 				arr.push({'nameChi':nameChi,'val':nameEn,'showFlag':true});
@@ -316,7 +322,7 @@ function buildColumnToggleCom(){
 			
 		//生成显示字段的多选框内容，
 		if(el.val && el.val!='all'){
-			let labelObj=$('<label></label>').prepend($('<input />').attr({'type':'checkbox','checked':true}).val(el.val)).append($('<span></span>').addClass('text-primary').text(el.nameChi)),
+			let labelObj=$('<label></label>').prepend($('<input />').attr({'type':'checkbox','checked':true}).val(el.val)).append($('<span></span>').addClass('text-primary').html(el.nameChi)),
 				divObj=$('<div></div>').append(labelObj).addClass('checkbox');
 			obj.find('ul').append($('<li></li>').append(divObj));
 		}

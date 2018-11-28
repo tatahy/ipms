@@ -55,7 +55,7 @@ class Issinfo extends Model
     private $errStr='not initiate Model Issinfo';
     
     //本类的5个私有静态变量赋初值  
-    static function initModel($userName,$userDept,$auth,$issEntName)
+    static function initModel($userName,$userDept,$auth,$issEntName='')
     {
       //使用静态变量的好处就是一次赋初值，本类中和所有实例化的对象都可以用到。
       self::$userName=$userName;
@@ -588,6 +588,16 @@ class Issinfo extends Model
     public function patinfo()
     {
         return $this->hasOne('Patinfo');
+        //return $this->belongsTo('Patinfo','issmap_id');
+                    //->order($sortName,$sortOrder);
+    }
+    
+     /**
+     * 获取对应thesis的内容，与Theinfo模型关联，是一对一的关联关系
+     */
+    public function theinfo()
+    {
+        return $this->hasOne('Theinfo');
     }
 
     /**

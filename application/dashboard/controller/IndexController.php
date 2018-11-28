@@ -60,8 +60,9 @@ class IndexController extends \think\Controller
         
         //取出user的authority字段值
         //$this->authArr = UserModel::get($this->userId)->authority;
-        
         $this->logUser=array('auth'=>$this->authArr,'username'=>$this->userName,'dept'=>$this->dept);
+        //使用模型前的初始化，为模型内部使用的变量赋初值，后续的各个方法中无需再初始化，但可以进行修改
+        IssinfoModel::initModel($this->userName,$this->dept,$this->authArr['iss']); 
     }
 
     // 判断是否为登录用户，私有方法
@@ -86,20 +87,10 @@ class IndexController extends \think\Controller
     {
         $this->_loginUser();
 
-        //  if(!empty($request->param('auth'))){
-        //           $auth=$request->param('auth');
-        //        }
-
         // $auth接收前端页面传来的auth值,表示rolename（映射“用户组名”）
         $auth = !empty($request->param('auth'))?$request->param('auth'):'done';
         $item=!empty($request->param('item'))?$request->param('item'):'userInfo';
-        
-        //调用issinfo模型定义查询方法issPatProcess()得到查询结果数据集
-        $num=$issMdl->issPatProcess($this->logUser,'_NUM');
-
-        $numIssPro = $issMdl::where('issmap_type', 'like', '%'.'_PRO'.'%')->count();
-        $numIssThe = $issMdl::where('issmap_type', 'like', '%'.'_THE'.'%')->count();
-        
+                
         $issEn=0;
         $patEn=0;
         $proEn=0;
@@ -110,7 +101,7 @@ class IndexController extends \think\Controller
         foreach($this->authArr as $key => $val){
           $n=0;
           foreach($val as $k => $v){
-            //'read'权限仅为用户登录后前台的“查阅”权限，后台“用户中心”无需该权限
+            //'read'权限仅为用户成功登录系统后，前台的“查阅”权限，后台“用户中心”无需该权限
             if($k!='read'){
               $n+=$v;
             }
@@ -138,17 +129,16 @@ class IndexController extends \think\Controller
           
         }
         
+        //调用issinfo模型定义查询方法getNumArr()得到各类iss数据
+        $numIssArr=$issMdl::getNumArr();
         $user=$userMdl::get($this->userId);
-        
         $userGroup=$userMdl->userGroupArr($this->userId);
-        
+               
         // 模板变量赋值
         $this->assign([
             'home' => $request->domain(), 
-            'username' => $this->userName, 
-            'numIssPat' => $num['todo'], 
-            'numIssPro' => $numIssPro,
-            'numIssThe' => $numIssThe, 
+            'username' => $this->userName,             
+            'numIssArr'=>json_encode($numIssArr),
             
             'issEn'=> $issEn ,
             'patEn'=> $patEn,

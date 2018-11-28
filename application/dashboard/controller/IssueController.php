@@ -84,6 +84,8 @@ class IssueController extends Controller
     {
       $this->priLogin();
       $request=$this->request;
+      
+      $issEntMdl='';
       //搜索查询条件数组
       $whereArr=[];
       $searchDefaults=array();
@@ -112,13 +114,58 @@ class IssueController extends Controller
         }
       }
       
+      //关联查询的对象
+      switch($issEntName){
+        case '_PAT':
+          $issEntMdl='patinfo';
+          break;
+        case '_THE':
+          $issEntMdl='theinfo';
+          break;
+        case '_PRO':
+          $issEntMdl='proinfo';
+          break;
+        default:
+          
+          break;
+        
+      }
+      
+      $sortDataSub=['name'=>'','order'=>$sortData['sortOrder']];
+      if(substr_count($sortData['sortName'],'Name')){
+        $sortDataSub['name']='topic';
+        $sortData['sortName']='';
+      }
+      if(substr_count($sortData['sortName'],'Type')){
+        $sortDataSub['name']='type';
+        $sortData['sortName']='';
+      }
+      if(substr_count($sortData['sortName'],'Status')){
+        $sortDataSub['name']='status';
+        $sortData['sortName']='';
+      }
+      
       //分页,每页$listRows条记录
       $issSet=$issMdl->issStatusQuery($issStatus,$issEntName)->where($whereArr)
+                      //->with($issEntMdl)
+                      ->with([$issEntMdl=>function($query) use($sortDataSub){
+                          $query->field('id,issinfo_id,topic,type,status')
+                                ->order($sortDataSub['name'], $sortDataSub['order']);
+                        }])
                       ->order($sortData['sortName'], $sortData['sortOrder'])
                       ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
-                        'query'=>['listRows'=>$sortData['listRows']]]);
-      // 获取分页显示
-      $issList=$issSet->render(); 
+                        'query'=>['listRows'=>$sortData['listRows']]]); 
+      //
+      $issList=$issSet->render();
+      
+      $issTest=$issMdl->issStatusQuery($issStatus,$issEntName)->where($whereArr)
+                      //->with($issEntMdl)
+                      ->with([$issEntMdl=>function($query) use($sortDataSub){
+                          $query->field('issinfo_id,topic,type,status')
+                                ->order($sortDataSub['name'], $sortDataSub['order']);
+                        }])
+                      ->order($sortData['sortName'], $sortData['sortOrder'])
+                      ->limit(5)->select();
       
       //搜索记录总数
       $searchResultNum=$issMdl->issStatusQuery($issStatus,$issEntName)->where($whereArr)->count();
@@ -127,7 +174,10 @@ class IssueController extends Controller
         'home'=>$this->home,
         'issEntName'=>$issEntName,
         'issSet'=>$issSet,
-        'issList'=>$issList, 
+        'issList'=>$issList,
+        'issTest'=>json_encode($issTest,JSON_UNESCAPED_UNICODE),
+        
+        'issEntMdl'=>$issEntMdl,
         
         //排序数组
         'sortData'=>$sortData,
@@ -141,14 +191,45 @@ class IssueController extends Controller
     public function searchForm(IssinfoModel $issMdl,$issEntName='',$issStatus='')
     {
       $this->priLogin();
-      $issEntName=!empty($this->request->param('issEntName'))?$this->request->param('issEntName'):'';
-      $issStatus=!empty($this->request->param('issStatus'))?$this->request->param('issStatus'):'';
+      //$issEntName=!empty($this->request->param('issEntName'))?$this->request->param('issEntName'):'';
+//      $issStatus=!empty($this->request->param('issStatus'))?$this->request->param('issStatus'):'';
+
+      // 接收前端的排序参数数组
+      $sortData=$this->request->param('sortData/a');
+      
+      $issEntName=$sortData['issEntName'];
+      //'_INPROCESS'字符串出现在$sortData['issStatus']中的次数
+      $issStatus=substr_count($sortData['issStatus'],'_INPROCESS')?'_INPROCESS':$sortData['issStatus'];
+
+      //关联查询的对象
+      switch($issEntName){
+        case '_PAT':
+          $issEntMdl='patinfo';
+          break;
+        case '_THE':
+          $issEntMdl='theinfo';
+          break;
+        case '_PRO':
+          $issEntMdl='proinfo';
+          break;
+        default:
+          
+          break;
+        
+      }
+      $issSet=$issMdl->issStatusQuery($issStatus,$issEntName)
+                      ->with([$issEntMdl=>function($query){
+                        $query->field('issinfo_id,topic,type,status');
+                      }])
+                      //->with($issEntMdl)
+                      ->limit(5)->select();
       $this->assign([
         'home'=>$this->home,
-        $issSet=$issMdl->issStatusQuery($issStatus)
+        'issSet'=>$issSet
       ]);
       
-      return [IssinfoModel::getAccessUser(),$issSet];
+      //return [IssinfoModel::getAccessUser(),$issSet];
+      return json_encode($issSet,JSON_UNESCAPED_UNICODE);
     }
     
     //响应前端请求，返回信息

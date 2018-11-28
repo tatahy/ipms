@@ -216,14 +216,14 @@ var setSideNavIssNumInprocess=(obj)=>{
 
 //自调用匿名函数立即执行的特点，进行页面初始化。
 (function($){
-	let obj={$numArr},name=anchorToIssEntName()
+	let obj={$numArr},name=anchorToIssEntName(),
 		numObj=Object.getOwnPropertyDescriptor(obj,name).value;
 	<!-- console.log(name); -->
 	<!-- console.table(obj); -->
 	setSideNavIssNumInprocess(obj);
 	completeUlDropMenu(numObj);
 	issEntNameChange();
-	// 设置各类tooltip
+	// 激活tooltip
 	$('[title]').tooltip();
 	loadIssList();
 })(jQuery);

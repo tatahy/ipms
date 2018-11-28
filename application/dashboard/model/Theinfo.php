@@ -10,24 +10,24 @@ namespace app\dashboard\model;
 use think\Model;
 use app\dashboard\model\Issinfo;
 
-class Patinfo extends Model
+class Theinfo extends Model
 {
     //protected $auto = ['patnum','pronum'];
-    protected $insert = ['patnum', 'issinfo_id'];
+    protected $insert = ['thenum', 'issinfo_id'];
     //protected $update = [];
 
     //只读字段，这个字段的值一旦写入，就无法更改。
-    protected $readonly = ['patnum', 'issinfo_id'];
+    protected $readonly = ['thenum', 'issinfo_id'];
 
     // 开启时间字段自动写入
     protected $autoWriteTimestamp = true;
 
     //修改器，设置patnum字段的值为pat+yyyy+0000的形式，即是在当年进行流水编号
-    protected function setPatnumAttr()
+    protected function setThenumAttr()
     {
 
-        $idmax = Patinfo::max('id');
-        $value = Patinfo::where('id', $idmax)->value('patnum');
+        $idmax = $this::max('id');
+        $value = $this::where('id', $idmax)->value('patnum');
 
         $year = substr($value, 3, 4);
         $num = substr($value, 3) + 1;
@@ -60,23 +60,23 @@ class Patinfo extends Model
         return explode(",", $value);
     }
 
-    //获取器，获取数据表patinfo中type字段值，转换为中文输出
+    //获取器，获取数据表theinfo中type字段值，转换为中文输出
     protected function getTypeAttr($dBStrEn)
     {
         $output = $dBStrEn;
-        //引用应用公共文件（app/common.php）中定义的数组常量conPatTypeArr        
-        if (array_key_exists($dBStrEn,conPatTypeArr)) {
-            $output = conPatTypeArr[$dBStrEn];
+        //引用应用公共文件（app/common.php）中定义的数组常量conTheTypeArr
+        if (array_key_exists($dBStrEn, conTheTypeArr)) {
+            $output = conTheTypeArr[$dBStrEn];
         }
         return $output;
     }
 
-    //修改器，修改存入数据表patinfo中type字段值，转换为类型编码
+    //修改器，修改存入数据表theinfo中type字段值，转换为类型编码。
     protected function setTypeAttr($strChi)
     {
         $output = $strChi;
-        //引用应用公共文件（app/common.php）中定义的数组常量conPatTypeArr
-        foreach(conPatTypeArr as $key => $val){
+        //引用应用公共文件（app/common.php）中定义的数组常量conTheTypeArr
+        foreach(conTheTypeArr as $key => $val){
             if($strChi==$val){
                 $output=$key;
             }
@@ -84,23 +84,23 @@ class Patinfo extends Model
         return $output;
     }
 
-    //获取器，获取数据表patinfo中status字段值，转换为中文输出
+    //获取器，获取数据表theinfo中status字段值，转换为中文输出，待考虑是否采用？？
     protected function getStatusAttr($dBStrEn)
     {
         $output = $dBStrEn;
-        //引用应用公共文件（app/common.php）中定义的数组常量conPatStatusArr
-        if (array_key_exists($dBStrEn, conPatStatusArr)) {
-            $output = conPatStatusArr[$dBStrEn];
+        //引用应用公共文件（app/common.php）中定义的数组常量conTheStatusArr
+        if (array_key_exists($dBStrEn, conTheStatusArr)) {
+            $output = conTheStatusArr[$dBStrEn];
         }
         return $output;
     }
     
-    //修改器，修改存入数据表Patinfo中status字段值，转换为类型编码。
+    //修改器，修改存入数据表theinfo中status字段值，转换为类型编码。
     protected function setStatusAttr($strChi)
     {
         $output = $strChi;
-        //引用应用公共文件（app/common.php）中定义的数组常量conPatStatusArr
-        foreach(conPatStatusArr as $key => $val){
+        //引用应用公共文件（app/common.php）中定义的数组常量conTheStatusArr
+        foreach(conTheStatusArr as $key => $val){
             if($strChi==$val){
                 $output=$key;
             }
@@ -139,10 +139,8 @@ class Patinfo extends Model
      */
     public function issinfo()
     {
-        
-        //return $this->belongsTo('Issinfo');
-        //return $this->hasMany('Issinfo','issmap_id');
-        return $this->morphMany('Issinfo', 'issmap');
+        //return $this->belongsTo('app\issue\model\Issinfo');
+        return $this->belongsTo('Issinfo');
     }
 
     /**
@@ -151,7 +149,7 @@ class Patinfo extends Model
     public function issues()
     {
         //return $this->morphMany('Issinfo', 'issmap', ['_ISST_PAT1', '_ISST_PAT2']);
-        return $this->morphMany('Issinfo', 'issmap');
+        return $this->morphMany('Issinfo', 'issmap',['_ISST_PAT1', '_ISST_PAT2']);
         
     }
 

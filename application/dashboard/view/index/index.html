@@ -79,7 +79,7 @@ footer {
 .sidenav.sidenav-show {
 	/* 确保遮盖footer*/
 	z-index: 10;
-	height: 70%;
+	height: 100%;
 	border-radius: 3px;
 	box-shadow:0px 0px 5px 2px #aaa;
 	background-color:#ffffff;
@@ -168,7 +168,7 @@ footer {
 <!-- pagewrap  -->
 <div id="main" class="container-fluid">
 	
-	<button id="openBtn" type="button" class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-dashboard"></span><span style="font-size:16px;">控制台</span></button>
+	<button id="openBtn" type="button" class="btn btn-link btn-lg" style="padding:0;" title="显示控制台" data-placement="right"><span class="glyphicon glyphicon-dashboard"></span><span style="font-size:16px;">控制台</span></button>
   
   	<div id="divContent_load">
 		<p class="text-center" style="font-size:28px;">加载中……</p>
@@ -185,6 +185,20 @@ footer {
 <!-- /pagewrap  -->
 
 <script>
+var setSideNavIssNumInprocess=(obj)=>{
+	let issNum='',issPatNum='',issProNum='',issTheNum='';
+	
+	issPatNum=obj._PAT.S_INPROCESS;
+	issProNum=obj._PRO.S_INPROCESS;
+	issTheNum=obj._THE.S_INPROCESS;
+	issNum=issPatNum+issProNum+issTheNum;
+	$('#issNumInprocess').text(issNum);
+	$('#issPatNumInprocess').text(issPatNum);
+	$('#issTheNumInprocess').text(issProNum);
+	$('#issProNumInprocess').text(issTheNum);
+	
+};
+
 var showSideNavbar=(y)=>{
 	if(y){
 		//show
@@ -234,8 +248,11 @@ function loadFile(anchor){
 
 //利用自调用匿名函数立即执行的特点， 页面初始化
 (function($){
+	
+	setSideNavIssNumInprocess({$numIssArr});
 	loadFile(window.location.hash);
-	$('[data-toggle="tooltip"]').tooltip();
+	// 激活tooltip
+	$('[title]').tooltip();
 	showSideNavbar(true);	
 
 })(jQuery);

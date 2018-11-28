@@ -56,41 +56,28 @@ class Patinfo extends Model
         return explode(",", $value);
     }
 
-    //获取器，获取数据表patinfo中pattype字段值，转换为中文输出
-    protected function getPattypeAttr($key)
+    //获取器，获取数据表patinfo中type字段值，转换为中文输出
+    protected function getTypeAttr($dBStrEn)
     {
-        $value = $key;
-        $patType = array(
-            '_PATT1' => '发明专利',
-            '_PATT2' => '实用新型专利',
-            '_PATT3' => '外观设计专利',
-            '_PATT4' => '软件版权',
-            '_PATT5' => '著作权',
-            '_PATT6' => '集成电路图',
-            '0' => '……');
-        if (array_key_exists($key, $patType)) {
-            $value = $patType[$key];
+        $output = $dBStrEn;
+         //引用应用公共文件（app/common.php）中定义的数组常量conPatTypeArr     
+        if (array_key_exists($dBStrEn,conPatTypeArr)) {
+            $output = conPatTypeArr[$dBStrEn];
         }
-        return $value;
+        return $output;
     }
 
-    //修改器，修改存入数据表patinfo中pattype字段值，转换为类型编码
-    protected function setPattypeAttr($key)
+    //修改器，修改存入数据表patinfo中type字段值，转换为类型编码
+    protected function setTypeAttr($strChi)
     {
-        $value = $key;
-        $patType = array(
-            '发明专利' => '_PATT1',
-            '实用新型专利' => '_PATT2',
-            '外观设计专利' => '_PATT3',
-            '软件版权' => '_PATT4',
-            '著作权' => '_PATT5',
-            '集成电路图' => '_PATT6',
-            '……' => '0');
-        if (array_key_exists($key, $patType)) {
-            $value = $patType[$key];
+        $output = $strChi;
+         //引用应用公共文件（app/common.php）中定义的数组常量conPatTypeArr
+        foreach(conPatTypeArr as $key => $val){
+            if($strChi==$val){
+                $output=$key;
+            }
         }
-        return $value;
-
+        return $output;
     }
 
     //获取器，获取数据表patinfo中status字段值，转换为中文输出，待考虑是否采用？？

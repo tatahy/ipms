@@ -56,8 +56,8 @@ class Patinfo extends Model
         return explode(",",$value);
     }
     
-    //获取器，获取数据表patinfo中pattype字段值，转换为中文输出
-    protected function getPattypeAttr($value)
+    //获取器，获取数据表patinfo中type字段值，转换为中文输出
+    protected function getTypeAttr($value)
     {
       $outPut='……';
       switch($value){

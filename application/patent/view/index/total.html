@@ -91,9 +91,9 @@
 				<tr>
 					<td>{$i+($pageTotalNum-1)*$totalTableRows}</a></td>
 					<td class="patInfo"><a href="{$home}/patent/index/patinfo/id/{$vo.id}" target="_blank" data-toggle="tooltip">{$vo.topic}</a></td>
-					{// patent模块的Model层对‘pattype’字段输出值有处理，用getData方法可以得到‘pattype’字段在数据库中的值}
-					<!-- <td>{$vo->getData('pattype')}</td> -->
-					<td>{$vo.pattype}</td>
+					{// patent模块的Model层对‘pattype’字段输出值有处理，用getData方法可以得到‘type’字段在数据库中的值}
+					<!-- <td>{$vo->getData('type')}</td> -->
+					<td>{$vo.type}</td>
 					<td>{$vo.status}</td>
 					<td>{$vo.submitdate}</td>
 					
@@ -445,7 +445,7 @@ $(document).ready(function(){
 						<!-- if(n2=="id"){ -->
 							<!-- str+="<option value='"+v2+"'>"; -->
 						<!-- } -->
-						if(n2=="pattype"){
+						if(n2=="type"){
 							str+="<option value='"+v2+"'>"+v2+"</option>";
 						}
 					});
