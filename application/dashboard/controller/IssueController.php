@@ -85,7 +85,19 @@ class IssueController extends Controller
       $this->priLogin();
       $request=$this->request;
       
-      $issEntMdl='';
+      //关联对象名称及关联方法对应关系数组
+      $entNameMethodArr=['_PAT'=>'patinfo','_THE'=>'theinfo','_PRO'=>'proinfo'];
+      //关联对象共有的字段名称与前端的对应关系
+      $entFieldAsArr=['issEntName'=>'topic','issEntType'=>'type','issEntStatus'=>'status'];
+      //关联对象共有的字段名称
+      $entField=['id','topic','type','status'];
+      //关联对象名称
+      $entName='';
+      //关联方法名称
+      $entMethod='';
+      //进行排序的关联对象字段名
+      $entSortName='';
+      
       //搜索查询条件数组
       $whereArr=[];
       $searchDefaults=array();
@@ -95,10 +107,11 @@ class IssueController extends Controller
       // 接收前端的排序参数数组
       $sortData=!empty($request->param('sortData/a'))?$request->param('sortData/a'):$sortDefaults;
       $sortData=array_merge($sortDefaults,$sortData);
-      $issEntName=$sortData['issEntName'];
+      $entName=$sortData['issEntName'];
       //'_INPROCESS'字符串出现在$sortData['issStatus']中的次数
       $issStatus=substr_count($sortData['issStatus'],'_INPROCESS')?'_INPROCESS':$sortData['issStatus'];
-      
+      //前端显示的内容
+      $issList=[];
       // 接收前端的搜索参数数组，由前端保证传来的搜索参数值非0，非空。
       $searchData=!empty($request->param('searchData/a'))?$request->param('searchData/a'):$searchDefaults;
       $searchData=array_merge($searchDefaults,$searchData);
@@ -113,71 +126,115 @@ class IssueController extends Controller
           unset($whereArr[$key]);
         }
       }
-      
-      //关联查询的对象
-      switch($issEntName){
-        case '_PAT':
-          $issEntMdl='patinfo';
-          break;
-        case '_THE':
-          $issEntMdl='theinfo';
-          break;
-        case '_PRO':
-          $issEntMdl='proinfo';
-          break;
-        default:
-          
-          break;
-        
+      //根据关联对象名得到关联方法
+      foreach($entNameMethodArr as $key => $val){
+        if($entName==$key){
+          $entMethod=$val;
+        }
       }
       
-      $sortDataSub=['name'=>'','order'=>$sortData['sortOrder']];
-      if(substr_count($sortData['sortName'],'Name')){
-        $sortDataSub['name']='topic';
-        $sortData['sortName']='';
-      }
-      if(substr_count($sortData['sortName'],'Type')){
-        $sortDataSub['name']='type';
-        $sortData['sortName']='';
-      }
-      if(substr_count($sortData['sortName'],'Status')){
-        $sortDataSub['name']='status';
-        $sortData['sortName']='';
+      foreach($entFieldAsArr as $key=>$val){
+        if($sortData['sortName']==$key){
+          $entSortName=$val;
+          $sortData['sortName']='';
+        }
       }
       
-      //分页,每页$listRows条记录
-      $issSet=$issMdl->issStatusQuery($issStatus,$issEntName)->where($whereArr)
-                      //->with($issEntMdl)
-                      ->with([$issEntMdl=>function($query) use($sortDataSub){
-                          $query->field('id,issinfo_id,topic,type,status')
-                                ->order($sortDataSub['name'], $sortDataSub['order']);
-                        }])
-                      ->order($sortData['sortName'], $sortData['sortOrder'])
+       //符合查询条件的记录分页,每页$listRows条记录
+      $issSet=$issMdl->issStatusQuery($issStatus,$entName)
+                      ->where($whereArr)
+                      ->order($sortData['sortName'],$sortData['sortOrder'])
                       ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
-                        'query'=>['listRows'=>$sortData['listRows']]]); 
-      //
-      $issList=$issSet->render();
+                        'query'=>['listRows'=>$sortData['listRows']]]);
+       
       
-      $issTest=$issMdl->issStatusQuery($issStatus,$issEntName)->where($whereArr)
-                      //->with($issEntMdl)
-                      ->with([$issEntMdl=>function($query) use($sortDataSub){
-                          $query->field('issinfo_id,topic,type,status')
-                                ->order($sortDataSub['name'], $sortDataSub['order']);
-                        }])
-                      ->order($sortData['sortName'], $sortData['sortOrder'])
-                      ->limit(5)->select();
+      //涉及关联对象$entName中字段的排序   
+      if($entSortName){
+        //符合查询条件的所有iss记录，待按$entName字段值排序后显示
+        $issTemp=$issMdl->issStatusQuery($issStatus,$entName)->where($whereArr)->select();
+        
+        //保证$issTemp为数据集对象才能使用延迟载入关联查询方法load()
+        if(is_array($issTemp)){
+          $issTemp=collection($issTemp);
+        }                
+        //延迟载入关联查询方法load()得到关联对象的数据集，仅关联对象共有的字段名称可见
+        $entList=$issTemp->load($entMethod)->visible(['id',$entMethod=>$entField]);
+        
+        //能否在load()方法中进行order和limit？？
+        //$entList=$issTemp->load([$entMethod=> function ($query) use ($entField,$entSortName,$sortData) {
+//                                  $query->field($entField)
+//                                        ->order($entSortName,$sortData['sortOrder'])
+//                                        ->limit(($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows']);
+//                              }])
+//                          ->visible(['id',$entMethod]);
+        
+        //将$entList转为仅有id与$entSortName字段的数组后，按$entSortName字段值排序
+        $arrId=$entList->column('id');//每个元素为id字段值(数字)的索引数组
+        $arrSub=collection($entList->column($entMethod))->column($entSortName);//每个元素为$entSortName字段值(字符串)的索引数组
+        $arr=array_combine($arrId,$arrSub);
+        
+        if($sortData['sortOrder']=='asc'){
+          //按值升序，保持键值关系
+          asort($arr);
+        }else{
+          //按值降序，保持键值关系
+          arsort($arr);
+        }
+        
+        $index=0;   
+        foreach($arr as $key=>$val){
+          $arr1[$index]=['id'=>$key,'value'=>$val];
+          $index++;
+        }
+        
+        //$entList=$arr;
+        //$entList=$arr1;
+        
+        $testSet =$issMdl->issStatusQuery($issStatus,$entName)->where($whereArr)->select();
+        
+        $issmapId=collection($testSet)->column('issmap_id');
+        $issId=collection($testSet)->column('id');                    
+        
+        $testSet = $issMdl->patinfoOrder($entSortName,$sortData['sortOrder'])
+                            ->limit(($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows'])
+                            ->select($issmapId);
+ 
+        $testList=$testSet;
+        
+        //重组本页的issList内容
+        $mStart=($sortData['pageNum']-1)*$sortData['listRows'];
+        $mEnd=$sortData['pageNum']*$sortData['listRows'];
+        for($n=$mStart;$n<$mEnd;$n++){
+          if($n<count($arr1)){
+            $id=$arr1[$n]['id'];
+            for($i=0;$i<count($issTemp);$i++){
+              if($issTemp[$i]->id==$id){
+                $issList[$n]=$issTemp[$i];
+                break;
+              }
+            }
+          }
+        }
+      }else{
+        $issTemp=$issMdl->issStatusQuery($issStatus,$entName)->where($whereArr)->order($sortData['sortName'],$sortData['sortOrder'])
+                ->limit(($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows'])->select();
+        $issList=$issTemp;
+        $entList=['haha'];
+        $testList=['haha'];
+      }
+      
       
       //搜索记录总数
-      $searchResultNum=$issMdl->issStatusQuery($issStatus,$issEntName)->where($whereArr)->count();
+      $searchResultNum=$issMdl->issStatusQuery($issStatus,$entName)->where($whereArr)->count();
       
       $this->assign([
         'home'=>$this->home,
-        'issEntName'=>$issEntName,
+        'issEntName'=>$entName,
         'issSet'=>$issSet,
         'issList'=>$issList,
-        'issTest'=>json_encode($issTest,JSON_UNESCAPED_UNICODE),
+        'issTest'=>json_encode($testList,JSON_UNESCAPED_UNICODE),
         
-        'issEntMdl'=>$issEntMdl,
+        'entMethod'=>$entMethod,
         
         //排序数组
         'sortData'=>$sortData,
@@ -204,25 +261,23 @@ class IssueController extends Controller
       //关联查询的对象
       switch($issEntName){
         case '_PAT':
-          $issEntMdl='patinfo';
+          $entName='patinfo';
           break;
         case '_THE':
-          $issEntMdl='theinfo';
+          $entName='theinfo';
           break;
         case '_PRO':
-          $issEntMdl='proinfo';
+          $entName='proinfo';
           break;
         default:
           
           break;
         
       }
-      $issSet=$issMdl->issStatusQuery($issStatus,$issEntName)
-                      ->with([$issEntMdl=>function($query){
-                        $query->field('issinfo_id,topic,type,status');
-                      }])
-                      //->with($issEntMdl)
-                      ->limit(5)->select();
+      
+      $issSet=$issMdl->issStatusQuery($issStatus,$issEntName)->order($sortData['sortName'],$sortData['sortOrder'])->select(); 
+      $issSet=collection($issSet)->visible(['topic','issnum']);
+      //$issSet=$issMdl->issStatusQuery($issStatus,$issEntName)->limit(5)->select();
       $this->assign([
         'home'=>$this->home,
         'issSet'=>$issSet

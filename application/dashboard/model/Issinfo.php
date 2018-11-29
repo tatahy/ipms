@@ -587,8 +587,23 @@ class Issinfo extends Model
      */
     public function patinfo()
     {
-        return $this->hasOne('Patinfo');
-        //return $this->belongsTo('Patinfo','issmap_id');
+        //与当前模型发生关联关系的模型（关联模型）类名：Patinfo；
+        //当前模型中与关联模型实现关联的键名：issmap_id
+        //默认关联模型中实现关联的主键：id
+        //2个键的值是相等的。
+        return $this->belongsTo('Patinfo','issmap_id');
+                    //->order($sortName,$sortOrder);
+    }
+    
+    public function patinfoOrder($name,$order)
+    {
+        //与当前模型发生关联关系的模型（关联模型）类名：Patinfo；
+        //当前模型中与关联模型实现关联的键名：issmap_id
+        //默认关联模型中实现关联的主键：id
+        //2个键的值是相等的。
+        return $this->belongsTo('Patinfo','issmap_id')
+                    ->field('topic,type,status')
+                    ->order($name,$order);
                     //->order($sortName,$sortOrder);
     }
     

@@ -27,22 +27,22 @@
 					<th>序号</th>
 					<th><a data-sort-name="topic">事务标题</a></th>
 					<th><a data-sort-name="issnum">编号</a></th>
-					<th><a data-sort-name="status">状态</a></th>
-					<th><a data-sort-name="statusdescription">状态说明</a></th>
+					<th><a data-sort-name="status">现状</a></th>
+					<th><a data-sort-name="statusdescription">现状说明</a></th>
 					<th><a data-sort-name="create_time">创建时间</a></th>
-					<th><a data-sort-name="update_time">更新时间</a></th>
+					<th><a data-sort-name="update_time">现状登记时间</a></th>
 					<th><a data-sort-name="issEntName"><span class="spIssEntName"></span>名称</a></th>
 					<th><a data-sort-name="issEntType"><span class="spIssEntName"></span>类型</a></th>
 					<th><a data-sort-name="issEntStatus"><span class="spIssEntName"></span>状态</a></th>
-					<th><a data-sort-name="dept">所属部门</a></th>
+					<th><a data-sort-name="dept">事务发起部门</a></th>
 					<th><a data-sort-name="writer">事务撰写人</a></th>
-					<th><a data-sort-name="registrar">事务登记人</a></th>
+					<th><a data-sort-name="registrar">现状登记人</a></th>
 					<th class="text-center">操作</th>
 				</tr>
 			
 			</thead>
 			<tbody><!-- 此处显示数据库查询后的数据集 -->
-				{volist name="issSet" id="vo" empty=""}
+				{volist name="issList" id="vo" empty=""}
 				<tr class="text-right">
 					<td class="text-center">{$i+($sortData.pageNum-1)*$sortData.listRows}</td>	
 					<td class="text-center"><a class="aTblIssSingle" href="#issInfo" data-ass-id="{$vo.issmap_id}">{$vo.topic}</a></td>
@@ -51,9 +51,9 @@
 					<td>{$vo.statusdescription}</td>
 					<td>{$vo.create_time}</td>
 					<td>{$vo.update_time}</td>
-					<td>{$vo[$issEntMdl]['topic']}</td>
-					<td>{$vo[$issEntMdl]['type']}</td>
-					<td>{$vo[$issEntMdl]['status']}</td>
+					<td>{$vo[$entMethod]['topic']}</td>
+					<td>{$vo[$entMethod]['type']}</td>
+					<td>{$vo[$entMethod]['status']}</td>
 					<td>{$vo.dept}</td>
 					<td>{$vo.writer}</td>
 					<td>{$vo.registrar}</td>
@@ -70,7 +70,6 @@
 	<div id="divListRows" class="row text-right" style="padding-top:10px;">
 		<!-- // 分页组件渲染 -->
 		<div class="col-sm-10">{$issSet->render()}</div>
-		<!-- <div class="col-sm-10">{$issList}</div> -->
 		
 		<div class="form-group form-group-sm col-sm-2">
 			<span class="">每页显示记录数：</span>
@@ -89,7 +88,6 @@
 
 <!-- /pagewrap  -->
 <script>
-//var issEntName='{ $issEntName}'; -->
 
 //根据columnToggleArr的值，改变复选框，显示/隐藏对应column
 var columnToggle=()=>{
@@ -248,12 +246,16 @@ $(document).ready(function(){
 	$('#tblIssList thead a').click(function(){
 		let sortName=$(this).data('sortName'),sortOrder=$(this).data('sortOrder');
 		//排序有关的值向$('#divTblSortData')汇集
-		if(sortName){
-			$('#divTblSortData').data('sortName',sortName);
-		}
-		if(sortOrder){
-			$('#divTblSortData').data('sortOrder',sortOrder);
-		}
+		<!-- if(sortName){ -->
+			<!-- $('#divTblSortData').data('sortName',sortName); -->
+		<!-- } -->
+		<!-- if(sortOrder){ -->
+			<!-- $('#divTblSortData').data('sortOrder',sortOrder); -->
+		<!-- } -->
+		
+		$('#divTblSortData').data('sortName',sortName);
+		$('#divTblSortData').data('sortOrder',sortOrder);
+		$('#divTblSortData').data('pageNum',1);
 		//调用index.html中的loadAssList()
 		loadIssList();
 		
