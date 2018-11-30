@@ -12,6 +12,8 @@ use think\Collection;
 
 use app\dashboard\model\User as UserModel;
 use app\dashboard\model\Patinfo as PatinfoModel;
+use app\dashboard\model\Proinfo as ProinfoModel;
+use app\dashboard\model\Theinfo as TheinfoModel;
 
 class Issinfo extends Model
 {
@@ -583,9 +585,9 @@ class Issinfo extends Model
     }
     
     /**
-     * 获取对应patent的内容，与Patinfo模型关联，是一对一的关联关系
+     * 获取对应patent的内容，与Patinfo模型关联，是多对一的关联关系
      */
-    public function patinfo()
+    public function patList()
     {
         //与当前模型发生关联关系的模型（关联模型）类名：Patinfo；
         //当前模型中与关联模型实现关联的键名：issmap_id
@@ -595,24 +597,31 @@ class Issinfo extends Model
                     //->order($sortName,$sortOrder);
     }
     
-    public function patinfoOrder($name,$order)
+    public function patListSort($name,$order)
     {
         //与当前模型发生关联关系的模型（关联模型）类名：Patinfo；
         //当前模型中与关联模型实现关联的键名：issmap_id
         //默认关联模型中实现关联的主键：id
         //2个键的值是相等的。
         return $this->belongsTo('Patinfo','issmap_id')
-                    ->field('topic,type,status')
                     ->order($name,$order);
                     //->order($sortName,$sortOrder);
     }
     
      /**
-     * 获取对应thesis的内容，与Theinfo模型关联，是一对一的关联关系
+     * 获取对应thesis的内容，与Theinfo模型关联，是多对一的关联关系
      */
-    public function theinfo()
+    public function theList()
     {
-        return $this->hasOne('Theinfo');
+        return $this->belongsTo('Theinfo','issmap_id');
+    }
+    
+     /**
+     * 获取对应project的内容，与Proinfo模型关联，是多对一的关联关系
+     */
+    public function proList()
+    {
+        return $this->belongsTo('Proinfo','issmap_id');
     }
 
     /**

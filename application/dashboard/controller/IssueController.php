@@ -8,6 +8,7 @@ use think\Controller;
 
 use app\dashboard\model\Issinfo as IssinfoModel;
 use app\dashboard\model\Issrecord as IssrecordModel;
+use app\dashboard\model\Patinfo as PatinfoModel;
 use app\dashboard\model\Assinfo as AssinfoModel;
 use app\dashboard\model\Assrecord as AssrecordModel;
 use app\dashboard\model\User as UserModel;
@@ -80,23 +81,23 @@ class IssueController extends Controller
       return view();
     }
     
-    public function issList(IssinfoModel $issMdl)
+    public function issList(IssinfoModel $issMdl,PatinfoModel $patMdl)
     {
       $this->priLogin();
       $request=$this->request;
       
       //关联对象名称及关联方法对应关系数组
-      $entNameMethodArr=['_PAT'=>'patinfo','_THE'=>'theinfo','_PRO'=>'proinfo'];
-      //关联对象共有的字段名称与前端的对应关系
-      $entFieldAsArr=['issEntName'=>'topic','issEntType'=>'type','issEntStatus'=>'status'];
-      //关联对象共有的字段名称
-      $entField=['id','topic','type','status'];
+      $entNameMethodArr=['_PAT'=>'patList','_THE'=>'theList','_PRO'=>'proList'];
       //关联对象名称
       $entName='';
-      //关联方法名称
-      $entMethod='';
-      //进行排序的关联对象字段名
+       //进行排序的关联对象字段名
       $entSortName='';
+      //关联对象共有的字段名称与前端的对应关系
+      $tblFieldAsArr=['issEntName'=>'topic','issEntType'=>'type','issEntStatus'=>'status'];
+      //关联对象共有的字段名称
+      $tblField=['id','topic','type','status'];
+      //关联方法名称
+      $mdlMethod='';
       
       //搜索查询条件数组
       $whereArr=[];
@@ -126,115 +127,100 @@ class IssueController extends Controller
           unset($whereArr[$key]);
         }
       }
-      //根据关联对象名得到关联方法
+      //根据关联对象名得到关联查询方法
       foreach($entNameMethodArr as $key => $val){
         if($entName==$key){
-          $entMethod=$val;
+          $mdlMethod=$val;
         }
       }
-      
-      foreach($entFieldAsArr as $key=>$val){
+      //是否对关联对象的字段进行排序，是就$sortData['sortName']=''
+      foreach($tblFieldAsArr as $key=>$val){
         if($sortData['sortName']==$key){
+          //关联对象排序字段名
           $entSortName=$val;
           $sortData['sortName']='';
         }
       }
+      //
+      $queryBase=$issMdl->issStatusQuery($issStatus,$entName)->where($whereArr)
+                      ->order($sortData['sortName'],$sortData['sortOrder']);
       
-       //符合查询条件的记录分页,每页$listRows条记录
-      $issSet=$issMdl->issStatusQuery($issStatus,$entName)
-                      ->where($whereArr)
+       //符合查询条件的所有iss记录分页,每页$listRows条记录
+      $pageSet=$issMdl->issStatusQuery($issStatus,$entName)->where($whereArr)
                       ->order($sortData['sortName'],$sortData['sortOrder'])
                       ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
                         'query'=>['listRows'=>$sortData['listRows']]]);
-       
       
-      //涉及关联对象$entName中字段的排序   
+      //-- block start 
+      //生成查询结果数据集：
+      $baseSet=$queryBase->select();
+      if(is_array($baseSet)){
+          $baseSet=collection($baseSet);
+      } 
+       
+      //延迟载入关联查询方法load()得到含有关联对象数据的数据集，仅拉取关联对象共有的字段名
+      $baseSet->load([$mdlMethod=>function($query) use($tblField) {
+                                  $query->field($tblField);}]);                         
+       //涉及关联对象$entName中字段的排序   
       if($entSortName){
-        //符合查询条件的所有iss记录，待按$entName字段值排序后显示
-        $issTemp=$issMdl->issStatusQuery($issStatus,$entName)->where($whereArr)->select();
         
-        //保证$issTemp为数据集对象才能使用延迟载入关联查询方法load()
-        if(is_array($issTemp)){
-          $issTemp=collection($issTemp);
-        }                
-        //延迟载入关联查询方法load()得到关联对象的数据集，仅关联对象共有的字段名称可见
-        $entList=$issTemp->load($entMethod)->visible(['id',$entMethod=>$entField]);
+        $issmapId=$baseSet->column('issmap_id');
+                                  
+        //选择排序对象
+        switch($entName){
+          case '_PAT':
+            //在patinfo中排序
+            $sortMdl =$patMdl;
+            break;
+          case '_PRO':
+            $sortMdl = $proMdl;
+            break;
+          case '_THE':
+            $sortMdl = $theMdl;
+            break;
+          
+        } 
+        //$testSet = $issMdl->patListSort($entSortName,$sortData['sortOrder'])->select($issmapId);
+        //下述语句为何不能像上述那样工作？？       
+        //$sortSet = $issMdl::with([$mdlMethod => function($query)use($tblField,$entSortName,$sortData){
+//                                    $query->field($tblField)
+//                                          ->order($entSortName,$sortData['sortOrder']);
+//                                  }])->select($issmapId);
         
-        //能否在load()方法中进行order和limit？？
-        //$entList=$issTemp->load([$entMethod=> function ($query) use ($entField,$entSortName,$sortData) {
-//                                  $query->field($entField)
-//                                        ->order($entSortName,$sortData['sortOrder'])
-//                                        ->limit(($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows']);
-//                              }])
-//                          ->visible(['id',$entMethod]);
+        //生成排序结果数据集：
+        $sortSet =$sortMdl->where('id','in',$issmapId)->order($entSortName,$sortData['sortOrder'])->select();
+        if(is_array($sortSet)){
+            $sortSet=collection($sortSet);
+        } 
+             
+        //在排序后的数据集中截取本页所需显示记录的issmap_id值（数组）                    
+        $issmapIdArr=$sortSet->slice(($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows'])->column('id');
         
-        //将$entList转为仅有id与$entSortName字段的数组后，按$entSortName字段值排序
-        $arrId=$entList->column('id');//每个元素为id字段值(数字)的索引数组
-        $arrSub=collection($entList->column($entMethod))->column($entSortName);//每个元素为$entSortName字段值(字符串)的索引数组
-        $arr=array_combine($arrId,$arrSub);
-        
-        if($sortData['sortOrder']=='asc'){
-          //按值升序，保持键值关系
-          asort($arr);
-        }else{
-          //按值降序，保持键值关系
-          arsort($arr);
-        }
-        
-        $index=0;   
-        foreach($arr as $key=>$val){
-          $arr1[$index]=['id'=>$key,'value'=>$val];
-          $index++;
-        }
-        
-        //$entList=$arr;
-        //$entList=$arr1;
-        
-        $testSet =$issMdl->issStatusQuery($issStatus,$entName)->where($whereArr)->select();
-        
-        $issmapId=collection($testSet)->column('issmap_id');
-        $issId=collection($testSet)->column('id');                    
-        
-        $testSet = $issMdl->patinfoOrder($entSortName,$sortData['sortOrder'])
-                            ->limit(($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows'])
-                            ->select($issmapId);
- 
-        $testList=$testSet;
-        
-        //重组本页的issList内容
-        $mStart=($sortData['pageNum']-1)*$sortData['listRows'];
-        $mEnd=$sortData['pageNum']*$sortData['listRows'];
-        for($n=$mStart;$n<$mEnd;$n++){
-          if($n<count($arr1)){
-            $id=$arr1[$n]['id'];
-            for($i=0;$i<count($issTemp);$i++){
-              if($issTemp[$i]->id==$id){
-                $issList[$n]=$issTemp[$i];
-                break;
-              }
+        //根据上一步中得到的$issmapIdArr，从数据集$baseSet中抽出与issmapId对应的iss记录，将抽出记录按照$issmapIdArr的顺序组装好。
+        foreach($issmapIdArr as $key=>$val){
+          for($i=0;$i<$baseSet->count();$i++){
+            if($baseSet[$i]['issmap_id']==$val){
+              $issList[$key]=$baseSet[$i];
+              break;
             }
           }
         }
       }else{
-        $issTemp=$issMdl->issStatusQuery($issStatus,$entName)->where($whereArr)->order($sortData['sortName'],$sortData['sortOrder'])
-                ->limit(($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows'])->select();
-        $issList=$issTemp;
-        $entList=['haha'];
-        $testList=['haha'];
-      }
-      
+        $issList=$baseSet->slice(($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows']);                
+      } 
+      //-- block end
       
       //搜索记录总数
-      $searchResultNum=$issMdl->issStatusQuery($issStatus,$entName)->where($whereArr)->count();
+      $searchResultNum=$baseSet->count();
       
       $this->assign([
         'home'=>$this->home,
         'issEntName'=>$entName,
-        'issSet'=>$issSet,
+        'pageSet'=>$pageSet,
         'issList'=>$issList,
-        'issTest'=>json_encode($testList,JSON_UNESCAPED_UNICODE),
+        'issTest'=>json_encode($issList,JSON_UNESCAPED_UNICODE),
         
-        'entMethod'=>$entMethod,
+        'mdlMethod'=>$mdlMethod,
         
         //排序数组
         'sortData'=>$sortData,
