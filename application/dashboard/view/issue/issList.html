@@ -24,7 +24,7 @@
 			<colgroup></colgroup>
 			<thead>
 				<tr>
-					<th>序号</th>
+					<th class="text-center">序号</th>
 					<th><a data-sort-name="topic">事务标题</a></th>
 					<th><a data-sort-name="issnum">编号</a></th>
 					<th><a data-sort-name="status">现状</a></th>
@@ -35,7 +35,7 @@
 					<th><a data-sort-name="issEntType"><span class="spIssEntName"></span>类型</a></th>
 					<th><a data-sort-name="issEntStatus"><span class="spIssEntName"></span>状态</a></th>
 					<th><a data-sort-name="dept">事务发起部门</a></th>
-					<th><a data-sort-name="writer">事务撰写人</a></th>
+					<th><a data-sort-name="writer">事务申请人</a></th>
 					<th><a data-sort-name="registrar">现状登记人</a></th>
 					<th class="text-center">操作</th>
 				</tr>
@@ -43,15 +43,15 @@
 			</thead>
 			<tbody><!-- 此处显示数据库查询后的数据集 -->
 				{volist name="issList" id="vo" empty=""}
-				<tr class="text-right">
+				<tr class="text-right" data-show-iss-id="{$vo.id}" >
 					<td class="text-center">{$i+($sortData.pageNum-1)*$sortData.listRows}</td>	
-					<td class="text-center"><a class="aTblIssSingle" href="#issInfo" data-ass-id="{$vo.issmap_id}">{$vo.topic}</a></td>
+					<td><a href="{$home}/issue/index/issinfo/id/{$vo.id}" target="_blank" title="事务详情" >{$vo.topic}</a></td>
 					<td>{$vo.issnum}</td>
-					<td><a class="aIssRecords" href="#issInfo" data-ass-id="{$vo.issmap_id}"><span class="spStatus">{$vo.status}</span></a></td>
+					<td><a href="{$home}/issue/index/issrecords/id/{$vo.id}" target="_blank" title="事务状态过程记录"><span class="spStatus">{$vo.status}</span></a></td>
 					<td>{$vo.statusdescription}</td>
 					<td>{$vo.create_time}</td>
 					<td>{$vo.update_time}</td>
-					<td>{$vo[$mdlMethod]['topic']}</td>
+					<td><a href="{$home}/patent/index/patinfo/id/{$vo.issmap_id}" target="_blank" title="专利详情">{$vo[$mdlMethod]['topic']}</a></td>
 					<td>{$vo[$mdlMethod]['type']}</td>
 					<td>{$vo[$mdlMethod]['status']}</td>
 					<td>{$vo.dept}</td>
@@ -122,6 +122,8 @@ var sortOrderToggle=()=>{
 		sortName=$('#divTblSortData').data('sortName');
 		
 	$('#tblIssList thead a').removeClass('label label-primary');
+	//选中进行排序的列向左对齐，添加底色
+	$('#tblIssList tbody').find('[data-hide-val="'+sortName+'"]').addClass('text-left bg-info');
 	
 	$('#tblIssList thead a').each(function(){
 		if(sortName==$(this).data('sortName')){
@@ -195,12 +197,15 @@ var pageShowCom=(num,reqObj)=>{
 	
 	//每个$('#tblIssList thead a')添加属性
 	$('#tblIssList thead a').attr({'href':window.location.hash,'data-title':'点击排序','data-toggle':'tooltip'}).closest('th').addClass('text-center');
+	
+	// 激活tooltip
+	$('[title]').tooltip();
 
 	pageShowCom({$searchResultNum});
 	buildColumnToggleCom();
 	columnToggle();
 	sortOrderToggle();
-	
+	trAddBgColor();
 	<!-- $('#pDis').html('{$issTest}'); -->
 	
 })(jQuery);
@@ -292,6 +297,15 @@ $(document).ready(function(){
 		//调用index.html中的loadAssList()
 		loadIssList();
 	});
+	
+	//
+	$('#tblIssList tbody a').click(function(){
+		$('#divTblSortData').data('showIssId',$(this).closest('tr').data('showIssId'));
+		
+		trAddBgColor();
+	});
+	
+
 });
 
 //生成控制显示/隐藏字段的组件
@@ -302,7 +316,7 @@ function buildColumnToggleCom(){
 		$('#tblIssList').find('th').each(function(){
 			<!-- tblColObjArr.push($(this).text()); -->
 			let nameEn=$(this).children('a').data('sortName'),
-				nameChi=$(this).html();
+				nameChi=$(this).text();
 			<!-- let nameChi=$(this).children('a').html(); -->
 			if(nameEn){
 				arr.push({'nameChi':nameChi,'val':nameEn,'showFlag':true});
@@ -339,6 +353,16 @@ function buildColumnToggleCom(){
 	//对生成的控制显示隐藏字段的单选框格式进行微调
 	$('#tblIssList caption div.checkbox').css('padding-left','10px').find('input').css('margin-top','0');	
 };
+
+//对点中的a所在行上底色
+function trAddBgColor(){
+	let showId=$('#divTblSortData').data('showIssId'),
+		obj=$('#tblIssList tbody');
+	//去掉所有行的底色
+	obj.find('tr').removeClass('bg-warning');
+	//给showId所在行上底色
+	obj.find('[data-show-iss-id="'+showId+'"]').addClass('bg-warning');
+}
 
 </script>
 

@@ -15,7 +15,7 @@
 			
 <div class="content-body">
 	<div id="divTopBtn" class="row myRow text-right" style="margin:10px 0px;">		
-		<a id="aSearchData" class="btn btn-primary btn-sm" href="#divSearchData" data-toggle="collapse" title="根据输入信息查询"><span class="glyphicon glyphicon-search"></span>查询</a>		
+		<a id="aSearchData" class="btn btn-primary btn-sm" href="#divSearchData" data-toggle="collapse" title="显示/隐藏查询条件"><span class="glyphicon glyphicon-plus-sign"></span>查询条件</a>		
 		
 		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新事务信息表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 			
@@ -28,22 +28,117 @@
 	<div id="divSearchData" class="collapse">
 		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchData"  data-toggle="collapse" title="点击隐藏">查询条件</a>
 		
-		<div id="divSearchForm_Load" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:2px;">
-			<form id="fmSearch" >
+		<form id="fmIssSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:2px;">
+			<input class="sr-only" name="reqObj" type="text" value="" />
+			<div class="row myRow">
+			<div class="form-group col-sm-5">
+				<label class="" for="topic">事务标题</label>
+				<input class="form-control" id="topic" name="topic" type="text" value="" placeholder="...不限">
+										
+			</div>
 			
-			</form>
-		</div>
-		
+			<div class="form-group col-sm-4">
+				<label class="" for="status">现状</label>
+				<select class="form-control" name="status">
+					<option value="">ss1</option>
+				</select>
+			</div>
+			
+			<div class="form-group col-sm-3">
+				<label class="control-label" for="writer">事务申请人</label>
+				<input class="form-control" name="writer" type="text" value="" placeholder="...不限" />
+			</div>
+			</div>
+			
+			<div class="row myRow">
+			<div class="form-group col-sm-5">
+				<label class="" for="dept">事务发起部门</label>
+				<!-- <select multiple class="form-control" name="dept" > -->
+				<select class="form-control" name="dept">
+					<option value="">d1</option>
+				</select>	
+			</div>
+			
+			<div class="form-group col-sm-4">
+				<label class="" for="issnum">编号</label>
+				<input class="form-control" name="issnum" type="text" value="" placeholder="...不限">
+										
+			</div>
+			
+			<div class="form-group col-sm-3">
+				<label class="control-label" for="registrar">事务登记人</label>
+				<input class="form-control" name="registrar" type="text" value="" placeholder="...不限" />
+			</div>
+			
+			</div>	
+			
+			<div class="row myRow">
+			<div class="form-group col-sm-5">
+				<label class="control-label" for="dept_now"><span class="spIssEntName"></span>名称</label>
+				<input class="form-control" name="issEntName" type="text" value="" placeholder="...不限">
+			</div>
+			<div class="form-group col-sm-4">
+				<label class="control-label" for="issEntType"><span class="spIssEntName"></span>类型</label>
+				<!-- <select multiple class="form-control" id="searchPatType" name="searchPatType" > -->
+				<select class="form-control" name="issEntType">
+					<option value="">t1</option>
+				</select>
+			</div>
+			
+			<div class="form-group col-sm-3">
+				<label class="control-label" for="issEntStatus"><span class="spIssEntName"></span>状态</label>
+				<!-- <select multiple class="form-control" id="searchPatType" name="searchPatType" > -->
+				<select class="form-control" name="issEntStatus">
+					<option value="">s1</option>
+				</select>
+			</div>
+			</div>		
+			
+			<div class="row myRow">
+			<div class="pull-right">
+				<button id="btnSearch" type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>查询</button>
+			
+				<button id="btnSearchReset" type="button" class="btn btn-primary btn-sm">条件重置</button>
+			</div>
+			</div>
+		</form>
 		</br>
 	</div>
 
 	<!-- // IssList表格排序信息汇总组件 -->
-	<div id="divTblSortData" data-iss-ent-name="{$sortData.issEntName}" data-iss-status="{$sortData.issStatus}" data-sort-name="{$sortData.sortName}" data-sort-order="{$sortData.sortOrder}" data-list-rows="{$sortData.listRows}" data-page-num="{$sortData.pageNum}" data-show-ass-id="{$sortData.showIssId}" class="sr-only"></div>
+	<div id="divTblSortData" data-iss-ent-name="{$sortData.issEntName}" data-iss-status="{$sortData.issStatus}" data-sort-name="{$sortData.sortName}" data-sort-order="{$sortData.sortOrder}" data-list-rows="{$sortData.listRows}" data-page-num="{$sortData.pageNum}" data-show-iss-id="{$sortData.showIssId}" class="sr-only"></div>
 	
 	<div id="divIssList_Load">
 		<p class="text-center" style="font-size:28px;">加载中……</p>
 	</div>
 </div>
+
+<!-- Modal "modalIssSingle" -->
+<div class="modal fade" id="modalIssSingle" role="dialog">
+	<div class="modal-dialog modal-lg">
+    
+      <!-- Modal content-->
+      	<div class="modal-content">
+        <div class="modal-header bg-info" style="border-radius:5px;">
+          	<button type="button" class="close" data-dismiss="modal">&times;</button>
+		  
+          	<h4 class="title"></h4>
+        </div>
+		
+        <div class="modal-body">
+			<!-- // 单个issue增删改查页面显示位置，需load模板文件-->
+			<div id="divFmIssSingle_Load"><p class="text-center" style="font-size:28px;">加载中……</p></div>
+		</div>
+		
+		<div class="modal-footer" hidden="true">
+        	<input type="button" class="btn btn-primary btn-sm" data-dismiss="modal" value="返回">  
+          
+        </div>
+		</div>
+	</div>
+
+</div>
+<!--/ Modal "modalIssSingle" -->
 
 <!-- /pagewrap  -->
 
@@ -112,6 +207,28 @@ var completeUlDropMenu=(numObj)=>{
 	});
 };
 
+var completeFmSelectCom=(fmObj,data)=>{
+	let selObj=fmObj.find('select'),
+		selName='',
+		nameArr=Object.keys(data);
+		valArr=Object.values(data);
+	selObj.empty();
+	for(var i=0;i<selObj.length;i++){
+		selName=selObj.eq(i).attr('name');
+		for(var n=0;n<selObj.length;n++){
+			if(selName==nameArr[n]){
+				selObj.eq(i).append($('<option></option>').val(0).text('…不限'));
+				valArr[n].forEach(function(item,index){
+					selObj.eq(i).append($('<option></option>').val(item).text(item));
+				});
+				break;
+			}
+		}
+	}
+	
+	console.log(data);
+};
+
 //改变标题
 var issEntNameChange=()=>{
 	let obj=$('#h4Title'),
@@ -142,8 +259,9 @@ var loadIssList=()=>{
 		issStatus=aObj.data('status'),
 		issEntName=anchorToIssEntName(),
 		urlList='{$home}/dashboard/issue/issList',
-		urlSearchForm='{$home}/dashboard/issue/searchForm',
-		data={'sortData':{},};
+		urlSearchForm='{$home}/dashboard/issue/searchFormSelData',
+		listData={sortData:{},searchData:{}},
+		selData={issEntName:issEntName,issStatus:issStatus,selObj:['status','dept','issEntType','issEntStatus']};
 	
 	//排序有关的参数都从$('#divTblSortData')获取
 	let obj=$('#divTblSortData'),
@@ -160,8 +278,23 @@ var loadIssList=()=>{
 	//排序有关的参数默认值
 	let sortDataDefault={'listRows':10,'sortName':'issnum','sortOrder':'asc','pageNum':1,'issEntName':'_PAT','showIssId':0,'issStatus':'_INPROCESS'};
 	
+	//用户搜索有关键值对从表单$('#fmIssPatSearch')获取
+	let formData=new FormData($('#fmIssSearch')[0]);
+	let searchData={};
+	//使用Map对象的forEach方法组装键值对
+	formData.forEach(function(val,key){
+		//非0非空的值才进行组装
+		if(val!='' && val!=0){
+			searchData[key]=val;
+		}
+	});
+	
+	<!-- // 转换成json字符串-->
+	JSON.stringify(searchData);
+	
 	sortData=$.extend({},sortDataDefault,sortData);
-	data.sortData=sortData;
+	listData.sortData=sortData;
+	listData.searchData=searchData;
 	
 	aObj.tab('show');
 	
@@ -171,22 +304,21 @@ var loadIssList=()=>{
 	//想利用$.when来保证，2个ajax加载都能成功得到处理。
 	$.when(
 		$('#divIssList_Load').html(loadStr)
-		.load(urlList,data,
+		.load(urlList,listData,
 			function(){
 				issEntNameChange();
-				
 			}
 		),
-		$('#divSearchForm_Load').html(loadStr).load(urlSearchForm,data)
-		//$.post(urlSearchForm,data)
+		$.post(urlSearchForm,selData)
 	).then(	
 		function(v1,v2){
 			//ajax成功,v对应为前2个load方法执行后得到的返回结果（V为jQuery对象）
 			if(v1.length){
 				//issEntNameChange();		
 			}
+			completeFmSelectCom($('#fmIssSearch'),v2[0]);
 			<!-- console.dir(v1.length);	 -->
-			<!-- console.dir(v2.length); -->
+			<!-- console.dir(v2); -->
 				
 			//$('#divIssList_load').html(JSON.stringify(v2[0]))			
 		},
@@ -212,7 +344,18 @@ var setSideNavIssNumInprocess=(obj)=>{
 	
 };
 
-
+//所有查询表单重置
+var fmReset=()=>{
+	let fm=$('form');
+	
+	fm.each(function(){
+		$(this)[0].reset();
+		$(this).find('.form-control').removeClass('alert-info');
+		if($(this).attr('id')=='fmRun'){
+			$(this).next().hide().find('span.alert-info').text('');
+		}
+	});
+};
 
 //自调用匿名函数立即执行的特点，进行页面初始化。
 (function($){
@@ -229,19 +372,54 @@ var setSideNavIssNumInprocess=(obj)=>{
 })(jQuery);
 
 $(document).ready(function(){
-	//
-	
+	var searchDataChanged=false;
+	<!-- // 页面刷新 -->
+	$('#btnRefresh').click(function(){
+		//所有表单重置
+		fmReset();
+		
+		//隐藏搜索条件
+		<!-- $('#divSearchData').collapse('hide'); -->
+		$('.collapse').collapse('hide');
+		//
+		loadIssList();
+	});
 	
 	<!-- //点击.aIss中的各个按钮后，改变显示格式，默认显示相应状态的issPat内容-->
 	$('.aIss').click(function(){
 		$(this).tab('show');
 		window.location.hash=$(this).attr('href');	//排序有关的值向$('#divTblSortData')汇集，置为1是为了让每一项都从第一页开始
-		$('#divTblSortData').data('pageNum',1);
-		
-		
-		console.log($(this).find('span .spType').html());
+		$('#divTblSortData').data('pageNum',1);		
+		<!-- console.log($(this).find('span .spType').html()); -->
 		loadIssList();
     });	
+	
+<!-- //表单$('#fmAssSearch')有关的代码块 -->
+	$('#fmIssSearch .form-control').change(function(){
+		if($(this).val()!=0){
+			//表单输入框附加底色
+			$(this).addClass('alert-info');
+			searchDataChanged=true;
+		}else{
+			//表单输入框去掉附加底色
+			$(this).removeClass('alert-info');
+		}
+	});
+	
+	//表单提交，显示asset结果
+	$('#btnSearch').click(function(){
+		let issEntName=$('#divTblSortData').data('issEntName');
+		//检查搜索表单的值是否有变化，若有变化，排序参数pageNum要重设为1，避免出现在当前分页无法显示查询结果的情况
+		if(searchDataChanged){
+			$('#divTblSortData').data('pageNum',1);
+		}
+		loadIssList();
+	});
+	
+	//表单重置
+	$('#btnSearchReset').click(function(){
+		fmReset();
+	});
 	
 <!-- function  -->
 
