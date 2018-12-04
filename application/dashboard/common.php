@@ -64,4 +64,60 @@ const conA=[
                     
                     ];
 
-
+/**
+     * 得到$parentArr的子集
+     * @param  Array $parentArr 一维关联数组，无重复值。
+     * @param  Array $clueArr, 一维关联数组。类似：$clueArr=['keys'=>$childArrKeys,'values'=>$childArrValues]
+     * @param  Array $childArrKeys 一维索引数组，是$parentArr的key的子集，可能有重复值 
+     * @param  Array $childArrValues 一维索引数组，是$parentArr的value的子集，可能有重复值
+     * @return Array $childArr 返回的一维索引数组，是$parentArr的子集
+     * 注意：$childArrKeys与$childArrValues必须有一个为空
+     */
+function find_child_array($parentArr,$clueArr=['keys'=>[],'values'=>[]])
+{
+  $childArr=[];
+  $childArrKeys=[];
+  $childArrValues=[];
+  $arr=[];
+  $cArr=[];
+  if(count($clueArr)==0 ){
+    return 'Error: clueArr is empty!';
+  }
+        
+  if(count($clueArr['keys']) && count($clueArr['values'])){
+    return 'Error: clueArr["keys"] and clueArr["values"] are all not empty! One of them should be empty.';
+  }
+        
+  if(count($clueArr['keys'])){
+    $arr=$clueArr['keys'];
+  }else{
+    $arr=$clueArr['values'];
+    //交换键值
+    $parentArr=array_flip($parentArr);
+  }
+        
+  //去重
+  $arr=array_unique($arr);
+  //自然排序
+  natcasesort($arr);
+  
+  if(count($clueArr['keys'])){
+    $childArrKeys=$arr;
+    $childArrValues=$cArr;
+  }else{
+    $childArrKeys=$cArr;
+    $childArrValues=$arr;
+  }
+        
+  foreach($arr as $key=>$val){
+    foreach($parentArr as $k=>$v){
+      if($val==$k){
+        $cArr[$key]=$v;
+        break;
+      }
+    }
+  }
+        
+  $childArr=array_combine($childArrKeys,$childArrValues);
+  return $childArr;
+}
