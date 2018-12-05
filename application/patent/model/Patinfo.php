@@ -80,58 +80,28 @@ class Patinfo extends Model
         return $output;
     }
 
-    //获取器，获取数据表patinfo中status字段值，转换为中文输出，待考虑是否采用？？
-    protected function getStatusAttr($key)
+    //获取器，获取数据表patinfo中status字段值，转换为中文输出
+    protected function getStatusAttr($dBStrEn)
     {
-        $value = $key;
-        $status = array(
-            '_PATS1' => '填报',
-            '_PATS2' => '内审',
-            '_PATS3' => '内审审核',
-            '_PATS4' => '内审修改',
-            '_PATS5' => '内审否决',
-            '_PATS6' => '拟申报(内审批准)',
-            '_PATS7' => '申报中',
-            '_PATS8' => '申报修改',
-            '_PATS9' => '授权',
-            '_PATS10' => '驳回',
-            '_PATS11' => '续费中',
-            '_PATS12' => '放弃续费',
-            '_PATS13' => '续费授权',
-            '_PATS14' => '续费驳回',
-            '_PATS15' => '超期无效',
-            );
-        if (array_key_exists($key, $status)) {
-            $value = $status[$key];
+        $output = $dBStrEn;
+        //引用应用公共文件（app/common.php）中定义的数组常量conPatStatusArr
+        if (array_key_exists($dBStrEn, conPatStatusArr)) {
+            $output = conPatStatusArr[$dBStrEn];
         }
-        return $value;
+        return $output;
     }
-
-    //修改器，修改存入数据表patinfo中status字段值，转换为类型编码。
-    protected function setStatusAttr($key)
+    
+    //修改器，修改存入数据表Patinfo中status字段值，转换为类型编码。
+    protected function setStatusAttr($strChi)
     {
-        $value = $key;
-        $status = array(
-            '填报' => '_PATS1',
-            '内审' => '_PATS2',
-            '内审审核' => '_PATS3',
-            '内审修改' => '_PATS4',
-            '内审否决' => '_PATS5',
-            '拟申报(内审批准)' => '_PATS6',
-            '申报中' => '_PATS7',
-            '申报修改' => '_PATS8',
-            '授权' => '_PATS9',
-            '驳回' => '_PATS10',
-            '续费中' => '_PATS11',
-            '放弃续费' => '_PATS12',
-            '续费授权' => '_PATS13',
-            '续费驳回' => '_PATS14',
-            '超期无效' => '_PATS15',
-            );
-        if (array_key_exists($key, $status)) {
-            $value = $status[$key];
+        $output = $strChi;
+        //引用应用公共文件（app/common.php）中定义的数组常量conPatStatusArr
+        foreach(conPatStatusArr as $key => $val){
+            if($strChi==$val){
+                $output=$key;
+            }
         }
-        return $value;
+        return $output;
     }
 
     /**

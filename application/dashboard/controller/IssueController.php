@@ -12,6 +12,7 @@ use app\dashboard\model\Patinfo as PatinfoModel;
 use app\dashboard\model\Assinfo as AssinfoModel;
 use app\dashboard\model\Assrecord as AssrecordModel;
 use app\dashboard\model\User as UserModel;
+use app\dashboard\model\Dept as DeptModel;
 
 class IssueController extends Controller
 {
@@ -56,7 +57,8 @@ class IssueController extends Controller
                               'relMethod'=>'pro_list',
                               'relStatus'=>conProStatusArr,
                               'relType'=>conProTypeArr],
-                    'relCommonFields'=>['id','topic','type','status']];
+                    'relCommonFields'=>['id','topic','type','status']
+                    ];
   
     //public function __construct(Request $request)
 //    {
@@ -75,7 +77,7 @@ class IssueController extends Controller
         $this->auth=UserModel::where(['userName'=>$this->userName,'pwd'=>$this->pwd])->find()->authority['iss'];
         //使用模型前的初始化，为模型内部使用的变量赋初值，后续的各个方法中无需再初始化，但可以进行修改
         IssinfoModel::initModel($this->userName,$this->dept,$this->auth,$this->issEntName); 
-       
+        
     }
     //
     private function priLogin()
@@ -197,9 +199,7 @@ class IssueController extends Controller
       
       //生成查询结果数据集：
       $baseSet=$queryBase->select();
-      if(is_array($baseSet)){
-          $baseSet=collection($baseSet);
-      } 
+      $baseSet=is_array($baseSet)?collection($baseSet):$baseSet;
       
       //搜索记录总数
       $searchResultNum=$baseSet->count();
@@ -262,7 +262,7 @@ class IssueController extends Controller
       return view();
     }
     
-    public function searchFormSelData(IssinfoModel $issMdl)
+    public function searchFormSelData(IssinfoModel $issMdl,DeptModel $deptMdl)
     {
       $this->priLogin();
       $request=$this->request;
@@ -276,6 +276,8 @@ class IssueController extends Controller
       $issRelStatusArr=[];
       //iss关联对象类型数组
       $issRelTypeArr=[];
+      //iss涉及的部门数组
+      $issDeptArr=$deptMdl->getNameAbbrVSFull();
       
       // 接收前端的参数
       $entName=$request->param('issEntName');
@@ -308,39 +310,32 @@ class IssueController extends Controller
       
       //组装返回前端的数组
       foreach($selObjArr as $key=>$val){
+        
         switch($val){
           case 'issEntType':
             $colArr=$relSet->column('type');
-            //$entTypeChi=$relSet->column('type');
-//            $entTypeChi=array_unique($entTypeChi);
-//            natcasesort($entTypeChi);
-//            foreach($entTypeChi as $key=>$val){
-//              foreach($issRelTypeArr as $k=>$v){
-//                if($val==$v){
-//                  $entTypeEn[$key]=$k;
-//                  break;
-//                }
-//              }
-//            }
-            
-            //$arr=$issRelTypeArr;
-            $arr=$colArr;
-            //$arr=find_child_array($issRelTypeArr,$clueArr=['keys'=>[],'values'=>$colArr]);
+            $parentArr=$issRelTypeArr;
             break;
           case 'issEntStatus':
             $colArr=$relSet->column('status');
-            //$arr=$issRelStatusArr;
-            $arr=$colArr;
-            //$arr=find_child_array($issRelStatusArr,$clueArr=['keys'=>[],'values'=>$colArr]);
+            $parentArr=$issRelStatusArr;
             break;
-          default:
+          case 'status':
             $colArr=$baseSet->column($val);
+            $parentArr=$issStatusArr;
+            break;
+          case 'dept':
+            $colArr=$baseSet->column($val);
+            $parentArr=$issDeptArr;
+            break;  
+          default:
+            //$colArr=$baseSet->column($val);
             //$arr=['key1'=>'value1'];
             break;                                  
         }
-        $colArr=array_unique($colArr);
-        natcasesort($colArr);
+        $colArr=get_child_array($parentArr,$clueArr=['keys'=>[],'values'=>$colArr]);
         $selResData[$val] = array_values($colArr);
+        $colArr=[];
       }
       //前端接收时数组被视为json对象
       return $selResData;
