@@ -224,8 +224,8 @@ const conIssPatStatusArr=[//除‘完结’以外的其它状态
                     //label-info，待定
                     '_PATS1'=>'送审',
                     '_PATS1-1'=>'填报中',
-                    '_PATS1-2'=>'审核-需修改',
-                    '_PATS1-3'=>'审批-需完善',
+                    '_PATS1-2'=>'审核完-待修改',
+                    '_PATS1-3'=>'审批完-需完善',
                     //label-success，正常
                     '_PATS2'=>'审核',
                     '_PATS2-1'=>'新增-专利申请',
@@ -259,8 +259,8 @@ const conIssTheStatusArr=[//除‘完结’以外的其它状态
                     //label-info，送审
                     '_THES1'=>'送审',
                     '_THES1-1'=>'填报中',
-                    '_THES1-2'=>'审核-需修改',
-                    '_THES1-3'=>'审批-需完善',
+                    '_THES1-2'=>'审核完-待修改',
+                    '_THES1-3'=>'审批完-需完善',
                     //label-success，审核
                     '_THES2'=>'审核',
                     '_THES2-1'=>'新增-论文发表申请',

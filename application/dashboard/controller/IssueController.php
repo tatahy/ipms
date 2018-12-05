@@ -282,16 +282,21 @@ class IssueController extends Controller
       // 接收前端的参数
       $entName=$request->param('issEntName');
       $issStatus=substr_count($request->param('issStatus'),'_INPROCESS')?'_INPROCESS':$request->param('issStatus');
-      $selObjArr=$request->param('selObj/a');//$selObjArr=['status','dept','issEntType','issEntStatus']
+      $selObjArr=$request->param('selArr/a');
+      $selNameArr=collection($request->param('selArr/a'))->column('name');
+      //$selArr=[['name'=>'status','selVal'=>[]],
+//                ['name'=>'dept','selVal'=>[]],
+//                ['name'=>'issEntType','selVal'=>[]],
+//                ['name'=>'issEntStatus','selVal'=>[]]
+//              ];  
       $colArr=[];
-      //根据关联对象名(_PAT/_PRO/_THE)得到关联查询方法
+      //根据关联对象名(_PAT/_PRO/_THE)得到关联查询方法及有关数组
       foreach($issConf as $key => $val){
         if($entName==$key){
           $mdlMethod=$val['relMethod'];
           $issStatusArr=$val['status'];
           $issRelStatusArr=$val['relStatus'];
           $issRelTypeArr=$val['relType'];
-          //$selResData[$key]=$val;
         }
       }
       
@@ -307,11 +312,12 @@ class IssueController extends Controller
       //关联对象数据集
       $relSet=collection($baseSet->column($mdlMethod));
       
+      //--block start--
       
-      //组装返回前端的数组
       foreach($selObjArr as $key=>$val){
-        
-        switch($val){
+        $name=$selObjArr[$key]['name'];
+        $selValArr=$selObjArr[$key]['selVal'];
+        switch($name){
           case 'issEntType':
             $colArr=$relSet->column('type');
             $parentArr=$issRelTypeArr;
@@ -321,11 +327,11 @@ class IssueController extends Controller
             $parentArr=$issRelStatusArr;
             break;
           case 'status':
-            $colArr=$baseSet->column($val);
+            $colArr=$baseSet->column($name);
             $parentArr=$issStatusArr;
             break;
           case 'dept':
-            $colArr=$baseSet->column($val);
+            $colArr=$baseSet->column($name);
             $parentArr=$issDeptArr;
             break;  
           default:
@@ -333,10 +339,24 @@ class IssueController extends Controller
             //$arr=['key1'=>'value1'];
             break;                                  
         }
-        $colArr=get_child_array($parentArr,$clueArr=['keys'=>[],'values'=>$colArr]);
-        $selResData[$val] = array_values($colArr);
+        $colArr=get_child_array($parentArr,$colArr,'VALUE');
+        //数组交集
+        if($name=='dept'){
+          $selValArr=array_intersect(array_values($colArr),$selValArr);
+        }else{
+          $selValArr=array_intersect(array_keys($colArr),$selValArr);
+        }
+        
+        //组装返回前端的数组
+        $selResData[$key] = ['name'=>$name,'key'=>array_keys($colArr),'value'=>array_values($colArr),'checked'=>array_values($selValArr)];
         $colArr=[];
+        
+        
       }
+      
+      //--block end--  
+      
+      
       //前端接收时数组被视为json对象
       return $selResData;
     }

@@ -15,7 +15,7 @@
 			
 <div class="content-body">
 	<div id="divTopBtn" class="row myRow text-right" style="margin:10px 0px;">		
-		<a id="aSearchData" class="btn btn-primary btn-sm" href="#divSearchData" data-toggle="collapse" title="显示/隐藏查询条件"><span class="glyphicon glyphicon-plus-sign"></span>查询条件</a>		
+		<a id="aSearchData" class="btn btn-primary btn-sm" href="#divSearchData" data-toggle="collapse" title="显示/隐藏查询条件"><span class="glyphicon glyphicon-plus-sign"></span>事务查询</a>		
 		
 		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新事务信息表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 			
@@ -26,7 +26,7 @@
 		
 		<!-- // 一般查询区域-->
 	<div id="divSearchData" class="collapse">
-		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchData"  data-toggle="collapse" title="点击隐藏">查询条件</a>
+		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchData"  data-toggle="collapse" title="点击隐藏">事务查询条件</a>
 		
 		<form id="fmIssSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:2px;">
 			<input class="sr-only" name="reqObj" type="text" value="" />
@@ -38,7 +38,7 @@
 			</div>
 			
 			<div class="form-group col-sm-4">
-				<label class="" for="status">现状</label>
+				<label class="" for="status">事务现状</label>
 				<select class="form-control" name="status">
 					<option value="">ss1</option>
 				</select>
@@ -60,7 +60,7 @@
 			</div>
 			
 			<div class="form-group col-sm-4">
-				<label class="" for="issnum">编号</label>
+				<label class="" for="issnum">事务编号</label>
 				<input class="form-control" name="issnum" type="text" value="" placeholder="...不限">
 										
 			</div>
@@ -206,26 +206,42 @@ var completeUlDropMenu=(numObj)=>{
 };
 
 var completeFmSelectCom=(fmObj,data)=>{
-	let selObj=fmObj.find('select'),
-		selName='',
-		nameArr=Object.keys(data);
-		valArr=Object.values(data);
-	selObj.empty();
-	for(var i=0;i<selObj.length;i++){
-		selName=selObj.eq(i).attr('name');
-		for(var n=0;n<selObj.length;n++){
-			if(selName==nameArr[n]){
-				selObj.eq(i).append($('<option></option>').val(0).text('…不限'));
-				valArr[n].forEach(function(item,index){
-					selObj.eq(i).append($('<option></option>').val(item).text(item));
+	let obj=fmObj.find('select'),
+		selObj={},
+		selName='';
+	<!-- console.log(data);	 -->
+	//挨个组装好select组件
+	for(var i=0;i<obj.length;i++){
+		selObj=obj.eq(i);
+		selName=selObj.attr('name');
+		selObj.empty().append($('<option></option>').val(0).text('…不限'));
+		//组装option
+		data.forEach(function(item){
+			let name=item.name,
+				checkArr=item.checked,
+				keyArr=item.key,
+				valueArr=item.value;
+			
+			if(selName=='dept' && selName==name){
+				valueArr.forEach(function(itmChi){
+					selObj.append($('<option></option>').val(itmChi).text(itmChi));
 				});
-				break;
+			}else if(selName==name){
+				keyArr.forEach(function(v,k){
+					selObj.append($('<option></option>').val(v).text(valueArr[k]));
+				});
 			}
-		}
+			//是否有选中项
+			if(checkArr != null){
+				checkArr.forEach(function(v,k){
+					selObj.val(v);
+				});
+			}
+		});
 	}
-	
-	console.log(data);
+	<!-- console.log(data); -->
 };
+
 
 //改变标题
 var issEntNameChange=()=>{
@@ -258,9 +274,8 @@ var loadIssList=()=>{
 		issEntName=anchorToIssEntName(),
 		urlList='{$home}/dashboard/issue/issList',
 		urlSearchForm='{$home}/dashboard/issue/searchFormSelData',
-		listData={sortData:{},searchData:{}},
-		selData={issEntName:issEntName,issStatus:issStatus,selObj:['status','dept','issEntType','issEntStatus']};
-	
+		listData={sortData:{},searchData:{}};
+		
 	//排序有关的参数都从$('#divTblSortData')获取
 	let obj=$('#divTblSortData'),
 		sortData={
@@ -279,6 +294,16 @@ var loadIssList=()=>{
 	//用户搜索有关键值对从表单$('#fmIssPatSearch')获取
 	let formData=new FormData($('#fmIssSearch')[0]);
 	let searchData={};
+	
+	//查询表单中选择框的定义
+	let selObj=$('#fmIssSearch select');
+		selDataDefault={issEntName:issEntName,
+						issStatus:issStatus,
+						selArr:[]
+						},
+		selArr=[],
+		selData={};
+	
 	//使用Map对象的forEach方法组装键值对
 	formData.forEach(function(val,key){
 		//非0非空的值才进行组装
@@ -286,6 +311,27 @@ var loadIssList=()=>{
 			searchData[key]=val;
 		}
 	});
+	
+	//查询表单中选择框的选择情况
+	for(var i=0;i<selObj.length;i++){
+		let subSelObj=selObj.eq(i),
+			val=subSelObj.val(),
+			valArr=[],
+			typeStr=typeof val;
+			
+		console.log(typeof valArr);
+		if(typeStr=='string'){
+			valArr.push(val);
+		}else if(typeStr=='object' && val!=null){
+			val.forEach(function(v,k){
+				valArr[k]=v;
+			});
+		}
+		
+		selArr[i]={name:subSelObj.attr('name'),selVal:valArr};
+	}
+
+	selData=$.extend({},selDataDefault,{selArr:selArr});
 	
 	<!-- // 转换成json字符串-->
 	JSON.stringify(searchData);
@@ -398,6 +444,7 @@ $(document).ready(function(){
 			//表单输入框附加底色
 			$(this).addClass('alert-info');
 			searchDataChanged=true;
+			console.log($(this).val());
 		}else{
 			//表单输入框去掉附加底色
 			$(this).removeClass('alert-info');

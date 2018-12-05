@@ -67,47 +67,37 @@ const conA=[
 /**
      * 得到$parentArr的子集
      * @param  Array $parentArr 一维关联数组，无重复值。
-     * @param  Array $clueArr, 一维关联数组。类似：$clueArr=['keys'=>$childArrKeys,'values'=>$childArrValues]
-     * @return Array $childArr 返回的一维索引数组，是$parentArr的子集
-     * Array $childArrKeys 一维索引数组，是$parentArr的key的子集，可能有重复值 
-     * Array $childArrValues 一维索引数组，是$parentArr的value的子集，可能有重复值
-     * 注意：$childArrKeys与$childArrValues必须有一个为空
+     * @param  Array $clueArr, 一维关联数组，可能有重复值。
+     * @param  String $type, 'KEY'| 'VALUE'，指定$clueArr的类型，默认为'KEY'
+     * @return Array $childArr 返回的一维关联数组，是$parentArr的子集。
      */
-function get_child_array($parentArr,$clueArr=['keys'=>[],'values'=>[]])
+function get_child_array($parentArr,$clueArr=[],$type='KEY')
 {
   $childArr=[];
   $childArrKeys=[];
   $childArrValues=[];
-  $arr=[];
   $cArr=[];
   if(count($clueArr)==0 ){
     return 'Error: clueArr is empty!';
   }
         
-  if(count($clueArr['keys']) && count($clueArr['values'])){
-    return 'Error: clueArr["keys"] and clueArr["values"] are all not empty! One of them should be empty.';
-  }
-        
-  if(count($clueArr['keys'])){
-    $arr=$clueArr['keys'];
+  if($type=='KEY'){
     //地址引用
-    $childArrKeys=&$arr;
+    $childArrKeys=&$clueArr;
     $childArrValues=&$cArr;    
   }else{
-    $arr=$clueArr['values'];
     //交换键值
     $parentArr=array_flip($parentArr);
     //地址引用
     $childArrKeys=&$cArr;
-    $childArrValues=&$arr;    
+    $childArrValues=&$clueArr;    
   }
         
   //去重
-  $arr=array_unique($arr);
-  //自然排序
-  natcasesort($arr);
-  //由$arr作为key数组在$parentArr中寻找其对应的value数组        
-  foreach($arr as $key=>$val){
+  $clueArr=array_unique($clueArr);
+
+  //由$clueArr作为key数组在$parentArr中寻找其对应的value数组        
+  foreach($clueArr as $key=>$val){
     foreach($parentArr as $k=>$v){
       if($val==$k){
         $cArr[$key]=$v;
@@ -116,5 +106,7 @@ function get_child_array($parentArr,$clueArr=['keys'=>[],'values'=>[]])
   }
         
   $childArr=array_combine($childArrKeys,$childArrValues);
+  //以键名进行升序排序，保持键值关系
+  ksort($childArr);
   return $childArr;
 }
