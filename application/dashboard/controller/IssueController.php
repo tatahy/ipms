@@ -9,6 +9,8 @@ use think\Controller;
 use app\dashboard\model\Issinfo as IssinfoModel;
 use app\dashboard\model\Issrecord as IssrecordModel;
 use app\dashboard\model\Patinfo as PatinfoModel;
+use app\dashboard\model\Proinfo as ProinfoModel;
+use app\dashboard\model\Theinfo as TheinfoModel;
 use app\dashboard\model\Assinfo as AssinfoModel;
 use app\dashboard\model\Assrecord as AssrecordModel;
 use app\dashboard\model\User as UserModel;
@@ -29,35 +31,32 @@ class IssueController extends Controller
     //请求对象域名
     private $home = '';
     //请求的issEntName
-    private $issEntName = '';
-    
-    //关联对象名称及关联方法对应关系数组
-    const ENT_NAME_METHOD=['_PAT'=>'pat_list','_THE'=>'the_list','_PRO'=>'pro_list'];
-    //关联对象共有的字段名称与前端变量名的对应关系
-    const FENAME_TBLFIELD=['issEntName'=>'topic','issEntType'=>'type','issEntStatus'=>'status'];
-    //关联对象共有的字段名称
-    const TBL_FIELDS=['id','topic','type','status'];
-    //issStatus数组
-    const ISS_STATUS=['_PAT'=>conIssPatStatusArr,'_THE'=>conIssTheStatusArr,'_PRO'=>conIssProStatusArr];
-    //iss关联对象Status数组
-    const REL_STATUS=['_PAT'=>conPatStatusArr,'_THE'=>conTheStatusArr,'_PRO'=>conProStatusArr];
-    //iss关联对象type数组
-    const REL_TYPE=['_PAT'=>conPatTypeArr,'_THE'=>conTheTypeArr,'_PRO'=>conProTypeArr];
-    
+    private $issEntName = '';    
     //issCONF数组
-    const ISS_CONF=['_PAT'=>['status'=>conIssPatStatusArr,
+    const ISS_CONF=['_PAT'=>[//issStatus数组
+                              'status'=>conIssPatStatusArr,
+                              //关联方法
                               'relMethod'=>'pat_list',
+                              //关联对象Status数组
                               'relStatus'=>conPatStatusArr,
-                              'relType'=>conPatTypeArr],
+                              //关联对象type数组
+                              'relType'=>conPatTypeArr,
+                              //关联对象模型名称
+                              'relEntModelName'=>'Patinfo'],
                     '_THE'=>['status'=>conIssTheStatusArr,
                               'relMethod'=>'the_list',
                               'relStatus'=>conTheStatusArr,
-                              'relType'=>conTheTypeArr],
+                              'relType'=>conTheTypeArr,
+                              'relEntModelName'=>'Theinfo'],
                     '_PRO'=>['status'=>conIssProStatusArr,
                               'relMethod'=>'pro_list',
                               'relStatus'=>conProStatusArr,
-                              'relType'=>conProTypeArr],
-                    'relCommonFields'=>['id','topic','type','status']
+                              'relType'=>conProTypeArr,
+                              'relEntModelName'=>'Proinfo'],
+                    //关联对象共有的字段名称
+                    'relEntTblCommonFields'=>['id','topic','type','status'],
+                    //关联对象共有的字段名称与前端变量名的对应关系
+                    'relTblFieldsFEName'=>['issEntName'=>'topic','issEntType'=>'type','issEntStatus'=>'status']
                     ];
   
     //public function __construct(Request $request)
@@ -110,26 +109,13 @@ class IssueController extends Controller
       
       return view();
     }
-    
+    //返回前端issue的排序、查询后分页显示所需的记录集
     public function issList(IssinfoModel $issMdl,PatinfoModel $patMdl)
     {
       $this->priLogin();
       $request=$this->request;
-      
-      //关联对象名称
-      $entName='';
-       //进行排序的关联对象字段名
-      $entSortName='';
-      
-      //关联对象共有的字段名称与前端的对应关系
-      $tblFieldAsArr=self::FENAME_TBLFIELD;
-      //关联对象共有的字段名称
-      $tblField=self::TBL_FIELDS;
-      
-      //关联方法名称
-      $mdlMethod='';
-      //搜索查询条件数组
-      $whereArr=[];
+      //self::ISS_CONF 
+      $issConf=self::ISS_CONF;
       $searchDefaults=array();
       $sortDefaults=array('listRows'=>10,'sortName'=>'issnum','sortOrder'=>'asc','pageNum'=>1,
                           'showIssId'=>0,'issEntName'=>'_PAT','issStatus'=>'_INPROCESS');
@@ -140,11 +126,43 @@ class IssueController extends Controller
       // 接收前端的搜索参数数组，由前端保证传来的搜索参数值非0，非空。
       $searchData=!empty($request->param('searchData/a'))?$request->param('searchData/a'):$searchDefaults;
       $searchData=array_merge($searchDefaults,$searchData);
+      
+      //关联对象名称
       $entName=$sortData['issEntName'];
-      //'_INPROCESS'字符串出现在$sortData['issStatus']中的次数
+      //关联方法名称
+      $mdlMethod=$issConf[$entName]['relMethod'];
+      //关联对象的数据模型名
+      $relModelName=$issConf[$entName]['relEntModelName'];       
+      //关联对象共有的字段名称与前端的对应关系
+      $tblFieldAsArr=$issConf['relTblFieldsFEName'];
+      //关联对象共有的字段名称
+      $tblFields=$issConf['relEntTblCommonFields'];
+      //关联对象的数据模型对象实例
+      $relMdl='';
+      //进行排序的关联对象字段名
+      $entSortName='';
+            
+      //根据'_INPROCESS'字符串出现在$sortData['issStatus']中的次数
       $issStatus=substr_count($sortData['issStatus'],'_INPROCESS')?'_INPROCESS':$sortData['issStatus'];
        //返回前端进行显示的内容
       $issList=array();
+      
+      //iss中进行搜索的条件数组
+      $whereArr=[];
+      //关联对象中进行搜索的条件数组
+      $whereEntArr=[];
+      
+      switch($relModelName){
+        case 'Patinfo':
+          $relMdl = new PatinfoModel;
+          break;
+        case 'Proinfo':
+          $relMdl = new ProinfoModel;
+          break;
+        case 'Theinfo':
+          $relMdl = new TheinfoModel;
+          break;
+      }
     
       //前端输入的关键字搜索,like关键字，issue，4个
       $whereArr['topic']=!empty($searchData['topic'])?['like','%'.$searchData['topic'].'%']:'';
@@ -173,12 +191,6 @@ class IssueController extends Controller
           unset($whereEntArr[$key]);
         }
       }
-      //根据关联对象名得到关联查询方法
-      foreach(self::ENT_NAME_METHOD as $key => $val){
-        if($entName==$key){
-          $mdlMethod=$val;
-        }
-      }
       //是否对关联对象的字段进行排序，是就$sortData['sortName']=''
       foreach($tblFieldAsArr as $key=>$val){
         if($sortData['sortName']==$key){
@@ -187,74 +199,76 @@ class IssueController extends Controller
           $sortData['sortName']='';
         }
       }
-      //
+      //iss模型对象，排序、查询用
       $queryBase=$issMdl->issStatusQuery($issStatus,$entName)->where($whereArr)
                       ->order($sortData['sortName'],$sortData['sortOrder']);
-      
-       //符合查询条件的所有iss记录分页,每页$listRows条记录
-      $pageSet=$issMdl->issStatusQuery($issStatus,$entName)->where($whereArr)
-                      ->order($sortData['sortName'],$sortData['sortOrder'])
-                      ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
-                        'query'=>['listRows'=>$sortData['listRows']]]);
       
       //生成查询结果数据集：
       $baseSet=$queryBase->select();
       $baseSet=is_array($baseSet)?collection($baseSet):$baseSet;
+      $issmapIdArr=$baseSet->column('issmap_id');
+      //搜索记录总数，隐含着count($issmapIdArr)==$baseSet->count()
+      $searchResultNum=count($issmapIdArr);
       
-      //搜索记录总数
-      $searchResultNum=$baseSet->count();
-      
+      //--block start                     
+      //涉及关联对象$entName中字段的排序、查询 
       if($searchResultNum){
-        //延迟载入关联查询方法load()得到含有关联对象数据的数据集，仅拉取关联对象共有的字段名
-        $baseSet->load([$mdlMethod=>function($query) use($tblField) {
-                                  $query->field($tblField);}]);
+        //$issmapIdArr中的值是否能有重复值？若可以有要怎么处理？
+        $relSet=$relMdl->field($tblFields)
+                        ->where('id','in',$issmapIdArr)
+                        ->where($whereEntArr)
+                        ->order($entSortName,$sortData['sortOrder'])
+                        ->select();
+                        
         //关联对象数据集
-        $relSet=collection($baseSet->column($mdlMethod));
-      }
-                            
-       //涉及关联对象$entName中字段的排序   
-      if($entSortName){
+        $relSet=is_array($relSet)?collection($relSet):$relSet;
         
-        //组合id与待排序的字段值
-        $testSet=array_combine($baseSet->column('id'),$relSet->column($entSortName));
+        $searchResultNum=$relSet->count();
         
-        //对待排序的字段值进行自然排序，保持键值关系
-        if($sortData['sortOrder']=='asc'){
-          asort($testSet,SORT_FLAG_CASE);
-        }else{
-          arsort($testSet,SORT_FLAG_CASE);
-        }
-        
-        //从排序后的数组中截取本页所需的部分，保持键值对应关系“true”
-        $testSet=array_slice($testSet,($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows'],true);
-        //得到id值（数组） 
-        $idArr=array_keys($testSet);
-        
-        //根据上一步中得到的$idArr，从数据集$baseSet中抽出与id对应的iss记录，将抽出记录按照$idArr的顺序组装好。
-        foreach($idArr as $key=>$val){
-          for($i=0;$i<$baseSet->count();$i++){
-            if($baseSet[$i]['id']==$val){
-              $issList[$key]=$baseSet[$i];
-              break;
+        if($searchResultNum){
+          //从排序后的数组中截取本页所需的部分，取出id字段值
+          $issmapIdArr=$relSet->column('id');
+          $idArr=$relSet->slice(($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows'])->column('id');
+          
+          //组装本页的issList。根据上一步中得到的arr，从数据集$baseSet中抽出对应的iss记录，将抽出记录按照arr的顺序组装好。
+          foreach($idArr as $key=>$val){
+            for($i=0;$i<$baseSet->count();$i++){
+              if($baseSet[$i]['issmap_id']==$val){
+                $issList[$key]=$baseSet[$i];
+                break;
+              }
             }
           }
         }
-      }else{
-        $issList=$baseSet->slice(($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows']);
-        $testSet=[':)testing'];                
-      }       
+      }
+      //延迟载入关联查询方法load()得到含有关联对象数据的数据集，
+      //仅拉取关联对象共有的字段名，设置可见字段，减小向前端传输的数据量
+      $issList=collection($issList)->load([$mdlMethod=>function($query) use($tblFields) {
+                                  $query->field($tblFields);}])->visible(['id']);
+
+      //iss模型对象，排序、查询后分页用
+      $pageQuery=$issMdl->issStatusQuery($issStatus,$entName)->where('issmap_id','in',$issmapIdArr)
+                      ->order($sortData['sortName'],$sortData['sortOrder']);
+      
+      //符合查询条件的所有iss记录分页,每页$listRows条记录
+      $pageSet=$pageQuery->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
+                        'query'=>['listRows'=>$sortData['listRows']]]);       
+      //--block end
       
       $this->assign([
         'home'=>$this->home,
         'issEntName'=>$entName,
         'pageSet'=>$pageSet,
         'issList'=>$issList,
-        'issTest'=>json_encode($testSet,JSON_UNESCAPED_UNICODE),
+        'issTest'=>json_encode('',JSON_UNESCAPED_UNICODE),
         
         'mdlMethod'=>$mdlMethod,
         
         //排序数组
         'sortData'=>$sortData,
+        //将数组转换为json字符串，编码为Unicode字符（\uxxxx）。
+        //前端就可以直接作为json对象使用，若前端文件采用utf-8编码，汉字也可直接解析显示。
+        'searchData'=>json_encode($issList,JSON_UNESCAPED_UNICODE),
         //记录总数
         'searchResultNum'=>$searchResultNum 
       ]);
@@ -267,39 +281,26 @@ class IssueController extends Controller
       $this->priLogin();
       $request=$this->request;
       $issConf=self::ISS_CONF;
-      $tblField=$issConf['relCommonFields'];
-      //iss获取关联对象的方法
-      $mdlMethod='';
-      //iss对象状态数组
-      $issStatusArr=[];    
-      //iss关联对象状态数组
-      $issRelStatusArr=[];
-      //iss关联对象类型数组
-      $issRelTypeArr=[];
-      //iss涉及的部门数组
-      $issDeptArr=$deptMdl->getNameAbbrVSFull();
-      
       // 接收前端的参数
       $entName=$request->param('issEntName');
       $issStatus=substr_count($request->param('issStatus'),'_INPROCESS')?'_INPROCESS':$request->param('issStatus');
-      $selObjArr=$request->param('selArr/a');
-      $selNameArr=collection($request->param('selArr/a'))->column('name');
-      //$selArr=[['name'=>'status','selVal'=>[]],
-//                ['name'=>'dept','selVal'=>[]],
-//                ['name'=>'issEntType','selVal'=>[]],
-//                ['name'=>'issEntStatus','selVal'=>[]]
-//              ];  
-      $colArr=[];
-      //根据关联对象名(_PAT/_PRO/_THE)得到关联查询方法及有关数组
-      foreach($issConf as $key => $val){
-        if($entName==$key){
-          $mdlMethod=$val['relMethod'];
-          $issStatusArr=$val['status'];
-          $issRelStatusArr=$val['relStatus'];
-          $issRelTypeArr=$val['relType'];
-        }
-      }
+      $selNameArr=$request->param('nameArr/a');//nameArr=['status','dept','issEntType','issEntStatus']
       
+      $tblFields=$issConf['relEntTblCommonFields'];
+      //iss获取关联对象的方法
+      $mdlMethod=$issConf[$entName]['relMethod'];
+      //iss对象状态数组
+      $issStatusArr=$issConf[$entName]['status'];    
+      //iss关联对象状态数组
+      $issRelStatusArr=$issConf[$entName]['relStatus'];
+      //iss关联对象类型数组
+      $issRelTypeArr=$issConf[$entName]['relType'];
+      
+      //iss涉及的部门数组
+      $issDeptArr=$deptMdl->getNameAbbrVSFull();
+      
+      $colArr=[];
+    
       //生成iss查询结果数据集：
       $baseSet=$issMdl->issStatusQuery($issStatus,$entName)->select();
       if(is_array($baseSet)){
@@ -307,17 +308,13 @@ class IssueController extends Controller
       }
       
       //延迟载入关联查询方法load()得到含有关联对象数据的数据集，仅拉取关联对象共有的字段名
-      $baseSet->load([$mdlMethod=>function($query) use($tblField) {
-                                  $query->field($tblField);}]);
+      $baseSet->load([$mdlMethod=>function($query) use($tblFields) {
+                                  $query->field($tblFields);}]);
       //关联对象数据集
       $relSet=collection($baseSet->column($mdlMethod));
-      
-      //--block start--
-      
-      foreach($selObjArr as $key=>$val){
-        $name=$selObjArr[$key]['name'];
-        $selValArr=$selObjArr[$key]['selVal'];
-        switch($name){
+      //组装返回前端的数组$selResData
+      foreach($selNameArr as $key=>$val){
+        switch($val){
           case 'issEntType':
             $colArr=$relSet->column('type');
             $parentArr=$issRelTypeArr;
@@ -327,11 +324,11 @@ class IssueController extends Controller
             $parentArr=$issRelStatusArr;
             break;
           case 'status':
-            $colArr=$baseSet->column($name);
+            $colArr=$baseSet->column($val);
             $parentArr=$issStatusArr;
             break;
           case 'dept':
-            $colArr=$baseSet->column($name);
+            $colArr=$baseSet->column($val);
             $parentArr=$issDeptArr;
             break;  
           default:
@@ -340,23 +337,10 @@ class IssueController extends Controller
             break;                                  
         }
         $colArr=get_child_array($parentArr,$colArr,'VALUE');
-        //数组交集
-        if($name=='dept'){
-          $selValArr=array_intersect(array_values($colArr),$selValArr);
-        }else{
-          $selValArr=array_intersect(array_keys($colArr),$selValArr);
-        }
-        
         //组装返回前端的数组
-        $selResData[$key] = ['name'=>$name,'key'=>array_keys($colArr),'value'=>array_values($colArr),'checked'=>array_values($selValArr)];
+        $selResData[$key] = ['name'=>$val,'key'=>array_keys($colArr),'value'=>array_values($colArr)];
         $colArr=[];
-        
-        
       }
-      
-      //--block end--  
-      
-      
       //前端接收时数组被视为json对象
       return $selResData;
     }

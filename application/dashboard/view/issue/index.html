@@ -205,43 +205,55 @@ var completeUlDropMenu=(numObj)=>{
 	});
 };
 
-var completeFmSelectCom=(fmObj,data)=>{
-	let obj=fmObj.find('select'),
-		selObj={},
-		selName='';
-	<!-- console.log(data);	 -->
-	//挨个组装好select组件
-	for(var i=0;i<obj.length;i++){
-		selObj=obj.eq(i);
-		selName=selObj.attr('name');
-		selObj.empty().append($('<option></option>').val(0).text('…不限'));
-		//组装option
-		data.forEach(function(item){
-			let name=item.name,
-				checkArr=item.checked,
-				keyArr=item.key,
-				valueArr=item.value;
-			
-			if(selName=='dept' && selName==name){
-				valueArr.forEach(function(itmChi){
-					selObj.append($('<option></option>').val(itmChi).text(itmChi));
-				});
-			}else if(selName==name){
-				keyArr.forEach(function(v,k){
-					selObj.append($('<option></option>').val(v).text(valueArr[k]));
-				});
-			}
-			//是否有选中项
-			if(checkArr != null){
-				checkArr.forEach(function(v,k){
-					selObj.val(v);
-				});
-			}
-		});
+var completeFmSelectCom=(fmObj)=>{
+	let selSet=fmObj.find('select'),
+		selName=[],
+		url='{$home}/dashboard/issue/searchFormSelData',
+		aObj=$('a.aIss[href="'+window.location.hash+'"]');
+		
+	//发送给后端的与选择框有关的变量
+	let selData={issEntName:anchorToIssEntName(),
+				issStatus:aObj.data('status')};
+		
+	
+	//查询表单中选择框的name属性值数组
+	for(var i=0;i<selSet.length;i++){
+		selName[i]=selSet.eq(i).attr('name');
 	}
+
+	selData=$.extend(selData,{nameArr:selName});
+	//向后端请求组装select组件所需数据
+	$.post(url,selData,function(data){
+	//挨个组装好所有的select组件
+		for(var i=0;i<selSet.length;i++){
+			let selObj=selSet.eq(i),
+				selName=selObj.attr('name');
+			selObj.empty().append($('<option></option>').val(0).text('…不限'));		
+			//组装option
+			data.forEach(function(item){
+				let name=item.name,
+					keyArr=item.key,
+					valueArr=item.value;
+				while(selName==name){
+					if(selName=='dept'){
+						valueArr.forEach(function(itmChi,index){
+							selObj.append($('<option></option>').val(itmChi).	text(itmChi +'，简称：'+keyArr[index]));
+						});
+					}else{
+						keyArr.forEach(function(v,k){
+							selObj.append($('<option></option>').val(v).text(valueArr[k]));
+						});
+					}
+				 //破坏循环执行条件，跳出循环。否则循环无限执行 -->
+				<!-- selName=0; -->
+				//直接跳出循环
+					break;
+				}
+			});
+		}
+	});
 	<!-- console.log(data); -->
 };
-
 
 //改变标题
 var issEntNameChange=()=>{
@@ -273,7 +285,7 @@ var loadIssList=()=>{
 		issStatus=aObj.data('status'),
 		issEntName=anchorToIssEntName(),
 		urlList='{$home}/dashboard/issue/issList',
-		urlSearchForm='{$home}/dashboard/issue/searchFormSelData',
+		urlSelData='{$home}/dashboard/issue/searchFormSelData',
 		listData={sortData:{},searchData:{}};
 		
 	//排序有关的参数都从$('#divTblSortData')获取
@@ -295,15 +307,6 @@ var loadIssList=()=>{
 	let formData=new FormData($('#fmIssSearch')[0]);
 	let searchData={};
 	
-	//查询表单中选择框的定义
-	let selObj=$('#fmIssSearch select');
-		selDataDefault={issEntName:issEntName,
-						issStatus:issStatus,
-						selArr:[]
-						},
-		selArr=[],
-		selData={};
-	
 	//使用Map对象的forEach方法组装键值对
 	formData.forEach(function(val,key){
 		//非0非空的值才进行组装
@@ -311,27 +314,6 @@ var loadIssList=()=>{
 			searchData[key]=val;
 		}
 	});
-	
-	//查询表单中选择框的选择情况
-	for(var i=0;i<selObj.length;i++){
-		let subSelObj=selObj.eq(i),
-			val=subSelObj.val(),
-			valArr=[],
-			typeStr=typeof val;
-			
-		console.log(typeof valArr);
-		if(typeStr=='string'){
-			valArr.push(val);
-		}else if(typeStr=='object' && val!=null){
-			val.forEach(function(v,k){
-				valArr[k]=v;
-			});
-		}
-		
-		selArr[i]={name:subSelObj.attr('name'),selVal:valArr};
-	}
-
-	selData=$.extend({},selDataDefault,{selArr:selArr});
 	
 	<!-- // 转换成json字符串-->
 	JSON.stringify(searchData);
@@ -343,7 +325,7 @@ var loadIssList=()=>{
 	aObj.tab('show');
 	
 	<!-- $('#divIssList_Load').html(loadStr).load(urlList,data,function(){issEntNameChange();}); -->
-	<!-- $('#divSearchForm_Load').html(loadStr).load(urlSearchForm,data); -->
+	<!-- $('#divSearchForm_Load').html(loadStr).load(urlSelData,data); -->
 	
 	//想利用$.when来保证，2个ajax加载都能成功得到处理。
 	$.when(
@@ -352,19 +334,17 @@ var loadIssList=()=>{
 			function(){
 				issEntNameChange();
 			}
-		),
-		$.post(urlSearchForm,selData)
+		)
+		<!-- $.post(urlSelData,selData) -->
 	).then(	
-		function(v1,v2){
+		function(v1){
 			//ajax成功,v对应为前2个load方法执行后得到的返回结果（V为jQuery对象）
 			if(v1.length){
 				//issEntNameChange();		
 			}
-			completeFmSelectCom($('#fmIssSearch'),v2[0]);
+			<!-- completeFmSelectCom($('#fmIssSearch'),v2[0]); -->
 			<!-- console.dir(v1.length);	 -->
-			<!-- console.dir(v2); -->
-				
-			//$('#divIssList_load').html(JSON.stringify(v2[0]))			
+			<!-- console.dir(v2); -->			
 		},
 		function(){
 			//ajax失败
@@ -408,7 +388,10 @@ var fmReset=()=>{
 	<!-- console.log(name); -->
 	<!-- console.table(obj); -->
 	setSideNavIssNumInprocess(obj);
+	
 	completeUlDropMenu(numObj);
+	completeFmSelectCom($('#fmIssSearch'));
+	
 	issEntNameChange();
 	// 激活tooltip
 	$('[title]').tooltip();

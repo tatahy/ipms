@@ -31,12 +31,14 @@
 					<th><a data-sort-name="statusdescription">现状说明</a></th>
 					<th><a data-sort-name="create_time">创建时间</a></th>
 					<th><a data-sort-name="update_time">现状登记时间</a></th>
-					<th><a data-sort-name="issEntName"><span class="spIssEntName"></span>名称</a></th>
-					<th><a data-sort-name="issEntType"><span class="spIssEntName"></span>类型</a></th>
-					<th><a data-sort-name="issEntStatus"><span class="spIssEntName"></span>状态</a></th>
 					<th><a data-sort-name="dept">事务发起部门</a></th>
 					<th><a data-sort-name="writer">事务申请人</a></th>
 					<th><a data-sort-name="registrar">现状登记人</a></th>
+					
+					<th><a data-sort-name="issEntName"><span class="spIssEntName"></span>名称</a></th>
+					<th><a data-sort-name="issEntType"><span class="spIssEntName"></span>类型</a></th>
+					<th><a data-sort-name="issEntStatus"><span class="spIssEntName"></span>状态</a></th>
+					
 					<th class="text-center">操作</th>
 				</tr>
 			
@@ -51,12 +53,14 @@
 					<td>{$vo.statusdescription}</td>
 					<td>{$vo.create_time}</td>
 					<td>{$vo.update_time}</td>
-					<td><a href="{$home}/patent/index/patinfo/id/{$vo.issmap_id}" target="_blank" title="专利详情">{$vo[$mdlMethod]['topic']}</a></td>
-					<td>{$vo[$mdlMethod]['type']}</td>
-					<td>{$vo[$mdlMethod]['status']}</td>
 					<td>{$vo.dept}</td>
 					<td>{$vo.writer}</td>
 					<td>{$vo.registrar}</td>
+					
+					<td><a href="{$home}/patent/index/patinfo/id/{$vo.issmap_id}" target="_blank" title="专利详情">{$vo[$mdlMethod]['topic']}</a></td>
+					<td>{$vo[$mdlMethod]['type']}</td>
+					<td>{$vo[$mdlMethod]['status']}</td>
+					
 					<td>操作</td>				
 				</tr>
 				{/volist}
@@ -188,6 +192,34 @@ var pageShowCom=(num,reqObj)=>{
 			break;
 	}
 };
+//设定搜索表单的内容
+var setFmSearch=(fmobj,optObj)=>{
+	let fcSet=fmobj.find('.form-control'),
+		keyArr=Object.keys(optObj),
+		valArr=Object.values(optObj);
+	
+	keyArr.forEach(function(item,index){
+		for(var i=0;i<fcSet.length;i++){
+			let subCom=fcSet.eq(i),
+				name=subCom.attr('name');
+			while(item==name){
+				<!-- console.log(typeof valArr[index]); -->
+				//valArr[index]是否为数组
+				if(typeof valArr[index] == 'Object'){
+					valArr[index].forEach(function(v,k){
+						subCom.val(v);
+						console.log(v);	
+					});
+				}else{
+					subCom.val(valArr[index]);
+				}
+				break;
+			}
+		}
+		<!-- console.log(item,valArr[index]);	 -->
+	});
+	
+};
 
 //自调用匿名函数立即执行的特点，进行页面初始化。
 (function($){
@@ -206,6 +238,11 @@ var pageShowCom=(num,reqObj)=>{
 	columnToggle();
 	sortOrderToggle();
 	trAddBgColor();
+	
+	if(Object.keys({$searchData}).length){
+		setFmSearch($('#fmIssSearch'),{$searchData});
+	}
+	
 	$('#pDis').html('{$issTest}');
 	
 })(jQuery);
@@ -249,7 +286,8 @@ $(document).ready(function(){
 	});	
 	//排序
 	$('#tblIssList thead a').click(function(){
-		let sortName=$(this).data('sortName'),sortOrder=$(this).data('sortOrder');
+		let sortName=$(this).data('sortName'),
+			sortOrder=$(this).data('sortOrder');
 		//排序有关的值向$('#divTblSortData')汇集
 		<!-- if(sortName){ -->
 			<!-- $('#divTblSortData').data('sortName',sortName); -->
