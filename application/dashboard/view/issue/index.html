@@ -19,7 +19,7 @@
 		
 		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新事务信息表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 			
-		<button class="btn btn-primary btn-sm btnAssOprt" data-iss-id="0" data-iss-oprt="_CREATE" title="新增事务"><span class="glyphicon glyphicon-modal-window"></span>新增</button>
+		<button class="btn btn-primary btn-sm btnIssOprt" data-iss-id="0" data-iss-oprt="_CREATE"><span class="glyphicon glyphicon-modal-window"></span>新增</button>
 			
 	</div>
 		
@@ -29,7 +29,7 @@
 		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchData"  data-toggle="collapse" title="点击隐藏">事务查询条件</a>
 		
 		<form id="fmIssSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:2px;">
-			<input class="sr-only" name="reqObj" type="text" value="" />
+			<input class="sr-only" id="searchEnt" name="searchEnt" type="text" value="" />
 			<div class="row myRow">
 			<div class="form-group col-sm-5">
 				<label class="" for="topic">事务标题</label>
@@ -142,6 +142,51 @@
 
 
 <script>
+//属于本页面的子页面也可使用的变量
+var entNameChi='{$issEntNameChi}',
+	entName='{$issEntName}',
+	glyPref='glyphicon glyphicon-',
+	labPref='label label-',
+	txtPref='text-',
+	urlPref='{$home}/dashboard/issue/';
+
+var issEntAttrObj={
+	'_PAT':{nameChi:'专利',nameEn:'_PAT',gly:glyPref+'wrench',color:{lab:labPref+'warning',txt:txtPref+'warning'}},
+	'_THE':{nameChi:'论文',nameEn:'_THE',gly:glyPref+'list',color:{lab:labPref+'info',txt:txtPref+'info'}},
+	'_PRO':{nameChi:'项目',nameEn:'_PRO',gly:glyPref+'inbox',color:{lab:labPref+'danger',txt:txtPref+'danger'}}	
+	};
+
+var issEntAttrArr=[
+	{nameChi:'专利',nameEn:'_PAT',gly:glyPref+'wrench',color:{lab:labPref+'warning',txt:txtPref+'warning'}},
+	{nameChi:'论文',nameEn:'_THE',gly:glyPref+'list',color:{lab:labPref+'info',txt:txtPref+'info'}},
+	{nameChi:'项目',nameEn:'_PRO',gly:glyPref+'inbox',color:{lab:labPref+'danger',txt:txtPref+'danger'}}	
+	];
+	
+//得到entName对应的组件(HTML字符串)
+var	getEntHtmlCom=(nameEn)=>{
+	let entHtml='';
+	//组装entHtml
+	for(var i=0;i<issEntAttrArr.length;i++){
+		let arr=issEntAttrArr;
+		if (nameEn==arr[i].nameEn){
+			entHtml='<span class="'+arr[i].color.txt+'"><span class="'+arr[i].gly+'"></span>'+arr[i].nameChi+'事务</span>';
+			break;
+		}
+	}
+	return entHtml;
+};
+
+var oprtComAttrArr=[
+	{nameChi:'新增',nameEn:'_CREATE',gly:glyPref+'modal-window',color:{lab:labPref+'info',txt:txtPref+'info',btn:'btn-primary'},title:'新增事务记录'},
+	{nameChi:'送审',nameEn:'_SUBMIT',gly:glyPref+'send',color:{lab:labPref+'info',txt:txtPref+'info',btn:'btn-info'},title:'送审记录'},
+	{nameChi:'审核',nameEn:'_AUDIT',gly:glyPref+'check',color:{lab:labPref+'warning',txt:txtPref+'warning',btn:'btn-warning'},title:'审核记录'},
+	{nameChi:'审批',nameEn:'_APPROVE',gly:glyPref+'ok',color:{lab:labPref+'danger',txt:txtPref+'danger',btn:'btn-danger'},title:'审批记录'},
+	{nameChi:'更新',nameEn:'_UPDATE',gly:glyPref+'save-file',color:{lab:labPref+'primary',txt:txtPref+'primary',btn:'btn-primary'},title:'更新记录'},
+	{nameChi:'删除',nameEn:'_DELETE',gly:glyPref+'remove',color:{lab:labPref+'danger',txt:txtPref+'danger',btn:'btn-danger'},title:'删除记录'},
+	{nameChi:'维护',nameEn:'_MAINTAIN',gly:glyPref+'list-alt',color:{lab:labPref+'primary',txt:txtPref+'primary',btn:'btn-primary'},title:'维护记录'},
+	{nameChi:'查询',nameEn:'_READ',gly:glyPref+'search',color:{lab:labPref+'primary',txt:txtPref+'primary',btn:'btn-primary'},title:'查询记录'}
+	];
+
 var loadStr='<p class="text-center" style="font-size:28px;">加载中……</p>';
 //控制显示/隐藏字段的组件的属性数组
 var columnToggleArr=[];
@@ -258,25 +303,9 @@ var completeFmSelectCom=(fmObj)=>{
 //改变标题
 var issEntNameChange=()=>{
 	let obj=$('#h4Title'),
-		spObj=$('.spIssEntName'),
-		htmlStr='',
-		arr=[{hClass:'text-warning',type:'_PAT',text:'专利',gly:'glyphicon glyphicon-wrench'},
-			{hClass:'text-info',type:'_THE',text:'论文',gly:'glyphicon glyphicon-list'},
-			{hClass:'text-danger',type:'_PRO',text:'项目',gly:'glyphicon glyphicon-inbox'}
-		],
-		
-		name=anchorToIssEntName();
-		
+		name=anchorToIssEntName();	
 	obj.empty();
-	for(var i=0;i<arr.length;i++){
-		if(name==arr[i].type){			
-			$('.spIssEntName').text(arr[i].text);
-			obj.prepend($('<span></span>').addClass(arr[i].hClass).text(arr[i].text+'事务').prepend($('<span></span>').addClass(arr[i].gly)));
-			
-			break;
-		}	
-	}
-	
+	obj.html(getEntHtmlCom(name));
 };
 
 //**根据锚点值加载不同的issList
@@ -421,6 +450,12 @@ $(document).ready(function(){
 		loadIssList();
     });	
 	
+	$('.btnIssOprt').click(function(){
+		$(this).tab('show');
+		
+		loadIssList();
+    });	
+	
 <!-- //表单$('#fmAssSearch')有关的代码块 -->
 	$('#fmIssSearch .form-control').change(function(){
 		if($(this).val()!=0){
@@ -441,6 +476,8 @@ $(document).ready(function(){
 		if(searchDataChanged){
 			$('#divTblSortData').data('pageNum',1);
 		}
+		//设定触发查询的对象是表单
+		$('#searchEnt').val('form');
 		loadIssList();
 	});
 	

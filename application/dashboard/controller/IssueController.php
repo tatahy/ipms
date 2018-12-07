@@ -35,7 +35,9 @@ class IssueController extends Controller
     //issCONF数组
     const ISS_CONF=['_PAT'=>[//issStatus数组
                               'status'=>conIssPatStatusArr,
-                              //关联方法
+                              //iss实体中文名
+                              'entNameChi'=>'专利',
+                              //关联属性/方法
                               'relMethod'=>'pat_list',
                               //关联对象Status数组
                               'relStatus'=>conPatStatusArr,
@@ -44,11 +46,13 @@ class IssueController extends Controller
                               //关联对象模型名称
                               'relEntModelName'=>'Patinfo'],
                     '_THE'=>['status'=>conIssTheStatusArr,
+                              'entNameChi'=>'论文',
                               'relMethod'=>'the_list',
                               'relStatus'=>conTheStatusArr,
                               'relType'=>conTheTypeArr,
                               'relEntModelName'=>'Theinfo'],
                     '_PRO'=>['status'=>conIssProStatusArr,
+                              'entNameChi'=>'项目',
                               'relMethod'=>'pro_list',
                               'relStatus'=>conProStatusArr,
                               'relType'=>conProTypeArr,
@@ -91,7 +95,8 @@ class IssueController extends Controller
     public function index(Request $request,IssinfoModel $issMdl,AssinfoModel $assMdl,$sortData=[],$searchData=[])
     {
       $this->priLogin();
-      $issEntName=!empty($this->request->param('issEntName'))?$this->request->param('issEntName'):'';
+      $issEntName=!empty($this->request->param('issEntName'))?$this->request->param('issEntName'):'_PAT';
+      $issEntNameChi=self::ISS_CONF[$issEntName]['entNameChi'];
       $issStatus=!empty($this->request->param('issStatus'))?$this->request->param('issStatus'):'_INPROCESS';
       
       
@@ -103,18 +108,31 @@ class IssueController extends Controller
       $this->assign([
         'home'=>$this->home,
         'issEntName'=>$issEntName,
+        'issEntNameChi'=>$issEntNameChi,
         'sortData'=>$sortData,
         'numArr'=>json_encode($numArr)
       ]);
       
       return view();
     }
+    //对单个iss记录进行增删改查操作
+    public function issOprt(IssinfoModel $issMdl)
+    {
+      $this->priLogin();
+      $req=$this->request;
+      $dataIss=$req->param();
+      
+      $resData= ['name'=>$dataIss];
+      
+      //前端接收时数组被视为json对象
+      return $resData;
+    }
     //返回前端issue的排序、查询后分页显示所需的记录集
-    public function issList(IssinfoModel $issMdl,PatinfoModel $patMdl)
+    public function issList(IssinfoModel $issMdl)
     {
       $this->priLogin();
       $request=$this->request;
-      //self::ISS_CONF 
+      //引入self::ISS_CONF 
       $issConf=self::ISS_CONF;
       $searchDefaults=array();
       $sortDefaults=array('listRows'=>10,'sortName'=>'issnum','sortOrder'=>'asc','pageNum'=>1,
@@ -129,7 +147,7 @@ class IssueController extends Controller
       
       //关联对象名称
       $entName=$sortData['issEntName'];
-      //关联方法名称
+      //关联属性/方法名称
       $mdlMethod=$issConf[$entName]['relMethod'];
       //关联对象的数据模型名
       $relModelName=$issConf[$entName]['relEntModelName'];       
@@ -213,7 +231,7 @@ class IssueController extends Controller
       //--block start                     
       //涉及关联对象$entName中字段的排序、查询 
       if($searchResultNum){
-        //$issmapIdArr中的值是否能有重复值？若可以有要怎么处理？
+        //$issmapIdArr中的值是否能有重复值？若可以有要怎么处理？ HY:2018/12/07
         $relSet=$relMdl->field($tblFields)
                         ->where('id','in',$issmapIdArr)
                         ->where($whereEntArr)
@@ -226,8 +244,9 @@ class IssueController extends Controller
         $searchResultNum=$relSet->count();
         
         if($searchResultNum){
-          //从排序后的数组中截取本页所需的部分，取出id字段值
+          
           $issmapIdArr=$relSet->column('id');
+          //从排序后的数组中截取本页所需的部分，取出id字段值
           $idArr=$relSet->slice(($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows'])->column('id');
           
           //组装本页的issList。根据上一步中得到的arr，从数据集$baseSet中抽出对应的iss记录，将抽出记录按照arr的顺序组装好。
@@ -239,13 +258,12 @@ class IssueController extends Controller
               }
             }
           }
+          //延迟载入关联查询方法load()得到含有关联对象数据的数据集，
+          //仅拉取关联对象共有的字段名，设置可见字段，减小向前端传输的数据量
+          //$issList=collection($issList)->load([$mdlMethod=>function($query) use($tblFields) {
+//                                  $query->field($tblFields);}])->visible(['id']);
         }
       }
-      //延迟载入关联查询方法load()得到含有关联对象数据的数据集，
-      //仅拉取关联对象共有的字段名，设置可见字段，减小向前端传输的数据量
-      $issList=collection($issList)->load([$mdlMethod=>function($query) use($tblFields) {
-                                  $query->field($tblFields);}])->visible(['id']);
-
       //iss模型对象，排序、查询后分页用
       $pageQuery=$issMdl->issStatusQuery($issStatus,$entName)->where('issmap_id','in',$issmapIdArr)
                       ->order($sortData['sortName'],$sortData['sortOrder']);
@@ -260,15 +278,13 @@ class IssueController extends Controller
         'issEntName'=>$entName,
         'pageSet'=>$pageSet,
         'issList'=>$issList,
-        'issTest'=>json_encode('',JSON_UNESCAPED_UNICODE),
-        
+        'issTest'=>json_encode('no debug info',JSON_UNESCAPED_UNICODE),
         'mdlMethod'=>$mdlMethod,
-        
         //排序数组
         'sortData'=>$sortData,
         //将数组转换为json字符串，编码为Unicode字符（\uxxxx）。
         //前端就可以直接作为json对象使用，若前端文件采用utf-8编码，汉字也可直接解析显示。
-        'searchData'=>json_encode($issList,JSON_UNESCAPED_UNICODE),
+        'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
         //记录总数
         'searchResultNum'=>$searchResultNum 
       ]);
@@ -390,40 +406,31 @@ class IssueController extends Controller
       return $res;
     }
     
-    public function fmAssSingle(Request $request,AssinfoModel $assMdl,$id=0,$oprt='')
+    public function fmIssSingle(IssinfoModel $issMdl,$id=0,$oprt='')
     {
       $this->priLogin();
-      $id=$request->param('id');
+      $request=$this->request;
+      $id=$request->param('id')?$request->param('id'):0;
       $oprt=$request->param('oprt');
       $statusEn='*';
-      $authAss=$this->auth['ass'];
-      $assSetArr=array('id'=>$id,
-                        'assnum'=>'',
-                        'code'=>'',
-                        'bar_code'=>'',
-                        'brand_model'=>'',
-                        'quantity'=>1,
-                        'place_now'=>'',
-                        'dept_now'=>'',
-                        'keeper_now'=>'',
-                        'dept_now'=>'',
-                        'status_now'=>'*',
-                        'status_now_desc'=>'新固定资产填报',
-                        'status_now_user_name'=>$this->userName,
+      $auth=$this->auth;
+      $issSingleArr=array('id'=>$id,
+                          'topic'=>'',
+                          'issnum'=>$issMdl->getNewIssNum(),
+                          'status'=>'*',
+                          'statusdescription'=>'',
+                          'dept'=>$this->dept,
+                          'writer'=>$this->userName,
                         );
-      //$assSet=($id*1)?$assMdl::get($id):$assSetArr;
-      if($oprt=='_RESTORE' || $oprt=='_DELETE'){
-        $assSet=$id?$assMdl::withTrashed()->where('id',$id)->find():$assSetArr;
-      }else{
-        $assSet=$id?$assMdl::get($id):$assSetArr;
-      }
+     
+      $issSingle=$id?$issMdl::get($id):$issSingleArr;
       
       $this->assign([
           'home'=>$request->domain(),
           'oprt'=>$oprt,
-          'assSet'=>$assSet,
+          'issSingle'=>$issSingle,
           'userName'=>$this->userName,
-          'authAss'=>$authAss
+          'auth'=>$auth
         ]);
       return view();
     }

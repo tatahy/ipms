@@ -1,89 +1,68 @@
 <!-- fmIssSingle.html -->
 
-<!-- pagewrap  -->	
-<form id="fmIssSingle" role="form" action="{$home}/dashboard/issue/issOprt"  method="post">
+<!-- pagewrap  -->
+<form id="fmEntSingle" role="form" method="post">
+
+</form>
+	
+<form id="fmIssSingle" role="form" method="post">
 	<input id="id" type="text" name="id" value="{$issSingle.id}" class="sr-only">
 	<input id="oprt" type="text" name="oprt" value="{$oprt}" class="sr-only">
 	<div class="row">
 	<div class="form-group col-sm-4">
-		<label class="control-label" for="brand_model">���ƣ���Ʒ�ơ��ͺţ�<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
-		<input class="form-control empty-check" name="brand_model" value="{$assSet.brand_model}" type="text">
+		<label class="control-label" for="topic">事务标题<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+		<input class="form-control empty-check" name="topic" value="{$issSingle.topic}" type="text">
 	
 	</div>
 	
 	<div class="form-group col-sm-3">
-		<label class="control-label" for="code">����<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
-		<input class="form-control empty-check" name="code" value="{$assSet.code}" type="text">
+		<label class="control-label" for="issnum">事务编号</label>
+		<input class="form-control" name="issnum" value="{$issSingle.issnum}" type="text" readonly>
 	
 	</div>
 	
-	<div class="form-group col-sm-3">
-		<label class="control-label" for="bar_code">�������<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
-		<input class="form-control empty-check" name="bar_code" value="{$assSet.bar_code}" type="text"  >
-	
-	</div>
-	
-	<div class="form-group col-sm-2">
-		<label class="control-label" for="assnum">���<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
-		<input class="form-control empty-check" name="assnum" value="{$assSet.assnum}" type="text">
-	
-	</div>
-	</div>
-	
-	<div class="row">
-	<div class="form-group col-sm-2">
-		<label class="control-label" for="quantity">����<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
-		<input class="form-control empty-check" name="quantity" value="{$assSet.quantity}" type="text">
-	
-	</div>
-	
-	<div class="form-group col-sm-3">
-		<label class="control-label" for="place_now">�ַ��õص�<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
-		<input class="form-control empty-check" name="place_now" value="{$assSet.place_now}" type="text">
-	
-	</div>
-	
-	<div class="form-group col-sm-5">
-		<label class="control-label" for="dept_now">��ʹ�ò���<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
-		<input class="form-control empty-check" name="dept_now" value="{$assSet.dept_now}" type="text">
-	
-	</div>
-	
-	<div class="form-group col-sm-2">
-		<label class="control-label" for="keeper_now">�ֱ�����<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
-		<input class="form-control empty-check" id="" name="keeper_now" value="{$assSet.keeper_now}" type="text">
-	
+	<div class="form-group col-sm-4">
+		<label class="control-label" for="status">事务现状</label>
+		<input class="form-control" id="status" value="{$issSingle.status}" type="text" readonly>
+		<span class="small text-muted">【<span class="text-primary"><span class="glyphicon glyphicon-save-file"></span>更新</span>】不改变“现状”</span>
 	</div>
 	</div>
 	
 	<div class="row">
 	<div class="form-group col-sm-4">
-		<label>��״</label>
-		<input class="form-control" id="statusNow" value="{$assSet.status_now}" type="text" readonly>
-		<span class="small text-muted">��<span class="text-primary"><span class="glyphicon glyphicon-save-file"></span>����</span>�����ı䡰��״��</span>
-	</div>
-	
-	
-	<div class="form-group col-sm-4">
-		<label for="status_now">״̬���Ϊ</label>
-		<select class="form-control" name="status_now" >
-			<option value="">d1</option>
+		<label for="status">状态</label>
+		<select class="form-control" name="status">
+			<option value="">s1</option>
 		</select>
 		<span class="small text-muted"></span>
 	</div>
 	
 	<div class="form-group col-sm-4">
-		<label class="control-label" for="status_now_desc">״̬˵��</label>
-		<input class="form-control empty-check" name="status_now_desc" value="{$assSet.status_now_desc}" type="text" placeholder="������״̬�ı�ļ��˵��">
+		<label class="control-label" for="statusdescription">状态说明<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+		<input class="form-control empty-check" name="statusdescription" value="{$issSingle.statusdescription}" type="text" placeholder="请填入状态改变的简短说明">
 		
 	</div>
+	
+	</div>
+	
+	<div class="row">
+	<div class="form-group col-sm-4">
+		<label for="dept">事务发起部门</label>
+		<input class="form-control" id="dept" value="{$issSingle.dept}" type="text" readonly>
+	</div>
+	
+	<div class="form-group col-sm-2">
+		<label for="writer">事务申请人</label>
+		<input class="form-control" name="writer" value="{$issSingle.writer}" type="text" readonly>
+	</div>
+	
 	</div>
 	
 	{notin name="oprt" value="_DELETE"}
 	<div class="row">
 	<div class="form-group col-sm-2">
-		<label for="status_now_user_name">�Ǽ���</label>
-		<input class="form-control" name="status_now_user_name" value="{$userName}" type="text" readonly>
+		<label for="registrar">登记人</label>
+		<input class="form-control" name="registrar" value="{$userName}" type="text" readonly>
 	</div>
 	</div>
 	{/notin}
@@ -91,12 +70,12 @@
 	
 	<div class="row myRow">
 	<div class="pull-left">
-		<button id="btnUpdate" type="submit" data-oprt="_UPDATE" class="btn btn-sm btn-primary "><span class="glyphicon glyphicon-save-file"></span>����</button>
+		<button id="btnUpdate" type="submit" data-oprt="_UPDATE" class="btn btn-sm btn-primary "><span class="glyphicon glyphicon-save-file"></span>更新</button>
 	</div>
 	
 	<div  class="pull-right">
-		<input type="reset" class="btn btn-primary btn-sm" value="����">
-		<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="ȡ��">
+		<input type="reset" class="btn btn-primary btn-sm" value="重置">
+		<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
 	</div>
 	</div>
 	
@@ -104,6 +83,203 @@
 
 <!-- /pagewrap  -->
 <script>
+var fmObj=$('#fmIssSingle'),
+	oprt=fmObj.find('[name="oprt"]').val();
+	
+//生成$.alert,$.confirm组件上显示内容的HTML字符串
+var comHtml=(opts)=>{
+	let optsDefault={topic:'xxx',oprt:'',result:''},
+		p=$.extend({},optsDefault,opts),
+		topic=p.topic,oprt=p.oprt,result=p.result,
+		oprtHtml='',entHtml='',resultHtml='',htmlStr='';
+	//组装entHtml	
+	entHtml=getEntHtmlCom(entName);
+	//组装oprtHtml
+	for(var i=0;i<oprtComAttrArr.length;i++){
+		let arr=oprtComAttrArr;
+		if (oprt==arr[i].nameEn){
+			oprtHtml='<p class="text-center">【<strong>'+topic+'</strong>】记录</p><p class="text-center">进行【<span class="'+arr[i].color.txt+'"><span class="'+arr[i].gly+'"></span>'+arr[i].nameChi+'</span>】</p>';
+			break;
+		}
+	}
+	switch(result){
+		case 'success':
+			resultHtml='<p class="text-center"><span class="text-success"><span class="glyphicon glyphicon-ok"></span><strong>成功</strong></span> </p>';
+			break;
+		case 'fail':
+			resultHtml='<p class="text-center"><span class="text-danger"><span class="glyphicon glyphicon-ban-circle"></span><strong>失败</strong></span></p>';
+			break;
+		default:
+			resultHtml='';
+			break;
+	}
+	
+	htmlStr='<p style="font-size:16px;">'+entHtml+'</p>'+oprtHtml+resultHtml;
+	return htmlStr;	
+};
+
+//生成modal上的操作组件HTML字符串。
+var buildOprtBtnCom=(oprt)=>{
+	let btnHtml='',
+		arr=oprtComAttrArr;
+	
+	for(var i=0;i<arr.length;i++){
+		if(oprt==arr[i].nameEn){
+			btnHtml='<button type="submit" class="btn btn-sm '+arr[i].color.btn+'"data-oprt="'+arr[i].nameEn+'"><span class="'+arr[i].gly+'"></span>'+arr[i].nameChi+'</button>&nbsp;';
+			break;
+		}
+	}	
+	if(oprt=='_CREATE' || oprt=='_DELETE'){
+		//消除_UPDATE按钮
+		$('.pull-left').children().remove();
+		//消除$('#statusNow').next('span')
+		$('#statusNow').next('span').remove();
+		//添加新按钮
+		$('.pull-left').append(btnHtml);
+	}else{
+		//_UPDATE按钮后添加新按钮
+		$('#btnUpdate').after('&nbsp;'+btnHtml);
+	}
+};
+
+var spanNextSelectStatusNow=(oprtEn)=>{
+
+};
+
+var fmEmptyCheck=(obj)=>{
+	let divObj=obj.closest('div'),
+		result=false;
+	divObj.removeClass('has-feedback has-error');
+	obj.nextAll('.spAdd').remove();
+	if(obj.val()!=''){
+		result=true;
+	}else{
+		divObj.addClass('has-feedback has-error');
+		result=false;
+		obj.after($('<span></span>').addClass('spAdd').css('color','#a94442').text('内容不能为空').after($('<span></span>').addClass('glyphicon glyphicon-remove form-control-feedback spAdd').css('text-align','unset')))
+	}
+	return result;
+};
+
+//对iss记录进行操作
+var ajaxIssOprt=(opts)=>{
+	let url=urlPref+'issOprt',
+		optsDefault={oprt:'',dataIss:{id:0},dataEnt:{},dataCom:{topic:'xxx',oprt:'',result:''}},
+		p=$.extend({},optsDefault,opts);
+	
+	p.dataCom.topic=p.dataIss.topic;
+	p.dataCom.oprt=p.oprt;	
+	
+	//向后端提交数据
+	$.post(url,p,function(data){
+		if(data.res){
+			p.dataCom.result='success';
+			$.alert(comHtml(p.dataCom));
+			<!-- …… -->
+						
+		}else{
+			p.dataCom.result='fail';
+			$.alert(comHtml(p.dataCom));
+		}
+	});
+	
+};
+
+//利用自调用匿名函数立即执行的特点，对页面的组件进行初始化
+(function($){
+
+	buildOprtBtnCom(oprt);
+})(jQuery);
+
+$(document).ready(function(){
+	
+	//状态变更时的操作
+	fmObj.find('select[name="status"]').change(function(){
+		spanNextSelectStatusNow(oprt,$(this).val());	
+	});
+	//表单重置时附加的操作reset
+	fmObj.find('input:reset').click(function(){
+		let obj=fmObj.find('.form-control'),
+			divObj=obj.closest('div');
+		divObj.removeClass('has-feedback has-error');
+		obj.nextAll('.spAdd').remove();
+		obj.removeClass('alert-info');	
+	});
+	//输入项有变化就加底色
+	fmObj.find('.form-control').change(function(){
+		fmEmptyCheck($(this));
+		//有变化加底色
+		if($(this).val()!=''){
+			$(this).addClass('alert-info');
+		}else{
+			$(this).removeClass('alert-info');
+		}
+	});
+	//表单提交按钮按下时修改oprt
+	fmObj.find('button:submit').click(function(){
+		oprt=$(this).data('oprt');
+		fmObj.find('[name="oprt"]').val(oprt);
+	});
+	//表单提交
+	fmObj.submit(function(evt){
+		evt.preventDefault();
+		let url=urlPref+'issOprt',
+			emptyCheckArr=[],
+			emptyCheckObj=$(this).find('.empty-check'),
+			flag='',
+			<!-- formData = $(this).serialize(), -->
+			formData = new FormData($(this)[0]),
+			dataIss=[],
+			dataCom={topic:$(this).find('[name="topic"]').val(),oprt:oprt,result:''};
+		
+		
+		//输入框非空检查
+		emptyCheckObj.each(function(){
+			emptyCheckArr.push(fmEmptyCheck($(this)));
+		});
+		//是否有输入框为空的情况
+		flag=emptyCheckArr.every(function(val) {
+            return val == true;});	
+		//有输入框为空的情况,后续语句不再执行。序号最小的$('.empty-check').eq(i)获得焦点。
+		if(!flag ){
+			let arr=[];
+			emptyCheckArr.forEach(function(v,k){
+				if(!v){
+					arr.push(k);
+				}
+			});
+			//序号最小的$('.empty-check').eq(i)获得焦点
+			emptyCheckObj.eq(Math.min.apply(null, arr)).focus();
+			return;
+		}
+		
+		//使用Map对象的forEach方法组装键值对
+		formData.forEach(function(val,key){
+			dataIss[key]=val;
+		});
+		<!-- obj1=Object.fromEntries(dataIss); -->
+		console.log(typeof dataIss);
+		
+		$('#modalIssSingle').modal('hide');
+		$.confirm(comHtml(dataCom),function(e){
+			con=e;
+			if(true==con){
+				//对iss记录进行操作
+				let ajOpts={oprt:oprt,
+						dataIss:dataIss,
+						dataEnt:''
+						};
+				console.log(dataIss.length);		
+				ajaxIssOprt(ajOpts);
+				
+			}else{
+				$('#modalIssSingle').modal('show');
+			}
+		}).cancel('否(N)').ok('是(Y)');	
+	});
+	
+	
+});
 
 </script>
 

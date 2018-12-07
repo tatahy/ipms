@@ -129,6 +129,23 @@ class Issinfo extends Model
     {
         //$idmax = Issinfo::max('id');
         //        $value = Issinfo::where('id',$idmax)->value('issnum');
+        //$idmax = $this->max('id');
+//        $value = $this->where('id', $idmax)->value('issnum');
+//
+//        $year = substr($value, 3, 4);
+//        $num = substr($value, 3) + 1;
+//
+//        if ($year == date('Y')) {
+//            $result = "iss".$num;
+//        } else {
+//            $result = "iss".date('Y')."0001";
+//        }
+//        return ($result);
+      return $this->getNewIssNum();
+    }
+    //设置issnum字段的值为iss+yyyy+0000的形式，即是在当年进行流水编号
+    public function getNewIssNum()
+    {
         $idmax = $this->max('id');
         $value = $this->where('id', $idmax)->value('issnum');
 
@@ -140,7 +157,7 @@ class Issinfo extends Model
         } else {
             $result = "iss".date('Y')."0001";
         }
-        return ($result);
+        return $result;
     }
 
     //获取器，获取数据表issinfo中issmap_type字段值，转换为中文输出

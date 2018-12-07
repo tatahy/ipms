@@ -37,7 +37,7 @@
 					
 					<th><a data-sort-name="issEntName"><span class="spIssEntName"></span>名称</a></th>
 					<th><a data-sort-name="issEntType"><span class="spIssEntName"></span>类型</a></th>
-					<th><a data-sort-name="issEntStatus"><span class="spIssEntName"></span>状态</a></th>
+					<th><a data-sort-name="issEntStatus"><span class="spIssEntName"></span>现状</a></th>
 					
 					<th class="text-center">操作</th>
 				</tr>
@@ -61,7 +61,7 @@
 					<td>{$vo[$mdlMethod]['type']}</td>
 					<td>{$vo[$mdlMethod]['status']}</td>
 					
-					<td>操作</td>				
+					<td class="tdIssOprt text-right" data-iss-status="{$vo.status}" data-iss-id="{$vo.id}" data-iss-topic="{$vo.topic}" >操作</td>				
 				</tr>
 				{/volist}
 			</tbody>
@@ -90,8 +90,14 @@
 	<p id="pIssNone" class="text-center" data-show="false"><span class="label label-default" style="font-size:16px;">无符合条件信息</span></p>	
 </div>
 
-<!-- /pagewrap  -->
+<!-- // pagewrap  -->
 <script>
+<!-- // -->
+
+//生成操作组件	
+var buildOprtCom=(status)=>{
+	
+};
 
 //根据columnToggleArr的值，改变复选框，显示/隐藏对应column
 var columnToggle=()=>{
@@ -150,49 +156,34 @@ var sortOrderToggle=()=>{
 };
 
 //根据查询记录数决定页面的组件显示
-var pageShowCom=(num,reqObj)=>{
-	let obj=$('#pIssNone'),resultStr='',
+var setShowCom=(num)=>{
+	let obj=$('#pIssNone'),
+		searchEnt=$('#searchEnt').val(),
+		resultStr='',
 		classStr=$('ul.nav-pills li.active').children('.aIss').find('.spLabel').attr('class');
 	
+	$('#spSearchResult').hide();
 	if(num){
 		obj.hide().data('show',false).prevAll().show();
-		$('#spSearchResult').hide();
 		$('#spIssNum').addClass(classStr);
 		resultStr='<p><span class="label label-info">查询结果</span>&nbsp;记录数：'+num+'</p>';
 	}else{
 		obj.show().data('show',true).prevAll().hide();
-		$('#spSearchResult').show();
 		resultStr='<p><span class="label label-default">查询结果</span>&nbsp;记录数：0</p>';
 	}
-	//根据reqObj实现不同的弹出窗
-	switch(reqObj){
+	//根据searchEnt实现不同的弹出窗
+	switch(searchEnt){
 		case 'form':
+			$('#spSearchResult').show();
 			$.alert('<span class="label label-info">查询结果</span>&nbsp;记录数：<span>'+num+'</span>');
 			break;
-		case 'barCode':
-			let code=$('#divBarcodeImg span.alert-info').text();
-			console.log($('#pIssNone').data('show'));
-			
-			if(code && obj.data('show')==false){
-				$.alert('<span class="label label-info">查询结果</span>&nbsp;记录数：<span>'+num+'</span>');
-			}else if(code && obj.data('show')){
-				//如果识别出条形码并且对条形码的查询结果为0			
-				let htmlStr='<p>无条形码【'+code+'】对应的信息记录。</p><p class="text-center">【<span class="text-primary"><span class="glyphicon glyphicon-modal-window">新增</span></span>】信息记录？</p>'
-				$.confirm(htmlStr,function(e){
-					con=e;
-					if(true==con){
-						//新增页面弹出	
-						btnClickShowModel('{$home}/dashboard/asset/fmAssSingle',{'oprt':'_CREATE','id':0,'reqObj':reqObj});
-					}
-				}).cancel('否(N)').ok('是(Y)');	
-			}else{}
-			break;
+		
 		default:
 		
 			break;
 	}
 };
-//设定搜索表单的内容
+//设定搜索表单的各项内容
 var setFmSearch=(fmobj,optObj)=>{
 	let fcSet=fmobj.find('.form-control'),
 		keyArr=Object.keys(optObj),
@@ -221,6 +212,38 @@ var setFmSearch=(fmobj,optObj)=>{
 	
 };
 
+var getOprtComHtml=(status)=>{
+	let btnHtml='';
+	
+	return btnHtml;
+	
+};
+
+var btnClickShowModel=(optObj)=>{
+	let oprt=optObj.oprt,
+		arr=oprtComAttrArr,
+		spCom='',spStr='',
+		url=urlPref+'fmIssSingle';
+		
+	//生成$('#modalAssSingle')标题上的span组件
+	for(var i=0;i<arr.length;i++){
+		let el=arr[i];
+		if(oprt==el.nameEn){
+			spStr='<span class="'+el.color.txt+'"><span class="'+el.gly+'"></span>'+el.nameChi+'</span>';		
+			break;
+		}
+	}
+	$('#divFmIssSingle_Load').html(loadStr).load(url,optObj,function(){
+	
+	});
+	
+	$('#modalIssSingle').find('.title').html('【'+spStr+'】'+entNameChi+'事务记录');
+	
+	//显示modal
+	$('#modalIssSingle').modal();
+	
+};	
+
 //自调用匿名函数立即执行的特点，进行页面初始化。
 (function($){
 	let statusText=$('ul.nav-pills li.active').children('.aIss').find('.spType').text();
@@ -230,10 +253,7 @@ var setFmSearch=(fmobj,optObj)=>{
 	//每个$('#tblIssList thead a')添加属性
 	$('#tblIssList thead a').attr({'href':window.location.hash,'data-title':'点击排序','data-toggle':'tooltip'}).closest('th').addClass('text-center');
 	
-	// 激活tooltip
-	$('[title]').tooltip();
-
-	pageShowCom({$searchResultNum});
+	setShowCom({$searchResultNum});
 	buildColumnToggleCom();
 	columnToggle();
 	sortOrderToggle();
@@ -243,7 +263,15 @@ var setFmSearch=(fmobj,optObj)=>{
 		setFmSearch($('#fmIssSearch'),{$searchData});
 	}
 	
+	//每个.tdIssOprt根据该行记录的data-iss-status="{$ vo.status}"添加相应的a标签
+	$('.tdAssOprt').each(function(){
+		let btnHtml=getOprtComHtml($(this).data('issStatus'));
+		$(this).append(btnHtml);
+	});
+	
 	$('#pDis').html('{$issTest}');
+	// 激活tooltip
+	$('[title]').tooltip();
 	
 })(jQuery);
 
@@ -252,7 +280,8 @@ $(document).ready(function(){
 	//选择显示/隐藏字段	
 	$('#tblIssList ul input').click(function(){
 		//复选框点击后的值
-		let checkVal=$(this).prop('checked'),val=$(this).val(),
+		let checkVal=$(this).prop('checked'),
+			val=$(this).val(),
 			arr=columnToggleArr;
 		if(val=='all'){
 			arr.forEach(function(el,index){
@@ -342,7 +371,21 @@ $(document).ready(function(){
 		
 		trAddBgColor();
 	});
-	
+	//页面内所有'.btnIssOprt'的click事件
+	$('.btnIssOprt').click(function(){
+		let oprt=$(this).data('issOprt'),
+			dataFromObj=$(this).closest('td'),
+			dataObj={'oprt':oprt,'id':dataFromObj.data('issId')};
+		
+		//去掉所有行的底色
+		$('tr').removeClass('bg-warning');
+		//给本行上底色
+		$(this).closest('tr').addClass('bg-warning');
+		//排序有关的值向$('#divTblSortData')汇集。发送本行的assId，便于刷新后本行继续加底色
+		$('#divTblSortData').data('showIssId',dataFromObj.data('issId'));
+		
+		btnClickShowModel(dataObj);
+	});
 
 });
 
