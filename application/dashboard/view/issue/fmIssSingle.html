@@ -164,14 +164,18 @@ var fmEmptyCheck=(obj)=>{
 //对iss记录进行操作
 var ajaxIssOprt=(opts)=>{
 	let url=urlPref+'issOprt',
-		optsDefault={oprt:'',dataIss:{id:0},dataEnt:{},dataCom:{topic:'xxx',oprt:'',result:''}},
+		optsDefault={dataIss:{id:0,oprt:''},
+					dataEnt:{entName:'',oprt:''},
+					dataCom:{topic:'xxx',oprt:'',result:''}
+					},
 		p=$.extend({},optsDefault,opts);
 	
 	p.dataCom.topic=p.dataIss.topic;
-	p.dataCom.oprt=p.oprt;	
+	p.dataCom.oprt=p.dataIss.oprt;	
 	
 	//向后端提交数据
-	$.post(url,p,function(data){
+	$.post(url,{dataIss:p.dataIss,dataEnt:p.dataEnt},function(data){
+		console.log(data);
 		if(data.res){
 			p.dataCom.result='success';
 			$.alert(comHtml(p.dataCom));
@@ -228,8 +232,9 @@ $(document).ready(function(){
 			emptyCheckObj=$(this).find('.empty-check'),
 			flag='',
 			<!-- formData = $(this).serialize(), -->
-			formData = new FormData($(this)[0]),
-			dataIss=[],
+			fmDataIss = new FormData($(this)[0]),
+			dataIss={oprt:oprt},
+			dataEnt={entName:entName,oprt:''},
 			dataCom={topic:$(this).find('[name="topic"]').val(),oprt:oprt,result:''};
 		
 		
@@ -253,23 +258,19 @@ $(document).ready(function(){
 			return;
 		}
 		
-		//使用Map对象的forEach方法组装键值对
-		formData.forEach(function(val,key){
-			dataIss[key]=val;
-		});
-		<!-- obj1=Object.fromEntries(dataIss); -->
-		console.log(typeof dataIss);
+		for(var pair of fmDataIss.entries()) {
+			dataIss[pair[0]]=pair[1];
+		}
+		console.dir(dataIss);
+		<!-- console.log(Object.entries(dataIss) ); -->
 		
 		$('#modalIssSingle').modal('hide');
 		$.confirm(comHtml(dataCom),function(e){
 			con=e;
 			if(true==con){
 				//对iss记录进行操作
-				let ajOpts={oprt:oprt,
-						dataIss:dataIss,
-						dataEnt:''
-						};
-				console.log(dataIss.length);		
+				let ajOpts={dataIss,dataEnt};
+				console.log(dataIss);		
 				ajaxIssOprt(ajOpts);
 				
 			}else{

@@ -93,11 +93,11 @@
 <!-- // pagewrap  -->
 <script>
 <!-- // -->
+//iss状态与操作对应关系
+var issStatusOprtArr='';
 
-//生成操作组件	
-var buildOprtCom=(status)=>{
-	
-};
+//iss权限与操作对应关系
+var issAuthOprtArr='';
 
 //根据columnToggleArr的值，改变复选框，显示/隐藏对应column
 var columnToggle=()=>{
@@ -215,6 +215,8 @@ var setFmSearch=(fmobj,optObj)=>{
 var getOprtComHtml=(status)=>{
 	let btnHtml='';
 	
+	
+	
 	return btnHtml;
 	
 };
@@ -318,13 +320,6 @@ $(document).ready(function(){
 		let sortName=$(this).data('sortName'),
 			sortOrder=$(this).data('sortOrder');
 		//排序有关的值向$('#divTblSortData')汇集
-		<!-- if(sortName){ -->
-			<!-- $('#divTblSortData').data('sortName',sortName); -->
-		<!-- } -->
-		<!-- if(sortOrder){ -->
-			<!-- $('#divTblSortData').data('sortOrder',sortOrder); -->
-		<!-- } -->
-		
 		$('#divTblSortData').data('sortName',sortName);
 		$('#divTblSortData').data('sortOrder',sortOrder);
 		$('#divTblSortData').data('pageNum',1);

@@ -34,7 +34,7 @@ class Issinfo extends Model
     protected $type = ['auth_time' => 'json', 'oprt_user' => 'json', ];
     
     //引用app\common中定义的常量
-    const ISSNAME=conIssNameArr;
+    const ISSNAME=conIssEntNameArr;
     const ISSCAT=conIssTypeArr;
     const PATSTATUS=conIssPatStatusArr;
     const THESTATUS=conIssTheStatusArr;

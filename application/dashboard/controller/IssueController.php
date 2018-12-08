@@ -33,35 +33,7 @@ class IssueController extends Controller
     //请求的issEntName
     private $issEntName = '';    
     //issCONF数组
-    const ISS_CONF=['_PAT'=>[//issStatus数组
-                              'status'=>conIssPatStatusArr,
-                              //iss实体中文名
-                              'entNameChi'=>'专利',
-                              //关联属性/方法
-                              'relMethod'=>'pat_list',
-                              //关联对象Status数组
-                              'relStatus'=>conPatStatusArr,
-                              //关联对象type数组
-                              'relType'=>conPatTypeArr,
-                              //关联对象模型名称
-                              'relEntModelName'=>'Patinfo'],
-                    '_THE'=>['status'=>conIssTheStatusArr,
-                              'entNameChi'=>'论文',
-                              'relMethod'=>'the_list',
-                              'relStatus'=>conTheStatusArr,
-                              'relType'=>conTheTypeArr,
-                              'relEntModelName'=>'Theinfo'],
-                    '_PRO'=>['status'=>conIssProStatusArr,
-                              'entNameChi'=>'项目',
-                              'relMethod'=>'pro_list',
-                              'relStatus'=>conProStatusArr,
-                              'relType'=>conProTypeArr,
-                              'relEntModelName'=>'Proinfo'],
-                    //关联对象共有的字段名称
-                    'relEntTblCommonFields'=>['id','topic','type','status'],
-                    //关联对象共有的字段名称与前端变量名的对应关系
-                    'relTblFieldsFEName'=>['issEntName'=>'topic','issEntType'=>'type','issEntStatus'=>'status']
-                    ];
+    const ISS_CONF=conIssConf;
   
     //public function __construct(Request $request)
 //    {
@@ -120,13 +92,14 @@ class IssueController extends Controller
     {
       $this->priLogin();
       $req=$this->request;
-      $dataIss=$req->param();
-      
-      $resData= ['name'=>$dataIss];
+      $dataIss=$req->param('dataIss/a');
+      $dataEnt=$req->param('dataEnt/a');
+      $data=$req->param();
       
       //前端接收时数组被视为json对象
-      return $resData;
+      return ['res'=>1,$data];
     }
+    
     //返回前端issue的排序、查询后分页显示所需的记录集
     public function issList(IssinfoModel $issMdl)
     {
@@ -217,51 +190,59 @@ class IssueController extends Controller
           $sortData['sortName']='';
         }
       }
-      //iss模型对象，排序、查询用
+      //iss模型对象，查询、排序用
       $queryBase=$issMdl->issStatusQuery($issStatus,$entName)->where($whereArr)
-                      ->order($sortData['sortName'],$sortData['sortOrder']);
+                        ->order($sortData['sortName'],$sortData['sortOrder']);
       
-      //生成查询结果数据集：
+      //查询、排序结果数据集：
       $baseSet=$queryBase->select();
       $baseSet=is_array($baseSet)?collection($baseSet):$baseSet;
+      
       $issmapIdArr=$baseSet->column('issmap_id');
-      //搜索记录总数，隐含着count($issmapIdArr)==$baseSet->count()
+      //查询、排序结果总数，隐含着count($issmapIdArr)==$baseSet->count()
       $searchResultNum=count($issmapIdArr);
       
-      //--block start                     
-      //涉及关联对象$entName中字段的排序、查询 
+      //--block start
+      
       if($searchResultNum){
-        //$issmapIdArr中的值是否能有重复值？若可以有要怎么处理？ HY:2018/12/07
-        $relSet=$relMdl->field($tblFields)
-                        ->where('id','in',$issmapIdArr)
-                        ->where($whereEntArr)
-                        ->order($entSortName,$sortData['sortOrder'])
-                        ->select();
-                        
-        //关联对象数据集
-        $relSet=is_array($relSet)?collection($relSet):$relSet;
-        
-        $searchResultNum=$relSet->count();
-        
-        if($searchResultNum){
+        //本页要显示的记录
+        $issList=$baseSet->slice(($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows']);
+        //涉及关联对象$entName中字段的排序、查询 
+        if($entSortName || count($whereEntArr)){
+          $relQuery=$relMdl->field($tblFields)
+                          ->where('id','in',$issmapIdArr)
+                          ->where($whereEntArr)
+                          ->order($entSortName,$sortData['sortOrder']);
+      
+          //$issmapIdArr中的值是否能有重复值？若可以有要怎么处理？ HY:2018/12/07
+          $relSet=$relQuery->select();
+                          
+          //关联对象数据集
+          $relSet=is_array($relSet)?collection($relSet):$relSet;
           
-          $issmapIdArr=$relSet->column('id');
-          //从排序后的数组中截取本页所需的部分，取出id字段值
-          $idArr=$relSet->slice(($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows'])->column('id');
-          
-          //组装本页的issList。根据上一步中得到的arr，从数据集$baseSet中抽出对应的iss记录，将抽出记录按照arr的顺序组装好。
-          foreach($idArr as $key=>$val){
-            for($i=0;$i<$baseSet->count();$i++){
-              if($baseSet[$i]['issmap_id']==$val){
-                $issList[$key]=$baseSet[$i];
-                break;
+          $searchResultNum=$relSet->count();
+          //关联对象有查询结果
+          if($searchResultNum){
+            
+            $issmapIdArr=$relSet->column('id');
+            //从排序后的数组中截取本页所需的部分，取出id字段值
+            $idArr=$relSet->slice(($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows'])->column('id');
+            $issList=[];
+            //组装本页的issList。根据上一步中得到的arr，从数据集$baseSet中抽出对应的iss记录，将抽出记录按照arr的顺序组装好。
+            foreach($idArr as $key=>$val){
+              for($i=0;$i<$baseSet->count();$i++){
+                if($baseSet[$i]['issmap_id']==$val){
+                  $issList[$key]=$baseSet[$i];
+                  break;
+                }
               }
             }
+            //延迟载入关联查询方法load()得到含有关联对象数据的数据集，
+            //仅拉取关联对象共有的字段名，设置可见字段，减小向前端传输的数据量
+            //$issList=collection($issList)->load([$mdlMethod=>function($query) use($tblFields) {
+  //                                  $query->field($tblFields);}])->visible(['id']);
           }
-          //延迟载入关联查询方法load()得到含有关联对象数据的数据集，
-          //仅拉取关联对象共有的字段名，设置可见字段，减小向前端传输的数据量
-          //$issList=collection($issList)->load([$mdlMethod=>function($query) use($tblFields) {
-//                                  $query->field($tblFields);}])->visible(['id']);
+
         }
       }
       //iss模型对象，排序、查询后分页用

@@ -204,7 +204,7 @@ const conIssOprtArr=['_CREATE'=>'新增',
                     '_DELETE'=>'删除',
                     ];
 //issue的类型大类：3类
-const conIssNameArr=['_PAT','_THE','_PRO'];
+const conIssEntNameArr=['_PAT','_THE','_PRO'];
 //issue的状态数组大类：5类
 const conIssTypeArr=['submit'=>['typeChi'=>'送审','typeValue'=>['_PATS1','_THES1','_PROS1']],
                       'audit'=>['typeChi'=>'审核','typeValue'=>['_PATS2','_THES2','_PROS2']],
@@ -288,16 +288,16 @@ const conIssTheStatusArr=[//除‘完结’以外的其它状态
                     ];
 //issue的Pro状态数组细分共6类?个，大类间用下划线“_”分隔，大类里的小项用连字符“-”分隔
 const conIssProStatusArr=[//除‘完结’以外的其它状态
-                    '_PROT_THES'=>'*',
+                    '_ISST_PROS'=>'*',
                     //label-info，送审
                     '_PROS1'=>'送审',
                     '_PROS1-1'=>'',
                     //label-success，审核
                     '_PROS2'=>'审核',
                     '_PROS2-1'=>'',
-                    '_THES2-2'=>'送审-已修改',
-                    '_THES2-3'=>'送审-已完善',
-                    '_THES2-END'=>'审核-拒绝',
+                    '_PROS2-2'=>'送审-已修改',
+                    '_PROS2-3'=>'送审-已完善',
+                    '_PROS2-END'=>'审核-拒绝',
                     //label-warning，审批
                     '_PROS3'=>'审批',
                     '_PROS3-1'=>'审核-通过',
