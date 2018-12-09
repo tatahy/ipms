@@ -218,7 +218,7 @@ var getOprtHtmlStr=(status)=>{
 		oprtArr.forEach(function(el){		
 			conOprtComAttr.forEach(function(e){
 				if(el==e.val){
-					btnHtml+='<button class="btn btn-'+e.color+' btn-xs btnAssOprt" data-ass-oprt="'+e.val+'" data-toggle="tooltip" title="'+e.title+'" style="margin:2px;"><span class="glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'</button>'
+					btnHtml+='<button class="btn btn-'+e.color+' btn-xs btnAssOprt" data-ass-oprt="'+e.val+'" data-toggle="tooltip" title="'+e.title+'" style="margin:2px;"><span class="glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'</button>';
 				}
 			});
 		});

@@ -1,68 +1,79 @@
 <?php
-//issue有关的配置参数
-const conIssConf=['_PAT'=>[//issStatus数组
-                              'status'=>conIssPatStatusArr,
-                              //iss实体中文名
-                              'entNameChi'=>'专利',
-                              //issue模型中关联属性/方法
-                              'relMethod'=>'pat_list',
-                              //关联对象Status数组
-                              'relStatus'=>conPatStatusArr,
-                              //关联对象type数组
-                              'relType'=>conPatTypeArr,
-                              //关联对象模型名称
-                              'relEntModelName'=>'Patinfo'],
-                    '_THE'=>['status'=>conIssTheStatusArr,
-                              'entNameChi'=>'论文',
-                              'relMethod'=>'the_list',
-                              'relStatus'=>conTheStatusArr,
-                              'relType'=>conTheTypeArr,
-                              'relEntModelName'=>'Theinfo'],
-                    '_PRO'=>['status'=>conIssProStatusArr,
-                              'entNameChi'=>'项目',
-                              'relMethod'=>'pro_list',
-                              'relStatus'=>conProStatusArr,
-                              'relType'=>conProTypeArr,
-                              'relEntModelName'=>'Proinfo'],
-                    //关联对象共有的字段名称
-                    'relEntTblCommonFields'=>['id','topic','type','status'],
-                    //关联对象共有的字段名称与前端变量名的对应关系
-                    'relTblFieldsFEName'=>['issEntName'=>'topic','issEntType'=>'type','issEntStatus'=>'status']
-                    ];
-
 //issue的状态与操作的对应关系，实体->现状->可对现状进行的操作->操作后的状态
 const conIssStatusOprtArr=[
         '_PAT'=>[
           ['status'=>'_PATS1','statusChi'=>'送审','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS1-1','statusChi'=>'填报中','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS1-2','statusChi'=>'审核完-待修改','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS1-3','statusChi'=>'审批完-需完善','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          //['status'=>'_PATS1-1','statusChi'=>'填报中','oprt'=>['_UPDATE','_SUBMIT','_DELETE'],'nextStatus'=>['_SUBMIT'=>['_PATS2-1'=>'新增-专利申请']]],
+          ['status'=>'_PATS1-1','statusChi'=>'填报中','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                ['name'=>'_DELETE','nextStatus'=>['显示'=>1]],
+                                                                ['name'=>'_SUBMIT','nextStatus'=>['_PATS2-1'=>'新增-专利申请']]]
+            ],
+          ['status'=>'_PATS1-2','statusChi'=>'审核完-待修改','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                      ['name'=>'_SUBMIT','nextStatus'=>['_PATS2-2'=>'送审-已修改']]]
+            ],                                                         
+          ['status'=>'_PATS1-3','statusChi'=>'审批完-需完善','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                      ['name'=>'_SUBMIT','nextStatus'=>['_PATS2-3'=>'送审-已完善']]]
+            ],
                     //label-success，正常
           ['status'=>'_PATS2','statusChi'=>'审核','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS2-1','statusChi'=>'新增-专利申请','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS2-2','statusChi'=>'送审-已修改','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS2-3','statusChi'=>'送审-已完善','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS2-END','statusChi'=>'审核-拒绝','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_PATS2-1','statusChi'=>'新增-专利申请','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                      ['name'=>'_AUDIT','nextStatus'=>['_PATS1-2'=>'审核完-待修改','_PATS2-END'=>'审核-拒绝','_PATS3-1'=>'审核-通过']]]
+            ],
+          ['status'=>'_PATS2-2','statusChi'=>'送审-已修改','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                    ['name'=>'_AUDIT','nextStatus'=>['_PATS1-2'=>'审核完-待修改','_PATS2-END'=>'审核-拒绝','_PATS3-1'=>'审核-通过']]]
+            ],
+          ['status'=>'_PATS2-3','statusChi'=>'送审-已完善','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                    ['name'=>'_AUDIT','nextStatus'=>['_PATS1-2'=>'审核完-待修改','_PATS2-END'=>'审核-拒绝','_PATS3-1'=>'审核-通过']]]
+            ],
+          ['status'=>'_PATS2-END','statusChi'=>'审核-拒绝','oprt'=>[['name'=>'_MAINTAIN','nextStatus'=>['_PATS_END'=>'完结']]]
+            ],
                     //label-warning，异常
-          ['status'=>'_PATS3','statusChi'=>'审核','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS3-1','statusChi'=>'审核-通过','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS3-2','statusChi'=>'新增-续费申请','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS3-END1','statusChi'=>'审批-否决','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS3-END2','statusChi'=>'续费-放弃','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_PATS3','statusChi'=>'审批','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_PATS3-1','statusChi'=>'审核-通过','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                  ['name'=>'_APPROVE','nextStatus'=>['_PATS4-1'=>'审批-批准','_PATS3-END1'=>'审批-否决','_PATS1-3'=>'审批完-需完善']]]
+            ],
+          ['status'=>'_PATS3-2','statusChi'=>'新增-续费申请','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                      ['name'=>'_APPROVE','nextStatus'=>['_PATS4-1'=>'审批-批准','_PATS3-END2'=>'续费-放弃']]]
+            ],
+          ['status'=>'_PATS3-END1','statusChi'=>'审批-否决','oprt'=>[['name'=>'_MAINTAIN','nextStatus'=>['_PATS_END'=>'完结']]]
+            ],
+          ['status'=>'_PATS3-END2','statusChi'=>'续费-放弃','oprt'=>[['name'=>'_MAINTAIN','nextStatus'=>['_PATS_END'=>'完结']]]
+            ],
                     //label-default，停用
-          ['status'=>'_PATS4','statusChi'=>'审批','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS4-1','statusChi'=>'审批-批准','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS4-2','statusChi'=>'执行中','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS4-3','statusChi'=>'申报-复核','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS4-4','statusChi'=>'申报-提交','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS4-5','statusChi'=>'申报-修改','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS4-6','statusChi'=>'续费-批准','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS4-7','statusChi'=>'续费-提交','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS4-END1','statusChi'=>'申报-授权','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS4-END2','statusChi'=>'申报-驳回','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PATS4-END3','statusChi'=>'续费-授权','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_PATS4','statusChi'=>'执行','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_PATS4-1','statusChi'=>'审批-批准','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                  ['name'=>'_EXECUTE','nextStatus'=>['_PATS4-2'=>'执行中','_PATS4-3'=>'申报-复核']]]
+            ],
+          ['status'=>'_PATS4-2','statusChi'=>'执行中','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                ['name'=>'_EXECUTE','nextStatus'=>['_PATS4-3'=>'申报-复核']]]
+            ],
+          ['status'=>'_PATS4-3','statusChi'=>'申报-复核','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                  ['name'=>'_MAINTAIN','nextStatus'=>['_PATS4-4'=>'申报-提交','_PATS4-5'=>'申报-修改']]]
+            ],
+          ['status'=>'_PATS4-4','statusChi'=>'申报-提交','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                  ['name'=>'_MAINTAIN','nextStatus'=>['_PATS4-END1'=>'申报-授权','_PATS4-END2'=>'申报-驳回','_PATS4-5'=>'申报-修改']]]
+            ],
+          ['status'=>'_PATS4-5','statusChi'=>'申报-修改','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                  ['name'=>'_EXECUTE','nextStatus'=>['_PATS4-3'=>'申报-复核']]]
+            ],
+          ['status'=>'_PATS4-6','statusChi'=>'续费-批准','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                  ['name'=>'_MAINTAIN','nextStatus'=>['_PATS4-7'=>'续费-提交']]]
+            ],
+          ['status'=>'_PATS4-7','statusChi'=>'续费-提交','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                  ['name'=>'_MAINTAIN','nextStatus'=>['_PATS4-END3'=>'续费-授权']]]
+            ],
+          ['status'=>'_PATS4-END1','statusChi'=>'申报-授权','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                      ['name'=>'_MAINTAIN','nextStatus'=>['_PATS_END'=>'完结']]]
+            ],
+          ['status'=>'_PATS4-END2','statusChi'=>'申报-驳回','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                      ['name'=>'_MAINTAIN','nextStatus'=>['_PATS_END'=>'完结']]]
+            ],
+          ['status'=>'_PATS4-END3','statusChi'=>'续费-授权','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                      ['name'=>'_MAINTAIN','nextStatus'=>['_PATS_END'=>'完结']]]
+            ],
                     //label-default，销账
-          ['status'=>'_PATS_END','statusChi'=>'完结','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]]
+          ['status'=>'_PATS_END','statusChi'=>'完结','oprt'=>[['name'=>'','nextStatus'=>[]]]
+            ]
           //['status'=>'_PATS_END','statusChi'=>'完结','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
         ],
         '_PRO'=>[
@@ -82,37 +93,72 @@ const conIssStatusOprtArr=[
           ['status'=>'_PROS4','statusChi'=>'执行','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
           ['status'=>'_PROS4-1','statusChi'=>'审批-批准','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
                     //label-default，完结
-          ['status'=>'_PROS_END','statusChi'=>'完结','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]]            
+          ['status'=>'_PROS_END','statusChi'=>'完结','oprt'=>['',''],'nextStatus'=>[''=>[]]]            
         ],
         '_THE'=>[
           ['status'=>'_THES1','statusChi'=>'送审','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_THES1-1','statusChi'=>'填报中','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_THES1-2','statusChi'=>'审核完-待修改','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_THES1-3','statusChi'=>'审批完-需完善','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_THES1-1','statusChi'=>'填报中','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                ['name'=>'_SUBMIT','nextStatus'=>['_THES2-1'=>'新增-论文发表申请']],
+                                                                ['name'=>'_DELETE','nextStatus'=>['显示'=>1]]]
+            ],
+          ['status'=>'_THES1-2','statusChi'=>'审核完-待修改','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                      ['name'=>'_SUBMIT','nextStatus'=>['_THES2-2'=>'送审-已修改']]]
+            ],
+          ['status'=>'_THES1-3','statusChi'=>'审批完-需完善','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                      ['name'=>'_SUBMIT','nextStatus'=>['_THES2-3'=>'送审-已完善']]]
+            ],
                     //label-success，审核
           ['status'=>'_THES2','statusChi'=>'审核','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_THES2-1','statusChi'=>'新增-论文发表申请','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_THES2-2','statusChi'=>'送审-已修改','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_THES2-3','statusChi'=>'送审-已完善','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_THES2-END','statusChi'=>'审核-拒绝','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_THES2-1','statusChi'=>'新增-论文发表申请','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                          ['name'=>'_AUDIT','nextStatus'=>['_THES3-1'=>'审核-通过','_THES2-END'=>'审核-拒绝','_THES1-2'=>'审核完-待修改']]]
+            ],
+          ['status'=>'_THES2-2','statusChi'=>'送审-已修改','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                    ['name'=>'_AUDIT','nextStatus'=>['_THES3-1'=>'审核-通过','_THES2-END'=>'审核-拒绝','_THES1-2'=>'审核完-待修改']]]
+            ],
+          ['status'=>'_THES2-3','statusChi'=>'送审-已完善','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                    ['name'=>'_AUDIT','nextStatus'=>['_THES3-1'=>'审核-通过','_THES2-END'=>'审核-拒绝','_THES1-2'=>'审核完-待修改']]]
+            ],
+          ['status'=>'_THES2-END','statusChi'=>'审核-拒绝','oprt'=>[['name'=>'_MAINTAIN','nextStatus'=>['_THES_END'=>'完结']]]
+            ],
                     //label-warning，审批
           ['status'=>'_THES3','statusChi'=>'审批','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_THES3-1','statusChi'=>'审核-通过','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_THES3-END','statusChi'=>'审批-否决','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_THES3-1','statusChi'=>'审核-通过','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                  ['name'=>'_APPROVE','nextStatus'=>['_THES4-1'=>'审批-批准','_THES3-END'=>'审批-否决','_THES1-3'=>'审批完-需完善']]]
+            ],
+          ['status'=>'_THES3-END','statusChi'=>'审批-否决','oprt'=>[['name'=>'_MAINTAIN','nextStatus'=>['_THES_END'=>'完结']]]
+            ],
                     //label-primary，执行
           ['status'=>'_THES4','statusChi'=>'执行','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_THES4-1','statusChi'=>'审批-批准','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_THES4-2','statusChi'=>'执行中','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_THES4-3','statusChi'=>'复核-修改','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_THES4-4','statusChi'=>'复核-通过','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_THES4-5','statusChi'=>'投稿-提交','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_THES4-6','statusChi'=>'投稿-修改','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_THES4-7','statusChi'=>'投稿-接受','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_THES4-8','statusChi'=>'投稿-复核','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_THES4-END1','statusChi'=>'投稿-发表','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_THES4-END2','statusChi'=>'投稿-被拒','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_THES4-1','statusChi'=>'审批-批准','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                  ['name'=>'_EXECUTE','nextStatus'=>['_THES4-2'=>'执行中','_THES4-8'=>'投稿-复核']]]
+            ],
+          ['status'=>'_THES4-2','statusChi'=>'执行中','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                ['name'=>'_EXECUTE','nextStatus'=>['_THES4-8'=>'投稿-复核']]]
+            ],
+          ['status'=>'_THES4-3','statusChi'=>'复核-修改','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                  ['name'=>'_EXECUTE','nextStatus'=>['_THES4-8'=>'投稿-复核']]]
+            ],
+          ['status'=>'_THES4-4','statusChi'=>'复核-通过','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                  ['name'=>'_EXECUTE','nextStatus'=>['_THES4-5'=>'投稿-提交']]]
+            ],
+          ['status'=>'_THES4-5','statusChi'=>'投稿-提交','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                  ['name'=>'_EXECUTE','nextStatus'=>['_THES4-6'=>'投稿-修改','_THES4-7'=>'投稿-接受','_THES4-END1'=>'投稿-发表','_THES4-END2'=>'投稿-被拒']]]
+            ],
+          ['status'=>'_THES4-6','statusChi'=>'投稿-修改','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                  ['name'=>'_EXECUTE','nextStatus'=>['_THES4-7'=>'投稿-接受','_THES4-END1'=>'投稿-发表','_THES4-END2'=>'投稿-被拒']]]
+            ],
+          ['status'=>'_THES4-7','statusChi'=>'投稿-接受','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                  ['name'=>'_EXECUTE','nextStatus'=>['_THES4-END1'=>'投稿-发表','_THES4-END2'=>'投稿-被拒']]]
+            ],
+          ['status'=>'_THES4-8','statusChi'=>'投稿-复核','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
+                                                                  ['name'=>'_MAINTAIN','nextStatus'=>['_THES4-3'=>'复核-修改','_THES4-4'=>'复核-通过']]]
+            ],
+          ['status'=>'_THES4-END1','statusChi'=>'投稿-发表','oprt'=>[['name'=>'_MAINTAIN','nextStatus'=>['_THES_END'=>'完结']]]
+            ],
+          ['status'=>'_THES4-END2','statusChi'=>'投稿-被拒','oprt'=>[['name'=>'_MAINTAIN','nextStatus'=>['_THES_END'=>'完结']]]
+            ],
                     //label-default，完结
-          ['status'=>'_THES_END','statusChi'=>'完结','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]]          
+          ['status'=>'_THES_END','statusChi'=>'完结','oprt'=>['',''],'nextStatus'=>[''=>[]]]          
         ],
                     
       ];
@@ -129,6 +175,44 @@ const conIssAuthOprtArr=[
                       ['auth'=>'approve','oprt'=>['_READ','_UPDATE','_APPROVE']],
                       //事务维护人
                       ['auth'=>'maintain','oprt'=>['_READ','_UPDATE','_MAINTAIN']]
+                    ];
+
+//issue有关的配置参数
+const conIssConf=['_PAT'=>[//issStatus数组
+                              'status'=>conIssPatStatusArr,
+                              //iss实体中文名
+                              'entNameChi'=>'专利',
+                              //issue模型中关联属性/方法
+                              'relMethod'=>'pat_list',
+                              //关联对象Status数组
+                              'relStatus'=>conPatStatusArr,
+                              //关联对象type数组
+                              'relType'=>conPatTypeArr,
+                              //关联对象模型名称
+                              'relEntModelName'=>'Patinfo',
+                              //状态与操作的关系
+                              'statusOprt'=>conIssStatusOprtArr['_PAT']
+                           ],   
+                    '_THE'=>['status'=>conIssTheStatusArr,
+                              'entNameChi'=>'论文',
+                              'relMethod'=>'the_list',
+                              'relStatus'=>conTheStatusArr,
+                              'relType'=>conTheTypeArr,
+                              'relEntModelName'=>'Theinfo',
+                              'statusOprt'=>conIssStatusOprtArr['_THE']
+                            ],
+                    '_PRO'=>['status'=>conIssProStatusArr,
+                              'entNameChi'=>'项目',
+                              'relMethod'=>'pro_list',
+                              'relStatus'=>conProStatusArr,
+                              'relType'=>conProTypeArr,
+                              'relEntModelName'=>'Proinfo',
+                              'statusOprt'=>conIssStatusOprtArr['_PRO']
+                            ],
+                    //关联对象共有的字段名称
+                    'relEntTblCommonFields'=>['id','topic','type','status'],
+                    //关联对象共有的字段名称与前端变量名的对应关系
+                    'relTblFieldsFEName'=>['issEntName'=>'topic','issEntType'=>'type','issEntStatus'=>'status']
                     ];
 
 //asset的状态数组共7类14个已放入app的common.php中

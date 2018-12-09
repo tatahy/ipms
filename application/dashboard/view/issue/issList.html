@@ -61,7 +61,7 @@
 					<td>{$vo[$mdlMethod]['type']}</td>
 					<td>{$vo[$mdlMethod]['status']}</td>
 					
-					<td class="tdIssOprt text-right" data-iss-status="{$vo.status}" data-iss-id="{$vo.id}" data-iss-topic="{$vo.topic}" >操作</td>				
+					<td class="tdIssOprt text-right" data-iss-status="{$vo.status}" data-iss-id="{$vo.id}" data-iss-topic="{$vo.topic}" ></td>				
 				</tr>
 				{/volist}
 			</tbody>
@@ -94,7 +94,8 @@
 <script>
 <!-- // -->
 //iss状态与操作对应关系
-var issStatusOprtArr='';
+var issStatusOprtArr={$statusOprtArr};
+<!-- console.dir(issStatusOprtArr); -->
 
 //iss权限与操作对应关系
 var issAuthOprtArr='';
@@ -211,14 +212,39 @@ var setFmSearch=(fmobj,optObj)=>{
 	});
 	
 };
-
+//生成oprt组件的HTML字符串
 var getOprtComHtml=(status)=>{
-	let btnHtml='';
+	let i=0,
+		btnHtml='',
+		arr=issStatusOprtArr,
+		oprtArr=[];
+		
+	arr.forEach(function(v,k){
+		if(status==v.status || status==v.statusChi){
+			//状态对应的操作名及操作后的后续状态
+			oprtArr=v.oprt;
+		}else if(status=='完结' || status.indexOf('END')){
+			btnHtml='无';
+		}
+	});
 	
-	
-	
+	oprtArr.forEach(function(v,k){
+		let name=v.name,
+			statusObj=v.nextStatus,
+			enArr=Object.keys(statusObj),
+			chiArr=Object.values(statusObj),
+			e=oprtComAttrArr;
+		//有后续状态的才生成oprt组件的HTML字符串			
+		if(enArr.length){
+			for(i=0;i<e.length;i++){
+				if(name==e[i].nameEn || name==e[i].nameChi){
+					btnHtml+='<button class="btn btn-xs '+e[i].color.btn+' btnIssOprt" data-iss-oprt="'+e[i].nameEn+'" data-toggle="tooltip" title="'+e[i].title+'" style="margin:2px;"><span class="'+e[i].gly+'"></span>'+e[i].nameChi+'</button>';
+					break;
+				}
+			}
+		}	
+	});
 	return btnHtml;
-	
 };
 
 var btnClickShowModel=(optObj)=>{
@@ -266,9 +292,9 @@ var btnClickShowModel=(optObj)=>{
 	}
 	
 	//每个.tdIssOprt根据该行记录的data-iss-status="{$ vo.status}"添加相应的a标签
-	$('.tdAssOprt').each(function(){
+	$('.tdIssOprt').each(function(){
 		let btnHtml=getOprtComHtml($(this).data('issStatus'));
-		$(this).append(btnHtml);
+		$(this).html(btnHtml);
 	});
 	
 	$('#pDis').html('{$issTest}');

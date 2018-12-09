@@ -233,13 +233,13 @@ const conIssPatStatusArr=[//除‘完结’以外的其它状态
                     '_PATS2-3'=>'送审-已完善',
                     '_PATS2-END'=>'审核-拒绝',
                     //label-warning，异常
-                    '_PATS3'=>'',
+                    '_PATS3'=>'审批',
                     '_PATS3-1'=>'审核-通过',
                     '_PATS3-2'=>'新增-续费申请',
                     '_PATS3-END1'=>'审批-否决',
                     '_PATS3-END2'=>'续费-放弃',
                     //label-default，停用
-                    '_PATS4'=>'审批',
+                    '_PATS4'=>'执行',
                     '_PATS4-1'=>'审批-批准',
                     '_PATS4-2'=>'执行中',
                     '_PATS4-3'=>'申报-复核',

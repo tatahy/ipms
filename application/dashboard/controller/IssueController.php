@@ -128,6 +128,8 @@ class IssueController extends Controller
       $tblFieldAsArr=$issConf['relTblFieldsFEName'];
       //关联对象共有的字段名称
       $tblFields=$issConf['relEntTblCommonFields'];
+      //状态与操作的关系
+      $statusOprtArr=$issConf[$entName]['statusOprt'];
       //关联对象的数据模型对象实例
       $relMdl='';
       //进行排序的关联对象字段名
@@ -261,6 +263,7 @@ class IssueController extends Controller
         'issList'=>$issList,
         'issTest'=>json_encode('no debug info',JSON_UNESCAPED_UNICODE),
         'mdlMethod'=>$mdlMethod,
+        'statusOprtArr'=>json_encode($statusOprtArr,JSON_UNESCAPED_UNICODE),
         //排序数组
         'sortData'=>$sortData,
         //将数组转换为json字符串，编码为Unicode字符（\uxxxx）。
