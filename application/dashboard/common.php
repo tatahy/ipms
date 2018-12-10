@@ -6,7 +6,7 @@ const conIssStatusOprtArr=[
             ],
           //['status'=>'_PATS1-1','statusChi'=>'填报中','oprt'=>['_UPDATE','_SUBMIT','_DELETE'],'nextStatus'=>['_SUBMIT'=>['_PATS2-1'=>'新增-专利申请']]],
           ['status'=>'_PATS1-1','statusChi'=>'填报中','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
-                                                                ['name'=>'_DELETE','nextStatus'=>['显示'=>1]],
+                                                                ['name'=>'_DELETE','nextStatus'=>['display'=>1]],
                                                                 ['name'=>'_SUBMIT','nextStatus'=>['_PATS2-1'=>'新增-专利申请']]]
             ],
           ['status'=>'_PATS1-2','statusChi'=>'审核完-待修改','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
@@ -177,22 +177,7 @@ const conIssStatusOprtArr=[
           ['status'=>'_THES_END','statusChi'=>'完结','oprt'=>[['name'=>''],['nextStatus'=>[]]]
             ]
         ],
-                    
-      ];
-
-//issue的权限与操作的对应关系
-const conIssAuthOprtArr=[
-                      //事务申请人
-                      ['auth'=>'edit','oprt'=>['_READ','_UPDATE','_CREATE','_SUBMIT','_DELETE','_EXECUTE']],
-                      //事务审核人
-                      ['auth'=>'audit','oprt'=>['_READ','_UPDATE','_AUDIT']],
-                      //事务复核人
-                      ['auth'=>'review','oprt'=>['_READ','_UPDATE','_REVIEW']],
-                      //事务审批人
-                      ['auth'=>'approve','oprt'=>['_READ','_UPDATE','_APPROVE']],
-                      //事务维护人
-                      ['auth'=>'maintain','oprt'=>['_READ','_UPDATE','_MAINTAIN']]
-                    ];
+];
 
 //issue有关的配置参数
 const conIssConf=['_PAT'=>[//issStatus数组
@@ -208,7 +193,9 @@ const conIssConf=['_PAT'=>[//issStatus数组
                               //关联对象模型名称
                               'relEntModelName'=>'Patinfo',
                               //状态与操作的关系
-                              'statusOprt'=>conIssStatusOprtArr['_PAT']
+                              'statusOprt'=>conIssStatusOprtArr['_PAT'],
+                              //权限与操作的关系
+                              'authOprt'=>conIssAuthOprtArr['_PAT'],
                            ],   
                     '_THE'=>['status'=>conIssTheStatusArr,
                               'entNameChi'=>'论文',
@@ -216,7 +203,8 @@ const conIssConf=['_PAT'=>[//issStatus数组
                               'relStatus'=>conTheStatusArr,
                               'relType'=>conTheTypeArr,
                               'relEntModelName'=>'Theinfo',
-                              'statusOprt'=>conIssStatusOprtArr['_THE']
+                              'statusOprt'=>conIssStatusOprtArr['_THE'],
+                              'authOprt'=>conIssAuthOprtArr['_THE']
                             ],
                     '_PRO'=>['status'=>conIssProStatusArr,
                               'entNameChi'=>'项目',
@@ -224,7 +212,8 @@ const conIssConf=['_PAT'=>[//issStatus数组
                               'relStatus'=>conProStatusArr,
                               'relType'=>conProTypeArr,
                               'relEntModelName'=>'Proinfo',
-                              'statusOprt'=>conIssStatusOprtArr['_PRO']
+                              'statusOprt'=>conIssStatusOprtArr['_PRO'],
+                              'authOprt'=>conIssAuthOprtArr['_PRO']
                             ],
                     //关联对象共有的字段名称
                     'relEntTblCommonFields'=>['id','topic','type','status'],

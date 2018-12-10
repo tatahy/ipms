@@ -484,6 +484,30 @@ class IndexController extends \think\Controller
       return view();
     }
     
+    public function UserList(Request $request,UsergroupModel $usrgroupMdl)
+    {
+      
+      return 'UserList';
+    }
+    
+    public function UserOprt1(Request $request,UsergroupModel $usrgroupMdl)
+    {
+      
+      return 'UserOprt1';
+    }
+    
+    public function UsergroupList(Request $request,UsergroupModel $usrgroupMdl)
+    {
+      
+      return 'UsergroupList';
+    }
+    
+    public function UsergroupOprt1(Request $request,UsergroupModel $usrgroupMdl)
+    {
+      
+      return 'UsergroupOprt1';
+    }
+    
      // 输出系统设置模板
     public function sysSetting(Request $request,DeptModel $deptMdl)
     {

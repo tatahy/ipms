@@ -28,6 +28,8 @@ class IssueController extends Controller
     private $dept = null;
     //登录用户的权限。
     private $auth=[];
+    //登录用户的权限与操作的关系
+    private $authOprt=[];
     //请求对象域名
     private $home = '';
     //请求的issEntName
@@ -42,6 +44,8 @@ class IssueController extends Controller
     // 初始化
     protected function _initialize()
     {
+        $issConf=self::ISS_CONF;
+        
         $this->userName=Session::get('username');
         $this->pwd=Session::get('pwd');
         $this->log=Session::get('log');
@@ -52,6 +56,17 @@ class IssueController extends Controller
         $this->auth=UserModel::where(['userName'=>$this->userName,'pwd'=>$this->pwd])->find()->authority['iss'];
         //使用模型前的初始化，为模型内部使用的变量赋初值，后续的各个方法中无需再初始化，但可以进行修改
         IssinfoModel::initModel($this->userName,$this->dept,$this->auth,$this->issEntName); 
+        
+        //权限与操作的关系
+        //foreach($this->auth as $key=>$val){
+//          foreach($val as $k=>$v){
+//            if($v){
+//              $this->authOprt[$key][$k]=$issConf[$key][$k];
+//            }else{
+//              $this->authOprt[$key][$k]=0;
+//            }
+//          } 
+//        }
         
     }
     //
@@ -130,6 +145,8 @@ class IssueController extends Controller
       $tblFields=$issConf['relEntTblCommonFields'];
       //状态与操作的关系
       $statusOprtArr=$issConf[$entName]['statusOprt'];
+      //权限与操作的关系
+      $authOprtArr='';
       //关联对象的数据模型对象实例
       $relMdl='';
       //进行排序的关联对象字段名
@@ -144,7 +161,7 @@ class IssueController extends Controller
       $whereArr=[];
       //关联对象中进行搜索的条件数组
       $whereEntArr=[];
-      
+          
       switch($relModelName){
         case 'Patinfo':
           $relMdl = new PatinfoModel;
@@ -264,6 +281,7 @@ class IssueController extends Controller
         'issTest'=>json_encode('no debug info',JSON_UNESCAPED_UNICODE),
         'mdlMethod'=>$mdlMethod,
         'statusOprtArr'=>json_encode($statusOprtArr,JSON_UNESCAPED_UNICODE),
+        'authOprtArr'=>json_encode($authOprtArr,JSON_UNESCAPED_UNICODE),
         //排序数组
         'sortData'=>$sortData,
         //将数组转换为json字符串，编码为Unicode字符（\uxxxx）。

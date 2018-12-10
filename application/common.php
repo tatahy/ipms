@@ -6,6 +6,34 @@
  * 所有的公共函数都以"_common"开头，再遵循驼峰命名法。
  * 所有的公共常量都以"con"开头，再遵循驼峰命名法。
  */
+
+//定义需要进行权限管理的模块/实体
+const conAuthEntNameArr=[
+        ['nameEn'=>'_ISS','nameChi'=>'事务',
+          'child'=>[['nameEn'=>'_PAT','nameChi'=>'专利事务'],['nameEn'=>'_THE','nameChi'=>'论文事务'],['nameEn'=>'_PRO','nameChi'=>'项目事务']]],
+        ['nameEn'=>'_PAT','nameChi'=>'专利','child'=>[]],
+        ['nameEn'=>'_THE','nameChi'=>'论文','child'=>[]],
+        ['nameEn'=>'_PRO','nameChi'=>'项目','child'=>[]],
+        ['nameEn'=>'_ATT','nameChi'=>'附件','child'=>[]],
+        ['nameEn'=>'_ASS','nameChi'=>'固定资产','child'=>[]],
+        ['nameEn'=>'_ADMIN','nameChi'=>'后台管理','child'=>[]]
+];
+
+//定义需要进行权限管理的模块/实体的权限
+const conAuthEntArr=[
+  '_ISS'=>[
+    '_PAT'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'maintain'=>0],
+    '_PRO'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'maintain'=>0],
+    '_THE'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'maintain'=>0]
+  ],
+  '_PAT'=>['edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
+  '_PRO'=>['edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
+  '_THE'=>['edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
+  '_ATT'=>['upload'=>0,'download'=>0,'erase'=>0,'move'=>0,'copy'=>0],
+  '_ASS'=>['read'=>0,'edit'=>0,'audit'=>0,'approve'=>0,'maintain'=>0],
+  '_ADMIN'=>['enable'=>0]
+];
+
 //patent的类型数组
 const conPatTypeArr=[
                     '_PATT1'=>'发明专利',
@@ -190,6 +218,30 @@ const conAssOprtArr=['_CREATE'=>'新增',
                     '_READ'=>'查阅',
                     '_DELETE'=>'删除',
                     ];
+                    
+const conIssAuthArr=[
+        '_PAT'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'maintain'=>0
+          //['name'=>'edit','value'=>0],
+//          ['name'=>'audit','value'=>0],
+//          ['name'=>'review','value'=>0],
+//          ['name'=>'approve','value'=>0],
+//          ['name'=>'maintain','value'=>0],
+        ],
+        '_PRO'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'maintain'=>0
+          //['name'=>'edit','value'=>0],
+//          ['name'=>'audit','value'=>0],
+//          ['name'=>'review','value'=>0],
+//          ['name'=>'approve','value'=>0],
+//          ['name'=>'maintain','value'=>0],
+        ],
+        '_THE'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'maintain'=>0
+          //['name'=>'edit','value'=>0],
+//          ['name'=>'audit','value'=>0],
+//          ['name'=>'review','value'=>0],
+//          ['name'=>'approve','value'=>0],
+//          ['name'=>'maintain','value'=>0],
+        ],
+];
 
 //issue的操作数组,4类（CURD）10个
 const conIssOprtArr=['_CREATE'=>'新增',
@@ -203,6 +255,62 @@ const conIssOprtArr=['_CREATE'=>'新增',
                     '_READ'=>'查阅',
                     '_DELETE'=>'删除',
                     ];
+
+//issue的权限与操作的对应关系
+const conIssAuthOprtArr=[
+        '_PAT'=>[
+          'edit'=>['_READ','_UPDATE','_CREATE','_SUBMIT','_DELETE','_EXECUTE'],
+          'audit'=>['_READ','_UPDATE','_AUDIT'],
+          'review'=>['_READ','_UPDATE','_REVIEW'],
+          'approve'=>['_READ','_UPDATE','_APPROVE'],
+          'maintain'=>['_READ','_UPDATE','_MAINTAIN']
+          //专利事务申请人
+         // ['name'=>'edit','oprt'=>['_READ','_UPDATE','_CREATE','_SUBMIT','_DELETE','_EXECUTE']],
+          //专利事务审核人
+          //['name'=>'audit','oprt'=>['_READ','_UPDATE','_AUDIT']],
+//          //专利事务复核人
+//          ['name'=>'review','oprt'=>['_READ','_UPDATE','_REVIEW']],
+//          //专利事务审批人
+//          ['name'=>'approve','oprt'=>['_READ','_UPDATE','_APPROVE']],
+//          //专利事务维护人
+//          ['name'=>'maintain','oprt'=>['_READ','_UPDATE','_MAINTAIN']]
+        ],
+        '_THE'=>[
+          'edit'=>['_READ','_UPDATE','_CREATE','_SUBMIT','_DELETE','_EXECUTE'],
+          'audit'=>['_READ','_UPDATE','_AUDIT'],
+          'review'=>['_READ','_UPDATE','_REVIEW'],
+          'approve'=>['_READ','_UPDATE','_APPROVE'],
+          'maintain'=>['_READ','_UPDATE','_MAINTAIN']
+          ////论文事务申请人
+//          ['name'=>'edit','oprt'=>['_READ','_UPDATE','_CREATE','_SUBMIT','_DELETE','_EXECUTE']],
+//          //论文事务审核人
+//          ['name'=>'audit','oprt'=>['_READ','_UPDATE','_AUDIT']],
+//          //论文事务复核人
+//          ['name'=>'review','oprt'=>['_READ','_UPDATE','_REVIEW']],
+//          //论文事务审批人
+//          ['name'=>'approve','oprt'=>['_READ','_UPDATE','_APPROVE']],
+//          //论文事务维护人
+//          ['name'=>'maintain','oprt'=>['_READ','_UPDATE','_MAINTAIN']]
+        ],
+        '_PRO'=>[
+          'edit'=>['_READ','_UPDATE','_CREATE','_SUBMIT','_DELETE','_EXECUTE'],
+          'audit'=>['_READ','_UPDATE','_AUDIT'],
+          'review'=>['_READ','_UPDATE','_REVIEW'],
+          'approve'=>['_READ','_UPDATE','_APPROVE'],
+          'maintain'=>['_READ','_UPDATE','_MAINTAIN']
+          ////项目事务申请人
+//          ['name'=>'edit','oprt'=>['_READ','_UPDATE','_CREATE','_SUBMIT','_DELETE','_EXECUTE']],
+//          //项目事务审核人
+//          ['name'=>'audit','oprt'=>['_READ','_UPDATE','_AUDIT']],
+//          //项目事务复核人
+//          ['name'=>'review','oprt'=>['_READ','_UPDATE','_REVIEW']],
+//          //项目事务审批人
+//          ['name'=>'approve','oprt'=>['_READ','_UPDATE','_APPROVE']],
+//          //项目事务维护人
+//          ['name'=>'maintain','oprt'=>['_READ','_UPDATE','_MAINTAIN']]
+        ],
+];
+
 //issue的类型大类：3类
 const conIssEntNameArr=['_PAT','_THE','_PRO'];
 //issue的状态数组大类：5类
@@ -349,6 +457,8 @@ const conIssProStatusArr=[//除‘完结’以外的其它状态
 //    $authThe=array('编辑'=>0,'审核'=>0,'审批'=>0,'执行'=>0,'维护'=>0);
 //    $authAtt=array('上传'=>0,'下载'=>0,'删除'=>0,'移动'=>0,'复制'=>0); 
     //'read'权限仅为用户登录后前台的“查阅”权限，后台“用户中心”无需该权限
+    $authIss1=['_PAT'=>conIssAuthArr['_PAT'],'_PRO'=>conIssAuthArr['_PRO'],'_THE'=>conIssAuthArr['_THE']];
+    
     $authIss=array('edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0);
     $authPat=array('edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0);
     $authPro=array('edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0);

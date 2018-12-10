@@ -166,9 +166,9 @@ var oprtBtnHtml=(oprtEn)=>{
 };
 
 var spanNextSelectStatusNow=(oprtEn)=>{
-	var spStr = '';
-	var statusNow=$('#statusNow').val();
-	var spanObj=$('#fmAssInfo').find('select[name="status_now"]').next('span');
+	let spStr = '',
+		statusNow=$('#statusNow').val(),
+		spanObj=$('#fmAssInfo').find('select[name="status_now"]').next('span');
 	conOprtComAttr.forEach(function(e){
 		if(oprtEn==e.val){
 			spStr='<span class="text-'+e.color+'"><span class="glyphicon glyphicon-'+e.gly+'"></span>'+e.name+'</span>';

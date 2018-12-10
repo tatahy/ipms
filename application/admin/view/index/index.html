@@ -141,6 +141,14 @@ footer {
 				<li class="text-right"><a class="aTab" href="#sysUsergroup">用户组&nbsp;<span class="glyphicon glyphicon-duplicate"></span></a></li>
 			</ul>
 		</li>
+		
+		<li class="dropdown">
+			<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span>&nbsp;系统用户管理<span class="caret"></span></a>
+			<ul class="dropdown-menu">
+				<li class="text-right"><a class="aTab" href="#userList">用户管理&nbsp;<span class="glyphicon glyphicon-file"></span></a></li>
+				<li class="text-right"><a class="aTab" href="#usergroupList">用户组管理&nbsp;<span class="glyphicon glyphicon-duplicate"></span></a></li>
+			</ul>
+		</li>
 				
 		<li><a class="aTab" href="#sysSetting"><span class="glyphicon glyphicon-wrench"></span>&nbsp;系统设置</a></li>
 	</ul>
@@ -216,12 +224,11 @@ $(document).ready(function(){
 	
 <!-- function -->
 	// 作用：提交锚点值给后端，由后端返回需加载的页面文件
-	function loadTplFile(sId){
-		if(null==sId || sId=='#undefined'){sId='#sysSummary';}
-        //提交锚点值给后端，由后端返回需加载的页面文件
-		$("#content").load('tplFile',{'sId':sId}); 
-		
-    }
+function loadTplFile(sId){
+	if(null==sId || sId=='#undefined'){sId='#sysSummary';}
+    //提交锚点值给后端，由后端返回需加载的页面文件
+	$("#content").load('tplFile',{'sId':sId}); 
+}
 	
 <!-- function -->
 

@@ -218,12 +218,14 @@ var getOprtComHtml=(status)=>{
 		btnHtml='',
 		arr=issStatusOprtArr,
 		oprtArr=[];
+		//权限与操作对应数组
+		//authArr=
 		
 	<!-- console.dir(arr); -->
 	
 	arr.forEach(function(v,k){
 		if(status==v.status || status==v.statusChi){
-			//状态对应的操作名及操作后的后续状态
+			//状态对应的所有操作及各个操作的后续状态
 			oprtArr=v.oprt;
 		}
 	});
@@ -244,9 +246,11 @@ var getOprtComHtml=(status)=>{
 			if(btnHtml=='无'){
 				btnHtml='';
 			}
+			
 			for(i=0;i<e.length;i++){
 				if(name==e[i].nameEn || name==e[i].nameChi){
-					btnHtml+='<button class="btn btn-xs '+e[i].color.btn+' btnIssOprt" data-iss-oprt="'+e[i].nameEn+'" data-toggle="tooltip" title="'+e[i].title+'" style="margin:2px;"><span class="'+e[i].gly+'"></span>&nbsp;'+e[i].nameChi+'</button>';
+					btnHtml+='<button class="btn btn-xs '+e[i].color.btn+' btnIssOprt" title="'+e[i].title+'" data-iss-oprt="'+e[i].nameEn+'" data-toggle="tooltip"  style="margin:2px;"><span class="'+e[i].gly+'"></span>&nbsp;'+e[i].nameChi+'</button>';
+					break;
 				}
 			}
 		}else{
@@ -260,7 +264,8 @@ var btnClickShowModel=(optObj)=>{
 	let oprt=optObj.oprt,
 		arr=oprtComAttrArr,
 		spCom='',spStr='',
-		url=urlPref+'fmIssSingle';
+		url=urlPref+'fmIssSingle',
+		nextStatus='';
 		
 	//生成$('#modalAssSingle')标题上的span组件
 	for(var i=0;i<arr.length;i++){
@@ -278,6 +283,8 @@ var btnClickShowModel=(optObj)=>{
 	
 	//显示modal
 	$('#modalIssSingle').modal();
+	
+	
 	
 };	
 
@@ -413,7 +420,6 @@ $(document).ready(function(){
 		$(this).closest('tr').addClass('bg-warning');
 		//排序有关的值向$('#divTblSortData')汇集。发送本行的assId，便于刷新后本行继续加底色
 		$('#divTblSortData').data('showIssId',dataFromObj.data('issId'));
-		
 		btnClickShowModel(dataObj);
 	});
 

@@ -9,19 +9,19 @@
 	<input id="id" type="text" name="id" value="{$issSingle.id}" class="sr-only">
 	<input id="oprt" type="text" name="oprt" value="{$oprt}" class="sr-only">
 	<div class="row">
-	<div class="form-group col-sm-4">
+	<div class="form-group col-sm-5">
 		<label class="control-label" for="topic">事务标题<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
 		<input class="form-control empty-check" name="topic" value="{$issSingle.topic}" type="text">
 	
 	</div>
 	
-	<div class="form-group col-sm-3">
+	<div class="form-group col-sm-4">
 		<label class="control-label" for="issnum">事务编号</label>
 		<input class="form-control" name="issnum" value="{$issSingle.issnum}" type="text" readonly>
 	
 	</div>
 	
-	<div class="form-group col-sm-4">
+	<div class="form-group col-sm-3">
 		<label class="control-label" for="status">事务现状</label>
 		<input class="form-control" id="status" value="{$issSingle.status}" type="text" readonly>
 		<span class="small text-muted">【<span class="text-primary"><span class="glyphicon glyphicon-save-file"></span>更新</span>】不改变“现状”</span>
@@ -29,8 +29,8 @@
 	</div>
 	
 	<div class="row">
-	<div class="form-group col-sm-4">
-		<label for="status">状态</label>
+	<div class="form-group col-sm-5">
+		<label for="status">状态变更</label>
 		<select class="form-control" name="status">
 			<option value="">s1</option>
 		</select>
@@ -46,7 +46,7 @@
 	</div>
 	
 	<div class="row">
-	<div class="form-group col-sm-4">
+	<div class="form-group col-sm-5">
 		<label for="dept">事务发起部门</label>
 		<input class="form-control" id="dept" value="{$issSingle.dept}" type="text" readonly>
 	</div>
@@ -84,7 +84,8 @@
 <!-- /pagewrap  -->
 <script>
 var fmObj=$('#fmIssSingle'),
-	oprt=fmObj.find('[name="oprt"]').val();
+	oprt=fmObj.find('[name="oprt"]').val(),
+	status=$('#status').val();
 	
 //生成$.alert,$.confirm组件上显示内容的HTML字符串
 var comHtml=(opts)=>{
@@ -118,7 +119,7 @@ var comHtml=(opts)=>{
 	return htmlStr;	
 };
 
-//生成modal上的操作组件HTML字符串。
+//生成modal上的操作btn组件
 var buildOprtBtnCom=(oprt)=>{
 	let btnHtml='',
 		arr=oprtComAttrArr;
@@ -142,7 +143,45 @@ var buildOprtBtnCom=(oprt)=>{
 	}
 };
 
-var spanNextSelectStatusNow=(oprtEn)=>{
+//生成modal上status的select组件
+var buildStatusSelCom=(oprt,status)=>{
+	let i=0,
+		arr=issStatusOprtArr,
+		selObj=fmObj.find('[name="status"]'),
+		oprtArr=[],
+		enArr=[],
+		chiArr=[];
+	//得到status对应的所有操作及各个操作的后续状态	
+	for(i=0;i<arr.length;i++){
+		let e=arr[i];
+		if(status==e.status || status==e.statusChi){
+			oprtArr=e.oprt;
+			break;
+		}
+	}
+	//得到oprt对应的所有后续状态
+	for(i=0;i<oprtArr.length;i++){
+		let e=oprtArr[i],
+			statusObj=(oprt==e.name)?e.nextStatus:[];
+		if(!Array.isArray(statusObj)){
+			enArr=Object.keys(statusObj);
+			chiArr=Object.values(statusObj);
+			break;
+		}	
+	}
+	//有后续状态的才生成select组件			
+	if(oprt=='_DELETE'){
+		selObj.closest('div').hide();
+		selObj.closest('div').next().hide();
+	}else if(enArr.length){
+		selObj.empty();
+		enArr.forEach(function(v,k){
+			selObj.append($('<option></option>').val(v).text(chiArr[k]));
+		});
+	}
+};
+
+var spanNextSelectStatusNow=(oprt,status)=>{
 
 };
 
@@ -191,8 +230,9 @@ var ajaxIssOprt=(opts)=>{
 
 //利用自调用匿名函数立即执行的特点，对页面的组件进行初始化
 (function($){
-
+	console.log(oprt+status);
 	buildOprtBtnCom(oprt);
+	buildStatusSelCom(oprt,status);
 })(jQuery);
 
 $(document).ready(function(){
