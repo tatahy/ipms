@@ -2,7 +2,8 @@
 //issue的状态与操作的对应关系，实体->现状->可对现状进行的操作->操作后的状态
 const conIssStatusOprtArr=[
         '_PAT'=>[
-          ['status'=>'_PATS1','statusChi'=>'送审','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_PATS1','statusChi'=>'送审','oprt'=>[['name'=>''],['nextStatus'=>[]]]
+            ],
           //['status'=>'_PATS1-1','statusChi'=>'填报中','oprt'=>['_UPDATE','_SUBMIT','_DELETE'],'nextStatus'=>['_SUBMIT'=>['_PATS2-1'=>'新增-专利申请']]],
           ['status'=>'_PATS1-1','statusChi'=>'填报中','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
                                                                 ['name'=>'_DELETE','nextStatus'=>['显示'=>1]],
@@ -15,32 +16,31 @@ const conIssStatusOprtArr=[
                                                                       ['name'=>'_SUBMIT','nextStatus'=>['_PATS2-3'=>'送审-已完善']]]
             ],
                     //label-success，正常
-          ['status'=>'_PATS2','statusChi'=>'审核','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_PATS2','statusChi'=>'审核','oprt'=>[['name'=>''],['nextStatus'=>[]]]
+            ],
           ['status'=>'_PATS2-1','statusChi'=>'新增-专利申请','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
-                                                                      ['name'=>'_AUDIT','nextStatus'=>['_PATS1-2'=>'审核完-待修改','_PATS2-END'=>'审核-拒绝','_PATS3-1'=>'审核-通过']]]
+                                                                      ['name'=>'_AUDIT','nextStatus'=>['_PATS1-2'=>'审核完-待修改','_PATS3-3'=>'审核-不予支持','_PATS3-1'=>'审核-通过']]]
             ],
           ['status'=>'_PATS2-2','statusChi'=>'送审-已修改','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
-                                                                    ['name'=>'_AUDIT','nextStatus'=>['_PATS1-2'=>'审核完-待修改','_PATS2-END'=>'审核-拒绝','_PATS3-1'=>'审核-通过']]]
+                                                                    ['name'=>'_AUDIT','nextStatus'=>['_PATS1-2'=>'审核完-待修改','_PATS3-3'=>'审核-不予支持','_PATS3-1'=>'审核-通过']]]
             ],
           ['status'=>'_PATS2-3','statusChi'=>'送审-已完善','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
-                                                                    ['name'=>'_AUDIT','nextStatus'=>['_PATS1-2'=>'审核完-待修改','_PATS2-END'=>'审核-拒绝','_PATS3-1'=>'审核-通过']]]
-            ],
-          ['status'=>'_PATS2-END','statusChi'=>'审核-拒绝','oprt'=>[['name'=>'_MAINTAIN','nextStatus'=>['_PATS_END'=>'完结']]]
+                                                                    ['name'=>'_AUDIT','nextStatus'=>['_PATS1-2'=>'审核完-待修改','_PATS3-3'=>'审核-不予支持','_PATS3-1'=>'审核-通过']]]
             ],
                     //label-warning，异常
-          ['status'=>'_PATS3','statusChi'=>'审批','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_PATS3','statusChi'=>'审批','oprt'=>[['name'=>''],['nextStatus'=>[]]]
+            ],
           ['status'=>'_PATS3-1','statusChi'=>'审核-通过','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
-                                                                  ['name'=>'_APPROVE','nextStatus'=>['_PATS4-1'=>'审批-批准','_PATS3-END1'=>'审批-否决','_PATS1-3'=>'审批完-需完善']]]
+                                                                  ['name'=>'_APPROVE','nextStatus'=>['_PATS4-1'=>'审批-批准','_PATS4-END4'=>'审批-否决','_PATS1-3'=>'审批完-需完善']]]
             ],
           ['status'=>'_PATS3-2','statusChi'=>'新增-续费申请','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
-                                                                      ['name'=>'_APPROVE','nextStatus'=>['_PATS4-1'=>'审批-批准','_PATS3-END2'=>'续费-放弃']]]
+                                                                      ['name'=>'_APPROVE','nextStatus'=>['_PATS4-1'=>'审批-批准','_PATS4-END5'=>'续费-放弃']]]
             ],
-          ['status'=>'_PATS3-END1','statusChi'=>'审批-否决','oprt'=>[['name'=>'_MAINTAIN','nextStatus'=>['_PATS_END'=>'完结']]]
-            ],
-          ['status'=>'_PATS3-END2','statusChi'=>'续费-放弃','oprt'=>[['name'=>'_MAINTAIN','nextStatus'=>['_PATS_END'=>'完结']]]
+          ['status'=>'_PATS3-3','statusChi'=>'审核-不予支持','oprt'=>[['name'=>'_APPROVE','nextStatus'=>['_PATS4-1'=>'审批-批准','_PATS4-END4'=>'审批-否决','_PATS1-3'=>'审批完-需完善']]]
             ],
                     //label-default，停用
-          ['status'=>'_PATS4','statusChi'=>'执行','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_PATS4','statusChi'=>'执行','oprt'=>[['name'=>''],['nextStatus'=>[]]]
+            ],
           ['status'=>'_PATS4-1','statusChi'=>'审批-批准','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
                                                                   ['name'=>'_EXECUTE','nextStatus'=>['_PATS4-2'=>'执行中','_PATS4-3'=>'申报-复核']]]
             ],
@@ -71,32 +71,41 @@ const conIssStatusOprtArr=[
           ['status'=>'_PATS4-END3','statusChi'=>'续费-授权','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
                                                                       ['name'=>'_MAINTAIN','nextStatus'=>['_PATS_END'=>'完结']]]
             ],
+          ['status'=>'_PATS4-END4','statusChi'=>'审批-否决','oprt'=>[['name'=>'_MAINTAIN','nextStatus'=>['_PATS_END'=>'完结']]]
+            ],
+          ['status'=>'_PATS4-END5','statusChi'=>'续费-放弃','oprt'=>[['name'=>'_MAINTAIN','nextStatus'=>['_PATS_END'=>'完结']]]
+            ],
                     //label-default，销账
           ['status'=>'_PATS_END','statusChi'=>'完结','oprt'=>[['name'=>'','nextStatus'=>[]]]
             ]
           //['status'=>'_PATS_END','statusChi'=>'完结','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
         ],
         '_PRO'=>[
-          ['status'=>'_PROS1','statusChi'=>'送审','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_PROS1','statusChi'=>'送审','oprt'=>[['name'=>''],['nextStatus'=>[]]]
+            ],
           ['status'=>'_PROS1-1','statusChi'=>'','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
                     //label-success，审核
           ['status'=>'_PROS2','statusChi'=>'审核','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
           ['status'=>'_PROS2-1','statusChi'=>'','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
           ['status'=>'_PROS2-2','statusChi'=>'送审-已修改','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
           ['status'=>'_PROS2-3','statusChi'=>'送审-已完善','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PROS2-END','statusChi'=>'审核-拒绝','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          //['status'=>'_PROS2-END','statusChi'=>'审核-不予支持','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
                     //label-warning，审批
           ['status'=>'_PROS3','statusChi'=>'审批','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
           ['status'=>'_PROS3-1','statusChi'=>'审核-通过','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
-          ['status'=>'_PROS3-END','statusChi'=>'审批-否决','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_PROS3-2','statusChi'=>'审核-不予支持','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          //['status'=>'_PROS3-END','statusChi'=>'审批-否决','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
                     //label-primary，执行
           ['status'=>'_PROS4','statusChi'=>'执行','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
           ['status'=>'_PROS4-1','statusChi'=>'审批-批准','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_PROS4-END1','statusChi'=>'审批-否决','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
                     //label-default，完结
-          ['status'=>'_PROS_END','statusChi'=>'完结','oprt'=>['',''],'nextStatus'=>[''=>[]]]            
+          ['status'=>'_PROS_END','statusChi'=>'完结','oprt'=>[['name'=>'','nextStatus'=>[]]]
+            ]          
         ],
         '_THE'=>[
-          ['status'=>'_THES1','statusChi'=>'送审','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_THES1','statusChi'=>'送审','oprt'=>[['name'=>''],['nextStatus'=>[]]]
+            ],
           ['status'=>'_THES1-1','statusChi'=>'填报中','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
                                                                 ['name'=>'_SUBMIT','nextStatus'=>['_THES2-1'=>'新增-论文发表申请']],
                                                                 ['name'=>'_DELETE','nextStatus'=>['显示'=>1]]]
@@ -108,27 +117,32 @@ const conIssStatusOprtArr=[
                                                                       ['name'=>'_SUBMIT','nextStatus'=>['_THES2-3'=>'送审-已完善']]]
             ],
                     //label-success，审核
-          ['status'=>'_THES2','statusChi'=>'审核','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_THES2','statusChi'=>'审核','oprt'=>[['name'=>''],['nextStatus'=>[]]]
+            ],
           ['status'=>'_THES2-1','statusChi'=>'新增-论文发表申请','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
-                                                                          ['name'=>'_AUDIT','nextStatus'=>['_THES3-1'=>'审核-通过','_THES2-END'=>'审核-拒绝','_THES1-2'=>'审核完-待修改']]]
+                                                                          ['name'=>'_AUDIT','nextStatus'=>['_THES3-1'=>'审核-通过','_THES3-2'=>'审核-不予支持','_THES1-2'=>'审核完-待修改']]]
             ],
           ['status'=>'_THES2-2','statusChi'=>'送审-已修改','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
-                                                                    ['name'=>'_AUDIT','nextStatus'=>['_THES3-1'=>'审核-通过','_THES2-END'=>'审核-拒绝','_THES1-2'=>'审核完-待修改']]]
+                                                                    ['name'=>'_AUDIT','nextStatus'=>['_THES3-1'=>'审核-通过','_THES3-2'=>'审核-不予支持','_THES1-2'=>'审核完-待修改']]]
             ],
           ['status'=>'_THES2-3','statusChi'=>'送审-已完善','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
-                                                                    ['name'=>'_AUDIT','nextStatus'=>['_THES3-1'=>'审核-通过','_THES2-END'=>'审核-拒绝','_THES1-2'=>'审核完-待修改']]]
+                                                                    ['name'=>'_AUDIT','nextStatus'=>['_THES3-1'=>'审核-通过','_THES3-2'=>'审核-不予支持','_THES1-2'=>'审核完-待修改']]]
             ],
-          ['status'=>'_THES2-END','statusChi'=>'审核-拒绝','oprt'=>[['name'=>'_MAINTAIN','nextStatus'=>['_THES_END'=>'完结']]]
-            ],
+          //['status'=>'_THES2-END','statusChi'=>'审核-不予支持','oprt'=>[['name'=>'_APPROVE','nextStatus'=>['_THES4-1'=>'审批-批准','_THES3-END'=>'审批-否决','_THES1-3'=>'审批完-需完善']]]
+//            ],
                     //label-warning，审批
-          ['status'=>'_THES3','statusChi'=>'审批','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_THES3','statusChi'=>'审批','oprt'=>[['name'=>''],['nextStatus'=>[]]]
+            ],
           ['status'=>'_THES3-1','statusChi'=>'审核-通过','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
-                                                                  ['name'=>'_APPROVE','nextStatus'=>['_THES4-1'=>'审批-批准','_THES3-END'=>'审批-否决','_THES1-3'=>'审批完-需完善']]]
+                                                                  ['name'=>'_APPROVE','nextStatus'=>['_THES4-1'=>'审批-批准','_THES4-END3'=>'审批-否决','_THES1-3'=>'审批完-需完善']]]
             ],
-          ['status'=>'_THES3-END','statusChi'=>'审批-否决','oprt'=>[['name'=>'_MAINTAIN','nextStatus'=>['_THES_END'=>'完结']]]
+          ['status'=>'_THES3-2','statusChi'=>'审核-不予支持','oprt'=>[['name'=>'_APPROVE','nextStatus'=>['_THES4-1'=>'审批-批准','_THES4-END3'=>'审批-否决','_THES1-3'=>'审批完-需完善']]]
             ],
+          //['status'=>'_THES3-END','statusChi'=>'审批-否决','oprt'=>[['name'=>'_MAINTAIN','nextStatus'=>['_THES_END'=>'完结']]]
+           // ],
                     //label-primary，执行
-          ['status'=>'_THES4','statusChi'=>'执行','oprt'=>['',''],'nextStatus'=>[''=>[],''=>[]]],
+          ['status'=>'_THES4','statusChi'=>'执行','oprt'=>[['name'=>''],['nextStatus'=>[]]]
+            ],
           ['status'=>'_THES4-1','statusChi'=>'审批-批准','oprt'=>[['name'=>'_UPDATE','nextStatus'=>[]],
                                                                   ['name'=>'_EXECUTE','nextStatus'=>['_THES4-2'=>'执行中','_THES4-8'=>'投稿-复核']]]
             ],
@@ -157,8 +171,11 @@ const conIssStatusOprtArr=[
             ],
           ['status'=>'_THES4-END2','statusChi'=>'投稿-被拒','oprt'=>[['name'=>'_MAINTAIN','nextStatus'=>['_THES_END'=>'完结']]]
             ],
+          ['status'=>'_THES4-END3','statusChi'=>'审批-否决','oprt'=>[['name'=>'_MAINTAIN','nextStatus'=>['_THES_END'=>'完结']]]
+            ],
                     //label-default，完结
-          ['status'=>'_THES_END','statusChi'=>'完结','oprt'=>['',''],'nextStatus'=>[''=>[]]]          
+          ['status'=>'_THES_END','statusChi'=>'完结','oprt'=>[['name'=>''],['nextStatus'=>[]]]
+            ]
         ],
                     
       ];

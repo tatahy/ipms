@@ -219,29 +219,38 @@ var getOprtComHtml=(status)=>{
 		arr=issStatusOprtArr,
 		oprtArr=[];
 		
+	<!-- console.dir(arr); -->
+	
 	arr.forEach(function(v,k){
 		if(status==v.status || status==v.statusChi){
 			//状态对应的操作名及操作后的后续状态
 			oprtArr=v.oprt;
-		}else if(status=='完结' || status.indexOf('END')){
-			btnHtml='无';
 		}
 	});
 	
 	oprtArr.forEach(function(v,k){
 		let name=v.name,
 			statusObj=v.nextStatus,
-			enArr=Object.keys(statusObj),
-			chiArr=Object.values(statusObj),
-			e=oprtComAttrArr;
+			e=oprtComAttrArr,
+			enArr=[],
+			chiArr=[];
+			
+		if(!Array.isArray(statusObj)){
+			enArr=Object.keys(statusObj);
+			chiArr=Object.values(statusObj);
+		}
 		//有后续状态的才生成oprt组件的HTML字符串			
 		if(enArr.length){
+			if(btnHtml=='无'){
+				btnHtml='';
+			}
 			for(i=0;i<e.length;i++){
 				if(name==e[i].nameEn || name==e[i].nameChi){
-					btnHtml+='<button class="btn btn-xs '+e[i].color.btn+' btnIssOprt" data-iss-oprt="'+e[i].nameEn+'" data-toggle="tooltip" title="'+e[i].title+'" style="margin:2px;"><span class="'+e[i].gly+'"></span>'+e[i].nameChi+'</button>';
-					break;
+					btnHtml+='<button class="btn btn-xs '+e[i].color.btn+' btnIssOprt" data-iss-oprt="'+e[i].nameEn+'" data-toggle="tooltip" title="'+e[i].title+'" style="margin:2px;"><span class="'+e[i].gly+'"></span>&nbsp;'+e[i].nameChi+'</button>';
 				}
 			}
+		}else{
+			btnHtml='无';
 		}	
 	});
 	return btnHtml;
@@ -257,7 +266,7 @@ var btnClickShowModel=(optObj)=>{
 	for(var i=0;i<arr.length;i++){
 		let el=arr[i];
 		if(oprt==el.nameEn){
-			spStr='<span class="'+el.color.txt+'"><span class="'+el.gly+'"></span>'+el.nameChi+'</span>';		
+			spStr='<span class="'+el.color.txt+'"><span class="'+el.gly+'"></span>&nbsp;'+el.nameChi+'</span>';		
 			break;
 		}
 	}

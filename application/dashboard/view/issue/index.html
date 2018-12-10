@@ -19,7 +19,7 @@
 		
 		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新事务信息表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 			
-		<button class="btn btn-primary btn-sm btnIssOprt" data-iss-id="0" data-iss-oprt="_CREATE"><span class="glyphicon glyphicon-modal-window"></span>新增</button>
+		<button class="btn btn-primary btn-sm btnIssOprt" title="新增事务记录" data-iss-id="0" data-iss-oprt="_CREATE"><span class="glyphicon glyphicon-modal-window"></span>新增</button>
 			
 	</div>
 		
@@ -169,7 +169,7 @@ var	getEntHtmlCom=(nameEn)=>{
 	for(var i=0;i<issEntAttrArr.length;i++){
 		let arr=issEntAttrArr;
 		if (nameEn==arr[i].nameEn){
-			entHtml='<span class="'+arr[i].color.txt+'"><span class="'+arr[i].gly+'"></span>'+arr[i].nameChi+'事务</span>';
+			entHtml='<span class="'+arr[i].color.txt+'"><span class="'+arr[i].gly+'"></span>&nbsp;'+arr[i].nameChi+'事务</span>';
 			break;
 		}
 	}
@@ -210,13 +210,12 @@ var completeUlDropMenu=(numObj)=>{
 		aPropArr=[
 			{aClass:'aIss',dataStatus:name+'S_INPROCESS',gly:'',spTypeText:'[总计]&nbsp;',spLabel:'badge spLabel',spLabelText:numObj.S_INPROCESS},
 			{aClass:'divider'},
-			{aClass:'aIss',dataStatus:name+'S1',gly:'glyphicon glyphicon-send',spTypeText:'&nbsp;[送审]&nbsp;',spLabel:'label label-info spLabel',spLabelText:numObj.S1},
-			{aClass:'aIss',dataStatus:name+'S2',gly:'glyphicon glyphicon-check',spTypeText:'&nbsp;[审核]&nbsp;',spLabel:'label label-warning spLabel',spLabelText:numObj.S2},
-			{aClass:'aIss',dataStatus:name+'S3',gly:'glyphicon glyphicon-ok',spTypeText:'&nbsp;[审批]&nbsp;',spLabel:'label label-danger spLabel',spLabelText:numObj.S3},
-			{aClass:'aIss',dataStatus:name+'S4',gly:'glyphicon glyphicon-random',spTypeText:'&nbsp;[执行]&nbsp;',spLabel:'label label-primary spLabel',spLabelText:numObj.S4},
-			{aClass:'aIss aPill text-muted',dataStatus:name+'S_END',gly:'glyphicon glyphicon-off',spTypeText:'&nbsp;[完结]&nbsp;',spLabel:'spLabel',spLabelText:numObj.S_END}
+			{aClass:'aIss',dataStatus:name+'S1',gly:glyPref+'send',spTypeText:'&nbsp;[送审]&nbsp;',spLabel:labPref+'info spLabel',spLabelText:numObj.S1},
+			{aClass:'aIss',dataStatus:name+'S2',gly:glyPref+'check',spTypeText:'&nbsp;[审核]&nbsp;',spLabel:labPref+'warning spLabel',spLabelText:numObj.S2},
+			{aClass:'aIss',dataStatus:name+'S3',gly:glyPref+'ok',spTypeText:'&nbsp;[审批]&nbsp;',spLabel:labPref+'danger spLabel',spLabelText:numObj.S3},
+			{aClass:'aIss',dataStatus:name+'S4',gly:glyPref+'random',spTypeText:'&nbsp;[执行]&nbsp;',spLabel:labPref+'primary spLabel',spLabelText:numObj.S4},
+			{aClass:'aIss aPill text-muted',dataStatus:name+'S_END',gly:glyPref+'off',spTypeText:'&nbsp;[完结]&nbsp;',spLabel:'spLabel',spLabelText:numObj.S_END}
 		];
-	
 	obj.empty();
 	obj.closest('li').nextAll().remove();
 	

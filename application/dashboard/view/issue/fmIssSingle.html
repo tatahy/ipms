@@ -98,7 +98,7 @@ var comHtml=(opts)=>{
 	for(var i=0;i<oprtComAttrArr.length;i++){
 		let arr=oprtComAttrArr;
 		if (oprt==arr[i].nameEn){
-			oprtHtml='<p class="text-center">【<strong>'+topic+'</strong>】记录</p><p class="text-center">进行【<span class="'+arr[i].color.txt+'"><span class="'+arr[i].gly+'"></span>'+arr[i].nameChi+'</span>】</p>';
+			oprtHtml='<p class="text-center">【<strong>'+topic+'</strong>】记录</p><p class="text-center">进行【<span class="'+arr[i].color.txt+'"><span class="'+arr[i].gly+'"></span>&nbsp;'+arr[i].nameChi+'</span>】</p>';
 			break;
 		}
 	}
@@ -125,7 +125,7 @@ var buildOprtBtnCom=(oprt)=>{
 	
 	for(var i=0;i<arr.length;i++){
 		if(oprt==arr[i].nameEn){
-			btnHtml='<button type="submit" class="btn btn-sm '+arr[i].color.btn+'"data-oprt="'+arr[i].nameEn+'"><span class="'+arr[i].gly+'"></span>'+arr[i].nameChi+'</button>&nbsp;';
+			btnHtml='<button type="submit" class="btn btn-sm '+arr[i].color.btn+'"data-oprt="'+arr[i].nameEn+'"><span class="'+arr[i].gly+'"></span>&nbsp;'+arr[i].nameChi+'</button>&nbsp;';
 			break;
 		}
 	}	

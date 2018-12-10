@@ -231,13 +231,14 @@ const conIssPatStatusArr=[//除‘完结’以外的其它状态
                     '_PATS2-1'=>'新增-专利申请',
                     '_PATS2-2'=>'送审-已修改',
                     '_PATS2-3'=>'送审-已完善',
-                    '_PATS2-END'=>'审核-拒绝',
+                    
                     //label-warning，异常
                     '_PATS3'=>'审批',
                     '_PATS3-1'=>'审核-通过',
                     '_PATS3-2'=>'新增-续费申请',
-                    '_PATS3-END1'=>'审批-否决',
-                    '_PATS3-END2'=>'续费-放弃',
+                    '_PATS3-3'=>'审核-不予支持',
+                    //'_PATS3-END1'=>'审批-否决',
+//                    '_PATS3-END2'=>'续费-放弃',
                     //label-default，停用
                     '_PATS4'=>'执行',
                     '_PATS4-1'=>'审批-批准',
@@ -250,6 +251,8 @@ const conIssPatStatusArr=[//除‘完结’以外的其它状态
                     '_PATS4-END1'=>'申报-授权',
                     '_PATS4-END2'=>'申报-驳回',
                     '_PATS4-END3'=>'续费-授权',
+                    '_PATS4-END4'=>'审批-否决',
+                    '_PATS4-END5'=>'续费-放弃',
                     //label-default，销账
                     '_PATS_END'=>'完结'
                     ];
@@ -266,11 +269,12 @@ const conIssTheStatusArr=[//除‘完结’以外的其它状态
                     '_THES2-1'=>'新增-论文发表申请',
                     '_THES2-2'=>'送审-已修改',
                     '_THES2-3'=>'送审-已完善',
-                    '_THES2-END'=>'审核-拒绝',
+                    //'_THES2-END'=>'审核-拒绝',
                     //label-warning，审批
                     '_THES3'=>'审批',
                     '_THES3-1'=>'审核-通过',
-                    '_THES3-END'=>'审批-否决',
+                    '_THES3-2'=>'审核-不予支持',
+                    //'_THES3-END'=>'审批-否决',
                     //label-primary，执行
                     '_THES4'=>'执行',
                     '_THES4-1'=>'审批-批准',
@@ -283,6 +287,7 @@ const conIssTheStatusArr=[//除‘完结’以外的其它状态
                     '_THES4-8'=>'投稿-复核',
                     '_THES4-END1'=>'投稿-发表',
                     '_THES4-END2'=>'投稿-被拒',
+                    '_THES4-END3'=>'审批-否决',
                     //label-default，完结
                     '_THES_END'=>'完结'
                     ];
@@ -297,14 +302,18 @@ const conIssProStatusArr=[//除‘完结’以外的其它状态
                     '_PROS2-1'=>'',
                     '_PROS2-2'=>'送审-已修改',
                     '_PROS2-3'=>'送审-已完善',
-                    '_PROS2-END'=>'审核-拒绝',
+                    //'_PROS2-END'=>'审核-拒绝',
                     //label-warning，审批
                     '_PROS3'=>'审批',
                     '_PROS3-1'=>'审核-通过',
-                    '_PROS3-END'=>'审批-否决',
+                    '_PROS3-2'=>'审核-不予支持',
+                    '_PROS3-3'=>'复核-通过',
+                    '_PROS3-4'=>'复核-不予支持',
+                    //'_PROS3-END'=>'审批-否决',
                     //label-primary，执行
                     '_PROS4'=>'执行',
                     '_PROS4-1'=>'审批-批准',
+                    '_PROS4-END1'=>'审批-否决',
                     //label-default，完结
                     '_PROS_END'=>'完结'
                     ];
