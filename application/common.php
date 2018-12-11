@@ -7,7 +7,7 @@
  * 所有的公共常量都以"con"开头，再遵循驼峰命名法。
  */
 
-//定义需要进行权限管理的模块/实体
+//定义需要进行权限管理的模块/实体名称
 const conAuthEntNameArr=[
         ['nameEn'=>'_ISS','nameChi'=>'事务',
           'child'=>[['nameEn'=>'_PAT','nameChi'=>'专利事务'],['nameEn'=>'_THE','nameChi'=>'论文事务'],['nameEn'=>'_PRO','nameChi'=>'项目事务']]],
@@ -22,9 +22,9 @@ const conAuthEntNameArr=[
 //定义需要进行权限管理的模块/实体的权限
 const conAuthEntArr=[
   '_ISS'=>[
-    '_PAT'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'maintain'=>0],
-    '_PRO'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'maintain'=>0],
-    '_THE'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'maintain'=>0]
+    '_PAT'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
+    '_PRO'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
+    '_THE'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0]
   ],
   '_PAT'=>['edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
   '_PRO'=>['edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
@@ -32,6 +32,21 @@ const conAuthEntArr=[
   '_ATT'=>['upload'=>0,'download'=>0,'erase'=>0,'move'=>0,'copy'=>0],
   '_ASS'=>['read'=>0,'edit'=>0,'audit'=>0,'approve'=>0,'maintain'=>0],
   '_ADMIN'=>['enable'=>0]
+];
+
+//定义权限名称中英文对应关系
+const conAuthNameArr=[
+  '_ISS'=>[
+    '_PAT'=>['edit'=>'申报','audit'=>'审核','review'=>'复核','approve'=>'审批','execute'=>'执行','maintain'=>'维护'],
+    '_PRO'=>['edit'=>'申报','audit'=>'审核','review'=>'复核','approve'=>'审批','execute'=>'执行','maintain'=>'维护'],
+    '_THE'=>['edit'=>'申报','audit'=>'审核','review'=>'复核','approve'=>'审批','execute'=>'执行','maintain'=>'维护'],
+  ],
+  '_PAT'=>['edit'=>'撰写','audit'=>'审核','approve'=>'审批','execute'=>'执行','maintain'=>'维护'],
+  '_PRO'=>['edit'=>'撰写','audit'=>'审核','approve'=>'审批','execute'=>'执行','maintain'=>'维护'],
+  '_THE'=>['edit'=>'撰写','audit'=>'审核','approve'=>'审批','execute'=>'执行','maintain'=>'维护'],
+  '_ATT'=>['upload'=>'上传','download'=>'下载','erase'=>'删除','move'=>'移动','copy'=>'复制'],
+  '_ASS'=>['read'=>'查阅','edit'=>'编辑','audit'=>'审核','approve'=>'审批','maintain'=>'维护'],
+  '_ADMIN'=>['enable'=>'启用']
 ];
 
 //patent的类型数组

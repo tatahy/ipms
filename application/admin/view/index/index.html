@@ -157,7 +157,9 @@ footer {
 <div id="divContainer" class="container-fluid">
 	
   	<button id="openBtn" type="button" class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-chevron-right"></span><span style="font-size:16px;">显示</span></button>
-  
+  	
+	<div id="divLoadParam" data-list-rows="{$loadParam.listRows}" data-page-num="{$loadParam.pageNum}" data-show-id="{$loadParam.showId}" class="sr-only"></div>
+	
   	<div id="content" style="padding-top:5px;"><p class="text-center" style="font-size:28px;">加载中……</p></div>
 	
 </div>
@@ -185,11 +187,38 @@ var showSideNavbar=(y)=>{
 		$('#divContainer').removeClass('sidenav-show');
 	}
 };
+
+// 作用：提交锚点值给后端，由后端返回需加载的页面文件
+var loadTplFile=()=>{
+	let sId=window.location.hash,
+		aObj='',
+		obj=$('#divLoadParam'),
+		loadParamDefault={
+		'listRows':obj.data('listRows'),
+		'pageNum':obj.data('pageNum'),
+		'showId':obj.data('showId')
+		};
+	//load参数都从$('#divLoadParam')获取
+	let loadParam={
+		'listRows':obj.data('listRows'),
+		'pageNum':obj.data('pageNum'),
+		'showId':obj.data('showId')
+		},
+		url=(sId=='#usergroupList')?'usergroupList':'tplFile';
+	sId=(null==sId || sId=='#undefined')?'#sysSummary':sId;
+	aObj=$('a.aTab[href="'+sId+'"]');
+	aObj.tab('show');
+	loadParam=$.extend({},loadParamDefault,loadParam);
+	
+    //提交锚点值给后端，由后端返回需加载的页面文件
+	$("#content").load(url,{sId:sId,loadParam:loadParam}); 
+};
+
 //利用自调用匿名函数立即执行的特点， 页面初始化
 (function($){
 	$('[data-toggle="tooltip"]').tooltip();   
 
-	loadTplFile(window.location.hash);
+	loadTplFile();
 	
 	showSideNavbar(true);	
 
@@ -199,18 +228,19 @@ $(document).ready(function(){
 
 	<!-- //点击nav-pills中的各个按钮后，显示对应的页面-->
 	$('.aTab').click(function(){
-        var sId = $(this).attr('href');  //a的href属性值即是页面的锚点值
-		<!-- window.location.hash = sId;  //设置锚点 -->
+    	$(this).tab('show');
+		//a的href属性值即是页面的锚点值
+		window.location.hash = $(this).attr('href'); 
 		//a所在li高亮
-		$(this).tab('show');
-        loadTplFile(sId);              //加载锚点对应的页面文件
+		<!--  -->
+        loadTplFile();              //加载锚点对应的页面文件
     });	
-	//锚点值与a的href属性值相同的a所在li高亮
-	$('.aTab').each(function(){
-		if(window.location.hash==$(this).attr('href')){
-			$(this).tab('show');
-		}
-    });	
+	<!-- //锚点值与a的href属性值相同的a所在li高亮 -->
+	<!-- $('.aTab').each(function(){ -->
+		<!-- if(window.location.hash==$(this).attr('href')){ -->
+			<!-- $(this).tab('show'); -->
+		<!-- } -->
+    <!-- });	 -->
 	
 	//显示SideNavbar
 	$('#openBtn').click(function(){
@@ -223,12 +253,7 @@ $(document).ready(function(){
 });	
 	
 <!-- function -->
-	// 作用：提交锚点值给后端，由后端返回需加载的页面文件
-function loadTplFile(sId){
-	if(null==sId || sId=='#undefined'){sId='#sysSummary';}
-    //提交锚点值给后端，由后端返回需加载的页面文件
-	$("#content").load('tplFile',{'sId':sId}); 
-}
+	
 	
 <!-- function -->
 

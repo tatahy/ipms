@@ -289,9 +289,9 @@ const conA=[
 /**
      * 得到$parentArr的子集
      * @param  Array $parentArr 一维关联数组，无重复值。
-     * @param  Array $clueArr, 一维关联数组，可能有重复值。
+     * @param  Array $clueArr, 一维索引数组，可能有重复值。
      * @param  String $type, 'KEY'| 'VALUE'，指定$clueArr的类型，默认为'KEY'
-     * @return Array $childArr 返回的一维关联数组，是$parentArr的子集。
+     * @return Array $childArr 返回的一维关联数组，是$parentArr的子集，包含无重复值的$clueArr。
      */
 function get_child_array($parentArr,$clueArr=[],$type='KEY')
 {
@@ -318,13 +318,21 @@ function get_child_array($parentArr,$clueArr=[],$type='KEY')
   //去重
   $clueArr=array_unique($clueArr);
 
-  //由$clueArr作为key数组在$parentArr中寻找其对应的value数组        
+  //由$clueArr作为key数组在$parentArr中寻找其对应的value数组,去掉在$parentArr中不存在的项        
   foreach($clueArr as $key=>$val){
     foreach($parentArr as $k=>$v){
       if($val==$k){
         $cArr[$key]=$v;
       }
     }
+    //$key是数字索引，$val是$parentArr中的键名
+    //if(array_key_exists($val,$parentArr)){
+//      $cArr[$key]=$parentArr[$val];
+//    }else{
+//      $cArr[$key]='';
+//      unset($cArr[$key]);
+//      unset($clueArr[$key]);
+//    }
   }
         
   $childArr=array_combine($childArrKeys,$childArrValues);

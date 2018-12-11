@@ -179,13 +179,13 @@ class IssueController extends Controller
       $whereArr['writer']=!empty($searchData['writer'])?['like','%'.$searchData['writer'].'%']:'';
       $whereArr['registrar']=!empty($searchData['registrar'])?['like','%'.$searchData['registrar'].'%']:'';
       $whereArr['issnum']=!empty($searchData['issnum'])?['like','%'.$searchData['issnum'].'%']:'';
-      //前端select值搜索，=select值，issue，2个
+      //前端select值搜索，=select值(兼容select标签的multiple属性设置)，issue，2个
       $whereArr['dept']=!empty($searchData['dept'])?['in',$searchData['dept']]:'';
       $whereArr['status']=!empty($searchData['status'])?['in',$searchData['status']]:'';
       
       //前端输入的关键字搜索,like关键字，关联对象，1个
       $whereEntArr['topic']=!empty($searchData['issEntName'])?['like','%'.$searchData['issEntName'].'%']:'';
-      //前端select值搜索，=select值，关联对象，2个
+      //前端select值搜索，=select值(兼容select标签的multiple属性设置)，关联对象，2个
       $whereEntArr['type']=!empty($searchData['issEntType'])?['in',$searchData['issEntType']]:'';
       $whereEntArr['status']=!empty($searchData['issEntStatus'])?['in',$searchData['issEntStatus']]:'';
        
@@ -242,10 +242,11 @@ class IssueController extends Controller
           $searchResultNum=$relSet->count();
           //关联对象有查询结果
           if($searchResultNum){
-            
+            //后续分页渲染使用
             $issmapIdArr=$relSet->column('id');
             //从排序后的数组中截取本页所需的部分，取出id字段值
             $idArr=$relSet->slice(($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows'])->column('id');
+            //清空issList，便于重新组装
             $issList=[];
             //组装本页的issList。根据上一步中得到的arr，从数据集$baseSet中抽出对应的iss记录，将抽出记录按照arr的顺序组装好。
             foreach($idArr as $key=>$val){
@@ -268,7 +269,7 @@ class IssueController extends Controller
       $pageQuery=$issMdl->issStatusQuery($issStatus,$entName)->where('issmap_id','in',$issmapIdArr)
                       ->order($sortData['sortName'],$sortData['sortOrder']);
       
-      //符合查询条件的所有iss记录分页,每页$listRows条记录
+      //分页对象，符合查询条件的所有iss记录分页,每页$listRows条记录
       $pageSet=$pageQuery->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
                         'query'=>['listRows'=>$sortData['listRows']]]);       
       //--block end
@@ -285,7 +286,7 @@ class IssueController extends Controller
         //排序数组
         'sortData'=>$sortData,
         //将数组转换为json字符串，编码为Unicode字符（\uxxxx）。
-        //前端就可以直接作为json对象使用，若前端文件采用utf-8编码，汉字也可直接解析显示。
+        //前端就可以使用json对象的访问方法或是关联数组的访问方法进行使用，若前端文件采用utf-8编码，汉字也可直接解析显示。
         'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
         //记录总数
         'searchResultNum'=>$searchResultNum 

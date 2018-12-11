@@ -7,6 +7,7 @@ use think\Model;
 
 use app\admin\model\Dept as DeptModel;
 use app\admin\model\Usergroup as UsergroupModel;
+use app\admin\model\Usergroup1 as UsergroupModel1;
 use app\admin\model\User as UserModel;
 
 class IndexController extends \think\Controller
@@ -49,10 +50,11 @@ class IndexController extends \think\Controller
     {
       //用户是否已经登录。
       $this->_loginUser();
-       
+      $loadParam=['listRows'=>10,'pageNum'=>1,'showId'=>0];
       $this->assign([
               'home'=>$request->domain(),
               'username'=>$this->username,
+              'loadParam'=>$loadParam,
               'year'=>date('Y')
               
         ]);
@@ -204,14 +206,10 @@ class IndexController extends \think\Controller
     public function tplFile(Request $request,UsergroupModel $usergroupMdl)
     {
       $this->_loginUser();
-      //前端发送的是锚点值
-      if(!empty($request->param('sId'))){
-        $tplFile=$request->param('sId');
-      }else{
-        $tplFile='#sysSummary';
-      }
       
-      //返回模板文件
+      $tplFile=!empty($request->param('sId'))?$request->param('sId'):'#sysSummary';
+           
+      //前端发送的是锚点值返回模板文件
       if(substr($tplFile,0,1)=='#'){
         $tplFile=substr($tplFile,1);
         $this->redirect($tplFile);
@@ -496,10 +494,48 @@ class IndexController extends \think\Controller
       return 'UserOprt1';
     }
     
-    public function UsergroupList(Request $request,UsergroupModel $usrgroupMdl)
+    public function UsergroupList(UsergroupModel $userGpMdl)
     {
+      $request=$this->request;
+      $loadParamDefaults=['listRows'=>10,'pageNum'=>1,'showIssId'=>0];
+      $loadParam=!empty($request->param('loadParam/a'))?$request->param('loadParam/a'):$loadParamDefaults;
       
-      return 'UsergroupList';
+      $loadParam=array_merge($loadParamDefaults,$loadParam);
+      $pageNum=$loadParam['pageNum'];
+      $listRows=$loadParam['listRows'];
+ 
+      //$nameEn=strtolower(ltrim($str,"_"));
+      //
+      
+      $userGpSet=$userGpMdl->where('id','>',0)->select();
+      
+      //
+      $userGpSet=is_array($userGpSet)?collection($userGpSet):$userGpSet;
+      $userGpList=$userGpSet->slice(($pageNum-1)*$listRows,$listRows);
+      $pageSet=$userGpMdl->where('id','>',0)->paginate($listRows,false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$pageNum,
+                        'query'=>['listRows'=>$listRows]]);    
+      
+      $this->assign([
+        'home'=>$request->home,
+        //结果集
+        'userGpList'=>$userGpList,
+        
+        //分页对象
+        'pageSet'=>$pageSet,
+        
+        'pageNum'=>$pageNum,
+        'listRows'=>$listRows,
+        
+        'searchNum'=>$userGpSet->count(),
+        'loadParam'=>$loadParam,
+        'auth'=>json_encode(conAuthNameArr,JSON_UNESCAPED_UNICODE)
+        //排序数组？
+        
+        //查询数组？
+      
+      ]);
+      
+      return view();
     }
     
     public function UsergroupOprt1(Request $request,UsergroupModel $usrgroupMdl)

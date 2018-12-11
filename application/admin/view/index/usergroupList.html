@@ -1,100 +1,167 @@
 <!-- usergroupList.html -->
 <div>
-	<h4><span class="label label-info" style="font-size:16px;">系统用户组总数&nbsp;<span class="badge">{$usergroupNum}</span></span></h4>
-	<p>
+	<h4><button class="btn btn-sm btn-info" style="font-size:16px;cursor:unset;">系统用户组总数<span class="badge">{$searchNum}</span></button></h4>
+	<p class="text-right">
 		<!--// bootstap通过button调用Model -->		
-		<button type="button" class="btn-link btnUsergroup" data-oprt="_CREATE" data-id="0" data-toggle="modal" data-target="#modalEditUsergroup"><span class="glyphicon glyphicon-duplicate">新增</span></button>
+		<button type="button" class="btn-link btnOprt" data-oprt="_CREATE" data-id="0" data-toggle="modal" data-target="#modalEditUsergroup"><span class="glyphicon glyphicon-duplicate"></span>新增</button>
 	</p> 	
-			
+	
 	<div class="table-responsive">
 	
-		<table class="table table-hover table-condensed table-bordered">
-			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>用户组列表</h4></caption>	
+		<table id="tblUserGpList" class="table table-hover table-condensed table-bordered">
+			<caption class="text-center" style="border-bottom:1px solid #eee;">
+				<h4>用户组列表
+					<div class="btn-group">
+      				<button type="button" class="btn btn-xs btn-primary dropdown-toggle" data-toggle="dropdown" >选择显示字段<span class="caret"></span></button>
+      				<ul class="dropdown-menu" >
+						<li><div class="checkbox"><label><input type="checkbox" value="all" checked><span class="text-primary">全选</span></label></div></li>
+						<li class="divider"></li>
+					</ul>
+    				</div>
+				</h4>
+			</caption>	
 			<thead>
 				<tr >
 					<th class="text-center">序号</th>
-					<th>用户组名</th>
+					<th class="text-center">用户组名</th>
 					<th>用户组说明</th>
-					<th class="text-center">“事务”权限</th>
-					<th class="text-center">“固定资产”权限</th>
-					<th class="text-center">“专利”权限</th>
-					<th class="text-center">“项目”权限</th>
-					<th class="text-center">“论文”权限</th>
-					<th class="text-center">“附件”权限</th>
-					<th class="text-center">“管理”权限</th>
-					<th>操作</th>
+					<th data-ent-name="_ISS-_PAT">“专利事务”权限</th>
+					<th data-ent-name="_ISS-_PRO">“项目事务”权限</th>
+					<th data-ent-name="_ISS-_THE">“论文事务”权限</th>
+					<th data-ent-name="_ASS">“固定资产”权限</th>
+					<th data-ent-name="_PAT">“专利”权限</th>
+					<th data-ent-name="_PRO">“项目”权限</th>
+					<th data-ent-name="_THE">“论文”权限</th>
+					<th data-ent-name="_ATT">“附件”权限</th>
+					<th data-ent-name="_ADMIN">“管理”权限</th>
+					<th class="text-center">操作</th>
 				</tr>
 			</thead>
 				
 			<tbody><!-- 此处显示数据库查询后的数据集 -->
-			{volist name="$usergroup" id="vo" empty="暂时没有数据"}
+			{volist name="$userGpList" id="vo" empty="暂时没有数据"}
 				<tr class="text-center">
-					<td>{$i+($usergroupPageNum-1)*$usergroupTableRows}</td>
-					<td class="name text-left">{$vo.name}</td>
-					<td class="name text-left">{$vo.description}</td>
-					<!-- //iss -->
-					<td class="authority"> 
+					<td>{$i+($pageNum-1)*$listRows}</td>
+					<td class="text-left">{$vo.name}</td>
+					<td class="text-left">{$vo.description}</td>
+					<!-- //_ISS_PAT -->
+					{present name="$vo.authority.iss.pat"}
+					<td class="tdAuth"> 
 						<div style="padding-top:3px" class="text-left">
-						{foreach name="$vo.authority.iss" item="v" }
-    						<span value="{$v}">{$key}</span>
+						{foreach name="$vo.authority.iss.pat" item="v" }
+    						<span data-val="{$v}">{$key}</span>
 						{/foreach}
 						</div>
 					</td>
+					{else /}
+					<td>无</td>
+					{/present}
+					
+					<!-- //_ISS_PRO -->
+					{present name="$vo.authority.iss.pro"}
+					<td class="tdAuth"> 
+						<div style="padding-top:3px" class="text-left">
+						{foreach name="$vo.authority.iss.pro" item="v" }
+    						<span data-val="{$v}">{$key}</span>
+						{/foreach}
+						</div>
+					</td>
+					{else /}
+					<td>无</td>
+					{/present}
+					<!-- //_ISS_THE -->
+					{present name="$vo.authority.iss.the"}
+					<td class="tdAuth"> 
+						<div style="padding-top:3px" class="text-left">
+						{foreach name="$vo.authority.iss.the" item="v" }
+    						<span data-val="{$v}">{$key}</span>
+						{/foreach}
+						</div>
+					</td>
+					{else /}
+					<td>无</td>
+					{/present}
 					<!-- //ass -->
-					<td class="authority"> 
+					{present name="$vo.authority.ass"}
+					<td class="tdAuth"> 
 						<div style="padding-top:3px" class="text-left">
 						{foreach name="$vo.authority.ass" item="v" }
-    						<span value="{$v}">{$key}</span>
+    						<span data-val="{$v}">{$key}</span>
 						{/foreach}
 						</div>
 					</td>
+					{else /}
+					<td>无</td>
+					{/present}
 					
 					<!-- //pat -->
-					<td class="authority"> 
+					{present name="$vo.authority.pat"}
+					<td class="tdAuth">
 						<div style="padding-top:3px" class="text-left">
 						{foreach name="$vo.authority.pat" item="v" }
-    						<span value="{$v}">{$key}</span>
+    						<span data-val="{$v}">{$key}</span>
 						{/foreach}
 						</div>
 					</td>
+					{else /}
+					<td>无</td>
+					{/present}
 					<!-- //pro -->
-					<td class="authority"> 
+					{present name="$vo.authority.pro"}
+					<td class="tdAuth"> 
 						<div style="padding-top:3px" class="text-left">
 						{foreach name="$vo.authority.pro" item="v" }
-    						<span value="{$v}">{$key}</span>
+    						<span data-val="{$v}">{$key}</span>
 						{/foreach}
 						</div>
 					</td>
+					{else /}
+					<td>无</td>
+					{/present}
 					<!-- //the -->
-					<td class="authority"> 
+					{present name="$vo.authority.the"}
+					<td class="tdAuth"> 
 						<div style="padding-top:3px" class="text-left">
 						{foreach name="$vo.authority.the" item="v" }
-    						<span value="{$v}">{$key}</span>
+    						<span data-val="{$v}">{$key}</span>
 						{/foreach}
 						</div>
 					</td>
+					{else /}
+					<td>无</td>
+					{/present}
 					<!-- //att -->
-					<td class="authority "> 
+					{present name="$vo.authority.att"}
+					<td class="tdAuth"> 
 						<div style="padding-top:3px" class="authatt text-left">
 						{foreach name="$vo.authority.att" item="v" }
-    						<span value="{$v}">{$key}</span>
+    						<span data-val="{$v}">{$key}</span>
 						{/foreach}
 						</div>
 					</td>
-					<td class="authority">
+					{else /}
+					<td>无</td>
+					{/present}
+					
+					{present name="$vo.authority.admin"}
+					<td class="tdAuth">
 						<div style="padding-top:3px">
 						{foreach name="$vo.authority.admin" item="v" }
-    						<span value="{$v}">{$key}</span>
+    						<span data-val="{$v}">{$key}</span>
 						{/foreach}	
 							<!-- <span class="" value="{ $vo.bgo}" >访问后台</span> -->
 						</div>
 					</td>
+					{else /}
+					<td>无</td>
+					{/present}
+					
 					<td class="button text-left">
-						<button type="button" class="btn-link btnUsergroup" data-id="{$vo.id}" data-oprt="_EDIT" data-toggle="modal" data-target="#modalEditUsergroup" ><span class="glyphicon glyphicon-edit"></span>编辑</button>
+						<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_EDIT" data-toggle="modal" data-target="#modalEditUsergroup" ><span class="glyphicon glyphicon-edit"></span>编辑</button>
 						
-						<button type="button" class="btn-link btnUsergroup" data-id="{$vo.id}" data-oprt="_DISABLE"><span class="text-warning glyphicon glyphicon-ban-circle"></span>停用</button>
+						<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_DISABLE"><span class="text-warning glyphicon glyphicon-ban-circle"></span>停用</button>
 							
-						<span>（已停用）</span><button class="btn-link btnUsergroup" data-id="{$vo.id}" data-oprt="_ENABLE" enable="{$vo.enable}"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
+						<span>（已停用）</span><button class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_ENABLE" enable="{$vo.enable}"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
 						
 					</td>
 				</tr>
@@ -102,12 +169,12 @@
 			</tbody>
 		</table>
 	</div>
-	<div id="divUsergroupTableRows" class="col-sm-12 text-right search">
-		<div class="col-sm-10 text-right">{$usergroupPage}</div>
+	<div id="divListRows" class="col-sm-12 text-right" style="padding-top:10px;">
+		<div class="col-sm-10">{$pageSet->render()}</div>
 						
 		<div class="form-group form-group-sm col-sm-2">
 			<span class="">每页记录行数：</span>
-			<select class="form-control" id="usergroupTableRows">
+			<select class="form-control" id="listRows">
 				<option value="5">5</option>
 				<option value="10">10</option>
 				<option value="15">15</option>
@@ -146,83 +213,186 @@
 <!-- / Modal "modalEditUsergroup" -->
 	
 <script>
+//控制显示/隐藏字段的组件的属性数组
+var columnToggleArr=[];
+//
+var authNameObj={$auth};
+
+//每一列内的span内容格式修改
+var spComModify=()=>{
+	let spSet=$('#tblUserGpList tbody .tdAuth').find('span')
+		auth=authNameObj;
+	
+	spSet.each(function(){
+		let nameEn=$(this).text(),
+			val=$(this).data('val')
+			type=$(this).closest('td').data('hideVal'),
+			typeArr=[],
+			nameChi='';
+		
+		//格式修改
+		$(this).css({"padding":"1px 5px","border-radius":"3px"})		
+		if(val){
+			$(this).addClass("text-primary bg-info");
+		}else{
+			$(this).addClass("text-muted");
+		}	
+		
+		//将span的text转换成中文
+		if(type.indexOf('-')>0){
+			typeArr=type.split('-');
+			//要求type是类似xx-yy的字符串，如果为xx-yy-zz该如何处理？？
+			nameChi=authNameObj[typeArr[0]][typeArr[1]][nameEn];
+			
+		}else{
+			nameChi=authNameObj[type][nameEn];
+		}
+		
+		$(this).text(nameChi);
+		<!-- console.log(typeArr); -->
+	});
+	
+	
+};
+
+var buildColumnToggleCom=()=>{
+	let arr=columnToggleArr;
+	//生成单选框组件属性数组
+	if(arr.length==0){
+		$('#tblUserGpList').find('th').each(function(){
+			<!-- tblColObjArr.push($(this).text()); -->
+			let nameEn=$(this).data('entName'),
+				nameChi=$(this).text();
+			<!-- let nameChi=$(this).children('a').html(); -->
+			if(nameEn){
+				arr.push({'nameChi':nameChi,'val':nameEn,'showFlag':true});
+			}else{
+				arr.push({'nameChi':nameChi,'val':0,'showFlag':false});
+			}
+		});
+		//附加value="all"的input复选框信息
+		arr.push({'nameChi':'全选','val':'all','showFlag':$('#tblUserGpList ul input').eq(0).prop('checked')});
+		//更新组件属性数组
+		columnToggleArr=arr;
+	}
+	//由属性数组生成单选框组件
+	arr.forEach(function(el,index){
+		let obj=$('#tblUserGpList');
+		let trObj=$('#tblUserGpList').find('tr');
+		//添加col标签
+		obj.find('colgroup').append('<col data-col-index="'+index+'">');
+			
+		//生成显示字段的多选框内容，
+		if(el.val && el.val!='all'){
+			let labelObj=$('<label></label>').prepend($('<input />').attr({'type':'checkbox','checked':true}).val(el.val)).append($('<span></span>').addClass('text-primary').html(el.nameChi)),
+				divObj=$('<div></div>').append(labelObj).addClass('checkbox');
+			obj.find('ul').append($('<li></li>').append(divObj));
+		}
+		//每个th、td添加data-hide-val=""，相同的data-hide-val=""用于组合成一个col
+		trObj.each(function(){
+			if(el.val){
+				$(this).children().eq(index).attr('data-hide-val',el.val);
+			}
+		});	
+	});
+	
+	//对生成的控制显示隐藏字段的单选框格式进行微调
+	$('#tblUserGpList caption div.checkbox').css('padding-left','10px').find('input').css('margin-top','0');	
+};
+
+
+//根据columnToggleArr的值，改变复选框，显示/隐藏对应column
+var columnToggle=()=>{
+	//column，一个([data-hide-val="'+el.val+'"]的th、td集合
+	columnToggleArr.forEach(function(el){		
+		//复选框
+		$('#tblUserGpList input').each(function(){
+			if($(this).val()==el.val){
+				//改变复选框的值
+				$(this).prop('checked',el.showFlag);
+				//改变复选框的字体颜色
+				$(this).next().removeClass('text-primary text-muted');
+				if(el.showFlag){
+					$(this).next().addClass('text-primary');
+					//显示col
+					$('#tblUserGpList').find('[data-hide-val="'+el.val+'"]').show();
+				}else{
+					$(this).next().addClass('text-muted');
+					//隐藏col
+					$('#tblUserGpList').find('[data-hide-val="'+el.val+'"]').hide();
+				}
+			}
+		});
+	});	
+};
+
+
+//自调用匿名函数立即执行的特点，进行页面初始化。
+(function($){
+		
+	//每个$('#tblUserGpList thead a')添加属性
+	$('#tblUserGpList thead th[data-ent-name]').addClass('text-center text-primary');
+	
+	buildColumnToggleCom();
+	columnToggle();
+	spComModify();
+	// 激活tooltip
+	$('[title]').tooltip();
+})(jQuery);
+
 $(document).ready(function(){
 		
-	<!-- // 对用户组表格中<td>里的<button>进行格式设置 -->
-	$('tbody td button').each(function(){
-		if($(this).attr('enable')=='1'){
-			$(this).prevAll('button').show();
-            $(this).prev('span').hide();
-			$(this).hide();
-			//所在行去掉上色
-			$(this).parent().parent().removeClass("danger text-muted");
-		}else{
-			$(this).prevAll('button').hide();
-			$(this).show();
-			//所在行上色
-			$(this).parent().parent().addClass("danger text-muted");
-		}
-	});
-	//对“superadmin”组只有编辑权限。进一步优化：若登录用户属于“superadmin”组才有，其他的用户都没有。
-	$('tbody tr').each(function(){
-		var name=$(this).find('td.name').text();
-		if('superadmin'==name){
-			$(this).find('button[data-oprt="_DISABLE"]').hide();
-			$(this).find('button[data-oprt="_UPDATE"]').show();
-		}		
-	});
-   
-   <!-- // 对用户组页面中<td>里的<span>进行格式设置 -->
-	$("td.authority span").each(function(){
-    	if($(this).attr("value")=="0"){
-			$(this).addClass("text-muted").css({"padding":"5px","border-radius":"3px"});
-		}else{
-			$(this).addClass("text-primary bg-info").css({"padding":"5px","border-radius":"3px"});
-		}	
-		var str=$(this).text();
-		//将span的text转换成中文
-		$(this).text(textEnToChi(str));
-   	});
-	//.btnUsergroup的按钮分类动作_ADDNEW、_EDIT、_DISABLE、_ENABLE
-	$('button.btnUsergroup').click(function(){
-		var id=$(this).attr('data-id');
-		var oprt=$(this).attr('data-oprt');
-		var htmlStr=$(this).html();
-		if(oprt=='_ADDNEW' || oprt=='_EDIT'){
-			ajaxModalShow($('#modalEditUsergroup'),'usergroupOprt',id,oprt,htmlStr);
-		}else{
-			ajaxOprt($(this),'usergroupOprt',id,oprt);
-		}
-		
-		if(oprt!='_ADDNEW'){
-			//先去掉上色
-			$(this).closest('tbody').children('tr').removeClass('bg-warning');
-			//所在行上色
-			$(this).closest('tr').addClass('bg-warning');
-		}
-	});
+	//btnOprt点击
+	
 	
 	<!-- //表格每页显示记录行数 -->
-	$("#usergroupTableRows").val('{$usergroupTableRows}'); 
-	$("#usergroupTableRows").change(function(){
-		<!-- //根据每页显示记录行数加载页面 -->
-		$("#content").load("sysUsergroup",{"usergroupTableRows":$(this).val()});
+	$('#listRows').val('{$loadParam.listRows}'); 
+	//listRow选择change	
+	$('#listRows').change(function(){
+		let listRows=$(this).val()*1,
+			obj=$('#divLoadParam');
+		//向$('#divLoadParam')汇集
+		if(listRows){
+			obj.data('listRows',listRows);
+			//分页从第一页开始
+			obj.data('pageNum',1);
+		}
+		//调用index.html中的loadTplFile()
+		loadTplFile();
+	});	
 	
+	//选择显示/隐藏字段	
+	$('#tblUserGpList ul input').click(function(){
+		//复选框点击后的值
+		let checkVal=$(this).prop('checked'),
+			val=$(this).val(),
+			arr=columnToggleArr;
+		if(val=='all'){
+			arr.forEach(function(el,index){
+				el.showFlag=checkVal;
+			});
+		}else{
+			for(let i=0;i<arr.length;i++){
+				if(val==arr[i].val){
+					arr[i].showFlag=checkVal;
+				}
+			}
+		}
+		//修改columnToggleArr
+		columnToggleArr=arr;
+		
+		columnToggle();	
 	});
 	
-	<!-- // 点击分页中的a(页数按钮)分页显示 -->
-	$('#divUsergroupTableRows a').click(function(event){
-		// a所在分页页数
-		var pageStr=$(this).text();
-		var pageNum;
-		//(li.active)所代表的页数
-		var pageNumActive=$('#divUsergroupTableRows li.active').children('span').text();
-		var rows= $('#usergroupTableRows').val();
+	//分页click
+	$('#divListRows a').click(function(evt){
+			// a所在分页页数
+		let pageStr=$(this).text(),pageNum,
+			//(li.active)所代表的页数
+			pageNumActive=$('#divListRows li.active').children('span').text();
+
+		evt.preventDefault();
 		
-		// jQuery的preventDefault()方法阻止元素发生默认的行为。阻止访问a的URL
-        event.preventDefault();
-		
-		//点击分页中的a(页数按钮)，
 		switch(pageStr){
 			case'»':
 				//用"*"确保得到的是加法运算结果，而不是字符串
@@ -234,158 +404,20 @@ $(document).ready(function(){
 			break;
 			
 			default:
-				pageNum=pageStr;
+				pageNum=pageStr*1;
 			break;
 		}
-		
-		// 重新加载自己到index2.html页面中的<div id="content"></div>
-		$('#content').load('sysUsergroup',{'usergroupPageNum':pageNum,'usergroupTableRows':rows});
+		//排序有关的值向$('#divTblSortData')汇集
+		if(pageNum){
+			$('#divLoadParam').data('pageNum',pageNum);
+		}
+		//调用index.html中的loadTplFile()
+		loadTplFile();
 	});
 	
-<!-- function -->
-	//**函数名：ajaxModalShow
- 	//* 作用：本页面内ajaxModalShow
-	//* 参数modalObj，类型：对象。值：不为空。说明：modal对象。
-	//* 异步请求的url,类型：字符串。值：不为空。说明：ajax操作的URL。
-	//* 参数id，类型：数值。值：调用函数的对象的属性'data-id'值。
-	//* 参数oprt，类型：字符串。值：调用函数的对象的属性'data-oprt'值。
-	//* 参数h4Html，类型：字符串。值：调用函数的对象的html值。
-	//* 返回值：无
-	function ajaxModalShow(modalObj,url,id,oprt,h4Html){
-		
-		//load成功后修改modal页面显示
-		$('#divEditUsergroup_load').load(url,{'oprt':oprt,'id':id},function(){
-			// 标题改名
-			modalObj.find('h4').html('【'+h4Html+'】用户组');
-			//修改#modalEditUsergroup的data-oprt属性值
-			modalObj.attr('data-oprt',oprt);
-			
-			//去掉标题底色
-			switch(oprt){
-				case '_ADDNEW':
-					modalObj.find('.modal-header').addClass("bg-info");
-				break;
-				case '_EDIT':
-					modalObj.find('.modal-header').removeClass("bg-info");
-				break;
-			}
-			// 清除输入框的格式
-			<!-- modalObj.find('.modal input').parent().parent().removeClass("has-success").removeClass("has-error");  -->
-			modalObj.find('.has-feedback').removeClass("has-success").removeClass("has-error"); 
-		
-    		modalObj.find('.spTips').hide();
-    		modalObj.find('.spOk').hide();
-    		modalObj.find('.spRemove').hide();
-			
-			//根据.modal的'data-oprt'值选定button，初始化赋值
-			$('#modalEditUsergroup button:submit').hide();
-			switch($('.modal').attr('data-oprt')){
-				case '_ADDNEW':
-					$('#btnCreate').show();
-					$('#oprt').val('_CREATE');
-				break;
-				case '_EDIT':
-					$('#btnUpdate').show();
-					$('#btnDelete').show();
-					$('#oprt').val('_UPDATE');
-				break;
-			}
-
-			$('.modal').on('shown.bs.modal', function(){
-				$('.inputCheck').eq(0).focus();
-			});			
-		}); 
-	}
-	
-	//**函数名：ajaxOprt
- 	//* 作用：本页面ajax操作
-	//* 参数btnObj，类型：对象。值：不为空。说明：btn对象。
-	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
-	//* 参数id，类型：数值。值：调用函数的对象的属性'data-id'值。
-	//* 参数oprt，类型：字符串。值：调用函数的对象的属性'data-oprt'值。
-	//* 返回值：无
-	function ajaxOprt(btnObj,url,id,oprt){
-		$.ajax({
-			type : 'post',
-			async : true,  //异步请求
-			url : url, 
-			<!-- // 发送到服务器的数据 -->
-			data : {'oprt':oprt,'id':id},
-			timeout:2000,
-			<!-- // 指定服务器端response的数据类型为json -->
-			dataType:"json",
-			success:function(backData){
-				<!-- var obj=$('tbody button[data-oprt="_ENABLE"][data-id="'+backData.id+'"]'); -->
-				btnObj.hide();
-				if(backData.enable){
-					btnObj.prevAll('button').show();
-					btnObj.prev('span').hide();
-					//本行去掉上色
-					btnObj.closest('tr').removeClass("danger text-muted");
-					$.alert('用户组【'+btnObj.closest('tr').children('.name').text()+'】<span class="label label-success">启用</span>&nbsp;成功');
-				}else{
-					btnObj.prevAll().hide();
-					btnObj.nextAll().show();
-					//本行上色
-					btnObj.closest('tr').addClass("danger text-muted");
-					$.alert('用户组【'+btnObj.closest('tr').children('.name').text()+'】<span class="label label-danger">停用</span>&nbsp;成功');
-				}
-			},
-			error: function() {
-               	$.alert('与服务器通讯超时，请稍后再试！');
-            }
-		});	
-	}
-	
-	//**函数名：textEnToChi
- 	//* 作用：本页面特定英文字符串转换成中文字符串
-	//* 参数text，类型：字符串。值：不为空。说明：待转换的英文字符串。
-	//* 返回值：中文字符串
-function textEnToChi(text){
-	switch(text){
-		case 'edit':
-            text='编辑';
-        break;
-        case 'audit':
-            text='审核';
-        break;
-        case 'approve':
-            text='审批';
-        break;
-        case 'execute':
-            text='执行';
-        break;
-        case 'maintain':
-            text='维护';
-        break;
-       //...................附件.....................
-        case 'upload':
-            text='上传';
-        break;
-        case 'download':
-            text='下载';
-        break;
-        case 'erase':
-            text='删除';
-        break;
-        case 'move':
-            text='移动';
-        break;
-        case 'copy':
-            text='复制';
-        break;
-		case 'enable':
-	        text='启用';
-         break;
-		case 'read':
-	        text='查阅';
-         break;
-	}
-	return text;
-}
-	
-<!--/ function -->
 });
+
+
 </script>
 		
 		

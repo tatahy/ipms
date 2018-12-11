@@ -1,7 +1,7 @@
 <!-- sysUsergroup.html -->
 <div>
-	<h4><span class="label label-info" style="font-size:16px;">系统用户组总数&nbsp;<span class="badge">{$usergroupNum}</span></span></h4>
-	<p>
+	<h4><button class="btn btn-sm btn-info" style="font-size:16px;cursor:unset;">系统用户组总数&nbsp;<span class="badge">{$usergroupNum}</span></button></h4>
+	<p class="text-right">
 		<!--// bootstap通过button调用Model -->		
 		<button type="button" class="btn-link btnUsergroup" data-oprt="_ADDNEW" data-id="0" data-toggle="modal" data-target="#modalEditUsergroup"><span class="glyphicon glyphicon-duplicate">新增</span></button>
 	</p> 	
@@ -13,16 +13,16 @@
 			<thead>
 				<tr >
 					<th class="text-center">序号</th>
-					<th>用户组名</th>
-					<th>用户组说明</th>
-					<th class="text-center">“事务”权限</th>
-					<th class="text-center">“固定资产”权限</th>
-					<th class="text-center">“专利”权限</th>
-					<th class="text-center">“项目”权限</th>
-					<th class="text-center">“论文”权限</th>
-					<th class="text-center">“附件”权限</th>
-					<th class="text-center">“管理”权限</th>
-					<th>操作</th>
+					<th class="text-center">用户组名</th>
+					<th class="text-center text-primary">用户组说明</th>
+					<th class="text-center text-primary">“事务”权限</th>
+					<th class="text-center text-primary">“固定资产”权限</th>
+					<th class="text-center text-primary">“专利”权限</th>
+					<th class="text-center text-primary">“项目”权限</th>
+					<th class="text-center text-primary">“论文”权限</th>
+					<th class="text-center text-primary">“附件”权限</th>
+					<th class="text-center text-primary">“管理”权限</th>
+					<th class="text-center">操作</th>
 				</tr>
 			</thead>
 				
