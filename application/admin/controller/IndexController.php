@@ -494,7 +494,7 @@ class IndexController extends \think\Controller
       return 'UserOprt1';
     }
     
-    public function UsergroupList(UsergroupModel $userGpMdl)
+    public function UsergroupList(UsergroupModel1 $userGpMdl)
     {
       $request=$this->request;
       $loadParamDefaults=['listRows'=>10,'pageNum'=>1,'showIssId'=>0];
@@ -511,13 +511,16 @@ class IndexController extends \think\Controller
       
       //
       $userGpSet=is_array($userGpSet)?collection($userGpSet):$userGpSet;
+      
       $userGpList=$userGpSet->slice(($pageNum-1)*$listRows,$listRows);
+      //补足authority字段comPleteAuthArr()
+      
       $pageSet=$userGpMdl->where('id','>',0)->paginate($listRows,false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$pageNum,
                         'query'=>['listRows'=>$listRows]]);    
       
       $this->assign([
         'home'=>$request->home,
-        //结果集
+        //显示结果集
         'userGpList'=>$userGpList,
         
         //分页对象
@@ -528,7 +531,9 @@ class IndexController extends \think\Controller
         
         'searchNum'=>$userGpSet->count(),
         'loadParam'=>$loadParam,
-        'auth'=>json_encode(conAuthNameArr,JSON_UNESCAPED_UNICODE)
+        'auth'=>json_encode(conAuthNameArr,JSON_UNESCAPED_UNICODE),
+        
+        'testDis'=>json_encode($userGpList->column('authority'),JSON_UNESCAPED_UNICODE)
         //排序数组？
         
         //查询数组？

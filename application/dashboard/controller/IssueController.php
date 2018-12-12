@@ -355,7 +355,8 @@ class IssueController extends Controller
             //$arr=['key1'=>'value1'];
             break;                                  
         }
-        $colArr=get_child_array($parentArr,$colArr,'VALUE');
+        //使用自定义函数
+        $colArr=fn_get_child_array($parentArr,$colArr,'VALUE');
         //组装返回前端的数组
         $selResData[$key] = ['name'=>$val,'key'=>array_keys($colArr),'value'=>array_values($colArr)];
         $colArr=[];

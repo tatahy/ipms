@@ -3,7 +3,8 @@
  * @author TATA
  * @copyright 2018
  * 应用公共文件
- * 所有的公共函数都以"_common"开头，再遵循驼峰命名法。
+ * //所有的公共函数都以"_common"开头，再遵循驼峰命名法。
+ * 所有的公共函数都以"fn"开头，再遵循下划线小写字母命名法，fn_xx_yy_zz。
  * 所有的公共常量都以"con"开头，再遵循驼峰命名法。
  */
 
@@ -20,7 +21,7 @@ const conAuthEntNameArr=[
 ];
 
 //定义需要进行权限管理的模块/实体的权限
-const conAuthEntArr=[
+const conAuthValueArr=[
   '_ISS'=>[
     '_PAT'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
     '_PRO'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
@@ -46,7 +47,7 @@ const conAuthNameArr=[
   '_THE'=>['edit'=>'撰写','audit'=>'审核','approve'=>'审批','execute'=>'执行','maintain'=>'维护'],
   '_ATT'=>['upload'=>'上传','download'=>'下载','erase'=>'删除','move'=>'移动','copy'=>'复制'],
   '_ASS'=>['read'=>'查阅','edit'=>'编辑','audit'=>'审核','approve'=>'审批','maintain'=>'维护'],
-  '_ADMIN'=>['enable'=>'启用']
+  '_ADMIN'=>['enable'=>'有']
 ];
 
 //patent的类型数组

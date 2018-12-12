@@ -3,9 +3,9 @@
 	<h4><button class="btn btn-sm btn-info" style="font-size:16px;cursor:unset;">系统用户组总数<span class="badge">{$searchNum}</span></button></h4>
 	<p class="text-right">
 		<!--// bootstap通过button调用Model -->		
-		<button type="button" class="btn-link btnOprt" data-oprt="_CREATE" data-id="0" data-toggle="modal" data-target="#modalEditUsergroup"><span class="glyphicon glyphicon-duplicate"></span>新增</button>
+		<button type="button" class="btn-link btnOprt" data-oprt="_CREATE" data-id="0" data-req-ent="model"><span class="glyphicon glyphicon-duplicate"></span>新增</button>
 	</p> 	
-	
+	<p>{$testDis}</p>
 	<div class="table-responsive">
 	
 		<table id="tblUserGpList" class="table table-hover table-condensed table-bordered">
@@ -45,124 +45,120 @@
 					<td class="text-left">{$vo.name}</td>
 					<td class="text-left">{$vo.description}</td>
 					<!-- //_ISS_PAT -->
-					{present name="$vo.authority.iss.pat"}
 					<td class="tdAuth"> 
-						<div style="padding-top:3px" class="text-left">
+						{present name="$vo.authority.iss.pat"}
+						<div class="text-left">
 						{foreach name="$vo.authority.iss.pat" item="v" }
     						<span data-val="{$v}">{$key}</span>
 						{/foreach}
 						</div>
+						{else /}
+						<span>0</span>
+						{/present}
 					</td>
-					{else /}
-					<td>无</td>
-					{/present}
-					
 					<!-- //_ISS_PRO -->
-					{present name="$vo.authority.iss.pro"}
 					<td class="tdAuth"> 
-						<div style="padding-top:3px" class="text-left">
+						{present name="$vo.authority.iss.pro"}
+						<div class="text-left">
 						{foreach name="$vo.authority.iss.pro" item="v" }
     						<span data-val="{$v}">{$key}</span>
 						{/foreach}
 						</div>
+						{else /}
+						<span>0</span>
+						{/present}
 					</td>
-					{else /}
-					<td>无</td>
-					{/present}
 					<!-- //_ISS_THE -->
-					{present name="$vo.authority.iss.the"}
 					<td class="tdAuth"> 
-						<div style="padding-top:3px" class="text-left">
+						{present name="$vo.authority.iss.the"}
+						<div class="text-left">
 						{foreach name="$vo.authority.iss.the" item="v" }
     						<span data-val="{$v}">{$key}</span>
 						{/foreach}
 						</div>
+						{else /}
+						<span>0</span>
+						{/present}
 					</td>
-					{else /}
-					<td>无</td>
-					{/present}
 					<!-- //ass -->
-					{present name="$vo.authority.ass"}
 					<td class="tdAuth"> 
-						<div style="padding-top:3px" class="text-left">
+						{present name="$vo.authority.ass"}
+						<div class="text-left">
 						{foreach name="$vo.authority.ass" item="v" }
     						<span data-val="{$v}">{$key}</span>
 						{/foreach}
 						</div>
+						{else /}
+						<span>0</span>
+						{/present}
 					</td>
-					{else /}
-					<td>无</td>
-					{/present}
-					
 					<!-- //pat -->
-					{present name="$vo.authority.pat"}
 					<td class="tdAuth">
-						<div style="padding-top:3px" class="text-left">
+						{present name="$vo.authority.pat"}
+						<div class="text-left">
 						{foreach name="$vo.authority.pat" item="v" }
     						<span data-val="{$v}">{$key}</span>
 						{/foreach}
 						</div>
+						{else /}
+						<span>0</span>
+						{/present}
 					</td>
-					{else /}
-					<td>无</td>
-					{/present}
 					<!-- //pro -->
-					{present name="$vo.authority.pro"}
 					<td class="tdAuth"> 
-						<div style="padding-top:3px" class="text-left">
+						{present name="$vo.authority.pro"}
+						<div class="text-left">
 						{foreach name="$vo.authority.pro" item="v" }
     						<span data-val="{$v}">{$key}</span>
 						{/foreach}
 						</div>
+						{else /}
+						<span>0</span>
+						{/present}
 					</td>
-					{else /}
-					<td>无</td>
-					{/present}
 					<!-- //the -->
-					{present name="$vo.authority.the"}
 					<td class="tdAuth"> 
-						<div style="padding-top:3px" class="text-left">
+						{present name="$vo.authority.the"}
+						<div class="text-left">
 						{foreach name="$vo.authority.the" item="v" }
     						<span data-val="{$v}">{$key}</span>
 						{/foreach}
 						</div>
+						{else /}
+						<span>0</span>
+						{/present}
 					</td>
-					{else /}
-					<td>无</td>
-					{/present}
 					<!-- //att -->
-					{present name="$vo.authority.att"}
 					<td class="tdAuth"> 
-						<div style="padding-top:3px" class="authatt text-left">
+						{present name="$vo.authority.att"}
+						<div class="authatt text-left">
 						{foreach name="$vo.authority.att" item="v" }
     						<span data-val="{$v}">{$key}</span>
 						{/foreach}
 						</div>
+						{else /}
+						<span>0</span>
+						{/present}
 					</td>
-					{else /}
-					<td>无</td>
-					{/present}
-					
-					{present name="$vo.authority.admin"}
 					<td class="tdAuth">
-						<div style="padding-top:3px">
+						{present name="$vo.authority.admin"}
 						{foreach name="$vo.authority.admin" item="v" }
     						<span data-val="{$v}">{$key}</span>
-						{/foreach}	
-							<!-- <span class="" value="{ $vo.bgo}" >访问后台</span> -->
-						</div>
+						{/foreach}
+						{else /}
+						<span>0</span>
+						{/present}
 					</td>
-					{else /}
-					<td>无</td>
-					{/present}
 					
-					<td class="button text-left">
-						<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_EDIT" data-toggle="modal" data-target="#modalEditUsergroup" ><span class="glyphicon glyphicon-edit"></span>编辑</button>
+					<td class="text-left" data-enable="{$vo.enable}">
+						<div class="btnEn">
+						<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_EDIT" data-req-ent="model"><span class="glyphicon glyphicon-edit"></span>编辑</button>
 						
-						<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_DISABLE"><span class="text-warning glyphicon glyphicon-ban-circle"></span>停用</button>
-							
-						<span>（已停用）</span><button class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_ENABLE" enable="{$vo.enable}"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
-						
+						<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_DISABLE" data-req-ent="result"><span class="text-warning glyphicon glyphicon-ban-circle"></span>停用</button>
+						</div>
+						<div class="btnDis">
+						<span class="alert-danger">（已停用）</span><button class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_ENABLE" data-req-ent="result"><span class="text-success glyphicon glyphicon-magnet"></span>启用</button>
+						</div>
 					</td>
 				</tr>
 				{/volist}
@@ -220,46 +216,45 @@ var authNameObj={$auth};
 
 //每一列内的span内容格式修改
 var spComModify=()=>{
-	let spSet=$('#tblUserGpList tbody .tdAuth').find('span')
-		auth=authNameObj;
-	
-	spSet.each(function(){
-		let nameEn=$(this).text(),
-			val=$(this).data('val')
-			type=$(this).closest('td').data('hideVal'),
-			typeArr=[],
-			nameChi='';
+	//递归函数得到中文名称
+	let getNameChi=(keyStr,obj)=>{
+			let k='',v='',arr=[];
+			if(keyStr.indexOf('-')>0){
+				arr=keyStr.split('-');
+			}
+			if(arr.length){
+				k=arr.shift();
+				keyStr=arr.join('-');
+				v=getNameChi(keyStr,obj[k]);
+			}else{
+				v=obj[keyStr];
+			}
+			return v;
+		};
+	$('#tblUserGpList .tdAuth span').each(function(){
+		let text=$(this).text(),
+			pref=$(this).closest('td').data('hideVal')+'-';
 		
-		//格式修改
-		$(this).css({"padding":"1px 5px","border-radius":"3px"})		
-		if(val){
-			$(this).addClass("text-primary bg-info");
+		//将span的text转换成中文，格式修改	
+		if(text==0){
+			$(this).text('无').addClass('label label-default').css('padding-bottom','2px');
 		}else{
-			$(this).addClass("text-muted");
-		}	
-		
-		//将span的text转换成中文
-		if(type.indexOf('-')>0){
-			typeArr=type.split('-');
-			//要求type是类似xx-yy的字符串，如果为xx-yy-zz该如何处理？？
-			nameChi=authNameObj[typeArr[0]][typeArr[1]][nameEn];
-			
-		}else{
-			nameChi=authNameObj[type][nameEn];
+			$(this).text(getNameChi(pref+text,authNameObj));
+			//span的格式修改
+			if($(this).data('val')){
+				$(this).addClass('label label-success').css('padding-bottom','2px');
+			}else{
+				$(this).addClass('text-muted');
+			}	
 		}
-		
-		$(this).text(nameChi);
-		<!-- console.log(typeArr); -->
 	});
-	
-	
 };
 
 var buildColumnToggleCom=()=>{
 	let arr=columnToggleArr;
 	//生成单选框组件属性数组
 	if(arr.length==0){
-		$('#tblUserGpList').find('th').each(function(){
+		$('#tblUserGpList th').each(function(){
 			<!-- tblColObjArr.push($(this).text()); -->
 			let nameEn=$(this).data('entName'),
 				nameChi=$(this).text();
@@ -332,10 +327,23 @@ var columnToggle=()=>{
 		
 	//每个$('#tblUserGpList thead a')添加属性
 	$('#tblUserGpList thead th[data-ent-name]').addClass('text-center text-primary');
-	
+	//操作列内的按键
+	$('#tblUserGpList tbody td[data-enable]').each(function(){
+		let enObj=$(this).find('.btnEn'),
+			disObj=$(this).find('.btnDis');
+		enObj.hide();
+		disObj.hide();
+		console.log($(this).data('enable'));
+		if($(this).data('enable')){
+			enObj.show();
+		}else{
+			disObj.show();
+		}
+	});	
 	buildColumnToggleCom();
 	columnToggle();
 	spComModify();
+
 	// 激活tooltip
 	$('[title]').tooltip();
 })(jQuery);
@@ -343,7 +351,16 @@ var columnToggle=()=>{
 $(document).ready(function(){
 		
 	//btnOprt点击
-	
+	$('.btnOprt').click(function(){
+		let type=$(this).data('reqEnt'),
+			oprt=$(this).data('oprt'),
+			id=$(this).data('oprt');
+		
+		//去掉所有行的底色
+		$('tr').removeClass('bg-warning');
+		//给本行上底色
+		$(this).closest('tr').addClass('bg-warning');
+	});	
 	
 	<!-- //表格每页显示记录行数 -->
 	$('#listRows').val('{$loadParam.listRows}'); 

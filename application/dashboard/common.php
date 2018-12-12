@@ -293,7 +293,7 @@ const conA=[
      * @param  String $type, 'KEY'| 'VALUE'，指定$clueArr的类型，默认为'KEY'
      * @return Array $childArr 返回的一维关联数组，是$parentArr的子集，包含无重复值的$clueArr。
      */
-function get_child_array($parentArr,$clueArr=[],$type='KEY')
+function fn_get_child_array($parentArr,$clueArr=[],$type='KEY')
 {
   $childArr=[];
   $childArrKeys=[];
