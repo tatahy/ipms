@@ -513,8 +513,14 @@ class IndexController extends \think\Controller
       $userGpSet=is_array($userGpSet)?collection($userGpSet):$userGpSet;
       
       $userGpList=$userGpSet->slice(($pageNum-1)*$listRows,$listRows);
-      //补足authority字段comPleteAuthArr()
+      #补足authority字段comPleteAuthArr()
+      $test=$userGpList->column('authority')[0];
+      //$test=["ass"=>["read"=>1],"att"=>["upload"=>1],"iss"=>["pat"=>["edit"=>1],"pro"=>["edit"=>1],"the"=>["edit"=>1]],"pro"=>["edit"=>1,"audit"=>1],"the"=>["edit"=>1,"audit"=>1,"execute"=>1]];
       
+      //$pathArr=fn_get_json_path_array($test);
+      
+      $pathArr=fn_get_intact_json_array($test,conAuthValueArr);
+            
       $pageSet=$userGpMdl->where('id','>',0)->paginate($listRows,false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$pageNum,
                         'query'=>['listRows'=>$listRows]]);    
       
@@ -533,7 +539,7 @@ class IndexController extends \think\Controller
         'loadParam'=>$loadParam,
         'auth'=>json_encode(conAuthNameArr,JSON_UNESCAPED_UNICODE),
         
-        'testDis'=>json_encode($userGpList->column('authority'),JSON_UNESCAPED_UNICODE)
+        'testDis'=>json_encode($pathArr,JSON_UNESCAPED_UNICODE)
         //排序数组？
         
         //查询数组？
