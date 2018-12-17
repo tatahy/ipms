@@ -34,6 +34,8 @@ const conAuthValueArr=[
   '_ASS'=>['read'=>0,'edit'=>0,'audit'=>0,'approve'=>0,'maintain'=>0],
   '_ADMIN'=>['enable'=>0]
 ];
+//const conAuthValueArr['_ISS']['_PAT']=['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0];
+//const conAuthValueArr['_ISS']['_PRO']=array('edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0);
 
 //定义权限名称中英文对应关系
 const conAuthNameArr=[

@@ -28,7 +28,7 @@ class Usergroup1 extends Model
         return $this->hasMany('User');
     }
     
-     //获取器，获取数据表Name字段值，转换为中文输出
+    //获取器，获取数据表Name字段值，转换为中文输出
     protected function getNameAttr($value)
     {
       $outPut='……';
@@ -61,7 +61,15 @@ class Usergroup1 extends Model
       return $outPut;
     }
     
-    
+    #获取器，获取数据表Name字段值，转换为中文输出
+   // protected function getAuthorityAttr($dbArr)
+//    {
+//      $tarArr=$dbArr;
+//      //$refArr=conAuthValueArr;
+////      $testArr=fn_merge_auth($tarArr,$refArr);
+//      
+//      return $tarArr;
+//    }
   
     
          

@@ -353,12 +353,17 @@ $(document).ready(function(){
 	$('.btnOprt').click(function(){
 		let type=$(this).data('reqEnt'),
 			oprt=$(this).data('oprt'),
-			id=$(this).data('oprt');
+			id=$(this).data('oprt'),
+			mdObj=$('#modalEditUsergroup');
 		
 		//去掉所有行的底色
 		$('tr').removeClass('bg-warning');
 		//给本行上底色
 		$(this).closest('tr').addClass('bg-warning');
+		
+		mdObj.find('h4').html(oprt);
+		mdObj.find('.modal-body').html('<p class="text-center" style="font-size:28px;">加载中……</p>');
+		mdObj.modal('show');
 	});	
 	
 	<!-- //表格每页显示记录行数 -->
