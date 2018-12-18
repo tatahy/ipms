@@ -175,6 +175,16 @@ footer {
 
 
 <script>
+//主要操作按钮核心属性
+var oprtBtnPropArr=[
+			{oprtEn:'_CREATE',oprtChi:'新增',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+			{oprtEn:'_EDIT',oprtChi:'编辑',color:{lab:'label label-primary',txt:'text-primary',btn:'btn-primary'},glyCom:'<span class="glyphicon glyphicon-edit"></span>'},
+			{oprtEn:'_UPDATE',oprtChi:'保存',color:{lab:'label label-primary',txt:'text-primary',btn:'btn-primary'},glyCom:'<span class="glyphicon glyphicon-saved"></span>'},
+			{oprtEn:'_DELETE',oprtChi:'删除',color:{lab:'label label-danger',txt:'text-danger',btn:'btn-danger'},glyCom:'<span class="glyphicon glyphicon-remove"></span>'},
+			{oprtEn:'_DISABLE',oprtChi:'禁用',color:{lab:'label label-warning',txt:'text-warning',btn:'btn-warning'},glyCom:'<span class="glyphicon glyphicon-ban-circle"></span>'},
+			{oprtEn:'_ENABLE',oprtChi:'启用',color:{lab:'label label-success',txt:'text-success',btn:'btn-success'},glyCom:'<span class="glyphicon glyphicon-magnet"></span>'},
+		];
+
 var showSideNavbar=(y)=>{
 	if(y){
 		//show

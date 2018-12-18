@@ -3,7 +3,7 @@
 	<h4><button class="btn btn-sm btn-info" style="font-size:16px;cursor:unset;">系统用户组总数<span class="badge">{$searchNum}</span></button></h4>
 	<p class="text-right">
 		<!--// bootstap通过button调用Model -->		
-		<button type="button" class="btn-link btnOprt" data-oprt="_CREATE" data-id="0" data-req-ent="model"><span class="glyphicon glyphicon-duplicate"></span>新增</button>
+		<button type="button" class="btn-link btnOprt" data-oprt="_CREATE" data-id="0" data-req-ent="model"></button>
 	</p> 	
 	<p>{$testDis}</p>
 	<div class="table-responsive">
@@ -151,12 +151,13 @@
 					</td>
 					
 					<td class="text-right" data-enable="{$vo.enable}">
+						<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_EDIT" data-req-ent="model"></button>
+						<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_DELETE" data-req-ent="model"></button>
 						<div class="btnEn">
-							<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_EDIT" data-req-ent="model"><span class="glyphicon glyphicon-edit"></span>编辑</button>
-							<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_DISABLE" data-req-ent="result"><span class="text-warning glyphicon glyphicon-ban-circle"></span>停用</button>
+							<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_DISABLE" data-req-ent="result"></button>
 						</div>
 						<div class="btnDis">
-							<span class="alert-danger">（已停用）</span><button class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_ENABLE" data-req-ent="result"><span class="glyphicon glyphicon-magnet text-success"></span>启用</button>
+							<strong>(已禁用)</strong><button class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_ENABLE" data-req-ent="result"></button>
 						</div>
 					</td>
 				</tr>
@@ -186,7 +187,7 @@
     <div class="modal-dialog modal-lg">
 
       <div class="modal-content">
-        <div class="modal-header bg-info" style="border-radius: 5px;">
+        <div class="modal-header" style="border-radius: 5px 5px 0px 0px;">
           	<button type="button" class="close" data-dismiss="modal">&times;</button>
 		  
           	<h4 id="h4Title"><strong>新增用户组</strong></h4>
@@ -213,7 +214,9 @@ var columnToggleArr=[];
 //
 var authNameObj={$auth};
 
-//每一列内的span内容格式修改
+var loadParam={$loadParam};
+
+//指定对象的span内容格式修改
 var spComModify=()=>{
 	//递归函数得到中文名称
 	let getNameChi=(keyStr,obj)=>{
@@ -319,25 +322,46 @@ var columnToggle=()=>{
 		});
 	});	
 };
-
+//操作列内每个单元格(td)内的按键显示、隐藏
+var oprtBtnDisplay=(tdObj)=>{
+	let enObj=tdObj.find('.btnEn'),
+		disObj=tdObj.find('.btnDis'),
+		trObj=tdObj.closest('tr');
+	enObj.hide();
+	disObj.hide();
+	
+	if(tdObj.data('enable')){
+		enObj.show();
+		//去掉本行的禁用底色
+		trObj.removeClass('alert-danger');
+	}else{
+		disObj.show();
+		//给本行添加禁用底色
+		trObj.addClass('alert-danger');
+		
+	}
+};
 
 //自调用匿名函数立即执行的特点，进行页面初始化。
-(function($){
-		
+(function($){	
 	//每个$('#tblUserGpList thead a')添加属性
 	$('#tblUserGpList thead th[data-ent-name]').addClass('text-center text-primary');
-	//操作列内的按键
-	$('#tblUserGpList tbody td[data-enable]').each(function(){
-		let enObj=$(this).find('.btnEn'),
-			disObj=$(this).find('.btnDis');
-		enObj.hide();
-		disObj.hide();
-		console.log($(this).data('enable'));
-		if($(this).data('enable')){
-			enObj.show();
-		}else{
-			disObj.show();
+	//每个操作按钮添加核心属性
+	$('.btnOprt').each(function(){
+		let oprtEn=$(this).data('oprt'),e='',
+			el=oprtBtnPropArr;
+		for(var i=0;i<el.length;i++){
+			e=el[i];
+			if(oprtEn==e.oprtEn){
+				$(this).append($('<span></span>').addClass(e.color.txt).html(e.glyCom+e.oprtChi));
+				break;
+			}
 		}
+	});
+	
+	//操作列内每个单元格内的按键显示、隐藏
+	$('#tblUserGpList tbody td[data-enable]').each(function(){
+		oprtBtnDisplay($(this));
 	});	
 	buildColumnToggleCom();
 	columnToggle();
@@ -351,23 +375,65 @@ $(document).ready(function(){
 		
 	//btnOprt点击
 	$('.btnOprt').click(function(){
-		let type=$(this).data('reqEnt'),
-			oprt=$(this).data('oprt'),
-			id=$(this).data('oprt'),
-			mdObj=$('#modalEditUsergroup');
-		
+		let url='',
+			data={oprt:$(this).data('oprt'),id:$(this).data('id'),reqEnt:$(this).data('reqEnt')},
+			el=oprtBtnPropArr,
+			mdObj=$('#modalEditUsergroup'),
+			tdObj='',
+			oprtStr='';
 		//去掉所有行的底色
 		$('tr').removeClass('bg-warning');
 		//给本行上底色
 		$(this).closest('tr').addClass('bg-warning');
 		
-		mdObj.find('h4').html(oprt);
-		mdObj.find('.modal-body').html('<p class="text-center" style="font-size:28px;">加载中……</p>');
-		mdObj.modal('show');
+		//操作结果字符串
+		for(var i=0;i<el.length;i++){
+			let e=el[i];
+			if(e.oprtEn==data.oprt){
+				oprtStr='【<span class="'+e.color.txt+'">'+e.glyCom+e.oprtChi+'</span>】';
+				break;
+			}
+		}
+		if(data.oprt=='_ENABLE' || data.oprt=='_DISABLE'){
+			url='usergroupOprt1';
+			tdObj=$(this).closest('td');
+			$.post(url,data,function(res){
+				let str='';
+				tdObj.data('enable',res.result);
+				oprtBtnDisplay(tdObj);
+				if(res.msg=='success'){
+					str='<p class="text-center text-success">成功<span class="glyphicon glyphicon-ok"></span></p>';
+				}else{
+					str='<p class="text-center text-danger">失败<span class="glyphicon glyphicon-remove"></span></p>';
+				}
+				$.alert('<p class="text-center"><strong>'+res.name+'</strong>'+oprtStr+'</p>'+str);
+			});
+		}else{
+			let h=mdObj.find('.modal-header');
+			url='fmUsergroupSingle';
+			h.removeClass('bg-info bg-danger bg-warning');
+			switch(data.oprt){
+				case '_DELETE':
+					h.addClass('bg-danger');
+					break;
+				case '_EDIT':
+					h.addClass('bg-warning');
+					break;
+				default:
+					h.addClass('bg-info');
+					break;
+			}		
+			mdObj.find('.modal-body').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(url,data,function(){
+				mdObj.find('h4').html(oprtStr+'用户组');
+				
+			});
+			mdObj.modal('show');
+		}
+		
 	});	
 	
 	<!-- //表格每页显示记录行数 -->
-	$('#listRows').val('{$loadParam.listRows}'); 
+	$('#listRows').val(loadParam.listRows); 
 	//listRow选择change	
 	$('#listRows').change(function(){
 		let listRows=$(this).val()*1,

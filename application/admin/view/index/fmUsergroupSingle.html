@@ -1,0 +1,512 @@
+<!-- //editUsergroup.html -->
+<form id="fmUsergroup" role="form" action="{$home}/admin/index/usergroupOprt" method="post">
+	<input id="id" type="text" name="id" value="{$ugSet.id}" class="sr-only">
+	<input id="oprt" type="text" name="oprt" value="" class="sr-only">
+	<div class="myFieldset">
+		<div class="myLegend"><span class="label label-info"><span class="glyphicon glyphicon-duplicate"></span>&nbsp;用户组信息</span></div>
+		<div class="row myRow">		
+		<div class="form-group has-feedback col-sm-6">
+			
+			<label for="usergroupName">用户组名<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+			<!-- // bootstrap实现矢量图在输入框开头 -->
+			<div class="input-group ">
+				<span class="input-group-addon"><span class="glyphicon glyphicon-education"></span></span>
+						
+				<input type="text" class="form-control inputCheck" id="usergroupName" name="usergroupName" value="{$ugSet.name}" placeholder="输入用户组名">
+			</div>	
+			<!-- // 配合jQuery 中的内容验证代码-->
+			<span style="color:red;display: none;" class="spTips"></span>
+      		<span style="display: none;margin-right:17px;"  class="spOk glyphicon glyphicon-ok form-control-feedback"></span>
+			<span style="display: none;margin-right:17px;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span>		
+		</div>
+		
+		<div class="form-group col-sm-6">
+			<label for="usergroupDescription">用户组说明</label>
+			<textarea rows="2" type="text" class="form-control" id="usergroupDescription" name="usergroupDescription" placeholder="简短说明用户组的作用">{$ugSet.description}</textarea>
+				
+		</div>
+		
+		</div>
+	</div>
+
+	<div class="myFieldset">
+		<div class="myLegend"><span class="label label-info"><span class="glyphicon glyphicon-alert"></span>&nbsp;用户组权限</span></div>
+		
+		<div class="row myRow">		
+		<div class="form-group col-sm-6">	
+			<label for="authIss"><span class="text-info">【事务】</span>模块</label>	
+			<div id="authIss" style="border-bottom:solid 1px #ccc; padding:5px;">
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="issEdit" value="1" checked><span>编辑</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="issAudit" value="1"><span>审核</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="issApprove" value="1"><span>审批</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="issExecute" value="1"><span>执行</span></label> -->
+				<!-- <label class="checkbox-inline"><input type="checkbox" name="issMaintain" value="1"><span>维护</span></label> -->
+				
+				{foreach name="$ugSet.authority.iss" item="v" }
+    			{if condition="($v==1)"} 
+				<label class="checkbox-inline"><input type="checkbox" name="authIss[]" value="{$key}" checked><span class="spAuthKey">{$key}</span></label>
+				{else /} 
+				<label class="checkbox-inline"><input type="checkbox" name="authIss[]" value="{$key}"><span class="spAuthKey">{$key}</span></label>
+				{/if}
+				{/foreach}
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label for="authAss"><span class="text-info">【固定资产】</span>模块</label>	
+			<div id="authAss" style="border-bottom:solid 1px #ccc; padding:5px;">
+						
+				{foreach name="$ugSet.authority.ass" item="v" }
+    			{if condition="($v==1)"} 
+				<label class="checkbox-inline"><input type="checkbox" name="authAss[]" value="{$key}" checked><span class="spAuthKey">{$key}</span></label>
+				{else /} 
+				<label class="checkbox-inline"><input type="checkbox" name="authAss[]" value="{$key}"><span class="spAuthKey">{$key}</span></label>
+				{/if}
+				{/foreach}
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label for="authPat"><span class="text-default">【专利】</span>模块</label>	
+			<div id="authPat" style="border-bottom:solid 1px #ccc; padding:5px;">				
+				{foreach name="$ugSet.authority.pat" item="v" }
+    			{if condition="($v==1)"} 
+				<label class="checkbox-inline"><input type="checkbox" name="authPat[]" value="{$key}" checked><span class="spAuthKey">{$key}</span></label>
+				{else /} 
+				<label class="checkbox-inline"><input type="checkbox" name="authPat[]" value="{$key}"><span class="spAuthKey">{$key}</span></label>
+				{/if}
+				{/foreach}
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label for="authPro"><span class="text-default">【项目】</span>模块</label>	
+			<div id="authPro" style="border-bottom:solid 1px #ccc; padding:5px;">
+				{foreach name="$ugSet.authority.pro" item="v" }
+    			{if condition="($v==1)"} 
+				<label class="checkbox-inline"><input type="checkbox" name="authPro[]" value="{$key}" checked><span class="spAuthKey">{$key}</span></label>
+				{else /} 
+				<label class="checkbox-inline"><input type="checkbox" name="authPro[]" value="{$key}"><span class="spAuthKey">{$key}</span></label>
+				{/if}
+				{/foreach}
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label for="authThe"><span class="text-default">【论文】</span>模块</label>	
+			<div id="authThe" style="border-bottom:solid 1px #ccc; padding:5px;">
+				{foreach name="$ugSet.authority.the" item="v" }
+    			{if condition="($v==1)"} 
+				<label class="checkbox-inline"><input type="checkbox" name="authThe[]" value="{$key}" checked><span class="spAuthKey">{$key}</span></label>
+				{else /} 
+				<label class="checkbox-inline"><input type="checkbox" name="authThe[]" value="{$key}"><span class="spAuthKey">{$key}</span></label>
+				{/if}
+				{/foreach}
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label for="authAtt"><span class="text-danger">【附件】</span>模块</label>	
+			<div id="authAtt" style="border-bottom:solid 1px #ccc; padding:5px;">
+				{foreach name="$ugSet.authority.att" item="v" }
+    			{if condition="($v==1)"} 
+				<label class="checkbox-inline"><input type="checkbox" name="authAtt[]" value="{$key}" checked><span class="spAuthKey">{$key}</span></label>
+				{else /} 
+				<label class="checkbox-inline"><input type="checkbox" name="authAtt[]" value="{$key}"><span class="spAuthKey">{$key}</span></label>
+				{/if}
+				{/foreach}
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label for="authAdmin"><span class="text-danger">【后台管理】</span>模块</label>	
+			<div id="authAdmin" class="form-group" style="border-bottom:solid 1px #ccc; padding:5px;">
+				{eq name="$ugSet.authority.admin.enable" value="1"} 
+				<label class="radio-inline">
+      				<input type="radio" name="adminEn" value="1" checked><span class="label label-default">有</span>
+    			</label>
+    			<label class="radio-inline">
+      				<input type="radio" name="adminEn" value="0" ><span class="label label-default">无</span>
+    			</label>
+				{else /} 
+				<label class="radio-inline">
+      				<input type="radio" name="adminEn" value="1" ><span class="label label-default">有</span>
+    			</label>
+    			<label class="radio-inline">
+      				<input type="radio" name="adminEn" value="0" checked><span class="label label-default">无</span>
+    			</label>
+				{/eq}
+			</div>
+		</div>
+		</div>
+		
+	</div>
+				
+
+	<div id="divUserGroupEn" class="myFieldset form-group">
+		<div class="myLegend"><span class="label label-info">
+			<span class="glyphicon glyphicon-magnet"></span>&nbsp;用户组启用</span>
+			<!-- <label class="" for="usergroupEn">用户组启用</label> -->
+			<label class="radio-inline">
+      			<input type="radio" name="usergroupEn" value="1" checked><span class="label label-info">是</span>
+    		</label>
+    		<label class="radio-inline">
+      			<input type="radio" name="usergroupEn" value="0" ><span class="label label-default">否</span>
+    		</label>
+		</div>
+	</div>	
+		<hr>
+	<div class="row myRow">	
+		
+	
+		<div class="pull-right">	
+			<button id="btnReset" type="reset" class="btn btn-primary btn-sm">重置</button>
+				
+			<button type="button" class="btn btn-warning btn-sm" data-dismiss="modal">取消</button>
+		</div>
+	</div>			
+	</form>
+
+	
+<script>
+var ugSet={$ugSet},
+	oprt='{$oprt}',
+	fm=$('#fmUsergroup');
+
+console.log(ugSet);
+
+//完善操作按钮
+var oprtBtnComShow=(oprt)=>{
+	let refObj=$('#btnReset').closest('div'),
+		el=oprtBtnPropArr,
+		e='',
+		uBtn='',
+		oBtn='';
+	let buildBtn=(oprt)=>{
+			let sBtn=$('<button></button>').addClass('btn btn-sm btnOprt').attr('type','submit').data('oprt','');
+			for(var i=0;i<el.length;i++){
+				e=el[i];
+				if(oprt==e.oprtEn){
+					sBtn.data('oprt',oprt).addClass(e.color.btn).html(e.glyCom+e.oprtChi);
+					break;
+				}
+			}
+			return sBtn;
+		};
+	switch(oprt){
+		case '_CREATE':
+			oBtn=buildBtn(oprt);
+			break;
+		case '_DELETE':
+			uBtn=buildBtn('_UPDATE');
+			oBtn=buildBtn(oprt);
+			break;
+		case '_EDIT':
+			oBtn=buildBtn('_UPDATE');
+			break;
+	}		
+	refObj.before(uBtn,'&nbsp;',oBtn);
+};
+
+//指定对象的span内容格式修改
+var spComModify=()=>{
+	//递归函数得到中文名称
+	let getNameChi=(keyStr,obj)=>{
+			let k='',v='',arr=[];
+			if(keyStr.indexOf('-')>0){
+				arr=keyStr.split('-');
+			}
+			if(arr.length){
+				k=arr.shift();
+				keyStr=arr.join('-');
+				v=getNameChi(keyStr,obj[k]);
+			}else{
+				v=obj[keyStr];
+			}
+			return v;
+		};
+
+	$('.spAuthKey').each(function(){
+		
+		//将span的text转换成中文，格式修改	
+		<!-- $(this).text(getNameChi(pref+text,authNameObj)); -->
+		<!-- if(text==0){ -->
+			<!-- .css('padding-bottom','2px'); -->
+		<!-- }else{ -->
+			
+			<!-- //span的格式修改 -->
+			<!-- if($(this).data('val')){ -->
+				<!-- $(this).addClass('label label-success').css('padding-bottom','2px'); -->
+			<!-- }else{ -->
+				<!-- $(this).addClass('text-muted'); -->
+			<!-- }	 -->
+		<!-- } -->
+	});
+};
+
+//自调用匿名函数立即执行的特点，进行页面初始化。
+(function($){	
+	
+	fm.find('[name="oprt"]').val(oprt);
+	
+	//将span的text转换成中文
+	<!-- oprtBtnComShow(oprt); -->
+	$('.spAuthKey').each(function(){
+		var str=$(this).text();
+		$(this).text(textEnToChi(str));
+   	});
+	spComModify();
+
+})(jQuery);
+
+$(document).ready(function(){
+	radioBg($('input:radio[name="adminEn"]:checked'));
+	
+	
+	
+	<!-- usergroupName内容验证 -->
+	$("#usergroupName").focusout(function(){
+        if(regUserGroupName.test($(this).val())){
+			//$(this)为本页面第0个输入框
+			success($(this),0);	
+		}else if ($(this).val().length < 3) {
+        	if($(this).val()==''){
+				fail($(this), 0, '用户组名不能为空。');
+			}else{
+				fail($(this), 0, '用户组名太短，不能少于3个字符。');
+			}
+		}
+		else {
+        	fail($(this), 0, '可由英文、数字、中文和下划线组成，但不能以数字开头。')
+    	}
+  	});
+	
+	//button:submit按钮
+	$('button:submit').click(function(event){
+		var url='usergroupOprt';
+		var name=$('#usergroupName').val();
+		var oprt=$(this).attr('data-oprt');
+		var formData=new FormData($('#fmUsergroup').get(0));
+		var anchor=window.location.hash;
+		var strHtml=$(this).html();
+		var flag=check.every(function(value) {
+            return value == true
+        });
+		
+		//阻止表单提交动作
+		event.preventDefault();
+		formData.append('oprt',oprt);
+		
+		if(oprt=='_DELETE'){
+			strHtml='<span class="label label-danger">'+strHtml+'</span>';
+		}else{
+			strHtml='<span class="label label-primary">'+strHtml+'</span>';
+		}
+		
+		if (!flag) {
+			var i=0;
+			<!-- //check中存在false,对应的input用“has-error”突出显示。 -->
+        	for (key in check) {
+            	if (!check[key]) {
+                	$(this).closest('form').find('.inputCheck').eq(key).closest('.has-feedback').removeClass('has-success').addClass('has-error');
+            	}
+				if(i!=key)i=key;
+        	}
+			//未通过验证的序号最小的$('.inputCheck').eq(i)获得焦点
+			$('.inputCheck').eq(i).focus();	
+		}else{
+			$('.modal').modal('hide');
+			$.confirm(strHtml+'【'+name+'】',function(e){
+				con=e;
+				if(true==con){
+					ajaxProcess(url,formData,anchor);
+				}
+				else{
+					$('.modal').modal('show');
+				}
+			}).ok('确定(Y)').cancel('取消(N)');		
+			
+		}
+	});
+	
+	// 表单input:radio选中元素改变背景色
+	$('input:radio').change(function(){
+		radioBg($('input:radio[name="adminEn"]:checked'));
+		radioBg($('input:radio[name="usergroupEn"]:checked'));
+	});
+	//checkbox背景色
+	$('input:checkbox').each(function(){
+		checkboxBg($(this));
+	});
+	//checkbox背景色
+	$('input:checkbox').click(function(){
+		checkboxBg($(this));
+	});
+	
+	<!-- // 重置按钮 -->
+	$('#btnReset').click(function(e){	
+		e.preventDefault();
+		//本按钮所在form进行reset
+		$(this).closest('form').get(0).reset();
+		radioBg($('input:radio[name="adminEn"]:checked'));
+		radioBg($('input:radio[name="usergroupEn"]:checked'));
+		$('input:checkbox').each(function(){
+			checkboxBg($(this));
+		});
+		$('.has-feedback').removeClass('has-success').removeClass('has-error'); 
+		
+		$('.spTips').hide();
+    	$('.spOk').hide();
+    	$('.spRemove').hide();
+		
+		$('.inputCheck').eq(0).focus();
+		
+		check = [false];
+	});
+			
+<!-- function -->
+// 正则表达式，由英文、数字、中文和下划线组成,但不能以数字开头,长度为3到20个字符。unicode编码中的汉字范围:\u2E80-\u9FFF
+var regUserGroupName = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{2,19}$/;
+
+// 数组，存储表单中输入框内容验证结果“true/false”。数组下标应与输入框下标一致，便于编程选择输入框
+var check = [false];
+
+	//校验成功函数
+function success(obj, counter) {
+    var divParent=obj.closest('.has-feedback');
+	divParent.removeClass('has-error').addClass('has-success');
+	divParent.find('.spTips').hide();
+    divParent.find('.spOk').show();
+    divParent.find('.spRemove').hide();
+    check[counter] = true;
+}
+
+// 校验失败函数
+function fail(obj, counter, msg) {
+    var divParent=obj.closest('.has-feedback');
+	divParent.removeClass('has-success').addClass('has-error');
+	divParent.find('.spTips').text(msg).show();
+    divParent.find('.spOk').hide();
+    divParent.find('.spRemove').show();
+    check[counter] = false;
+}
+	
+//设置input:radio选中元素的背景色，适用于有2个radio，都带有“value”属性，第一个value=1，第二个为0。
+function radioBg(obj){	
+	if(obj.val()==1){
+		obj.next().removeClass('label-default').addClass('label-info');
+	}else if(obj.val()==0){
+		obj.parent().siblings('label').find('span').removeClass('label-info').addClass("label-default");
+	}	
+}
+
+//设置input:checkbox元素的背景色
+function checkboxBg(obj){
+	//点击是选中上色，
+	if(obj.prop('checked')){
+		obj.next().addClass('label label-info');
+	}else{
+		//点击为非选中去掉颜色
+		obj.next().removeClass('label label-info');
+	}
+}
+
+	//**函数名：ajaxProcess
+ 	//* 作用：本页面ajax过程
+	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
+	//* 参数data，类型：数值。值：传送给后端的键值对数据。
+	//* 参数archor，类型：字符串。值：本页面锚点值：window.location.hash。
+	//* 返回值：无
+function ajaxProcess(url,data,archor){
+	$.ajax({
+		type: 'post',
+        url: url,
+        data: data,
+		timeout:2000,
+		<!-- datatype: 'JSON', -->
+        contentType: false,// 当有文件要上传时，此项是必须的，否则会导致后台无法识别文件流的起始位置
+        processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)。当使用FormData()，必须设为false，否则jqurey默认将FormData()转换为查询字符串。
+		success: function(dataBack){
+			<!-- $('.modal').modal('hide'); -->
+			//dataBack的5个返回值id,result,name,msg,msgPatch
+			if(dataBack.result=='success'){
+				//ajax更新页面信息
+				$('#content').load(
+					'tplFile',
+					{'sId':archor},
+					function(){
+						//所在行上色'bg-warning'
+						$('button[data-id="'+dataBack.id+'"]').closest('tr').addClass('bg-warning').focus();
+						$.alert('用户组【'+dataBack.name+'】<span class="label label-success">'+dataBack.msg+'</span><br>'+dataBack.msgPatch);
+					}
+				);
+			}else{
+				$.alert('用户组【'+dataBack.name+'】<span class="label label-danger">'+dataBack.msg+'</span><br>'+dataBack.msgPatch);	
+			}
+		},
+		error: function(){
+			$.alert('与服务器通讯超时，请稍后再试！');
+		}
+	});	
+}
+
+
+
+<!--// function -->
+	
+});
+
+//**函数名：textEnToChi
+ 	//* 作用：本页面特定英文字符串转换成中文字符串
+	//* 参数text，类型：字符串。值：不为空。说明：待转换的英文字符串。
+	//* 返回值：中文字符串
+function textEnToChi(text){
+	switch(text){
+		case 'edit':
+            text='编辑';
+        break;
+        case 'audit':
+            text='审核';
+        break;
+        case 'approve':
+            text='审批';
+        break;
+        case 'execute':
+            text='执行';
+        break;
+        case 'maintain':
+            text='维护';
+        break;
+       //...................附件.....................
+        case 'upload':
+            text='上传';
+        break;
+        case 'download':
+            text='下载';
+        break;
+        case 'erase':
+            text='删除';
+        break;
+        case 'move':
+            text='移动';
+        break;
+        case 'copy':
+            text='复制';
+        break;
+		case 'enable':
+	        text='启用';
+         break;
+		case 'read':
+	        text='查阅';
+         break;
+	}
+	return text;
+}
+
+</script>
+
+
+<script>
+
+</script>
+			

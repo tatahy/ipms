@@ -74,14 +74,15 @@ class IndexController extends \think\Controller
     {
       //通过$this->log判断是否是登录用户，非登录用户退回到登录页面
       $this->log=Session::get('log');
-      $this->userId=Session::get('userId');
-      $this->username=Session::get('username');
-      $this->pwd=Session::get('pwd');
-      $this->dept=Session::get('dept');
-      $this->authArr=Session::get('authArr');
       
       if(1!=$this->log){
         return $this->error('无用户名或密码，请先登录系统');
+      }else{
+        $this->userId=Session::get('userId');
+        $this->username=Session::get('username');
+        $this->pwd=Session::get('pwd');
+        $this->dept=Session::get('dept');
+        $this->authArr=Session::get('authArr');
       }    
     }
       
@@ -482,19 +483,19 @@ class IndexController extends \think\Controller
       return view();
     }
     
-    public function UserList(Request $request,UsergroupModel $usrgroupMdl)
+    public function userList(Request $request,UsergroupModel $usrgroupMdl)
     {
       
       return 'UserList';
     }
     
-    public function UserOprt1(Request $request,UsergroupModel $usrgroupMdl)
+    public function userOprt1(Request $request,UsergroupModel $usrgroupMdl)
     {
          
       return 'UserOprt1';
     }
     
-    public function UsergroupList(UsergroupModel1 $userGpMdl)
+    public function usergroupList(UsergroupModel1 $userGpMdl)
     {
       $request=$this->request;
       $loadParamDefaults=['listRows'=>10,'pageNum'=>1,'showIssId'=>0];
@@ -539,7 +540,7 @@ class IndexController extends \think\Controller
         'listRows'=>$listRows,
         
         'searchNum'=>$userGpSet->count(),
-        'loadParam'=>$loadParam,
+        'loadParam'=>json_encode($loadParam,JSON_UNESCAPED_UNICODE),
         'auth'=>json_encode(conAuthNameArr,JSON_UNESCAPED_UNICODE),
         
         'testDis'=>json_encode($testArr,JSON_UNESCAPED_UNICODE)
@@ -552,14 +553,80 @@ class IndexController extends \think\Controller
       return view();
     }
     
-    public function UsergroupOprt1(Request $request,UsergroupModel $usrgroupMdl)
+    public function usergroupOprt1(Request $request,UsergroupModel1 $ugMdl)
     {
+      $this->_loginUser();
+      
+      $oprt=empty($request->param('oprt'))?'':$request->param('oprt');
+      $id=empty($request->param('id'))?'':$request->param('id');
+      $reqEnt=empty($request->param('reqEnt'))?'':$request->param('reqEnt');
+      
+      $result=0;
+      $msg='';
+      $name='';
+
+      #模型Create
       
       
+      #模型Delete
       
-      return 'UsergroupOprt1';
+      
+      #模型Update
+      if($oprt=='_ENABLE' || $oprt=='_DISABLE'){
+        //$ugSet= $ugMdl::update(['enable'=>($oprt=='_ENABLE')?1:0],['id' => $id]);
+        $ugSet= $ugMdl::get($id);
+        $ugSet->enable = ($oprt=='_ENABLE')?1:0;
+        $msg=$ugSet->save()?'success':'error';
+        $result=$ugSet->enable;
+        $name=$ugSet->name;
+      }
+      
+      #模型Read
+      
+      
+      $this->assign([
+        'home'=>$request->home,
+        
+      ]);
+      
+      return ['result'=>$result,'msg'=>$msg,'name'=>$name];
     }
+    public function fmUsergroupSingle(Request $request,UsergroupModel $ugMdl)
+    {
+      $this->_loginUser();
+      $conAuth=conAuthValueArr;
     
+      $oprt=empty($request->param('oprt'))?'':$request->param('oprt');
+      $id=empty($request->param('id'))?'':$request->param('id');
+      $reqEnt=empty($request->param('reqEnt'))?'':$request->param('reqEnt');
+      
+      $ugSet=[];
+      
+      if($id){
+        $ugSet= $ugMdl::get($id);
+      }else{
+        $ugSet['id']=0;
+        $ugSet['name']='';
+        $ugSet['description']='';
+        $ugSet['enable']=0;
+        $ugSet['authority']=fn_merge_auth($ugSet['authority'],$conAuth);
+        $ugSet=collection($ugSet);
+      }
+      
+            
+      $this->assign([
+        'home'=>$request->home,
+        #返回前端对象:$ugSet
+        'ugSet'=>$ugSet,
+        //'ugSet'=>json_encode($ugSet,JSON_UNESCAPED_UNICODE),
+        'oprt'=>$oprt,
+        
+        
+      ]);
+      
+      
+      return view();
+    }
      // 输出系统设置模板
     public function sysSetting(Request $request,DeptModel $deptMdl)
     {
