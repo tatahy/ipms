@@ -9,15 +9,31 @@
  */
 
 //定义需要进行权限管理的模块/实体名称
+//const conAuthEntNameArr1=[
+//        ['nameEn'=>'_ISS','nameChi'=>'事务',
+//          'child'=>[
+//            ['nameEn'=>'_PAT','nameChi'=>'专利事务','child'=>[]],
+//            ['nameEn'=>'_THE','nameChi'=>'论文事务','child'=>[]],
+//            ['nameEn'=>'_PRO','nameChi'=>'项目事务','child'=>[]]
+//          ]
+//        ],
+//        ['nameEn'=>'_PAT','nameChi'=>'专利','child'=>[]],
+//        ['nameEn'=>'_THE','nameChi'=>'论文','child'=>[]],
+//        ['nameEn'=>'_PRO','nameChi'=>'项目','child'=>[]],
+//        ['nameEn'=>'_ATT','nameChi'=>'附件','child'=>[]],
+//        ['nameEn'=>'_ASS','nameChi'=>'固定资产','child'=>[]],
+//        ['nameEn'=>'_ADMIN','nameChi'=>'后台管理','child'=>[]]
+//];
 const conAuthEntNameArr=[
-        ['nameEn'=>'_ISS','nameChi'=>'事务',
-          'child'=>[['nameEn'=>'_PAT','nameChi'=>'专利事务'],['nameEn'=>'_THE','nameChi'=>'论文事务'],['nameEn'=>'_PRO','nameChi'=>'项目事务']]],
-        ['nameEn'=>'_PAT','nameChi'=>'专利','child'=>[]],
-        ['nameEn'=>'_THE','nameChi'=>'论文','child'=>[]],
-        ['nameEn'=>'_PRO','nameChi'=>'项目','child'=>[]],
-        ['nameEn'=>'_ATT','nameChi'=>'附件','child'=>[]],
-        ['nameEn'=>'_ASS','nameChi'=>'固定资产','child'=>[]],
-        ['nameEn'=>'_ADMIN','nameChi'=>'后台管理','child'=>[]]
+        ['nameEn'=>'_ISS-_PAT','nameChi'=>'专利事务'],
+        ['nameEn'=>'_ISS-_THE','nameChi'=>'论文事务'],
+        ['nameEn'=>'_ISS-_PRO','nameChi'=>'项目事务'],
+        ['nameEn'=>'_PAT','nameChi'=>'专利'],
+        ['nameEn'=>'_THE','nameChi'=>'论文'],
+        ['nameEn'=>'_PRO','nameChi'=>'项目'],
+        ['nameEn'=>'_ATT','nameChi'=>'附件'],
+        ['nameEn'=>'_ASS','nameChi'=>'固定资产'],
+        ['nameEn'=>'_ADMIN','nameChi'=>'后台管理']
 ];
 
 //定义需要进行权限管理的模块/实体的权限
@@ -27,6 +43,17 @@ const conAuthValueArr=[
     '_PRO'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
     '_THE'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0]
   ],
+  '_PAT'=>['edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
+  '_PRO'=>['edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
+  '_THE'=>['edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
+  '_ATT'=>['upload'=>0,'download'=>0,'erase'=>0,'move'=>0,'copy'=>0],
+  '_ASS'=>['read'=>0,'edit'=>0,'audit'=>0,'approve'=>0,'maintain'=>0],
+  '_ADMIN'=>['enable'=>0]
+];
+const conAuthValueArr1=[
+  '_ISS-_PAT'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
+  '_ISS-_PRO'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
+  '_ISS-_THE'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
   '_PAT'=>['edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
   '_PRO'=>['edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
   '_THE'=>['edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
@@ -50,6 +77,90 @@ const conAuthNameArr=[
   '_ATT'=>['upload'=>'上传','download'=>'下载','erase'=>'删除','move'=>'移动','copy'=>'复制'],
   '_ASS'=>['read'=>'查阅','edit'=>'编辑','audit'=>'审核','approve'=>'审批','maintain'=>'维护'],
   '_ADMIN'=>['enable'=>'有']
+];
+
+//定义需要进行权限管理的模块/实体及其属性，方便进行横向和纵向的扩展
+const conAuthEntArr=[
+        ['entEn'=>'_ISS-_PAT','entChi'=>'专利事务',
+          'auth'=>[
+            ['en'=>'edit','chi'=>'申报','val'=>0],
+            ['en'=>'audit','chi'=>'审核','val'=>0],
+            ['en'=>'review','chi'=>'复核','val'=>0],
+            ['en'=>'approve','chi'=>'审批','val'=>0],
+            ['en'=>'execute','chi'=>'执行','val'=>0],
+            ['en'=>'maintain','chi'=>'维护','val'=>0]
+          ],
+          //'type'=>[],
+//          'status'=>[]
+        ],
+        ['entEn'=>'_ISS-_THE','entChi'=>'论文事务',
+          'auth'=>[
+            ['en'=>'edit','chi'=>'申报','val'=>0],
+            ['en'=>'audit','chi'=>'审核','val'=>0],
+            ['en'=>'review','chi'=>'复核','val'=>0],
+            ['en'=>'approve','chi'=>'审批','val'=>0],
+            ['en'=>'execute','chi'=>'执行','val'=>0],
+            ['en'=>'maintain','chi'=>'维护','val'=>0]
+          ],
+        ],
+        ['entEn'=>'_ISS-_PRO','entChi'=>'项目事务',
+          'auth'=>[
+            ['en'=>'edit','chi'=>'申报','val'=>0],
+            ['en'=>'audit','chi'=>'审核','val'=>0],
+            ['en'=>'review','chi'=>'复核','val'=>0],
+            ['en'=>'approve','chi'=>'审批','val'=>0],
+            ['en'=>'execute','chi'=>'执行','val'=>0],
+            ['en'=>'maintain','chi'=>'维护','val'=>0]
+          ],
+        ],
+        ['entEn'=>'_PAT','entChi'=>'专利',
+          'auth'=>[
+            ['en'=>'edit','chi'=>'撰写','val'=>0],
+            ['en'=>'audit','chi'=>'审核','val'=>0],
+            ['en'=>'approve','chi'=>'审批','val'=>0],
+            ['en'=>'execute','chi'=>'执行','val'=>0],
+            ['en'=>'maintain','chi'=>'维护','val'=>0]
+          ]
+        ],
+        ['entEn'=>'_THE','entChi'=>'论文',
+          'auth'=>[
+            ['en'=>'edit','chi'=>'撰写','val'=>0],
+            ['en'=>'audit','chi'=>'审核','val'=>0],
+            ['en'=>'approve','chi'=>'审批','val'=>0],
+            ['en'=>'execute','chi'=>'执行','val'=>0],
+            ['en'=>'maintain','chi'=>'维护','val'=>0]
+          ]
+        ],
+        ['entEn'=>'_PRO','entChi'=>'项目',
+          'auth'=>[
+            ['en'=>'edit','chi'=>'撰写','val'=>0],
+            ['en'=>'audit','chi'=>'审核','val'=>0],
+            ['en'=>'approve','chi'=>'审批','val'=>0],
+            ['en'=>'execute','chi'=>'执行','val'=>0],
+            ['en'=>'maintain','chi'=>'维护','val'=>0]
+          ]
+        ],
+        ['entEn'=>'_ATT','entChi'=>'附件',
+          'auth'=>[
+            ['en'=>'upload','chi'=>'上传','val'=>0],
+            ['en'=>'download','chi'=>'下载','val'=>0],
+            ['en'=>'erase','chi'=>'删除','val'=>0],
+            ['en'=>'move','chi'=>'移动','val'=>0],
+            ['en'=>'copy','chi'=>'复制','val'=>0]
+          ]
+        ],
+        ['entEn'=>'_ASS','entChi'=>'固定资产',
+          'auth'=>[
+            ['en'=>'read','chi'=>'查阅','val'=>0],
+            ['en'=>'edit','chi'=>'申报','val'=>0],
+            ['en'=>'audit','chi'=>'审核','val'=>0],
+            ['en'=>'approve','chi'=>'审批','val'=>0],
+            ['en'=>'maintain','chi'=>'维护','val'=>0]
+          ]
+        ],
+        ['entEn'=>'_ADMIN','entChi'=>'后台管理',
+          'auth'=>[['en'=>'enable','chi'=>'有','val'=>0]]
+        ]
 ];
 
 //patent的类型数组

@@ -185,6 +185,44 @@ var oprtBtnPropArr=[
 			{oprtEn:'_ENABLE',oprtChi:'启用',color:{lab:'label label-success',txt:'text-success',btn:'btn-success'},glyCom:'<span class="glyphicon glyphicon-magnet"></span>'},
 		];
 
+//spSet对象的span内容格式修改，后续通过$.load的页面使用
+var spComModify=(spSet)=>{
+	//递归函数得到中文名称
+	let getNameChi=(keyStr,obj)=>{
+			let k='',v='',arr=[];
+			if(keyStr.indexOf('-')>0){
+				arr=keyStr.split('-');
+			}
+			if(arr.length){
+				k=arr.shift();
+				keyStr=arr.join('-');
+				v=getNameChi(keyStr,obj[k]);
+			}else{
+				v=obj[keyStr];
+			}
+			return v;
+		};
+	spSet.each(function(){
+		let text=$(this).text(),
+			prefA=$(this).closest('td').data('hideVal'),
+			prefB='',
+			pref=prefA.length?prefA+'-':prefB+'-';
+		
+		//将span的text转换成中文，格式修改	
+		if(text==0){
+			$(this).text('无').addClass('label label-default').css('padding-bottom','2px');
+		}else{
+			$(this).text(getNameChi(pref+text,authNameObj));
+			//span的格式修改
+			if($(this).data('val')){
+				$(this).addClass('label label-success').css('padding-bottom','2px');
+			}else{
+				$(this).addClass('text-muted');
+			}	
+		}
+	});
+};
+
 var showSideNavbar=(y)=>{
 	if(y){
 		//show

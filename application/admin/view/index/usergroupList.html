@@ -210,48 +210,11 @@
 	
 <script>
 //控制显示/隐藏字段的组件的属性数组
-var columnToggleArr=[];
-//
-var authNameObj={$auth};
+var columnToggleArr=[],
+	authNameObj={$auth},
+	loadParam={$loadParam};
 
-var loadParam={$loadParam};
-
-//指定对象的span内容格式修改
-var spComModify=()=>{
-	//递归函数得到中文名称
-	let getNameChi=(keyStr,obj)=>{
-			let k='',v='',arr=[];
-			if(keyStr.indexOf('-')>0){
-				arr=keyStr.split('-');
-			}
-			if(arr.length){
-				k=arr.shift();
-				keyStr=arr.join('-');
-				v=getNameChi(keyStr,obj[k]);
-			}else{
-				v=obj[keyStr];
-			}
-			return v;
-		};
-	$('#tblUserGpList .tdAuth span').each(function(){
-		let text=$(this).text(),
-			pref=$(this).closest('td').data('hideVal')+'-';
-		
-		//将span的text转换成中文，格式修改	
-		if(text==0){
-			$(this).text('无').addClass('label label-default').css('padding-bottom','2px');
-		}else{
-			$(this).text(getNameChi(pref+text,authNameObj));
-			//span的格式修改
-			if($(this).data('val')){
-				$(this).addClass('label label-success').css('padding-bottom','2px');
-			}else{
-				$(this).addClass('text-muted');
-			}	
-		}
-	});
-};
-
+//选择显示、隐藏字段组件生成函数
 var buildColumnToggleCom=()=>{
 	let arr=columnToggleArr;
 	//生成单选框组件属性数组
@@ -365,7 +328,7 @@ var oprtBtnDisplay=(tdObj)=>{
 	});	
 	buildColumnToggleCom();
 	columnToggle();
-	spComModify();
+	spComModify($('#tblUserGpList .tdAuth span'));
 
 	// 激活tooltip
 	$('[title]').tooltip();

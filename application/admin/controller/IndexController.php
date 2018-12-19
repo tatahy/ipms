@@ -85,6 +85,83 @@ class IndexController extends \think\Controller
         $this->authArr=Session::get('authArr');
       }    
     }
+    
+    // 将数据库中存储的auth值，组装成app/common.php中预定义的结构，方便前端使用。
+    private function _authDbToFe($arr=[])
+    {
+      #app/common.php中预定义的结构，整个函数严重依赖conAuthEntArr的结构
+      $authEntArr=conAuthEntArr;
+      $nameArr=[];
+      $tArr=[];
+      $authKeys=[];
+      $authVals=[];
+      $authArr=[];
+      $resultArr=[];
+      
+      #将ent名称转为全小写，并去掉字符串中的下划线
+      foreach($authEntArr as $k=>$v){
+        $authEntArr[$k]['entEn']=strtolower(strtr($v['entEn'],['_'=>'']));
+      }
+      
+      if(empty($arr)){
+        $resultArr=$authEntArr;
+        return $resultArr;
+      }else{
+        $nameArr=array_keys($arr);
+        $tArr=array_values($arr);
+      }
+      #组装成预定义的结构
+      foreach($nameArr as $k=>$v){
+        $authKeys=array_keys($tArr[$k]);
+        $authVals=array_values($tArr[$k]);
+        foreach($authKeys as $kM=>$vM){
+          #比照$authEntArr添加'chi'字段
+          $authArr[$k][$kM]=['en'=>$vM,'chi'=>'','val'=>$authVals[$kM]];
+        }          
+        #组装成$authEntArr的结构
+        $resultArr[$k]=['entEn'=>$v,'entChi'=>'','auth'=>$authArr[$k]];
+      }
+      #比照$authEntArr补足'chi','entChi'字段值
+      foreach($authEntArr as $kP=>$vP){
+        foreach($resultArr as $k=>$v){
+          if($v['entEn']==$vP['entEn']){
+            $resultArr[$k]['entChi']=$vP['entChi'];
+            foreach($v['auth'] as $kC=>$vC){
+              //$vC['en']
+              foreach($vP['auth'] as $kM=>$vM){
+                if($vC['en']==$vM['en'])
+                  $resultArr[$k]['auth'][$kC]['chi']=$vM['chi'];
+              }
+            }
+          }
+        }
+      }
+      #比照$authEntArr补足缺失的auth数组
+      foreach(array_diff(array_column($authEntArr,'entEn'),array_column($resultArr,'entEn')) as $k=>$v){
+        array_push($resultArr,$authEntArr[$k]);
+      }
+      return $resultArr;
+      
+      #定义闭包得到预定义的全部auth值，组装成数据库中存储的结构，暂时没用。
+      $authArr=function($arr,$lower=true){
+        $nameArr=array_column($arr,'entEn');//索引数组，每个值为一个ent名称（全大写，‘-’分隔的每个字符串的首字符为下划线‘_’）
+        $tArr=array_column($arr,'auth');//索引数组，每个值为一个关联数组（索引为权限名称，值为关联数组）
+        $authKeys=[];
+        $authVals=[];
+        $authArr=[];
+        $resultArr=[];
+        #组装成数据库中存储的结构
+        foreach($nameArr as $k=>$v){
+          $authKeys[$k]=array_column($tArr[$k],'en');
+          $authVals[$k]=array_column($tArr[$k],'val');
+          $authArr[$k]=array_combine($authKeys[$k],$authVals[$k]);
+          #将ent名称转为全小写，并去掉字符串中的下划线
+          $nameArr[$k]=$lower?strtr(strtolower($nameArr[$k]),['_'=>'']):$nameArr[$k];
+          $resultArr[$nameArr[$k]]=$authArr[$k];
+        }
+        return $resultArr;
+      };
+    }
       
     //响应前端请求，返回信息
     public function selectResponse(Request $request)
@@ -594,33 +671,38 @@ class IndexController extends \think\Controller
     public function fmUsergroupSingle(Request $request,UsergroupModel $ugMdl)
     {
       $this->_loginUser();
-      $conAuth=conAuthValueArr;
-    
+      #前端传来的数据
       $oprt=empty($request->param('oprt'))?'':$request->param('oprt');
       $id=empty($request->param('id'))?'':$request->param('id');
       $reqEnt=empty($request->param('reqEnt'))?'':$request->param('reqEnt');
+      #auth分类数组
+      $authArr=array_column(conAuthEntArr,'entEn');
+      $ugSet=[];   
       
-      $ugSet=[];
-      
+      #将$authArr的值转为全小写，并去掉字符串中的下划线
+      foreach($authArr as $k=>$v){
+        $authArr[$k]=strtolower(strtr($v,['_'=>'']));
+      }
       if($id){
         $ugSet= $ugMdl::get($id);
+        $ugSet->authority=$this->_authDbToFe($ugSet->authority);
       }else{
         $ugSet['id']=0;
         $ugSet['name']='';
         $ugSet['description']='';
         $ugSet['enable']=0;
-        $ugSet['authority']=fn_merge_auth($ugSet['authority'],$conAuth);
+        $ugSet['authority']=$this->_authDbToFe();
+        #将数组转换为对象
         $ugSet=collection($ugSet);
       }
       
             
       $this->assign([
         'home'=>$request->home,
-        #返回前端对象:$ugSet
+        #返回前端必须为对象类型:$ugSet
         'ugSet'=>$ugSet,
-        //'ugSet'=>json_encode($ugSet,JSON_UNESCAPED_UNICODE),
         'oprt'=>$oprt,
-        
+        'authArr'=>json_encode($authArr,JSON_UNESCAPED_UNICODE)
         
       ]);
       

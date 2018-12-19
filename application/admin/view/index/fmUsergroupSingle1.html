@@ -28,31 +28,119 @@
 		
 		</div>
 	</div>
-	<hr>
+
 	<div class="myFieldset">
 		<div class="myLegend"><span class="label label-info"><span class="glyphicon glyphicon-alert"></span>&nbsp;用户组权限</span></div>
 		
-		<div id="divAuthCom" class="row myRow">		
-			<!-- <div class="form-group col-sm-6">	 -->
-			<!-- <label for="authIss"><span class="text-info">【事务】</span>模块</label>	 -->
-			<!-- <div id="authIss" style="border-bottom:solid 1px #ccc; padding:5px;"> -->
-				<!-- {foreach name="$ugSet.authority[0]" item="v" } -->
-    			<!-- {if condition="( $v==1)"}  -->
-				<!-- <label class="checkbox-inline"><input type="checkbox" name="authIss[]" value="{ $key}" checked><span class="spAuthKey">{ $key}</span></label> -->
-				<!-- {else /}  -->
-				<!-- <label class="checkbox-inline"><input type="checkbox" name="authIss[]" value="{ $key}"><span class="spAuthKey">{ $key}</span></label> -->
-				<!-- {/if} -->
-				<!-- {/foreach} -->
-			<!-- </div> -->
-			<!-- </div> -->
+		<div class="row myRow">		
+		<div class="form-group col-sm-6">	
+			<label for="authIss"><span class="text-info">【事务】</span>模块</label>	
+			<div id="authIss" style="border-bottom:solid 1px #ccc; padding:5px;">
+				{foreach name="$ugSet.authority.iss" item="v" }
+    			{if condition="($v==1)"} 
+				<label class="checkbox-inline"><input type="checkbox" name="authIss[]" value="{$key}" checked><span class="spAuthKey">{$key}</span></label>
+				{else /} 
+				<label class="checkbox-inline"><input type="checkbox" name="authIss[]" value="{$key}"><span class="spAuthKey">{$key}</span></label>
+				{/if}
+				{/foreach}
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label for="authAss"><span class="text-info">【固定资产】</span>模块</label>	
+			<div id="authAss" style="border-bottom:solid 1px #ccc; padding:5px;">
+						
+				{foreach name="$ugSet.authority.ass" item="v" }
+    			{if condition="($v==1)"} 
+				<label class="checkbox-inline"><input type="checkbox" name="authAss[]" value="{$key}" checked><span class="spAuthKey">{$key}</span></label>
+				{else /} 
+				<label class="checkbox-inline"><input type="checkbox" name="authAss[]" value="{$key}"><span class="spAuthKey">{$key}</span></label>
+				{/if}
+				{/foreach}
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label for="authPat"><span class="text-default">【专利】</span>模块</label>	
+			<div id="authPat" style="border-bottom:solid 1px #ccc; padding:5px;">				
+				{foreach name="$ugSet.authority.pat" item="v" }
+    			{if condition="($v==1)"} 
+				<label class="checkbox-inline"><input type="checkbox" name="authPat[]" value="{$key}" checked><span class="spAuthKey">{$key}</span></label>
+				{else /} 
+				<label class="checkbox-inline"><input type="checkbox" name="authPat[]" value="{$key}"><span class="spAuthKey">{$key}</span></label>
+				{/if}
+				{/foreach}
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label for="authPro"><span class="text-default">【项目】</span>模块</label>	
+			<div id="authPro" style="border-bottom:solid 1px #ccc; padding:5px;">
+				{foreach name="$ugSet.authority.pro" item="v" }
+    			{if condition="($v==1)"} 
+				<label class="checkbox-inline"><input type="checkbox" name="authPro[]" value="{$key}" checked><span class="spAuthKey">{$key}</span></label>
+				{else /} 
+				<label class="checkbox-inline"><input type="checkbox" name="authPro[]" value="{$key}"><span class="spAuthKey">{$key}</span></label>
+				{/if}
+				{/foreach}
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label for="authThe"><span class="text-default">【论文】</span>模块</label>	
+			<div id="authThe" style="border-bottom:solid 1px #ccc; padding:5px;">
+				{foreach name="$ugSet.authority.the" item="v" }
+    			{if condition="($v==1)"} 
+				<label class="checkbox-inline"><input type="checkbox" name="authThe[]" value="{$key}" checked><span class="spAuthKey">{$key}</span></label>
+				{else /} 
+				<label class="checkbox-inline"><input type="checkbox" name="authThe[]" value="{$key}"><span class="spAuthKey">{$key}</span></label>
+				{/if}
+				{/foreach}
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label for="authAtt"><span class="text-danger">【附件】</span>模块</label>	
+			<div id="authAtt" style="border-bottom:solid 1px #ccc; padding:5px;">
+				{foreach name="$ugSet.authority.att" item="v" }
+    			{if condition="($v==1)"} 
+				<label class="checkbox-inline"><input type="checkbox" name="authAtt[]" value="{$key}" checked><span class="spAuthKey">{$key}</span></label>
+				{else /} 
+				<label class="checkbox-inline"><input type="checkbox" name="authAtt[]" value="{$key}"><span class="spAuthKey">{$key}</span></label>
+				{/if}
+				{/foreach}
+			</div>
+		</div>
+		
+		<div class="form-group col-sm-6">	
+			<label for="authAdmin"><span class="text-danger">【后台管理】</span>模块</label>	
+			<div id="authAdmin" class="form-group" style="border-bottom:solid 1px #ccc; padding:5px;">
+				{eq name="$ugSet.authority.admin.enable" value="1"} 
+				<label class="radio-inline">
+      				<input type="radio" name="adminEn" value="1" checked><span class="label label-default">有</span>
+    			</label>
+    			<label class="radio-inline">
+      				<input type="radio" name="adminEn" value="0" ><span class="label label-default">无</span>
+    			</label>
+				{else /} 
+				<label class="radio-inline">
+      				<input type="radio" name="adminEn" value="1" ><span class="label label-default">有</span>
+    			</label>
+    			<label class="radio-inline">
+      				<input type="radio" name="adminEn" value="0" checked><span class="label label-default">无</span>
+    			</label>
+				{/eq}
+			</div>
+		</div>
 		</div>
 		
 	</div>
-	<hr>			
+				
+
 	<div id="divUserGroupEn" class="myFieldset form-group">
 		<div class="myLegend"><span class="label label-info">
 			<span class="glyphicon glyphicon-magnet"></span>&nbsp;用户组启用</span>
-			<label class="" for="usergroupEn">用户组启用</label> 
+			<!-- <label class="" for="usergroupEn">用户组启用</label> -->
 			<label class="radio-inline">
       			<input type="radio" name="usergroupEn" value="1" checked><span class="label label-info">是</span>
     		</label>
@@ -61,8 +149,10 @@
     		</label>
 		</div>
 	</div>	
-	<hr>
+		<hr>
 	<div class="row myRow">	
+		
+	
 		<div class="pull-right">	
 			<button id="btnReset" type="reset" class="btn btn-primary btn-sm">重置</button>
 				
@@ -74,54 +164,10 @@
 	
 <script>
 var ugSet={$ugSet},
-	authArr={$authArr},
 	oprt='{$oprt}',
 	fm=$('#fmUsergroup');
-	
-console.dir(ugSet.authority);
 
-//生成auth组件。根据查询到的auth数据ugSet.authority，参照已定义的auth类型authArr
-var buildAuthCom=()=>{
-	let inObj='',
-		spObj='',
-		labSet=[],
-		dSet=[],
-		lSet=[],
-		divCom=[],
-		sumAuth=0;
-	
-	ugSet.authority.forEach(function(el,m){
-		if(authArr.indexOf(el.entEn)!=-1){
-		labSet=[];
-		sumAuth=0
-			el.auth.forEach(function(e,n){
-				inObj=$('<input>').attr('type','checkbox').val(e.val).attr('name',el.entEn+'[]');
-				if(e.val){
-					inObj.attr('checked',true);
-				}else{
-					inObj.attr('checked',false);
-				}
-				sumAuth+=e.val;
-				spObj=$('<span></span>').addClass('spAuthKey text-muted').text(e.chi);
-				labSet[n]=$('<label></label>').addClass('checkbox-inline').append(inObj,spObj);
-			});
-			
-			lSet[m]=$('<label></label>').append($('<span></span>').html('【'+el.entChi+'】模块&nbsp;'));
-			if(sumAuth){
-				lSet[m].addClass('bg-primary');
-			}else{
-				lSet[m].addClass('text-muted');
-			}
-			lSet[m].css({'padding':'1px','border-radius':'3px'})
-			
-			dSet[m]=$('<div></div>').css({'border-bottom':'solid 1px #ccc','padding':'5px'}).append(labSet);
-			
-			divCom[m]=$('<div></div>').addClass('form-group col-sm-6').append(lSet[m],dSet[m]);	
-		}
-	});
-	<!-- console.log(divCom.length); -->
-	$('#divAuthCom').append(divCom);	
-};
+console.log(ugSet);
 
 //完善操作按钮
 var oprtBtnComShow=(oprt)=>{
@@ -160,16 +206,20 @@ var oprtBtnComShow=(oprt)=>{
 (function($){	
 	
 	fm.find('[name="oprt"]').val(oprt);
-	fm.find('.myFieldset').css('border-width','0px');
 	
-	buildAuthCom();
 	oprtBtnComShow(oprt);
-	
+	//将span的text转换成中文
+	$('.spAuthKey').each(function(){
+		var str=$(this).text();
+		$(this).text(textEnToChi(str));
+   	});
+	//指定对象的span内容格式修改
+	<!-- spComModify($('.spAuthKey')); -->
 
 })(jQuery);
 
 $(document).ready(function(){
-	//radioBg($('input:radio[name="adminEn"]:checked'));
+	radioBg($('input:radio[name="adminEn"]:checked'));
 	
 	<!-- usergroupName内容验证 -->
 	$("#usergroupName").focusout(function(){
@@ -318,11 +368,97 @@ function checkboxBg(obj){
 	}
 }
 
+	//**函数名：ajaxProcess
+ 	//* 作用：本页面ajax过程
+	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
+	//* 参数data，类型：数值。值：传送给后端的键值对数据。
+	//* 参数archor，类型：字符串。值：本页面锚点值：window.location.hash。
+	//* 返回值：无
+function ajaxProcess(url,data,archor){
+	$.ajax({
+		type: 'post',
+        url: url,
+        data: data,
+		timeout:2000,
+		<!-- datatype: 'JSON', -->
+        contentType: false,// 当有文件要上传时，此项是必须的，否则会导致后台无法识别文件流的起始位置
+        processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)。当使用FormData()，必须设为false，否则jqurey默认将FormData()转换为查询字符串。
+		success: function(dataBack){
+			<!-- $('.modal').modal('hide'); -->
+			//dataBack的5个返回值id,result,name,msg,msgPatch
+			if(dataBack.result=='success'){
+				//ajax更新页面信息
+				$('#content').load(
+					'tplFile',
+					{'sId':archor},
+					function(){
+						//所在行上色'bg-warning'
+						$('button[data-id="'+dataBack.id+'"]').closest('tr').addClass('bg-warning').focus();
+						$.alert('用户组【'+dataBack.name+'】<span class="label label-success">'+dataBack.msg+'</span><br>'+dataBack.msgPatch);
+					}
+				);
+			}else{
+				$.alert('用户组【'+dataBack.name+'】<span class="label label-danger">'+dataBack.msg+'</span><br>'+dataBack.msgPatch);	
+			}
+		},
+		error: function(){
+			$.alert('与服务器通讯超时，请稍后再试！');
+		}
+	});	
+}
+
+
 
 <!--// function -->
 	
 });
 
+//**函数名：textEnToChi
+ 	//* 作用：本页面特定英文字符串转换成中文字符串
+	//* 参数text，类型：字符串。值：不为空。说明：待转换的英文字符串。
+	//* 返回值：中文字符串
+function textEnToChi(text){
+	switch(text){
+		case 'edit':
+            text='编辑';
+        break;
+        case 'audit':
+            text='审核';
+        break;
+        case 'approve':
+            text='审批';
+        break;
+        case 'execute':
+            text='执行';
+        break;
+        case 'maintain':
+            text='维护';
+        break;
+       //...................附件.....................
+        case 'upload':
+            text='上传';
+        break;
+        case 'download':
+            text='下载';
+        break;
+        case 'erase':
+            text='删除';
+        break;
+        case 'move':
+            text='移动';
+        break;
+        case 'copy':
+            text='复制';
+        break;
+		case 'enable':
+	        text='启用';
+         break;
+		case 'read':
+	        text='查阅';
+         break;
+	}
+	return text;
+}
 
 </script>
 
