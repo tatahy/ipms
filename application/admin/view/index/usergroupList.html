@@ -46,9 +46,9 @@
 					<td>{$vo.description}</td>
 					<!-- //_ISS_PAT -->
 					<td class="tdAuth"> 
-						{present name="$vo.authority.iss.pat"}
+						{present name="$vo.authority['iss-pat']"}
 						<div class="">
-						{foreach name="$vo.authority.iss.pat" item="v" }
+						{foreach name="$vo.authority['iss-pat']" item="v" }
     						<span data-val="{$v}">{$key}</span>
 						{/foreach}
 						</div>
@@ -58,9 +58,9 @@
 					</td>
 					<!-- //_ISS_PRO -->
 					<td class="tdAuth"> 
-						{present name="$vo.authority.iss.pro"}
+						{present name="$vo.authority['iss-pro']"}
 						<div class="">
-						{foreach name="$vo.authority.iss.pro" item="v" }
+						{foreach name="$vo.authority['iss-pro']" item="v" }
     						<span data-val="{$v}">{$key}</span>
 						{/foreach}
 						</div>
@@ -70,9 +70,9 @@
 					</td>
 					<!-- //_ISS_THE -->
 					<td class="tdAuth"> 
-						{present name="$vo.authority.iss.the"}
+						{present name="$vo.authority['iss-the']"}
 						<div class="">
-						{foreach name="$vo.authority.iss.the" item="v" }
+						{foreach name="$vo.authority['iss-the']" item="v" }
     						<span data-val="{$v}">{$key}</span>
 						{/foreach}
 						</div>
@@ -151,13 +151,13 @@
 					</td>
 					
 					<td class="text-right" data-enable="{$vo.enable}">
-						<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_EDIT" data-req-ent="model"></button>
-						<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_DELETE" data-req-ent="model"></button>
+						<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_EDIT" data-req-ent="model" title="编辑用户组"></button>
+						<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_DELETE" data-req-ent="model" title="删除用户组"></button>
 						<div class="btnEn">
-							<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_DISABLE" data-req-ent="result"></button>
+							<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_DISABLE" data-req-ent="result" title="禁用用户组"></button>
 						</div>
 						<div class="btnDis">
-							<strong>(已禁用)</strong><button class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_ENABLE" data-req-ent="result"></button>
+							<button class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_ENABLE" data-req-ent="result" title="启用用户组"><strong class="text-danger">(已禁用)</strong></button>
 						</div>
 					</td>
 				</tr>

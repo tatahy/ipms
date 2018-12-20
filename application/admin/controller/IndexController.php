@@ -91,54 +91,34 @@ class IndexController extends \think\Controller
     {
       #app/common.php中预定义的结构，整个函数严重依赖conAuthEntArr的结构
       $authEntArr=conAuthEntArr;
-      $nameArr=[];
-      $tArr=[];
-      $authKeys=[];
-      $authVals=[];
-      $authArr=[];
+      $entName='';
       $resultArr=[];
       
-      #将ent名称转为全小写，并去掉字符串中的下划线
-      foreach($authEntArr as $k=>$v){
-        $authEntArr[$k]['entEn']=strtolower(strtr($v['entEn'],['_'=>'']));
+      if(empty($arr)){
+        foreach($authEntArr as $k=>$v){
+          #将ent名称转为全小写，并去掉字符串中的下划线，
+          $authEntArr[$k]['entEn']=strtolower(strtr($v['entEn'],['_'=>'']));
+        }
+        return $authEntArr;
       }
       
-      if(empty($arr)){
-        $resultArr=$authEntArr;
-        return $resultArr;
-      }else{
-        $nameArr=array_keys($arr);
-        $tArr=array_values($arr);
-      }
-      #组装成预定义的结构
-      foreach($nameArr as $k=>$v){
-        $authKeys=array_keys($tArr[$k]);
-        $authVals=array_values($tArr[$k]);
-        foreach($authKeys as $kM=>$vM){
-          #比照$authEntArr添加'chi'字段
-          $authArr[$k][$kM]=['en'=>$vM,'chi'=>'','val'=>$authVals[$kM]];
-        }          
-        #组装成$authEntArr的结构
-        $resultArr[$k]=['entEn'=>$v,'entChi'=>'','auth'=>$authArr[$k]];
-      }
-      #比照$authEntArr补足'chi','entChi'字段值
-      foreach($authEntArr as $kP=>$vP){
-        foreach($resultArr as $k=>$v){
-          if($v['entEn']==$vP['entEn']){
-            $resultArr[$k]['entChi']=$vP['entChi'];
-            foreach($v['auth'] as $kC=>$vC){
-              //$vC['en']
-              foreach($vP['auth'] as $kM=>$vM){
-                if($vC['en']==$vM['en'])
-                  $resultArr[$k]['auth'][$kC]['chi']=$vM['chi'];
+      #输出数组以$authEntArr为基础，叠加$arr中值为1的部分。
+      foreach($authEntArr as $k=>$v){
+        #将ent名称转为全小写，并去掉字符串中的下划线，
+        $entName=strtolower(strtr($v['entEn'],['_'=>'']));
+        $v['entEn']=$entName;
+        //$authEntArr[$k]['entEn']=$v['entEn'];
+        if(isset($arr[$entName])){
+          foreach($arr[$entName] as $kC=>$vC){
+            for($i=0;$i<count($v['auth']);$i++){
+              if($kC==$v['auth'][$i]['en']){
+                $v['auth'][$i]['val']=$vC;
+                break;
               }
             }
           }
         }
-      }
-      #比照$authEntArr补足缺失的auth数组
-      foreach(array_diff(array_column($authEntArr,'entEn'),array_column($resultArr,'entEn')) as $k=>$v){
-        array_push($resultArr,$authEntArr[$k]);
+        $resultArr[$k]=$v;
       }
       return $resultArr;
       
@@ -582,29 +562,14 @@ class IndexController extends \think\Controller
       $pageNum=$loadParam['pageNum'];
       $listRows=$loadParam['listRows'];
  
-      //$nameEn=strtolower(ltrim($str,"_"));
-      //
-      
       $userGpSet=$userGpMdl->where('id','>',0)->select();
-      
-      //
       $userGpSet=is_array($userGpSet)?collection($userGpSet):$userGpSet;
-      
       $userGpList=$userGpSet->slice(($pageNum-1)*$listRows,$listRows);
-      
-      $testArr=$userGpList->column('authority')[0];
-      
-      //$testArr=[];
-     
-      $conAuth=conAuthValueArr;
-      //unset($conAuth['_ADMIN']);
-      #补足authority字段comPleteAuthArr()
-      $testArr=fn_merge_auth($testArr,$conAuth);
-      //$userGpList[0]['authority']=$testArr;
-            
+                 
       $pageSet=$userGpMdl->where('id','>',0)->paginate($listRows,false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$pageNum,
                         'query'=>['listRows'=>$listRows]]);    
-      
+                        
+      $testArr=$userGpList->column('authority')[0];
       $this->assign([
         'home'=>$request->home,
         //显示结果集
@@ -668,7 +633,7 @@ class IndexController extends \think\Controller
       
       return ['result'=>$result,'msg'=>$msg,'name'=>$name];
     }
-    public function fmUsergroupSingle(Request $request,UsergroupModel $ugMdl)
+    public function fmUsergroupSingle(Request $request,UsergroupModel1 $ugMdl)
     {
       $this->_loginUser();
       #前端传来的数据
@@ -690,7 +655,7 @@ class IndexController extends \think\Controller
         $ugSet['id']=0;
         $ugSet['name']='';
         $ugSet['description']='';
-        $ugSet['enable']=0;
+        $ugSet['enable']=1;
         $ugSet['authority']=$this->_authDbToFe();
         #将数组转换为对象
         $ugSet=collection($ugSet);
