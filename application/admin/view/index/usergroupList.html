@@ -311,15 +311,9 @@ var oprtBtnDisplay=(tdObj)=>{
 	$('#tblUserGpList thead th[data-ent-name]').addClass('text-center text-primary');
 	//每个操作按钮添加核心属性
 	$('.btnOprt').each(function(){
-		let oprtEn=$(this).data('oprt'),e='',
-			el=oprtBtnPropArr;
-		for(var i=0;i<el.length;i++){
-			e=el[i];
-			if(oprtEn==e.oprtEn){
-				$(this).append($('<span></span>').addClass(e.color.txt).html(e.glyCom+e.oprtChi));
-				break;
-			}
-		}
+		let e=oprtBtnProp[$(this).data('oprt')];
+		$(this).append($('<span></span>').addClass(e.color.txt).html(e.glyCom+e.chi));
+		
 	});
 	
 	//操作列内每个单元格内的按键显示、隐藏
@@ -340,23 +334,16 @@ $(document).ready(function(){
 	$('.btnOprt').click(function(){
 		let url='',
 			data={oprt:$(this).data('oprt'),id:$(this).data('id'),reqEnt:$(this).data('reqEnt')},
-			el=oprtBtnPropArr,
+			e=oprtBtnProp[data.oprt],
 			mdObj=$('#modalEditUsergroup'),
 			tdObj='',
-			oprtStr='';
+			//操作结果字符串
+			oprtStr='【<span class="'+e.color.txt+'">'+e.glyCom+e.chi+'</span>】';
 		//去掉所有行的底色
 		$('tr').removeClass('bg-warning');
 		//给本行上底色
 		$(this).closest('tr').addClass('bg-warning');
 		
-		//操作结果字符串
-		for(var i=0;i<el.length;i++){
-			let e=el[i];
-			if(e.oprtEn==data.oprt){
-				oprtStr='【<span class="'+e.color.txt+'">'+e.glyCom+e.oprtChi+'</span>】';
-				break;
-			}
-		}
 		if(data.oprt=='_ENABLE' || data.oprt=='_DISABLE'){
 			url='usergroupOprt1';
 			tdObj=$(this).closest('td');

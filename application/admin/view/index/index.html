@@ -176,27 +176,27 @@ footer {
 
 <script>
 //主要操作按钮核心属性
-var oprtBtnPropArr=[
-	{oprtEn:'_CREATE',oprtChi:'新增',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	{oprtEn:'_EDIT',oprtChi:'编辑',color:{lab:'label label-primary',txt:'text-primary',btn:'btn-primary'},glyCom:'<span class="glyphicon glyphicon-edit"></span>'},
-	{oprtEn:'_UPDATE',oprtChi:'保存',color:{lab:'label label-primary',txt:'text-primary',btn:'btn-primary'},glyCom:'<span class="glyphicon glyphicon-saved"></span>'},
-	{oprtEn:'_DELETE',oprtChi:'删除',color:{lab:'label label-danger',txt:'text-danger',btn:'btn-danger'},glyCom:'<span class="glyphicon glyphicon-remove"></span>'},
-	{oprtEn:'_DISABLE',oprtChi:'禁用',color:{lab:'label label-warning',txt:'text-warning',btn:'btn-warning'},glyCom:'<span class="glyphicon glyphicon-ban-circle"></span>'},
-	{oprtEn:'_ENABLE',oprtChi:'启用',color:{lab:'label label-success',txt:'text-success',btn:'btn-success'},glyCom:'<span class="glyphicon glyphicon-magnet"></span>'},
-];
+var oprtBtnProp={
+	'_CREATE':{chi:'新增',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	'_EDIT':{chi:'编辑',color:{lab:'label label-primary',txt:'text-primary',btn:'btn-primary'},glyCom:'<span class="glyphicon glyphicon-edit"></span>'},
+	'_UPDATE':{chi:'保存',color:{lab:'label label-primary',txt:'text-primary',btn:'btn-primary'},glyCom:'<span class="glyphicon glyphicon-saved"></span>'},
+	'_DELETE':{chi:'删除',color:{lab:'label label-danger',txt:'text-danger',btn:'btn-danger'},glyCom:'<span class="glyphicon glyphicon-remove"></span>'},
+	'_DISABLE':{chi:'禁用',color:{lab:'label label-warning',txt:'text-warning',btn:'btn-warning'},glyCom:'<span class="glyphicon glyphicon-ban-circle"></span>'},
+	'_ENABLE':{chi:'启用',color:{lab:'label label-success',txt:'text-success',btn:'btn-success'},glyCom:'<span class="glyphicon glyphicon-magnet"></span>'}
+};
 		
 //权限模块核心属性
-var authEntPropArr=[
-	{authEn:'ass',authChi:'固定资产',color:{bg:'bg-default',txt:'text-default',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	{authEn:'att',authChi:'附件',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	{authEn:'iss-pat',authChi:'专利事务',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	{authEn:'iss-pro',authChi:'项目事务',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	{authEn:'iss-the',authChi:'论文事务',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	{authEn:'pat',authChi:'专利',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	{authEn:'pro',authChi:'项目',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	{authEn:'the',authChi:'论文',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	{authEn:'admin',authChi:'后台管理',color:{bg:'bg-danger',txt:'text-danger'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'}
-];
+var authEntProp={
+	'ass':{chi:'固定资产',color:{bg:'bg-default',txt:'text-default',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	'att':{chi:'附件',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	'iss-pat':{chi:'专利事务',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	'iss-pro':{chi:'项目事务',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	'iss-the':{chi:'论文事务',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	'pat':{chi:'专利',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	'pro':{chi:'项目',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	'the':{chi:'论文',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	'admin':{chi:'后台管理',color:{bg:'bg-danger',txt:'text-danger'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'}
+};
 
 //spSet对象的span内容格式修改，后续通过$.load的页面使用
 var spComModify=(spSet)=>{

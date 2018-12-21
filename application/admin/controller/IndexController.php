@@ -89,7 +89,7 @@ class IndexController extends \think\Controller
     // 将数据库中存储的auth值，组装成app/common.php中预定义的结构，方便前端使用。
     private function _authDbToFe($arr=[])
     {
-      #app/common.php中预定义的结构，整个函数严重依赖conAuthEntArr的结构
+      #app/common.php中预定义的结构，整个函数输出严重依赖conAuthEntArr的结构
       $authEntArr=conAuthEntArr;
       $entName='';
       $resultArr=[];
@@ -97,7 +97,7 @@ class IndexController extends \think\Controller
       if(empty($arr)){
         foreach($authEntArr as $k=>$v){
           #将ent名称转为全小写，并去掉字符串中的下划线，
-          $authEntArr[$k]['entEn']=strtolower(strtr($v['entEn'],['_'=>'']));
+          $k=strtolower(strtr($k,['_'=>'']));
         }
         return $authEntArr;
       }
@@ -105,17 +105,11 @@ class IndexController extends \think\Controller
       #输出数组以$authEntArr为基础，叠加$arr中值为1的部分。
       foreach($authEntArr as $k=>$v){
         #将ent名称转为全小写，并去掉字符串中的下划线，
-        $entName=strtolower(strtr($v['entEn'],['_'=>'']));
-        $v['entEn']=$entName;
+        $k=strtolower(strtr($k,['_'=>'']));
         //$authEntArr[$k]['entEn']=$v['entEn'];
-        if(isset($arr[$entName])){
-          foreach($arr[$entName] as $kC=>$vC){
-            for($i=0;$i<count($v['auth']);$i++){
-              if($kC==$v['auth'][$i]['en']){
-                $v['auth'][$i]['val']=$vC;
-                break;
-              }
-            }
+        if(isset($arr[$k])){
+          foreach($arr[$k] as $kC=>$vC){
+            $v['auth'][$kC]['val']=$vC;
           }
         }
         $resultArr[$k]=$v;

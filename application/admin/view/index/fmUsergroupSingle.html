@@ -37,7 +37,7 @@
 			<!-- <div class="form-group col-sm-6">	 -->
 			<!-- <label for="authIss"><span class="text-info">【事务】</span>模块</label>	 -->
 			<!-- <div id="authIss" style="border-bottom:solid 1px #ccc; padding:5px;"> -->
-				<!-- {foreach name="$ugSet.authority[0]" item="v" } -->
+				<!-- {foreach name="$ugSet.authority" item="v" } -->
     			<!-- {if condition="( $v==1)"}  -->
 				<!-- <label class="checkbox-inline"><input type="checkbox" name="authIss[]" value="{ $key}" checked><span class="spAuthKey">{ $key}</span></label> -->
 				<!-- {else /}  -->
@@ -79,18 +79,20 @@
 var ugSet={$ugSet},
 	oprt='{$oprt}',
 	fm=$('#fmUsergroup');
-
-//生成radio、checkbox组件。根据查询到的auth数据ugSet.authority，参照已定义的authEntPropArr变量
+console.log(ugSet);
+//生成radio、checkbox组件。根据查询到的auth数据ugSet.authority，参照已定义的authEntProp变量
 var buildRaChkCom=()=>{
 	let inObj='',
 		spObj='',
 		labSet=[],
 		divCom=[],
 		enable=ugSet.enable,
+		//循环计数器
+		m=0,
 		rCom='';
-		authEntArr=ugSet.authority,
-		authArr=authEntPropArr.map(el=>el.authEn).sort();
-
+		//auth的hash数组（关联数组）
+		ugAuth=ugSet.authority;
+	console.log(ugAuth);
 	//生成radio组件
 	for(var i=0;i<2;i++){
 		inObj=$('<input>').attr('type','radio').val(i).attr('name','usergroupEn');
@@ -107,56 +109,97 @@ var buildRaChkCom=()=>{
 	}
 	$('#radioCom').append(labSet);
 	
-	//生成各项auth的checkbox组件
-	authEntArr.forEach(function(el,m){
-		let dSet=[],
+	//生成各项auth的checkbox组件，遍历hash数组：ugAuth
+	//ent=='ass'...
+	for(var ent in ugAuth){
+ 		let entObj=ugAuth[ent],
+			authObj=entObj['auth'],
+			sumAuth=0,
+			//循环计数器
+			i=0,
+			dSet=[], 
 			lSet=[],
-			bgColor='',
-			labColor='',
-			sumAuth=0;
-		if(authArr.indexOf(el.entEn)!=-1){
-			labSet=[];
-			el.auth.forEach(function(e,n){
-				inObj=$('<input>').attr('type','checkbox').val(e.val).attr('name',el.entEn+'[]');
-				//是否选中
-				e.val?inObj.attr('checked',true):inObj.attr('checked',false);
-				sumAuth+=e.val;
-				spObj=$('<span></span>').addClass('spAuthKey text-muted').text(e.chi);
-				labSet[n]=$('<label></label>').addClass('checkbox-inline').append(inObj,spObj);
-				//checkbox的标签背景色
-				el.entEn=='admin'?labColor='label label-info':labColor='label label-success';
-				inObj.prop('checked')?spObj.addClass(labColor):'';
-			});
-			lSet[m]=$('<label></label>').addClass('control-label ').html('【'+el.entChi+'】模块&nbsp;').css({'padding':'1px','border-radius':'3px'});
-			//checkbox的标签底色类型
-			el.entEn=='admin'?bgColor='bg-info':bgColor='bg-success';
-			//根据checkbox为选中状态的数量添加标签底色
-			sumAuth?lSet[m].addClass(bgColor):lSet[m].addClass('text-muted');
-			
-			dSet[m]=$('<div></div>').css({'border-bottom':'solid 1px #ccc','padding':'5px'}).append(labSet);
-			
-			divCom[m]=$('<div></div>').addClass('form-group has-feedback col-sm-6').data('authName',el.entEn).append(lSet[m],dSet[m]);	
+		    //checkbox的父标签底色类型
+			bgColor=(ent=='admin')?'bg-info':'bg-success',
+			//checkbox相邻标签背景色
+			labColor=(ent=='admin')?'label label-info':'label label-success';
+		
+		labSet=[];
+		//遍历hash数组：authObj，
+		//auth=='read'...
+		for(var auth in authObj){
+			let e=authObj[auth];
+				
+			inObj=$('<input>').attr({'type':'checkbox','name':ent+'[]'}).val(e.val).prop('checked',e.val);
+			spObj=$('<span></span>').addClass('spAuthKey text-muted').text(e.chi);
+			e.val?spObj.addClass(labColor):'';
+			//是否选中
+			<!-- e.val?inObj.attr('checked',true):inObj.attr('checked',false); -->
+			sumAuth+=e.val;
+			labSet[i]=$('<label></label>').addClass('checkbox-inline').append(inObj,spObj);
+			//循环计数器
+			i++;
 		}
-	});
+		
+		lSet[m]=$('<label></label>').addClass('control-label ').html('【'+entObj.chi+'】模块&nbsp;').css({'padding':'1px','border-radius':'3px'});
+		
+		//根据checkbox为选中状态的数量添加标签底色
+		sumAuth?lSet[m].addClass(bgColor):lSet[m].addClass('text-muted');
+			
+		dSet[m]=$('<div></div>').css({'border-bottom':'solid 1px #ccc','padding':'5px'}).append(labSet);
+		
+		divCom[m]=$('<div></div>').addClass('form-group has-feedback col-sm-6').data('authName',ent).append(lSet[m],dSet[m]);
+		//循环计数器
+		m++;	
+		
+	}
+	
+	console.table(divCom);
+	console.log(m);
 	$('#checkBoxCom').append(divCom);
+	
+	<!-- authEntArr.forEach(function(el,m){ -->
+		<!-- let dSet=[], -->
+			<!-- lSet=[], -->
+			<!-- bgColor='', -->
+			<!-- labColor='', -->
+			<!-- sumAuth=0; -->
+		<!-- if(authArr.indexOf(el.entEn)!=-1){ -->
+			<!-- labSet=[]; -->
+			<!-- el.auth.forEach(function(e,n){ -->
+				<!-- inObj=$('<input>').attr('type','checkbox').val(e.val).attr('name',el.entEn+'[]'); -->
+				<!-- //是否选中 -->
+				<!-- e.val?inObj.attr('checked',true):inObj.attr('checked',false); -->
+				<!-- sumAuth+=e.val; -->
+				<!-- spObj=$('<span></span>').addClass('spAuthKey text-muted').text(e.chi); -->
+				<!-- labSet[n]=$('<label></label>').addClass('checkbox-inline').append(inObj,spObj); -->
+				<!-- //checkbox的标签背景色 -->
+				<!-- el.entEn=='admin'?labColor='label label-info':labColor='label label-success'; -->
+				<!-- inObj.prop('checked')?spObj.addClass(labColor):''; -->
+			<!-- }); -->
+			<!-- lSet[m]=$('<label></label>').addClass('control-label ').html('【'+el.entChi+'】模块&nbsp;').css({'padding':'1px','border-radius':'3px'}); -->
+			<!-- //checkbox的标签底色类型 -->
+			<!-- el.entEn=='admin'?bgColor='bg-info':bgColor='bg-success'; -->
+			<!-- //根据checkbox为选中状态的数量添加标签底色 -->
+			<!-- sumAuth?lSet[m].addClass(bgColor):lSet[m].addClass('text-muted'); -->
+			
+			<!-- dSet[m]=$('<div></div>').css({'border-bottom':'solid 1px #ccc','padding':'5px'}).append(labSet); -->
+			
+			<!-- divCom[m]=$('<div></div>').addClass('form-group has-feedback col-sm-6').data('authName',el.entEn).append(lSet[m],dSet[m]);	 -->
+		<!-- } -->
+	<!-- }); -->
+	<!-- $('#checkBoxCom').append(divCom); -->
 };
 
 //完善操作按钮
 var oprtBtnComShow=(oprt)=>{
 	let refObj=$('#btnReset').closest('div'),
-		el=oprtBtnPropArr,
-		e='',
 		uBtn='',
 		oBtn='';
 	let buildBtn=(oprt)=>{
-			let sBtn=$('<button></button>').addClass('btn btn-sm btnOprt').attr({'type':'submit','data-oprt':oprt});
-			for(var i=0;i<el.length;i++){
-				e=el[i];
-				if(oprt==e.oprtEn){
-					sBtn.addClass(e.color.btn).html(e.glyCom+e.oprtChi);
-					break;
-				}
-			}
+			let e=oprtBtnProp[oprt],
+				sBtn=$('<button></button>').addClass('btn btn-sm btnOprt').attr({'type':'submit','data-oprt':oprt});
+			sBtn.addClass(e.color.btn).html(e.glyCom+e.chi);
 			return sBtn;
 		};
 	switch(oprt){

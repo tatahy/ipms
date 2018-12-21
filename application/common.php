@@ -81,85 +81,94 @@ const conAuthNameArr=[
 
 //定义需要进行权限管理的模块/实体及其属性，方便进行横向和纵向的扩展
 const conAuthEntArr=[
-        ['entEn'=>'_ISS-_PAT','entChi'=>'专利事务',
+        '_ISS-_PAT'=>[
+          'chi'=>'专利事务',
           'auth'=>[
-            ['en'=>'edit','chi'=>'申报','val'=>0],
-            ['en'=>'audit','chi'=>'审核','val'=>0],
-            ['en'=>'review','chi'=>'复核','val'=>0],
-            ['en'=>'approve','chi'=>'审批','val'=>0],
-            ['en'=>'execute','chi'=>'执行','val'=>0],
-            ['en'=>'maintain','chi'=>'维护','val'=>0]
+            'edit'=>['chi'=>'申报','val'=>0],
+            'audit'=>['chi'=>'审核','val'=>0],
+            'review'=>['chi'=>'复核','val'=>0],
+            'approve'=>['chi'=>'审批','val'=>0],
+            'execute'=>['chi'=>'执行','val'=>0],
+            'maintain'=>['chi'=>'维护','val'=>0]
           ],
           //'type'=>[],
 //          'status'=>[]
         ],
-        ['entEn'=>'_ISS-_THE','entChi'=>'论文事务',
+        '_ISS-_THE'=>[
+          'chi'=>'论文事务',
           'auth'=>[
-            ['en'=>'edit','chi'=>'申报','val'=>0],
-            ['en'=>'audit','chi'=>'审核','val'=>0],
-            ['en'=>'review','chi'=>'复核','val'=>0],
-            ['en'=>'approve','chi'=>'审批','val'=>0],
-            ['en'=>'execute','chi'=>'执行','val'=>0],
-            ['en'=>'maintain','chi'=>'维护','val'=>0]
+            'edit'=>['chi'=>'申报','val'=>0],
+            'audit'=>['chi'=>'审核','val'=>0],
+            'review'=>['chi'=>'复核','val'=>0],
+            'approve'=>['chi'=>'审批','val'=>0],
+            'execute'=>['chi'=>'执行','val'=>0],
+            'maintain'=>['chi'=>'维护','val'=>0]
           ],
         ],
-        ['entEn'=>'_ISS-_PRO','entChi'=>'项目事务',
+        '_ISS-_PRO'=>[
+          'chi'=>'项目事务',
           'auth'=>[
-            ['en'=>'edit','chi'=>'申报','val'=>0],
-            ['en'=>'audit','chi'=>'审核','val'=>0],
-            ['en'=>'review','chi'=>'复核','val'=>0],
-            ['en'=>'approve','chi'=>'审批','val'=>0],
-            ['en'=>'execute','chi'=>'执行','val'=>0],
-            ['en'=>'maintain','chi'=>'维护','val'=>0]
+            'edit'=>['chi'=>'申报','val'=>0],
+            'audit'=>['chi'=>'审核','val'=>0],
+            'review'=>['chi'=>'复核','val'=>0],
+            'approve'=>['chi'=>'审批','val'=>0],
+            'execute'=>['chi'=>'执行','val'=>0],
+            'maintain'=>['chi'=>'维护','val'=>0]
           ],
         ],
-        ['entEn'=>'_PAT','entChi'=>'专利',
+        '_PAT'=>[
+          'chi'=>'专利',
           'auth'=>[
-            ['en'=>'edit','chi'=>'撰写','val'=>0],
-            ['en'=>'audit','chi'=>'审核','val'=>0],
-            ['en'=>'approve','chi'=>'审批','val'=>0],
-            ['en'=>'execute','chi'=>'执行','val'=>0],
-            ['en'=>'maintain','chi'=>'维护','val'=>0]
+            'edit'=>['chi'=>'撰写','val'=>0],
+            'audit'=>['chi'=>'审核','val'=>0],
+            'approve'=>['chi'=>'审批','val'=>0],
+            'execute'=>['chi'=>'执行','val'=>0],
+            'maintain'=>['chi'=>'维护','val'=>0]
           ]
         ],
-        ['entEn'=>'_THE','entChi'=>'论文',
+        '_THE'=>[
+          'chi'=>'论文',
           'auth'=>[
-            ['en'=>'edit','chi'=>'撰写','val'=>0],
-            ['en'=>'audit','chi'=>'审核','val'=>0],
-            ['en'=>'approve','chi'=>'审批','val'=>0],
-            ['en'=>'execute','chi'=>'执行','val'=>0],
-            ['en'=>'maintain','chi'=>'维护','val'=>0]
+            'edit'=>['chi'=>'撰写','val'=>0],
+            'audit'=>['chi'=>'审核','val'=>0],
+            'approve'=>['chi'=>'审批','val'=>0],
+            'execute'=>['chi'=>'执行','val'=>0],
+            'maintain'=>['chi'=>'维护','val'=>0]
           ]
         ],
-        ['entEn'=>'_PRO','entChi'=>'项目',
+        '_PRO'=>[
+          'chi'=>'项目',
           'auth'=>[
-            ['en'=>'edit','chi'=>'撰写','val'=>0],
-            ['en'=>'audit','chi'=>'审核','val'=>0],
-            ['en'=>'approve','chi'=>'审批','val'=>0],
-            ['en'=>'execute','chi'=>'执行','val'=>0],
-            ['en'=>'maintain','chi'=>'维护','val'=>0]
+            'edit'=>['chi'=>'撰写','val'=>0],
+            'audit'=>['chi'=>'审核','val'=>0],
+            'approve'=>['chi'=>'审批','val'=>0],
+            'execute'=>['chi'=>'执行','val'=>0],
+            'maintain'=>['chi'=>'维护','val'=>0]
           ]
         ],
-        ['entEn'=>'_ATT','entChi'=>'附件',
+        '_ATT'=>[
+          'chi'=>'附件',
           'auth'=>[
-            ['en'=>'upload','chi'=>'上传','val'=>0],
-            ['en'=>'download','chi'=>'下载','val'=>0],
-            ['en'=>'erase','chi'=>'删除','val'=>0],
-            ['en'=>'move','chi'=>'移动','val'=>0],
-            ['en'=>'copy','chi'=>'复制','val'=>0]
+            'upload'=>['chi'=>'上传','val'=>0],
+            'download'=>['chi'=>'下载','val'=>0],
+            'erase'=>['chi'=>'删除','val'=>0],
+            'move'=>['chi'=>'移动','val'=>0],
+            'copy'=>['chi'=>'复制','val'=>0]
           ]
         ],
-        ['entEn'=>'_ASS','entChi'=>'固定资产',
+        '_ASS'=>[
+          'chi'=>'固定资产',
           'auth'=>[
-            ['en'=>'read','chi'=>'查阅','val'=>0],
-            ['en'=>'edit','chi'=>'申报','val'=>0],
-            ['en'=>'audit','chi'=>'审核','val'=>0],
-            ['en'=>'approve','chi'=>'审批','val'=>0],
-            ['en'=>'maintain','chi'=>'维护','val'=>0]
+            'read'=>['chi'=>'查阅','val'=>0],
+            'edit'=>['chi'=>'申报','val'=>0],
+            'audit'=>['chi'=>'审核','val'=>0],
+            'approve'=>['chi'=>'审批','val'=>0],
+            'maintain'=>['chi'=>'维护','val'=>0]
           ]
         ],
-        ['entEn'=>'_ADMIN','entChi'=>'后台管理',
-          'auth'=>[['en'=>'enable','chi'=>'有','val'=>0]]
+        '_ADMIN'=>[
+          'chi'=>'后台管理',
+          'auth'=>['enable'=>['chi'=>'有','val'=>0]]
         ]
 ];
 
