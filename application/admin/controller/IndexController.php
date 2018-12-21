@@ -98,8 +98,9 @@ class IndexController extends \think\Controller
         foreach($authEntArr as $k=>$v){
           #将ent名称转为全小写，并去掉字符串中的下划线，
           $k=strtolower(strtr($k,['_'=>'']));
+          $resultArr[$k]=$v;
         }
-        return $authEntArr;
+        return $resultArr;
       }
       
       #输出数组以$authEntArr为基础，叠加$arr中值为1的部分。
@@ -600,6 +601,7 @@ class IndexController extends \think\Controller
       $result=0;
       $msg='';
       $name='';
+      $data=$request->param();
 
       #模型Create
       
@@ -617,6 +619,9 @@ class IndexController extends \think\Controller
         $name=$ugSet->name;
       }
       
+      if($oprt=='_UPDATE' ){
+      
+      }
       #模型Read
       
       
@@ -625,7 +630,7 @@ class IndexController extends \think\Controller
         
       ]);
       
-      return ['result'=>$result,'msg'=>$msg,'name'=>$name];
+      return ['result'=>$result,'msg'=>$msg,'name'=>$name,'data'=>$data];
     }
     public function fmUsergroupSingle(Request $request,UsergroupModel1 $ugMdl)
     {
@@ -634,14 +639,8 @@ class IndexController extends \think\Controller
       $oprt=empty($request->param('oprt'))?'':$request->param('oprt');
       $id=empty($request->param('id'))?'':$request->param('id');
       $reqEnt=empty($request->param('reqEnt'))?'':$request->param('reqEnt');
-      #auth分类数组
-      $authArr=array_column(conAuthEntArr,'entEn');
       $ugSet=[];   
       
-      #将$authArr的值转为全小写，并去掉字符串中的下划线
-      foreach($authArr as $k=>$v){
-        $authArr[$k]=strtolower(strtr($v,['_'=>'']));
-      }
       if($id){
         $ugSet= $ugMdl::get($id);
         $ugSet->authority=$this->_authDbToFe($ugSet->authority);
@@ -654,14 +653,12 @@ class IndexController extends \think\Controller
         #将数组转换为对象
         $ugSet=collection($ugSet);
       }
-      
-            
+                 
       $this->assign([
         'home'=>$request->home,
         #返回前端必须为对象类型:$ugSet
         'ugSet'=>$ugSet,
         'oprt'=>$oprt,
-        'authArr'=>json_encode($authArr,JSON_UNESCAPED_UNICODE)
         
       ]);
       
