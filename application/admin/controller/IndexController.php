@@ -550,7 +550,7 @@ class IndexController extends \think\Controller
     public function usergroupList(UsergroupModel1 $userGpMdl)
     {
       $request=$this->request;
-      $loadParamDefaults=['listRows'=>10,'pageNum'=>1,'showIssId'=>0];
+      $loadParamDefaults=['listRows'=>10,'pageNum'=>1,'showId'=>0];
       $loadParam=!empty($request->param('loadParam/a'))?$request->param('loadParam/a'):$loadParamDefaults;
       
       $loadParam=array_merge($loadParamDefaults,$loadParam);
@@ -601,7 +601,10 @@ class IndexController extends \think\Controller
       $result=0;
       $msg='';
       $name='';
-      $data=$request->param();
+      $data['name']=$request->param('usergroupName');
+      $data['description']=$request->param('usergroupDescription');
+      $data['enable']=$request->param('usergroupEn');
+      $data['authority']=$request->param('auth/a');
 
       #模型Create
       
@@ -620,7 +623,22 @@ class IndexController extends \think\Controller
       }
       
       if($oprt=='_UPDATE' ){
-      
+        $ugSet= $ugMdl::get($id);
+        //$ugSet->name = ;
+//        $ugSet->discription = ;
+//        $ugSet->enable = ($oprt=='_ENABLE')?1:0;
+//        $ugSet->authority = ;
+        
+        if($ugSet->save($data)){
+          $result=1;
+          $msg='修改成功';
+        }else{
+          $result=0;
+          $msg='无变化';
+        }
+        $data=$ugMdl::get($id);
+        $name=$ugSet->name;
+        
       }
       #模型Read
       

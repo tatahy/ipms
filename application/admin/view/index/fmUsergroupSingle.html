@@ -80,7 +80,7 @@ var ugSet={$ugSet},
 	fm=$('#fmUsergroup');
 console.log(ugSet);
 //生成radio、checkbox组件。根据查询到的auth数据ugSet.authority，参照已定义的authEntProp变量
-var buildRaChkCom=()=>{
+var buildRaChkCom=(ugSet)=>{
 	let inObj='',
 		spObj='',
 		labSet=[],
@@ -129,7 +129,7 @@ var buildRaChkCom=()=>{
 		for(var auth in authObj){
 			let e=authObj[auth];
 				
-			inObj=$('<input>').attr({'type':'checkbox','name':ent+'[]'}).val(e.val).prop('checked',e.val);
+			inObj=$('<input>').attr({'type':'checkbox','name':'auth'+'['+ent+']'+'['+auth+']'}).val(e.val).prop('checked',e.val);
 			spObj=$('<span></span>').addClass('spAuthKey text-muted').text(e.chi);
 			e.val?spObj.addClass(labColor):'';
 			labSet[i]=$('<label></label>').addClass('checkbox-inline').append(inObj,spObj);
@@ -206,8 +206,9 @@ var checkBoxBg=(obj)=>{
 		bgColor='bg-info';
 		labColor='label label-info';
 	}
-	//本按钮的label是否上色
-	obj.prop('checked')?obj.next().addClass(labColor):obj.next().removeClass(labColor);
+	//本按钮的label是否上色，改变值
+	obj.prop('checked')?obj.val(1).next().addClass(labColor):obj.val(0).next().removeClass(labColor);
+	
 	//本按钮所在rObj下选中按钮的个数
 	rObj.find('input').each(function(){
 		ckSum+=$(this).prop('checked')?1:0;
@@ -225,7 +226,7 @@ var checkBoxBg=(obj)=>{
 	fm.find('[name="oprt"]').val(oprt);
 	fm.find('.myFieldset').css('border-width','0px');
 	
-	buildRaChkCom();
+	buildRaChkCom(ugSet);
 	oprtBtnComShow(oprt);
 	
 })(jQuery);
@@ -257,9 +258,10 @@ $(document).ready(function(){
 	//表单提交
 	fm.submit(function(evt){
 		let url='usergroupOprt1',
-			name=fm.find('[name="usergroupName"]').val(),
-			el=oprtBtnProp[fm.find('[name="oprt"]').val()],
-			formData=new FormData(fm[0]),
+			name=$(this).find('[name="usergroupName"]').val(),
+			el=oprtBtnProp[$(this).find('[name="oprt"]').val()],
+			formData=new FormData($(this)[0]),
+			<!-- formData=$(this).sierilize(), -->
 			strHtml='<p class="text-center" style="font-size:16px;">对用户组：<strong>'+name+'</strong></p><p class="text-center" style="font-size:16px;">进行【<span class="'+el.color.txt+'">'+el.glyCom+el.chi+'</span>】</p>',
 			flag=check.every(function(val) {
             	return val == true
@@ -272,7 +274,7 @@ $(document).ready(function(){
 			<!-- //check中存在false,对应的input用“has-error”突出显示。 -->
         	for (key in check) {
             	if (!check[key]) {
-                	fm.find('.inputCheck').eq(key).closest('.has-feedback').removeClass('has-success').addClass('has-error');
+                	$(this).find('.inputCheck').eq(key).closest('.has-feedback').removeClass('has-success').addClass('has-error');
             	}
 				if(i!=key)i=key;
         	}
@@ -282,12 +284,9 @@ $(document).ready(function(){
 			$('.modal').modal('hide');
 			$.confirm(strHtml,function(e){
 				con=e;
+				console.log(formData);
 				if(true==con){
-					<!-- ajaxProcess(url,formData,anchor); -->
-					$.post(url,formData,function(res){
-					
-						console.log(res);
-					})
+					ajaxUgoprt(url,formData);
 				}
 				else{
 					$('.modal').modal('show');
@@ -354,6 +353,41 @@ function inputValid(nameObj){
 	}else {
         fail(nameObj, 0, '可由英文、数字、中文和下划线组成，但不能以数字开头。')
     }
+}
+
+function ajaxUgoprt(url,data){
+	let name=fm.find('[name="usergroupName"]').val(),
+		el=oprtBtnProp[fm.find('[name="oprt"]').val()];
+	$.ajax({
+		type: 'post',
+        url: url,
+        data: data,
+		timeout:2000,
+		<!-- datatype: 'JSON', -->
+        contentType: false,// 当有文件要上传时，此项是必须的，否则会导致后台无法识别文件流的起始位置
+        processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)。当使用FormData()，必须设为false，否则jqurey默认将FormData()转换为查询字符串。
+		success: function(res){
+			let msg=res.msg,
+				strHtml='<p class="text-center" style="font-size:16px;">对用户组：<strong>'+name+'</strong></p><p class="text-center" style="font-size:16px;">进行【<span class="'+el.color.txt+'">'+el.glyCom+el.chi+'</span>】<br/>结果：'+msg+'</p>';
+			
+			console.log(res);
+			
+			if(res.result){
+				//向$('#divLoadParam')汇集
+				$('#divLoadParam').data('showId',res.data.id);
+				buildRaChkCom(res.data);
+				
+				//更新表格
+				//调用index.html中的loadTplFile()
+				loadTplFile();
+			}
+			
+			$.alert(strHtml);
+		},
+		error: function(){
+			$.alert('与服务器通讯超时，请稍后再试！');
+		}
+	});	
 }
 
 <!--// function -->

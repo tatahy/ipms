@@ -40,7 +40,7 @@
 				
 			<tbody><!-- 此处显示数据库查询后的数据集 -->
 			{volist name="$userGpList" id="vo" empty="暂时没有数据"}
-				<tr class="text-left">
+				<tr class="text-left" data-id="{$vo.id}">
 					<td>{$i+($pageNum-1)*$listRows}</td>
 					<td><strong>{$vo.name}</strong></td>
 					<td>{$vo.description}</td>
@@ -151,13 +151,13 @@
 					</td>
 					
 					<td class="text-right" data-enable="{$vo.enable}">
-						<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_EDIT" data-req-ent="model" title="编辑用户组"></button>
-						<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_DELETE" data-req-ent="model" title="删除用户组"></button>
+						<button type="button" class="btn-link btnOprt" data-oprt="_EDIT" data-req-ent="model" title="编辑用户组"></button>
+						<button type="button" class="btn-link btnOprt" data-oprt="_DELETE" data-req-ent="model" title="删除用户组"></button>
 						<div class="btnEn">
-							<button type="button" class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_DISABLE" data-req-ent="result" title="禁用用户组"></button>
+							<button type="button" class="btn-link btnOprt" data-oprt="_DISABLE" data-req-ent="result" title="禁用用户组"></button>
 						</div>
 						<div class="btnDis">
-							<button class="btn-link btnOprt" data-id="{$vo.id}" data-oprt="_ENABLE" data-req-ent="result" title="启用用户组"><strong class="text-danger">(已禁用)</strong></button>
+							<button class="btn-link btnOprt" data-oprt="_ENABLE" data-req-ent="result" title="启用用户组"><strong class="text-danger">(已禁用)</strong></button>
 						</div>
 					</td>
 				</tr>
@@ -305,6 +305,25 @@ var oprtBtnDisplay=(tdObj)=>{
 	}
 };
 
+//
+var tblTrBg=(issId)=>{
+	let obj=$('#tblUserGpList tbody'),
+		trObj=obj.find('tr[data-id="'+issId+'"]');
+	
+	//去掉所有行的底色
+	obj.find('tr').removeClass('bg-warning');
+	
+	if(issId==0){
+		//默认给表内的第一行内容上底色
+		obj.find('tr').eq(0).addClass('bg-warning');
+	}else{
+		
+		//给本行上底色
+		trObj.addClass('bg-warning');
+	}
+	console.log(obj.find('tr').eq(0).data('id'));	
+};
+
 //自调用匿名函数立即执行的特点，进行页面初始化。
 (function($){	
 	//每个$('#tblUserGpList thead a')添加属性
@@ -326,14 +345,18 @@ var oprtBtnDisplay=(tdObj)=>{
 
 	// 激活tooltip
 	$('[title]').tooltip();
+	
 })(jQuery);
 
 $(document).ready(function(){
-		
+	//给特定行上底色
+	tblTrBg(loadParam.showId);
+	
+	console.log(loadParam.showId);
 	//btnOprt点击
 	$('.btnOprt').click(function(){
 		let url='',
-			data={oprt:$(this).data('oprt'),id:$(this).data('id'),reqEnt:$(this).data('reqEnt')},
+			data={oprt:$(this).data('oprt'),id:$(this).closest('tr').data('id'),reqEnt:$(this).data('reqEnt')},
 			e=oprtBtnProp[data.oprt],
 			mdObj=$('#modalEditUsergroup'),
 			tdObj='',

@@ -255,10 +255,11 @@ var showSideNavbar=(y)=>{
 		$('#openBtn').hide();
 		$('#mySidenav').addClass('sidenav-show');
 		$('#divContainer').addClass('sidenav-show');
-		//添加div组件及其click事件函数，实现点击该组件就隐藏sideNave，还需结合sidenav-backdrop的css属性实现与sideNave的分层
-		$('body').append($('<div></div>').addClass('sidenav-backdrop').click(function(){
+		//添加div组件及其click事件函数，实现点击该组件就隐藏sideNave，还需结合sidenav-backdrop的css属性实现与sideNav的分层
+		$('body').append($('<div></div>').addClass('sidenav-backdrop').bind('click',function(){
     		showSideNavbar(false);
-		}));
+		})
+		);
 	}else{
 		$('#openBtn').show();
 		$('#mySidenav').removeClass('sidenav-show');
@@ -309,11 +310,11 @@ $(document).ready(function(){
 
 	<!-- //点击nav-pills中的各个按钮后，显示对应的页面-->
 	$('.aTab').click(function(){
-    	$(this).tab('show');
+    	//a所在li高亮
+		$(this).tab('show');
 		//a的href属性值即是页面的锚点值
 		window.location.hash = $(this).attr('href'); 
-		//a所在li高亮
-		<!--  -->
+
         loadTplFile();              //加载锚点对应的页面文件
     });	
 	
