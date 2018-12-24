@@ -188,14 +188,28 @@ footer {
 
 
 <script>
+var getBS3Color=(type,str)=>{
+	let str=(str=='' || str==null)?'info':str,
+		type=(type=='' || type==null)?'label':type,
+		bs3Color={
+	label:{info:'label label-info',danger:'label label-danger',warning:'label label-warning',success:'label label-success',primary:'label label-primary',default:'label label-default'},
+	btn:{info:'btn-info',danger:'btn-danger',warning:'btn-warning',success:'btn-success',primary:'btn-primary',default:'btn-default'},
+	text:{info:'text-info',danger:'text-danger',warning:'text-warning',success:'text-success',primary:'text-primary',muted:'text-muted'},
+	bg:{info:'btn-info',primary:'btn-primary',danger:'btn-danger',warning:'btn-warning',success:'btn-success'},
+	alert:{info:'alert-info',danger:'alert-danger',warning:'alert-warning',success:'alert-success'}};
+
+	return bs3Color[type][str];
+};
+
 //主要操作按钮核心属性
 var oprtBtnProp={
-	'_CREATE':{chi:'新增',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	'_EDIT':{chi:'编辑',color:{lab:'label label-primary',txt:'text-primary',btn:'btn-primary'},glyCom:'<span class="glyphicon glyphicon-edit"></span>'},
-	'_UPDATE':{chi:'保存',color:{lab:'label label-primary',txt:'text-primary',btn:'btn-primary'},glyCom:'<span class="glyphicon glyphicon-saved"></span>'},
-	'_DELETE':{chi:'删除',color:{lab:'label label-danger',txt:'text-danger',btn:'btn-danger'},glyCom:'<span class="glyphicon glyphicon-remove"></span>'},
-	'_DISABLE':{chi:'禁用',color:{lab:'label label-warning',txt:'text-warning',btn:'btn-warning'},glyCom:'<span class="glyphicon glyphicon-ban-circle"></span>'},
-	'_ENABLE':{chi:'启用',color:{lab:'label label-success',txt:'text-success',btn:'btn-success'},glyCom:'<span class="glyphicon glyphicon-magnet"></span>'}
+	'_CREATE':{chi:'新增',color:{lab:'label label-info',txt:'text-info',btn:'btn-info',bg:'bg-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	'_EDIT':{chi:'编辑',color:{lab:'label label-primary',txt:'text-primary',btn:'btn-primary',bg:'bg-warning'},glyCom:'<span class="glyphicon glyphicon-edit"></span>'},
+	'_UPDATE':{chi:'保存',color:{lab:'label label-primary',txt:'text-primary',btn:'btn-primary',bg:'bg-info'},glyCom:'<span class="glyphicon glyphicon-saved"></span>'},
+	'_DELETE':{chi:'删除',color:{lab:'label label-danger',txt:'text-danger',btn:'btn-danger',bg:'bg-danger'},glyCom:'<span class="glyphicon glyphicon-remove"></span>'},
+	'_DISABLE':{chi:'禁用',color:{lab:'label label-warning',txt:'text-warning',btn:'btn-warning',bg:'bg-info'},glyCom:'<span class="glyphicon glyphicon-ban-circle"></span>'},
+	'_ENABLE':{chi:'启用',color:{lab:'label label-success',txt:'text-success',btn:'btn-success',bg:'bg-info'},glyCom:'<span class="glyphicon glyphicon-magnet"></span>'},
+	'_READ':{chi:'查询',color:{lab:'label label-info',txt:'text-info',btn:'btn-info',bg:'bg-info'},glyCom:'<span class="glyphicon glyphicon-search"></span>'}
 };
 		
 //权限模块核心属性
@@ -269,7 +283,7 @@ var showSideNavbar=(y)=>{
 };
 
 // 作用：提交锚点值给后端，由后端返回需加载的页面文件
-var loadTplFile=()=>{
+var loadTplFile=(cbFn)=>{
 	let sId=window.location.hash,
 		aObj='',
 		obj=$('#divLoadParam'),
@@ -291,7 +305,11 @@ var loadTplFile=()=>{
 	loadParam=$.extend({},loadParamDefault,loadParam);
 	
     //提交锚点值给后端，由后端返回需加载的页面文件
-	$("#content").load(url,{sId:sId,loadParam:loadParam}); 
+	$("#content").load(url,{sId:sId,loadParam:loadParam},function(){
+		if(typeof cbFn =='function'){
+			return cbFn;
+		};
+	}); 
 };
 
 //利用自调用匿名函数立即执行的特点， 页面初始化

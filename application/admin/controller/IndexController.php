@@ -589,7 +589,7 @@ class IndexController extends \think\Controller
       
       return view();
     }
-    
+    //前端传来的oprt值:_CREATE、_UPDATE、_EDIT、_DISABLE、_ENABLE、_READ
     public function usergroupOprt1(Request $request,UsergroupModel1 $ugMdl)
     {
       $this->_loginUser();
@@ -601,18 +601,44 @@ class IndexController extends \think\Controller
       $result=0;
       $msg='';
       $name='';
-      $data['name']=$request->param('usergroupName');
-      $data['description']=$request->param('usergroupDescription');
-      $data['enable']=$request->param('usergroupEn');
-      $data['authority']=$request->param('auth/a');
+      $data['name']=empty($request->param('usergroupName'))?'':$request->param('usergroupName');
+      $data['description']=empty($request->param('usergroupDescription'))?'':$request->param('usergroupDescription');
+      $data['enable']=empty($request->param('usergroupEn'))?'':$request->param('usergroupEn');
+      $data['authority']=empty($request->param('auth/a'))?'':$request->param('auth/a');
 
-      #模型Create
+      #模型Create，$oprt=='_CREATE'
+      if($oprt=='_CREATE') {
+        if($ugMdl::get(['name'=>$data['name']])->count()){
+          $msg='创建失败。用户组【'.$data['name'].'】已存在。';
+        }else{
+          $ugSet= $ugMdl::create($data,true);
+          if($ugSet->id){
+            $result=1;
+            $msg='成功';
+            $data=$ugSet;
+            $name=$ugSet->name;
+          }else{
+            $result=0;
+            $msg='失败';
+          }
+        }      
+      }
       
+      #模型Delete，$oprt=='_DELETE'
+      if($oprt=='_DELETE'){
+        //$ugSet= $ugMdl::update(['enable'=>($oprt=='_ENABLE')?1:0],['id' => $id]);
+        $ugSet= $ugMdl::get($id);
+        $name=$ugSet->name;
+        if($ugSet->delete()){
+          $result=1;
+          $msg='成功';
+        }else{
+          $result=0;
+          $msg='失败';
+        }        
+      }
       
-      #模型Delete
-      
-      
-      #模型Update
+      #模型Update，$oprt:in['_ENABLE','_DISABLE','_UPDATE'] 
       if($oprt=='_ENABLE' || $oprt=='_DISABLE'){
         //$ugSet= $ugMdl::update(['enable'=>($oprt=='_ENABLE')?1:0],['id' => $id]);
         $ugSet= $ugMdl::get($id);
@@ -621,14 +647,8 @@ class IndexController extends \think\Controller
         $result=$ugSet->enable;
         $name=$ugSet->name;
       }
-      
       if($oprt=='_UPDATE' ){
         $ugSet= $ugMdl::get($id);
-        //$ugSet->name = ;
-//        $ugSet->discription = ;
-//        $ugSet->enable = ($oprt=='_ENABLE')?1:0;
-//        $ugSet->authority = ;
-        
         if($ugSet->save($data)){
           $result=1;
           $msg='修改成功';
@@ -636,20 +656,35 @@ class IndexController extends \think\Controller
           $result=0;
           $msg='无变化';
         }
-        $data=$ugMdl::get($id);
+        $data=$ugSet;
         $name=$ugSet->name;
         
       }
       #模型Read
-      
-      
+      if($oprt=='_READ'){
+        //$ugSet=$ugMdl::all(function($query)use($data){ 
+//                        $query->where('name',$data['name']);
+//                      });
+        $ugSet=$ugMdl::get(['name'=>$data['name']]);
+        if(count($ugSet)){
+          
+          if($id==0){
+            $result=1;
+            $msg='用户组【'.$data['name'].'】已存在。';
+          }else if($id==$ugSet->id){
+            $msg='';
+            $result=0;
+          }
+        }
+      }
       $this->assign([
         'home'=>$request->home,
         
       ]);
       
-      return ['result'=>$result,'msg'=>$msg,'name'=>$name,'data'=>$data];
+      return ['result'=>$result,'msg'=>$msg,'name'=>$name,'data'=>$data,'oprt'=>$oprt];
     }
+    //单个用户组信息表单
     public function fmUsergroupSingle(Request $request,UsergroupModel1 $ugMdl)
     {
       $this->_loginUser();
@@ -676,10 +711,8 @@ class IndexController extends \think\Controller
         'home'=>$request->home,
         #返回前端必须为对象类型:$ugSet
         'ugSet'=>$ugSet,
-        'oprt'=>$oprt,
-        
+        'oprt'=>$oprt
       ]);
-      
       
       return view();
     }

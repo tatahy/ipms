@@ -30,7 +30,8 @@
 	</div>
 	<hr>
 	<div class="myFieldset">
-		<div class="myLegend"><span class="label label-info"><span class="glyphicon glyphicon-alert"></span>&nbsp;用户组权限</span></div>
+		<div class="myLegend has-feedback"><span><span class="glyphicon glyphicon-alert"></span>&nbsp;用户组权限</span><input type="text" class="form-control inputCheck sr-only" name="checkBoxNum" value="" ></div>
+		<span style="color:red;display: none;" class="spTips"></span>
 		
 		<div id="checkBoxCom" class="row myRow">		
 			<!-- //js中checkBoxCom的建模参考 -->
@@ -78,20 +79,37 @@
 var ugSet={$ugSet},
 	oprt='{$oprt}',
 	fm=$('#fmUsergroup');
-console.log(ugSet);
+
+var checkBoxNum=()=>{
+	let inObj=fm.find('[name="checkBoxNum"]'),
+		num=inObj.val(),
+		spObj=inObj.prev(),
+		spTip=inObj.closest('div').next('span'),
+		lab=(num!=0)?'label label-info':'label label-default';
+	
+	spObj.addClass(lab);	
+	(num!=0)?spTip.hide():spTip.text('请添加用户组权限').show();
+	return num;
+	
+};
+	
+<!-- console.log(ugSet); -->
 //生成radio、checkbox组件。根据查询到的auth数据ugSet.authority，参照已定义的authEntProp变量
 var buildRaChkCom=(ugSet)=>{
 	let inObj='',
 		spObj='',
+		spHelp=$('<span></span>').addClass('help-block').css('color','red'),
 		labSet=[],
 		divCom=[],
+		rCom='',
 		enable=ugSet.enable,
 		//循环计数器
 		m=0,
-		rCom='';
+		//divCom的总数
+		divSum=0,
 		//auth的hash数组（关联数组）
 		ugAuth=ugSet.authority;
-	console.log(ugAuth);
+	<!-- console.log(ugAuth); -->
 	//生成radio组件
 	for(var i=0;i<2;i++){
 		inObj=$('<input>').attr('type','radio').val(i).attr('name','usergroupEn');
@@ -135,7 +153,7 @@ var buildRaChkCom=(ugSet)=>{
 			labSet[i]=$('<label></label>').addClass('checkbox-inline').append(inObj,spObj);
 			//循环计数器
 			i++;
-			sumAuth+=e.val;
+			sumAuth+=e.val*1;
 		}
 		
 		lSet[m]=$('<label></label>').addClass('control-label ').html('【'+entObj.chi+'】模块&nbsp;').css({'padding':'1px','border-radius':'3px'});
@@ -147,8 +165,16 @@ var buildRaChkCom=(ugSet)=>{
 		
 		divCom[m]=$('<div></div>').addClass('form-group has-feedback col-sm-6').data('authName',ent).append(lSet[m],dSet[m]);
 		//循环计数器
-		m++;	
+		m++;
+		//checkbox为选中状态的总数
+		divSum+=sumAuth*1;	
 	}
+	
+	fm.find('[name="checkBoxNum"]').val(divSum);
+	<!-- console.log(divSum); -->
+	//根据checkbox为选中状态的数量添加标签底色
+	checkBoxNum();
+	
 	$('#checkBoxCom').append(divCom);
 };
 
@@ -195,7 +221,7 @@ var radioBg=()=>{
 };
 //设置input:checkbox元素及其关联组件的背景色
 var checkBoxBg=(obj)=>{
-	let rObj=obj.closest('div').parent(),
+	let rObj=obj.closest('div').parent('.col-sm-6'),
 		lObj=rObj.children('label');
 		authName=rObj.data('authName'),
 		bgColor='bg-success',
@@ -217,6 +243,8 @@ var checkBoxBg=(obj)=>{
 	ckSum?lObj.addClass(bgColor):lObj.removeClass(bgColor);
 	//本按钮所在rObj的label是否变淡
 	ckSum?lObj.removeClass('text-muted'):lObj.addClass('text-muted');
+	
+	checkBoxNum();
 };
 
 
@@ -225,20 +253,32 @@ var checkBoxBg=(obj)=>{
 	
 	fm.find('[name="oprt"]').val(oprt);
 	fm.find('.myFieldset').css('border-width','0px');
-	
 	buildRaChkCom(ugSet);
 	oprtBtnComShow(oprt);
 	
 })(jQuery);
 
 $(document).ready(function(){
-// 数组，存储表单中输入框内容验证结果“true/false”。数组下标应与输入框下标一致，便于编程选择输入框
-	var check = [false];
-	
-	fm.find('[name="usergroupName"]').focus();
+// 初始化数组，存储表单中输入框（class="inputCheck"）d内容验证结果“true/false”。数组下标应与输入框下标一致，便于编程选择输入框
+	var check = Array(fm.find('.inputCheck').length).fill(false);
+	console.log(check);
 	<!-- //usergroupName内容验证 -->
 	fm.find('[name="usergroupName"]').focusout(function(){
-        inputValid($(this));
+        let url='usergroupOprt1',
+			oprt='_READ',
+			name=$(this).val(),
+			cbFn=(txt)=>{
+				return inputValid($(this),txt);
+			};
+		fm.find('[name="oprt"]').val(oprt);
+		
+		formData=new FormData();
+		formData.append('id',fm.find('[name="id"]').val());
+		formData.append('usergroupName',name);
+		formData.append('oprt',oprt);
+		//检查新增用户组名是否唯一
+		ajaxUgoprt(url,formData,cbFn);
+
   	});
 	// 表单input:radio选中元素改变背景色
 	fm.find('input:radio').change(function(){
@@ -247,13 +287,14 @@ $(document).ready(function(){
 	
 	//checkbox背景色
 	fm.find('input:checkbox').click(function(){
-		checkBoxBg($(this));
+		checkBoxBg($(this));		
 	});
 	
 	//表单提交按钮按下时修改oprt
 	fm.find('button:submit').click(function(){
 		oprt=$(this).data('oprt');
 		fm.find('[name="oprt"]').val(oprt);
+		
 	});
 	//表单提交
 	fm.submit(function(evt){
@@ -268,13 +309,13 @@ $(document).ready(function(){
         	});
 		//阻止表单提交动作
 		evt.preventDefault();
-		
+		console.log(check);
 		if (!flag) {
 			let i=0;
 			<!-- //check中存在false,对应的input用“has-error”突出显示。 -->
         	for (key in check) {
             	if (!check[key]) {
-                	$(this).find('.inputCheck').eq(key).closest('.has-feedback').removeClass('has-success').addClass('has-error');
+                	$(this).find('.inputCheck').eq(key).closest('.has-feedback').removeClass('has-success has-error').addClass('has-error');
             	}
 				if(i!=key)i=key;
         	}
@@ -284,7 +325,6 @@ $(document).ready(function(){
 			$('.modal').modal('hide');
 			$.confirm(strHtml,function(e){
 				con=e;
-				console.log(formData);
 				if(true==con){
 					ajaxUgoprt(url,formData);
 				}
@@ -292,9 +332,7 @@ $(document).ready(function(){
 					$('.modal').modal('show');
 				}
 			}).ok('确定(Y)').cancel('取消(N)');		
-			
 		}
-		
 	});
 	
 	<!-- // 表单重置 -->
@@ -321,43 +359,76 @@ $(document).ready(function(){
 function success(obj, counter) {
     var pObj=obj.closest('.has-feedback');
 	pObj.removeClass('has-error').addClass('has-success');
-	pObj.children('span');
+	pObj.children('span').hide();
     pObj.find('.spOk').show();
     check[counter] = true;
 }
 
 // 校验失败函数
-function fail(obj, counter, msg) {
-    var pObj=obj.closest('.has-feedback');
-	pObj.removeClass('has-success').addClass('has-error');
-	pObj.children('span');
+function fail(obj, counter, msg='') {
+    let pObj=obj.closest('.has-feedback');
+	
+	pObj.removeClass('has-success has-error').addClass('has-error');
+	pObj.children('span').hide();
 	pObj.find('.spTips').text(msg).show();
     pObj.find('.spRemove').show();
     check[counter] = false;
 }
 
 //输入有效性检查
-function inputValid(nameObj){
+function inputValid(inObj,txt=''){
 	// 正则表达式，由英文、数字、中文和下划线组成,但不能以数字开头,长度为3到20个字符。unicode编码中的汉字范围:\u2E80-\u9FFF
-	let nameVal= nameObj.val(),
+	let nameVal= inObj.val(),
+		num='',
+		inSet=fm.find('.inputCheck'),
+		index='',
+		regVal='',
 		regUserGroupName = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{2,19}$/;
-	if(regUserGroupName.test(nameVal)){
-		//$(this)为本页面第0个输入框
-		success(nameObj,0);	
-	}else if (nameVal.length < 3) {
-        if(nameVal==''){
-			fail(nameObj, 0, '用户组名不能为空。');
-		}else{
-			fail(nameObj, 0, '用户组名太短，不能少于3个字符。');
+	
+	//inObj在inSet中的序号
+	for(var i=0;i<inSet.length;i++){
+		if(inObj.attr('name')==inSet.eq(i).attr('name')){
+			index=i;
+			regVal=inObj.attr('name');
+			break;
 		}
-	}else {
-        fail(nameObj, 0, '可由英文、数字、中文和下划线组成，但不能以数字开头。')
-    }
+	}
+			
+	switch(regVal){
+		case 'usergroupName':
+			regVal=regUserGroupName;
+			//[name="usergroupName"]的输入框	
+			if(txt!=''){
+				return fail(inObj,index,txt);
+			}
+			if(regVal.test(nameVal)){
+				return success(inObj,index);	
+			}
+			if(nameVal.length < 3){
+				if(nameVal==''){
+					txt='用户组名不能为空。';
+				}else{
+					txt='用户组名太短，不能少于3个字符。';
+				}
+			}else{
+				txt='可由英文、数字、中文和下划线组成，但不能以数字开头。';
+			}
+			return fail(inObj,index,txt);
+			break;
+		case 'checkBoxNum':
+			num=checkBoxNum();
+			console.log(num);
+			num==0?fail(inObj,index,'请添加用户组权限'):success(inObj,index);
+			break;
+	}
+	
+	
 }
 
-function ajaxUgoprt(url,data){
+function ajaxUgoprt(url,data,cbFn){
 	let name=fm.find('[name="usergroupName"]').val(),
 		el=oprtBtnProp[fm.find('[name="oprt"]').val()];
+		
 	$.ajax({
 		type: 'post',
         url: url,
@@ -367,12 +438,10 @@ function ajaxUgoprt(url,data){
         contentType: false,// 当有文件要上传时，此项是必须的，否则会导致后台无法识别文件流的起始位置
         processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)。当使用FormData()，必须设为false，否则jqurey默认将FormData()转换为查询字符串。
 		success: function(res){
-			let msg=res.msg,
+			let msg=res.result?'<span class="alert-success">&nbsp;'+res.msg+'&nbsp;</span>':'<span class="text-muted">&nbsp;'+res.msg+'&nbsp;</span>',
 				strHtml='<p class="text-center" style="font-size:16px;">对用户组：<strong>'+name+'</strong></p><p class="text-center" style="font-size:16px;">进行【<span class="'+el.color.txt+'">'+el.glyCom+el.chi+'</span>】<br/>结果：'+msg+'</p>';
-			
-			console.log(res);
-			
-			if(res.result){
+			<!-- console.log(res); -->
+			if(res.oprt!='_READ'){
 				//向$('#divLoadParam')汇集
 				$('#divLoadParam').data('showId',res.data.id);
 				buildRaChkCom(res.data);
@@ -380,26 +449,21 @@ function ajaxUgoprt(url,data){
 				//更新表格
 				//调用index.html中的loadTplFile()
 				loadTplFile();
+				$.alert(strHtml);
+			}else{
+				//调用回调函数处理
+				res.result?cbFn(res.msg):cbFn();	
 			}
+			inputValid(fm.find('[name="checkBoxNum"]'));
 			
-			$.alert(strHtml);
 		},
 		error: function(){
 			$.alert('与服务器通讯超时，请稍后再试！');
 		}
 	});	
 }
-
 <!--// function -->
 });
-
-
-
-
 </script>
 
-
-<script>
-
-</script>
 			
