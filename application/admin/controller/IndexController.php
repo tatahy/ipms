@@ -560,6 +560,8 @@ class IndexController extends \think\Controller
       $userGpSet=$userGpMdl->where('id','>',0)->select();
       $userGpSet=is_array($userGpSet)?collection($userGpSet):$userGpSet;
       $userGpList=$userGpSet->slice(($pageNum-1)*$listRows,$listRows);
+      
+     // $loadParam['showId']=($loadParam['showId']==0)?$userGpList[0]->id:$loadParam['showId'];
                  
       $pageSet=$userGpMdl->where('id','>',0)->paginate($listRows,false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$pageNum,
                         'query'=>['listRows'=>$listRows]]);    
@@ -608,7 +610,7 @@ class IndexController extends \think\Controller
 
       #模型Create，$oprt=='_CREATE'
       if($oprt=='_CREATE') {
-        if($ugMdl::get(['name'=>$data['name']])->count()){
+        if(count($ugMdl::get(['name'=>$data['name']]))){
           $msg='创建失败。用户组【'.$data['name'].'】已存在。';
         }else{
           $ugSet= $ugMdl::create($data,true);
@@ -660,15 +662,15 @@ class IndexController extends \think\Controller
         $name=$ugSet->name;
         
       }
-      #模型Read
+      #模型Read，查询提交的$data['name']是否已存在，因为$data['name']的值在数据库中必须唯一
       if($oprt=='_READ'){
         //$ugSet=$ugMdl::all(function($query)use($data){ 
 //                        $query->where('name',$data['name']);
 //                      });
         $ugSet=$ugMdl::get(['name'=>$data['name']]);
         if(count($ugSet)){
-          
-          if($id==0){
+          //$id==0是‘新增’，$id!=$ugSet->id是‘编辑’
+          if($id==0 || $id!=$ugSet->id){
             $result=1;
             $msg='用户组【'.$data['name'].'】已存在。';
           }else if($id==$ugSet->id){
@@ -689,7 +691,7 @@ class IndexController extends \think\Controller
     {
       $this->_loginUser();
       #前端传来的数据
-      $oprt=empty($request->param('oprt'))?'':$request->param('oprt');
+      $oprt=empty($request->param('oprt'))?'_READ':$request->param('oprt');
       $id=empty($request->param('id'))?'':$request->param('id');
       $reqEnt=empty($request->param('reqEnt'))?'':$request->param('reqEnt');
       $ugSet=[];   

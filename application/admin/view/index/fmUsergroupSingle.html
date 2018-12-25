@@ -1,7 +1,7 @@
 <!-- //fmUgergroupSingl.html -->
 <form id="fmUsergroup" role="form" action="" method="post">
 	<input id="id" type="text" name="id" value="{$ugSet.id}" class="sr-only">
-	<input type="text" name="oprt" value="" class="sr-only">
+	<input type="text" name="oprt" value="{$oprt}" class="sr-only">
 	<div class="myFieldset">
 		<div class="myLegend"><span class="label label-info"><span class="glyphicon glyphicon-duplicate"></span>&nbsp;用户组信息</span></div>
 		<div class="row myRow">		
@@ -30,7 +30,11 @@
 	</div>
 	<hr>
 	<div class="myFieldset">
-		<div class="myLegend has-feedback"><span><span class="glyphicon glyphicon-alert"></span>&nbsp;用户组权限</span><input type="text" class="form-control inputCheck sr-only" name="checkBoxNum" value="" ></div>
+		<div class="myLegend has-feedback">
+			<label style="font-size:100%"><span class="glyphicon glyphicon-alert"></span>&nbsp;用户组权限
+			</label>
+			<input type="text" class="form-control inputCheck sr-only" name="checkBoxSelNum" value="" >
+		</div>
 		<span style="color:red;display: none;" class="spTips"></span>
 		
 		<div id="checkBoxCom" class="row myRow">		
@@ -67,7 +71,10 @@
 	</div>	
 	<hr>
 	<div class="row myRow">	
-		<div class="pull-right">	
+		<div id="oprtBtnCom" class="col-sm-6 text-left">
+				
+		</div>
+		<div class="col-sm-6 text-right">
 			<input type="reset" class="btn btn-primary btn-sm" value="重置">
 			<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
 		</div>
@@ -80,19 +87,6 @@ var ugSet={$ugSet},
 	oprt='{$oprt}',
 	fm=$('#fmUsergroup');
 
-var checkBoxNum=()=>{
-	let inObj=fm.find('[name="checkBoxNum"]'),
-		num=inObj.val(),
-		spObj=inObj.prev(),
-		spTip=inObj.closest('div').next('span'),
-		lab=(num!=0)?'label label-info':'label label-default';
-	
-	spObj.addClass(lab);	
-	(num!=0)?spTip.hide():spTip.text('请添加用户组权限').show();
-	return num;
-	
-};
-	
 <!-- console.log(ugSet); -->
 //生成radio、checkbox组件。根据查询到的auth数据ugSet.authority，参照已定义的authEntProp变量
 var buildRaChkCom=(ugSet)=>{
@@ -105,8 +99,6 @@ var buildRaChkCom=(ugSet)=>{
 		enable=ugSet.enable,
 		//循环计数器
 		m=0,
-		//divCom的总数
-		divSum=0,
 		//auth的hash数组（关联数组）
 		ugAuth=ugSet.authority;
 	<!-- console.log(ugAuth); -->
@@ -118,11 +110,13 @@ var buildRaChkCom=(ugSet)=>{
 		labSet[i]=$('<label></label>').addClass('control-label radio-inline').append(inObj,spObj);
 	}
 	if(enable){
-		labSet[1].children('input').prop('checked',true);
+		<!-- labSet[1].children('input').prop('checked',true); -->
+		labSet[1].children('input').attr('checked',true);
 		labSet[1].children('span').addClass('label-success');
 		$('#radioCom').siblings('.label').addClass('label-info');
 	}else{
-		labSet[0].children('input').prop('checked',true);
+		<!-- labSet[0].children('input').prop('checked',true); -->
+		labSet[0].children('input').attr('checked',true);
 	}
 	$('#radioCom').append(labSet);
 	
@@ -147,9 +141,14 @@ var buildRaChkCom=(ugSet)=>{
 		for(var auth in authObj){
 			let e=authObj[auth];
 				
-			inObj=$('<input>').attr({'type':'checkbox','name':'auth'+'['+ent+']'+'['+auth+']'}).val(e.val).prop('checked',e.val);
+			inObj=$('<input>').attr({'type':'checkbox','name':'auth'+'['+ent+']'+'['+auth+']'}).val(e.val);
 			spObj=$('<span></span>').addClass('spAuthKey text-muted').text(e.chi);
-			e.val?spObj.addClass(labColor):'';
+			if(e.val){
+				inObj.attr('checked',true);
+				spObj.addClass(labColor);
+			}else{
+				inObj.attr('checked',false);
+			}
 			labSet[i]=$('<label></label>').addClass('checkbox-inline').append(inObj,spObj);
 			//循环计数器
 			i++;
@@ -166,21 +165,50 @@ var buildRaChkCom=(ugSet)=>{
 		divCom[m]=$('<div></div>').addClass('form-group has-feedback col-sm-6').data('authName',ent).append(lSet[m],dSet[m]);
 		//循环计数器
 		m++;
-		//checkbox为选中状态的总数
-		divSum+=sumAuth*1;	
 	}
-	
-	fm.find('[name="checkBoxNum"]').val(divSum);
-	<!-- console.log(divSum); -->
-	//根据checkbox为选中状态的数量添加标签底色
-	checkBoxNum();
-	
 	$('#checkBoxCom').append(divCom);
+};
+//检查checkbox为选中状态的数量，根据数量添加标签底色和提示信息
+var checkBoxSelNum=()=>{
+	let inObj=fm.find('[name="checkBoxSelNum"]'),
+		ckSet=fm.find('input:checkbox'),
+		labObj=inObj.prev().removeClass('label label-info label-default'),
+		spTip=inObj.closest('div').next('span'),
+		dObj=inObj.closest('div.has-feedback').removeClass('has-success has-error'),
+		num=0,
+		labColor='',
+		dColor='';
+	//检查checkbox为选中状态的数量
+	ckSet.each(function(){
+		num=$(this).prop('checked')?num+1:num;
+	});
+	inObj.val(num);
+	
+	//添加什么样标签底色和提示信息
+	if(num){
+		labColor='label label-info';
+		dColor='has-success';
+		spTip.text('').hide();
+		
+	}else{
+		labColor='label label-default';
+		spTip.text('请添加用户组权限').show();
+		dColor='has-error';
+	}
+	labObj.addClass(labColor);	
+	dObj.addClass(dColor);	
+	
+	<!-- //添加标签底色和提示信息 -->
+	<!-- labColor=(num!=0)?'label label-info':'label label-default'; -->
+	<!-- labObj.addClass(labColor);	 -->
+	<!-- (num!=0)?spTip.hide():spTip.text('请添加用户组权限').show(); -->
+	//返回checkbox为选中状态的数量
+	return num;
 };
 
 //完善操作按钮
 var oprtBtnComShow=(oprt)=>{
-	let refObj=fm.find('input:reset').closest('div'),
+	let obj=$('#oprtBtnCom'),
 		uBtn='',
 		oBtn='';
 	let buildBtn=(oprt)=>{
@@ -201,7 +229,7 @@ var oprtBtnComShow=(oprt)=>{
 			oBtn=buildBtn('_UPDATE');
 			break;
 	}		
-	refObj.before(uBtn,'&nbsp;',oBtn);
+	obj.append(uBtn,'&nbsp;',oBtn);
 };
 //设置input:radio元素及其关联组件的背景色，适用于有2个radio
 var radioBg=()=>{	
@@ -222,10 +250,12 @@ var radioBg=()=>{
 //设置input:checkbox元素及其关联组件的背景色
 var checkBoxBg=(obj)=>{
 	let rObj=obj.closest('div').parent('.col-sm-6'),
-		lObj=rObj.children('label');
+		lObj=rObj.children('label'),
 		authName=rObj.data('authName'),
 		bgColor='bg-success',
 		labColor='label label-success',
+		txtColor='text-muted',
+		tNum=fm.find('[name="checkBoxSelNum"]').val(),
 		ckSum=0;
 	
 	if(authName=='admin'){
@@ -239,44 +269,53 @@ var checkBoxBg=(obj)=>{
 	rObj.find('input').each(function(){
 		ckSum+=$(this).prop('checked')?1:0;
 	});
-	//本按钮所在rObj的label是否上色
-	ckSum?lObj.addClass(bgColor):lObj.removeClass(bgColor);
-	//本按钮所在rObj的label是否变淡
-	ckSum?lObj.removeClass('text-muted'):lObj.addClass('text-muted');
+	//本按钮所在rObj的label是否上色及label是否变淡
+	ckSum?lObj.addClass(bgColor).removeClass(txtColor):lObj.removeClass(bgColor).addClass(txtColor);
+	//更新fm.find('[name="checkBoxSelNum"]').val()和tNum
+	tNum=((tNum-ckSum)<tNum || ckSum==0)?checkBoxSelNum():tNum;
 	
-	checkBoxNum();
+	<!-- return tNum; -->
 };
-
-
-//自调用匿名函数立即执行的特点，进行页面初始化。
-(function($){	
-	
-	fm.find('[name="oprt"]').val(oprt);
-	fm.find('.myFieldset').css('border-width','0px');
+var initFm=()=>{
+	$('#checkBoxCom').empty();
+	$('#radioCom').empty();
+	$('#oprtBtnCom').empty();
 	buildRaChkCom(ugSet);
 	oprtBtnComShow(oprt);
-	
+	<!-- //检查checkbox为选中状态的数量 -->
+	checkBoxSelNum();
+	radioBg();
+	fm.find('.myFieldset').css('border-width','0px');
+};
+
+//自调用匿名函数立即执行的特点，进行页面初始化。
+;(function($){	
+	buildRaChkCom(ugSet);
+	oprtBtnComShow(oprt);
+	//检查checkbox为选中状态的数量
+	checkBoxSelNum();
+	fm.find('.myFieldset').css('border-width','0px');
+	<!-- initFm(); -->
 })(jQuery);
 
 $(document).ready(function(){
-// 初始化数组，存储表单中输入框（class="inputCheck"）d内容验证结果“true/false”。数组下标应与输入框下标一致，便于编程选择输入框
+// 初始化数组，存储表单中输入框（class="inputCheck"）的内容验证结果“true/false”。数组下标应与输入框下标一致，便于编程选择输入框
 	var check = Array(fm.find('.inputCheck').length).fill(false);
-	console.log(check);
+	
 	<!-- //usergroupName内容验证 -->
 	fm.find('[name="usergroupName"]').focusout(function(){
         let url='usergroupOprt1',
 			oprt='_READ',
 			name=$(this).val(),
+			//定义回调函数
 			cbFn=(txt)=>{
 				return inputValid($(this),txt);
 			};
-		fm.find('[name="oprt"]').val(oprt);
-		
 		formData=new FormData();
 		formData.append('id',fm.find('[name="id"]').val());
 		formData.append('usergroupName',name);
 		formData.append('oprt',oprt);
-		//检查新增用户组名是否唯一
+		//检查用户组名是否唯一
 		ajaxUgoprt(url,formData,cbFn);
 
   	});
@@ -287,7 +326,7 @@ $(document).ready(function(){
 	
 	//checkbox背景色
 	fm.find('input:checkbox').click(function(){
-		checkBoxBg($(this));		
+		checkBoxBg($(this));
 	});
 	
 	//表单提交按钮按下时修改oprt
@@ -299,38 +338,40 @@ $(document).ready(function(){
 	//表单提交
 	fm.submit(function(evt){
 		let url='usergroupOprt1',
+			inSet=fm.find('input.inputCheck');
 			name=$(this).find('[name="usergroupName"]').val(),
 			el=oprtBtnProp[$(this).find('[name="oprt"]').val()],
 			formData=new FormData($(this)[0]),
 			<!-- formData=$(this).sierilize(), -->
-			strHtml='<p class="text-center" style="font-size:16px;">对用户组：<strong>'+name+'</strong></p><p class="text-center" style="font-size:16px;">进行【<span class="'+el.color.txt+'">'+el.glyCom+el.chi+'</span>】</p>',
-			flag=check.every(function(val) {
-            	return val == true
-        	});
+			strHtml='<p class="text-center" style="font-size:16px;">对用户组：<strong>'+name+'</strong></p><p class="text-center" style="font-size:16px;">进行【<span class="'+el.color.txt+'">'+el.glyCom+el.chi+'</span>】</p>';
 		//阻止表单提交动作
 		evt.preventDefault();
+		//输入框有效性检查
+		inSet.each(function(index){
+			let dObj=$(this).closest('.has-feedback'),
+				cStr=dObj.attr('class');
+			
+			check[index]=(cStr.indexOf('has-success')!=-1)?true:false;
+		});
+		
 		console.log(check);
-		if (!flag) {
-			let i=0;
+		//有输入框为空的情况,后续语句不再执行。序号最小的$('.inputCheck').eq(i)获得焦点。
+		if (!check.every(val=>{return val == true})){
+			let arr=[];
 			<!-- //check中存在false,对应的input用“has-error”突出显示。 -->
-        	for (key in check) {
-            	if (!check[key]) {
-                	$(this).find('.inputCheck').eq(key).closest('.has-feedback').removeClass('has-success has-error').addClass('has-error');
-            	}
-				if(i!=key)i=key;
-        	}
+			check.forEach(function(e,index){
+				if(!e){
+					arr.push(index);
+					inSet.eq(index).closest('.has-feedback').removeClass('has-success has-error').addClass('has-error');
+				}
+			});
 			//未通过验证的序号最小的$('.inputCheck').eq(i)获得焦点
-			$('.inputCheck').eq(i).focus();	
+			inSet.eq(Math.min.apply(null, arr)).focus();
+			return;			
 		}else{
 			$('.modal').modal('hide');
 			$.confirm(strHtml,function(e){
-				con=e;
-				if(true==con){
-					ajaxUgoprt(url,formData);
-				}
-				else{
-					$('.modal').modal('show');
-				}
+				e?ajaxUgoprt(url,formData):$('.modal').modal('show');
 			}).ok('确定(Y)').cancel('取消(N)');		
 		}
 	});
@@ -339,90 +380,82 @@ $(document).ready(function(){
 	//表单重置时附加的操作
 	fm.find('input:reset').click(function(e){	
 		e.preventDefault();
+		check = Array(check.length).fill(false);
 		//本按钮所在form进行reset
 		fm[0].reset();
-		fm.find('input:radio[value="1"]').prop('checked',1);
+		//根据reset后的form状态，重新设定各项组件
+		fm.find('.has-feedback').removeClass('has-success has-error').children('span').hide(); 
 		radioBg();
 		fm.find('input:checkbox').each(function(){
 			checkBoxBg($(this));
 		});
-		fm.find('.has-feedback').removeClass('has-success has-error').children('span').hide(); 
-				
-		fm.find('[name="usergroupName"]').focus();
-		
-		check = [false];
+		checkBoxSelNum();
+		<!-- initFm(); -->
+		fm.find('input.inputCheck').eq(0).focus();
+		console.log(check);
 	});
 	
 <!-- function -->
-
-//校验成功函数
-function success(obj, counter) {
-    var pObj=obj.closest('.has-feedback');
-	pObj.removeClass('has-error').addClass('has-success');
-	pObj.children('span').hide();
-    pObj.find('.spOk').show();
-    check[counter] = true;
-}
-
-// 校验失败函数
-function fail(obj, counter, msg='') {
-    let pObj=obj.closest('.has-feedback');
-	
-	pObj.removeClass('has-success has-error').addClass('has-error');
-	pObj.children('span').hide();
-	pObj.find('.spTips').text(msg).show();
-    pObj.find('.spRemove').show();
-    check[counter] = false;
-}
-
 //输入有效性检查
 function inputValid(inObj,txt=''){
-	// 正则表达式，由英文、数字、中文和下划线组成,但不能以数字开头,长度为3到20个字符。unicode编码中的汉字范围:\u2E80-\u9FFF
-	let nameVal= inObj.val(),
-		num='',
+	let tVal= inObj.val(),
+		tName=inObj.attr('name'),
 		inSet=fm.find('.inputCheck'),
-		index='',
-		regVal='',
 		regUserGroupName = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{2,19}$/;
-	
-	//inObj在inSet中的序号
-	for(var i=0;i<inSet.length;i++){
-		if(inObj.attr('name')==inSet.eq(i).attr('name')){
-			index=i;
-			regVal=inObj.attr('name');
-			break;
+	//定义检查结果函数
+	let checkResult=(obj,msg='')=>{
+		let pObj=obj.closest('.has-feedback'),
+			inSet=fm.find('.inputCheck')
+			index=0;
+		//obj在inSet中的序号
+		for(var i=0;i<inSet.length;i++){
+			if(obj.attr('name')==inSet.eq(i).attr('name')){
+				<!-- check[i] = false; -->
+				index=i;
+				break;
+			}
 		}
-	}
-			
-	switch(regVal){
+
+		pObj.removeClass('has-success has-error').children('span').hide();
+		if(msg.length){
+			//显示校验fail的msg
+			pObj.addClass('has-error');
+			pObj.find('.spTips').text(msg).show();
+    		pObj.find('.spRemove').show();
+			check[index]=false;			
+		}else{
+			//校验success
+			pObj.addClass('has-success');
+			pObj.find('.spOk').show();
+			check[index]=true;
+		}
+	};
+		
+	<!-- console.log(); -->
+	switch(tName){
+		//检查[name="usergroupName"]的输入框	
 		case 'usergroupName':
-			regVal=regUserGroupName;
-			//[name="usergroupName"]的输入框	
 			if(txt!=''){
-				return fail(inObj,index,txt);
+				return checkResult(inObj,txt);
 			}
-			if(regVal.test(nameVal)){
-				return success(inObj,index);	
+			if(regUserGroupName.test(tVal)){
+				return checkResult(inObj);	
 			}
-			if(nameVal.length < 3){
-				if(nameVal==''){
-					txt='用户组名不能为空。';
-				}else{
-					txt='用户组名太短，不能少于3个字符。';
-				}
+			if(tVal.length < 3){
+				txt=(tVal=='')?'用户组名不能为空。':'用户组名太短，不能少于3个字符。';
 			}else{
 				txt='可由英文、数字、中文和下划线组成，但不能以数字开头。';
 			}
-			return fail(inObj,index,txt);
+			return checkResult(inObj,txt);
 			break;
-		case 'checkBoxNum':
-			num=checkBoxNum();
+		//检查[name="checkBoxSelNum"]的输入框
+		case 'checkBoxSelNum':
+			num=checkBoxSelNum();
 			console.log(num);
-			num==0?fail(inObj,index,'请添加用户组权限'):success(inObj,index);
+			txt=num!=0?'':'请添加用户组权限';
+			return checkResult(inObj,txt);
 			break;
 	}
-	
-	
 }
 
 function ajaxUgoprt(url,data,cbFn){
@@ -453,9 +486,7 @@ function ajaxUgoprt(url,data,cbFn){
 			}else{
 				//调用回调函数处理
 				res.result?cbFn(res.msg):cbFn();	
-			}
-			inputValid(fm.find('[name="checkBoxNum"]'));
-			
+			}			
 		},
 		error: function(){
 			$.alert('与服务器通讯超时，请稍后再试！');
@@ -464,6 +495,5 @@ function ajaxUgoprt(url,data,cbFn){
 }
 <!--// function -->
 });
-</script>
 
-			
+</script>
