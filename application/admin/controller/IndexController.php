@@ -26,6 +26,8 @@ class IndexController extends \think\Controller
     private $dept = null;
     //用户权限
     private $authArr=array();
+    //响应前端要求的分页信息
+    private $resPgInfo=array();
     
     // 初始化
     protected function _initialize()
@@ -42,7 +44,7 @@ class IndexController extends \think\Controller
         $this->roles=array();
         $this->dept='';
         $this->authArr=array();
-        
+        $this->resPgInfo=['listRows'=>10,'pageNum'=>1,'showId'=>0,'url'=>__FUNCTION__];
 
     }
     
@@ -50,11 +52,11 @@ class IndexController extends \think\Controller
     {
       //用户是否已经登录。
       $this->_loginUser();
-      $loadParam=['listRows'=>10,'pageNum'=>1,'showId'=>0];
+      //$pageParam=['listRows'=>10,'pageNum'=>1,'showId'=>0,'url'=>__FUNCTION__];
       $this->assign([
               'home'=>$request->domain(),
               'username'=>$this->username,
-              'loadParam'=>$loadParam,
+              'pageParam'=>$this->resPgInfo,
               'year'=>date('Y')
               
         ]);
@@ -83,6 +85,7 @@ class IndexController extends \think\Controller
         $this->pwd=Session::get('pwd');
         $this->dept=Session::get('dept');
         $this->authArr=Session::get('authArr');
+        $this->_setResPgInfo($this->request->param('pageParam/a'));
       }    
     }
     
@@ -136,6 +139,12 @@ class IndexController extends \think\Controller
         }
         return $resultArr;
       };
+    }
+    //
+    private function _setResPgInfo($rqPgInfo=[])
+    {
+      $this->resPgInfo=empty($rqPgInfo)?$this->resPgInfo:array_merge($this->resPgInfo,$rqPgInfo);
+      return $this->resPgInfo;
     }
       
     //响应前端请求，返回信息
@@ -535,40 +544,194 @@ class IndexController extends \think\Controller
       return view();
     }
     
-    public function userList(Request $request,UsergroupModel $usrgroupMdl)
+    public function userList(UserModel $userMdl)
     {
+      $this->_loginUser();
+         
+      $pageNum=$this->resPgInfo['pageNum'];
+      $listRows=$this->resPgInfo['listRows'];
+      $userSet=$userMdl->where('id','>',0)->select();
+      $userSet=is_array($userSet)?collection($userSet):$userSet;
       
-      return 'UserList';
+      $userList=$userSet->slice(($pageNum-1)*$listRows,$listRows);
+    
+      $pageSet=$userMdl->where('id','>',0)->paginate($listRows,false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$pageNum,
+                        'query'=>['listRows'=>$listRows]]);    
+      
+      $test=$this->resPgInfo;
+      $this->assign([       
+        //显示结果集
+        'userList'=>$userList,
+        
+        //分页对象
+        'pageSet'=>$pageSet,
+        
+        'pageNum'=>$pageNum,
+        'listRows'=>$listRows,
+        
+        'searchNum'=>$userSet->count(),
+        'pageParam'=>json_encode($this->resPgInfo,JSON_UNESCAPED_UNICODE),
+        
+        'test'=>json_encode($test,JSON_UNESCAPED_UNICODE)
+        
+      ]);
+      
+      return view();
+      //return 'UserList';
     }
     
-    public function userOprt1(Request $request,UsergroupModel $usrgroupMdl)
+    public function userOprt1(UserModel $usrgroupMdl)
     {
-         
-      return 'UserOprt1';
+      $this->_loginUser();
+      $request=$this->request;
+      $oprt=empty($request->param('oprt'))?'':$request->param('oprt');
+      $id=empty($request->param('id'))?'':$request->param('id');
+      
+      $result=0;
+      $msg='';
+      $name='';
+      
+      #模型Create，$oprt=='_CREATE'
+      if($oprt=='_CREATE') {
+        if(count($ugMdl::get(['name'=>$data['name']]))){
+          $msg='创建失败。用户组【'.$data['name'].'】已存在。';
+        }else{
+          $ugSet= $ugMdl::create($data,true);
+          if($ugSet->id){
+            $result=1;
+            $msg='成功';
+            $data=$ugSet;
+            $name=$ugSet->name;
+          }else{
+            $result=0;
+            $msg='失败';
+          }
+        }      
+      }
+      
+      #模型Delete，$oprt=='_DELETE'
+      if($oprt=='_DELETE'){
+        //$ugSet= $ugMdl::update(['enable'=>($oprt=='_ENABLE')?1:0],['id' => $id]);
+        $ugSet= $ugMdl::get($id);
+        $name=$ugSet->name;
+        if($ugSet->delete()){
+          $result=1;
+          $msg='成功';
+        }else{
+          $result=0;
+          $msg='失败';
+        }        
+      }
+      
+      #模型Update，$oprt:in['_ENABLE','_DISABLE','_UPDATE'] 
+      if($oprt=='_ENABLE' || $oprt=='_DISABLE'){
+        //$ugSet= $ugMdl::update(['enable'=>($oprt=='_ENABLE')?1:0],['id' => $id]);
+        $ugSet= $ugMdl::get($id);
+        $ugSet->enable = ($oprt=='_ENABLE')?1:0;
+        $msg=$ugSet->save()?'success':'error';
+        $result=$ugSet->enable;
+        $name=$ugSet->name;
+      }
+      if($oprt=='_UPDATE' ){
+        $ugSet= $ugMdl::get($id);
+        if($ugSet->save($data)){
+          $result=1;
+          $msg='修改成功';
+        }else{
+          $result=0;
+          $msg='无变化';
+        }
+        $data=$ugSet;
+        $name=$ugSet->name;
+        
+      }
+      #模型Read，查询提交的$data['name']是否已存在，因为$data['name']的值在数据库中必须唯一
+      if($oprt=='_READ'){
+        //$ugSet=$ugMdl::all(function($query)use($data){ 
+//                        $query->where('name',$data['name']);
+//                      });
+        $ugSet=$ugMdl::get(['name'=>$data['name']]);
+        if(count($ugSet)){
+          //$id==0是‘新增’，$id!=$ugSet->id是‘编辑’
+          if($id==0 || $id!=$ugSet->id){
+            $result=1;
+            $msg='用户组【'.$data['name'].'】已存在。';
+          }else if($id==$ugSet->id){
+            $msg='';
+            $result=0;
+          }
+        }
+      }
+      
+      $this->assign([
+        'home'=>$request->home,
+        
+      ]);
+      
+      return ['result'=>$result,'msg'=>$msg,'name'=>$name,'data'=>$data,'oprt'=>$oprt];    
+      
+    }
+    //单个用户信息表单
+    public function fmUserSingle(UserModel $userMdl,UsergroupModel1 $ugMdl)
+    {
+      $this->_loginUser();
+      $request=$this->request;
+      #前端传来的数据
+      $oprt=empty($request->param('oprt'))?'_READ':$request->param('oprt');
+      $id=empty($request->param('id'))?0:$request->param('id');
+      
+      $userSet['id']=$id;
+      $userSet['username']='';
+      $userSet['mobile']='12345678901';
+      $userSet['dept']='';
+      $userSet['enable']=1;
+      $userSet['usergroup_id']=1;
+      $userSet['toJoinGroup']=$ugMdl->getAllGroup(); 
+      $userSet['joinedGroup']=[];   
+      
+      if($id){
+        $user= $userMdl::get($id);
+        foreach($userMdl::get($id)->toArray() as $k=>$v){
+          //直接拿到数据库中'usergroup_id'、'mobile'字段的数据
+          if($k=='usergroup_id' || $k=='mobile'){
+            $userSet[$k]=$user->getData($k);
+          }else{
+            $userSet[$k]=$v;
+          }
+        }
+        $userSet['joinedGroup']=$user->joinedGroup;
+        $userSet['toJoinGroup']=$user->toJoinGroup;
+      }
+      #将数组转换为对象
+      $userSet=collection($userSet);
+                 
+      $this->assign([
+        #返回前端必须为对象类型:$ugSet
+        'userSet'=>$userSet,
+        'oprt'=>$oprt,
+      ]);
+      
+      return view();
     }
     
     public function usergroupList(UsergroupModel1 $userGpMdl)
     {
-      $request=$this->request;
-      $loadParamDefaults=['listRows'=>10,'pageNum'=>1,'showId'=>0];
-      $loadParam=!empty($request->param('loadParam/a'))?$request->param('loadParam/a'):$loadParamDefaults;
+      $this->_loginUser();
       
-      $loadParam=array_merge($loadParamDefaults,$loadParam);
-      $pageNum=$loadParam['pageNum'];
-      $listRows=$loadParam['listRows'];
+      $pageNum=$this->resPgInfo['pageNum'];
+      $listRows=$this->resPgInfo['listRows'];
  
       $userGpSet=$userGpMdl->where('id','>',0)->select();
       $userGpSet=is_array($userGpSet)?collection($userGpSet):$userGpSet;
       $userGpList=$userGpSet->slice(($pageNum-1)*$listRows,$listRows);
       
-     // $loadParam['showId']=($loadParam['showId']==0)?$userGpList[0]->id:$loadParam['showId'];
+     // $pageParam['showId']=($pageParam['showId']==0)?$userGpList[0]->id:$pageParam['showId'];
                  
       $pageSet=$userGpMdl->where('id','>',0)->paginate($listRows,false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$pageNum,
                         'query'=>['listRows'=>$listRows]]);    
                         
       $testArr=$userGpList->column('authority')[0];
       $this->assign([
-        'home'=>$request->home,
         //显示结果集
         'userGpList'=>$userGpList,
         
@@ -579,7 +742,7 @@ class IndexController extends \think\Controller
         'listRows'=>$listRows,
         
         'searchNum'=>$userGpSet->count(),
-        'loadParam'=>json_encode($loadParam,JSON_UNESCAPED_UNICODE),
+        'pageParam'=>json_encode($this->resPgInfo,JSON_UNESCAPED_UNICODE),
         'auth'=>json_encode(conAuthNameArr,JSON_UNESCAPED_UNICODE),
         
         'testDis'=>json_encode($testArr,JSON_UNESCAPED_UNICODE)
@@ -687,9 +850,10 @@ class IndexController extends \think\Controller
       return ['result'=>$result,'msg'=>$msg,'name'=>$name,'data'=>$data,'oprt'=>$oprt];
     }
     //单个用户组信息表单
-    public function fmUsergroupSingle(Request $request,UsergroupModel1 $ugMdl)
+    public function fmUsergroupSingle(UsergroupModel1 $ugMdl)
     {
       $this->_loginUser();
+      $request=$this->request;
       #前端传来的数据
       $oprt=empty($request->param('oprt'))?'_READ':$request->param('oprt');
       $id=empty($request->param('id'))?'':$request->param('id');
@@ -710,7 +874,6 @@ class IndexController extends \think\Controller
       }
                  
       $this->assign([
-        'home'=>$request->home,
         #返回前端必须为对象类型:$ugSet
         'ugSet'=>$ugSet,
         'oprt'=>$oprt

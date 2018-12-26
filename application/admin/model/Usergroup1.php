@@ -22,12 +22,6 @@ class Usergroup1 extends Model
         'authority'  =>  'json',
     ];
     
-    // 与模型User（表user）的关联关系
-    public function users()
-    {
-        return $this->hasMany('User');
-    }
-    
     //获取器，获取数据表Name字段值，转换为中文输出
     protected function getNameAttr($value)
     {
@@ -59,6 +53,25 @@ class Usergroup1 extends Model
         
       }
       return $outPut;
+    }
+    
+     // 与模型User（表user）的关联关系
+    public function users()
+    {
+        return $this->hasMany('User');
+    }
+    
+    // 与模型User（表user）的关联关系
+    public function getAllGroup()
+    {
+      $ugSet=$this->where('enable',1)->order('id asc')->select();
+      $keys=[];
+      $vals=[];
+      foreach($ugSet as $k=>$v){
+        $keys[$k]=$v['id'];
+        $vals[$k]=$v['name'];
+      }
+      return array_combine($keys,$vals);;
     }
     
     #获取器，获取数据表Name字段值，转换为中文输出

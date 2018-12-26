@@ -181,38 +181,12 @@
 		</div>
 	</div>
 </div>
-
-<!-- Modal "modalEditUsergroup" -->
-<div class="modal fade" id="modalEditUsergroup" role="dialog" data-oprt=""> 
-    <div class="modal-dialog modal-lg">
-
-      <div class="modal-content">
-        <div class="modal-header" style="border-radius: 5px 5px 0px 0px;">
-          	<button type="button" class="close" data-dismiss="modal">&times;</button>
-		  
-          	<h4 id="h4Title"><strong>新增用户组</strong></h4>
-        </div>
-		
-        <div class="modal-body">
-			<div id="divEditUsergroup_load"><p class="text-center" style="font-size:28px;">加载中……</p></div>
-			
-        </div>
-		
-        <!-- <div class="modal-footer"> -->
-          <!-- <button type="submit" class="btn btn-danger btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 取消</button> -->
-          
-        <!-- </div> -->
-      </div>
-      
-    </div>
-</div>
-<!-- / Modal "modalEditUsergroup" -->
 	
 <script>
 //控制显示/隐藏字段的组件的属性数组
 var columnToggleArr=[],
 	authNameObj={$auth},
-	loadParam={$loadParam};
+	pageParam={$pageParam};
 
 //选择显示、隐藏字段组件生成函数
 var buildColumnToggleCom=()=>{
@@ -285,7 +259,7 @@ var columnToggle=()=>{
 		});
 	});	
 };
-//操作列内每个单元格(td)内的按键显示、隐藏
+//‘操作’列内每个单元格(td)内的按键显示、隐藏
 var oprtBtnDisplay=(tdObj)=>{
 	let enObj=tdObj.find('.btnEn'),
 		disObj=tdObj.find('.btnDis'),
@@ -305,7 +279,7 @@ var oprtBtnDisplay=(tdObj)=>{
 	}
 };
 
-//
+//给表格内的特定行上底色
 var tblTrBg=(issId)=>{
 	let obj=$('#tblUserGpList tbody'),
 		trObj=obj.find('tr[data-id="'+issId+'"]');
@@ -333,7 +307,7 @@ var tblTrBg=(issId)=>{
 		
 	});
 	
-	//操作列内每个单元格内的按键显示、隐藏
+	//‘操作’列内每个单元格内的按键显示、隐藏
 	$('#tblUserGpList tbody td[data-enable]').each(function(){
 		oprtBtnDisplay($(this));
 	});	
@@ -347,24 +321,23 @@ var tblTrBg=(issId)=>{
 })(jQuery);
 
 $(document).ready(function(){
-	//给特定行上底色
-	tblTrBg(loadParam.showId);
+	tblTrBg(pageParam.showId);
 	
-	console.log(loadParam.showId);
+	console.log(pageParam.showId);
 	//btnOprt点击
 	$('.btnOprt').click(function(){
 		let url='',
 			data={oprt:$(this).data('oprt'),id:$(this).closest('tr').data('id'),reqEnt:$(this).data('reqEnt')},
 			e=oprtBtnProp[data.oprt],
-			mdObj=$('#modalEditUsergroup'),
+			mdObj=$('#modalSingle'),
 			tdObj='',
 			//操作结果字符串
 			oprtStr='【<span class="'+e.color.txt+'">'+e.glyCom+e.chi+'</span>】';
-		//去掉所有行的底色
-		$('tr').removeClass('bg-warning');
-		//给本行上底色
-		$(this).closest('tr').addClass('bg-warning');
-		
+		//是表格内的oprt按钮
+		if($(this).closest('tr').length){
+			tblTrBg(data.id);
+		}
+				
 		if(data.oprt=='_ENABLE' || data.oprt=='_DISABLE'){
 			url='usergroupOprt1';
 			tdObj=$(this).closest('td');
@@ -397,12 +370,12 @@ $(document).ready(function(){
 	});	
 	
 	<!-- //表格每页显示记录行数 -->
-	$('#listRows').val(loadParam.listRows); 
+	$('#listRows').val(pageParam.listRows); 
 	//listRow选择change	
 	$('#listRows').change(function(){
 		let listRows=$(this).val()*1,
-			obj=$('#divLoadParam');
-		//向$('#divLoadParam')汇集
+			obj=$('#pageParam');
+		//向$('#pageParam')汇集
 		if(listRows){
 			obj.data('listRows',listRows);
 			//分页从第一页开始
@@ -440,7 +413,8 @@ $(document).ready(function(){
 			// a所在分页页数
 		let pageStr=$(this).text(),pageNum,
 			//(li.active)所代表的页数
-			pageNumActive=$('#divListRows li.active').children('span').text();
+			pageNumActive=$('#divListRows li.active').children('span').text(),
+			url=window.location.hash.slice(1);
 
 		evt.preventDefault();
 		
@@ -460,7 +434,8 @@ $(document).ready(function(){
 		}
 		//排序有关的值向$('#divTblSortData')汇集
 		if(pageNum){
-			$('#divLoadParam').data('pageNum',pageNum);
+			$('#pageParam').data('pageNum',pageNum);
+			$('#pageParam').data('url',url);
 		}
 		//调用index.html中的loadTplFile()
 		loadTplFile();

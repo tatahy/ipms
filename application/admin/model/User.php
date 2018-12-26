@@ -8,7 +8,7 @@
 namespace app\admin\model;
 
 use think\Model;
-use app\admin\model\Usergroup as UsergroupModel;
+use app\admin\model\Usergroup1 as UsergroupModel;
 
 class User extends Model
 {   
@@ -32,7 +32,47 @@ class User extends Model
         }
         return $val;
     }
-    
+    //获取器，获取数据表usergroup_id字段值，转换为字符串输出
+    protected function getUsergroupIdAttr($dbVal)
+    {
+        $ugMdl=new UsergroupModel;
+        $arr=explode(",", $dbVal);//$usergroup_id=array(8,9,10)
+        $str='';
+        
+        foreach($arr as $k=>$v){
+          $str.=$ugMdl::get($v)['name'].'('.$v.')&nbsp;<br>';
+        }
+        return $str;
+    }
+    //获取器，根据getJoinedGroupAttr()，得到可参加的用户组数组
+    protected function getToJoinGroupAttr($dbVal,$data)
+    {
+        $ugSet=UsergroupModel::where('enable',1)->order('id asc')->select();
+        $keys=[];
+        $vals=[];
+        $allGroup=[];
+        $joinedGoup=$this->getJoinedGroupAttr(1,$data);
+        foreach($ugSet as $k=>$v){
+          $keys[$k]=$v['id'];
+          $vals[$k]=$v['name'];
+        }
+        $allGroup=array_combine($keys,$vals);
+        
+        
+        return array_diff_assoc($allGroup,$joinedGoup);
+    }
+    //获取器，根据数据表usergroup_id字段值，得到已参加的用户组数组
+    protected function getJoinedGroupAttr($dbVal,$data)
+    {
+      $ugSet=UsergroupModel::where('id','in',explode(",", $data['usergroup_id']))->order('id asc')->select();
+      $keys=[];
+      $vals=[];
+      foreach($ugSet as $k=>$v){
+        $keys[$k]=$v['id'];
+        $vals[$k]=$v['name'];
+      }
+      return array_combine($keys,$vals);
+    }
     /**
      * 获取用户所属的角色信息
      */

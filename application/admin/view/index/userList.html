@@ -1,0 +1,263 @@
+<!-- userList.html -->
+<div>
+	<h4><button class="btn btn-sm btn-warning" style="font-size:16px;cursor:unset;">系统用户总数<span class="badge">{$searchNum}</span></button></h4>
+	<p class="text-right">
+		<!--// bootstap通过button调用Model -->		
+		<button type="button" class="btn-link btnOprt" data-oprt="_CREATE" data-id="0"></button>
+		<button type="button" class="btn-link"><span class="text-info" data-toggle="collapse" data-target="#divCollapse"><span class="glyphicon glyphicon-search">搜索</span></span></button>		
+		<button type="button" class="btn-link btnOprt" data-oprt="_REFRESH"></button>	
+	</p>
+ 	<div id="divCollapse" class="collapse">
+		<form id="fmUserSearch" class="form-inline">
+			<div class="form-group">
+				<label class="" for="searchUserName">用户名</label>
+				<input class="form-control" id="searchUserName" name="searchUserName" type="text" value="" placeholder="...不限">		
+			</div>
+					
+			<div class="form-group">
+				<label class="control-label" for="searchDept">部门</label>
+				<select class="form-control" id="searchDept" name="searchDept">
+					<option value="0">...不限</option>				
+				</select>
+			</div>
+									
+			<div class="form-group">
+				<label class="control-label" for="searchUsergroup">用户组</label>
+				<select class="form-control" id="searchUsergroup" name="searchUsergroup">
+					<option value="0">...不限</option>				
+				</select>
+			</div>
+				
+				<!-- <input type="submit" class="btn btn-primary btn-sm" value="搜索 >>"> -->
+				
+			<button type="button" class="btn-link btnOprt" data-oprt="_READ"></button>
+			<button id="btnSearchReset" type="reset" class="btn-link">条件重置</button>
+				<!-- <input type="reset" class="btn btn-primary btn-sm" value="重置" id=""><span class="glyphicon glyphicon-refresh"></span> -->
+			</form>
+			<hr>
+		</div> 
+	<p>{$test}</p>
+	<div class="table-responsive">
+		<table id="tblUserList" class="table table-hover table-condensed">
+			<caption class="text-center" style="border-bottom:1px solid #eee;">
+				<h4>用户列表</h4>
+			</caption>	
+			<thead>
+				<tr >
+					<th>序号</th>
+					<th><a data-sort="{ $sort}" data-sort-name="username">用户名&nbsp;</a></th>
+						
+					<th><a data-sort="{ $sort}" data-sort-name="depr">所属部门&nbsp;</a></th>
+					<th><a data-sort="{ $sort}" data-sort-name="mobile">手机号&nbsp;</a></th>
+					<th><a data-sort="{ $sort}" data-sort-name="usergroup">用户组名/编号</a></th>
+					<th>操作</th>
+				</tr>
+			</thead>
+				
+			<tbody><!-- 此处显示数据库查询后的数据集 -->
+			{volist name="$userList" id="vo" empty="暂时没有数据"}
+				<tr class="text-center" data-id="{$vo.id}">
+					<td>{$i+($pageNum-1)*$listRows}</td>
+					<td><strong>{$vo.username}</strong></td>
+					<td>{$vo.dept}</td>
+					<td>{$vo.mobile}</td>
+					<td class="text-right">{$vo.usergroup_id}</td>
+					
+					<td class="text-right" data-enable="{$vo.enable}">
+						<button type="button" class="btn-link btnOprt" data-oprt="_EDIT" data-req-ent="model" title="编辑用户"></button>
+						<button type="button" class="btn-link btnOprt" data-oprt="_DELETE" data-req-ent="model" title="删除用户"></button>
+						<div class="btnEn">
+							<button type="button" class="btn-link btnOprt" data-oprt="_DISABLE" data-req-ent="result" title="禁用用户"></button>
+						</div>
+						<div class="btnDis">
+							<button class="btn-link btnOprt" data-oprt="_ENABLE" data-req-ent="result" title="启用用户"><strong class="text-danger">(已禁用)</strong></button>
+						</div>
+					</td>
+				</tr>
+				{/volist}
+			</tbody>
+		</table>
+	</div>
+	<div id="divListRows" class="col-sm-12 text-right" style="padding-top:10px;">
+		<div class="col-sm-10">{$pageSet->render()}</div>
+						
+		<div class="form-group form-group-sm col-sm-2">
+			<span class="">每页记录行数：</span>
+			<select class="form-control" id="listRows">
+				<option value="5">5</option>
+				<option value="10">10</option>
+				<option value="15">15</option>
+				<option value="30">30</option>
+				<option value="50">50</option>
+			</select>
+						
+		</div>
+	</div>
+</div>
+
+	
+<script>
+
+var pageParam={$pageParam};
+
+//‘操作’列内每个单元格(td)内的按键显示、隐藏
+var oprtBtnDisplay=(tdObj)=>{
+	let enObj=tdObj.find('.btnEn'),
+		disObj=tdObj.find('.btnDis'),
+		trObj=tdObj.closest('tr');
+	enObj.hide();
+	disObj.hide();
+	
+	if(tdObj.data('enable')){
+		enObj.show();
+		//去掉本行的禁用底色
+		trObj.removeClass('alert-danger');
+	}else{
+		disObj.show();
+		//给本行添加禁用底色
+		trObj.addClass('alert-danger');
+		
+	}
+};
+//给表格内的特定行上底色
+var tblTrBg=(issId)=>{
+	let obj=$('#tblUserList tbody'),
+		trObj=obj.find('tr[data-id="'+issId+'"]');
+	
+	//去掉所有行的底色
+	obj.find('tr').removeClass('bg-warning');
+	
+	if(issId==0){
+		//默认给表内的第一行内容上底色
+		obj.find('tr').eq(0).addClass('bg-warning');
+	}else{
+		//给本行上底色
+		trObj.addClass('bg-warning');
+	}
+};
+
+//自调用匿名函数立即执行的特点，进行页面初始化。
+(function($){	
+	//每个$('#tblUserList thead th')添加属性
+	$('#tblUserList thead th').addClass('text-center').find('a').addClass('text-primary').attr({href:'#userList',title:'点击排序'});
+	
+	//每个操作按钮添加核心属性
+	$('.btnOprt').each(function(){
+		let e=oprtBtnProp[$(this).data('oprt')];
+		$(this).append($('<span></span>').addClass(e.color.txt).html(e.glyCom+e.chi));
+		
+	});
+	
+	//‘操作’列内每个单元格内的按键显示、隐藏
+	$('#tblUserList tbody td[data-enable]').each(function(){
+		oprtBtnDisplay($(this));
+	});	
+	
+	spComModify($('#tblUserList .tdAuth span'));
+
+	// 激活tooltip
+	$('[title]').tooltip({placement:'auto bottom'});
+	
+})(jQuery);
+
+$(document).ready(function(){
+	
+	tblTrBg(pageParam.showId);
+	
+	//btnOprt点击
+	$('.btnOprt').click(function(){
+		let url='',
+			data={oprt:$(this).data('oprt'),id:$(this).closest('tr').data('id')},
+			e=oprtBtnProp[data.oprt],
+			mdObj=$('#modalSingle'),
+			tdObj='',
+			//操作结果字符串
+			oprtStr='【<span class="'+e.color.txt+'">'+e.glyCom+e.chi+'</span>】';
+		//是表格内的oprt按钮
+		if($(this).closest('tr').length){
+			tblTrBg(data.id);
+		}
+		
+		if(data.oprt=='_ENABLE' || data.oprt=='_DISABLE'){
+			url='userOprt1';
+			tdObj=$(this).closest('td');
+			$.post(url,data,function(res){
+				let str='';
+				tdObj.data('enable',res.result);
+				oprtBtnDisplay(tdObj);
+				if(res.msg=='success'){
+					str='<p class="text-center text-success">成功<span class="glyphicon glyphicon-ok"></span></p>';
+				}else{
+					str='<p class="text-center text-danger">失败<span class="glyphicon glyphicon-remove"></span></p>';
+				}
+				$.alert('<p class="text-center"><strong>'+res.name+'</strong>'+oprtStr+'</p>'+str);
+			});
+		}else{
+			url='fmUserSingle';
+	
+			mdObj.find('.modal-header').removeClass('bg-info bg-danger bg-warning').addClass(e.color.bg);			
+			mdObj.find('.modal-body').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(url,data,function(){
+				mdObj.find('h4').html(oprtStr+'用户');
+				
+			});
+			mdObj.on('shown.bs.modal', function () {
+            	$('#fmUsergroup').find('.inputCheck').eq(0).focus();
+    		});
+			mdObj.modal('show');
+			
+		}
+		
+	});	
+	
+	<!-- //表格每页显示记录行数 -->
+	$('#listRows').val(pageParam.listRows); 
+	//listRow选择change	
+	$('#listRows').change(function(){
+		let listRows=$(this).val()*1,
+			obj=$('#pageParam');
+		//向$('#pageParam')汇集
+		if(listRows){
+			obj.data('listRows',listRows);
+			//分页从第一页开始
+			obj.data('pageNum',1);
+		}
+		//调用index.html中的loadTplFile()
+		loadTplFile();
+	});	
+	
+	//分页click
+	$('#divListRows a').click(function(evt){
+			// a所在分页页数
+		let pageStr=$(this).text(),pageNum,
+			//(li.active)所代表的页数
+			pageNumActive=$('#divListRows li.active').children('span').text(),
+			url=window.location.hash.slice(1);
+
+		evt.preventDefault();
+		
+		switch(pageStr){
+			case'»':
+				//用"*"确保得到的是加法运算结果，而不是字符串
+				pageNum=(pageNumActive*1+1);
+			break;
+			
+			case'«':
+				pageNum=(pageNumActive*1-1);
+			break;
+			
+			default:
+				pageNum=pageStr*1;
+			break;
+		}
+		<!-- //排序有关的值向$('#divTblSortData')汇集 -->
+		if(pageNum){
+			$('#pageParam').data('pageNum',pageNum);
+			$('#pageParam').data('url',url);
+		}
+		//调用index.html中的loadTplFile()
+		loadTplFile();
+	});
+	
+});
+
+</script>

@@ -82,7 +82,7 @@ footer {
 .sidenav.sidenav-show {
 	/* 确保遮盖footer*/
 	z-index: 20;
-	height: 70%;
+	height: 100%;
 	border-radius: 3px;
 	box-shadow:0px 0px 5px 2px #aaa;
 	background-color:#ffffff;
@@ -91,7 +91,7 @@ footer {
 #divContainer.sidenav-show {
 	margin-left:0px;
 }
-
+/* 产生点击层，配合js实现点击屏幕空白处隐藏sidnav*/
 .sidenav-backdrop {
   position: fixed;
   top: 0;
@@ -171,7 +171,7 @@ footer {
 	
   	<button id="openBtn" type="button" class="btn btn-link btn-lg" style="padding:0;"><span class="glyphicon glyphicon-chevron-right"></span><span style="font-size:16px;">显示</span></button>
   	
-	<div id="divLoadParam" data-list-rows="{$loadParam.listRows}" data-page-num="{$loadParam.pageNum}" data-show-id="{$loadParam.showId}" class="sr-only"></div>
+	<div id="pageParam" data-list-rows="{$pageParam.listRows}" data-page-num="{$pageParam.pageNum}" data-show-id="{$pageParam.showId}" data-url="{$pageParam.url}" class="sr-only"></div>
 	
   	<div id="content" style="padding-top:5px;"><p class="text-center" style="font-size:28px;">加载中……</p></div>
 	
@@ -183,7 +183,27 @@ footer {
 	</div>
 </footer>
 		
+<!-- Modal "modalSingle" -->
+<div class="modal fade" id="modalSingle" role="dialog" data-oprt=""> 
+    <div class="modal-dialog modal-lg">
 
+      <div class="modal-content">
+        <div class="modal-header" style="border-radius: 5px 5px 0px 0px;">
+          	<button type="button" class="close" data-dismiss="modal">&times;</button>
+          	<h4>标题</h4>
+        </div>
+		
+        <div class="modal-body">内容</div>
+		
+        <!-- <div class="modal-footer"> -->
+          <!-- <button type="submit" class="btn btn-danger btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> 取消</button> -->
+          
+        <!-- </div> -->
+      </div>
+      
+    </div>
+</div>
+<!-- / Modal "modalSingle" -->
 <!-- //pagewrap  -->
 
 
@@ -203,26 +223,27 @@ var getBS3Color=(type,str)=>{
 
 //主要操作按钮核心属性
 var oprtBtnProp={
-	'_CREATE':{chi:'新增',color:{lab:'label label-info',txt:'text-info',btn:'btn-info',bg:'bg-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	'_EDIT':{chi:'编辑',color:{lab:'label label-primary',txt:'text-primary',btn:'btn-primary',bg:'bg-warning'},glyCom:'<span class="glyphicon glyphicon-edit"></span>'},
-	'_UPDATE':{chi:'保存',color:{lab:'label label-primary',txt:'text-primary',btn:'btn-primary',bg:'bg-info'},glyCom:'<span class="glyphicon glyphicon-saved"></span>'},
-	'_DELETE':{chi:'删除',color:{lab:'label label-danger',txt:'text-danger',btn:'btn-danger',bg:'bg-danger'},glyCom:'<span class="glyphicon glyphicon-remove"></span>'},
-	'_DISABLE':{chi:'禁用',color:{lab:'label label-warning',txt:'text-warning',btn:'btn-warning',bg:'bg-info'},glyCom:'<span class="glyphicon glyphicon-ban-circle"></span>'},
-	'_ENABLE':{chi:'启用',color:{lab:'label label-success',txt:'text-success',btn:'btn-success',bg:'bg-info'},glyCom:'<span class="glyphicon glyphicon-magnet"></span>'},
-	'_READ':{chi:'查询',color:{lab:'label label-info',txt:'text-info',btn:'btn-info',bg:'bg-info'},glyCom:'<span class="glyphicon glyphicon-search"></span>'}
+	_CREATE:{chi:'新增',color:{lab:'label label-info',txt:'text-info',btn:'btn-info',bg:'bg-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	_EDIT:{chi:'编辑',color:{lab:'label label-primary',txt:'text-primary',btn:'btn-primary',bg:'bg-warning'},glyCom:'<span class="glyphicon glyphicon-edit"></span>'},
+	_UPDATE:{chi:'保存',color:{lab:'label label-primary',txt:'text-primary',btn:'btn-primary',bg:'bg-info'},glyCom:'<span class="glyphicon glyphicon-saved"></span>'},
+	_DELETE:{chi:'删除',color:{lab:'label label-danger',txt:'text-danger',btn:'btn-danger',bg:'bg-danger'},glyCom:'<span class="glyphicon glyphicon-remove"></span>'},
+	_DISABLE:{chi:'禁用',color:{lab:'label label-warning',txt:'text-warning',btn:'btn-warning',bg:'bg-info'},glyCom:'<span class="glyphicon glyphicon-ban-circle"></span>'},
+	_ENABLE:{chi:'启用',color:{lab:'label label-success',txt:'text-success',btn:'btn-success',bg:'bg-info'},glyCom:'<span class="glyphicon glyphicon-magnet"></span>'},
+	_READ:{chi:'查询',color:{lab:'label label-info',txt:'text-info',btn:'btn-info',bg:'bg-info'},glyCom:'<span class="glyphicon glyphicon-search"></span>'},
+	_REFRESH:{chi:'刷新',color:{lab:'label label-info',txt:'text-info',btn:'btn-info',bg:'bg-info'},glyCom:'<span class="glyphicon glyphicon-refresh"></span>'}
 };
 		
 //权限模块核心属性
 var authEntProp={
-	'ass':{chi:'固定资产',color:{bg:'bg-default',txt:'text-default',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	'att':{chi:'附件',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	ass:{chi:'固定资产',color:{bg:'bg-default',txt:'text-default',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	att:{chi:'附件',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
 	'iss-pat':{chi:'专利事务',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
 	'iss-pro':{chi:'项目事务',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
 	'iss-the':{chi:'论文事务',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	'pat':{chi:'专利',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	'pro':{chi:'项目',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	'the':{chi:'论文',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	'admin':{chi:'后台管理',color:{bg:'bg-danger',txt:'text-danger'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'}
+	pat:{chi:'专利',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	pro:{chi:'项目',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	the:{chi:'论文',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	admin:{chi:'后台管理',color:{bg:'bg-danger',txt:'text-danger'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'}
 };
 
 //spSet对象的span内容格式修改，后续通过$.load的页面使用
@@ -283,32 +304,32 @@ var showSideNavbar=(y)=>{
 };
 
 // 作用：提交锚点值给后端，由后端返回需加载的页面文件
-var loadTplFile=(cbFn)=>{
-	let sId=window.location.hash,
+var loadTplFile=()=>{
+	let sId=(null==window.location.hash || window.location.hash=='#undefined')?'#sysSummary':window.location.hash,
+		url=(['usergroupList','userList'].indexOf(sId.slice(1))!=-1 )?sId.slice(1):'tplFile',
 		aObj='',
-		obj=$('#divLoadParam'),
-		loadParamDefault={
-		'listRows':obj.data('listRows'),
-		'pageNum':obj.data('pageNum'),
-		'showId':obj.data('showId')
+		obj=$('#pageParam'),
+		pageParamDefault={
+		listRows:10,
+		pageNum:1,
+		showId:0,
+		url:''
 		};
-	//load参数都从$('#divLoadParam')获取
-	let loadParam={
-		'listRows':obj.data('listRows'),
-		'pageNum':obj.data('pageNum'),
-		'showId':obj.data('showId')
-		},
-		url=(sId=='#usergroupList')?'usergroupList':'tplFile';
-	sId=(null==sId || sId=='#undefined')?'#sysSummary':sId;
+	//load参数都从$('#pageParam')获取
+	let pageParam={
+		listRows:obj.data('listRows'),
+		pageNum:(url==obj.data('url'))?obj.data('pageNum'):1,
+		showId:obj.data('showId'),
+		url:url
+		};
+	
 	aObj=$('a.aTab[href="'+sId+'"]');
 	aObj.tab('show');
-	loadParam=$.extend({},loadParamDefault,loadParam);
+	pageParam=$.extend({},pageParamDefault,pageParam);
 	
     //提交锚点值给后端，由后端返回需加载的页面文件
-	$("#content").load(url,{sId:sId,loadParam:loadParam},function(){
-		if(typeof cbFn =='function'){
-			return cbFn;
-		};
+	$("#content").load(url,{sId:sId,pageParam:pageParam},function(){
+		
 	}); 
 };
 

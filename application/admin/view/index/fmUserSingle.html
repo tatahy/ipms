@@ -1,0 +1,394 @@
+<!-- //fmUgergroupSingl.html -->
+<form id="fmUser" role="form" action="" method="post">
+	<input id="id" type="text" name="id" value="{$userSet.id}" class="sr-only">
+	<input type="text" name="oprt" value="{$oprt}" class="sr-only">
+	<div class="myFieldset">
+		<div class="myLegend"><span class="label label-info"><span class="glyphicon glyphicon-duplicate"></span>&nbsp;用户信息</span></div>
+		<div class="row myRow">		
+			<div class="form-group has-feedback col-sm-6">
+				<label for="username">用户名<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+				<!-- // bootstrap实现矢量图在输入框开头 -->
+				<div class="input-group">
+					<span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+					<input type="text" class="form-control inputCheck" id="userName" name="userName" value="{$userSet.username}" placeholder="输入用户名">	
+				</div>
+			</div>
+	
+			<div class="form-group col-sm-6">
+				<label for="psw">登录密码<span class="small text-danger">（用户需登录后自己修改）</span></label>
+				<!-- // bootstrap实现矢量图在输入框开头 -->
+				<div class="input-group">
+					<span class="input-group-addon"><span class="small glyphicon glyphicon-th-large"></span></span>
+					<input type="password" class="form-control" id="pwd" name="pwd" readonly="true" autocomplete="pwd" placeholder="系统默认为‘111111a’">
+				</div>		
+		
+			</div>
+		
+		</div>
+		
+		<div class="row myRow">
+			<div class="form-group has-feedback col-sm-6">
+				<label for="userMobile">手机号<span class="small glyphicon glyphicon-asterisk text-danger"></span></label>
+				<!-- // bootstrap实现矢量图在输入框开头 -->
+				<div class="input-group">
+					<span class="input-group-addon"><span class="glyphicon glyphicon-phone"></span></span>
+					<input type="text" class="form-control inputCheck" id="userMobile" name="mobile" value="{$userSet.mobile}" placeholder="输入用户手机号">	
+			
+				</div>	
+			</div>
+	
+			<div class="form-group has-feedback col-sm-6">
+				<label for="selDept">选择部门<span class="small glyphicon glyphicon-asterisk text-danger">（单选）</span></label>
+				<div class="input-group">
+					<span class="input-group-addon"><span class="glyphicon glyphicon-tree-conifer"></span></span>
+					<select class="form-control inputCheck" id="selDept" name="dept">
+    					<option value="0">……选择一个部门</option>
+    				</select>
+				</div>
+			</div>
+		</div>	
+	
+		<div class="row myRow">
+			<div class="form-group col-sm-6">
+				<label for="selUsergroup">可加入用户组数：<span class="spNum"></span><span class="small text-primary">（单击加入）</span></label>
+				<div class="input-group">
+					<span class="input-group-addon"><span class="glyphicon glyphicon-plus"></span></span>
+					<select class="form-control" id="selUsergroup">
+    			
+    				</select>
+				</div>
+			</div>
+	
+			<div class="form-group has-feedback col-sm-6">
+				<label for="selectedUsergroup">已加入用户组数：<span class="spNum text-danger"></span>&nbsp;<span class="small  glyphicon glyphicon-asterisk text-danger">（单击退出）</span></label>
+				<div class="input-group">
+					<span class="input-group-addon"><span class="glyphicon glyphicon-education"></span></span>
+					<select class="form-control inputCheck" id="selectedUsergroup">
+    			
+    				</select>
+				</div>
+			</div>
+		</div>	
+		
+	</div>
+	
+	<hr>
+			
+	<div class="myFieldset">
+		<div class="myLegend"><span class="label label-default">
+		<span class="glyphicon glyphicon-magnet"></span>&nbsp;用户启用</span>&nbsp;&nbsp;&nbsp;&nbsp;
+			
+			<span id="radioCom"></span>
+			<!-- //js中radioCom的建模参考 -->
+			<!-- <label class="radio-inline"> -->
+      			<!-- <input type="radio" name="usergroupEn" value="1" checked><span class="label label-success">是</span> -->
+    		<!-- </label> -->
+    		<!-- <label class="radio-inline"> -->
+      			<!-- <input type="radio" name="usergroupEn" value="0" ><span class="label label-default">否</span> -->
+    		<!-- </label> -->
+		</div>
+	</div>	
+	<hr>
+	<div class="row myRow">	
+		<div id="oprtBtnCom" class="col-sm-6 text-left">
+				
+		</div>
+		<div class="col-sm-6 text-right">
+			<input type="reset" class="btn btn-primary btn-sm" value="重置">
+			<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
+		</div>
+	</div>			
+	</form>
+
+	
+<script>
+var userSet={$userSet},
+	oprt='{$oprt}',
+	fm=$('#fmUser');
+
+console.log(userSet);
+
+//生成radio组件。
+var buildRaCom=(userSet)=>{
+	let inObj='',
+		spObj='',
+		labSet=[],
+		spHelp=$('<span></span>').addClass('help-block').css('color','red'),
+		enable=userSet.enable;
+		
+	//生成radio组件
+	for(var i=0;i<2;i++){
+		inObj=$('<input>').attr('type','radio').val(i).attr('name','usergroupEn');
+		spObj=$('<span></span>').addClass('label label-default');
+		i?spObj.text('是'):spObj.text('否');
+		labSet[i]=$('<label></label>').addClass('control-label radio-inline').append(inObj,spObj);
+	}
+	if(enable){
+		labSet[1].children('input').attr('checked',true);
+		labSet[1].children('span').addClass('label-success');
+		$('#radioCom').siblings('.label').addClass('label-info');
+	}else{
+		labSet[0].children('input').attr('checked',true);
+	}
+	$('#radioCom').append(labSet);
+};
+//完善操作按钮
+var oprtBtnComShow=(oprt)=>{
+	let obj=$('#oprtBtnCom'),
+		uBtn='',
+		oBtn='';
+	let buildBtn=(oprt)=>{
+			let e=oprtBtnProp[oprt],
+				sBtn=$('<button></button>').addClass('btn btn-sm btnOprt').attr({'type':'submit','data-oprt':oprt});
+			sBtn.addClass(e.color.btn).html(e.glyCom+e.chi);
+			return sBtn;
+		};
+	switch(oprt){
+		case '_CREATE':
+			oBtn=buildBtn(oprt);
+			break;
+		case '_DELETE':
+			uBtn=buildBtn('_UPDATE');
+			oBtn=buildBtn(oprt);
+			break;
+		case '_EDIT':
+			oBtn=buildBtn('_UPDATE');
+			break;
+	}		
+	obj.append(uBtn,'&nbsp;',oBtn);
+};
+//设置input:radio元素及其关联组件的背景色，适用于有2个radio
+var radioBg=()=>{	
+	let rObj=$('#radioCom'),
+		lObj=rObj.siblings('.label'),
+		yR=rObj.find('[value="1"]'),
+		labS='label-success',
+		labI='label-info';
+	
+	if(yR.prop('checked')==true){
+		yR.next().addClass(labS);
+		lObj.addClass(labI);
+	}else{
+		yR.next().removeClass(labS);
+		lObj.removeClass(labI);
+	}
+};
+
+
+
+//自调用匿名函数立即执行的特点，进行页面初始化。
+;(function($){	
+	buildRaCom(userSet);
+	oprtBtnComShow(oprt);
+	
+	//.inputCheck后添加span，配合jQuery 中的内容验证代码
+	fm.find('.inputCheck').each(function(){
+		let dObj=$(this).closest('div'),
+			spStr='<span style="color:red;display:none;" class="spTips"></span><span style="display: none;margin-right:34px;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span><span style="display: none;margin-right:34px;" class="spOk glyphicon glyphicon-ok form-control-feedback"></span>';
+			
+		dObj.after(spStr);
+	});
+	
+	fm.find('.myFieldset').css('border-width','0px');
+	<!-- initFm(); -->
+})(jQuery);
+
+$(document).ready(function(){
+// 初始化数组，存储表单中输入框（class="inputCheck"）的内容验证结果“true/false”。数组下标应与输入框下标一致，便于编程选择输入框
+	var check = Array(fm.find('.inputCheck').length).fill(false);
+	console.log(check);
+	<!-- //usergroupName内容验证 -->
+	fm.find('[name="usergroupName"]').focusout(function(){
+        let url='usergroupOprt1',
+			oprt='_READ',
+			name=$(this).val(),
+			//定义回调函数
+			cbFn=(txt)=>{
+				return inputValid($(this),txt);
+			};
+		formData=new FormData();
+		formData.append('id',fm.find('[name="id"]').val());
+		formData.append('usergroupName',name);
+		formData.append('oprt',oprt);
+		//检查用户组名是否唯一
+		ajaxUgoprt(url,formData,cbFn);
+
+  	});
+	// 表单input:radio选中元素改变背景色
+	fm.find('input:radio').change(function(){
+		radioBg();
+	});
+	
+	//checkbox背景色
+	fm.find('input:checkbox').click(function(){
+		checkBoxBg($(this));
+	});
+	
+	//表单提交按钮按下时修改oprt
+	fm.find('button:submit').click(function(){
+		oprt=$(this).data('oprt');
+		fm.find('[name="oprt"]').val(oprt);
+		
+	});
+	//表单提交
+	fm.submit(function(evt){
+		let url='usergroupOprt1',
+			inSet=fm.find('input.inputCheck');
+			name=$(this).find('[name="usergroupName"]').val(),
+			el=oprtBtnProp[$(this).find('[name="oprt"]').val()],
+			formData=new FormData($(this)[0]),
+			<!-- formData=$(this).sierilize(), -->
+			strHtml='<p class="text-center" style="font-size:16px;">对用户组：<strong>'+name+'</strong></p><p class="text-center" style="font-size:16px;">进行【<span class="'+el.color.txt+'">'+el.glyCom+el.chi+'</span>】</p>';
+		//阻止表单提交动作
+		evt.preventDefault();
+		//输入框有效性检查
+		inSet.each(function(index){
+			let dObj=$(this).closest('.has-feedback'),
+				cStr=dObj.attr('class');
+			
+			check[index]=(cStr.indexOf('has-success')!=-1)?true:false;
+		});
+		
+		console.log(check);
+		//有输入框为空的情况,后续语句不再执行。序号最小的$('.inputCheck').eq(i)获得焦点。
+		if (!check.every(val=>{return val == true})){
+			let arr=[];
+			<!-- //check中存在false,对应的input用“has-error”突出显示。 -->
+			check.forEach(function(e,index){
+				if(!e){
+					arr.push(index);
+					inSet.eq(index).closest('.has-feedback').removeClass('has-success has-error').addClass('has-error');
+				}
+			});
+			//未通过验证的序号最小的$('.inputCheck').eq(i)获得焦点
+			inSet.eq(Math.min.apply(null, arr)).focus();
+			return;			
+		}else{
+			$('.modal').modal('hide');
+			$.confirm(strHtml,function(e){
+				e?ajaxUgoprt(url,formData):$('.modal').modal('show');
+			}).ok('确定(Y)').cancel('取消(N)');		
+		}
+	});
+	
+	<!-- // 表单重置 -->
+	//表单重置时附加的操作
+	fm.find('input:reset').click(function(e){	
+		e.preventDefault();
+		check = Array(check.length).fill(false);
+		//本按钮所在form进行reset
+		fm[0].reset();
+		//根据reset后的form状态，重新设定各项组件
+		fm.find('.has-feedback').removeClass('has-success has-error').children('span').hide(); 
+		radioBg();
+		fm.find('input:checkbox').each(function(){
+			checkBoxBg($(this));
+		});
+		checkBoxSelNum();
+		<!-- initFm(); -->
+		fm.find('input.inputCheck').eq(0).focus();
+		console.log(check);
+	});
+	
+<!-- function -->
+//输入有效性检查
+function inputValid(inObj,txt=''){
+	let tVal= inObj.val(),
+		tName=inObj.attr('name'),
+		inSet=fm.find('.inputCheck'),
+		regUserGroupName = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{2,19}$/;
+	//定义检查结果函数
+	let checkResult=(obj,msg='')=>{
+		let pObj=obj.closest('.has-feedback'),
+			inSet=fm.find('.inputCheck')
+			index=0;
+		//obj在inSet中的序号
+		for(var i=0;i<inSet.length;i++){
+			if(obj.attr('name')==inSet.eq(i).attr('name')){
+				<!-- check[i] = false; -->
+				index=i;
+				break;
+			}
+		}
+
+		pObj.removeClass('has-success has-error').children('span').hide();
+		if(msg.length){
+			//显示校验fail的msg
+			pObj.addClass('has-error');
+			pObj.find('.spTips').text(msg).show();
+    		pObj.find('.spRemove').show();
+			check[index]=false;			
+		}else{
+			//校验success
+			pObj.addClass('has-success');
+			pObj.find('.spOk').show();
+			check[index]=true;
+		}
+	};
+		
+	<!-- console.log(); -->
+	switch(tName){
+		//检查[name="usergroupName"]的输入框	
+		case 'usergroupName':
+			if(txt!=''){
+				return checkResult(inObj,txt);
+			}
+			if(regUserGroupName.test(tVal)){
+				return checkResult(inObj);	
+			}
+			if(tVal.length < 3){
+				txt=(tVal=='')?'用户组名不能为空。':'用户组名太短，不能少于3个字符。';
+			}else{
+				txt='可由英文、数字、中文和下划线组成，但不能以数字开头。';
+			}
+			return checkResult(inObj,txt);
+			break;
+		//检查[name="checkBoxSelNum"]的输入框
+		case 'checkBoxSelNum':
+			num=checkBoxSelNum();
+			console.log(num);
+			txt=num!=0?'':'请添加用户组权限';
+			return checkResult(inObj,txt);
+			break;
+	}
+}
+
+function ajaxUgoprt(url,data,cbFn){
+	let name=fm.find('[name="usergroupName"]').val(),
+		el=oprtBtnProp[fm.find('[name="oprt"]').val()];
+		
+	$.ajax({
+		type: 'post',
+        url: url,
+        data: data,
+		timeout:2000,
+		<!-- datatype: 'JSON', -->
+        contentType: false,// 当有文件要上传时，此项是必须的，否则会导致后台无法识别文件流的起始位置
+        processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)。当使用FormData()，必须设为false，否则jqurey默认将FormData()转换为查询字符串。
+		success: function(res){
+			let msg=res.result?'<span class="alert-success">&nbsp;'+res.msg+'&nbsp;</span>':'<span class="text-muted">&nbsp;'+res.msg+'&nbsp;</span>',
+				strHtml='<p class="text-center" style="font-size:16px;">对用户组：<strong>'+name+'</strong></p><p class="text-center" style="font-size:16px;">进行【<span class="'+el.color.txt+'">'+el.glyCom+el.chi+'</span>】<br/>结果：'+msg+'</p>';
+			<!-- console.log(res); -->
+			if(res.oprt!='_READ'){
+				//向$('#pageParam')汇集
+				$('#pageParam').data('showId',res.data.id);
+				buildRaChkCom(res.data);
+				
+				//更新表格
+				//调用index.html中的loadTplFile()
+				loadTplFile();
+				$.alert(strHtml);
+			}else{
+				//调用回调函数处理
+				res.result?cbFn(res.msg):cbFn();	
+			}			
+		},
+		error: function(){
+			$.alert('与服务器通讯超时，请稍后再试！');
+		}
+	});	
+}
+<!--// function -->
+});
+
+</script>
