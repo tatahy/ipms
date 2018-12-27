@@ -9,6 +9,7 @@ namespace app\admin\model;
 
 use think\Model;
 use app\admin\model\Usergroup1 as UsergroupModel;
+use app\admin\model\Dept as DeptModel;
 
 class User extends Model
 {   
@@ -16,9 +17,10 @@ class User extends Model
     //protected $insert = ['dev_id'];  
     //protected $update = ['topic','abstract','addnewdate'];
     
-     protected $type = [
+    protected $type = [
         'authority'  =>  'json',
-    ];  
+    ];
+      
    
     //只读字段，这个字段的值一旦写入，就无法更改。
     //protected $readonly = ['rolety_id'];
@@ -44,19 +46,40 @@ class User extends Model
         }
         return $str;
     }
+    //method，得到所有的启用用户组
+    public function getAllGroup()
+    {
+      //$ugSet=UsergroupModel::where('enable',1)->order('id asc')->select();
+//      $keys=[];
+//      $vals=[];
+//      foreach($ugSet as $k=>$v){
+//        $keys[$k]=$v['id'];
+//        $vals[$k]=$v['name'];
+//      }
+      return $this->getAllGroupAttr(1);
+    }
+    //获取器 ，得到所有的启用用户组
+    protected function getAllGroupAttr($dbVal)
+    {
+      $ugSet=UsergroupModel::where('enable',1)->order('id asc')->select();
+      $keys=[];
+      $vals=[];
+      foreach($ugSet as $k=>$v){
+        $keys[$k]=$v['id'];
+        $vals[$k]=$v['name'];
+      }
+      return array_combine($keys,$vals);
+    }
     //获取器，根据getJoinedGroupAttr()，得到可参加的用户组数组
     protected function getToJoinGroupAttr($dbVal,$data)
     {
-        $ugSet=UsergroupModel::where('enable',1)->order('id asc')->select();
-        $keys=[];
-        $vals=[];
-        $allGroup=[];
+        $allGroup=$this->getAllGroupAttr(1);
         $joinedGoup=$this->getJoinedGroupAttr(1,$data);
-        foreach($ugSet as $k=>$v){
-          $keys[$k]=$v['id'];
-          $vals[$k]=$v['name'];
-        }
-        $allGroup=array_combine($keys,$vals);
+        //foreach($ugSet as $k=>$v){
+//          $keys[$k]=$v['id'];
+//          $vals[$k]=$v['name'];
+//        }
+//        $allGroup=array_combine($keys,$vals);
         
         
         return array_diff_assoc($allGroup,$joinedGoup);
@@ -72,6 +95,19 @@ class User extends Model
         $vals[$k]=$v['name'];
       }
       return array_combine($keys,$vals);
+    }
+    //method，得到所有有效的部门数组
+    public function getAllDept()
+    {
+      return $this->getAllDeptAttr(1,$this->data);
+    }
+    //获取器，得到所有有效的部门数组
+    Protected function getAllDeptAttr($dbVal,$data)
+    {
+      $dtSet=DeptModel::where('enable',1)->order('id asc')->select();
+      $dtSet=is_array($dtSet)?collection($dtSet):$dtSet;
+      
+      return array_combine($dtSet->column('id'),$dtSet->column('name'));
     }
     /**
      * 获取用户所属的角色信息

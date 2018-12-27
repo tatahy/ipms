@@ -682,28 +682,27 @@ class IndexController extends \think\Controller
       
       $userSet['id']=$id;
       $userSet['username']='';
+      $userSet['pwd']=md5('111111a');
       $userSet['mobile']='12345678901';
       $userSet['dept']='';
+      $userSet['allDept']=$userMdl->getAllDept();
       $userSet['enable']=1;
-      $userSet['usergroup_id']=1;
-      $userSet['toJoinGroup']=$ugMdl->getAllGroup(); 
-      $userSet['joinedGroup']=[];   
-      
+      $userSet['toJoinGroup']=$userMdl->getAllGroup(); 
+      $userSet['joinedGroup']=[];
+      //可见字段值   
+      $fieldArr=array_keys($userSet);
       if($id){
-        $user= $userMdl::get($id);
-        foreach($userMdl::get($id)->toArray() as $k=>$v){
-          //直接拿到数据库中'usergroup_id'、'mobile'字段的数据
-          if($k=='usergroup_id' || $k=='mobile'){
-            $userSet[$k]=$user->getData($k);
-          }else{
-            $userSet[$k]=$v;
-          }
-        }
-        $userSet['joinedGroup']=$user->joinedGroup;
-        $userSet['toJoinGroup']=$user->toJoinGroup;
+        #追加数据表中没有而模型中定义了获取器的2个字段值
+        $userSet= $userMdl::get($id)->append(['joinedGroup','toJoinGroup','allDept'])->visible($fieldArr);
+        $mobile=$userSet->getData('mobile');
+        #要修改$userSet对象中mobile的值，必须将$userSet对象转为数组，
+        #因为mobile已定义获取器，对象取值操作（$userSet->mobile）会触发获取器，所以$userSet->mobile=$mobile无法正确赋值。
+        $userSet=$userSet->toArray();
+        $userSet['mobile']=$mobile;
       }
+      $userSet['pwd']='';
       #将数组转换为对象
-      $userSet=collection($userSet);
+      $userSet=is_array($userSet)?collection($userSet):$userSet;
                  
       $this->assign([
         #返回前端必须为对象类型:$ugSet

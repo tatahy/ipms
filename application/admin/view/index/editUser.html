@@ -131,11 +131,11 @@ $(document).ready(function(){
 	<!-- // 单选框#selDept的内容 -->
 	ajaxSelectOption($('#selDept'),{"async":false,"url":"selectResponse","ajaxData":{"req":"_DEPT"},"first":{"val":"0","text":"请选择一个部门…"},"selected":{"val":"{$user.dept}"}});
 	// 得到页面加载时单选框#selUsergroup的option内容，页面“重置”时加载
-	var selUsergroupStr=ajaxSelectOption($('#selUsergroup'),{"async":false,"url":"selectResponse","ajaxData":{"req":"_USERGROUP"},"first":{"val":"0","text":"可选…"},"remove":{"val":"{$user.usergroup_id}"}});
+	var selUsergroupStr=ajaxSelectOption($('#selUsergroup'),{"async":false,"url":"selectResponse","ajaxData":{"req":"_USERGROUP"},"first":{"val":"0","text":"可选…"},"remove":{"val":"{$user->get('usergroup_id')}"}});
 	// 保留页面加载时单选框#selUsergroup的label内容，页面“重置”时加载
 	var spNumSelUsergroup=$('#selUsergroup').closest('.form-group').find('.spNum').text();
 	// 得到页面加载时单选框#selectedUsergroup的option内容，页面“重置”时加载
-	var selectedUsergroupStr=ajaxSelectOption($('#selectedUsergroup'),{"async":false,"url":"selectResponse","ajaxData":{"req":"_USERGROUP"},"first":{"val":"0","text":"已加入…"},"show":{"val":"{$user.usergroup_id}"},"selected":0,"multiple":0});
+	var selectedUsergroupStr=ajaxSelectOption($('#selectedUsergroup'),{"async":false,"url":"selectResponse","ajaxData":{"req":"_USERGROUP"},"first":{"val":"0","text":"已加入…"},"show":{"val":"{$user->get('usergroup_id')}"},"selected":0,"multiple":0});
 	// 保留页面加载时单选框#selectedUsergroup的label内容，页面“重置”时加载
 	var spNumSelectedUsergroup=$('#selectedUsergroup').closest('.form-group').find('.spNum').text();
 	//必填输入框内容有效性判断结果数组

@@ -16,9 +16,7 @@ class Dept extends Model
 //    {
 //        return $this->hasMany('User');
 //    }
-    
-    
-    
+  
     
 }
 

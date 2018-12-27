@@ -7,7 +7,64 @@
 	<div class="myFieldset">
 		<div class="myLegend"><span class="label label-info"><span class="glyphicon glyphicon-duplicate"></span>&nbsp;用户信息</span></div>
 		<div id="formGroupCom" class="row myRow">
+			<div class="form-group has-feedback col-sm-6">
+				<label for="username">用户名<span class="small text-danger"><span class="glyphicon glyphicon-asterisk"></span></span></label>
+				<!-- // bootstrap实现矢量图在输入框开头 -->
+				<div class="input-group">
+					<span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+					<input type="text" class="form-control inputCheck" name="userName" value="{$userSet.username}" placeholder="输入用户名">	
+				</div>
+			</div>
+	
+			<div class="form-group col-sm-6">
+				<label for="psw">登录密码<span class="small text-danger">（用户需登录后自己修改）</span></label>
+				<!-- // bootstrap实现矢量图在输入框开头 -->
+				<div class="input-group">
+					<span class="input-group-addon"><span class="glyphicon glyphicon-th-large"></span></span>
+					<input class="form-control" readonly="true" placeholder="系统默认为‘111111a’">
+				</div>		
+		
+			</div>
+		
+			<div class="form-group has-feedback col-sm-6">
+				<label for="userMobile">手机号<span class="small text-danger"><span class="glyphicon glyphicon-asterisk"></span></span></label>
+				<!-- // bootstrap实现矢量图在输入框开头 -->
+				<div class="input-group">
+					<span class="input-group-addon"><span class="glyphicon glyphicon-phone"></span></span>
+					<input type="text" class="form-control inputCheck" id="userMobile" name="mobile" value="{$userSet.mobile}" placeholder="输入用户手机号">	
 			
+				</div>	
+			</div>
+	
+			<div class="form-group has-feedback col-sm-6">
+				<label for="selDept">选择部门<span class="small text-danger"><span class="glyphicon glyphicon-asterisk"></span>（单选）</span></label>
+				<div class="input-group">
+					<span class="input-group-addon"><span class="glyphicon glyphicon-tree-conifer"></span></span>
+					<select class="form-control inputCheck" id="selDept" name="dept">
+    					<option value="0">……选择一个部门</option>
+    				</select>
+				</div>
+			</div>
+	
+			<div class="form-group col-sm-6">
+				<label for="toJoinGroup">可加入用户组<span class="small text-primary">（单击加入）</span></label>
+				<div class="input-group">
+					<span class="input-group-addon"><span class="glyphicon glyphicon-plus"></span></span>
+					<select class="form-control" id="toJoinGroup">
+    					<option value="0">……总数：xx</option>
+    				</select>
+				</div>
+			</div>
+	
+			<div class="form-group has-feedback col-sm-6">
+				<label for="joinedGroup">已加入用户组<span class="small text-danger"><span class="glyphicon glyphicon-asterisk"></span>（单击退出）</span></label>
+				<div class="input-group">
+					<span class="input-group-addon"><span class="glyphicon glyphicon-education"></span></span>
+					<select class="form-control inputCheck" id="joinedGroup" >
+    					<option value="0">……总数：yy</option>
+    				</select>
+				</div>
+			</div>
 		</div>
 		<hr>
 		<br/>
@@ -33,6 +90,8 @@
 			</div>
 		</div>			
 	</div>
+	
+	
 	</form>
 
 	
@@ -40,10 +99,16 @@
 var userSet={$userSet},
 	oprt='{$oprt}',
 	fm=$('#fmUser1');
-<!-- console.log(typeof userSet['allDept']); -->
+console.log(typeof userSet['allDept']);
+	
+Object.entries(userSet['allDept']).forEach(function(v,k){
+	
+	console.log(k+':'+v[0]+'|'+v[1]);
+
+});
 
 //生成radio组件。
-var buildRaCom=()=>{
+var buildRaCom=(userSet)=>{
 	let labSet=[],
 		spHelp=$('<span></span>').addClass('help-block').css('color','red');
 		
@@ -105,95 +170,26 @@ var radioBg=()=>{
 	}
 };
 
-var	buildFormGroupCom=()=>{
-	let glyRisk='<span class="glyphicon glyphicon-asterisk"></span>',
-		//与后端传送的字段名保持一致
-		formGoupComProp={
-			//r1
-			username:{rCss:'has-feedback',c1CColor:'text-danger',c1CGly:glyRisk,c1CTxt:'',c1Txt:'用户名',c2C1Gly:'<span class="glyphicon glyphicon-user"></span>',c2C2Type:'input',c2C2Css:'inputCheck',c2C2Attr:{'name':'userName','value':'','placeholder':'输入用户名','type':'text'}},
-			//r2
-			pwd:{rCss:'',c1CColor:'text-danger',c1CGly:'',c1CTxt:'（用户需登录后自己修改）',c1Txt:'登录密码',c2C1Gly:'<span class="glyphicon glyphicon-th-large"></span>',c2C2Type:'input',c2C2Css:'',c2C2Attr:{'placeholder':'系统默认为‘111111a’','value':'','readonly':true}},
-			//r3
-			mobile:{rCss:'has-feedback',c1CColor:'text-danger',c1CGly:glyRisk,c1CTxt:'',c1Txt:'手机号',c2C1Gly:'<span class="glyphicon glyphicon-phone"></span>',c2C2Type:'input',c2C2Css:'inputCheck',c2C2Attr:{'name':'mobile','value':'','placeholder':'输入用户手机号','type':'text'}},
-			//r4
-			dept:{rCss:'has-feedback',c1CColor:'text-danger',c1CGly:glyRisk,c1CTxt:'（单选）',c1Txt:'选择部门',c2C1Gly:'<span class="glyphicon glyphicon-tree-conifer"></span>',c2C2Type:'select',c2C2Css:'inputCheck',c2C2Attr:{'name':'dept'}},
-			//r5
-			toJoinGroup:{rCss:'',c1CColor:'text-primary',c1CGly:'',c1CTxt:'（单击加入）',c1Txt:'可加入用户组',c2C1Gly:'<span class="glyphicon glyphicon-plus"></span>',c2C2Type:'select',c2C2Css:'',c2C2Attr:{'name':'toJoinGroup'}},
-			//r6
-			joinedGroup:{rCss:'has-feedback',c1CColor:'text-danger',c1CGly:glyRisk,c1CTxt:'（单击退出）',c1Txt:'已加入用户组',c2C1Gly:'<span class="glyphicon glyphicon-education"></span>',c2C2Type:'select',c2C2Css:'inputCheck',c2C2Attr:{'name':'joinedGroup'}}
-		};
-	
-	if(oprt!='_CREATE'){
-		delete formGoupComProp.pwd;
-	}
-	
-	for(var ent in formGoupComProp){
-		let e=formGoupComProp[ent],
-			val=userSet[ent],
-			rObj=$('<div></div>').addClass('form-group col-sm-6 '+e.rCss),
-			c1C=$('<span></span>').addClass('small '+e.c1CColor).append(e.c1CGly,e.c1CTxt),
-			c1=$('<label></label>'),
-			c2C1=$('<span></span>').addClass('input-group-addon').append(e.c2C1Gly),
-			sel=$('<select></select>').addClass('form-control'),
-			inp=$('<input/>').addClass('form-control'),
-			c2C2='',
-			c2=$('<div></div>').addClass('input-group'),
-			//.inputCheck后添加span，配合jQuery 中的内容验证代码
-			c3='<span style="color:red;display:none;" class="spTips"></span><span style="display: none;margin-right:34px;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span><span style="display: none;margin-right:34px;" class="spOk glyphicon glyphicon-ok form-control-feedback"></span>';
-		
-		c1.append(e.c1Txt,c1C);
-		
-		if(e.c2C2Type=='input'){
-			e.c2C2Attr.value=val;
-			c2C2=inp.attr(e.c2C2Attr);
-		}
-		
-		if(e.c2C2Type=='select'){
-			//val若是字符串，则要通过hash数组userSet.allDept来组装option
-			let n=0,
-				arr=(typeof val=='object')?val:userSet['allDept'];
-			
-			Object.entries(arr).forEach(function(v,k){
-				sel.append($('<option></option>').val(v[0]).text(v[1]));
-			});
-			n=sel.children().length;
-			if(ent =='dept'){
-				//设定选定项
-				sel.find('option[text="'+val+'"]').attr('selected',true);
-			}else{
-				//计算总数，添加第一项总数项并设为选定项
-				sel.prepend($('<option></option>').val(0).text('...总数：'+n).attr('selected',true));
-			}
-			c2C2=sel.attr(e.c2C2Attr);
-		}
 
-		c2.append(c2C1,c2C2.addClass(e.c2C2Css));
-		
-		(e.c2C2Css)?rObj.append(c1,c2,c3):rObj.append(c1,c2);
-
-		$('#formGroupCom').append(rObj);
-	}
-	<!-- if(oprt!='_CREATE'){ -->
-		<!-- let obj=$('#formGroupCom').find('div.col-sm-6').eq(0), -->
-			<!-- h=obj.height(); -->
-		<!-- console.log(h); -->
-		<!-- obj.after($('<div></div>').addClass('form-group col-sm-6').html('&nbsp;').height(h)); -->
-	<!-- } -->
-	
-};
 
 //自调用匿名函数立即执行的特点，进行页面初始化。
 ;(function($){	
-	buildRaCom();
-	oprtBtnComShow(oprt);	
-	buildFormGroupCom();
-
+	buildRaCom(userSet);
+	oprtBtnComShow(oprt);
+	
+	//.inputCheck后添加span，配合jQuery 中的内容验证代码
+	fm.find('.inputCheck').each(function(){
+		let dObj=$(this).closest('div'),
+			spStr='<span style="color:red;display:none;" class="spTips"></span><span style="display: none;margin-right:34px;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span><span style="display: none;margin-right:34px;" class="spOk glyphicon glyphicon-ok form-control-feedback"></span>';
+			
+		dObj.after(spStr);
+	});
+	
 	fm.find('.myFieldset').css('border-width','0px');
 	<!-- initFm(); -->
 })(jQuery);
 
 $(document).ready(function(){
-	
 // 初始化数组，存储表单中输入框（class="inputCheck"）的内容验证结果“true/false”。数组下标应与输入框下标一致，便于编程选择输入框
 	var check = Array(fm.find('.inputCheck').length).fill(false);
 	console.log(check);
