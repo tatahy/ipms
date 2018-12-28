@@ -36,7 +36,7 @@
 			</form>
 			<hr>
 		</div> 
-	<p>{$test}</p>
+	<!-- <p>{$test}</p> -->
 	<div class="table-responsive">
 		<table id="tblUserList" class="table table-hover table-condensed">
 			<caption class="text-center" style="border-bottom:1px solid #eee;">
@@ -44,13 +44,13 @@
 			</caption>	
 			<thead>
 				<tr >
-					<th>序号</th>
+					<th class="text-center">序号</th>
 					<th><a data-sort="{ $sort}" data-sort-name="username">用户名&nbsp;</a></th>
 						
 					<th><a data-sort="{ $sort}" data-sort-name="depr">所属部门&nbsp;</a></th>
 					<th><a data-sort="{ $sort}" data-sort-name="mobile">手机号&nbsp;</a></th>
 					<th><a data-sort="{ $sort}" data-sort-name="usergroup">用户组名/编号</a></th>
-					<th>操作</th>
+					<th class="text-right">操作</th>
 				</tr>
 			</thead>
 				
@@ -138,8 +138,8 @@ var tblTrBg=(issId)=>{
 
 //自调用匿名函数立即执行的特点，进行页面初始化。
 (function($){	
-	//每个$('#tblUserList thead th')添加属性
-	$('#tblUserList thead th').addClass('text-center').find('a').addClass('text-primary').attr({href:'#userList',title:'点击排序'});
+	//每个含有a标签的$('#tblUserList thead th')添加属性
+	$('#tblUserList thead').find('a').addClass('text-primary').attr({href:'#userList',title:'点击排序'}).closest('th').addClass('text-center');
 	
 	//每个操作按钮添加核心属性
 	$('.btnOprt').each(function(){
@@ -190,7 +190,7 @@ $(document).ready(function(){
 				}else{
 					str='<p class="text-center text-danger">失败<span class="glyphicon glyphicon-remove"></span></p>';
 				}
-				$.alert('<p class="text-center"><strong>'+res.name+'</strong>'+oprtStr+'</p>'+str);
+				$.alert('<p class="text-center">用户：<strong>'+res.name+'</strong>'+oprtStr+'</p>'+str);
 			});
 		}else{
 			url='fmUserSingle';

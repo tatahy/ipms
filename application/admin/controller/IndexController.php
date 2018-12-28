@@ -580,7 +580,9 @@ class IndexController extends \think\Controller
       //return 'UserList';
     }
     
-    public function userOprt1(UserModel $usrgroupMdl)
+    #前端传来的oprt值:_CREATE、_UPDATE、_EDIT、_DISABLE、_ENABLE、_READ
+    #$userMdl中mobile字段为无重复值字段
+    public function userOprt1(UserModel $userMdl)
     {
       $this->_loginUser();
       $request=$this->request;
@@ -590,18 +592,25 @@ class IndexController extends \think\Controller
       $result=0;
       $msg='';
       $name='';
+      #需要更新的数据表字段值
+      $data['username']=empty($request->param('username'))?'':$request->param('username');
+      $data['mobile']=empty($request->param('mobile'))?'':$request->param('mobile');
+      $data['dept']=empty($request->param('dept'))?'':$request->param('dept');
+      $data['enable']=empty($request->param('userEn'))?'':$request->param('userEn');
+      $data['usergroup_id']=empty($request->param('joinedGroup/a'))?'':implode(',',$request->param('joinedGroup/a'));
       
+     
       #模型Create，$oprt=='_CREATE'
       if($oprt=='_CREATE') {
-        if(count($ugMdl::get(['name'=>$data['name']]))){
-          $msg='创建失败。用户组【'.$data['name'].'】已存在。';
+        if(count($userMdl::get(['mobile'=>$data['mobile']]))){
+          $msg='创建失败。手机号【'.$data['mobile'].'】已存在。';
         }else{
-          $ugSet= $ugMdl::create($data,true);
-          if($ugSet->id){
+          $userSet= $userMdl::create($data,true);
+          if($userSet->id){
             $result=1;
             $msg='成功';
-            $data=$ugSet;
-            $name=$ugSet->name;
+            $data=$userSet;
+            $name=$userSet->name;
           }else{
             $result=0;
             $msg='失败';
@@ -612,9 +621,9 @@ class IndexController extends \think\Controller
       #模型Delete，$oprt=='_DELETE'
       if($oprt=='_DELETE'){
         //$ugSet= $ugMdl::update(['enable'=>($oprt=='_ENABLE')?1:0],['id' => $id]);
-        $ugSet= $ugMdl::get($id);
-        $name=$ugSet->name;
-        if($ugSet->delete()){
+        $userSet= $userMdl::get($id);
+        $name=$userSet->name;
+        if($userSet->delete()){
           $result=1;
           $msg='成功';
         }else{
@@ -626,23 +635,23 @@ class IndexController extends \think\Controller
       #模型Update，$oprt:in['_ENABLE','_DISABLE','_UPDATE'] 
       if($oprt=='_ENABLE' || $oprt=='_DISABLE'){
         //$ugSet= $ugMdl::update(['enable'=>($oprt=='_ENABLE')?1:0],['id' => $id]);
-        $ugSet= $ugMdl::get($id);
-        $ugSet->enable = ($oprt=='_ENABLE')?1:0;
-        $msg=$ugSet->save()?'success':'error';
-        $result=$ugSet->enable;
-        $name=$ugSet->name;
+        $userSet= $userMdl::get($id);
+        $userSet->enable = ($oprt=='_ENABLE')?1:0;
+        $msg=$userSet->save()?'success':'error';
+        $result=$userSet->enable;
+        $name=$userSet->username;
       }
       if($oprt=='_UPDATE' ){
-        $ugSet= $ugMdl::get($id);
-        if($ugSet->save($data)){
+        $userSet= $userMdl::get($id);
+        if($userSet->save($data)){
           $result=1;
           $msg='修改成功';
         }else{
           $result=0;
           $msg='无变化';
         }
-        $data=$ugSet;
-        $name=$ugSet->name;
+        $data=$userSet;
+        $name=$userSet->username;
         
       }
       #模型Read，查询提交的$data['name']是否已存在，因为$data['name']的值在数据库中必须唯一
@@ -650,23 +659,18 @@ class IndexController extends \think\Controller
         //$ugSet=$ugMdl::all(function($query)use($data){ 
 //                        $query->where('name',$data['name']);
 //                      });
-        $ugSet=$ugMdl::get(['name'=>$data['name']]);
-        if(count($ugSet)){
+        $userSet=$userMdl::get(['mobile'=>$data['mobile']]);
+        if(count($userSet)){
           //$id==0是‘新增’，$id!=$ugSet->id是‘编辑’
-          if($id==0 || $id!=$ugSet->id){
+          if($id==0 || $id!=$userSet->id){
             $result=1;
-            $msg='用户组【'.$data['name'].'】已存在。';
-          }else if($id==$ugSet->id){
+            $msg='手机号【'.$data['mobile'].'】已存在。';
+          }else if($id==$userSet->id){
             $msg='';
             $result=0;
           }
         }
       }
-      
-      $this->assign([
-        'home'=>$request->home,
-        
-      ]);
       
       return ['result'=>$result,'msg'=>$msg,'name'=>$name,'data'=>$data,'oprt'=>$oprt];    
       
@@ -753,7 +757,8 @@ class IndexController extends \think\Controller
       
       return view();
     }
-    //前端传来的oprt值:_CREATE、_UPDATE、_EDIT、_DISABLE、_ENABLE、_READ
+    #前端传来的oprt值:_CREATE、_UPDATE、_EDIT、_DISABLE、_ENABLE、_READ
+    #$ugMdl中的name字段为无重复值字段
     public function usergroupOprt1(Request $request,UsergroupModel1 $ugMdl)
     {
       $this->_loginUser();
@@ -765,6 +770,7 @@ class IndexController extends \think\Controller
       $result=0;
       $msg='';
       $name='';
+      #需要更新的数据表字段值
       $data['name']=empty($request->param('usergroupName'))?'':$request->param('usergroupName');
       $data['description']=empty($request->param('usergroupDescription'))?'':$request->param('usergroupDescription');
       $data['enable']=empty($request->param('usergroupEn'))?'':$request->param('usergroupEn');

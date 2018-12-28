@@ -43,13 +43,13 @@ var userSet={$userSet},
 <!-- console.log(typeof userSet['allDept']); -->
 
 //生成radio组件。
-var buildRaCom=()=>{
+var buildRaCom=(node)=>{
 	let labSet=[],
 		spHelp=$('<span></span>').addClass('help-block').css('color','red');
-		
+	node.empty();	
 	//生成radio组件
 	for(var i=0;i<2;i++){
-		let inObj=$('<input>').attr({type:'radio',name:'usergroupEn',value:i}),
+		let inObj=$('<input>').attr({type:'radio',name:'userEn',value:i}),
 			spObj=$('<span></span>').addClass('label label-default');		
 		i?spObj.text('是'):spObj.text('否');
 		labSet[i]=$('<label></label>').addClass('control-label radio-inline').append(inObj,spObj);
@@ -61,12 +61,11 @@ var buildRaCom=()=>{
 	}else{
 		labSet[0].children('input').attr('checked',true);
 	}
-	$('#radioCom').append(labSet);
+	node.append(labSet);
 };
 //完善操作按钮
-var oprtBtnComShow=(oprt)=>{
-	let obj=$('#oprtBtnCom'),
-		uBtn='',
+var oprtBtnComShow=(node,oprt)=>{
+	let uBtn='',
 		oBtn='';
 	let buildBtn=(oprt)=>{
 			let e=oprtBtnProp[oprt],
@@ -74,6 +73,7 @@ var oprtBtnComShow=(oprt)=>{
 			sBtn.addClass(e.color.btn).html(e.glyCom+e.chi);
 			return sBtn;
 		};
+	node.empty();
 	switch(oprt){
 		case '_CREATE':
 			oBtn=buildBtn(oprt);
@@ -86,13 +86,12 @@ var oprtBtnComShow=(oprt)=>{
 			oBtn=buildBtn('_UPDATE');
 			break;
 	}		
-	obj.append(uBtn,'&nbsp;',oBtn);
+	node.append(uBtn,'&nbsp;',oBtn);
 };
 //设置input:radio元素及其关联组件的背景色，适用于有2个radio
-var radioBg=()=>{	
-	let rObj=$('#radioCom'),
-		lObj=rObj.siblings('.label'),
-		yR=rObj.find('[value="1"]'),
+var radioBg=(node)=>{	
+	let lObj=node.siblings('.label'),
+		yR=node.find('[value="1"]'),
 		labS='label-success',
 		labI='label-info';
 	
@@ -105,12 +104,12 @@ var radioBg=()=>{
 	}
 };
 
-var	buildFormGroupCom=()=>{
+var	buildFormGroupCom=(node)=>{
 	let glyRisk='<span class="glyphicon glyphicon-asterisk"></span>',
 		//与后端传送的字段名保持一致
 		formGoupComProp={
 			//r1
-			username:{rCss:'has-feedback',c1CColor:'text-danger',c1CGly:glyRisk,c1CTxt:'',c1Txt:'用户名',c2C1Gly:'<span class="glyphicon glyphicon-user"></span>',c2C2Type:'input',c2C2Css:'inputCheck',c2C2Attr:{'name':'userName','value':'','placeholder':'输入用户名','type':'text'}},
+			username:{rCss:'has-feedback',c1CColor:'text-danger',c1CGly:glyRisk,c1CTxt:'',c1Txt:'用户名',c2C1Gly:'<span class="glyphicon glyphicon-user"></span>',c2C2Type:'input',c2C2Css:'inputCheck',c2C2Attr:{'name':'username','value':'','placeholder':'输入用户名','type':'text'}},
 			//r2
 			pwd:{rCss:'',c1CColor:'text-danger',c1CGly:'',c1CTxt:'（用户需登录后自己修改）',c1Txt:'登录密码',c2C1Gly:'<span class="glyphicon glyphicon-th-large"></span>',c2C2Type:'input',c2C2Css:'',c2C2Attr:{'placeholder':'系统默认为‘111111a’','value':'','readonly':true}},
 			//r3
@@ -121,48 +120,57 @@ var	buildFormGroupCom=()=>{
 			toJoinGroup:{rCss:'',c1CColor:'text-primary',c1CGly:'',c1CTxt:'（单击加入）',c1Txt:'可加入用户组',c2C1Gly:'<span class="glyphicon glyphicon-plus"></span>',c2C2Type:'select',c2C2Css:'',c2C2Attr:{'name':'toJoinGroup'}},
 			//r6
 			joinedGroup:{rCss:'has-feedback',c1CColor:'text-danger',c1CGly:glyRisk,c1CTxt:'（单击退出）',c1Txt:'已加入用户组',c2C1Gly:'<span class="glyphicon glyphicon-education"></span>',c2C2Type:'select',c2C2Css:'inputCheck',c2C2Attr:{'name':'joinedGroup'}}
-		};
-	
-	if(oprt!='_CREATE'){
-		delete formGoupComProp.pwd;
-	}
-	
+		},
+		//计数器
+		m=0
+		formDiv=[],
+		rowDiv=[];
+
 	for(var ent in formGoupComProp){
 		let e=formGoupComProp[ent],
-			val=userSet[ent],
+			valBe=userSet[ent],
 			rObj=$('<div></div>').addClass('form-group col-sm-6 '+e.rCss),
 			c1C=$('<span></span>').addClass('small '+e.c1CColor).append(e.c1CGly,e.c1CTxt),
-			c1=$('<label></label>'),
+			c1=$('<label></label>').addClass('control-label'),
 			c2C1=$('<span></span>').addClass('input-group-addon').append(e.c2C1Gly),
 			sel=$('<select></select>').addClass('form-control'),
 			inp=$('<input/>').addClass('form-control'),
 			c2C2='',
 			c2=$('<div></div>').addClass('input-group'),
-			//.inputCheck后添加span，配合jQuery 中的内容验证代码
+			//.inputCheck后添加span，配合jQuery中的内容验证代码
 			c3='<span style="color:red;display:none;" class="spTips"></span><span style="display: none;margin-right:34px;" class="spRemove glyphicon glyphicon-remove form-control-feedback"></span><span style="display: none;margin-right:34px;" class="spOk glyphicon glyphicon-ok form-control-feedback"></span>';
 		
 		c1.append(e.c1Txt,c1C);
-		
+
 		if(e.c2C2Type=='input'){
-			e.c2C2Attr.value=val;
+			e.c2C2Attr.value=valBe;
 			c2C2=inp.attr(e.c2C2Attr);
 		}
-		
+	
 		if(e.c2C2Type=='select'){
-			//val若是字符串，则要通过hash数组userSet.allDept来组装option
-			let n=0,
-				arr=(typeof val=='object')?val:userSet['allDept'];
+			//若ent=='dept'，组装select组件时，val是字符串，
+			//要通过hash数组userSet.allDept来组装option。
+			//不然val就是hash数组
+			let selVal=0,
+				arr=(ent=='dept')?userSet['allDept']:valBe;
 			
 			Object.entries(arr).forEach(function(v,k){
+				//组装option
 				sel.append($('<option></option>').val(v[0]).text(v[1]));
+				
+				if(ent=='dept' && valBe==v[1]){
+					selVal=v[0];
+				}
+				
 			});
-			n=sel.children().length;
-			if(ent =='dept'){
-				//设定选定项
-				sel.find('option[text="'+val+'"]').attr('selected',true);
+			//设定选定项
+			if(ent=='dept'){
+				sel.val(selVal);
 			}else{
+				<!-- //计算总数，添加第一项总数项并设为选定项 -->
+				<!-- sel.prepend($('<option></option>').val(0).text('...总数：'+sel.children().length).prop('selected',true)); -->
 				//计算总数，添加第一项总数项并设为选定项
-				sel.prepend($('<option></option>').val(0).text('...总数：'+n).attr('selected',true));
+				sel.prepend($('<option></option>').val(0).text('...总数：'+sel.children().length).attr('selected',true));
 			}
 			c2C2=sel.attr(e.c2C2Attr);
 		}
@@ -170,23 +178,46 @@ var	buildFormGroupCom=()=>{
 		c2.append(c2C1,c2C2.addClass(e.c2C2Css));
 		
 		(e.c2C2Css)?rObj.append(c1,c2,c3):rObj.append(c1,c2);
-
-		$('#formGroupCom').append(rObj);
+		
+		formDiv[m]=rObj;
+		m++;
 	}
-	<!-- if(oprt!='_CREATE'){ -->
-		<!-- let obj=$('#formGroupCom').find('div.col-sm-6').eq(0), -->
-			<!-- h=obj.height(); -->
-		<!-- console.log(h); -->
-		<!-- obj.after($('<div></div>').addClass('form-group col-sm-6').html('&nbsp;').height(h)); -->
-	<!-- } -->
+	if(oprt!='_CREATE'){
+		formDiv[1].empty();
+	}
 	
+	for(var i=0;i<formDiv.length;i++){
+		//2个formDiv一组装入rowDiv中
+		rowDiv[i]=$('<div></div>').addClass('row myRow').append(formDiv[i*2],formDiv[i*2+1]);
+	}
+	node.empty().append(rowDiv);
+	
+};
+//相互关联的2个select的内容变化
+var selOptionChange=(obj,ptObj)=>{
+	let str='',num=0;
+	//兼容multiple=1
+	obj.find('option:selected').each(function(){
+		if($(this).val()!=0){
+			str+='<option value="'+$(this).val()+'">'+$(this).text()+'</option>';
+			$(this).remove();
+			num++;
+		}
+    });
+	
+	if(num){
+		obj.find('option:first').text('...总数：'+(obj.children('option').length-1));
+		//对partner的操作
+		ptObj.append(str);
+		ptObj.find('option:first').text('...总数：'+(ptObj.children('option').length-1));
+	}
 };
 
 //自调用匿名函数立即执行的特点，进行页面初始化。
 ;(function($){	
-	buildRaCom();
-	oprtBtnComShow(oprt);	
-	buildFormGroupCom();
+	buildRaCom($('#radioCom'));
+	oprtBtnComShow($('#oprtBtnCom'),oprt);	
+	buildFormGroupCom($('#formGroupCom'));
 
 	fm.find('.myFieldset').css('border-width','0px');
 	<!-- initFm(); -->
@@ -196,27 +227,48 @@ $(document).ready(function(){
 	
 // 初始化数组，存储表单中输入框（class="inputCheck"）的内容验证结果“true/false”。数组下标应与输入框下标一致，便于编程选择输入框
 	var check = Array(fm.find('.inputCheck').length).fill(false);
-	console.log(check);
-	<!-- //usergroupName内容验证 -->
-	fm.find('[name="usergroupName"]').focusout(function(){
-        let url='usergroupOprt1',
+	<!-- //username内容验证 -->
+	fm.find('[name="username"]').focusout(function(){
+ 		inputValid($(this));
+  	});
+	<!-- //mobile内容验证 -->
+	fm.find('[name="mobile"]').focusout(function(){
+        let url='userOprt1',
 			oprt='_READ',
-			name=$(this).val(),
+			mobile=$(this).val(),
 			//定义回调函数
 			cbFn=(txt)=>{
 				return inputValid($(this),txt);
 			};
 		formData=new FormData();
 		formData.append('id',fm.find('[name="id"]').val());
-		formData.append('usergroupName',name);
+		formData.append('mobile',mobile);
 		formData.append('oprt',oprt);
 		//检查用户组名是否唯一
 		ajaxUgoprt(url,formData,cbFn);
 
   	});
+	<!-- //dept内容验证 -->
+	fm.find('[name="dept"]').focusout(function(){
+ 		inputValid($(this));
+  	});
+	<!-- //joinedGroup内容验证 -->
+	fm.find('[name="joinedGroup"]').focusout(function(){
+ 		inputValid($(this));
+  	});
+	//表单select,[name="toJoinGroup"]
+	fm.find('[name="toJoinGroup"]').click(function(){
+		selOptionChange($(this),fm.find('[name="joinedGroup"]'));
+	});
+	
+	//表单select,[name="toJoinGroup"]
+	fm.find('[name="joinedGroup"]').change(function(){
+		selOptionChange($(this),fm.find('[name="toJoinGroup"]'));
+	});
+	
 	// 表单input:radio选中元素改变背景色
 	fm.find('input:radio').change(function(){
-		radioBg();
+		radioBg($(this));
 	});
 	
 	//checkbox背景色
@@ -232,24 +284,34 @@ $(document).ready(function(){
 	});
 	//表单提交
 	fm.submit(function(evt){
-		let url='usergroupOprt1',
-			inSet=fm.find('input.inputCheck');
-			name=$(this).find('[name="usergroupName"]').val(),
+		let url='userOprt1',
+			inSet=$(this).find('.inputCheck');
+			name=$(this).find('[name="username"]').val(),
 			el=oprtBtnProp[$(this).find('[name="oprt"]').val()],
 			formData=new FormData($(this)[0]),
 			<!-- formData=$(this).sierilize(), -->
-			strHtml='<p class="text-center" style="font-size:16px;">对用户组：<strong>'+name+'</strong></p><p class="text-center" style="font-size:16px;">进行【<span class="'+el.color.txt+'">'+el.glyCom+el.chi+'</span>】</p>';
+			strHtml='<p class="text-center" style="font-size:16px;">对用户：<strong>'+name+'</strong></p><p class="text-center" style="font-size:16px;">进行【<span class="'+el.color.txt+'">'+el.glyCom+el.chi+'</span>】</p>',
+			getJoinedGroupStr=()=>{
+				let arr=[];
+				$(this).find('[name="joinedGroup"]').children('option').each(function(index,e){
+					(e.value==0)?'':arr.push(e.value);
+				});
+				
+				return arr.sort(function(a,b){return a-b;}).join(',');
+			};
 		//阻止表单提交动作
 		evt.preventDefault();
+			
 		//输入框有效性检查
 		inSet.each(function(index){
-			let dObj=$(this).closest('.has-feedback'),
-				cStr=dObj.attr('class');
-			
-			check[index]=(cStr.indexOf('has-success')!=-1)?true:false;
+			inputValid($(this));
 		});
 		
-		console.log(check);
+		//formData数据整理
+		formData.delete('dept');
+		formData.delete('joinedGroup');
+		formData.append('dept',$(this).find('[name="dept"]').children('option:selected').text());
+		formData.append('joinedGroup',getJoinedGroupStr());
 		//有输入框为空的情况,后续语句不再执行。序号最小的$('.inputCheck').eq(i)获得焦点。
 		if (!check.every(val=>{return val == true})){
 			let arr=[];
@@ -280,14 +342,11 @@ $(document).ready(function(){
 		fm[0].reset();
 		//根据reset后的form状态，重新设定各项组件
 		fm.find('.has-feedback').removeClass('has-success has-error').children('span').hide(); 
-		radioBg();
-		fm.find('input:checkbox').each(function(){
-			checkBoxBg($(this));
-		});
-		checkBoxSelNum();
+		radioBg($('#radioCom'));
+		
 		<!-- initFm(); -->
 		fm.find('input.inputCheck').eq(0).focus();
-		console.log(check);
+		<!-- console.log(check); -->
 	});
 	
 <!-- function -->
@@ -296,7 +355,10 @@ function inputValid(inObj,txt=''){
 	let tVal= inObj.val(),
 		tName=inObj.attr('name'),
 		inSet=fm.find('.inputCheck'),
-		regUserGroupName = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{2,19}$/;
+		//userName正则表达式，由英文、数字、中文和下划线组成,但不能以数字开头,长度为2到20个字符。unicode编码中的汉字范围:\u2E80-\u9FFF
+		regUsername = /^[a-zA-Z_\u2E80-\u9FFF][a-zA-Z0-9_\u2E80-\u9FFF]{1,19}$/,
+		//mobile正则表达式，11位数字。必须以1开头。
+		regMobile = /^1[0-9]{10}$/;
 	//定义检查结果函数
 	let checkResult=(obj,msg='')=>{
 		let pObj=obj.closest('.has-feedback'),
@@ -328,33 +390,51 @@ function inputValid(inObj,txt=''){
 		
 	<!-- console.log(); -->
 	switch(tName){
-		//检查[name="usergroupName"]的输入框	
-		case 'usergroupName':
+		//检查[name="username"]的输入框	
+		case 'username':
 			if(txt!=''){
 				return checkResult(inObj,txt);
 			}
-			if(regUserGroupName.test(tVal)){
+			if(regUsername.test(tVal)){
 				return checkResult(inObj);	
 			}
-			if(tVal.length < 3){
-				txt=(tVal=='')?'用户组名不能为空。':'用户组名太短，不能少于3个字符。';
+			if(tVal.length < 2){
+				txt=(tVal=='')?'用户名不能为空。':'用户名太短，不能少于2个字符。';
 			}else{
 				txt='可由英文、数字、中文和下划线组成，但不能以数字开头。';
 			}
 			return checkResult(inObj,txt);
 			break;
-		//检查[name="checkBoxSelNum"]的输入框
-		case 'checkBoxSelNum':
-			num=checkBoxSelNum();
-			console.log(num);
-			txt=num!=0?'':'请添加用户组权限';
+		//检查[name="mobile"]的输入框
+		case 'mobile':
+			if(txt!=''){
+				return checkResult(inObj,txt);
+			}
+			if(regMobile.test(tVal)){
+				return checkResult(inObj);	
+			}
+			if(tVal.length < 11){
+				txt=(tVal=='')?'手机号不能为空。':'只有'+tVal.length+'位。手机号是11位数字，必须以1开头。';
+			}else{
+				txt='已有'+tVal.length+'位，但必须是以1开头的11位数字';
+			}
+			return checkResult(inObj,txt);			
+			break;
+		//检查[name="dept"]的输入框
+		case 'dept':
+			txt=(inObj.find('option:selected').length)?'':'请选择一个部门';
+			return checkResult(inObj,txt);
+			break;
+		//检查[name="joinedGroup"]的输入框
+		case 'joinedGroup':
+			txt=(inObj.find('option:last').val()==0)?'至少加入一个用户组':'';
 			return checkResult(inObj,txt);
 			break;
 	}
 }
 
 function ajaxUgoprt(url,data,cbFn){
-	let name=fm.find('[name="usergroupName"]').val(),
+	let name=fm.find('[name="username"]').val(),
 		el=oprtBtnProp[fm.find('[name="oprt"]').val()];
 		
 	$.ajax({
@@ -367,12 +447,12 @@ function ajaxUgoprt(url,data,cbFn){
         processData: false,// 是否序列化data属性，默认true(注意：false时type必须是post)。当使用FormData()，必须设为false，否则jqurey默认将FormData()转换为查询字符串。
 		success: function(res){
 			let msg=res.result?'<span class="alert-success">&nbsp;'+res.msg+'&nbsp;</span>':'<span class="text-muted">&nbsp;'+res.msg+'&nbsp;</span>',
-				strHtml='<p class="text-center" style="font-size:16px;">对用户组：<strong>'+name+'</strong></p><p class="text-center" style="font-size:16px;">进行【<span class="'+el.color.txt+'">'+el.glyCom+el.chi+'</span>】<br/>结果：'+msg+'</p>';
+				strHtml='<p class="text-center" style="font-size:16px;">对用户：<strong>'+name+'</strong></p><p class="text-center" style="font-size:16px;">进行【<span class="'+el.color.txt+'">'+el.glyCom+el.chi+'</span>】<br/>结果：'+msg+'</p>';
 			<!-- console.log(res); -->
 			if(res.oprt!='_READ'){
 				//向$('#pageParam')汇集
 				$('#pageParam').data('showId',res.data.id);
-				buildRaChkCom(res.data);
+				<!-- buildRaChkCom(res.data); -->
 				
 				//更新表格
 				//调用index.html中的loadTplFile()
