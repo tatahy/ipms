@@ -40,14 +40,18 @@ class User extends Model
         $ugMdl=new UsergroupModel;
         $arr=explode(",", $dbVal);//$usergroup_id=array(8,9,10)
         $str='';
-        
+        $preStr='';
+        $patchStr='';
         foreach($arr as $k=>$v){
-          $str.=$ugMdl::get($v)['name'].'('.$v.')&nbsp;<br>';
+          $preStr=($v/10>=1)?'&nbsp;':'&nbsp;&nbsp;&nbsp;';
+          $patchStr='&nbsp;/&nbsp;';
+         // $str.=$ugMdl::get($v)['name'].$patchStr.$v.'<br>';
+          $str.=$preStr.$v.$patchStr.$ugMdl::get($v)['name'].'<br>';
         }
         return $str;
     }
     //method，得到所有的启用用户组
-    public function getAllGroup()
+    static public function getAllGroup()
     {
       //$ugSet=UsergroupModel::where('enable',1)->order('id asc')->select();
 //      $keys=[];
@@ -56,7 +60,11 @@ class User extends Model
 //        $keys[$k]=$v['id'];
 //        $vals[$k]=$v['name'];
 //      }
-      return $this->getAllGroupAttr(1);
+      
+      $obj = new User;
+      $arr=$obj->getAllGroupAttr(1);
+      unset($obj);
+      return $arr;
     }
     //获取器 ，得到所有的启用用户组
     protected function getAllGroupAttr($dbVal)
@@ -97,9 +105,13 @@ class User extends Model
       return array_combine($keys,$vals);
     }
     //method，得到所有有效的部门数组
-    public function getAllDept()
+    static public function getAllDept()
     {
-      return $this->getAllDeptAttr(1,$this->data);
+      $obj = new User;
+      $arr=$obj->getAllDeptAttr(1,$obj->data);
+      unset($obj);
+      return $arr;
+      //return $this->getAllDeptAttr(1,$this->data);
     }
     //获取器，得到所有有效的部门数组
     Protected function getAllDeptAttr($dbVal,$data)

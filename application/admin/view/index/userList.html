@@ -1,42 +1,60 @@
 <!-- userList.html -->
 <div>
-	<h4><button class="btn btn-sm btn-warning" style="font-size:16px;cursor:unset;">系统用户总数<span class="badge">{$searchNum}</span></button></h4>
+	<h4><button class="btn btn-sm btn-warning" style="font-size:16px;cursor:unset;">系统用户总数<span class="badge">{$userNum}</span></button></h4>
 	<p class="text-right">
 		<!--// bootstap通过button调用Model -->		
-		<button type="button" class="btn-link btnOprt" data-oprt="_CREATE" data-id="0"></button>
-		<button type="button" class="btn-link"><span class="text-info" data-toggle="collapse" data-target="#divCollapse"><span class="glyphicon glyphicon-search">搜索</span></span></button>		
-		<button type="button" class="btn-link btnOprt" data-oprt="_REFRESH"></button>	
+		<button type="button" class="btn-link btnOprt" data-oprt="_CREATE" data-id="0" title="新增用户"></button>
+		<button type="button" class="btn-link" title="显示/隐藏用户查询"><span class="text-info" data-toggle="collapse" data-target="#divCollapse"><span class="glyphicon glyphicon-plus-sign" ></span>搜索</span></button>	
+		<button id="btnRefresh" type="button" class="btn-link" title="刷新用户列表"><span class="glyphicon glyphicon-refresh"></span>刷新</span></button>	
 	</p>
  	<div id="divCollapse" class="collapse">
-		<form id="fmUserSearch" class="form-inline">
-			<div class="form-group">
-				<label class="" for="searchUserName">用户名</label>
-				<input class="form-control" id="searchUserName" name="searchUserName" type="text" value="" placeholder="...不限">		
-			</div>
+		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divCollapse"  data-toggle="collapse" title="点击隐藏">用户查询</a>
+		<form id="fmUserSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:2px;">
+			<div class="row myRow">
+			
 					
-			<div class="form-group">
-				<label class="control-label" for="searchDept">部门</label>
-				<select class="form-control" id="searchDept" name="searchDept">
+			<div class="form-group col-sm-5">
+				<label class="control-label" for="dept">部门</label>
+				<select class="form-control" name="dept">
 					<option value="0">...不限</option>				
 				</select>
+			</div>
+			
+			<div class="form-group col-sm-3">
+				<label class="" for="username">用户名</label>
+				<input class="form-control" name="username" type="text" value="" placeholder="...不限">		
 			</div>
 									
-			<div class="form-group">
-				<label class="control-label" for="searchUsergroup">用户组</label>
-				<select class="form-control" id="searchUsergroup" name="searchUsergroup">
-					<option value="0">...不限</option>				
+			<div class="form-group col-sm-4">
+				<label class="control-label" for="usergroup_id">用户组</label>
+				<select class="form-control" name="usergroup_id">
+					<option value="0">...不限</option>
+					<option value="1">1</option>
+					<option value="2">2</option>						
 				</select>
 			</div>
-				
-				<!-- <input type="submit" class="btn btn-primary btn-sm" value="搜索 >>"> -->
-				
-			<button type="button" class="btn-link btnOprt" data-oprt="_READ"></button>
-			<button id="btnSearchReset" type="reset" class="btn-link">条件重置</button>
-				<!-- <input type="reset" class="btn btn-primary btn-sm" value="重置" id=""><span class="glyphicon glyphicon-refresh"></span> -->
-			</form>
-			<hr>
-		</div> 
+			</div>
+			
+			<div class="row myRow text-right">
+				<input class="sr-only" name="searchTrig" value=true>
+				<button type="submit" class="btn-link" title="开始查询"><span class="glyphicon glyphicon-search" ></span>查询</button>
+				<button type="reset" class="btn-link" title="重置查询关键词"><span class="glyphicon glyphicon-erase" ></span>重置</button>
+			</div>
+			
+			<div class="row myRow text-right form-inline resultShow" hidden="true">
+				<label class="label label-info">查询结果</label>
+				<input class="form-control btn-link" type="text" name="resultNum" value="0" style="cursor:unset;width:50px;">	
+			</div>		
+		</form>	
+	</div>
 	<!-- <p>{$test}</p> -->
+	<br/>
+	
+	<p id="resultNone" class="text-center" hidden="true">
+		<span class="label label-default" style="font-size:16px;">无符合条件信息</span>
+	</p>	
+	
+	<div class="resultShow">
 	<div class="table-responsive">
 		<table id="tblUserList" class="table table-hover table-condensed">
 			<caption class="text-center" style="border-bottom:1px solid #eee;">
@@ -49,19 +67,19 @@
 						
 					<th><a data-sort="{ $sort}" data-sort-name="depr">所属部门&nbsp;</a></th>
 					<th><a data-sort="{ $sort}" data-sort-name="mobile">手机号&nbsp;</a></th>
-					<th><a data-sort="{ $sort}" data-sort-name="usergroup">用户组名/编号</a></th>
+					<th><a data-sort="{ $sort}" data-sort-name="usergroup">用户组编号/名称</a></th>
 					<th class="text-right">操作</th>
 				</tr>
 			</thead>
 				
 			<tbody><!-- 此处显示数据库查询后的数据集 -->
-			{volist name="$userList" id="vo" empty="暂时没有数据"}
+			{volist name="$userList" id="vo" empty="无查询结果"}
 				<tr class="text-center" data-id="{$vo.id}">
 					<td>{$i+($pageNum-1)*$listRows}</td>
 					<td><strong>{$vo.username}</strong></td>
 					<td>{$vo.dept}</td>
 					<td>{$vo.mobile}</td>
-					<td class="text-right">{$vo.usergroup_id}</td>
+					<td class="text-left">{$vo.usergroup_id}</td>
 					
 					<td class="text-right" data-enable="{$vo.enable}">
 						<button type="button" class="btn-link btnOprt" data-oprt="_EDIT" data-req-ent="model" title="编辑用户"></button>
@@ -93,12 +111,71 @@
 						
 		</div>
 	</div>
+	</div>
 </div>
 
 	
 <script>
 
-var pageParam={$pageParam};
+var allDept={$allDept},
+	allGroup={$allGroup},
+	pageParam={$pageParam},
+	searchDataBe={$searchData},
+	fmSearch=$('#fmUserSearch');
+
+var setFmCom=(fmObj,data={})=>{
+	let fmCs=fmObj.closest('div'),
+		keys=Object.keys(data),
+		noneObj=$('#resultNone'),
+		showObj=$('.resultShow');
+	noneObj.hide();
+	showObj.show();
+	<!-- if(Object.keys(data)) -->
+	<!-- if(keys.includes('searchTrig') && keys.includes('resultNum')){ -->
+		<!-- noneObj.hide(); -->
+		<!-- showObj.show(); -->
+	<!-- } -->
+	
+	if(keys.includes('searchTrig') && !keys.includes('resultNum')){
+		noneObj.show();
+		showObj.hide();
+	}
+	//有查询条件
+	if(Object.values(data).length){
+		//设定fmObj中的输入框值
+		for(let e in data){
+			let v=data[e];
+			if(v!=''){
+				fmObj.find('[name="'+e+'"]').val(v);
+				<!-- console.log(v); -->
+			}
+		}
+		//显示fmObj，$('#fmUserSearch')
+		fmCs.collapse();
+	}
+}	
+
+var addOptToSelCom=(node,optObj)=>{
+	let optObjDefault={0:'...不限'},
+		name=node.attr('name');
+	
+	optObj=$.extend({},optObjDefault,optObj);
+	node.empty();
+	for(let num in optObj){
+		let txt=optObj[num],
+			optCom=$('<option></option>');
+		
+		if(name=='dept' && num!=0){
+			num=txt;
+		}		
+		
+		if(name=='usergroup_id' && num!=0){
+			let patchStr=(Math.floor(num/10)>=1)?num+'&nbsp;/&nbsp;':'&nbsp;&nbsp;'+num+'&nbsp;&nbsp;/&nbsp;';
+			txt=patchStr+txt;
+		}
+		node.append(optCom.val(num).html(txt));
+	}
+};
 
 //‘操作’列内每个单元格(td)内的按键显示、隐藏
 var oprtBtnDisplay=(tdObj)=>{
@@ -107,7 +184,6 @@ var oprtBtnDisplay=(tdObj)=>{
 		trObj=tdObj.closest('tr');
 	enObj.hide();
 	disObj.hide();
-	
 	if(tdObj.data('enable')){
 		enObj.show();
 		//去掉本行的禁用底色
@@ -116,17 +192,14 @@ var oprtBtnDisplay=(tdObj)=>{
 		disObj.show();
 		//给本行添加禁用底色
 		trObj.addClass('alert-danger');
-		
 	}
 };
 //给表格内的特定行上底色
 var tblTrBg=(issId)=>{
 	let obj=$('#tblUserList tbody'),
 		trObj=obj.find('tr[data-id="'+issId+'"]');
-	
 	//去掉所有行的底色
 	obj.find('tr').removeClass('bg-warning');
-	
 	if(issId==0){
 		//默认给表内的第一行内容上底色
 		obj.find('tr').eq(0).addClass('bg-warning');
@@ -140,29 +213,34 @@ var tblTrBg=(issId)=>{
 (function($){	
 	//每个含有a标签的$('#tblUserList thead th')添加属性
 	$('#tblUserList thead').find('a').addClass('text-primary').attr({href:'#userList',title:'点击排序'}).closest('th').addClass('text-center');
-	
 	//每个操作按钮添加核心属性
 	$('.btnOprt').each(function(){
 		let e=oprtBtnProp[$(this).data('oprt')];
 		$(this).append($('<span></span>').addClass(e.color.txt).html(e.glyCom+e.chi));
-		
 	});
-	
 	//‘操作’列内每个单元格内的按键显示、隐藏
 	$('#tblUserList tbody td[data-enable]').each(function(){
 		oprtBtnDisplay($(this));
 	});	
+	//select组件添加option
+	addOptToSelCom(fmSearch.find('[name="dept"]'),allDept);
+	addOptToSelCom(fmSearch.find('[name="usergroup_id"]'),allGroup);
 	
-	spComModify($('#tblUserList .tdAuth span'));
-
+	//是否显示查询表单
+	if(Object.values(searchDataBe).length){
+		setFmCom($('#fmUserSearch'),searchDataBe);
+	}
+	
 	// 激活tooltip
 	$('[title]').tooltip({placement:'auto bottom'});
-	
 })(jQuery);
 
 $(document).ready(function(){
-	
 	tblTrBg(pageParam.showId);
+	//页面刷新
+	$('#btnRefresh').click(function(){
+		loadTplFile();
+	});	
 	
 	//btnOprt点击
 	$('.btnOprt').click(function(){
@@ -179,6 +257,7 @@ $(document).ready(function(){
 		}
 		
 		if(data.oprt=='_ENABLE' || data.oprt=='_DISABLE'){
+		//$.post()		
 			url='userOprt1';
 			tdObj=$(this).closest('td');
 			$.post(url,data,function(res){
@@ -193,6 +272,7 @@ $(document).ready(function(){
 				$.alert('<p class="text-center">用户：<strong>'+res.name+'</strong>'+oprtStr+'</p>'+str);
 			});
 		}else{
+		//$.load()
 			url='fmUserSingle';
 	
 			mdObj.find('.modal-header').removeClass('bg-info bg-danger bg-warning').addClass(e.color.bg);			
@@ -204,9 +284,7 @@ $(document).ready(function(){
             	$('#fmUsergroup').find('.inputCheck').eq(0).focus();
     		});
 			mdObj.modal('show');
-			
 		}
-		
 	});	
 	
 	<!-- //表格每页显示记录行数 -->
@@ -257,6 +335,29 @@ $(document).ready(function(){
 		//调用index.html中的loadTplFile()
 		loadTplFile();
 	});
+	
+	//fmUserSearch表单提交
+	fmSearch.submit(function(evt){
+		//阻止表单提交动作
+		evt.preventDefault();
+		loadTplFile({searchData:getFmData()});
+	});
+	
+	//fmUserSearch表单重置按钮
+	fmSearch.find(':reset').click(function(){
+		fmSearch.find('[name="resultNum"]').closest('div').hide();
+		
+	});
+
+function getFmData(){
+	let formData=new FormData(fmSearch[0]),
+		searchData={};
+	//遍历formData中的键值对转换成hash数组
+	for(let p of formData){
+		searchData[p[0]]=p[1];
+	}
+	return searchData;
+}
 	
 });
 

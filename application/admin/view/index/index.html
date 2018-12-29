@@ -304,32 +304,38 @@ var showSideNavbar=(y)=>{
 };
 
 // 作用：提交锚点值给后端，由后端返回需加载的页面文件
-var loadTplFile=()=>{
+var loadTplFile=(rqData={})=>{
 	let sId=(null==window.location.hash || window.location.hash=='#undefined')?'#sysSummary':window.location.hash,
 		url=(['usergroupList','userList'].indexOf(sId.slice(1))!=-1 )?sId.slice(1):'tplFile',
 		aObj='',
 		obj=$('#pageParam'),
 		pageParamDefault={
-		listRows:10,
-		pageNum:1,
-		showId:0,
-		url:''
-		};
-	//load参数都从$('#pageParam')获取
-	let pageParam={
-		listRows:obj.data('listRows'),
-		pageNum:(url==obj.data('url'))?obj.data('pageNum'):1,
-		showId:obj.data('showId'),
-		url:url
-		};
+			listRows:10,
+			pageNum:1,
+			showId:0,
+			url:''},
+		//page参数都从$('#pageParam')获取
+		pageParam={
+			listRows:obj.data('listRows'),
+			pageNum:(url==obj.data('url'))?obj.data('pageNum'):1,
+			showId:obj.data('showId'),
+			url:url
+		}
+		rqDataDefault={
+			sId:sId,
+			pageParam:pageParam,
+			searchData:'',
+			sortData:''};
 	
 	aObj=$('a.aTab[href="'+sId+'"]');
 	aObj.tab('show');
 	pageParam=$.extend({},pageParamDefault,pageParam);
+	rqData=$.extend({},rqDataDefault,rqData);
 	
+	<!-- console.log(rqData); -->
     //提交锚点值给后端，由后端返回需加载的页面文件
-	$("#content").load(url,{sId:sId,pageParam:pageParam},function(){
-		
+	$("#content").load(url,rqData,function(){
+
 	}); 
 };
 
@@ -342,8 +348,6 @@ var loadTplFile=()=>{
 	showSideNavbar(true);	
 
 })(jQuery);
-
-
 
 $(document).ready(function(){
 
@@ -368,11 +372,6 @@ $(document).ready(function(){
 			
     });
 });	
-	
-<!-- function -->
-	
-	
-<!-- function -->
 
 </script>
 

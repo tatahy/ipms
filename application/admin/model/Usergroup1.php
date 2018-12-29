@@ -70,7 +70,15 @@ class Usergroup1 extends Model
 //      
 //      return $tarArr;
 //    }
-  
+  #可静态使用的方法，得到所有有效的用户组数组（以id为下标，name为值的关联数组）
+  Static Public function getEnGroups()
+  {
+    $obj=new Usergroup1;
+    $set=$obj->where('enable',1)->order('id asc')->select();
+    $set=is_array($set)?collection($set):$set;
+    unset($obj);
+    return array_combine($set->column('id'),$set->column('name'));
+  }
     
          
 }

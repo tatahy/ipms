@@ -121,7 +121,7 @@ var	buildFormGroupCom=(node)=>{
 			//r6
 			joinedGroup:{rCss:'has-feedback',c1CColor:'text-danger',c1CGly:glyRisk,c1CTxt:'（单击退出）',c1Txt:'已加入用户组',c2C1Gly:'<span class="glyphicon glyphicon-education"></span>',c2C2Type:'select',c2C2Css:'inputCheck',c2C2Attr:{'name':'joinedGroup'}}
 		},
-		//计数器
+		//formDiv计数器，上限<formGoupComProp.length
 		m=0
 		formDiv=[],
 		rowDiv=[];
@@ -148,11 +148,12 @@ var	buildFormGroupCom=(node)=>{
 		}
 	
 		if(e.c2C2Type=='select'){
-			//若ent=='dept'，组装select组件时，val是字符串，
+			//若ent=='dept'，组装select组件时，valBe是字符串，
 			//要通过hash数组userSet.allDept来组装option。
-			//不然val就是hash数组
-			let selVal=0,
-				arr=(ent=='dept')?userSet['allDept']:valBe;
+			//不然valBe就是hash数组
+			let arr=(ent=='dept')?userSet['allDept']:valBe,
+				//选定option项的值
+				selVal=0;
 			
 			Object.entries(arr).forEach(function(v,k){
 				//组装option
@@ -174,15 +175,13 @@ var	buildFormGroupCom=(node)=>{
 			}
 			c2C2=sel.attr(e.c2C2Attr);
 		}
-
 		c2.append(c2C1,c2C2.addClass(e.c2C2Css));
-		
 		(e.c2C2Css)?rObj.append(c1,c2,c3):rObj.append(c1,c2);
-		
 		formDiv[m]=rObj;
 		m++;
 	}
 	if(oprt!='_CREATE'){
+		//第二个formDiv组件就是pwd，非_CREATE操作不需要
 		formDiv[1].empty();
 	}
 	
@@ -190,6 +189,7 @@ var	buildFormGroupCom=(node)=>{
 		//2个formDiv一组装入rowDiv中
 		rowDiv[i]=$('<div></div>').addClass('row myRow').append(formDiv[i*2],formDiv[i*2+1]);
 	}
+	//rowDiv放入node
 	node.empty().append(rowDiv);
 	
 };
@@ -244,7 +244,7 @@ $(document).ready(function(){
 		formData.append('id',fm.find('[name="id"]').val());
 		formData.append('mobile',mobile);
 		formData.append('oprt',oprt);
-		//检查用户组名是否唯一
+		//检查mobile是否唯一
 		ajaxUgoprt(url,formData,cbFn);
 
   	});
@@ -307,11 +307,9 @@ $(document).ready(function(){
 			inputValid($(this));
 		});
 		
-		//formData数据整理
-		formData.delete('dept');
-		formData.delete('joinedGroup');
-		formData.append('dept',$(this).find('[name="dept"]').children('option:selected').text());
-		formData.append('joinedGroup',getJoinedGroupStr());
+		//formData对象数据整理
+		formData.set('dept',$(this).find('[name="dept"]').children('option:selected').text());
+		formData.set('joinedGroup',getJoinedGroupStr());
 		//有输入框为空的情况,后续语句不再执行。序号最小的$('.inputCheck').eq(i)获得焦点。
 		if (!check.every(val=>{return val == true})){
 			let arr=[];

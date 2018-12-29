@@ -28,6 +28,10 @@ class IndexController extends \think\Controller
     private $authArr=array();
     //响应前端要求的分页信息
     private $resPgInfo=array();
+    //响应前端要求的分页信息
+    private $allDept=array();
+    //响应前端要求的分页信息
+    private $allGroup=array();
     
     // 初始化
     protected function _initialize()
@@ -85,6 +89,10 @@ class IndexController extends \think\Controller
         $this->pwd=Session::get('pwd');
         $this->dept=Session::get('dept');
         $this->authArr=Session::get('authArr');
+        
+        $this->allDept=DeptModel::getEnDepts();
+        $this->allGroup=UsergroupModel1::getEnGroups();
+        
         $this->_setResPgInfo($this->request->param('pageParam/a'));
       }    
     }
@@ -550,29 +558,59 @@ class IndexController extends \think\Controller
          
       $pageNum=$this->resPgInfo['pageNum'];
       $listRows=$this->resPgInfo['listRows'];
-      $userSet=$userMdl->where('id','>',0)->select();
-      $userSet=is_array($userSet)?collection($userSet):$userSet;
+      #定义查询条件及结果数组
+      $searchDataDefault=['username'=>'','dept'=>'','usergroup_id'=>'','resultNum'=>'','searchTrig'=>''];
+      $searchData=empty($this->request->param('searchData/a'))?$searchDataDefault:array_merge($searchDataDefault,$this->request->param('searchData/a'));
+      #设定查询的默认字段：数据表user中的字段
+      $whereData['username']=$searchData['username']?['like','%'.$searchData['username'].'%']:'';
+      $whereData['dept']=$searchData['dept']?$searchData['dept']:'';
+      $whereData['usergroup_id']=$searchData['usergroup_id']?['like','%'.$searchData['usergroup_id'].'%']:'';
       
+      foreach($whereData as $k=>$v){
+        if(empty($v)){unset($whereData[$k]);}
+      }
+      
+      $userSet=$userMdl->where('id','>',0)->where($whereData)->select();
+      
+      $userSet=is_array($userSet)?collection($userSet):$userSet;
+      #因数据表user中'usergroup_id'字段值为由‘,’分隔的字符串，$searchData['usergroup_id']为数值，还需进行一次比对查找
+      if(!empty($searchData['usergroup_id'])){
+        foreach($userSet as $k=>$v){
+          #数据表user的'usergroup_id'，已定义获取器，取原始数据
+          $arr=explode(',',$userSet[$k]->getData('usergroup_id'));
+          if(!in_array($searchData['usergroup_id'],$arr)){unset($userSet[$k]);}
+        }
+      }
+      $searchData['resultNum']=$searchData['searchTrig']?count($userSet):'';
+      
+      foreach($searchData as $k=>$v){
+        if(empty($v)){unset($searchData[$k]);}
+      }
+      #显示用结果集对象
       $userList=$userSet->slice(($pageNum-1)*$listRows,$listRows);
-    
-      $pageSet=$userMdl->where('id','>',0)->paginate($listRows,false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$pageNum,
+      #分页对象
+      $pageSet=$userMdl->where('id','in',$userSet->column('id'))->paginate($listRows,false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$pageNum,
                         'query'=>['listRows'=>$listRows]]);    
       
       $test=$this->resPgInfo;
       $this->assign([       
-        //显示结果集
+        #用户总数
+        'userNum'=>count($userMdl::all()),
+        
         'userList'=>$userList,
         
-        //分页对象
         'pageSet'=>$pageSet,
-        
+        #分页参数
         'pageNum'=>$pageNum,
         'listRows'=>$listRows,
-        
-        'searchNum'=>$userSet->count(),
         'pageParam'=>json_encode($this->resPgInfo,JSON_UNESCAPED_UNICODE),
+        #查询条件及结果
+        'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
+        #限定的查询关键词
+        'allDept'=>json_encode($this->allDept,JSON_UNESCAPED_UNICODE),
+        'allGroup'=>json_encode($this->allGroup,JSON_UNESCAPED_UNICODE),
         
-        'test'=>json_encode($test,JSON_UNESCAPED_UNICODE)
+        'test'=>json_encode($searchData,JSON_UNESCAPED_UNICODE)
         
       ]);
       
