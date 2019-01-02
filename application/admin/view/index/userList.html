@@ -7,7 +7,8 @@
 		<button type="button" class="btn-link" title="显示/隐藏用户查询"><span class="text-info" data-toggle="collapse" data-target="#divCollapse"><span class="glyphicon glyphicon-plus-sign" ></span>搜索</span></button>	
 		<button id="btnRefresh" type="button" class="btn-link" title="刷新用户列表"><span class="glyphicon glyphicon-refresh"></span>刷新</span></button>	
 	</p>
- 	<div id="divCollapse" class="collapse">
+ 	<div id="divCollapse" class="collapse user-list-search-form">
+ 	<!-- <div id="divCollapse" class="collapse"> -->
 		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divCollapse"  data-toggle="collapse" title="点击隐藏">用户查询</a>
 		<form id="fmUserSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:2px;">
 			<div class="row myRow">
@@ -36,25 +37,23 @@
 			</div>
 			
 			<div class="row myRow text-right">
-				<input class="sr-only" name="searchTrig" value=true>
 				<button type="submit" class="btn-link" title="开始查询"><span class="glyphicon glyphicon-search" ></span>查询</button>
 				<button type="reset" class="btn-link" title="重置查询关键词"><span class="glyphicon glyphicon-erase" ></span>重置</button>
 			</div>
-			
-			<div class="row myRow text-right form-inline resultShow" hidden="true">
-				<label class="label label-info">查询结果</label>
-				<input class="form-control btn-link" type="text" name="resultNum" value="0" style="cursor:unset;width:50px;">	
-			</div>		
-		</form>	
+		</form>		
 	</div>
-	<!-- <p>{$test}</p> -->
+	<!-- <p>{$test}</p>	 -->
 	<br/>
-	
-	<p id="resultNone" class="text-center" hidden="true">
+	<p class="text-center user-list-search user-list-search-none">
 		<span class="label label-default" style="font-size:16px;">无符合条件信息</span>
-	</p>	
+	</p>
 	
-	<div class="resultShow">
+	<div class="row myRow text-right user-list-search user-list-search-num">
+		<label class="label label-info">查询结果</label>
+		<span>333</span>&nbsp;&nbsp;&nbsp;&nbsp;
+	</div>		
+	
+	<div class="user-list-search user-list-search-table">
 	<div class="table-responsive">
 		<table id="tblUserList" class="table table-hover table-condensed">
 			<caption class="text-center" style="border-bottom:1px solid #eee;">
@@ -120,40 +119,42 @@
 var allDept={$allDept},
 	allGroup={$allGroup},
 	pageParam={$pageParam},
-	searchDataBe={$searchData},
+	searchData=$.extend({},{keys:'',resultNum:'null',trig:false},{$searchData}),
 	fmSearch=$('#fmUserSearch');
-
-var setFmCom=(fmObj,data={})=>{
-	let fmCs=fmObj.closest('div'),
-		keys=Object.keys(data),
-		noneObj=$('#resultNone'),
-		showObj=$('.resultShow');
-	noneObj.hide();
-	showObj.show();
-	<!-- if(Object.keys(data)) -->
-	<!-- if(keys.includes('searchTrig') && keys.includes('resultNum')){ -->
-		<!-- noneObj.hide(); -->
-		<!-- showObj.show(); -->
-	<!-- } -->
-	
-	if(keys.includes('searchTrig') && !keys.includes('resultNum')){
-		noneObj.show();
-		showObj.hide();
-	}
-	//有查询条件
-	if(Object.values(data).length){
-		//设定fmObj中的输入框值
-		for(let e in data){
-			let v=data[e];
+//设置与search有关的userList组件（.user-list-search）	
+var setUserListCom=(searchData={})=>{
+	let tbl=$('.user-list-search-table'),
+		num=$('.user-list-search-num'),
+		none=$('.user-list-search-none'),
+		fm=$('.user-list-search-form'),
+		objStatus=(searchNum)=>{
+			$('.user-list-search').hide();	
+			if(searchNum>0){
+				fm.collapse();
+				num.show().find('span').text(searchNum);
+				tbl.show();
+			}
+			if(searchNum==0){
+				fm.collapse();
+				none.show();
+			}
+			if(searchNum=='null'){
+				tbl.show();
+			}
+		};
+	//有查询
+	if(searchData.trig){
+		//设定fmSearch中的输入框值
+		for(let k in searchData['keys']){
+			let v=searchData['keys'][k];
+			<!-- console.log(k+' : '+v); -->
 			if(v!=''){
-				fmObj.find('[name="'+e+'"]').val(v);
-				<!-- console.log(v); -->
+				fmSearch.find('[name="'+k+'"]').val(v);
 			}
 		}
-		//显示fmObj，$('#fmUserSearch')
-		fmCs.collapse();
 	}
-}	
+	objStatus(searchData.resultNum);
+};
 
 var addOptToSelCom=(node,optObj)=>{
 	let optObjDefault={0:'...不限'},
@@ -226,10 +227,8 @@ var tblTrBg=(issId)=>{
 	addOptToSelCom(fmSearch.find('[name="dept"]'),allDept);
 	addOptToSelCom(fmSearch.find('[name="usergroup_id"]'),allGroup);
 	
-	//是否显示查询表单
-	if(Object.values(searchDataBe).length){
-		setFmCom($('#fmUserSearch'),searchDataBe);
-	}
+	//设置与search有关的userList组件（.user-list-search）
+	setUserListCom(searchData);
 	
 	// 激活tooltip
 	$('[title]').tooltip({placement:'auto bottom'});
@@ -339,23 +338,26 @@ $(document).ready(function(){
 	//fmUserSearch表单提交
 	fmSearch.submit(function(evt){
 		//阻止表单提交动作
-		evt.preventDefault();
-		loadTplFile({searchData:getFmData()});
+		evt.preventDefault();		
+		loadTplFile({searchData:setSearchData($(this))});
 	});
 	
 	//fmUserSearch表单重置按钮
-	fmSearch.find(':reset').click(function(){
-		fmSearch.find('[name="resultNum"]').closest('div').hide();
-		
+	fmSearch.find(':reset').click(function(evt){
+		<!-- $('.user-list-search-num').hide(); -->	
+		//阻止默认事件
+		evt.preventDefault();
+		fmSearch[0].reset();
+		loadTplFile({searchData:setSearchData(fmSearch)});
 	});
 
-function getFmData(){
-	let formData=new FormData(fmSearch[0]),
-		searchData={};
+function setSearchData(fmObj){
+	let formData=new FormData(fmObj[0]);
 	//遍历formData中的键值对转换成hash数组
 	for(let p of formData){
-		searchData[p[0]]=p[1];
+		searchData.keys[p[0]]=p[1];
 	}
+	searchData.trig=true;
 	return searchData;
 }
 	

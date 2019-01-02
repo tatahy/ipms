@@ -558,34 +558,40 @@ class IndexController extends \think\Controller
          
       $pageNum=$this->resPgInfo['pageNum'];
       $listRows=$this->resPgInfo['listRows'];
-      #定义查询条件及结果数组
-      $searchDataDefault=['username'=>'','dept'=>'','usergroup_id'=>'','resultNum'=>'','searchTrig'=>''];
+      #定义查询关键字及结果数组，关键字为数据表中的字段
+      $searchDataDefault=['keys'=>['username'=>'','dept'=>'','usergroup_id'=>''],'resultNum'=>'null','trig'=>false];
       $searchData=empty($this->request->param('searchData/a'))?$searchDataDefault:array_merge($searchDataDefault,$this->request->param('searchData/a'));
-      #设定查询的默认字段：数据表user中的字段
-      $whereData['username']=$searchData['username']?['like','%'.$searchData['username'].'%']:'';
-      $whereData['dept']=$searchData['dept']?$searchData['dept']:'';
-      $whereData['usergroup_id']=$searchData['usergroup_id']?['like','%'.$searchData['usergroup_id'].'%']:'';
       
-      foreach($whereData as $k=>$v){
-        if(empty($v)){unset($whereData[$k]);}
+      #定义查询条件数组
+      $whereData=[];
+     
+      #其他查询条件
+      foreach($searchData['keys'] as $k=>$v){
+        if(!empty($v)){
+          $whereData[$k]=($k=='dept')?$v:['like','%'.$v.'%'];
+        }
       }
-      
-      $userSet=$userMdl->where('id','>',0)->where($whereData)->select();
+      $userSet=$userMdl::all(function($query)use($whereData){
+                          $query->where($whereData);
+                        });
       
       $userSet=is_array($userSet)?collection($userSet):$userSet;
-      #因数据表user中'usergroup_id'字段值为由‘,’分隔的字符串，$searchData['usergroup_id']为数值，还需进行一次比对查找
-      if(!empty($searchData['usergroup_id'])){
+      #因数据表user中'usergroup_id'字段值为由‘,’分隔的数值字符串，$searchData['usergroup_id']为单个数值，还需进行一次比对查找
+      if(!empty($searchData['keys']['usergroup_id'])){
         foreach($userSet as $k=>$v){
           #数据表user的'usergroup_id'，已定义获取器，取原始数据
           $arr=explode(',',$userSet[$k]->getData('usergroup_id'));
-          if(!in_array($searchData['usergroup_id'],$arr)){unset($userSet[$k]);}
+          if(!in_array($searchData['keys']['usergroup_id'],$arr)){unset($userSet[$k]);}
         }
       }
-      $searchData['resultNum']=$searchData['searchTrig']?count($userSet):'';
       
-      foreach($searchData as $k=>$v){
-        if(empty($v)){unset($searchData[$k]);}
+      if($searchData['trig']){
+        #返回前端查询结果数
+        $searchData['resultNum']=count($userSet);
+        #调整分页从第一页开始
+        $pageNum=1;
       }
+      
       #显示用结果集对象
       $userList=$userSet->slice(($pageNum-1)*$listRows,$listRows);
       #分页对象
@@ -606,7 +612,7 @@ class IndexController extends \think\Controller
         'pageParam'=>json_encode($this->resPgInfo,JSON_UNESCAPED_UNICODE),
         #查询条件及结果
         'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
-        #限定的查询关键词
+        #限定查询关键词的范围
         'allDept'=>json_encode($this->allDept,JSON_UNESCAPED_UNICODE),
         'allGroup'=>json_encode($this->allGroup,JSON_UNESCAPED_UNICODE),
         
