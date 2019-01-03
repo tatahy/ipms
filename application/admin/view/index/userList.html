@@ -1,6 +1,6 @@
 <!-- userList.html -->
 <div>
-	<h4><button class="btn btn-sm btn-warning" style="font-size:16px;cursor:unset;">系统用户总数<span class="badge">{$userNum}</span></button></h4>
+	<h4><button class="btn btn-sm btn-warning" style="font-size:16px;cursor:unset;">系统用户总数&nbsp;<span class="badge">{$userNum}</span></button></h4>
 	<p class="text-right">
 		<!--// bootstap通过button调用Model -->		
 		<button type="button" class="btn-link btnOprt" data-oprt="_CREATE" data-id="0" title="新增用户"></button>
@@ -9,7 +9,7 @@
 	</p>
  	<div id="divCollapse" class="collapse user-list-search-form">
  	<!-- <div id="divCollapse" class="collapse"> -->
-		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divCollapse"  data-toggle="collapse" title="点击隐藏">用户查询</a>
+		<a class="label label-warning" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divCollapse"  data-toggle="collapse" title="点击隐藏">用户查询</a>
 		<form id="fmUserSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:2px;">
 			<div class="row myRow">
 			
@@ -40,6 +40,10 @@
 				<button type="submit" class="btn-link" title="开始查询"><span class="glyphicon glyphicon-search" ></span>查询</button>
 				<button type="reset" class="btn-link" title="重置查询关键词"><span class="glyphicon glyphicon-erase" ></span>重置</button>
 			</div>
+			
+			<div class="row myRow text-right user-list-search user-list-search-num">
+				<button type="button" class="btn btn-xs btn-warning" style="font-size:14px;cursor:unset;">查询结果&nbsp;<span class="badge"></span></button>&nbsp;&nbsp;&nbsp;&nbsp;
+			</div>		
 		</form>		
 	</div>
 	<!-- <p>{$test}</p>	 -->
@@ -47,12 +51,7 @@
 	<p class="text-center user-list-search user-list-search-none">
 		<span class="label label-default" style="font-size:16px;">无符合条件信息</span>
 	</p>
-	
-	<div class="row myRow text-right user-list-search user-list-search-num">
-		<label class="label label-info">查询结果</label>
-		<span>333</span>&nbsp;&nbsp;&nbsp;&nbsp;
-	</div>		
-	
+
 	<div class="user-list-search user-list-search-table">
 	<div class="table-responsive">
 		<table id="tblUserList" class="table table-hover table-condensed">
@@ -62,11 +61,11 @@
 			<thead>
 				<tr >
 					<th class="text-center">序号</th>
-					<th><a data-sort="{ $sort}" data-sort-name="username">用户名&nbsp;</a></th>
+					<th><a data-sort-order="asc" data-sort-name="username">用户名&nbsp;</a></th>
 						
-					<th><a data-sort="{ $sort}" data-sort-name="depr">所属部门&nbsp;</a></th>
-					<th><a data-sort="{ $sort}" data-sort-name="mobile">手机号&nbsp;</a></th>
-					<th><a data-sort="{ $sort}" data-sort-name="usergroup">用户组编号/名称</a></th>
+					<th><a data-sort-order="asc" data-sort-name="dept">所属部门&nbsp;</a></th>
+					<th><a data-sort-order="asc" data-sort-name="mobile">手机号&nbsp;</a></th>
+					<th><a data-sort-order="asc" data-sort-name="usergroup_id">用户组编号/名称</a></th>
 					<th class="text-right">操作</th>
 				</tr>
 			</thead>
@@ -78,7 +77,7 @@
 					<td><strong>{$vo.username}</strong></td>
 					<td>{$vo.dept}</td>
 					<td>{$vo.mobile}</td>
-					<td class="text-left">{$vo.usergroup_id}</td>
+					<td>{$vo.usergroup_id}</td>
 					
 					<td class="text-right" data-enable="{$vo.enable}">
 						<button type="button" class="btn-link btnOprt" data-oprt="_EDIT" data-req-ent="model" title="编辑用户"></button>
@@ -116,11 +115,15 @@
 	
 <script>
 
-var allDept={$allDept},
-	allGroup={$allGroup},
-	pageParam={$pageParam},
-	searchData=$.extend({},{keys:'',resultNum:'null',trig:false},{$searchData}),
+const res={$resData};
+var	allDept=res.allDept,
+	allGroup=res.allGroup,
+	pageParam=res.pageParam,
+	searchData=$.extend({},{keys:'',resultNum:'null',trig:false},res.searchData),
+	sortData=$.extend({},{name:'username',order:'asc'},res.sortData),
 	fmSearch=$('#fmUserSearch');
+	
+<!-- console.dir({$resData}); -->
 //设置与search有关的userList组件（.user-list-search）	
 var setUserListCom=(searchData={})=>{
 	let tbl=$('.user-list-search-table'),
@@ -195,20 +198,6 @@ var oprtBtnDisplay=(tdObj)=>{
 		trObj.addClass('alert-danger');
 	}
 };
-//给表格内的特定行上底色
-var tblTrBg=(issId)=>{
-	let obj=$('#tblUserList tbody'),
-		trObj=obj.find('tr[data-id="'+issId+'"]');
-	//去掉所有行的底色
-	obj.find('tr').removeClass('bg-warning');
-	if(issId==0){
-		//默认给表内的第一行内容上底色
-		obj.find('tr').eq(0).addClass('bg-warning');
-	}else{
-		//给本行上底色
-		trObj.addClass('bg-warning');
-	}
-};
 
 //自调用匿名函数立即执行的特点，进行页面初始化。
 (function($){	
@@ -226,67 +215,43 @@ var tblTrBg=(issId)=>{
 	//select组件添加option
 	addOptToSelCom(fmSearch.find('[name="dept"]'),allDept);
 	addOptToSelCom(fmSearch.find('[name="usergroup_id"]'),allGroup);
-	
 	//设置与search有关的userList组件（.user-list-search）
 	setUserListCom(searchData);
-	
+	//排序
+	sortOrderToggle();
 	// 激活tooltip
 	$('[title]').tooltip({placement:'auto bottom'});
 })(jQuery);
 
 $(document).ready(function(){
+	//给表格内的特定行上底色
 	tblTrBg(pageParam.showId);
 	//页面刷新
 	$('#btnRefresh').click(function(){
 		loadTplFile();
 	});	
 	
-	//btnOprt点击
-	$('.btnOprt').click(function(){
-		let url='',
-			data={oprt:$(this).data('oprt'),id:$(this).closest('tr').data('id')},
-			e=oprtBtnProp[data.oprt],
-			mdObj=$('#modalSingle'),
-			tdObj='',
-			//操作结果字符串
-			oprtStr='【<span class="'+e.color.txt+'">'+e.glyCom+e.chi+'</span>】';
-		//是表格内的oprt按钮
-		if($(this).closest('tr').length){
-			tblTrBg(data.id);
-		}
+	//排序
+	$('#tblUserList thead a').click(function(){
+		//修改排序值
+		sortData.name=$(this).data('sortName');
+		sortData.order=$(this).data('sortOrder');
 		
-		if(data.oprt=='_ENABLE' || data.oprt=='_DISABLE'){
-		//$.post()		
-			url='userOprt1';
-			tdObj=$(this).closest('td');
-			$.post(url,data,function(res){
-				let str='';
-				tdObj.data('enable',res.result);
-				oprtBtnDisplay(tdObj);
-				if(res.msg=='success'){
-					str='<p class="text-center text-success">成功<span class="glyphicon glyphicon-ok"></span></p>';
-				}else{
-					str='<p class="text-center text-danger">失败<span class="glyphicon glyphicon-remove"></span></p>';
-				}
-				$.alert('<p class="text-center">用户：<strong>'+res.name+'</strong>'+oprtStr+'</p>'+str);
-			});
-		}else{
-		//$.load()
-			url='fmUserSingle';
-	
-			mdObj.find('.modal-header').removeClass('bg-info bg-danger bg-warning').addClass(e.color.bg);			
-			mdObj.find('.modal-body').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(url,data,function(){
-				mdObj.find('h4').html(oprtStr+'用户');
-				
-			});
-			mdObj.on('shown.bs.modal', function () {
-            	$('#fmUsergroup').find('.inputCheck').eq(0).focus();
-    		});
-			mdObj.modal('show');
-		}
+		//调用index.html中的loadTplFile()
+		loadTplFile({sortData:sortData});
 	});	
-	
-	<!-- //表格每页显示记录行数 -->
+	//btnOprt点击	
+	$('.btnOprt').click(function(){
+		let oprt=$(this).data('oprt');
+		if(oprt=='_ENABLE' || oprt=='_DISABLE'){
+			url='userOprt';
+		}else{ 
+			url='userSingleForm';
+		}
+		btnOprtClick($(this),url);
+	});	
+		
+	//表格每页显示记录行数
 	$('#listRows').val(pageParam.listRows); 
 	//listRow选择change	
 	$('#listRows').change(function(){
@@ -332,14 +297,14 @@ $(document).ready(function(){
 			$('#pageParam').data('url',url);
 		}
 		//调用index.html中的loadTplFile()
-		loadTplFile();
+		loadTplFile({sortData:sortData});
 	});
 	
 	//fmUserSearch表单提交
 	fmSearch.submit(function(evt){
 		//阻止表单提交动作
 		evt.preventDefault();		
-		loadTplFile({searchData:setSearchData($(this))});
+		loadTplFile({searchData:setSearchData(),sortData:sortData});
 	});
 	
 	//fmUserSearch表单重置按钮
@@ -348,11 +313,11 @@ $(document).ready(function(){
 		//阻止默认事件
 		evt.preventDefault();
 		fmSearch[0].reset();
-		loadTplFile({searchData:setSearchData(fmSearch)});
+		loadTplFile({searchData:setSearchData(),sortData:sortData});
 	});
 
-function setSearchData(fmObj){
-	let formData=new FormData(fmObj[0]);
+function setSearchData(){
+	let formData=new FormData(fmSearch[0]);
 	//遍历formData中的键值对转换成hash数组
 	for(let p of formData){
 		searchData.keys[p[0]]=p[1];

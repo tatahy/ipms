@@ -304,7 +304,7 @@ $(document).ready(function(){
 	
 	<!-- //usergroupName内容验证 -->
 	fm.find('[name="usergroupName"]').focusout(function(){
-        let url='usergroupOprt1',
+        let url='usergroupOprt',
 			oprt='_READ',
 			name=$(this).val(),
 			//定义回调函数
@@ -337,7 +337,7 @@ $(document).ready(function(){
 	});
 	//表单提交
 	fm.submit(function(evt){
-		let url='usergroupOprt1',
+		let url='usergroupOprt',
 			inSet=fm.find('input.inputCheck');
 			name=$(this).find('[name="usergroupName"]').val(),
 			el=oprtBtnProp[$(this).find('[name="oprt"]').val()],

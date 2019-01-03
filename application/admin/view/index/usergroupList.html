@@ -1,13 +1,46 @@
 <!-- usergroupList.html -->
 <div>
-	<h4><button class="btn btn-sm btn-info" style="font-size:16px;cursor:unset;">系统用户组总数<span class="badge">{$searchNum}</span></button></h4>
+	<h4><button class="btn btn-sm btn-info" style="font-size:16px;cursor:unset;">系统用户组总数&nbsp;<span class="badge">{$usergroupNum}</span></button></h4>
 	<p class="text-right">
 		<!--// bootstap通过button调用Model -->		
 		<button type="button" class="btn-link btnOprt" data-oprt="_CREATE" data-id="0" data-req-ent="model"></button>
-	</p> 	
+		<button type="button" class="btn-link" title="显示/隐藏用户组查询"><span class="text-info" data-toggle="collapse" data-target="#divCollapse"><span class="glyphicon glyphicon-plus-sign" ></span>搜索</span></button>	
+		<button id="btnRefresh" type="button" class="btn-link" title="刷新用户组列表"><span class="glyphicon glyphicon-refresh"></span>刷新</span></button>
+	</p>
+	<div id="divCollapse" class="collapse usergroup-list-search-form">
+ 	<!-- <div id="divCollapse" class="collapse"> -->
+		<a class="label label-info" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divCollapse"  data-toggle="collapse" title="点击隐藏">用户组查询</a>
+		<form id="fmUsergroupSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:2px;">
+			<div class="row myRow">			
+			<div class="form-group col-sm-3">
+				<label class="" for="name">用户组名</label>
+				<input class="form-control" name="name" type="text" value="" placeholder="...不限">		
+			</div>
+									
+			<div class="form-group col-sm-5">
+				<label class="control-label" for="description">用户组说明</label>
+				<input class="form-control" name="description" type="text" value="" placeholder="...不限">		
+			</div>
+			</div>
+			
+			<div class="row myRow text-right">
+				<button type="submit" class="btn-link" title="开始查询"><span class="glyphicon glyphicon-search" ></span>查询</button>
+				<button type="reset" class="btn-link" title="重置查询关键词"><span class="glyphicon glyphicon-erase" ></span>重置</button>
+			</div>
+			
+			<div class="row myRow text-right usergroup-list-search usergroup-list-search-num">
+				<button type="button" class="btn btn-xs btn-info" style="font-size:14px;cursor:unset;">查询结果&nbsp;<span class="badge"></span></button>&nbsp;&nbsp;&nbsp;&nbsp;
+			</div>	
+		</form>	
+	</div> 	
 	<!-- <p>{$testDis}</p> -->
+	<br/>
+	<p class="text-center usergroup-list-search usergroup-list-search-none">
+		<span class="label label-default" style="font-size:16px;">无符合条件信息</span>
+	</p>
+
+	<div class="usergroup-list-search usergroup-list-search-table">
 	<div class="table-responsive">
-	
 		<table id="tblUserGpList" class="table table-hover table-condensed table-bordered">
 			<caption class="text-center" style="border-bottom:1px solid #eee;">
 				<h4>用户组列表
@@ -23,8 +56,8 @@
 			<thead>
 				<tr >
 					<th class="text-center">序号</th>
-					<th class="text-center">用户组名</th>
-					<th>用户组说明</th>
+					<th><a data-sort-order="asc" data-sort-name="name">用户组名</a></th>
+					<th><a data-sort-order="asc" data-sort-name="description">用户组说明</a></th>
 					<th data-ent-name="_ISS-_PAT">“专利事务”权限</th>
 					<th data-ent-name="_ISS-_PRO">“项目事务”权限</th>
 					<th data-ent-name="_ISS-_THE">“论文事务”权限</th>
@@ -41,9 +74,9 @@
 			<tbody><!-- 此处显示数据库查询后的数据集 -->
 			{volist name="$userGpList" id="vo" empty="暂时没有数据"}
 				<tr class="text-left" data-id="{$vo.id}">
-					<td>{$i+($pageNum-1)*$listRows}</td>
-					<td><strong>{$vo.name}</strong></td>
-					<td>{$vo.description}</td>
+					<td class="text-center">{$i+($pageNum-1)*$listRows}</td>
+					<td class="text-center"><strong>{$vo.name}</strong></td>
+					<td class="text-center">{$vo.description}</td>
 					<!-- //_ISS_PAT -->
 					<td class="tdAuth"> 
 						{present name="$vo.authority['iss-pat']"}
@@ -180,14 +213,55 @@
 						
 		</div>
 	</div>
+	</div>
 </div>
 	
 <script>
 //控制显示/隐藏字段的组件的属性数组
+const res={$resData};
 var columnToggleArr=[],
-	authNameObj={$auth},
-	pageParam={$pageParam};
+	authNameObj=res.auth,
+	pageParam=res.pageParam,
+	searchData=$.extend({},{keys:'',resultNum:'null',trig:false},res.searchData),
+	sortData=$.extend({},{name:'name',order:'asc'},res.sortData),
+	fmSearch=$('#fmUsergroupSearch');
 
+	console.log(res);
+
+//设置与search有关的userList组件（.usergroup-list-search）	
+var setUsergroupListCom=(searchData={})=>{
+	let tbl=$('.usergroup-list-search-table'),
+		num=$('.usergroup-list-search-num'),
+		none=$('.usergroup-list-search-none'),
+		fm=$('.usergroup-list-search-form'),
+		objStatus=(searchNum)=>{
+			$('.usergroup-list-search').hide();	
+			if(searchNum>0){
+				fm.collapse();
+				num.show().find('span').text(searchNum);
+				tbl.show();
+			}
+			if(searchNum==0){
+				fm.collapse();
+				none.show();
+			}
+			if(searchNum=='null'){
+				tbl.show();
+			}
+		};
+	//有查询
+	if(searchData.trig){
+		//设定fmSearch中的输入框值
+		for(let k in searchData['keys']){
+			let v=searchData['keys'][k];
+			<!-- console.log(k+' : '+v); -->
+			if(v!=''){
+				fmSearch.find('[name="'+k+'"]').val(v);
+			}
+		}
+	}
+	objStatus(searchData.resultNum);
+};
 //选择显示、隐藏字段组件生成函数
 var buildColumnToggleCom=()=>{
 	let arr=columnToggleArr;
@@ -279,27 +353,14 @@ var oprtBtnDisplay=(tdObj)=>{
 	}
 };
 
-//给表格内的特定行上底色
-var tblTrBg=(issId)=>{
-	let obj=$('#tblUserGpList tbody'),
-		trObj=obj.find('tr[data-id="'+issId+'"]');
-	
-	//去掉所有行的底色
-	obj.find('tr').removeClass('bg-warning');
-	
-	if(issId==0){
-		//默认给表内的第一行内容上底色
-		obj.find('tr').eq(0).addClass('bg-warning');
-	}else{
-		//给本行上底色
-		trObj.addClass('bg-warning');
-	}
-};
-
 //自调用匿名函数立即执行的特点，进行页面初始化。
 (function($){	
 	//每个$('#tblUserGpList thead a')添加属性
 	$('#tblUserGpList thead th[data-ent-name]').addClass('text-center text-primary');
+	
+	//每个含有a标签的$('#tblUserList thead th')添加属性
+	$('#tblUserGpList thead').find('a').addClass('text-primary').attr({href:'#usergroupList',title:'点击排序'}).closest('th').addClass('text-center');
+	
 	//每个操作按钮添加核心属性
 	$('.btnOprt').each(function(){
 		let e=oprtBtnProp[$(this).data('oprt')];
@@ -314,75 +375,39 @@ var tblTrBg=(issId)=>{
 	buildColumnToggleCom();
 	columnToggle();
 	spComModify($('#tblUserGpList .tdAuth span'));
-
+	//设置与search有关的usergroupList组件（.usergroup-list-search）
+	setUsergroupListCom(searchData);
+	//排序
+	sortOrderToggle();
 	// 激活tooltip
-	$('[title]').tooltip();
-	
+	$('[title]').tooltip();   
 })(jQuery);
 
 $(document).ready(function(){
+	//给表格内的特定行上底色
 	tblTrBg(pageParam.showId);
-	
-	<!-- console.log(pageParam.showId); -->
-	//btnOprt点击
-	$('.btnOprt').click(function(){
-		let url='',
-			data={oprt:$(this).data('oprt'),id:$(this).closest('tr').data('id'),reqEnt:$(this).data('reqEnt')},
-			e=oprtBtnProp[data.oprt],
-			mdObj=$('#modalSingle'),
-			tdObj='',
-			//操作结果字符串
-			oprtStr='【<span class="'+e.color.txt+'">'+e.glyCom+e.chi+'</span>】';
-		//是表格内的oprt按钮
-		if($(this).closest('tr').length){
-			tblTrBg(data.id);
-		}
-				
-		if(data.oprt=='_ENABLE' || data.oprt=='_DISABLE'){
-			url='usergroupOprt1';
-			tdObj=$(this).closest('td');
-			$.post(url,data,function(res){
-				let str='';
-				tdObj.data('enable',res.result);
-				oprtBtnDisplay(tdObj);
-				if(res.msg=='success'){
-					str='<p class="text-center text-success">成功<span class="glyphicon glyphicon-ok"></span></p>';
-				}else{
-					str='<p class="text-center text-danger">失败<span class="glyphicon glyphicon-remove"></span></p>';
-				}
-				$.alert('<p class="text-center">用户组：<strong>'+res.name+'</strong>'+oprtStr+'</p>'+str);
-			});
-		}else{
-			url='fmUsergroupSingle';
-	
-			mdObj.find('.modal-header').removeClass('bg-info bg-danger bg-warning').addClass(e.color.bg);			
-			mdObj.find('.modal-body').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(url,data,function(){
-				mdObj.find('h4').html(oprtStr+'用户组');
-				
-			});
-			mdObj.on('shown.bs.modal', function () {
-            	$('#fmUsergroup').find('.inputCheck').eq(0).focus();
-    		});
-			mdObj.modal('show');
-			
-		}
-		
-	});	
-	
-	<!-- //表格每页显示记录行数 -->
-	$('#listRows').val(pageParam.listRows); 
-	//listRow选择change	
-	$('#listRows').change(function(){
-		let listRows=$(this).val()*1,
-			obj=$('#pageParam');
-		//向$('#pageParam')汇集
-		if(listRows){
-			obj.data('listRows',listRows);
-			//分页从第一页开始
-			obj.data('pageNum',1);
-		}
-		//调用index.html中的loadTplFile()
+	//页面刷新
+	$('#btnRefresh').click(function(){
 		loadTplFile();
+	});	
+	//排序
+	$('#tblUserGpList thead a').click(function(){
+		//修改排序值
+		sortData.name=$(this).data('sortName');
+		sortData.order=$(this).data('sortOrder');
+		
+		//调用index.html中的loadTplFile()
+		loadTplFile({sortData:sortData});
+	});	
+	//btnOprt点击	
+	$('.btnOprt').click(function(){
+		let oprt=$(this).data('oprt');
+		if(oprt=='_ENABLE' || oprt=='_DISABLE'){
+			url='usergroupOprt';
+		}else{ 
+			url='usergroupSingleForm';
+		}
+		btnOprtClick($(this),url);
 	});	
 	
 	//选择显示/隐藏字段	
@@ -407,6 +432,22 @@ $(document).ready(function(){
 		
 		columnToggle();	
 	});
+	
+	<!-- //表格每页显示记录行数 -->
+	$('#listRows').val(pageParam.listRows); 
+	//listRow选择change	
+	$('#listRows').change(function(){
+		let listRows=$(this).val()*1,
+			obj=$('#pageParam');
+		//向$('#pageParam')汇集
+		if(listRows){
+			obj.data('listRows',listRows);
+			//分页从第一页开始
+			obj.data('pageNum',1);
+		}
+		//调用index.html中的loadTplFile()
+		loadTplFile();
+	});	
 	
 	//分页click
 	$('#divListRows a').click(function(evt){
@@ -438,8 +479,35 @@ $(document).ready(function(){
 			$('#pageParam').data('url',url);
 		}
 		//调用index.html中的loadTplFile()
-		loadTplFile();
+		loadTplFile({sortData:sortData});
 	});
+	
+	//fmUsergroupSearch表单提交
+	fmSearch.submit(function(evt){
+		//阻止表单提交动作
+		evt.preventDefault();		
+		loadTplFile({searchData:setSearchData(),sortData:sortData});
+	});
+	
+	//fmUserSearch表单重置按钮
+	fmSearch.find(':reset').click(function(evt){
+		<!-- $('.user-list-search-num').hide(); -->	
+		//阻止默认事件
+		evt.preventDefault();
+		fmSearch[0].reset();
+		loadTplFile({searchData:setSearchData(),sortData:sortData});
+	});
+
+function setSearchData(){
+	let formData=new FormData(fmSearch[0]);
+	//遍历formData中的键值对转换成hash数组
+	for(let p of formData){
+		searchData.keys[p[0]]=p[1];
+	}
+	searchData.trig=true;
+	return searchData;
+}
+	
 	
 });
 

@@ -7,7 +7,6 @@ use think\Model;
 
 use app\admin\model\Dept as DeptModel;
 use app\admin\model\Usergroup as UsergroupModel;
-use app\admin\model\Usergroup1 as UsergroupModel1;
 use app\admin\model\User as UserModel;
 
 class IndexController extends \think\Controller
@@ -83,18 +82,20 @@ class IndexController extends \think\Controller
       
       if(1!=$this->log){
         return $this->error('无用户名或密码，请先登录系统');
-      }else{
-        $this->userId=Session::get('userId');
-        $this->username=Session::get('username');
-        $this->pwd=Session::get('pwd');
-        $this->dept=Session::get('dept');
-        $this->authArr=Session::get('authArr');
+      }
+      
+      $this->userId=Session::get('userId');
+      $this->username=Session::get('username');
+      $this->pwd=Session::get('pwd');
+      $this->dept=Session::get('dept');
+      $this->authArr=Session::get('authArr');
         
-        $this->allDept=DeptModel::getEnDepts();
-        $this->allGroup=UsergroupModel1::getEnGroups();
+      $this->allDept=DeptModel::getEnDepts();
+      $this->allGroup=UsergroupModel::getEnGroups();
         
-        $this->_setResPgInfo($this->request->param('pageParam/a'));
-      }    
+      $this->_setResPgInfo($this->request->param('pageParam/a'));
+      
+      return true;    
     }
     
     // 将数据库中存储的auth值，组装成app/common.php中预定义的结构，方便前端使用。
@@ -223,10 +224,9 @@ class IndexController extends \think\Controller
       
       // 查询数据库中是否存在页面传来的数据
       // 限制登录的用户必须rolety_id=6（admin）或7（superadmin）
-      $user = UserModel::where('username',$username)
+      $user = $userMdl::where('username',$username)
                             ->where('pwd',$pwd)
                             ->where('enable',1)
-                            ->where('rolety_id','in','8,9')
                             ->whereOr('usergroup_id','in','6,7')
                             ->find();
                             
@@ -272,24 +272,7 @@ class IndexController extends \think\Controller
       
     }
     
-    // 根据前端发送的模板文件名参数，选择对应的页面文件返回
-    public function tplFile(Request $request,UsergroupModel $usergroupMdl)
-    {
-      $this->_loginUser();
-      
-      $tplFile=!empty($request->param('sId'))?$request->param('sId'):'#sysSummary';
-           
-      //前端发送的是锚点值返回模板文件
-      if(substr($tplFile,0,1)=='#'){
-        $tplFile=substr($tplFile,1);
-        $this->redirect($tplFile);
-      }else{
-        return '模板文件不存在。';
-      }
-    
-    }
-    
-     // 输出系统摘要模板
+    // 输出系统摘要模板
     public function sysSummary(Request $request)
     {
       $this->_loginUser();
@@ -331,233 +314,19 @@ class IndexController extends \think\Controller
       return view();
       
     }
-    
-    // 输出系统用户模板
-    public function sysUser(Request $request,UsergroupModel $usergroupMdl,UserModel $userMdl)
-    {
-      $this->_loginUser();
-      //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
-      
-      // 分页页数变量：“pageUserNum”
-      if(!empty($request->param('pageUserNum'))){
-          $pageUserNum=$request->param('pageUserNum');
-      }else{
-          $pageUserNum=1;
-      }
-      
-       //$userTableRows接收页面传来的分页时每页表格显示的记录行数，初始值为10
-        if(!empty($request->param('userTableRows'))){
-          $userTableRows=$request->param('userTableRows');
-        }else{
-          $userTableRows=10;
-        }
-        // 基本查询条件， 
-        $map['id']=['>',0];  
-        // 查询词1，'searchUserName'
-        if(!empty($request->param('searchUserName'))){
-          $searchUserName=$request->param('searchUserName');
-          // 组合查询条件1，
-          $map['username']=['like','%'.$searchUserName.'%'];
-        }else{
-          $searchUserName=0;
-        } 
         
-        // 查询词2，'searchDept'
-        if(!empty($request->param('searchDept'))){
-          $searchDept=$request->param('searchDept');
-          // 组合查询条件2，
-          $map['dept']=$searchDept;
-        }else{
-          $searchDept=0;
-        } 
-        
-        // 查询词3，'$searchUsergroup'
-        if(!empty($request->param('searchUsergroup'))){
-          $searchUsergroup=$request->param('searchUsergroup');
-          // 组合查询条件3，
-          $map['usergroup_id']=['like','%'.$searchUsergroup.'%'];
-        }else{
-          $searchUsergroup=0;
-        }
-
-        //$sortName、$sort接收页面传来的排序信息
-        $sortName=$request->param('sortName');
-        $sort=$request->param('sort');
-        //  升序asc查询
-        if($sort=="_ASC"){
-          switch($sortName){
-            case '_USERNAME':
-              $strOrder='username asc';
-              
-            break;
-            
-            case '_DEPT':
-              $strOrder='dept asc';
-              
-            break;
-            
-           // case '_USERGROUP':
-//              $strOrder='rolety_id asc';
-//             
-//            break;
-            
-            case '_ENABLE':
-              $strOrder='enable asc';
-             
-            break;
-            
-            //默认按字段“username”的升序
-            default:
-              $strOrder='username asc';  
-              $sortName="_USERNAME";
-              $sort="_ASC";
-             
-            break;
-          } 
-        }else{
-          // 降序desc查询
-          switch($sortName){
-            case '_USERNAME':
-              $strOrder='username desc';
-              
-            break;
-            
-            case '_DEPT':
-              $strOrder='dept desc';
-              
-            break;
-            
-           // case '_USERGROUP':
-//              $strOrder='rolety_id desc';
-//             
-//            break;
-            
-            case '_ENABLE':
-              $strOrder='enable desc';
-             
-            break;
-            
-            //默认按字段“username”的升序
-            default:
-              $strOrder='username asc';  
-              $sortName="_USERNAME";
-              $sort="_ASC";
-              
-            break;
-          } 
-        }
-        
-        // 查出所有的用户并分页，根据“strOrder”排序，设定前端页面显示的锚点（hash值）为“div1”，设定分页页数变量：“pageUserNum”
-        // 带上每页显示记录行数$userTableRows和3个查询词，实现查询结果分页显示。
-        $users = $userMdl::where($map)
-                            ->order($strOrder)
-                           // ->paginate($userTableRows,false,['type'=>'bootstrap','var_page'=>'pageUserNum']);
-                            ->paginate($userTableRows,false,['query'=>['userTableRows'=>$userTableRows,'searchUserName'=>$searchUserName,'searchUsergroup'=>$searchUsergroup,'searchDept'=>$searchDept]
-                                                              ,'type'=>'bootstrap','fragment'=>'sysUser','var_page'=>'pageUserNum']);                                                                           
-          
-        // 分页变量
-        $pageUser = $users->render();
-        
-        // 查出所有的用户总数        
-         $usersNum=$userMdl::where($map)
-                            ->group('username')
-                            ->count(); 
-                            
-        //添加groupNameNum字段到数据集$users中
-        //字段内容：根据user的usergroup_id字段添加UserGroup.name的内容后生成$groupNameNum字符串
-        foreach($users as $v){
-          $groupNameNum='';
-          //$groupNameNum=array();
-          //根据user的usergroup_id字段生成数组
-          $usergroup_id= explode(",", $v['usergroup_id']);//$usergroup_id=array(8,9,10)
-          if(count($usergroup_id)){
-            //由数组每个元素查找对应的name值
-            for($i=0;$i<count($usergroup_id);$i++){
-              //$groupNameNum[]=$usergroupMdl::get($usergroup_id[$i])['name'].'('.$usergroup_id[$i].')&nbsp;';
-              //由数组每个元素查及对应的name值拼接成字符串
-              $groupNameNum.=$usergroupMdl::get($usergroup_id[$i])['name'].'('.$usergroup_id[$i].')&nbsp;<br>';
-            }
-          }
-          //$v['groupNameNum']=json_encode($groupNameNum);
-          //添加groupNameNum字段到数据集$users中
-          $v['groupNameNum']=$groupNameNum;
-        }
-      
-      $this->assign([
-             'home'=>$request->domain(),
-             
-             // 所有用户信息
-              'users'=>$users,
-              'usersNum'=>$usersNum,
-              
-              'pageUser'=>$pageUser,
-              'pageUserNum'=>$pageUserNum,
-              
-              // 表格搜索字段
-              'searchUserName'=>$searchUserName,
-              'searchDept'=>$searchDept,
-              'searchUsergroup'=>$searchUsergroup,
-              
-              // 表格排序信息
-              'sortName'=>$sortName,
-              'sort'=>$sort,
-              'userTableRows'=>$userTableRows,
-             
-        ]);
-      return view();
-    }
-    
-    // 输出系统用户组模板
-    public function sysUsergroup(Request $request,UsergroupModel $usrgroupMdl)
-    {
-      $this->_loginUser();
-      //return '<div style="padding: 24px 48px;"><h1>:)</h1><p>模块开发中……<br/></p></div>';
-      
-        // 分页页数变量：“usergroupPageNum”
-      if(!empty($request->param('usergroupPageNum'))){
-          $usergroupPageNum=$request->param('usergroupPageNum');
-      }else{
-          $usergroupPageNum=1;
-      }
-      
-      //$usergroupTableRows接收页面传来的分页时每页表格显示的记录行数，初始值为10
-        if(!empty($request->param('usergroupTableRows'))){
-          $usergroupTableRows=$request->param('usergroupTableRows');
-        }else{
-          $usergroupTableRows=10;
-        }
-       
-        // 查出所有用户组
-        $usergroup = $usrgroupMdl::where('id','>',0)
-                              ->order('id asc')
-                              ->paginate($usergroupTableRows,false,['type'=>'bootstrap','var_page'=>'usergroupPageNum']);                     
-        
-        // 分页变量
-        $usergroupPage = $usergroup->render();
-        
-        // 记录总数
-        $usergroupNum = $usrgroupMdl::where('id','>',0)
-                            ->count();
-     
-      
-      $this->assign([
-              'home'=>$request->domain(),
-              // 所有用户组信息
-              'usergroup'=>$usergroup,
-              'usergroupNum'=>$usergroupNum,
-              'usergroupPage'=>$usergroupPage,
-              'usergroupPageNum'=>$usergroupPageNum,
-              'usergroupTableRows'=>$usergroupTableRows
-        ]);
-      return view();
-    }
-    
     public function userList(UserModel $userMdl)
     {
       $this->_loginUser();
          
       $pageNum=$this->resPgInfo['pageNum'];
       $listRows=$this->resPgInfo['listRows'];
+      
+      #定义排序关键字及要求顺序
+      $sortDataDefault=['name'=>'username','order'=>'asc'];
+      $sortData=empty($this->request->param('sortData/a'))?$sortDataDefault:array_merge($sortDataDefault,$this->request->param('sortData/a'));
+      
+      
       #定义查询关键字及结果数组，关键字为数据表中的字段
       $searchDataDefault=['keys'=>['username'=>'','dept'=>'','usergroup_id'=>''],'resultNum'=>'null','trig'=>false];
       $searchData=empty($this->request->param('searchData/a'))?$searchDataDefault:array_merge($searchDataDefault,$this->request->param('searchData/a'));
@@ -565,14 +334,15 @@ class IndexController extends \think\Controller
       #定义查询条件数组
       $whereData=[];
      
-      #其他查询条件
+      #查询条件组装
       foreach($searchData['keys'] as $k=>$v){
         if(!empty($v)){
           $whereData[$k]=($k=='dept')?$v:['like','%'.$v.'%'];
         }
       }
-      $userSet=$userMdl::all(function($query)use($whereData){
-                          $query->where($whereData);
+      $userSet=$userMdl::all(function($query)use($whereData,$sortData){
+                          $query->where($whereData)
+                                ->order($sortData['name'],$sortData['order']);
                         });
       
       $userSet=is_array($userSet)?collection($userSet):$userSet;
@@ -596,28 +366,34 @@ class IndexController extends \think\Controller
       $userList=$userSet->slice(($pageNum-1)*$listRows,$listRows);
       #分页对象
       $pageSet=$userMdl->where('id','in',$userSet->column('id'))->paginate($listRows,false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$pageNum,
-                        'query'=>['listRows'=>$listRows]]);    
+                        'query'=>['listRows'=>$listRows]]);
       
       $test=$this->resPgInfo;
       $this->assign([       
+      #前端HTML中使用的变量
         #用户总数
         'userNum'=>count($userMdl::all()),
-        
+        #显示数据集
         'userList'=>$userList,
-        
+        #分页对象
         'pageSet'=>$pageSet,
         #分页参数
         'pageNum'=>$pageNum,
         'listRows'=>$listRows,
-        'pageParam'=>json_encode($this->resPgInfo,JSON_UNESCAPED_UNICODE),
-        #查询条件及结果
-        'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
-        #限定查询关键词的范围
-        'allDept'=>json_encode($this->allDept,JSON_UNESCAPED_UNICODE),
-        'allGroup'=>json_encode($this->allGroup,JSON_UNESCAPED_UNICODE),
+      #测试输出
+        'test'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
         
-        'test'=>json_encode($searchData,JSON_UNESCAPED_UNICODE)
-        
+      #前端js中使用的变量
+        'resData'=>json_encode([#分页参数
+                                'pageParam'=>$this->resPgInfo,
+                                #排序信息
+                                'sortData'=>$sortData,
+                                #查询条件及结果
+                                'searchData'=>$searchData,
+                                #限定查询关键词dept的范围
+                                'allDept'=>$this->allDept,
+                                #限定查询关键词usergroup的范围
+                                'allGroup'=>$this->allGroup],JSON_UNESCAPED_UNICODE)
       ]);
       
       return view();
@@ -626,7 +402,7 @@ class IndexController extends \think\Controller
     
     #前端传来的oprt值:_CREATE、_UPDATE、_EDIT、_DISABLE、_ENABLE、_READ
     #$userMdl中mobile字段为无重复值字段
-    public function userOprt1(UserModel $userMdl)
+    public function userOprt(UserModel $userMdl)
     {
       $this->_loginUser();
       $request=$this->request;
@@ -720,7 +496,7 @@ class IndexController extends \think\Controller
       
     }
     //单个用户信息表单
-    public function fmUserSingle(UserModel $userMdl,UsergroupModel1 $ugMdl)
+    public function userSingleForm(UserModel $userMdl,UsergroupModel $ugMdl)
     {
       $this->_loginUser();
       $request=$this->request;
@@ -761,49 +537,82 @@ class IndexController extends \think\Controller
       return view();
     }
     
-    public function usergroupList(UsergroupModel1 $userGpMdl)
+    public function usergroupList(UsergroupModel $userGpMdl)
     {
       $this->_loginUser();
       
       $pageNum=$this->resPgInfo['pageNum'];
       $listRows=$this->resPgInfo['listRows'];
- 
-      $userGpSet=$userGpMdl->where('id','>',0)->select();
+      
+      #定义排序关键字及要求顺序
+      $sortDataDefault=['name'=>'name','order'=>'asc'];
+      $sortData=empty($this->request->param('sortData/a'))?$sortDataDefault:array_merge($sortDataDefault,$this->request->param('sortData/a'));
+      
+      
+      #定义查询关键字及结果数组，关键字为数据表中的字段
+      $searchDataDefault=['keys'=>['name'=>'','description'=>''],'resultNum'=>'null','trig'=>false];
+      $searchData=empty($this->request->param('searchData/a'))?$searchDataDefault:array_merge($searchDataDefault,$this->request->param('searchData/a'));
+      
+      #定义查询条件数组
+      $whereData=[];
+     
+      #查询条件组装
+      foreach($searchData['keys'] as $k=>$v){
+        if(!empty($v)){
+          $whereData[$k]=['like','%'.$v.'%'];
+        }
+      }
+      $userGpSet=$userGpMdl::all(function($query)use($whereData,$sortData){
+                          $query->where($whereData)->order($sortData['name'],$sortData['order']);
+                        });
+     
       $userGpSet=is_array($userGpSet)?collection($userGpSet):$userGpSet;
+       if($searchData['trig']){
+        #返回前端查询结果数
+        $searchData['resultNum']=count($userGpSet);
+        #调整分页从第一页开始
+        $pageNum=1;
+      }
+      #前端显示用数据集
       $userGpList=$userGpSet->slice(($pageNum-1)*$listRows,$listRows);
       
      // $pageParam['showId']=($pageParam['showId']==0)?$userGpList[0]->id:$pageParam['showId'];
                  
-      $pageSet=$userGpMdl->where('id','>',0)->paginate($listRows,false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$pageNum,
+      $pageSet=$userGpMdl->where('id','in',$userGpSet->column('id'))->paginate($listRows,false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$pageNum,
                         'query'=>['listRows'=>$listRows]]);    
                         
-      $testArr=$userGpList->column('authority')[0];
+      $testArr=$userGpList->column('authority');
       $this->assign([
-        //显示结果集
+      #前端HTML中使用的变量
+        #用户组总数
+        'usergroupNum'=>count($userGpMdl::all()),
+        #显示结果集
         'userGpList'=>$userGpList,
-        
-        //分页对象
+        #分页对象
         'pageSet'=>$pageSet,
-        
+        #分页参数
         'pageNum'=>$pageNum,
         'listRows'=>$listRows,
-        
+      #测试输出
+        'testDis'=>json_encode($testArr,JSON_UNESCAPED_UNICODE),  
         'searchNum'=>$userGpSet->count(),
         'pageParam'=>json_encode($this->resPgInfo,JSON_UNESCAPED_UNICODE),
         'auth'=>json_encode(conAuthNameArr,JSON_UNESCAPED_UNICODE),
-        
-        'testDis'=>json_encode($testArr,JSON_UNESCAPED_UNICODE)
-        //排序数组？
-        
-        //查询数组？
-      
+      #前端js中使用的变量
+       'resData'=>json_encode([#分页参数
+                                'pageParam'=>$this->resPgInfo,
+                                #查询条件及结果
+                                'searchData'=>$searchData,
+                                #排序信息
+                                'sortData'=>$sortData,
+                                #权限
+                                'auth'=>conAuthNameArr],JSON_UNESCAPED_UNICODE)
       ]);
-      
       return view();
     }
     #前端传来的oprt值:_CREATE、_UPDATE、_EDIT、_DISABLE、_ENABLE、_READ
     #$ugMdl中的name字段为无重复值字段
-    public function usergroupOprt1(Request $request,UsergroupModel1 $ugMdl)
+    public function usergroupOprt(Request $request,UsergroupModel $ugMdl)
     {
       $this->_loginUser();
       
@@ -899,7 +708,7 @@ class IndexController extends \think\Controller
       return ['result'=>$result,'msg'=>$msg,'name'=>$name,'data'=>$data,'oprt'=>$oprt];
     }
     //单个用户组信息表单
-    public function fmUsergroupSingle(UsergroupModel1 $ugMdl)
+    public function usergroupSingleForm(UsergroupModel $ugMdl)
     {
       $this->_loginUser();
       $request=$this->request;
@@ -918,10 +727,9 @@ class IndexController extends \think\Controller
         $ugSet['description']='';
         $ugSet['enable']=1;
         $ugSet['authority']=$this->_authDbToFe();
-        #将数组转换为对象
-        $ugSet=collection($ugSet);
       }
-                 
+      #将数组转换为对象
+      $ugSet=is_array($ugSet)?collection($ugSet):$ugSet;          
       $this->assign([
         #返回前端必须为对象类型:$ugSet
         'ugSet'=>$ugSet,
@@ -941,334 +749,7 @@ class IndexController extends \think\Controller
               'numDept'=>$deptMdl::where('id','>',0)->count()
         ]);
       return view();
-    }
-    
-     // 用户CDUR，接收客户端通过Ajax，post来的参数，返回json数据
-    public function userOprt(Request $request,UserModel $userMdl,$oprt='_CREATE',$id='0')
-    {
-      $this->_loginUser();
-      
-      $oprt=$request->param('oprt');
-      $id=!empty($request->param('id'))?$request->param('id'):0;
-      $result='';
-      $msg='';
-      $msgPatch='';
-      //1.分情况变量赋值
-      if($oprt=='_CREATE') {
-        $userData=array('username'=>$request->param('userName'),
-                        'pwd'=>md5($request->param('pwd')),
-                        'mobile'=>$request->param('mobile'),
-                        'dept'=>$request->param('dept'),
-                        'enable'=>$request->param('userEn'),
-                        'usergroup_id'=>$request->param('usergroup_id'),
-                        );
-      
-      }elseif($oprt=='_UPDATE'){
-        $userData=array('username'=>$request->param('userName'),
-                        'mobile'=>$request->param('mobile'),
-                        'dept'=>$request->param('dept'),
-                        'enable'=>$request->param('userEn'),
-                        'usergroup_id'=>$request->param('usergroup_id'),
-                        );
-        
-      }
-      
-      //2.分情况执行业务逻辑，生成返回前端的数据、操作数据库等 
-      switch($oprt){
-        case '_ADDNEW':
-          $user=array('id'=>$id,'username'=>'','dept'=>'','mobile'=>'','usergroup_id'=>0);
-          
-        break;
-        
-        case '_EDIT':
-          $user=$userMdl::get($id);
-          
-        break;
-        
-        case '_CREATE':
-          $user=$userMdl::get(['mobile'=>$request->param('mobile')]);
-          $name=$request->param('userName');
-          if(count($user)){
-            $result='false';
-            $msg='创建失败';
-            $msgPatch='手机号：'.$request->param('mobile').',已存在。';
-          }else{
-            $user=$userMdl::create($userData,true);
-            $result='success';
-            $msg='创建成功';
-            $id=$user->id;
-          }
-        break;
-        
-        case '_UPDATE': 
-          $name=$userMdl::get($id)->username;
-          //因对‘mobile’字段定义了获取器，调用getData()方法得到数据库的原始数据
-          $mobile=$userMdl::get($id)->getData('mobile');
-          
-          //手机号要唯一
-          if($request->param('mobile')==$mobile){
-              if($request->param('userName')!=$name){
-                  $msgPatch='用户名更新为【'.$request->param('userName').'】。';
-                  
-              }
-              $userMdl::update($userData,['id'=>$id],true);
-              $result='success';
-              $msg='保存成功';
-              //else{
-//                  $result='false';
-//                  $msg='保存失败';
-//                  $msgPatch='手机号：'.$request->param('mobile').',已存在。';
-//                
-//              }
-              
-          }else{
-              if(count($userMdl::get(['mobile'=>$request->param('mobile')]))){
-                  $result='false';
-                  $msg='保存失败';
-                  $msgPatch='手机号：'.$request->param('mobile').',已存在。';
-              }else{
-                  $result='success';
-                  $msg='保存成功';
-                  if($request->param('userName')!=$name){
-                      $msgPatch='用户名更新为【'.$request->param('userName').'】。';
-                  }
-                  $userMdl::update($userData,['id'=>$id],true);
-              }
-          }
-          
-        break;
-        
-        case '_DELETE':
-          $name=$userMdl::get($id)->username;  
-          $userMdl::destroy($id);
-          $result='success';
-          $msg='删除成功';
-          //返回最小的$id
-          $id=$userMdl::where('id','>',0)->min('id');
-        break;
-        
-        case'_DISABLE':
-          $userMdl::update(['enable'=> 0], ['id' => $id]);
-          $result='success';
-        break;
-        
-        case'_ENABLE':
-          $userMdl::update(['enable'=> 1], ['id' => $id]);
-          $result='success';
-          
-        break;
-        
-        
-      }
-      
-      //3.分情况组装数据，返回前端
-       if ($oprt=='_ADDNEW' || $oprt=='_EDIT'){
-          if($oprt=='_EDIT'){
-            //因对‘mobile’字段定义了获取器，调用getData()方法得到数据库的原始数据
-            $mobile=$userMdl::get($id)->getData('mobile');
-          
-          }else{
-            $mobile=0;
-          }
-          
-          $this->assign([
-               'home'=>$request->domain(),
-               'user'=>$user,
-               'oprt'=>$oprt,
-               'userMobile'=>$mobile
-          ]);
-          // 返回前端模板文件
-          return view('editUser');
-       }elseif($oprt=='_CREATE' || $oprt=='_UPDATE' || $oprt=='_DELETE'){
-          // 返回前端JSON数据 
-          return ['result'=>$result,'id'=>$id,'name'=>$name,'msg'=>$msg,'msgPatch'=>$msgPatch];
-       }elseif($oprt=='_DISABLE' || $oprt=='_ENABLE'){
-          // 返回前端JSON数据 
-          return ['enable'=>$userMdl::get($id)->enable,'id'=>$id];
-       }
-      
-    }
-    
-    // 用户组CDUR，接收客户端通过Ajax，post来的参数，返回json数据
-    //前端传来的oprt值:_CREATE、_UPDATE、_ADDNEW、_EDIT、_DISABLE、_ENABLE
-    public function usergroupOprt(Request $request,UsergroupModel $usergroupMdl,$oprt='_CREATE',$id='0')
-    {
-      $this->_loginUser();
-    
-      $oprt=$request->param('oprt');
-      $id=$request->param('id');
-      $result='';
-      $msg='';
-      $msgPatch='';
-      $issTemp=array();
-      //1.分情况变量赋值
-      if($oprt=='_CREATE' || $oprt=='_UPDATE') {
-        if(count($request->param('authIss/a'))){
-          foreach($request->param('authIss/a') as $v){
-            $iss[$v]=1;
-          }
-        }else{
-          $iss=array();
-        }
-        
-        if(count($request->param('authPat/a'))){
-          foreach($request->param('authPat/a') as $v){
-            $pat[$v]=1;
-          }
-        }else{
-          $pat=array();
-        }
-
-        if(count($request->param('authPro/a'))){
-          foreach($request->param('authPro/a') as $v){
-            $pro[$v]=1;
-          }
-        }else{
-          $pro=array();
-        }
-        
-        if(count($request->param('authThe/a'))){
-          foreach($request->param('authThe/a') as $v){
-            $the[$v]=1;
-          }
-        }else{
-          $the=array();
-        }
-        
-        if(count($request->param('authAtt/a'))){
-          foreach($request->param('authAtt/a') as $v){
-            $att[$v]=1;
-          }
-        }else{
-          $att=array();
-        }
-        
-        if(count($request->param('authAss/a'))){
-          foreach($request->param('authAss/a') as $v){
-            $ass[$v]=1;
-          }
-        }else{
-          $ass=array();
-        }
-        
-        if(!empty($request->param('adminEn')) && $request->param('adminEn')){
-          $admin=['enable'=>1];
-        }else{
-          $admin=['enable'=>0];
-        }
-        //array_merge再重新合并成新数组，得到用户组新的权限集。
-        $iss=array_merge(_commonModuleAuth('_ISS'),$iss);
-        $pat=array_merge(_commonModuleAuth('_PAT'),$pat);
-        $pro=array_merge(_commonModuleAuth('_PRO'),$pro);
-        $the=array_merge(_commonModuleAuth('_THE'),$the);
-        $att=array_merge(_commonModuleAuth('_ATT'),$att);
-        $admin=array_merge(_commonModuleAuth('_ADMIN'),$admin); 
-        $ass=array_merge(_commonModuleAuth('_ASS'),$ass);
-           
-        //组装数据
-        $authority=array("iss"=>$iss,
-                            "att"=>$att,
-                            "pat"=>$pat,
-                            "pro"=>$pro,
-                            "the"=>$the,
-                            "admin"=>$admin,
-                            "ass"=>$ass,
-                            );
-        $usergroupData=array('name'=>$request->param('usergroupName'),
-                                'enable'=>$request->param('usergroupEn'),
-                                'authority'=>$authority,
-                                'description'=>!empty($request->param('usergroupDescription'))?$request->param('usergroupDescription'):'无');
-      }
-      //2. 分情况操作数据库
-      switch($oprt){
-        case '_ADDNEW':
-          $usergroup=array('id'=>$id,'name'=>'','authority'=>_commonModuleAuth(),'description'=>'无');
-          //将iss权限数组的$key转为中文_commonAuthArrKeyToCHN
-          //$usergroup['authority']['iss']=_commonAuthArrKeyToCHN($usergroup['authority']['iss']);
-//          $usergroup['authority']['pat']=_commonAuthArrKeyToCHN($usergroup['authority']['pat']);
-//          $usergroup['authority']['pro']=_commonAuthArrKeyToCHN($usergroup['authority']['pro']);
-//          $usergroup['authority']['the']=_commonAuthArrKeyToCHN($usergroup['authority']['the']);
-//          $usergroup['authority']['att']=_commonAuthArrKeyToCHN($usergroup['authority']['att']);     
-        break;
-        
-        case '_EDIT':
-          $usergroup=$usergroupMdl::get($id);
-        break;
-        
-        case '_CREATE':
-          $usergroup=$usergroupMdl::get(['name'=>$request->param('usergroupName')]);
-          $name=$request->param('usergroupName');
-          $result='success';
-          $id=!empty($usergroup->id)?$usergroup->id:0;
-          if(count($usergroup)){
-            $msg='创建失败';
-            $msgPatch='用户组【'.$request->param('usergroupName').'】已存在。';
-          }else{
-            $usergroup=$usergroupMdl::create($usergroupData,true);
-            $msg='创建成功';
-          }
-        break;
-        
-        case '_UPDATE': 
-          $n=count($usergroupMdl->where('name',$request->param('usergroupName'))->select());
-          $name=$usergroupMdl::get($id)->name;
-          if($request->param('usergroupName')==$name){
-            $usergroup = $usergroupMdl::update($usergroupData,['id'=>$id],true);
-            $result='success';
-            $msg='更新成功';
-          }else if($request->param('usergroupName')!=$name && $n){  
-            $usergroup=$usergroupMdl::get($id);
-            $result='false';
-            $msg='修改失败';
-            $msgPatch='用户组【'.$request->param('usergroupName').'】已存在。';
-            
-          }else{
-            // 使用静态方法，向Usergroup表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
-            $usergroup = $usergroupMdl::update($usergroupData,['id'=>$id],true);
-            $result='success';
-            $msg='修改成功';
-            $msgPatch='修改为【'.$request->param('usergroupName').'】';
-          }
-          
-        break;
-        
-        case '_DELETE':
-          $name=$usergroupMdl::get($id)->name;  
-          $usergroupMdl::destroy($id);
-          $result='success';
-          $msg='删除成功';
-          //返回默认的$id
-          $id=$usergroupMdl::where('id','>',0)->min('id');
-          
-        break;
-        
-        case'_DISABLE':
-          $usergroupMdl::update(array('enable'=> 0), ['id' => $id]);         
-        break;
-        
-        case'_ENABLE':
-          $usergroupMdl::update(array('enable'=> 1), ['id' => $id]);          
-        break;
-      }
-     //3.分情况返回前端数据
-     if ($oprt=='_ADDNEW' || $oprt=='_EDIT'){
-             
-        $this->assign([
-             'home'=>$request->domain(),
-             'usergroup'=>$usergroup,
-        ]);
-        // 返回前端模板文件
-        return view('editUsergroup');
-     }elseif($oprt=='_CREATE' || $oprt=='_UPDATE' || $oprt=='_DELETE'){
-        // 返回前端JSON数据 
-        return ['result'=>$result,'id'=>$id,'name'=>$name,'msg'=>$msg,'msgPatch'=>$msgPatch];
-     }elseif($oprt=='_DISABLE' || $oprt=='_ENABLE'){
-        // 返回前端JSON数据 
-        return ['enable'=>$usergroupMdl::get($id)->enable,'id'=>$id];
-     }
-      
-    }
-    
+    }      
     // 部门组CDUR，接收客户端通过Ajax，post来的参数，返回json数据
     //前端传来的oprt值:_CREATE、_UPDATE、_ADDNEW、_EDIT、_DISABLE、_ENABLE、_DELETE
     public function deptOprt(Request $request,DeptModel $deptMdl,$oprt='_CREATE',$id='0')

@@ -8,7 +8,7 @@
 namespace app\admin\model;
 
 use think\Model;
-use app\admin\model\Usergroup1 as UsergroupModel;
+use app\admin\model\Usergroup as UsergroupModel;
 use app\admin\model\Dept as DeptModel;
 
 class User extends Model

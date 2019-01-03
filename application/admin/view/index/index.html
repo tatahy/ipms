@@ -147,13 +147,13 @@ footer {
 	<ul class="nav nav-pills nav-stacked" >
 		<li class="active"><a class="aTab" href="#sysSummary"><span class="glyphicon glyphicon-inbox"></span>&nbsp;系统概况</a></li>
 				
-		<li class="dropdown">
-			<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span>&nbsp;系统用户<span class="caret"></span></a>
-			<ul class="dropdown-menu">
-				<li class="text-right"><a class="aTab" href="#sysUser">用户&nbsp;<span class="glyphicon glyphicon-file"></span></a></li>
-				<li class="text-right"><a class="aTab" href="#sysUsergroup">用户组&nbsp;<span class="glyphicon glyphicon-duplicate"></span></a></li>
-			</ul>
-		</li>
+		<!-- <li class="dropdown"> -->
+			<!-- <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span>&nbsp;系统用户<span class="caret"></span></a> -->
+			<!-- <ul class="dropdown-menu"> -->
+				<!-- <li class="text-right"><a class="aTab" href="#sysUser">用户&nbsp;<span class="glyphicon glyphicon-file"></span></a></li> -->
+				<!-- <li class="text-right"><a class="aTab" href="#sysUsergroup">用户组&nbsp;<span class="glyphicon glyphicon-duplicate"></span></a></li> -->
+			<!-- </ul> -->
+		<!-- </li> -->
 		
 		<li class="dropdown">
 			<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span>&nbsp;系统用户管理<span class="caret"></span></a>
@@ -208,6 +208,8 @@ footer {
 
 
 <script>
+//锚点/控制台菜单名称
+const archName=['#sysSummary','#userList','#usergroupList','#sysSetting'];
 var getBS3Color=(type,str)=>{
 	let str=(str=='' || str==null)?'info':str,
 		type=(type=='' || type==null)?'label':type,
@@ -235,14 +237,23 @@ var oprtBtnProp={
 		
 //权限模块核心属性
 var authEntProp={
+	//ass
 	ass:{chi:'固定资产',color:{bg:'bg-default',txt:'text-default',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	//att
 	att:{chi:'附件',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	//iss-pat
 	'iss-pat':{chi:'专利事务',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	//iss-pro
 	'iss-pro':{chi:'项目事务',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	//iss-the
 	'iss-the':{chi:'论文事务',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	//pat
 	pat:{chi:'专利',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	//pro
 	pro:{chi:'项目',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	//the
 	the:{chi:'论文',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
+	//admin
 	admin:{chi:'后台管理',color:{bg:'bg-danger',txt:'text-danger'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'}
 };
 
@@ -284,29 +295,67 @@ var spComModify=(spSet)=>{
 	});
 };
 
-var showSideNavbar=(y)=>{
-	if(y){
+var showSideNavbar=(show=true)=>{
+	if(show){
 		//show
 		$('#openBtn').hide();
 		$('#mySidenav').addClass('sidenav-show');
 		$('#divContainer').addClass('sidenav-show');
 		//添加div组件及其click事件函数，实现点击该组件就隐藏sideNave，还需结合sidenav-backdrop的css属性实现与sideNav的分层
-		$('body').append($('<div></div>').addClass('sidenav-backdrop').bind('click',function(){
+		return $('body').append($('<div></div>').addClass('sidenav-backdrop').one('click',function(){
     		showSideNavbar(false);
-		})
+			})
 		);
-	}else{
-		$('#openBtn').show();
-		$('#mySidenav').removeClass('sidenav-show');
-		$('#divContainer').removeClass('sidenav-show');	
-		$('div.sidenav-backdrop').remove();		
 	}
+	
+	$('#openBtn').show();
+	$('#mySidenav').removeClass('sidenav-show');
+	$('#divContainer').removeClass('sidenav-show');	
+	$('div.sidenav-backdrop').remove();
+	
+	return true;	
+};
+
+//对表格$('#content table')的选定字段进行升、降序转换，并改变其显示格式
+var sortOrderToggle=(tblObj='null')=>{
+	let obj='',
+		<!-- tbl=(tblObj=='null')?$('#tblUserList'):tblObj, -->
+		tbl=(tblObj=='null')?$('#content table'):tblObj,
+		aSet=tbl.find('thead a'),
+		glyAsc='&nbsp;<span class="small glyphicon glyphicon-sort-by-attributes"></span>',
+		glyDesc='&nbsp;<span class="small glyphicon glyphicon-sort-by-order-alt"></span>',
+		sortOrder=sortData.order,
+		sortName=sortData.name,
+		labColor='label label-primary';
+		
+	aSet.removeClass(labColor).each(function(){
+		if(sortName==$(this).data('sortName')){
+			obj=$(this);
+			obj.addClass(labColor);
+			if(sortOrder == 'asc'){
+				//当前为升序
+				obj.append(glyAsc).data('sortOrder','desc').attr('title','当前为升序。点击后降序').tooltip({placement: 'top'});
+			}else{
+				//当前为降序
+				obj.append(glyDesc).data('sortOrder','asc').attr('title','当前为降序。点击后升序').tooltip({placement: 'top'});
+			}
+		}else{
+			$(this).tooltip({placement: 'bottom'});
+		}
+	});
+	
+	//选中进行排序的列向左对齐，添加底色
+	tbl.find('tbody tr').each(function(){
+		let n=obj.closest('th').prevAll().length;
+		$(this).children('td').eq(n).removeClass('text-center').addClass('text-left bg-info');
+	});
+	
 };
 
 // 作用：提交锚点值给后端，由后端返回需加载的页面文件
 var loadTplFile=(rqData={})=>{
-	let sId=(null==window.location.hash || window.location.hash=='#undefined')?'#sysSummary':window.location.hash,
-		url=(['usergroupList','userList'].indexOf(sId.slice(1))!=-1 )?sId.slice(1):'tplFile',
+	let sId=(window.location.hash==null)?archName[0]:window.location.hash,
+		url=(archName.indexOf(sId)!=-1 )?sId.slice(1):archName[0].slice(1),
 		aObj='',
 		obj=$('#pageParam'),
 		pageParamDefault={
@@ -338,32 +387,90 @@ var loadTplFile=(rqData={})=>{
 		
 	}); 
 };
+//给表格内的特定行上底色
+var	tblTrBg=(id='')=>{
+	let obj=$('#content tbody'),
+		trObj=obj.find('tr[data-id="'+id+'"]');
+	//去掉所有行的底色
+	obj.find('tr').removeClass('bg-warning');
+	if(id==0){
+		//默认给表内的第一行内容上底色
+		obj.find('tr').eq(0).addClass('bg-warning');
+	}else{
+		//给本行上底色
+		trObj.addClass('bg-warning');
+	}
+};
+
+//btnOprt点击
+var btnOprtClick=(obj,url)=>{
+	let data={oprt:obj.data('oprt'),id:obj.closest('tr').data('id'),reqEnt:obj.data('reqEnt')},
+		e=oprtBtnProp[data.oprt],
+		mdObj=$('#modalSingle'),
+		tdObj='',
+		//操作结果字符串
+		oprtStr='【<span class="'+e.color.txt+'">'+e.glyCom+e.chi+'</span>】';
+		
+	//是表格内的oprt按钮
+	if(obj.closest('tr').length){
+		tblTrBg(data.id);
+		//分页参数向$('#pageParam')汇集
+		$('#pageParam').data('showId',data.id);
+	}
+				
+	if(data.oprt=='_ENABLE' || data.oprt=='_DISABLE'){
+		tdObj=obj.closest('td');
+		$.post(url,data,function(res){
+			let str='';
+			tdObj.data('enable',res.result);
+			oprtBtnDisplay(tdObj);
+			if(res.msg=='success'){
+				str='<p class="text-center text-success">成功<span class="glyphicon glyphicon-ok"></span></p>';
+			}else{
+				str='<p class="text-center text-danger">失败<span class="glyphicon glyphicon-remove"></span></p>';
+			}
+			$.alert('<p class="text-center">用户组：<strong>'+res.name+'</strong>'+oprtStr+'</p>'+str);
+		});
+	}else{
+		mdObj.find('.modal-header').removeClass('bg-info bg-danger bg-warning').addClass(e.color.bg);			
+		mdObj.find('.modal-body').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(url,data,function(){
+			mdObj.find('h4').html(oprtStr+'用户组');
+				
+		});
+		mdObj.on('shown.bs.modal', function () {
+            $('#fmUsergroup').find('.inputCheck').eq(0).focus();
+    	});
+		mdObj.modal('show');
+	}
+};
 
 //利用自调用匿名函数立即执行的特点， 页面初始化
 (function($){
-	$('[data-toggle="tooltip"]').tooltip();   
-
+	//设定页面初始锚点/菜单
+	if(window.location.hash==''){
+		window.location.hash=archName[0];
+	}
+	showSideNavbar();	
 	loadTplFile();
-	
-	showSideNavbar(true);	
-
+	// 激活tooltip
+	$('[title]').tooltip();   
 })(jQuery);
 
 $(document).ready(function(){
-
+	
 	<!-- //点击nav-pills中的各个按钮后，显示对应的页面-->
 	$('.aTab').click(function(){
     	//a所在li高亮
 		$(this).tab('show');
 		//a的href属性值即是页面的锚点值
 		window.location.hash = $(this).attr('href'); 
-
-        loadTplFile();              //加载锚点对应的页面文件
+		//加载锚点对应的页面文件
+        loadTplFile();              
     });	
 	
 	//显示SideNavbar
 	$('#openBtn').click(function(){
-		showSideNavbar(true);
+		showSideNavbar();
 			
     });	
 	//关闭SideNavbar
@@ -371,6 +478,7 @@ $(document).ready(function(){
         showSideNavbar(false);
 			
     });
+	
 });	
 
 </script>

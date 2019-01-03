@@ -1,4 +1,4 @@
-<!-- //fmUgergroupSingl.html -->
+<!-- //userSinglForm.html -->
 <form id="fmUser1" role="form" action="" method="post">
 	<div class="sr-only">
 		<input name="id" value="{$userSet.id}">
@@ -11,8 +11,10 @@
 		</div>
 		<hr>
 		<br/>
-		<div class="myLegend"><span class="label label-default">
-			<span class="glyphicon glyphicon-magnet"></span>&nbsp;用户启用</span>&nbsp;&nbsp;&nbsp;&nbsp;
+		<div class="myLegend">
+			<span class="label label-default">
+			<span class="glyphicon glyphicon-magnet"></span>&nbsp;用户启用
+			</span>&nbsp;&nbsp;&nbsp;&nbsp;
 			
 			<span id="radioCom"></span>
 			<!-- //js中radioCom的建模参考 -->
@@ -89,9 +91,10 @@ var oprtBtnComShow=(node,oprt)=>{
 	node.append(uBtn,'&nbsp;',oBtn);
 };
 //设置input:radio元素及其关联组件的背景色，适用于有2个radio
-var radioBg=(node)=>{	
-	let lObj=node.siblings('.label'),
-		yR=node.find('[value="1"]'),
+var radioBg=(node='null')=>{	
+	let rObj=(node=='null')?$('#radioCom'):node,
+		lObj=rObj.siblings('.label'),
+		yR=rObj.find('[value="1"]'),
 		labS='label-success',
 		labI='label-info';
 	
@@ -228,12 +231,12 @@ $(document).ready(function(){
 // 初始化数组，存储表单中输入框（class="inputCheck"）的内容验证结果“true/false”。数组下标应与输入框下标一致，便于编程选择输入框
 	var check = Array(fm.find('.inputCheck').length).fill(false);
 	<!-- //username内容验证 -->
-	fm.find('[name="username"]').focusout(function(){
- 		inputValid($(this));
-  	});
+	<!-- fm.find('[name="username"]').focusout(function(){ -->
+ 		<!-- inputValid($(this)); -->
+  	<!-- }); -->
 	<!-- //mobile内容验证 -->
 	fm.find('[name="mobile"]').focusout(function(){
-        let url='userOprt1',
+        let url='userOprt',
 			oprt='_READ',
 			mobile=$(this).val(),
 			//定义回调函数
@@ -248,14 +251,15 @@ $(document).ready(function(){
 		ajaxUgoprt(url,formData,cbFn);
 
   	});
-	<!-- //dept内容验证 -->
-	fm.find('[name="dept"]').focusout(function(){
- 		inputValid($(this));
-  	});
-	<!-- //joinedGroup内容验证 -->
-	fm.find('[name="joinedGroup"]').focusout(function(){
- 		inputValid($(this));
-  	});
+	//dept内容验证
+	<!-- fm.find('[name="dept"]').focusout(function(){ -->
+ 		<!-- inputValid($(this)); -->
+  	<!-- }); -->
+	//joinedGroup内容验证
+	<!-- fm.find('[name="joinedGroup"]').focusout(function(){ -->
+ 		<!-- inputValid($(this)); -->
+  	<!-- }); -->
+	
 	//表单select,[name="toJoinGroup"]
 	fm.find('[name="toJoinGroup"]').click(function(){
 		selOptionChange($(this),fm.find('[name="joinedGroup"]'));
@@ -268,23 +272,16 @@ $(document).ready(function(){
 	
 	// 表单input:radio选中元素改变背景色
 	fm.find('input:radio').change(function(){
-		radioBg($(this));
-	});
-	
-	//checkbox背景色
-	fm.find('input:checkbox').click(function(){
-		checkBoxBg($(this));
+		radioBg();
 	});
 	
 	//表单提交按钮按下时修改oprt
 	fm.find('button:submit').click(function(){
-		oprt=$(this).data('oprt');
-		fm.find('[name="oprt"]').val(oprt);
-		
+		fm.find('[name="oprt"]').val($(this).data('oprt'));
 	});
 	//表单提交
 	fm.submit(function(evt){
-		let url='userOprt1',
+		let url='userOprt',
 			inSet=$(this).find('.inputCheck');
 			name=$(this).find('[name="username"]').val(),
 			el=oprtBtnProp[$(this).find('[name="oprt"]').val()],
@@ -304,7 +301,8 @@ $(document).ready(function(){
 			
 		//输入框有效性检查
 		inSet.each(function(index){
-			inputValid($(this));
+			let msg=$(this).closest('div').siblings('.spTips').text();
+			inputValid($(this),msg);
 		});
 		
 		//formData对象数据整理
@@ -322,7 +320,7 @@ $(document).ready(function(){
 			});
 			//未通过验证的序号最小的$('.inputCheck').eq(i)获得焦点
 			inSet.eq(Math.min.apply(null, arr)).focus();
-			return;			
+			return true;			
 		}else{
 			$('.modal').modal('hide');
 			$.confirm(strHtml,function(e){
