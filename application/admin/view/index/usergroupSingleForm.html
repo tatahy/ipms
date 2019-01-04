@@ -130,11 +130,14 @@ var buildRaChkCom=(ugSet)=>{
 			i=0,
 			dSet=[], 
 			lSet=[],
+			rank=authEntProp[ent]['rank'],
 		    //checkbox的父标签底色类型
-			bgColor=(ent=='admin')?'bg-info':'bg-success',
+			<!-- bgColor=(ent=='admin')?'bg-info':'bg-success', -->
+			bgColor=authColor[rank]['bg'],
 			//checkbox相邻标签背景色
-			labColor=(ent=='admin')?'label label-info':'label label-success';
-		
+			<!-- labColor=(ent=='admin')?'label label-info':'label label-success'; -->
+			labColor=authColor[rank]['lab'];
+		console.log(rank);
 		labSet=[];
 		//遍历hash数组：authObj，
 		//auth=='read'...
@@ -162,7 +165,7 @@ var buildRaChkCom=(ugSet)=>{
 			
 		dSet[m]=$('<div></div>').css({'border-bottom':'solid 1px #ccc','padding':'5px'}).append(labSet);
 		
-		divCom[m]=$('<div></div>').addClass('form-group has-feedback col-sm-6').data('authName',ent).append(lSet[m],dSet[m]);
+		divCom[m]=$('<div></div>').addClass('form-group has-feedback col-sm-6').attr('data-auth-name',ent).append(lSet[m],dSet[m]);
 		//循环计数器
 		m++;
 	}
@@ -172,7 +175,7 @@ var buildRaChkCom=(ugSet)=>{
 var checkBoxSelNum=()=>{
 	let inObj=fm.find('[name="checkBoxSelNum"]'),
 		ckSet=fm.find('input:checkbox'),
-		labObj=inObj.prev().removeClass('label label-info label-default'),
+		labObj=inObj.prev().removeClass('label label-info label-default label-success label-warning label-danger'),
 		spTip=inObj.closest('div').next('span'),
 		dObj=inObj.closest('div.has-feedback').removeClass('has-success has-error'),
 		num=0,
@@ -251,17 +254,14 @@ var radioBg=()=>{
 var checkBoxBg=(obj)=>{
 	let rObj=obj.closest('div').parent('.col-sm-6'),
 		lObj=rObj.children('label'),
-		authName=rObj.data('authName'),
-		bgColor='bg-success',
-		labColor='label label-success',
+		ent=rObj.data('authName'),
+		rank=authEntProp[ent]['rank'],
+		bgColor=authColor[rank]['bg'],
+		labColor=authColor[rank]['lab'],
 		txtColor='text-muted',
 		tNum=fm.find('[name="checkBoxSelNum"]').val(),
 		ckSum=0;
 	
-	if(authName=='admin'){
-		bgColor='bg-info';
-		labColor='label label-info';
-	}
 	//本按钮的label是否上色，改变值
 	obj.prop('checked')?obj.val(1).next().addClass(labColor):obj.val(0).next().removeClass(labColor);
 	

@@ -3,7 +3,7 @@
 	<h4><button class="btn btn-sm btn-info" style="font-size:16px;cursor:unset;">系统用户组总数&nbsp;<span class="badge">{$usergroupNum}</span></button></h4>
 	<p class="text-right">
 		<!--// bootstap通过button调用Model -->		
-		<button type="button" class="btn-link btnOprt" data-oprt="_CREATE" data-id="0" data-req-ent="model"></button>
+		<button type="button" class="btn-link btnOprt" data-oprt="_CREATE" data-id="0" data-req-ent="model" title="新增用户组"></button>
 		<button type="button" class="btn-link" title="显示/隐藏用户组查询"><span class="text-info" data-toggle="collapse" data-target="#divCollapse"><span class="glyphicon glyphicon-plus-sign" ></span>搜索</span></button>	
 		<button id="btnRefresh" type="button" class="btn-link" title="刷新用户组列表"><span class="glyphicon glyphicon-refresh"></span>刷新</span></button>
 	</p>
@@ -58,15 +58,15 @@
 					<th class="text-center">序号</th>
 					<th><a data-sort-order="asc" data-sort-name="name">用户组名</a></th>
 					<th><a data-sort-order="asc" data-sort-name="description">用户组说明</a></th>
-					<th data-ent-name="_ISS-_PAT">“专利事务”权限</th>
-					<th data-ent-name="_ISS-_PRO">“项目事务”权限</th>
-					<th data-ent-name="_ISS-_THE">“论文事务”权限</th>
-					<th data-ent-name="_ASS">“固定资产”权限</th>
-					<th data-ent-name="_PAT">“专利”权限</th>
-					<th data-ent-name="_PRO">“项目”权限</th>
-					<th data-ent-name="_THE">“论文”权限</th>
-					<th data-ent-name="_ATT">“附件”权限</th>
-					<th data-ent-name="_ADMIN">“管理”权限</th>
+					<th data-ent-name="iss-pat">“专利事务”权限</th>
+					<th data-ent-name="iss-pro">“项目事务”权限</th>
+					<th data-ent-name="iss-the">“论文事务”权限</th>
+					<th data-ent-name="ass">“固定资产”权限</th>
+					<th data-ent-name="pat">“专利”权限</th>
+					<th data-ent-name="pro">“项目”权限</th>
+					<th data-ent-name="the">“论文”权限</th>
+					<th data-ent-name="att">“附件”权限</th>
+					<th data-ent-name="admin">“系统管理”权限</th>
 					<th class="text-center">操作</th>
 				</tr>
 			</thead>
@@ -220,13 +220,10 @@
 //控制显示/隐藏字段的组件的属性数组
 const res={$resData};
 var columnToggleArr=[],
-	authNameObj=res.auth,
 	pageParam=res.pageParam,
 	searchData=$.extend({},{keys:'',resultNum:'null',trig:false},res.searchData),
 	sortData=$.extend({},{name:'name',order:'asc'},res.sortData),
 	fmSearch=$('#fmUsergroupSearch');
-
-	console.log(res);
 
 //设置与search有关的userList组件（.usergroup-list-search）	
 var setUsergroupListCom=(searchData={})=>{
@@ -273,20 +270,20 @@ var buildColumnToggleCom=()=>{
 				nameChi=$(this).text();
 			<!-- let nameChi=$(this).children('a').html(); -->
 			if(nameEn){
-				arr.push({'nameChi':nameChi,'val':nameEn,'showFlag':true});
+				arr.push({nameChi:nameChi,val:nameEn,showFlag:true});
 			}else{
-				arr.push({'nameChi':nameChi,'val':0,'showFlag':false});
+				arr.push({nameChi:nameChi,val:0,showFlag:false});
 			}
 		});
 		//附加value="all"的input复选框信息
-		arr.push({'nameChi':'全选','val':'all','showFlag':$('#tblUserGpList ul input').eq(0).prop('checked')});
+		arr.push({nameChi:'全选',val:'all',showFlag:$('#tblUserGpList ul input').eq(0).prop('checked')});
 		//更新组件属性数组
 		columnToggleArr=arr;
 	}
 	//由属性数组生成单选框组件
 	arr.forEach(function(el,index){
-		let obj=$('#tblUserGpList');
-		let trObj=$('#tblUserGpList').find('tr');
+		let obj=$('#tblUserGpList'),
+			trSet=$('#tblUserGpList').find('tr');
 		//添加col标签
 		obj.find('colgroup').append('<col data-col-index="'+index+'">');
 			
@@ -297,7 +294,7 @@ var buildColumnToggleCom=()=>{
 			obj.find('ul').append($('<li></li>').append(divObj));
 		}
 		//每个th、td添加data-hide-val=""，相同的data-hide-val=""用于组合成一个col
-		trObj.each(function(){
+		trSet.each(function(){
 			if(el.val){
 				$(this).children().eq(index).attr('data-hide-val',el.val);
 			}
@@ -314,20 +311,22 @@ var columnToggle=()=>{
 	//column，一个([data-hide-val="'+el.val+'"]的th、td集合
 	columnToggleArr.forEach(function(el){		
 		//复选框
-		$('#tblUserGpList input').each(function(){
+		$('#tblUserGpList input').each(function(){			
+			let txt=$(this).next(),
+				col=$('#tblUserGpList').find('[data-hide-val="'+el.val+'"]');
 			if($(this).val()==el.val){
 				//改变复选框的值
 				$(this).prop('checked',el.showFlag);
 				//改变复选框的字体颜色
-				$(this).next().removeClass('text-primary text-muted');
+				txt.removeClass('text-primary text-muted');
 				if(el.showFlag){
-					$(this).next().addClass('text-primary');
+					txt.addClass('text-primary');
 					//显示col
-					$('#tblUserGpList').find('[data-hide-val="'+el.val+'"]').show();
+					col.show();
 				}else{
-					$(this).next().addClass('text-muted');
+					txt.addClass('text-muted');
 					//隐藏col
-					$('#tblUserGpList').find('[data-hide-val="'+el.val+'"]').hide();
+					col.hide();
 				}
 			}
 		});

@@ -25,6 +25,8 @@ class IndexController extends \think\Controller
     private $dept = null;
     //用户权限
     private $authArr=array();
+    //权限实体定义
+    private $authEnt=array();
     //响应前端要求的分页信息
     private $resPgInfo=array();
     //响应前端要求的分页信息
@@ -60,6 +62,8 @@ class IndexController extends \think\Controller
               'home'=>$request->domain(),
               'username'=>$this->username,
               'pageParam'=>$this->resPgInfo,
+              #权限实体
+              'authEnt'=>json_encode($this->authEnt,JSON_UNESCAPED_UNICODE),
               'year'=>date('Y')
               
         ]);
@@ -79,7 +83,8 @@ class IndexController extends \think\Controller
     {
       //通过$this->log判断是否是登录用户，非登录用户退回到登录页面
       $this->log=Session::get('log');
-      
+      #app/common.php中预定义的权限实体
+      $authEntArr=conAuthEntArr;
       if(1!=$this->log){
         return $this->error('无用户名或密码，请先登录系统');
       }
@@ -89,7 +94,13 @@ class IndexController extends \think\Controller
       $this->pwd=Session::get('pwd');
       $this->dept=Session::get('dept');
       $this->authArr=Session::get('authArr');
-        
+      
+      foreach($authEntArr as $k=>$v){
+          #将ent名称转为全小写，并去掉字符串中的下划线，
+          $k=strtolower(strtr($k,['_'=>'']));
+          $this->authEnt[$k]=$v;
+      }
+      
       $this->allDept=DeptModel::getEnDepts();
       $this->allGroup=UsergroupModel::getEnGroups();
         
@@ -583,7 +594,7 @@ class IndexController extends \think\Controller
                         
       $testArr=$userGpList->column('authority');
       $this->assign([
-      #前端HTML中使用的变量
+      #模板文件的HTML中使用的变量
         #用户组总数
         'usergroupNum'=>count($userGpMdl::all()),
         #显示结果集
@@ -593,20 +604,15 @@ class IndexController extends \think\Controller
         #分页参数
         'pageNum'=>$pageNum,
         'listRows'=>$listRows,
-      #测试输出
+        #测试输出
         'testDis'=>json_encode($testArr,JSON_UNESCAPED_UNICODE),  
-        'searchNum'=>$userGpSet->count(),
-        'pageParam'=>json_encode($this->resPgInfo,JSON_UNESCAPED_UNICODE),
-        'auth'=>json_encode(conAuthNameArr,JSON_UNESCAPED_UNICODE),
-      #前端js中使用的变量
+      #模板文件的js中使用的变量
        'resData'=>json_encode([#分页参数
                                 'pageParam'=>$this->resPgInfo,
                                 #查询条件及结果
                                 'searchData'=>$searchData,
                                 #排序信息
-                                'sortData'=>$sortData,
-                                #权限
-                                'auth'=>conAuthNameArr],JSON_UNESCAPED_UNICODE)
+                                'sortData'=>$sortData],JSON_UNESCAPED_UNICODE)
       ]);
       return view();
     }

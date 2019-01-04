@@ -7,81 +7,11 @@
  * 所有的公共常量都以"con"开头，再遵循驼峰命名法。
  */
 
-//定义需要进行权限管理的模块/实体名称
-//const conAuthEntNameArr1=[
-//        ['nameEn'=>'_ISS','nameChi'=>'事务',
-//          'child'=>[
-//            ['nameEn'=>'_PAT','nameChi'=>'专利事务','child'=>[]],
-//            ['nameEn'=>'_THE','nameChi'=>'论文事务','child'=>[]],
-//            ['nameEn'=>'_PRO','nameChi'=>'项目事务','child'=>[]]
-//          ]
-//        ],
-//        ['nameEn'=>'_PAT','nameChi'=>'专利','child'=>[]],
-//        ['nameEn'=>'_THE','nameChi'=>'论文','child'=>[]],
-//        ['nameEn'=>'_PRO','nameChi'=>'项目','child'=>[]],
-//        ['nameEn'=>'_ATT','nameChi'=>'附件','child'=>[]],
-//        ['nameEn'=>'_ASS','nameChi'=>'固定资产','child'=>[]],
-//        ['nameEn'=>'_ADMIN','nameChi'=>'后台管理','child'=>[]]
-//];
-const conAuthEntNameArr=[
-        ['nameEn'=>'_ISS-_PAT','nameChi'=>'专利事务'],
-        ['nameEn'=>'_ISS-_THE','nameChi'=>'论文事务'],
-        ['nameEn'=>'_ISS-_PRO','nameChi'=>'项目事务'],
-        ['nameEn'=>'_PAT','nameChi'=>'专利'],
-        ['nameEn'=>'_THE','nameChi'=>'论文'],
-        ['nameEn'=>'_PRO','nameChi'=>'项目'],
-        ['nameEn'=>'_ATT','nameChi'=>'附件'],
-        ['nameEn'=>'_ASS','nameChi'=>'固定资产'],
-        ['nameEn'=>'_ADMIN','nameChi'=>'后台管理']
-];
-
-//定义需要进行权限管理的模块/实体的权限
-const conAuthValueArr=[
-  '_ISS'=>[
-    '_PAT'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
-    '_PRO'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
-    '_THE'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0]
-  ],
-  '_PAT'=>['edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
-  '_PRO'=>['edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
-  '_THE'=>['edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
-  '_ATT'=>['upload'=>0,'download'=>0,'erase'=>0,'move'=>0,'copy'=>0],
-  '_ASS'=>['read'=>0,'edit'=>0,'audit'=>0,'approve'=>0,'maintain'=>0],
-  '_ADMIN'=>['enable'=>0]
-];
-const conAuthValueArr1=[
-  '_ISS-_PAT'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
-  '_ISS-_PRO'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
-  '_ISS-_THE'=>['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
-  '_PAT'=>['edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
-  '_PRO'=>['edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
-  '_THE'=>['edit'=>0,'audit'=>0,'approve'=>0,'execute'=>0,'maintain'=>0],
-  '_ATT'=>['upload'=>0,'download'=>0,'erase'=>0,'move'=>0,'copy'=>0],
-  '_ASS'=>['read'=>0,'edit'=>0,'audit'=>0,'approve'=>0,'maintain'=>0],
-  '_ADMIN'=>['enable'=>0]
-];
-//const conAuthValueArr['_ISS']['_PAT']=['edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0];
-//const conAuthValueArr['_ISS']['_PRO']=array('edit'=>0,'audit'=>0,'review'=>0,'approve'=>0,'execute'=>0,'maintain'=>0);
-
-//定义权限名称中英文对应关系
-const conAuthNameArr=[
-  '_ISS'=>[
-    '_PAT'=>['edit'=>'申报','audit'=>'审核','review'=>'复核','approve'=>'审批','execute'=>'执行','maintain'=>'维护'],
-    '_PRO'=>['edit'=>'申报','audit'=>'审核','review'=>'复核','approve'=>'审批','execute'=>'执行','maintain'=>'维护'],
-    '_THE'=>['edit'=>'申报','audit'=>'审核','review'=>'复核','approve'=>'审批','execute'=>'执行','maintain'=>'维护'],
-  ],
-  '_PAT'=>['edit'=>'撰写','audit'=>'审核','approve'=>'审批','execute'=>'执行','maintain'=>'维护'],
-  '_PRO'=>['edit'=>'撰写','audit'=>'审核','approve'=>'审批','execute'=>'执行','maintain'=>'维护'],
-  '_THE'=>['edit'=>'撰写','audit'=>'审核','approve'=>'审批','execute'=>'执行','maintain'=>'维护'],
-  '_ATT'=>['upload'=>'上传','download'=>'下载','erase'=>'删除','move'=>'移动','copy'=>'复制'],
-  '_ASS'=>['read'=>'查阅','edit'=>'编辑','audit'=>'审核','approve'=>'审批','maintain'=>'维护'],
-  '_ADMIN'=>['enable'=>'有']
-];
-
-//定义需要进行权限管理的模块/实体及其属性，方便进行横向和纵向的扩展
+//定义需要进行权限管理的模块/实体及其属性，方便使用及横向和纵向的扩展
 const conAuthEntArr=[
         '_ISS-_PAT'=>[
           'chi'=>'专利事务',
+          'rank'=>'common',
           'auth'=>[
             'edit'=>['chi'=>'申报','val'=>0],
             'audit'=>['chi'=>'审核','val'=>0],
@@ -89,12 +19,12 @@ const conAuthEntArr=[
             'approve'=>['chi'=>'审批','val'=>0],
             'execute'=>['chi'=>'执行','val'=>0],
             'maintain'=>['chi'=>'维护','val'=>0]
-          ],
-          //'type'=>[],
+          ]
 //          'status'=>[]
         ],
         '_ISS-_THE'=>[
           'chi'=>'论文事务',
+          'rank'=>'common',
           'auth'=>[
             'edit'=>['chi'=>'申报','val'=>0],
             'audit'=>['chi'=>'审核','val'=>0],
@@ -102,10 +32,11 @@ const conAuthEntArr=[
             'approve'=>['chi'=>'审批','val'=>0],
             'execute'=>['chi'=>'执行','val'=>0],
             'maintain'=>['chi'=>'维护','val'=>0]
-          ],
+          ]
         ],
         '_ISS-_PRO'=>[
           'chi'=>'项目事务',
+          'rank'=>'common',
           'auth'=>[
             'edit'=>['chi'=>'申报','val'=>0],
             'audit'=>['chi'=>'审核','val'=>0],
@@ -113,10 +44,11 @@ const conAuthEntArr=[
             'approve'=>['chi'=>'审批','val'=>0],
             'execute'=>['chi'=>'执行','val'=>0],
             'maintain'=>['chi'=>'维护','val'=>0]
-          ],
+          ]
         ],
         '_PAT'=>[
           'chi'=>'专利',
+          'rank'=>'common',
           'auth'=>[
             'edit'=>['chi'=>'撰写','val'=>0],
             'audit'=>['chi'=>'审核','val'=>0],
@@ -127,6 +59,7 @@ const conAuthEntArr=[
         ],
         '_THE'=>[
           'chi'=>'论文',
+          'rank'=>'common',
           'auth'=>[
             'edit'=>['chi'=>'撰写','val'=>0],
             'audit'=>['chi'=>'审核','val'=>0],
@@ -137,6 +70,7 @@ const conAuthEntArr=[
         ],
         '_PRO'=>[
           'chi'=>'项目',
+          'rank'=>'important',
           'auth'=>[
             'edit'=>['chi'=>'撰写','val'=>0],
             'audit'=>['chi'=>'审核','val'=>0],
@@ -147,6 +81,7 @@ const conAuthEntArr=[
         ],
         '_ATT'=>[
           'chi'=>'附件',
+          'rank'=>'common',
           'auth'=>[
             'upload'=>['chi'=>'上传','val'=>0],
             'download'=>['chi'=>'下载','val'=>0],
@@ -157,6 +92,7 @@ const conAuthEntArr=[
         ],
         '_ASS'=>[
           'chi'=>'固定资产',
+          'rank'=>'important',
           'auth'=>[
             'read'=>['chi'=>'查阅','val'=>0],
             'edit'=>['chi'=>'申报','val'=>0],
@@ -166,7 +102,8 @@ const conAuthEntArr=[
           ]
         ],
         '_ADMIN'=>[
-          'chi'=>'后台管理',
+          'chi'=>'系统管理',
+          'rank'=>'critical',
           'auth'=>['enable'=>['chi'=>'有','val'=>0]]
         ]
 ];

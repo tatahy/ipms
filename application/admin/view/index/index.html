@@ -208,22 +208,100 @@ footer {
 
 
 <script>
+<!-- 'use strict' -->
 //锚点/控制台菜单名称
 const archName=['#sysSummary','#userList','#usergroupList','#sysSetting'];
-var getBS3Color=(type,str)=>{
-	let str=(str=='' || str==null)?'info':str,
-		type=(type=='' || type==null)?'label':type,
-		bs3Color={
-	label:{info:'label label-info',danger:'label label-danger',warning:'label label-warning',success:'label label-success',primary:'label label-primary',default:'label label-default'},
-	btn:{info:'btn-info',danger:'btn-danger',warning:'btn-warning',success:'btn-success',primary:'btn-primary',default:'btn-default'},
-	text:{info:'text-info',danger:'text-danger',warning:'text-warning',success:'text-success',primary:'text-primary',muted:'text-muted'},
-	bg:{info:'btn-info',primary:'btn-primary',danger:'btn-danger',warning:'btn-warning',success:'btn-success'},
-	alert:{info:'alert-info',danger:'alert-danger',warning:'alert-warning',success:'alert-success'}};
-
-	return bs3Color[type][str];
+//归纳bootStrap3中的颜色相关属性
+const bs3Color={
+	//info
+	info:{lab:'label label-info',btn:'btn-info',txt:'text-info',bg:'btn-info',alt:'alert-info'},
+	//success
+	success:{lab:'label label-success',btn:'btn-success',txt:'text-success',bg:'btn-success',alt:'alert-success'},
+	//danger
+	danger:{lab:'label label-danger',btn:'btn-danger',txt:'text-danger',bg:'btn-danger',alt:'alert-danger'},
+	//warning
+	warning:{lab:'label label-warning',btn:'btn-warning',txt:'text-warning',bg:'btn-warning',alt:'alert-warning'},
+	//primary
+	primary:{lab:'label label-primary',btn:'btn-primary',txt:'text-primary',bg:'btn-primary'},
+	//default
+	'default':{lab:'label label-default',btn:'btn-default'},
+	//muted
+	muted:{text:'text-muted'},
+	//link
+	link:{btn:'btn-link'}
 };
+//定义权限涉及的颜色属性
+const authColor={
+	common:bs3Color.success,
+	important:bs3Color.warning,
+	critical:bs3Color.danger
+};
+//深冻结函数，递归冻结每一个属性，因Object.freeze()仅冻结第一层属性
+function deepFreeze(obj){
+	//第一层属性名
+	var propNames=Object.getOwnPropertyNames(obj);
+	//冻结自身前冻结所有属性
+	propNames.forEach(function(name){
+		var prop=obj[name];
+		//如果是一个对象就冻结
+		if(typeof prop=='object' && prop !==null)
+			deepFreeze(prop);
+	});
+	//冻结自身
+	return Object.freeze(obj);
+}
+//拷贝函数，递归拷贝每一个属性，针对深冻结的对象进行拷贝时，拷贝得到的对象可以修改/增加/删除属性
+function copyDeepFreeze(obj,copy={}){
+	//第一层属性名
+	let propNames=Object.getOwnPropertyNames(obj);
+	propNames.forEach(function(name){
+		let prop=obj[name];
+		//如果是一个对象就递归调用
+		if(typeof prop=='object' && prop !==null)
+			copyDeepFreeze(prop,copy[name]={});
+		
+		if(typeof prop!='object')
+			copy[name]=prop;
+	});
+	return copy;
+}
 
-//主要操作按钮核心属性
+//权限模块核心属性，不允许修改/增加/删除属性（深冻结）
+const authEntCoreProp=deepFreeze({$authEnt});
+//需扩展的权限模块显示属性
+const authEntViewProp={
+	//ass
+	ass:{view:{gly:'<span class="glyphicon glyphicon-duplicate"></span>'}},
+	//att
+	att:{view:{gly:'<span class="glyphicon glyphicon-duplicate"></span>'}},
+	//iss-pat
+	'iss-pat':{view:{gly:'<span class="glyphicon glyphicon-duplicate"></span>'}},
+	//iss-pro
+	'iss-pro':{view:{gly:'<span class="glyphicon glyphicon-duplicate"></span>'}},
+	//iss-the
+	'iss-the':{view:{gly:'<span class="glyphicon glyphicon-duplicate"></span>'}},
+	//pat
+	pat:{view:{gly:'<span class="glyphicon glyphicon-duplicate"></span>'}},
+	//pro
+	pro:{view:{gly:'<span class="glyphicon glyphicon-duplicate"></span>'}},
+	//the
+	the:{view:{gly:'<span class="glyphicon glyphicon-duplicate"></span>'}},
+	//admin
+	admin:{view:{gly:'<span class="glyphicon glyphicon-duplicate"></span>'}}
+};
+//扩展权限模块属性的方法
+var extendAuthEntProp=()=>{
+	let obj=Object.isFrozen(authEntCoreProp)?copyDeepFreeze(authEntCoreProp):authEntCoreProp;
+	for (let el in obj){
+		obj[el]['view']=authEntViewProp[el]['view'];
+	}
+	return obj;
+};
+//权限模块扩展后的属性
+const authEntProp=extendAuthEntProp();
+<!-- console.log(authEntProp); -->
+
+//主要操作按钮显示属性
 var oprtBtnProp={
 	_CREATE:{chi:'新增',color:{lab:'label label-info',txt:'text-info',btn:'btn-info',bg:'bg-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
 	_EDIT:{chi:'编辑',color:{lab:'label label-primary',txt:'text-primary',btn:'btn-primary',bg:'bg-warning'},glyCom:'<span class="glyphicon glyphicon-edit"></span>'},
@@ -234,63 +312,25 @@ var oprtBtnProp={
 	_READ:{chi:'查询',color:{lab:'label label-info',txt:'text-info',btn:'btn-info',bg:'bg-info'},glyCom:'<span class="glyphicon glyphicon-search"></span>'},
 	_REFRESH:{chi:'刷新',color:{lab:'label label-info',txt:'text-info',btn:'btn-info',bg:'bg-info'},glyCom:'<span class="glyphicon glyphicon-refresh"></span>'}
 };
-		
-//权限模块核心属性
-var authEntProp={
-	//ass
-	ass:{chi:'固定资产',color:{bg:'bg-default',txt:'text-default',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	//att
-	att:{chi:'附件',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	//iss-pat
-	'iss-pat':{chi:'专利事务',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	//iss-pro
-	'iss-pro':{chi:'项目事务',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	//iss-the
-	'iss-the':{chi:'论文事务',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	//pat
-	pat:{chi:'专利',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	//pro
-	pro:{chi:'项目',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	//the
-	the:{chi:'论文',color:{lab:'label label-info',txt:'text-info',btn:'btn-info'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'},
-	//admin
-	admin:{chi:'后台管理',color:{bg:'bg-danger',txt:'text-danger'},glyCom:'<span class="glyphicon glyphicon-duplicate"></span>'}
-};
 
-//spSet对象的span内容格式修改，后续通过$.load的页面使用
+//spSet对象的span内容格式修改，供后续通过$.load()的页面使用
 var spComModify=(spSet)=>{
-	//递归函数得到中文名称
-	let getNameChi=(keyStr,obj)=>{
-			let k='',v='',arr=[];
-			if(keyStr.indexOf('-')>0){
-				arr=keyStr.split('-');
-			}
-			if(arr.length){
-				k=arr.shift();
-				keyStr=arr.join('-');
-				v=getNameChi(keyStr,obj[k]);
-			}else{
-				v=obj[keyStr];
-			}
-			return v;
-		};
+	
 	spSet.each(function(){
-		let text=$(this).text(),
-			prefA=$(this).closest('td').data('hideVal'),
-			prefB='',
-			pref=prefA.length?prefA+'-':prefB+'-';
+		let txt=$(this).text(),
+			ent=$(this).closest('td').data('hideVal'),
+			auth=(txt!=0)?authEntProp[ent]['auth'][txt]:'',
+			rank=authEntProp[ent]['rank'],
+			labColor=(txt==0)?'label label-default':authColor[rank]['lab'];
 		
+		$(this).addClass(labColor);
 		//将span的text转换成中文，格式修改	
-		if(text==0){
-			$(this).text('无').addClass('label label-default').css('padding-bottom','2px');
+		if(txt==0){
+			$(this).text('无').css({'padding-bottom':'2px','font-weight':'400'});
 		}else{
-			$(this).text(getNameChi(pref+text,authNameObj));
+			$(this).text(auth.chi);
 			//span的格式修改
-			if($(this).data('val')){
-				$(this).addClass('label label-success').css('padding-bottom','2px');
-			}else{
-				$(this).addClass('text-muted');
-			}	
+			($(this).data('val'))?$(this).css('padding-bottom','2px'):$(this).addClass('text-muted');
 		}
 	});
 };
@@ -329,19 +369,15 @@ var sortOrderToggle=(tblObj='null')=>{
 		labColor='label label-primary';
 		
 	aSet.removeClass(labColor).each(function(){
+		let gly=(sortOrder=='asc')?glyAsc:glyDesc,
+			order=(sortOrder=='asc')?'desc':'asc',
+			title=(sortOrder=='asc')?'当前为升序。点击后降序':'当前为降序。点击后升序';
+			
 		if(sortName==$(this).data('sortName')){
 			obj=$(this);
-			obj.addClass(labColor);
-			if(sortOrder == 'asc'){
-				//当前为升序
-				obj.append(glyAsc).data('sortOrder','desc').attr('title','当前为升序。点击后降序').tooltip({placement: 'top'});
-			}else{
-				//当前为降序
-				obj.append(glyDesc).data('sortOrder','asc').attr('title','当前为降序。点击后升序').tooltip({placement: 'top'});
-			}
-		}else{
-			$(this).tooltip({placement: 'bottom'});
+			obj.addClass(labColor).append(gly).data('sortOrder',order).attr('title',title).tooltip({placement: 'top'});
 		}
+		$(this).tooltip({placement: 'bottom'});
 	});
 	
 	//选中进行排序的列向左对齐，添加底色
@@ -387,7 +423,7 @@ var loadTplFile=(rqData={})=>{
 		
 	}); 
 };
-//给表格内的特定行上底色
+//表格$('#content table')内的特定行上底色
 var	tblTrBg=(id='')=>{
 	let obj=$('#content tbody'),
 		trObj=obj.find('tr[data-id="'+id+'"]');
