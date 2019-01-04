@@ -733,7 +733,9 @@ class IndexController extends \think\Controller
         $ugSet['description']='';
         $ugSet['enable']=1;
         $ugSet['authority']=$this->_authDbToFe();
+        
       }
+      $ugSet['groupMembers']=$ugMdl::getGroupMembers($id);
       #将数组转换为对象
       $ugSet=is_array($ugSet)?collection($ugSet):$ugSet;          
       $this->assign([

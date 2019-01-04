@@ -30,13 +30,14 @@
 	</div>
 	<hr>
 	<div class="myFieldset">
+		
 		<div class="myLegend has-feedback">
 			<label style="font-size:100%"><span class="glyphicon glyphicon-alert"></span>&nbsp;用户组权限
 			</label>
 			<input type="text" class="form-control inputCheck sr-only" name="checkBoxSelNum" value="" >
 		</div>
-		<span style="color:red;display: none;" class="spTips"></span>
-		
+		<span style="color:red;display: none;padding-left:20px;" class="spTips"></span>
+		<p id="authRank" style="padding-left:20px;"><strong>权限类别：</strong></p>
 		<div id="checkBoxCom" class="row myRow">		
 			<!-- //js中checkBoxCom的建模参考 -->
 			<!-- <div class="form-group col-sm-6">	 -->
@@ -54,10 +55,10 @@
 		</div>
 		
 	</div>
-	<hr>			
+	<hr>
 	<div class="myFieldset">
-		<div class="myLegend"><span class="label label-default">
-		<span class="glyphicon glyphicon-magnet"></span>&nbsp;用户组启用</span>&nbsp;&nbsp;&nbsp;&nbsp;
+		<div class="myLegend">
+			<span class="label label-default"><span class="glyphicon glyphicon-magnet"></span>&nbsp;用户组启用</span>&nbsp;&nbsp;&nbsp;&nbsp;
 			
 			<span id="radioCom"></span>
 			<!-- //js中radioCom的建模参考 -->
@@ -69,12 +70,29 @@
     		<!-- </label> -->
 		</div>
 	</div>	
+	<hr>	
+	<div class="myFieldset">
+		<div class="myLegend">
+			<span class="label label-default"><span class="glyphicon glyphicon-magnet"></span>&nbsp;用户组成员</span>&nbsp;&nbsp;&nbsp;&nbsp;
+		</div>
+		<div class="row myRow">
+			<div class="form-group col-sm-12">
+			<label class="control-label">用户组</label>
+			<textarea class="form-control" name="groupMembers" rows="5"></textarea>
+			
+			<!-- <textarea rows="2" type="text" class="form-control" id="usergroupDescription" name="usergroupDescription" placeholder="简短说明用户组的作用">{$ugSet.description}</textarea> -->
+			</div>
+			
+		</div>
+		<div class="row myRow">
+		<p id="pGroupMembers"></p>
+		</div>
+	</div>	
 	<hr>
 	<div class="row myRow">	
-		<div id="oprtBtnCom" class="col-sm-6 text-left">
-				
-		</div>
-		<div class="col-sm-6 text-right">
+		<div id="oprtBtnCom" class="pull-left"></div>
+	
+		<div class="pull-right">
 			<input type="reset" class="btn btn-primary btn-sm" value="重置">
 			<input type="button" class="btn btn-warning btn-sm" data-dismiss="modal" value="取消">
 		</div>
@@ -100,8 +118,12 @@ var buildRaChkCom=(ugSet)=>{
 		//循环计数器
 		m=0,
 		//auth的hash数组（关联数组）
-		ugAuth=ugSet.authority;
-	<!-- console.log(ugAuth); -->
+		ugAuth=ugSet.authority,
+		//groupMembers的hash数组（关联数组）
+		ugMemArr=ugSet.groupMembers,
+		btnStr='';
+	console.log(ugSet.id);
+	console.log(ugMemArr);
 	//生成radio组件
 	for(var i=0;i<2;i++){
 		inObj=$('<input>').attr('type','radio').val(i).attr('name','usergroupEn');
@@ -132,12 +154,10 @@ var buildRaChkCom=(ugSet)=>{
 			lSet=[],
 			rank=authEntProp[ent]['rank'],
 		    //checkbox的父标签底色类型
-			<!-- bgColor=(ent=='admin')?'bg-info':'bg-success', -->
-			bgColor=authColor[rank]['bg'],
+			bgColor=authColor[rank]['bs3']['bg'],
 			//checkbox相邻标签背景色
-			<!-- labColor=(ent=='admin')?'label label-info':'label label-success'; -->
-			labColor=authColor[rank]['lab'];
-		console.log(rank);
+			labColor=authColor[rank]['bs3']['lab'];
+		
 		labSet=[];
 		//遍历hash数组：authObj，
 		//auth=='read'...
@@ -170,6 +190,28 @@ var buildRaChkCom=(ugSet)=>{
 		m++;
 	}
 	$('#checkBoxCom').append(divCom);
+	
+	//生成#authRank的内容
+	for(let el in authColor){
+		let e=authColor[el],
+			spObj=$('<span></span>').css('font-size','12px'),
+			txt=e.chi,
+			labColor=e.bs3.lab;
+		$('#authRank').append('&nbsp;',spObj.addClass(labColor).text(txt));
+	}
+	
+	//生成[name="groupMembers"]的组件
+	ugMemArr.forEach(function(e,index){
+		let btnObj=$('<button></button>').attr('type','button').addClass('btn btn-link').val(e.id).text(e.username),
+			aObj=$('<a></a>').attr('href','#usergroupList').val(e.id).text(e.username);
+			<!-- btnStr+='<button class="btn btn-link" value="'+e.id+'">'+e.username+'</button>&nbsp;'; -->
+			btnStr+=e.username+',&nbsp;';
+		
+		$('#pGroupMembers').append(aObj,',&nbsp;');
+	})
+	$('[name="groupMembers"]').html(btnStr);
+	
+	
 };
 //检查checkbox为选中状态的数量，根据数量添加标签底色和提示信息
 var checkBoxSelNum=()=>{
@@ -256,8 +298,8 @@ var checkBoxBg=(obj)=>{
 		lObj=rObj.children('label'),
 		ent=rObj.data('authName'),
 		rank=authEntProp[ent]['rank'],
-		bgColor=authColor[rank]['bg'],
-		labColor=authColor[rank]['lab'],
+		bgColor=authColor[rank]['bs3']['bg'],
+		labColor=authColor[rank]['bs3']['lab'],
 		txtColor='text-muted',
 		tNum=fm.find('[name="checkBoxSelNum"]').val(),
 		ckSum=0;

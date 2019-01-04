@@ -232,9 +232,9 @@ const bs3Color={
 };
 //定义权限涉及的颜色属性
 const authColor={
-	common:bs3Color.success,
-	important:bs3Color.warning,
-	critical:bs3Color.danger
+	common:{bs3:bs3Color.success,chi:'普通类'},
+	important:{bs3:bs3Color.warning,chi:'重要类'},
+	critical:{bs3:bs3Color.danger,chi:'关键类'}
 };
 //深冻结函数，递归冻结每一个属性，因Object.freeze()仅冻结第一层属性
 function deepFreeze(obj){
@@ -321,7 +321,7 @@ var spComModify=(spSet)=>{
 			ent=$(this).closest('td').data('hideVal'),
 			auth=(txt!=0)?authEntProp[ent]['auth'][txt]:'',
 			rank=authEntProp[ent]['rank'],
-			labColor=(txt==0)?'label label-default':authColor[rank]['lab'];
+			labColor=(txt==0)?'label label-default':authColor[rank]['bs3']['lab'];
 		
 		$(this).addClass(labColor);
 		//将span的text转换成中文，格式修改	

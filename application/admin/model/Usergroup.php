@@ -9,6 +9,8 @@ namespace app\admin\model;
 
 use think\Model;
 
+use app\admin\model\User as UserModel;
+
 class Usergroup extends Model
 {   
     //protected $auto = ['patnum','pronum'];
@@ -78,6 +80,29 @@ class Usergroup extends Model
     $set=is_array($set)?collection($set):$set;
     unset($obj);
     return array_combine($set->column('id'),$set->column('name'));
+  }
+  
+  #可静态使用的方法，得到用户组成员名单（以id为下标，username为值的关联数组）
+  Static Public function getGroupMembers($ugId=0)
+  {
+    $arr=['none'=>'无'];
+    $obj=new UserModel;
+    $set=$obj::all(function($query)use($ugId){
+                          //$query->where('usergroup_id',['like', $ugId],['like', $ugId.','.'%'], ['like', '%',','.$ugId.',%'], ['like', '%',','.$ugId])
+                          $query->field('id,username,dept,enable')
+                                ->whereLike('usergroup_id',$ugId)
+                                ->whereLike('usergroup_id',$ugId.',%','or')
+                                ->whereLike('usergroup_id','%,'.$ugId.',%','or')
+                                ->whereLike('usergroup_id','%,'.$ugId,'or')
+                                ->order('id asc');
+                        });
+    if(count($set)){
+      $set=is_array($set)?collection($set):$set;
+      $arr=$set;
+      //$arr=array_combine($set->column('id'),$set->column('username'));
+    }
+    unset($obj);
+    return $arr;
   }
     
          
