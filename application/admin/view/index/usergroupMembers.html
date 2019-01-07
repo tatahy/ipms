@@ -1,0 +1,90 @@
+<!-- //usergroupMembers.html -->
+<div>
+<h4><span class="text-info">用户组说明：</span>{$ugSet.description}</h4>
+<!-- <h4>用户组说明：<span class="help-block">{$ugSet.description}</span></h4> -->
+
+<div class="row myRow">
+	
+	<div class="form-group col-sm-5" >
+		<h4><button class="btn btn-sm btn-info" style="font-size:16px;font-weight:700;" title="显示/隐藏现有成员">现有成员总数&nbsp;<span class="badge">{$ugMemNum}</span></button></h4>
+		
+		<div class="panel panel-info">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+        			<a data-toggle="collapse" href="#panel1"> <strong class="text-primary">dept1</strong><span class="badge">{$ugMemNum}</span></a>
+      			</h4>
+			
+			</div>
+			<div id="panel1" class="panel-collapse collapse in">
+				<ul class="list-group">
+						
+				</ul>
+			</div>
+		</div>
+		
+	</div>
+	<div class="form-group col-sm-2">
+	
+	</div>
+	<div class="form-group col-sm-5">
+		<h4><button class="btn btn-sm btn-warning" style="font-size:16px;font-weight:700;" title="显示/隐藏待添加成员">待添加成员总数&nbsp;<span class="badge">{$ugSelectMemNum}</span></button></h4>
+		<div class="panel panel-warning">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+        			<a data-toggle="collapse" href="#panel2"> <strong class="text-warning">dept1</strong><span class="badge">{$ugSelectMemNum}</span></a>
+      			</h4>
+			
+			</div>
+			
+			<div id="panel2" class="panel-body panel-collapse collapse in">
+				<p>11</p>
+				<table class="table">
+    				<thead>
+						<tr>
+							<th class="text-center">序号</th>
+							<th><a data-sort-name="username">事务标题</a></th>
+							<th><a data-sort-name="dept">事务标题</a></th>
+							<th class="text-center">操作</th>
+						</tr>
+					</thead>
+					<tbody>
+					{volist name="userSet" id="vo" empty="暂无信息"}
+						<tr class="text-right" >					
+							<td class="text-center">{$i}</td>	
+							<td>{$vo.username}</td>
+							<td>{$vo.dept}</td>
+							<td>无</td>
+						</tr>
+					{/volist}
+					</tbody>
+					
+  				</table>
+			</div>
+		</div>
+		
+	</div>
+</div>
+</div>
+<script>
+var ugSet={$ugSet},
+	ugMems=ugSet.groupMembers;
+
+var buildUgMembersCom=(ugMemArr)=>{
+	let btnStr='';
+	//生成[name="groupMembers"]的组件
+	ugMemArr.forEach(function(e,index){
+		let aObj=$('<a></a>').attr({'href':'#usergroupList','class':'list-group-item text-center','title':'点击删除','data-ug-id':e.id}).append($('<strong></strong>').text(e.username),'，',e.dept);
+		$('#panel1').children('ul').append(aObj);
+	})
+	<!-- $('[name="groupMembers"]').html(btnStr); -->
+};
+
+//自调用匿名函数立即执行的特点，进行页面初始化。
+;(function($){	
+	buildUgMembersCom(ugMems);
+	$('[title]').tooltip();   
+})(jQuery);
+
+console.log({$ugId});
+
+</script>

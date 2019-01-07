@@ -1,4 +1,4 @@
-<!-- //fmUgergroupSingl.html -->
+<!-- //usergroupSinglForm.html -->
 <form id="fmUsergroup" role="form" action="" method="post">
 	<input id="id" type="text" name="id" value="{$ugSet.id}" class="sr-only">
 	<input type="text" name="oprt" value="{$oprt}" class="sr-only">
@@ -71,24 +71,7 @@
 		</div>
 	</div>	
 	<hr>	
-	<div class="myFieldset">
-		<div class="myLegend">
-			<span class="label label-default"><span class="glyphicon glyphicon-magnet"></span>&nbsp;用户组成员</span>&nbsp;&nbsp;&nbsp;&nbsp;
-		</div>
-		<div class="row myRow">
-			<div class="form-group col-sm-12">
-			<label class="control-label">用户组</label>
-			<textarea class="form-control" name="groupMembers" rows="5"></textarea>
-			
-			<!-- <textarea rows="2" type="text" class="form-control" id="usergroupDescription" name="usergroupDescription" placeholder="简短说明用户组的作用">{$ugSet.description}</textarea> -->
-			</div>
-			
-		</div>
-		<div class="row myRow">
-		<p id="pGroupMembers"></p>
-		</div>
-	</div>	
-	<hr>
+	
 	<div class="row myRow">	
 		<div id="oprtBtnCom" class="pull-left"></div>
 	
@@ -198,20 +181,7 @@ var buildRaChkCom=(ugSet)=>{
 			txt=e.chi,
 			labColor=e.bs3.lab;
 		$('#authRank').append('&nbsp;',spObj.addClass(labColor).text(txt));
-	}
-	
-	//生成[name="groupMembers"]的组件
-	ugMemArr.forEach(function(e,index){
-		let btnObj=$('<button></button>').attr('type','button').addClass('btn btn-link').val(e.id).text(e.username),
-			aObj=$('<a></a>').attr('href','#usergroupList').val(e.id).text(e.username);
-			<!-- btnStr+='<button class="btn btn-link" value="'+e.id+'">'+e.username+'</button>&nbsp;'; -->
-			btnStr+=e.username+',&nbsp;';
-		
-		$('#pGroupMembers').append(aObj,',&nbsp;');
-	})
-	$('[name="groupMembers"]').html(btnStr);
-	
-	
+	}	
 };
 //检查checkbox为选中状态的数量，根据数量添加标签底色和提示信息
 var checkBoxSelNum=()=>{

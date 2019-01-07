@@ -746,7 +746,49 @@ class IndexController extends \think\Controller
       
       return view();
     }
-     // 输出系统设置模板
+     //单个用户组信息表单
+    public function usergroupMembers(UsergroupModel $ugMdl,UserModel $uMdl,$ugId='')
+    {
+      $this->_loginUser();
+      $request=$this->request;
+      
+      $ugId=empty($request->param('ugId'))?0:$request->param('ugId');
+      $ugSet=[];
+      if($ugId){
+        $ugSet= $ugMdl::get($ugId);
+        $ugSet->authority=$this->_authDbToFe($ugSet->authority);
+      }else{
+        $ugSet['id']=0;
+        $ugSet['name']='';
+        $ugSet['description']='';
+        $ugSet['enable']=1;
+        $ugSet['authority']=$this->_authDbToFe();
+        
+      }
+      $ugSet['groupMembers']=$ugMdl::getGroupMembers($ugId);
+      $ugMemNum=count($ugSet['groupMembers']);
+      $uIdArr=is_array($ugSet['groupMembers'])?collection($ugSet['groupMembers']):$ugSet['groupMembers'];
+      #已有成员id数组
+      $uIdArr=$uIdArr->column('id');
+      #将数组转换为对象
+      $ugSet=is_array($ugSet)?collection($ugSet):$ugSet;
+      
+      
+      #所有用户按部门升序排列减掉已有的
+      $userSet=$uMdl::all(function($query)use($uIdArr){
+                        $query=$query->where('id','notin',$uIdArr)->order('dept asc');
+                      });
+      
+      
+      $this->assign([
+              'ugId'=>$ugId,
+              'ugSet'=>$ugSet,
+              'ugMemNum'=>$ugMemNum,
+              'userSet'=>$userSet,
+              'ugSelectMemNum'=>count($userSet),
+        ]);
+      return view();
+    }
     public function sysSetting(Request $request,DeptModel $deptMdl)
     {
       $this->_loginUser();
@@ -758,8 +800,8 @@ class IndexController extends \think\Controller
         ]);
       return view();
     }      
-    // 部门组CDUR，接收客户端通过Ajax，post来的参数，返回json数据
-    //前端传来的oprt值:_CREATE、_UPDATE、_ADDNEW、_EDIT、_DISABLE、_ENABLE、_DELETE
+    # 部门组CDUR，接收客户端通过Ajax，post来的参数，返回json数据
+    #前端传来的oprt值:_CREATE、_UPDATE、_ADDNEW、_EDIT、_DISABLE、_ENABLE、_DELETE
     public function deptOprt(Request $request,DeptModel $deptMdl,$oprt='_CREATE',$id='0')
     {
       $this->_loginUser();
@@ -769,7 +811,7 @@ class IndexController extends \think\Controller
       $result='';
       $msg='';
       $msgPatch='';
-      //1.分情况变量赋值
+      #1.分情况变量赋值
       if($oprt=='_CREATE' || $oprt=='_UPDATE') {
         $deptData=array('name'=>$request->param('deptName'),
                         'abbr'=>$request->param('deptAbbr'),

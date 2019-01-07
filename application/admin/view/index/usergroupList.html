@@ -75,7 +75,7 @@
 			{volist name="$userGpList" id="vo" empty="暂时没有数据"}
 				<tr class="text-left" data-id="{$vo.id}">
 					<td class="text-center">{$i+($pageNum-1)*$listRows}</td>
-					<td class="text-center"><strong>{$vo.name}</strong></td>
+					<td class="text-center"><strong><a class="groupMembers" href="#usergroupList" title="管理用户组成员">{$vo.name}</a></strong></td>
 					<td class="text-center">{$vo.description}</td>
 					<!-- //_ISS_PAT -->
 					<td class="tdAuth"> 
@@ -446,6 +446,26 @@ $(document).ready(function(){
 		}
 		//调用index.html中的loadTplFile()
 		loadTplFile();
+	});	
+	
+	//编辑用户组成员$('a.groupMembers')
+	$('a.groupMembers').click(function(evt){
+		let ugId=$(this).closest('tr').data('id'),
+			ugName=$(this).text(),
+			mdObj=$('#modalSingle'),
+			url='usergroupMembers';
+		evt.preventDefault();
+		
+		<!-- $("#content").load(url,{ugId:ugId},function(){}); -->
+		
+		mdObj.find('.modal-header').removeClass('bg-info bg-danger bg-warning').addClass('bg-info');			
+		mdObj.find('.modal-body').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(url,{ugId:ugId},function(){
+			mdObj.find('.modal-header h4').html('用户组【'+ugName+'】成员');
+				
+		});
+		
+		mdObj.modal('show');
+		
 	});	
 	
 	//分页click

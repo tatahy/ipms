@@ -85,7 +85,7 @@ class Usergroup extends Model
   #可静态使用的方法，得到用户组成员名单（以id为下标，username为值的关联数组）
   Static Public function getGroupMembers($ugId=0)
   {
-    $arr=['none'=>'无'];
+    $arr=[['id'=>0,'username'=>'无','dept'=>'无','enable'=>0]];
     $obj=new UserModel;
     $set=$obj::all(function($query)use($ugId){
                           //$query->where('usergroup_id',['like', $ugId],['like', $ugId.','.'%'], ['like', '%',','.$ugId.',%'], ['like', '%',','.$ugId])
@@ -94,7 +94,7 @@ class Usergroup extends Model
                                 ->whereLike('usergroup_id',$ugId.',%','or')
                                 ->whereLike('usergroup_id','%,'.$ugId.',%','or')
                                 ->whereLike('usergroup_id','%,'.$ugId,'or')
-                                ->order('id asc');
+                                ->order('dept asc');
                         });
     if(count($set)){
       $set=is_array($set)?collection($set):$set;
