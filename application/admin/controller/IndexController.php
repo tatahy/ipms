@@ -746,7 +746,7 @@ class IndexController extends \think\Controller
       
       return view();
     }
-     //单个用户组信息表单
+    #用户组成员，可添加成员信息
     public function usergroupMembers(UsergroupModel $ugMdl,UserModel $uMdl,$ugId='')
     {
       $this->_loginUser();
@@ -756,39 +756,37 @@ class IndexController extends \think\Controller
       $ugSet=[];
       if($ugId){
         $ugSet= $ugMdl::get($ugId);
-        $ugSet->authority=$this->_authDbToFe($ugSet->authority);
+       // $ugSet->authority=$this->_authDbToFe($ugSet->authority);
+       unset($ugSet->authority);
       }else{
         $ugSet['id']=0;
         $ugSet['name']='';
         $ugSet['description']='';
-        $ugSet['enable']=1;
-        $ugSet['authority']=$this->_authDbToFe();
-        
+        $ugSet['enable']='';
+       // $ugSet['authority']=$this->_authDbToFe();
       }
-      $ugSet['groupMembers']=$ugMdl::getGroupMembers($ugId);
-      $ugMemNum=count($ugSet['groupMembers']);
-      $uIdArr=is_array($ugSet['groupMembers'])?collection($ugSet['groupMembers']):$ugSet['groupMembers'];
-      #已有成员id数组
-      $uIdArr=$uIdArr->column('id');
       #将数组转换为对象
       $ugSet=is_array($ugSet)?collection($ugSet):$ugSet;
       
-      
-      #所有用户按部门升序排列减掉已有的
-      $userSet=$uMdl::all(function($query)use($uIdArr){
-                        $query=$query->where('id','notin',$uIdArr)->order('dept asc');
-                      });
-      
-      
+      #用户组成员信息
+      $ugMem=$ugMdl::getGroupMembers($ugId);
+      #成员的部门分布数量
+      $ugMemDept=array_count_values($ugMem->column('dept'));
+      #用户组可添加的成员信息
+      $userAddOn=$ugMdl::getAddOnGroupMembers($ugId);
+      #成员的部门分布数量
+      $userAddOnDept=array_count_values($userAddOn->column('dept'));
+      $group=['info'=>$ugSet,
+              'members'=>['num'=>count($ugMem),'info'=>$ugMem,'deptDist'=>$ugMemDept],
+              'userAddOn'=>['num'=>count($userAddOn),'info'=>$userAddOn,'deptDist'=>$userAddOnDept]
+              ];
       $this->assign([
-              'ugId'=>$ugId,
-              'ugSet'=>$ugSet,
-              'ugMemNum'=>$ugMemNum,
-              'userSet'=>$userSet,
-              'ugSelectMemNum'=>count($userSet),
+              'description'=>$group['info']['description'],
+              'data'=>json_encode($group,JSON_UNESCAPED_UNICODE)
         ]);
       return view();
     }
+    
     public function sysSetting(Request $request,DeptModel $deptMdl)
     {
       $this->_loginUser();

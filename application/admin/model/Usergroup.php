@@ -82,14 +82,14 @@ class Usergroup extends Model
     return array_combine($set->column('id'),$set->column('name'));
   }
   
-  #可静态使用的方法，得到用户组成员名单（以id为下标，username为值的关联数组）
+  #可静态使用的方法，得到用户组成员对象（以id为下标，username为值的关联数组，已按'dept asc'排列）
   Static Public function getGroupMembers($ugId=0)
   {
-    $arr=[['id'=>0,'username'=>'无','dept'=>'无','enable'=>0]];
+    //$arr=[['id'=>0,'username'=>'无','dept'=>'无','enable'=>0]];
+    $arr=[];
     $obj=new UserModel;
     $set=$obj::all(function($query)use($ugId){
-                          //$query->where('usergroup_id',['like', $ugId],['like', $ugId.','.'%'], ['like', '%',','.$ugId.',%'], ['like', '%',','.$ugId])
-                          $query->field('id,username,dept,enable')
+                          $query->field('id,username,dept,enable,mobile')
                                 ->whereLike('usergroup_id',$ugId)
                                 ->whereLike('usergroup_id',$ugId.',%','or')
                                 ->whereLike('usergroup_id','%,'.$ugId.',%','or')
@@ -97,11 +97,36 @@ class Usergroup extends Model
                                 ->order('dept asc');
                         });
     if(count($set)){
-      $set=is_array($set)?collection($set):$set;
       $arr=$set;
       //$arr=array_combine($set->column('id'),$set->column('username'));
     }
     unset($obj);
+    $arr=is_array($arr)?collection($arr):$arr;
+    return $arr;
+  }
+  
+  #可静态使用的方法，得到用户组可添加成员对象（以id为下标，username为值的关联数组，已按'dept asc'排列）
+  Static Public function getAddOnGroupMembers($ugId=0)
+  {
+    $arr=[['id'=>0,'username'=>'无','dept'=>'无','enable'=>0]];
+    $ugMem=self::getGroupMembers($ugId);
+    $uIdArr=is_array($ugMem)?collection($ugMem):$ugMem;
+    #已有成员id数组
+    $uIdArr=$uIdArr->column('id');
+    $obj=new UserModel;
+    #用户组可添加的成员，所有用户按部门升序排列减掉已有的
+    $set=$obj::all(function($query)use($uIdArr){
+                  $query->field('id,username,dept,enable,mobile')
+                        ->where('id','notin',$uIdArr)
+                        ->order('dept asc');
+                  });
+    
+    if(count($set)){
+      $arr=$set;
+      //$arr=array_combine($set->column('id'),$set->column('username'));
+    }
+    unset($obj);
+    $arr=is_array($arr)?collection($arr):$arr;
     return $arr;
   }
     

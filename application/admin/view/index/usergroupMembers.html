@@ -1,90 +1,107 @@
 <!-- //usergroupMembers.html -->
 <div>
-<h4><span class="text-info">用户组说明：</span>{$ugSet.description}</h4>
-<!-- <h4>用户组说明：<span class="help-block">{$ugSet.description}</span></h4> -->
+<h4><span class="text-info">用户组说明：</span>{$description}</h4>
 
 <div class="row myRow">
 	
 	<div class="form-group col-sm-5" >
-		<h4><button class="btn btn-sm btn-info" style="font-size:16px;font-weight:700;" title="显示/隐藏现有成员">现有成员总数&nbsp;<span class="badge">{$ugMemNum}</span></button></h4>
-		
-		<div class="panel panel-info">
-			<div class="panel-heading">
-				<h4 class="panel-title">
-        			<a data-toggle="collapse" href="#panel1"> <strong class="text-primary">dept1</strong><span class="badge">{$ugMemNum}</span></a>
-      			</h4>
+		<h4><button class="btn btn-sm btn-info" style="font-size:16px;font-weight:700;" title="显示/隐藏现有成员" data-toggle="collapse" data-target="#members">现有成员&nbsp;<span class="badge">44</span></button></h4>
+		<div id="members" class="panel-group collapse">
+		<!-- // js中buildUgMembersCom()的编程模型-->
+		<!-- <div class="panel panel-info"> -->
+			<!-- <div class="panel-heading"> -->
+				<!-- <h4 class="panel-title"> -->
+        			<!-- <a data-toggle="collapse" href="#panel1"> <strong class="text-primary">dept1</strong><span class="badge">{ $group.members.num}</span></a> -->
+      			<!-- </h4> -->
 			
-			</div>
-			<div id="panel1" class="panel-collapse collapse in">
-				<ul class="list-group">
+			<!-- </div> -->
+			<!-- <div id="panel1" class="panel-collapse collapse in"> -->
+				<!-- <ul class="list-group"> -->
 						
-				</ul>
-			</div>
+				<!-- </ul> -->
+			<!-- </div> -->
+		<!-- </div> -->		
 		</div>
-		
 	</div>
+	
 	<div class="form-group col-sm-2">
 	
 	</div>
+	
 	<div class="form-group col-sm-5">
-		<h4><button class="btn btn-sm btn-warning" style="font-size:16px;font-weight:700;" title="显示/隐藏待添加成员">待添加成员总数&nbsp;<span class="badge">{$ugSelectMemNum}</span></button></h4>
-		<div class="panel panel-warning">
-			<div class="panel-heading">
-				<h4 class="panel-title">
-        			<a data-toggle="collapse" href="#panel2"> <strong class="text-warning">dept1</strong><span class="badge">{$ugSelectMemNum}</span></a>
-      			</h4>
-			
-			</div>
-			
-			<div id="panel2" class="panel-body panel-collapse collapse in">
-				<p>11</p>
-				<table class="table">
-    				<thead>
-						<tr>
-							<th class="text-center">序号</th>
-							<th><a data-sort-name="username">事务标题</a></th>
-							<th><a data-sort-name="dept">事务标题</a></th>
-							<th class="text-center">操作</th>
-						</tr>
-					</thead>
-					<tbody>
-					{volist name="userSet" id="vo" empty="暂无信息"}
-						<tr class="text-right" >					
-							<td class="text-center">{$i}</td>	
-							<td>{$vo.username}</td>
-							<td>{$vo.dept}</td>
-							<td>无</td>
-						</tr>
-					{/volist}
-					</tbody>
-					
-  				</table>
-			</div>
+		<h4><button class="btn btn-sm btn-warning" style="font-size:16px;font-weight:700;" title="显示/隐藏待添加成员" data-toggle="collapse" data-target="#userAddOn">可加入用户&nbsp;<span class="badge">2</span></button></h4>
+		
+		<div id="userAddOn" class="panel-group collapse">	
 		</div>
 		
 	</div>
 </div>
 </div>
 <script>
-var ugSet={$ugSet},
-	ugMems=ugSet.groupMembers;
+var resData={$data};
 
-var buildUgMembersCom=(ugMemArr)=>{
-	let btnStr='';
-	//生成[name="groupMembers"]的组件
-	ugMemArr.forEach(function(e,index){
-		let aObj=$('<a></a>').attr({'href':'#usergroupList','class':'list-group-item text-center','title':'点击删除','data-ug-id':e.id}).append($('<strong></strong>').text(e.username),'，',e.dept);
-		$('#panel1').children('ul').append(aObj);
-	})
-	<!-- $('[name="groupMembers"]').html(btnStr); -->
+var buildPanelCom=(members={},obj,color='')=>{
+	let colorArr=['info','success','danger','warning','primary'],
+		colorName=(colorArr.indexOf(color)!=-1 )?color:'info',
+		panelColor=bs3Color[colorName]['pan'],
+		txtColor=bs3Color[colorName]['txt'],
+		membersDefault={num:'',info:'',deptDist:''},
+		data=$.extend({},membersDefault,members),
+		memArr=data.info,
+		deptDist=data.deptDist,
+		num=data.num,
+		//计数器
+		m=0,
+		rSet=[];
+		
+	obj.prev('h4').find('.badge').text(num);
+	
+	//panel中的内容组件
+	for(let name in deptDist){
+		let userNum=deptDist[name],
+			divId='dept-'+name+'-in-'+colorName,
+			aHref='#'+divId,
+			r=$('<div></div>').addClass(panelColor),
+			c1=$('<div></div>').addClass('panel-heading'),
+			c1c=$('<h4></h4>').addClass('panel-title'),
+			c1cc=$('<a></a>').attr({'href':aHref,'data-toggle':'collapse','title':'点击查看详情'}).append($('<strong></strong>').html(name+'&nbsp;'),$('<span></span>').addClass('badge').text(userNum)),
+			c2=$('<div></div>').attr({'id':divId,'class':'panel-collapse collapse'}),
+			c2c=$('<ul></ul>').addClass('list-group');
+			
+		//panel中的内容组件	
+		memArr.forEach(function(e,index){
+			let txt=(colorName=='info')?'点击删除':'点击添加',
+				c2cc=$('<a></a>').attr({'class':'list-group-item text-center','title':txt});
+			if(e.dept==name){
+				c2cc.data('userId',e.id).append($('<strong></strong>').text(e.username),'，',e.mobile);
+				
+				(e.enable)?c2cc.append('，正常'):c2cc.append('，',$('<span></span>').addClass('label label-danger').text('已禁用'));
+				
+				c2c.append(c2cc);
+			}
+		});
+		c1c.append(c1cc);
+		
+		rSet[m]=r.append(c1.append(c1c),c2.append(c2c));
+		m++;
+	}
+	obj.empty().append(rSet);
+	(colorName=='info')?obj.collapse('show'):obj.collapse('hide');
 };
 
 //自调用匿名函数立即执行的特点，进行页面初始化。
 ;(function($){	
-	buildUgMembersCom(ugMems);
+
+	buildPanelCom(resData.members,$('#members'));
+	buildPanelCom(resData.userAddOn,$('#userAddOn'),'warning');
 	$('[title]').tooltip();   
 })(jQuery);
 
-console.log({$ugId});
+
+$(document).ready(function(){
+
+
+});
+
 
 </script>

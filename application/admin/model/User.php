@@ -164,9 +164,6 @@ class User extends Model
       }
       
       #使用静态方法，向User表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
-      //$this::update([
-//          'authority'  => $authArr,
-//        ], ['username' => $username,'pwd'=>$pwd]);
       return $this::update([
           'authority'  => $authArr,
         ], ['username' => $username,'pwd'=>$pwd]);

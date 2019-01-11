@@ -214,15 +214,15 @@ const archName=['#sysSummary','#userList','#usergroupList','#sysSetting'];
 //归纳bootStrap3中的颜色相关属性
 const bs3Color={
 	//info
-	info:{lab:'label label-info',btn:'btn-info',txt:'text-info',bg:'btn-info',alt:'alert-info'},
+	info:{lab:'label label-info',btn:'btn-info',txt:'text-info',bg:'btn-info',alt:'alert-info',pan:'panel panel-info'},
 	//success
-	success:{lab:'label label-success',btn:'btn-success',txt:'text-success',bg:'btn-success',alt:'alert-success'},
+	success:{lab:'label label-success',btn:'btn-success',txt:'text-success',bg:'btn-success',alt:'alert-success',pan:'panel panel-success'},
 	//danger
-	danger:{lab:'label label-danger',btn:'btn-danger',txt:'text-danger',bg:'btn-danger',alt:'alert-danger'},
+	danger:{lab:'label label-danger',btn:'btn-danger',txt:'text-danger',bg:'btn-danger',alt:'alert-danger',pan:'panel panel-danger'},
 	//warning
-	warning:{lab:'label label-warning',btn:'btn-warning',txt:'text-warning',bg:'btn-warning',alt:'alert-warning'},
+	warning:{lab:'label label-warning',btn:'btn-warning',txt:'text-warning',bg:'btn-warning',alt:'alert-warning',pan:'panel panel-warning'},
 	//primary
-	primary:{lab:'label label-primary',btn:'btn-primary',txt:'text-primary',bg:'btn-primary'},
+	primary:{lab:'label label-primary',btn:'btn-primary',txt:'text-primary',bg:'btn-primary',pan:'panel panel-primary'},
 	//default
 	'default':{lab:'label label-default',btn:'btn-default'},
 	//muted
@@ -416,7 +416,7 @@ var loadTplFile=(rqData={})=>{
 	aObj.tab('show');
 	pageParam=$.extend({},pageParamDefault,pageParam);
 	rqData=$.extend({},rqDataDefault,rqData);
-	
+	http://sh.qihoo.com/pc/home?ch=youlike&sign=360_0ed9f8f8
 	<!-- console.log(rqData); -->
     //提交锚点值给后端，由后端返回需加载的页面文件
 	$("#content").load(url,rqData,function(){
