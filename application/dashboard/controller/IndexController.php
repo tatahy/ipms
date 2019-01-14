@@ -45,6 +45,8 @@ class IndexController extends \think\Controller
     private $today = null;
 
     private $now = null;
+    #权限实体定义
+    private $authEnt=array();
     // 初始化
     protected function _initialize()
     {
@@ -62,25 +64,33 @@ class IndexController extends \think\Controller
         //$this->authArr = UserModel::get($this->userId)->authority;
         $this->logUser=array('auth'=>$this->authArr,'username'=>$this->userName,'dept'=>$this->dept);
         //使用模型前的初始化，为模型内部使用的变量赋初值，后续的各个方法中无需再初始化，但可以进行修改
-        IssinfoModel::initModel($this->userName,$this->dept,$this->authArr['iss']); 
+        IssinfoModel::initModel($this->userName,$this->dept,$this->authArr); 
     }
 
     // 判断是否为登录用户，私有方法
+    // 判断是否为登录用户
     private function _loginUser()
     {
-        //通过$this->log判断是否是登录用户，非登录用户退回到登录页面
-        //$this->log = Session::get('log');
-
-        if (1 != $this->log) {
-            return $this->error('无用户名或密码，请先登录系统');
-        } 
-        
-        //if(empty($this->logUser)){
-//            $user = new UserModel;
-//            $userlg = $user->where('username', $this->userName)->where('pwd', $this->pwd)->find();
-//            $this->logUser=array('auth'=>$userlg->authority,'username'=>$userlg->username,'dept'=>$userlg->dept);
-//        }
-        
+      //通过$this->log判断是否是登录用户，非登录用户退回到登录页面
+      $this->log=Session::get('log');
+      #app/common.php中预定义的权限实体
+      $authEntArr=conAuthEntArr;
+      if(1!=$this->log){
+        return $this->error('无用户名或密码，请先登录系统');
+      }
+      
+      $this->userId=Session::get('userId');
+      $this->username=Session::get('username');
+      $this->pwd=Session::get('pwd');
+      $this->dept=Session::get('dept');
+      $this->authArr=Session::get('authArr');
+      
+      foreach($authEntArr as $k=>$v){
+          #将ent名称转为全小写，并去掉字符串中的下划线，
+          $k=strtolower(strtr($k,['_'=>'']));
+          $this->authEnt[$k]=$v;
+      }
+      return true;    
     }
 
     public function index(Request $request, IssinfoModel $issMdl,UserModel $userMdl, $auth = '',$item='')
@@ -139,7 +149,8 @@ class IndexController extends \think\Controller
             'home' => $request->domain(), 
             'username' => $this->userName,             
             'numIssArr'=>json_encode($numIssArr),
-            
+            #权限实体
+            'authEnt'=>json_encode($this->authEnt,JSON_UNESCAPED_UNICODE),
             'issEn'=> $issEn ,
             'patEn'=> $patEn,
             'proEn'=> $proEn,

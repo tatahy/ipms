@@ -11,30 +11,30 @@ use app\admin\model\User as UserModel;
 
 class IndexController extends \think\Controller
 {
-     //用户名
+    #用户名
     private $userId = null;  
-     //用户名
+    #用户名
     private $username = null;
-    //用户密码
+    #用户密码
     private $pwd = null;
-    //用户登录状态
+    #用户登录状态
     private $log = null;
-    //用户角色
+    #用户角色
     private $roles=array();
-    //用户所在部门
+    #用户所在部门
     private $dept = null;
-    //用户权限
+    #用户权限
     private $authArr=array();
-    //权限实体定义
+    #权限实体定义
     private $authEnt=array();
-    //响应前端要求的分页信息
+    #响应前端要求的分页信息
     private $resPgInfo=array();
-    //响应前端要求的分页信息
+    #响应前端要求的分页信息
     private $allDept=array();
-    //响应前端要求的分页信息
+    #响应前端要求的分页信息
     private $allGroup=array();
     
-    // 初始化
+    # 初始化
     protected function _initialize()
     {
         //$this->username=Session::get('username');

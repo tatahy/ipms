@@ -144,81 +144,36 @@ class User extends Model
      * 刷新登录用户的各个模块（issue，project，patent，thesis，attachment，asset）权限
      * 返回值：json数组,刷新后的各个模块权限
      */
-     public function refreshUserAuth($username,$pwd)
+    static public function refreshUserAuth($username,$pwd)
     {
-      $user=$this->where('username',$username)->where('pwd',$pwd)->where('enable',1)->find();
+      $obj=new User;
+      $user=$obj->where('username',$username)->where('pwd',$pwd)->where('enable',1)->find();
       $usergroup_id= explode(",", $user->usergroup_id);//$usergroup_id=array(8,9,10)
-      
-      //$iss=array("edit"=>0,"audit"=>0,"approve"=>0,"execute"=>0,"maintain"=>0);
-//      $pat=array("edit"=>0,"audit"=>0,"approve"=>0,"execute"=>0,"maintain"=>0);
-//      $att=array("upload"=>0,"download"=>0,"erase"=>0,"move"=>0,"copy"=>0);
-//      $pro=array("edit"=>0,"audit"=>0,"approve"=>0,"execute"=>0,"maintain"=>0);
-//      $the=array("edit"=>0,"audit"=>0,"approve"=>0,"execute"=>0,"maintain"=>0); 
-     // $admin=array("enable"=>0);
-      
-      $iss=_commonModuleAuth('_ISS');
-      $pat=_commonModuleAuth('_PAT');
-      $att=_commonModuleAuth('_ATT');
-      $pro=_commonModuleAuth('_PRO');
-      $the=_commonModuleAuth('_THE');
-      $admin=_commonModuleAuth('_ADMIN');
-      $ass=_commonModuleAuth('_ASS');
-      
-      for($i=0;$i<count($usergroup_id);$i++){
-        //根据usergroup_id，应用模型UsergroupModel分别取出对应usergroup的iss/pat/pro/the/att权限的项，
-        $usergroup=UsergroupModel::get($usergroup_id[$i]);
-        //array_filter($arr)去除数组$arr中值为false的键值对后的新数组
-        //array_merge再重新合并成新数组，得到用户所在所有用户组权限的交集。
-        //$iss=array_merge($iss,array_filter($usergroup['authority']['iss']));
-//        $pat=array_merge($pat,array_filter($usergroup['authority']['pat']));
-//        $pro=array_merge($pro,array_filter($usergroup['authority']['pro']));
-//        $the=array_merge($the,array_filter($usergroup['authority']['the']));
-//        $att=array_merge($att,array_filter($usergroup['authority']['att']));
-//        $admin=array_merge($admin,array_filter($usergroup['authority']['admin']));
-
-        //$iss=array_merge($iss,array($usergroup['authority']['iss']));
-//        $pat=array_merge($pat,array($usergroup['authority']['pat']));
-//        $pro=array_merge($pro,array($usergroup['authority']['pro']));
-//        $the=array_merge($the,array($usergroup['authority']['the']));
-//        $att=array_merge($att,array($usergroup['authority']['att']));
-//        $admin=array_merge($admin,array($usergroup['authority']['admin']));
-
-        if(array_filter($usergroup['authority']['iss'])){
-          $iss=array_merge($iss,array_filter($usergroup['authority']['iss']));
-        }
-        if(array_filter($usergroup['authority']['pat'])){
-          $pat=array_merge($pat,array_filter($usergroup['authority']['pat']));
-        }
-        if(array_filter($usergroup['authority']['pro'])){
-          $pro=array_merge($pro,array_filter($usergroup['authority']['pro']));
-        }
-        if(array_filter($usergroup['authority']['the'])){
-          $the=array_merge($the,array_filter($usergroup['authority']['the']));
-        }
-        if(array_filter($usergroup['authority']['att'])){
-          $att=array_merge($att,array_filter($usergroup['authority']['att']));
-        }
-        if(array_filter($usergroup['authority']['ass'])){
-          $ass=array_merge($ass,array_filter($usergroup['authority']['ass']));
-        }
-        
-        
+      #app/common.php中预定义的权限实体
+      $authEntArr=conAuthEntArr;
+      $authArr=[];
+      foreach($authEntArr as $k=>$v){
+          #将ent名称转为全小写，并去掉字符串中的下划线，
+          $k=strtolower(strtr($k,['_'=>'']));
+          #根据$authEntArr构建权限数组，初始赋值为0      
+          $authArr[$k]=array_fill_keys(array_keys($v['auth']),0);
       }
-      //组装数据
-      $authority=array("iss"=>$iss,
-                        "att"=>$att,
-                        "pat"=>$pat,
-                        "pro"=>$pro,
-                        "the"=>$the,
-                        "admin"=>$admin,
-                        "ass"=>$ass,
-                        );
-        
-      // 使用静态方法，向User表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
-      $this::update([
-          'authority'  => $authority,
+            
+      for($i=0;$i<count($usergroup_id);$i++){
+        #根据usergroup_id，应用模型UsergroupModel分别取出对应usergroup的权限值，
+        $usergroup=UsergroupModel::get($usergroup_id[$i]);
+        #array_filter($arr)去除数组$arr中值为false的键值对后的新数组
+        foreach($usergroup['authority'] as $key=>$val){
+          $authArr[$key]=array_filter(array_merge($authArr[$key],$val));
+        }
+      }
+            
+      #使用静态方法，向User表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
+      $obj::update([
+          'authority'  => $authArr,
         ], ['username' => $username,'pwd'=>$pwd]);
-      return $authority;
+      unset($obj);
+      return $authArr;
     }
 }
 ?>

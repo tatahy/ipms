@@ -286,13 +286,14 @@ class Issinfo extends Model
       $dept=self::$userDept;
       $userName=self::$userName;
       self::$issEntName=in_array($issEntName,self::ISSNAME)?$issEntName:'_PAT';
+      $name='iss-'.strtolower(strtr(self::$issEntName,['_'=>'']));
       $authNum=0;
       if(!$this->checkIssStatus()){
         return $this->errStr;
       }
       
-      if(count($auth)){
-        foreach($auth as $val){
+      if(count($auth[$name])){
+        foreach($auth[$name] as $val){
           $authNum+=$val;
         }
       }else{

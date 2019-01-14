@@ -13,6 +13,11 @@ use app\asset\model\Assinfo as AssinfoModel;
 
 class IndexController extends Controller
 {
+  
+  //用户权限
+  private $authArr=array();
+  
+  
   public function index(Request $request,PatinfoModel $patMdl,UserModel $userMdl,AssinfoModel $assMdl)
   {
     //'username'和'pwd'的来源：session或初次登录时表单POST提交

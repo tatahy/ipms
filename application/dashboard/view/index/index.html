@@ -185,6 +185,35 @@ footer {
 <!-- /pagewrap  -->
 
 <script>
+//归纳bootStrap3中的颜色相关属性
+const bs3Color={
+	//info
+	info:{lab:'label label-info',btn:'btn-info',txt:'text-info',bg:'btn-info',alt:'alert-info',pan:'panel panel-info'},
+	//success
+	success:{lab:'label label-success',btn:'btn-success',txt:'text-success',bg:'btn-success',alt:'alert-success',pan:'panel panel-success'},
+	//danger
+	danger:{lab:'label label-danger',btn:'btn-danger',txt:'text-danger',bg:'btn-danger',alt:'alert-danger',pan:'panel panel-danger'},
+	//warning
+	warning:{lab:'label label-warning',btn:'btn-warning',txt:'text-warning',bg:'btn-warning',alt:'alert-warning',pan:'panel panel-warning'},
+	//primary
+	primary:{lab:'label label-primary',btn:'btn-primary',txt:'text-primary',bg:'btn-primary',pan:'panel panel-primary'},
+	//default
+	'default':{lab:'label label-default',btn:'btn-default'},
+	//muted
+	muted:{text:'text-muted'},
+	//link
+	link:{btn:'btn-link'}
+};
+//定义权限涉及的颜色属性
+const authColor={
+	common:{bs3:bs3Color.success,chi:'普通'},
+	important:{bs3:bs3Color.warning,chi:'重要'},
+	critical:{bs3:bs3Color.danger,chi:'关键'}
+};
+//权限模块核心属性，不允许修改/增加/删除属性（深冻结）
+const authEntProp={$authEnt};
+
+
 var setSideNavIssNumInprocess=(obj)=>{
 	let issNum='',issPatNum='',issProNum='',issTheNum='';
 	

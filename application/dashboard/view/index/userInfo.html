@@ -4,7 +4,7 @@
 <div id="divUsergroup" data-user-id="{$user.id}" style="margin-top:10px;">
 	
 	<div class="btn-group">
-    	<button type="button" class="btn btn-warning" style="padding:1px 5px;font-size:16px;" data-toggle="collapse" data-target="#divUserBasicInfo"><span class="glyphicon glyphicon-duplicate"></span>基本信息</button>
+    	<button type="button" class="btn btn-warning" style="padding:1px 5px;font-size:16px;" data-toggle="collapse" data-target="#divUserBasicInfo" title="显示/隐藏基本信息"><span class="glyphicon glyphicon-duplicate"></span>基本信息</button>
     	<div class="btn-group">
       		<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" style="padding:1px 5px;font-size:16px;">修改<span class="caret"></span></button>
       		<ul class="dropdown-menu" role="menu">
@@ -32,110 +32,17 @@
 	</div>
 	<hr>
 	
-	<button type="button" class="btn btn-warning" style="padding:1px 5px;font-size:16px;" data-toggle="collapse" data-target="#divUserAuth"><span class="glyphicon glyphicon-alert"></span>系统权限</button>
-		
+	<button type="button" class="btn btn-warning" style="padding:1px 5px;font-size:16px;" data-toggle="collapse" data-target="#divUserAuth"title="显示/隐藏系统权限"><span class="glyphicon glyphicon-alert"></span>系统权限</button>
+	<br />
+	<br />
+	<p id="authRank" style="padding-left:20px;"><strong>权限类别：</strong></p>
+
 	<div id="divUserAuth" class="row myRow collaps in" style="margin-top:10px;">		
-		<div class="form-group col-sm-6">	
-			<label><span class="text-info">【事务】</span></label>	
-			<div style="border-bottom:solid 1px #ccc; padding:5px;">	
-				{foreach name="$user.authority.iss" item="v" }
-    			{if condition="($v==1)"} 
-				<span class="label label-info"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-ok"></span></span>
-				
-				{else /} 
-				<span class="text-muted"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-unchecked"></span></span>
-				{/if}
-				{/foreach}			
-				
-			</div>
-		</div>
 		
-		<div class="form-group col-sm-6">	
-			<label><span class="text-info">【固定资产】</span></label>	
-			<div style="border-bottom:solid 1px #ccc; padding:5px;">	
-				{foreach name="$user.authority.ass" item="v" }
-    			{if condition="($v==1)"} 
-				<span class="label label-info"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-ok"></span></span>
-				
-				{else /} 
-				<span class="text-muted"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-unchecked"></span></span>
-				{/if}
-				{/foreach}			
-				
-			</div>
-		</div>
-		
-		<div class="form-group col-sm-6">	
-			<label><span class="text-default">【专利】</span></label>	
-			<div style="border-bottom:solid 1px #ccc; padding:5px;">
-				{foreach name="$user.authority.pat" item="v" }
-    			{if condition="($v==1)"} 
-				<span class="label label-info"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-ok"></span></span>
-				
-				{else /} 
-				<span class="text-muted"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-unchecked"></span></span>
-				{/if}
-				{/foreach}			
-				
-			</div>
-		</div>
-		
-		<div class="form-group col-sm-6">	
-			<label><span class="text-default">【项目】</span></label>	
-			<div style="border-bottom:solid 1px #ccc; padding:5px;">
-				{foreach name="$user.authority.pro" item="v" }
-    			{if condition="($v==1)"} 
-				<span class="label label-info"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-ok"></span></span>
-				
-				{else /} 
-				<span class="text-muted"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-unchecked"></span></span>
-				{/if}
-				{/foreach}
-			</div>
-		</div>
-		
-		<div class="form-group col-sm-6">	
-			<label><span class="text-default">【论文】</span></label>	
-			<div style="border-bottom:solid 1px #ccc; padding:5px;">
-				{foreach name="$user.authority.the" item="v" }
-    			{if condition="($v==1)"} 
-				<span class="label label-info"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-ok"></span></span>
-				
-				{else /} 
-				<span class="text-muted"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-unchecked"></span></span>
-				{/if}
-				{/foreach}
-			</div>
-		</div>
-		
-		<div class="form-group col-sm-6">	
-			<label><span class="text-danger">【附件】</span></label>	
-			<div style="border-bottom:solid 1px #ccc; padding:5px;">
-				{foreach name="$user.authority.att" item="v" }
-    			{if condition="($v==1)"} 
-				<span class="label label-info"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-ok"></span></span>
-				
-				{else /} 
-				<span class="text-muted"><span class="spAuthKey">{$key}</span><span class="glyphicon glyphicon-unchecked"></span></span>
-				{/if}
-				{/foreach}
-			</div>
-		</div>
-		
-		<div class="form-group col-sm-6">	
-			<label><span class="text-danger">【后台管理】</span></label>	
-			<div class="form-group" style="border-bottom:solid 1px #ccc; padding:5px;">
-				{eq name="$user.authority.admin.enable" value="1"} 
-				<span class="label label-info">有<span class="glyphicon glyphicon-ok"></span></span>
-				{else /} 
-				<span class="text-muted">无<span class="glyphicon glyphicon-unchecked"></span></span>
-				{/eq}
-			</div>
-		</div>
 	</div>
 	<hr>
 		
-	<button type="button" class="btn btn-warning" style="padding:1px 5px;font-size:16px;" data-toggle="collapse" data-target="#divUserGroup"><span class="glyphicon glyphicon-education"></span>所属用户组</button>
+	<button type="button" class="btn btn-warning" style="padding:1px 5px;font-size:16px;" data-toggle="collapse" data-target="#divUserGroup" title="显示/隐藏所属用户组"><span class="glyphicon glyphicon-education"></span>所属用户组</button>
 	
 	<div id="divUserGroup" class="row myRow collaps in" style="margin-top:10px;">		
 		<ul class="list-group">
@@ -264,7 +171,9 @@
 <!-- /pagewrap  -->
 
 <script>
+var uAuth={$user}['authority'];
 
+console.log(uAuth);
 //必填输入框内容有效性判断结果数组
 var check = [];
 
@@ -330,6 +239,73 @@ var modalUserInfoShow=(h4Html,divPart)=>{
 	
 	modalObj.modal();
 };
+
+//生成auth的显示组件。根据查询到的auth数据uSet.authority，参照已定义的authEntProp变量
+var buildAuthCom=(uAuth)=>{
+	let rSet=[],		
+		//循环计数器
+		m=0;
+		
+	//生成各项auth的组件，遍历hash数组：uAuth
+	//ent=='admin'...
+	for(var ent in uAuth){
+ 		let authObj=uAuth[ent],
+			name=authEntProp[ent]['chi'],
+			sumAuth=0,
+			//循环计数器
+			i=0,
+			spSet=[], 
+			rank=authEntProp[ent]['rank'],
+		    //checkbox的父标签底色类型
+			bgColor=authColor[rank]['bs3']['bg'],
+			//checkbox相邻标签背景色
+			txtColor=authColor[rank]['bs3']['txt'],
+			rCom=$('<div></div>').addClass('form-group col-sm-6'),
+			c1=$('<label></label>').addClass('control-label '+bgColor).html('【'+name+'】模块&nbsp;').css({'padding':'1px','border-radius':'3px'}),
+			c2=$('<div></div>').css({'padding-bottom':'5px','border-bottom':'solid 1px #ccc'});
+		
+		labSet=[];
+		//遍历hash数组：authObj，
+		//auth=='read'...
+		for(var auth in authObj){
+			let e=authEntProp[ent]['auth'][auth],
+				v=authObj[auth],
+				tColor=(v==1)?txtColor:'text-muted',
+				chi=$('<span></span>').addClass('spAuthKey').text(e.chi),
+				gly=$('<span></span>').addClass('glyphicon glyphicon-ok'),
+				spCom=$('<span></span>').addClass(tColor).append(gly);
+			
+			spSet[i]=(v==1)?$('<span></span>').append(chi,spCom,'&nbsp;&nbsp;'):$('<span></span>').append('无','&nbsp;&nbsp;'); 
+			
+			//循环计数器
+			i++;
+			
+		}
+		c2.append(spSet);
+		rSet[m]=rCom.append(c1,c2);
+		//循环计数器
+		m++;
+	}
+	$('#divUserAuth').append(rSet);
+	
+	//生成#authRank的内容
+	for(let el in authColor){
+		let e=authColor[el],
+			spObj=$('<span></span>').css('font-size','12px'),
+			txt=e.chi,
+			labColor=e.bs3.lab;
+		$('#authRank').append('&nbsp;',spObj.addClass(labColor).text(txt));
+	}	
+};
+
+//利用自调用匿名函数立即执行的特点， 页面初始化
+(function($){
+	console.log(authEntProp);
+	buildAuthCom(uAuth);
+	// 激活tooltip
+	$('[title]').tooltip({placement:'auto bottom'});
+	
+})(jQuery);
 
 var regCheckUserName=(obj)=>{
 	//userName正则表达式，由英文、数字、中文和下划线组成,但不能以数字开头,长度为2到20个字符。unicode编码中的汉字范围:\u2E80-\u9FFF
