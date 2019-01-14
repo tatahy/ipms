@@ -50,23 +50,16 @@ class User extends Model
         }
         return $str;
     }
-    //method，得到所有的启用用户组
+    #method，得到所有的启用用户组
     static public function getAllGroup()
     {
-      //$ugSet=UsergroupModel::where('enable',1)->order('id asc')->select();
-//      $keys=[];
-//      $vals=[];
-//      foreach($ugSet as $k=>$v){
-//        $keys[$k]=$v['id'];
-//        $vals[$k]=$v['name'];
-//      }
-      
+     
       $obj = new User;
       $arr=$obj->getAllGroupAttr(1);
       unset($obj);
       return $arr;
     }
-    //获取器 ，得到所有的启用用户组
+    #获取器 ，得到所有的启用用户组
     protected function getAllGroupAttr($dbVal)
     {
       $ugSet=UsergroupModel::where('enable',1)->order('id asc')->select();
@@ -78,7 +71,7 @@ class User extends Model
       }
       return array_combine($keys,$vals);
     }
-    //获取器，根据getJoinedGroupAttr()，得到可参加的用户组数组
+    #获取器，根据getJoinedGroupAttr()，得到可参加的用户组数组
     protected function getToJoinGroupAttr($dbVal,$data)
     {
         $allGroup=$this->getAllGroupAttr(1);
@@ -92,7 +85,7 @@ class User extends Model
         
         return array_diff_assoc($allGroup,$joinedGoup);
     }
-    //获取器，根据数据表usergroup_id字段值，得到已参加的用户组数组
+    #获取器，根据数据表usergroup_id字段值，得到已参加的用户组数组
     protected function getJoinedGroupAttr($dbVal,$data)
     {
       $ugSet=UsergroupModel::where('id','in',explode(",", $data['usergroup_id']))->order('id asc')->select();
@@ -104,7 +97,7 @@ class User extends Model
       }
       return array_combine($keys,$vals);
     }
-    //method，得到所有有效的部门数组
+    #method，得到所有有效的部门数组
     static public function getAllDept()
     {
       $obj = new User;
@@ -113,13 +106,48 @@ class User extends Model
       return $arr;
       //return $this->getAllDeptAttr(1,$this->data);
     }
-    //获取器，得到所有有效的部门数组
+    #获取器，得到所有有效的部门数组
     Protected function getAllDeptAttr($dbVal,$data)
     {
       $dtSet=DeptModel::where('enable',1)->order('id asc')->select();
       $dtSet=is_array($dtSet)?collection($dtSet):$dtSet;
       
       return array_combine($dtSet->column('id'),$dtSet->column('name'));
+    }
+    #method，加入用户组$ugId
+    static public function addUserGroup($ugId)
+    {
+      $obj = new User;
+      $arr=$obj->getAllDeptAttr(1,$obj->data);
+      unset($obj);
+      return $arr;
+      //return $this->getAllDeptAttr(1,$this->data);
+    }
+    #method，添加/删除用户组$ugId
+    static public function setUserGroup($userId='',$ugId='',$oprt='')
+    {
+      $obj = new User;
+      $userSet=$obj::get($userId);
+      $arr=explode(",", $userSet->getData('usergroup_id'));
+      
+      #默认为$oprt=='_DELETE'
+      for($i=0;$i<count($arr);$i++){
+        if($arr[$i]==$ugId){
+          unset($arr[$i]);
+          break;
+        }
+      }
+      
+      if($oprt=='_ADD'){
+        array_push($arr,$ugId);
+      }
+      sort($arr);
+      $userSet->data('usergroup_id',implode(',',$arr));
+      $userSet->save();
+      
+      unset($obj);
+      return true;
+     
     }
     /**
      * 获取用户所属的角色信息

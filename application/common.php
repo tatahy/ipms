@@ -106,6 +106,7 @@ const conAuthEntArr=[
           'rank'=>'critical',
           'auth'=>['enable'=>['chi'=>'有','val'=>0]]
         ]
+
 ];
 
 //patent的类型数组

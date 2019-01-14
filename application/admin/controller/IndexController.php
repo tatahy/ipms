@@ -753,7 +753,17 @@ class IndexController extends \think\Controller
       $request=$this->request;
       
       $ugId=empty($request->param('ugId'))?0:$request->param('ugId');
+      
+      $userId=empty($request->param('userId'))?0:$request->param('userId');
+      $userOprt=empty($request->param('userOprt'))?'':$request->param('userOprt');
+      
       $ugSet=[];
+      
+      if($userOprt){
+        $uMdl::setUserGroup($userId,$ugId,$userOprt);
+        return true;
+      }
+      
       if($ugId){
         $ugSet= $ugMdl::get($ugId);
        // $ugSet->authority=$this->_authDbToFe($ugSet->authority);
@@ -784,6 +794,10 @@ class IndexController extends \think\Controller
               'description'=>$group['info']['description'],
               'data'=>json_encode($group,JSON_UNESCAPED_UNICODE)
         ]);
+        
+      //if($userOprt){
+//        return $group;
+//      }
       return view();
     }
     
