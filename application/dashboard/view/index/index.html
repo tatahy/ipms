@@ -61,7 +61,9 @@ body {
 #main.sidenav-show{
 	margin-left:200px;
 }
-
+.sidenav-backdrop {
+	z-index: 0;
+}
 footer {
 	//border:1px solid #e3e3e3;
 	background-color:#f5f5f5; 
@@ -78,7 +80,7 @@ footer {
 @media screen and (max-width: 767px) {
 .sidenav.sidenav-show {
 	/* 确保遮盖footer*/
-	z-index: 10;
+	z-index: 20;
 	height: 100%;
 	border-radius: 3px;
 	box-shadow:0px 0px 5px 2px #aaa;
@@ -88,7 +90,16 @@ footer {
 #main.sidenav-show {
 	margin-left:0px;
 }
-
+/* 产生点击层，配合js实现点击屏幕空白处隐藏sidnav*/
+.sidenav-backdrop {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  background-color: transparent;
+}
 .sidenav a {font-size: 16px;}
 
 footer {
@@ -141,7 +152,7 @@ footer {
 	</div>
 </nav>
 
-<div id="mySideNav" class="sidenav">
+<div id="mySidenav" class="sidenav">
 	<div style="height:30px;border-bottom:1px solid #e3e3e3;"><button id="closeBtn" type="button" class="btn btn-link btn-lg pull-right" style="padding:0px 10px 0px 0px;"><span class="glyphicon glyphicon-chevron-left"></span><span style="font-size:16px;">隐藏</span></button>
 	</div>
 	<!-- nav 与 jQuery结合实现菜单栏导航效果-->
@@ -188,15 +199,15 @@ footer {
 //归纳bootStrap3中的颜色相关属性
 const bs3Color={
 	//info
-	info:{lab:'label label-info',btn:'btn-info',txt:'text-info',bg:'btn-info',alt:'alert-info',pan:'panel panel-info'},
+	info:{lab:'label label-info',btn:'btn-info',txt:'text-info',bg:'bg-info',alt:'alert-info',pan:'panel panel-info'},
 	//success
-	success:{lab:'label label-success',btn:'btn-success',txt:'text-success',bg:'btn-success',alt:'alert-success',pan:'panel panel-success'},
+	success:{lab:'label label-success',btn:'btn-success',txt:'text-success',bg:'bg-success',alt:'alert-success',pan:'panel panel-success'},
 	//danger
-	danger:{lab:'label label-danger',btn:'btn-danger',txt:'text-danger',bg:'btn-danger',alt:'alert-danger',pan:'panel panel-danger'},
+	danger:{lab:'label label-danger',btn:'btn-danger',txt:'text-danger',bg:'bg-danger',alt:'alert-danger',pan:'panel panel-danger'},
 	//warning
-	warning:{lab:'label label-warning',btn:'btn-warning',txt:'text-warning',bg:'btn-warning',alt:'alert-warning',pan:'panel panel-warning'},
+	warning:{lab:'label label-warning',btn:'btn-warning',txt:'text-warning',bg:'bg-warning',alt:'alert-warning',pan:'panel panel-warning'},
 	//primary
-	primary:{lab:'label label-primary',btn:'btn-primary',txt:'text-primary',bg:'btn-primary',pan:'panel panel-primary'},
+	primary:{lab:'label label-primary',btn:'btn-primary',txt:'text-primary',bg:'bg-primary',pan:'panel panel-primary'},
 	//default
 	'default':{lab:'label label-default',btn:'btn-default'},
 	//muted
@@ -204,13 +215,14 @@ const bs3Color={
 	//link
 	link:{btn:'btn-link'}
 };
-//定义权限涉及的颜色属性
+//定义权限涉及的颜色属性，权限重要性分类
 const authColor={
 	common:{bs3:bs3Color.success,chi:'普通'},
 	important:{bs3:bs3Color.warning,chi:'重要'},
 	critical:{bs3:bs3Color.danger,chi:'关键'}
 };
-//权限模块核心属性，不允许修改/增加/删除属性（深冻结）
+console.log(Object.keys(authColor));
+//权限模块核心属性，
 const authEntProp={$authEnt};
 
 
@@ -228,17 +240,26 @@ var setSideNavIssNumInprocess=(obj)=>{
 	
 };
 
-var showSideNavbar=(y)=>{
-	if(y){
+var showSideNavbar=(show=true)=>{
+	if(show){
 		//show
 		$('#openBtn').hide();
-		$('#mySideNav').addClass('sidenav-show');
+		$('#mySidenav').addClass('sidenav-show');
 		$('#main').addClass('sidenav-show');
-	}else{
-		$('#openBtn').show();
-		$('#mySideNav').removeClass('sidenav-show');
-		$('#main').removeClass('sidenav-show');
+		//添加div组件及其click事件函数，实现点击该组件就隐藏sideNave，还需结合sidenav-backdrop的css属性实现与sideNav的分层
+		return $('body').append($('<div></div>').addClass('sidenav-backdrop').one('click',function(){
+    		showSideNavbar(false);
+			})
+		);
 	}
+	
+	$('#openBtn').show();
+	$('#mySidenav').removeClass('sidenav-show');
+	$('#main').removeClass('sidenav-show');	
+	$('div.sidenav-backdrop').remove();
+	
+	return true;
+	
 };
 //根据anchor值选择加载的文件
 function loadFile(anchor){
@@ -279,10 +300,11 @@ function loadFile(anchor){
 (function($){
 	
 	setSideNavIssNumInprocess({$numIssArr});
+	showSideNavbar();	
 	loadFile(window.location.hash);
 	// 激活tooltip
 	$('[title]').tooltip();
-	showSideNavbar(true);	
+	
 
 })(jQuery);
 
@@ -300,7 +322,7 @@ $(document).ready(function(){
 	
 	//显示SideNavbar
 	$('#openBtn').click(function(){
-		showSideNavbar(true);		
+		showSideNavbar();		
     });	
 	//关闭SideNavbar
 	$('#closeBtn').click(function(){

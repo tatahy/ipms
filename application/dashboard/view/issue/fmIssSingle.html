@@ -180,9 +180,18 @@ var buildStatusSelCom=(oprt,status)=>{
 		});
 	}
 };
-
-var spanNextSelectStatusNow=(oprt,status)=>{
-
+//[name="status"]组件下的说明文字
+var spanNextSelectStatus=(oprt)=>{
+	let str='',
+		spObj=fmObj.find('select[name="status"]').next('span');
+	
+	oprtComAttrArr.forEach(function(e){
+		if(oprt==e.nameEn){
+			str='<span class="'+e.color.txt+'"><span class="'+e.gly+'"></span>'+e.nameChi+'</span>';
+		}
+	});
+	
+	spObj.html('【'+str+'】成功后，“现状”变为上述值');
 };
 
 var fmEmptyCheck=(obj)=>{
@@ -233,6 +242,7 @@ var ajaxIssOprt=(opts)=>{
 	console.log(oprt+status);
 	buildOprtBtnCom(oprt);
 	buildStatusSelCom(oprt,status);
+	spanNextSelectStatus(oprt);
 })(jQuery);
 
 $(document).ready(function(){

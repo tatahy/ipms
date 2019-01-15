@@ -177,7 +177,7 @@ class Assinfo extends Model
       if($auth['read']==1 && $authNum<=1){
         //登录用户的asset权限有且仅有read，仅能查阅自己名下的asset，
         $query=$scopeQ->where('keeper_now',$userName)->where($whereArr);
-      }else if($auth['read']==1 && $auth['edit']==1 && $authNum<=2){
+      }else if($auth['read']==1 && 1==$auth['edit'] && $authNum<=2){
         //登录用户的asset权限有且仅有read和edit，仅能查阅自己部门和自己名下的asset，
         $scopeArr=($assType=='_ASSS_USUAL')?$scopeArr=array('id'=>['>',0]):$scopeArr=array('status_now'=>['like','%'.$assType.'%']);
         //不能使用已定义的前置查询范围，因为查询的条件是需要在一个前置查询范围内分为2个不同的查询。使用闭包实现

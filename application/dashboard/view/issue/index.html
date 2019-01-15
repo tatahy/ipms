@@ -117,7 +117,7 @@
     
       <!-- Modal content-->
       	<div class="modal-content">
-        <div class="modal-header bg-info" style="border-radius:5px;">
+        <div class="modal-header" style="border-radius: 5px 5px 0px 0px;">
           	<button type="button" class="close" data-dismiss="modal">&times;</button>
 		  
           	<h4 class="title"></h4>
@@ -177,15 +177,15 @@ var	getEntHtmlCom=(nameEn)=>{
 };
 
 var oprtComAttrArr=[
-	{nameChi:'新增',nameEn:'_CREATE',gly:glyPref+'modal-window',color:{lab:labPref+'info',txt:txtPref+'info',btn:'btn-primary'},title:'新增事务记录'},
-	{nameChi:'送审',nameEn:'_SUBMIT',gly:glyPref+'send',color:{lab:labPref+'info',txt:txtPref+'info',btn:'btn-info'},title:'送审记录'},
-	{nameChi:'审核',nameEn:'_AUDIT',gly:glyPref+'check',color:{lab:labPref+'warning',txt:txtPref+'warning',btn:'btn-warning'},title:'审核记录'},
-	{nameChi:'审批',nameEn:'_APPROVE',gly:glyPref+'ok',color:{lab:labPref+'danger',txt:txtPref+'danger',btn:'btn-danger'},title:'审批记录'},
-	{nameChi:'更新',nameEn:'_UPDATE',gly:glyPref+'save-file',color:{lab:labPref+'primary',txt:txtPref+'primary',btn:'btn-primary'},title:'更新记录'},
-	{nameChi:'删除',nameEn:'_DELETE',gly:glyPref+'remove',color:{lab:labPref+'danger',txt:txtPref+'danger',btn:'btn-danger'},title:'删除记录'},
-	{nameChi:'执行',nameEn:'_EXECUTE',gly:glyPref+'random',color:{lab:labPref+'primary',txt:txtPref+'primary',btn:'btn-primary'},title:'执行情况记录'},
-	{nameChi:'维护',nameEn:'_MAINTAIN',gly:glyPref+'list-alt',color:{lab:labPref+'primary',txt:txtPref+'primary',btn:'btn-primary'},title:'维护记录'},
-	{nameChi:'查询',nameEn:'_READ',gly:glyPref+'search',color:{lab:labPref+'primary',txt:txtPref+'primary',btn:'btn-primary'},title:'查询记录'}
+	{nameChi:'新增',nameEn:'_CREATE',gly:glyPref+'modal-window',color:{lab:labPref+'info',txt:txtPref+'info',btn:'btn-primary',bg:'bg-info'},title:'新增事务记录'},
+	{nameChi:'送审',nameEn:'_SUBMIT',gly:glyPref+'send',color:{lab:labPref+'info',txt:txtPref+'info',btn:'btn-info',bg:'bg-info'},title:'送审记录'},
+	{nameChi:'审核',nameEn:'_AUDIT',gly:glyPref+'check',color:{lab:labPref+'warning',txt:txtPref+'warning',btn:'btn-warning',bg:'bg-warning'},title:'审核记录'},
+	{nameChi:'审批',nameEn:'_APPROVE',gly:glyPref+'ok',color:{lab:labPref+'danger',txt:txtPref+'danger',btn:'btn-danger',bg:'bg-danger'},title:'审批记录'},
+	{nameChi:'更新',nameEn:'_UPDATE',gly:glyPref+'save-file',color:{lab:labPref+'primary',txt:txtPref+'primary',btn:'btn-primary',bg:'bg-primary'},title:'更新记录'},
+	{nameChi:'删除',nameEn:'_DELETE',gly:glyPref+'remove',color:{lab:labPref+'danger',txt:txtPref+'danger',btn:'btn-danger',bg:'bg-danger'},title:'删除记录'},
+	{nameChi:'执行',nameEn:'_EXECUTE',gly:glyPref+'random',color:{lab:labPref+'primary',txt:txtPref+'primary',btn:'btn-primary',bg:'bg-primary'},title:'执行情况记录'},
+	{nameChi:'维护',nameEn:'_MAINTAIN',gly:glyPref+'list-alt',color:{lab:labPref+'primary',txt:txtPref+'primary',btn:'btn-primary',bg:'bg-primary'},title:'维护记录'},
+	{nameChi:'查询',nameEn:'_READ',gly:glyPref+'search',color:{lab:labPref+'primary',txt:txtPref+'primary',btn:'btn-primary',bg:'bg-primary'},title:'查询记录'}
 	];
 
 var loadStr='<p class="text-center" style="font-size:28px;">加载中……</p>';

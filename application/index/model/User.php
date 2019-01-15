@@ -164,7 +164,8 @@ class User extends Model
         $usergroup=UsergroupModel::get($usergroup_id[$i]);
         #array_filter($arr)去除数组$arr中值为false的键值对后的新数组
         foreach($usergroup['authority'] as $key=>$val){
-          $authArr[$key]=array_filter(array_merge($authArr[$key],$val));
+          //$authArr[$key]=array_filter(array_merge($authArr[$key],$val));
+          $authArr[$key]=array_merge($authArr[$key],$val);
         }
       }
             

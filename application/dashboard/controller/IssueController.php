@@ -53,7 +53,7 @@ class IssueController extends Controller
          //继承了控制器基类Controller后，直接可使用其request属性来使用Request类的实例。
         $this->home=$this->request->domain();
         $this->issEntName=$this->request->param('issEntName');
-        $this->auth=UserModel::where(['userName'=>$this->userName,'pwd'=>$this->pwd])->find()->authority['iss'];
+        $this->auth=UserModel::where(['userName'=>$this->userName,'pwd'=>$this->pwd])->find()->authority;
         //使用模型前的初始化，为模型内部使用的变量赋初值，后续的各个方法中无需再初始化，但可以进行修改
         IssinfoModel::initModel($this->userName,$this->dept,$this->auth,$this->issEntName); 
         

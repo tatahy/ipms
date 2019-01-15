@@ -230,11 +230,11 @@ const bs3Color={
 	//link
 	link:{btn:'btn-link'}
 };
-//定义权限涉及的颜色属性
+//定义权限涉及的颜色属性，权限重要性分类
 const authColor={
-	common:{bs3:bs3Color.success,chi:'普通类'},
-	important:{bs3:bs3Color.warning,chi:'重要类'},
-	critical:{bs3:bs3Color.danger,chi:'关键类'}
+	common:{bs3:bs3Color.success,chi:'普通'},
+	important:{bs3:bs3Color.warning,chi:'重要'},
+	critical:{bs3:bs3Color.danger,chi:'关键'}
 };
 //深冻结函数，递归冻结每一个属性，因Object.freeze()仅冻结第一层属性
 function deepFreeze(obj){
