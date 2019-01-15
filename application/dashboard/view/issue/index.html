@@ -14,6 +14,7 @@
 </div>
 			
 <div class="content-body">
+	
 	<div id="divTopBtn" class="row myRow text-right" style="margin:10px 0px;">		
 		<a id="aSearchData" class="btn btn-primary btn-sm" href="#divSearchData" data-toggle="collapse" title="显示/隐藏查询条件"><span class="glyphicon glyphicon-plus-sign"></span>事务查询</a>		
 		
@@ -423,6 +424,7 @@ var fmReset=()=>{
 	completeFmSelectCom($('#fmIssSearch'));
 	
 	issEntNameChange();
+	<!-- console.log({$issEnt}['iss-pat']['status']); -->
 	// 激活tooltip
 	$('[title]').tooltip();
 	loadIssList();

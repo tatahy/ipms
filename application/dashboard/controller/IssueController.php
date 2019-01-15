@@ -97,7 +97,8 @@ class IssueController extends Controller
         'issEntName'=>$issEntName,
         'issEntNameChi'=>$issEntNameChi,
         'sortData'=>$sortData,
-        'numArr'=>json_encode($numArr)
+        'numArr'=>json_encode($numArr),
+        'issEnt'=>json_encode(conIssEntArr,JSON_UNESCAPED_UNICODE)
       ]);
       
       return view();

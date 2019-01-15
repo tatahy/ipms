@@ -19,7 +19,9 @@ const conAuthEntArr=[
             'approve'=>['chi'=>'审批','val'=>0],
             'execute'=>['chi'=>'执行','val'=>0],
             'maintain'=>['chi'=>'维护','val'=>0]
-          ]
+          ],
+          #所有权限都为0，所以'visible'=>false
+          'visible'=>false
 //          'status'=>[]
         ],
         '_ISS-_THE'=>[
@@ -32,7 +34,8 @@ const conAuthEntArr=[
             'approve'=>['chi'=>'审批','val'=>0],
             'execute'=>['chi'=>'执行','val'=>0],
             'maintain'=>['chi'=>'维护','val'=>0]
-          ]
+          ],
+          'visible'=>false
         ],
         '_ISS-_PRO'=>[
           'chi'=>'项目事务',
@@ -44,7 +47,8 @@ const conAuthEntArr=[
             'approve'=>['chi'=>'审批','val'=>0],
             'execute'=>['chi'=>'执行','val'=>0],
             'maintain'=>['chi'=>'维护','val'=>0]
-          ]
+          ],
+          'visible'=>false
         ],
         '_PAT'=>[
           'chi'=>'专利',
@@ -55,7 +59,8 @@ const conAuthEntArr=[
             'approve'=>['chi'=>'审批','val'=>0],
             'execute'=>['chi'=>'执行','val'=>0],
             'maintain'=>['chi'=>'维护','val'=>0]
-          ]
+          ],
+          'visible'=>false
         ],
         '_THE'=>[
           'chi'=>'论文',
@@ -66,7 +71,8 @@ const conAuthEntArr=[
             'approve'=>['chi'=>'审批','val'=>0],
             'execute'=>['chi'=>'执行','val'=>0],
             'maintain'=>['chi'=>'维护','val'=>0]
-          ]
+          ],
+          'visible'=>false
         ],
         '_PRO'=>[
           'chi'=>'项目',
@@ -77,7 +83,8 @@ const conAuthEntArr=[
             'approve'=>['chi'=>'审批','val'=>0],
             'execute'=>['chi'=>'执行','val'=>0],
             'maintain'=>['chi'=>'维护','val'=>0]
-          ]
+          ],
+          'visible'=>false
         ],
         '_ATT'=>[
           'chi'=>'附件',
@@ -88,7 +95,8 @@ const conAuthEntArr=[
             'erase'=>['chi'=>'删除','val'=>0],
             'move'=>['chi'=>'移动','val'=>0],
             'copy'=>['chi'=>'复制','val'=>0]
-          ]
+          ],
+          'visible'=>false
         ],
         '_ASS'=>[
           'chi'=>'固定资产',
@@ -99,14 +107,15 @@ const conAuthEntArr=[
             'audit'=>['chi'=>'审核','val'=>0],
             'approve'=>['chi'=>'审批','val'=>0],
             'maintain'=>['chi'=>'维护','val'=>0]
-          ]
+          ],
+          'visible'=>false
         ],
         '_ADMIN'=>[
           'chi'=>'系统管理',
           'rank'=>'critical',
-          'auth'=>['enable'=>['chi'=>'有','val'=>0]]
+          'auth'=>['enable'=>['chi'=>'有','val'=>0]],
+          'visible'=>false
         ]
-
 ];
 
 //patent的类型数组
@@ -339,16 +348,6 @@ const conIssAuthOprtArr=[
           'review'=>['_READ','_UPDATE','_REVIEW'],
           'approve'=>['_READ','_UPDATE','_APPROVE'],
           'maintain'=>['_READ','_UPDATE','_MAINTAIN']
-          //专利事务申请人
-         // ['name'=>'edit','oprt'=>['_READ','_UPDATE','_CREATE','_SUBMIT','_DELETE','_EXECUTE']],
-          //专利事务审核人
-          //['name'=>'audit','oprt'=>['_READ','_UPDATE','_AUDIT']],
-//          //专利事务复核人
-//          ['name'=>'review','oprt'=>['_READ','_UPDATE','_REVIEW']],
-//          //专利事务审批人
-//          ['name'=>'approve','oprt'=>['_READ','_UPDATE','_APPROVE']],
-//          //专利事务维护人
-//          ['name'=>'maintain','oprt'=>['_READ','_UPDATE','_MAINTAIN']]
         ],
         '_THE'=>[
           'edit'=>['_READ','_UPDATE','_CREATE','_SUBMIT','_DELETE','_EXECUTE'],
@@ -356,16 +355,6 @@ const conIssAuthOprtArr=[
           'review'=>['_READ','_UPDATE','_REVIEW'],
           'approve'=>['_READ','_UPDATE','_APPROVE'],
           'maintain'=>['_READ','_UPDATE','_MAINTAIN']
-          ////论文事务申请人
-//          ['name'=>'edit','oprt'=>['_READ','_UPDATE','_CREATE','_SUBMIT','_DELETE','_EXECUTE']],
-//          //论文事务审核人
-//          ['name'=>'audit','oprt'=>['_READ','_UPDATE','_AUDIT']],
-//          //论文事务复核人
-//          ['name'=>'review','oprt'=>['_READ','_UPDATE','_REVIEW']],
-//          //论文事务审批人
-//          ['name'=>'approve','oprt'=>['_READ','_UPDATE','_APPROVE']],
-//          //论文事务维护人
-//          ['name'=>'maintain','oprt'=>['_READ','_UPDATE','_MAINTAIN']]
         ],
         '_PRO'=>[
           'edit'=>['_READ','_UPDATE','_CREATE','_SUBMIT','_DELETE','_EXECUTE'],
@@ -373,19 +362,281 @@ const conIssAuthOprtArr=[
           'review'=>['_READ','_UPDATE','_REVIEW'],
           'approve'=>['_READ','_UPDATE','_APPROVE'],
           'maintain'=>['_READ','_UPDATE','_MAINTAIN']
-          ////项目事务申请人
-//          ['name'=>'edit','oprt'=>['_READ','_UPDATE','_CREATE','_SUBMIT','_DELETE','_EXECUTE']],
-//          //项目事务审核人
-//          ['name'=>'audit','oprt'=>['_READ','_UPDATE','_AUDIT']],
-//          //项目事务复核人
-//          ['name'=>'review','oprt'=>['_READ','_UPDATE','_REVIEW']],
-//          //项目事务审批人
-//          ['name'=>'approve','oprt'=>['_READ','_UPDATE','_APPROVE']],
-//          //项目事务维护人
-//          ['name'=>'maintain','oprt'=>['_READ','_UPDATE','_MAINTAIN']]
         ],
 ];
 
+#issue的实体定义
+const conIssEntArr=[
+  'process'=>[
+    'submit'=>['chi'=>'送审','status'=>['_PATS1','_THES1','_PROS1']],
+    'audit'=>['chi'=>'审核','status'=>['_PATS2','_THES2','_PROS2']],
+    'approve'=>['chi'=>'审批','status'=>['_PATS3','_THES3','_PROS3']],
+    'execute'=>['chi'=>'执行','status'=>['_PATS4','_THES4','_PROS4']],
+    'end'=>['chi'=>'完结','status'=>['_PATS_END','_THES_END','_PROS_END']]
+  ],
+  'oprt'=>[
+    '_CREATE'=>'新增',
+    '_SUBMIT'=>'送审',
+    '_AUDIT'=>'审核',
+    '_REVIEW'=>'复核',
+    '_APPROVE'=>'审批',
+    '_MAINTAIN'=>'维护',
+    '_UPDATE'=>'更新',
+    '_EXECUTE'=>'执行',
+    '_READ'=>'查阅',
+    '_DELETE'=>'删除'
+  ],
+  'ent-name'=>['iss-pat','iss-the','iss-pro'],
+  'iss-pat'=>[
+    'auth-oprt'=>[
+      'edit'=>['chi'=>'申报','oprt'=>['_READ','_UPDATE','_CREATE','_SUBMIT','_DELETE','_EXECUTE']],
+      'audit'=>['chi'=>'审核','oprt'=>['_READ','_UPDATE','_AUDIT']],
+      'review'=>['chi'=>'复审','oprt'=>['_READ','_UPDATE','_REVIEW']],
+      'approve'=>['chi'=>'审批','oprt'=>['_READ','_UPDATE','_APPROVE']],
+      'maintain'=>['chi'=>'维护','oprt'=>['_READ','_UPDATE','_MAINTAIN']],
+      'execute'=>['chi'=>'执行','oprt'=>['_READ','_UPDATE','_MAINTAIN']]
+    ],
+    'status'=>[//除‘完结’以外的其它状态
+      '_ISST_PATS'=>'*',
+      //label-info，待定
+      '_PATS1'=>['chi'=>'送审','oprt'=>[]],
+      '_PATS1-1'=>[
+        'chi'=>'填报中',
+        'oprt'=>[
+          '_UPDATE'=>['next-status'=>[]],
+          '_DELETE'=>['next-status'=>['display'=>1]],
+          '_SUBMIT'=>['next-status'=>['_PATS2-1']]
+        ]
+      ],
+      '_PATS1-2'=>[
+        'chi'=>'审核完-待修改',
+        'oprt'=>[
+          '_UPDATE'=>['next-status'=>[]],
+          '_SUBMIT'=>['next-status'=>['_PATS2-2']]
+        ]
+      ],
+      '_PATS1-3'=>[
+        'chi'=>'审批完-需完善',
+        'oprt'=>[
+          '_UPDATE'=>['next-status'=>[]],
+          '_SUBMIT'=>['next-status'=>['_PATS2-3']]
+        ]
+      ],
+      //label-success，正常
+      '_PATS2'=>['chi'=>'审核','oprt'=>[]],
+      '_PATS2-1'=>[
+        'chi'=>'新增-专利申请',
+        'oprt'=>[
+          '_UPDATE'=>['next-status'=>[]],
+          '_AUDIT'=>['next-status'=>['_PATS1-2','_PATS3-3','_PATS3-1']]
+        ]
+      ],
+      '_PATS2-2'=>[
+        'chi'=>'送审-已修改',
+        'oprt'=>[
+          '_UPDATE'=>['next-status'=>[]],
+          '_AUDIT'=>['next-status'=>['_PATS1-2','_PATS3-3','_PATS3-1']]
+        ]
+      ],
+      '_PATS2-3'=>[
+        'chi'=>'送审-已完善',
+        'oprt'=>[
+          '_UPDATE'=>['next-status'=>[]],
+          '_AUDIT'=>['next-status'=>['_PATS1-2','_PATS3-3','_PATS3-1']]
+        ]
+      ],
+      //label-warning，异常
+      '_PATS3'=>['chi'=>'审批','oprt'=>[]],
+      '_PATS3-1'=>[
+        'chi'=>'审核-通过',
+        'oprt'=>[
+          '_UPDATE'=>['next-status'=>[]],
+          '_APPROVE'=>['next-status'=>['_PATS4-1','_PATS4-END4','_PATS1-3']]
+        ]
+      ],
+      '_PATS3-2'=>[
+        'chi'=>'新增-续费申请',
+        'oprt'=>[
+          '_UPDATE'=>['next-status'=>[]],
+          '_APPROVE'=>['next-status'=>['_PATS4-1','_PATS4-END5']]
+        ]
+      ],
+      '_PATS3-3'=>[
+        'chi'=>'审核-不予支持',
+        'oprt'=>[
+          '_APPROVE'=>['next-status'=>['_PATS4-1','_PATS4-END4','_PATS1-3']]
+        ]
+      ],
+      //'_PATS3-END1'=>'审批-否决',
+//      '_PATS3-END2'=>'续费-放弃',
+      //label-default，停用
+      '_PATS4'=>['chi'=>'执行','oprt'=>[]],
+      '_PATS4-1'=>[
+        'chi'=>'审批-批准',
+        'oprt'=>[
+          '_UPDATE'=>['next-status'=>[]],
+          '_EXECUTE'=>['next-status'=>['_PATS4-2','_PATS4-3']]
+        ]
+      ],
+      '_PATS4-2'=>[
+        'chi'=>'执行中',
+        'oprt'=>[
+          '_UPDATE'=>['next-status'=>[]],
+          '_EXECUTE'=>['next-status'=>['_PATS4-3']]
+        ]
+      ],
+      '_PATS4-3'=>[
+        'chi'=>'申报-复核',
+        'oprt'=>[
+          '_UPDATE'=>['next-status'=>[]],
+          '_MAINTAIN'=>['next-status'=>['_PATS4-4','_PATS4-5']]
+        ]
+      ],
+      '_PATS4-4'=>[
+        'chi'=>'申报-提交',
+        'oprt'=>[
+          '_UPDATE'=>['next-status'=>[]],
+          '_MAINTAIN'=>['next-status'=>['_PATS4-END1','_PATS4-END2','_PATS4-5']]
+        ]
+      ],
+      '_PATS4-5'=>[
+        'chi'=>'申报-修改',
+        'oprt'=>[
+          '_UPDATE'=>['next-status'=>[]],
+          '_EXECUTE'=>['next-status'=>['_PATS4-3']]
+        ]
+      ],
+      '_PATS4-6'=>[
+        'chi'=>'续费-批准',
+        'oprt'=>[
+          '_UPDATE'=>['next-status'=>[]],
+          '_MAINTAIN'=>['next-status'=>['_PATS4-7']]
+        ]
+      ],
+      '_PATS4-7'=>[
+        'chi'=>'续费-提交',
+        'oprt'=>[
+          '_UPDATE'=>['next-status'=>[]],
+          '_MAINTAIN'=>['next-status'=>['_PATS4-END3']]
+        ]
+      ],
+      '_PATS4-END1'=>[
+        'chi'=>'申报-授权',
+        'oprt'=>[
+          '_UPDATE'=>['next-status'=>[]],
+          '_MAINTAIN'=>['next-status'=>['_PATS_END']]
+        ]
+      ],
+      '_PATS4-END2'=>[
+        'chi'=>'申报-驳回',
+        'oprt'=>[
+          '_UPDATE'=>['next-status'=>[]],
+          '_MAINTAIN'=>['next-status'=>['_PATS_END']]
+        ]
+      ],
+      '_PATS4-END3'=>[
+        'chi'=>'续费-授权',
+        'oprt'=>[
+          '_UPDATE'=>['next-status'=>[]],
+          '_MAINTAIN'=>['next-status'=>['_PATS_END']]
+        ]
+      ],
+      '_PATS4-END4'=>[
+        'chi'=>'审批-否决',
+        'oprt'=>[
+          '_MAINTAIN'=>['next-status'=>['_PATS_END']]
+        ]
+      ],
+      '_PATS4-END5'=>[
+        'chi'=>'续费-放弃',
+        'oprt'=>[
+          '_MAINTAIN'=>['next-status'=>['_PATS_END']]
+        ]
+      ],
+      //label-default，销账
+      '_PATS_END'=>['chi'=>'完结','oprt'=>[]]
+    ]
+  ],
+  'iss-the'=>[
+    'auth-oprt'=>[
+      'edit'=>['chi'=>'申报','oprt'=>['_READ','_UPDATE','_CREATE','_SUBMIT','_DELETE','_EXECUTE']],
+      'audit'=>['chi'=>'审核','oprt'=>['_READ','_UPDATE','_AUDIT']],
+      'review'=>['chi'=>'复审','oprt'=>['_READ','_UPDATE','_REVIEW']],
+      'approve'=>['chi'=>'审批','oprt'=>['_READ','_UPDATE','_APPROVE']],
+      'maintain'=>['chi'=>'维护','oprt'=>['_READ','_UPDATE','_MAINTAIN']],
+      'execute'=>['chi'=>'执行','oprt'=>['_READ','_UPDATE','_MAINTAIN']]
+    ],
+    'status'=>[//除‘完结’以外的其它状态
+      '_ISST_THES'=>'*',
+      //label-info，送审
+      '_THES1'=>'送审',
+      '_THES1-1'=>'填报中',
+      '_THES1-2'=>'审核完-待修改',
+      '_THES1-3'=>'审批完-需完善',
+      //label-success，审核
+      '_THES2'=>'审核',
+      '_THES2-1'=>'新增-论文发表申请',
+      '_THES2-2'=>'送审-已修改',
+      '_THES2-3'=>'送审-已完善',
+      //'_THES2-END'=>'审核-拒绝',
+      //label-warning，审批
+      '_THES3'=>'审批',
+      '_THES3-1'=>'审核-通过',
+      '_THES3-2'=>'审核-不予支持',
+      //'_THES3-END'=>'审批-否决',
+      //label-primary，执行
+      '_THES4'=>'执行',
+      '_THES4-1'=>'审批-批准',
+      '_THES4-2'=>'执行中',
+      '_THES4-3'=>'复核-修改',
+      '_THES4-4'=>'复核-通过',
+      '_THES4-5'=>'投稿-提交',
+      '_THES4-6'=>'投稿-修改',
+      '_THES4-7'=>'投稿-接受',
+      '_THES4-8'=>'投稿-复核',
+      '_THES4-END1'=>'投稿-发表',
+      '_THES4-END2'=>'投稿-被拒',
+      '_THES4-END3'=>'审批-否决',
+      //label-default，完结
+      '_THES_END'=>'完结'
+    ]
+  ],
+  'iss-pro'=>[
+    'auth-oprt'=>[
+      'edit'=>['chi'=>'申报','oprt'=>['_READ','_UPDATE','_CREATE','_SUBMIT','_DELETE','_EXECUTE']],
+      'audit'=>['chi'=>'审核','oprt'=>['_READ','_UPDATE','_AUDIT']],
+      'review'=>['chi'=>'复审','oprt'=>['_READ','_UPDATE','_REVIEW']],
+      'approve'=>['chi'=>'审批','oprt'=>['_READ','_UPDATE','_APPROVE']],
+      'maintain'=>['chi'=>'维护','oprt'=>['_READ','_UPDATE','_MAINTAIN']],
+      'execute'=>['chi'=>'执行','oprt'=>['_READ','_UPDATE','_MAINTAIN']]
+    ],
+    'status'=>[//除‘完结’以外的其它状态
+      '_ISST_PROS'=>'*',
+      //label-info，送审
+      '_PROS1'=>'送审',
+      '_PROS1-1'=>'',
+      //label-success，审核
+      '_PROS2'=>'审核',
+      '_PROS2-1'=>'',
+      '_PROS2-2'=>'送审-已修改',
+      '_PROS2-3'=>'送审-已完善',
+      //'_PROS2-END'=>'审核-拒绝',
+      //label-warning，审批
+      '_PROS3'=>'审批',
+      '_PROS3-1'=>'审核-通过',
+      '_PROS3-2'=>'审核-不予支持',
+      '_PROS3-3'=>'复核-通过',
+      '_PROS3-4'=>'复核-不予支持',
+      //'_PROS3-END'=>'审批-否决',
+      //label-primary，执行
+      '_PROS4'=>'执行',
+      '_PROS4-1'=>'审批-批准',
+      '_PROS4-END1'=>'审批-否决',
+      //label-default，完结
+      '_PROS_END'=>'完结'
+    ]
+  ]
+];
 //issue的类型大类：3类
 const conIssEntNameArr=['_PAT','_THE','_PRO'];
 //issue的状态数组大类：5类

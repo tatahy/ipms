@@ -173,7 +173,6 @@
 <script>
 var uAuth={$user}['authority'];
 
-console.log(uAuth);
 //必填输入框内容有效性判断结果数组
 var check = [];
 
@@ -309,7 +308,6 @@ var buildAuthCom=(uAuth)=>{
 
 //利用自调用匿名函数立即执行的特点， 页面初始化
 (function($){
-	console.log(authEntProp);
 	buildAuthCom(uAuth);
 	// 激活tooltip
 	$('[title]').tooltip({placement:'auto bottom'});

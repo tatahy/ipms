@@ -196,6 +196,7 @@ footer {
 <!-- /pagewrap  -->
 
 <script>
+
 //归纳bootStrap3中的颜色相关属性
 const bs3Color={
 	//info
@@ -221,10 +222,45 @@ const authColor={
 	important:{bs3:bs3Color.warning,chi:'重要'},
 	critical:{bs3:bs3Color.danger,chi:'关键'}
 };
-console.log(Object.keys(authColor));
+
 //权限模块核心属性，
 const authEntProp={$authEnt};
 
+console.log(authEntProp);
+
+//权限模块vs锚点/控制台菜单名称
+const authEntArchName={
+	'iss-pat':{arch:'#_ISST_PATS_INPROCESS'},
+	'iss-the':{arch:'#_ISST_THES_INPROCESS'},
+	'iss-pro':{arch:'#_ISST_PROS_INPROCESS'},
+	att:{arch:'#_ATTS'},
+	ass:{arch:'#_ASSS_USUAL'}
+};
+
+var setSidenav=()=>{
+	let liObj=$('#mySidenav .nav-pills li.dropdown'),
+		//计数器
+		n=0;
+	
+	for(let ent in authEntProp){
+		let e=authEntProp[ent],
+			arch='',
+			aObj='';
+				
+		if(typeof authEntArchName[ent]=='object'){
+			arch=authEntArchName[ent]['arch'];
+			aObj=$('#mySidenav .nav-pills [href="'+arch+'"]');
+			
+			e.visible?aObj.show():aObj.hide();
+			if(e.visible==false && arch.indexOf('#_ISS')!=-1){
+				n++;
+			}
+		}
+	}
+	<!-- console.log(n); -->
+	n==3?liObj.hide():liObj.show();
+	
+};
 
 var setSideNavIssNumInprocess=(obj)=>{
 	let issNum='',issPatNum='',issProNum='',issTheNum='';
@@ -300,7 +336,8 @@ function loadFile(anchor){
 (function($){
 	
 	setSideNavIssNumInprocess({$numIssArr});
-	showSideNavbar();	
+	showSideNavbar();
+	setSidenav();	
 	loadFile(window.location.hash);
 	// 激活tooltip
 	$('[title]').tooltip();

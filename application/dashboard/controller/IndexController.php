@@ -89,6 +89,16 @@ class IndexController extends \think\Controller
           #将ent名称转为全小写，并去掉字符串中的下划线，
           $k=strtolower(strtr($k,['_'=>'']));
           $this->authEnt[$k]=$v;
+          $n=0;
+          #根据$this->authArr对$this->authEnt中auth进行逐项赋值
+          foreach($this->authArr[$k] as $k1=>$v1){
+            if($v1){
+              $this->authEnt[$k]['auth'][$k1]['val']=$v1;
+              $n++;
+            }
+          }
+          #该项模块是否可见
+          $this->authEnt[$k]['visible']=($n>0)?true:false;
       }
       return true;    
     }
@@ -100,47 +110,16 @@ class IndexController extends \think\Controller
         // $auth接收前端页面传来的auth值,表示rolename（映射“用户组名”）
         $auth = !empty($request->param('auth'))?$request->param('auth'):'done';
         $item=!empty($request->param('item'))?$request->param('item'):'userInfo';
-                
-        $issEn=0;
-        $patEn=0;
-        $proEn=0;
-        $theEn=0;
-        $attEn=0;
-        $assEn=0;
-        
-        foreach($this->authArr as $key => $val){
-          $n=0;
-          foreach($val as $k => $v){
-            //'read'权限仅为用户成功登录系统后，前台的“查阅”权限，后台“用户中心”无需该权限
-            if($k!='read'){
-              $n+=$v;
-            }
-          }
-          switch($key){
-            case 'iss':
-              $issEn=$n;
-              break;
-            case 'pat':
-              $patEn=$n;
-              break;
-            case 'pro':
-              $proEn=$n;
-              break;
-            case 'the':
-              $theEn=$n;
-              break;
-            case 'att':
-              $attEn=$n;
-              break;  
-            case 'ass':
-              $assEn=$n;
-              break; 
-          }
-          
-        }
-        
+        $authEnt=$this->authEnt;
+                        
         //调用issinfo模型定义查询方法getNumArr()得到各类iss数据
         $numIssArr=$issMdl::getNumArr();
+        //if($authEnt['iss-pat']['visible'] || $authEnt['iss-the']['visible'] || $authEnt['iss-pro']['visible']){
+//          $numIssArr=$issMdl::getNumArr();
+//        }else{
+//          $numIssArr=0;
+//        }
+        
         $user=$userMdl::get($this->userId);
         $userGroup=$userMdl->userGroupArr($this->userId);
                
@@ -151,12 +130,7 @@ class IndexController extends \think\Controller
             'numIssArr'=>json_encode($numIssArr),
             #权限实体
             'authEnt'=>json_encode($this->authEnt,JSON_UNESCAPED_UNICODE),
-            'issEn'=> $issEn ,
-            'patEn'=> $patEn,
-            'proEn'=> $proEn,
-            'theEn'=> $theEn,
-            'attEn'=> $attEn,
-            'assEn'=> $assEn,
+            'authArr'=>json_encode($this->authArr,JSON_UNESCAPED_UNICODE),
             'user' => $user,
             'userGroup' => $userGroup,
             'userMobile'=>$user->getData('mobile'),
