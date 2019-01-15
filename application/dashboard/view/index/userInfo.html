@@ -261,13 +261,13 @@ var buildAuthCom=(uAuth)=>{
 			i=0,
 			spSet=[], 
 			rank=authEntProp[ent]['rank'],
-		    //checkbox的父标签底色类型
-			bgColor=authColor[rank]['bs3']['bg'],
-			//checkbox相邻标签背景色
+		    //父标签底色类型
+			bgColor=authColor[rank]['bs3']['lab'],
+			//标签背景色
 			txtColor=authColor[rank]['bs3']['txt'],
 			rCom=$('<div></div>').addClass('form-group col-sm-6'),
-			c1=$('<label></label>').addClass('control-label '+bgColor).html('【'+name+'】模块&nbsp;').css({'padding':'1px','border-radius':'3px'}),
-			c2=$('<div></div>').css({'padding-bottom':'5px','border-bottom':'solid 1px #ccc'});
+			c1=$('<label></label>').addClass('control-label '+bgColor).html(name).css({'padding':'3px 5px','border-radius':'3px','font-size':'14px'}),
+			c2=$('<div></div>').css({'padding':'5px','border-bottom':'solid 1px #ccc'});
 		
 		//遍历hash数组：authObj，
 		//auth=='read'...
@@ -300,7 +300,7 @@ var buildAuthCom=(uAuth)=>{
 	//生成#authRank的内容
 	for(let el in authColor){
 		let e=authColor[el],
-			spObj=$('<span></span>').css('font-size','12px'),
+			spObj=$('<span></span>').css({'padding':'3px 5px','border-radius':'3px','font-size':'12px'}),
 			txt=e.chi,
 			labColor=e.bs3.lab;
 		$('#authRank').append('&nbsp;',spObj.addClass(labColor).text(txt));
