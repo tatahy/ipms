@@ -96,6 +96,7 @@
 //iss状态与操作对应关系
 var issStatusOprtArr={$statusOprtArr};
 <!-- console.dir(issStatusOprtArr); -->
+var searchData={$searchData};
 
 //iss权限与操作对应关系
 var issAuthOprtArr='';
@@ -185,7 +186,7 @@ var setShowCom=(num)=>{
 	}
 };
 //设定搜索表单的各项内容
-var setFmSearch=(fmobj,optObj)=>{
+var setFmSearchData=(fmobj,optObj)=>{
 	let fcSet=fmobj.find('.form-control'),
 		keyArr=Object.keys(optObj),
 		valArr=Object.values(optObj);
@@ -303,8 +304,8 @@ var btnClickShowModel=(optObj)=>{
 	sortOrderToggle();
 	trAddBgColor();
 	
-	if(Object.keys({$searchData}).length){
-		setFmSearch($('#fmIssSearch'),{$searchData});
+	if(Object.keys(searchData.length)){
+		setFmSearchData($('#fmIssSearch'),searchData);
 	}
 	
 	//每个.tdIssOprt根据该行记录的data-iss-status="{$ vo.status}"添加相应的a标签
@@ -347,7 +348,7 @@ $(document).ready(function(){
 	$('#listRows').val('{$sortData.listRows}'); 
 	
 	$('#listRows').change(function(){
-		var listRows=$(this).val()*1;
+		let listRows=$(this).val()*1;
 		//排序有关的值向$('#divTblSortData')汇集
 		if(listRows){
 			$('#divTblSortData').data('listRows',listRows);
@@ -365,7 +366,7 @@ $(document).ready(function(){
 		$('#divTblSortData').data('sortName',sortName);
 		$('#divTblSortData').data('sortOrder',sortOrder);
 		$('#divTblSortData').data('pageNum',1);
-		//调用index.html中的loadAssList()
+		//调用index.html中的loadIssList()
 		loadIssList();
 		
 	});	

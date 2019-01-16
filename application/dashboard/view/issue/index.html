@@ -317,7 +317,8 @@ var loadIssList=()=>{
 		issEntName=anchorToIssEntName(),
 		urlList='{$home}/dashboard/issue/issList',
 		urlSelData='{$home}/dashboard/issue/searchFormSelData',
-		listData={sortData:{},searchData:{}};
+		listData={sortData:{},searchData:{}},
+		loadStr='<p class="text-center" style="font-size:28px;">加载中……</p>';
 		
 	//排序有关的参数都从$('#divTblSortData')获取
 	let obj=$('#divTblSortData'),

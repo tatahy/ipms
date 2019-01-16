@@ -148,7 +148,6 @@ const conPatStatusArr=[
                     '_PATS4-END1'=>'续费-放弃',
                     '_PATS4-END2'=>'续费-授权',
                     '_PATS5'=>'超期无效',
-               
                     ];
                     
 //thesis的类型数组

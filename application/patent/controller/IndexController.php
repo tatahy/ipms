@@ -13,17 +13,20 @@ use app\admin\model\Dept as DeptModel;
 
 class IndexController extends \think\Controller
 {
-     //用户名
+    #用户名
     private $username = null;
-    //用户密码
+    #用户密码
     private $pwd = null;
-    //用户登录状态
+    #用户登录状态
     private $log = null;
-    //用户角色
+    #用户角色
     private $roles=array();
-    //用户所在部门
+    #用户所在部门
     private $dept = null;
-    
+    #请求对象域名
+    private $home = '';
+    #排序数组
+    private $sortData=array();
     // 初始化
     protected function _initialize()
     {
@@ -32,100 +35,42 @@ class IndexController extends \think\Controller
         $this->log=Session::get('log');
         $this->roles=Session::get('role');
         $this->dept=Session::get('dept');
+        #继承了控制器基类Controller后，直接可使用其request属性来使用Request类的实例。
+        $this->home=$this->request->domain();
+        #排序初始值
+        $this->sortData=array('listRows'=>10,'sortName'=>'topic','sortOrder'=>'asc','pageNum'=>1,
+                          'showId'=>0,'period'=>'total');
     }
-    
-    public function index(Request $request)
+    private function priLogin()
     {
-        
         //通过$log判断是否是登录用户，非登录用户退回到登录页面
         if(1!==$this->log){
             $this->error('未登录用户，请先登录系统');
-            $this->redirect($request->domain());
-        }else{
-            //根据登录人选择的role，控制模板显示对应的内容
-            $roleparam=$request->param('role');
-            $active=$request->param('active');
+            //$this->redirect($request->domain());
         }
-                       
-        //$active的值不能超3或小1(因为系统默认每个角色需处理3种状态的事务，分别为1,2,3)，否则修改为1
-        if($active>3 or $active<1){
-            $active=1;
-        }
-        
-        //判断$request->param('role')传来的role值是否为Session中存储的role值，否则报错退回到登录页面
-        for($i = 0; $i < count($roles); $i++) {
-            if($roleparam==$roles[$i]){
-                $n=0;
-                $n=$n+1;
-                break;   
-            }else{
-                $n=0;
-            }
-        }
-        if($n>=1){
-            switch($roleparam){
-                case"writer":
-                    $rolename="撰写人";
-                break;
-                        
-                case"reviewer":
-                    $rolename="审查人";
-                break;
-                        
-                case"formchecker":
-                    $rolename="形式审查人";
-                break;
-                        
-                case"financialchecker":
-                    $rolename="财务审查人";
-                break;
-                        
-                case"approver":
-                    $rolename="批准人";
-                break;
-                        
-                case"maintainer":
-                    $rolename="维护人";
-                break;
-                        
-                case"operator":
-                    $rolename="执行人";
-                break;
-                        
-                default:
-                $this->error('用户角色错误，请重新登录系统');   
-            }
-        }else{
-            $this->error('用户角色不符，只能使用已注册角色');
-        }
-
-        //--在index.html页面输出自定义信息的HTML代码块        
-		$destr= "请求方法:".$request->method()."</br>".
-            "username:".$username."</br>".
-            //"pwd:".sizeof($pwd);
-            "pwd:".$pwd."</br>".
-            "log:".$log."</br>".
-            "roleparam:".$request->param('role').";active:".$request->param('active')."</br>";
-        //--!       
-        
-        $this->assign([
-          //在index.html页面通过'destr'输出自定义的信息
-          'destr'=>$destr,
-          //在index.html页面通过'array'输出自定义的数组内容
-          'array'=>$roles, 
-          
-          'home'=>$request->domain(),
-          'username'=>$username,
-          'rolename'=>$rolename,
-          'role'=>$roleparam,
-          'active'=>$active,
-          'year'=>date('Y')
-        ]);
-        return view();
+    }
+    
+    public function index(Request $request,PatinfoModel $patMdl)
+    {
+      $this->priLogin();    
+      $periodArr=conPatPeriodVsStatus;
+      foreach($periodArr as $key=>$val){
+        $periodArr[$key]['num']=$patMdl::getPeriodNum($key);
+        unset($periodArr[$key]['status']);
+      }
+      $this->assign([
+        'home'=>$this->home,
+        #各个
+        'periodProp'=>json_encode($periodArr,JSON_UNESCAPED_UNICODE),
+        'sortData'=>$this->sortData,
+        'username'=>$this->username,
+        'year'=>date('Y')
+      ]);
+      return view();
     }
     
      //patent列表    
-	public function patlist(Request $request)
+	public function patlist1(Request $request)
     {
         $log=Session::get('log');
             
@@ -364,6 +309,90 @@ class IndexController extends \think\Controller
         return view();
     }
     
+    #patent列表    
+    public function patList(Request $request,PatinfoModel $patMdl)
+    {
+      $this->priLogin();    
+      
+      #接收前端的排序参数数组
+      $sortData=!empty($request->param('sortData/a'))?$request->param('sortData/a'):$this->sortData;
+      $sortData=array_merge($this->sortData,$sortData);
+      #接收前端的搜索参数数组，由前端保证传来的搜索参数值非0，非空。
+      $searchData=!empty($request->param('searchData/a'))?$request->param('searchData/a'):array();
+      $searchData=array_merge([],$searchData);
+      
+      #返回前端进行显示的内容
+      $patList=array();
+      #进行搜索的条件数组
+      $whereArr=[];
+      
+      #前端输入的关键字搜索,like关键字，2个
+      $whereArr['topic']=!empty($searchData['topic'])?['like','%'.$searchData['topic'].'%']:'';
+      $whereArr['author']=!empty($searchData['author'])?['like','%'.$searchData['author'].'%']:'';
+      
+      #前端select值搜索，=select值(兼容select标签的multiple属性设置)，3个
+      $whereArr['dept']=!empty($searchData['dept'])?['in',$searchData['dept']]:'';
+      $whereArr['status']=!empty($searchData['status'])?['in',$searchData['status']]:'';
+      $whereArr['type']=!empty($searchData['type'])?['in',$searchData['type']]:'';
+      
+      #将空白元素删除
+      foreach($whereArr as $key=>$val){
+        if(empty($val)){
+          unset($whereArr[$key]);
+        }
+      }
+      #当前period的pat数据集
+      $patSet=$patMdl::getPeriodSet($sortData['period']);
+      $patSet=is_array($patSet)?collection($patSet):$patSet;
+      
+      #pat模型对象，查询、排序用
+      $queryBase=$patMdl->where('id','in',$patSet->column('id'))
+                        ->where($whereArr)
+                        ->order($sortData['sortName'],$sortData['sortOrder']);
+      
+      #查询、排序结果数据集：
+      $baseSet=$queryBase->select();
+      $baseSet=is_array($baseSet)?collection($baseSet):$baseSet;
+      
+      #查询、排序结果总数
+      $searchResultNum=count($baseSet);
+      
+      if($searchResultNum){
+        #本页要显示的记录
+        $patList=$baseSet->slice(($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows']);
+      }
+      
+      #pat模型对象，排序、查询后分页用
+      $pageQuery=$patMdl->where('id','in',$baseSet->column('id'))
+                      ->order($sortData['sortName'],$sortData['sortOrder']);
+      #分页对象，符合查询条件的所有iss记录分页,每页$listRows条记录
+      $pageSet=$pageQuery->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
+                        'query'=>['listRows'=>$sortData['listRows']]]);
+      
+      $this->assign([
+        'home'=>$this->home,
+        'numTotal'=>$searchResultNum,
+        #当前页显示内容
+        'patList'=>$patList,
+        #分页对象
+        'pageSet'=>$pageSet,
+        #排序数组
+        'sortData'=>$sortData,
+        #搜索数组。JSON_UNESCAPED_UNICODE，保持编码格式。若前端文件采用utf-8编码，汉字就可直接解析显示。
+        'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
+      ]);
+      return view();
+    }
+    #parSearchForm
+    public function patSearchForm(Request $request)
+    {
+      $this->priLogin();    
+      
+      $this->assign([
+        'numTotal'=>1,
+      ]);
+      return view();
+    }
     //role为writer才能增加新patent
     public function patnew(Request $request)
     {
@@ -1034,166 +1063,46 @@ class IndexController extends \think\Controller
 
     }
     
-    // 输出total模板
-    public function total(Request $request)
+    #输出total模板
+    public function total(Request $request,PatinfoModel $patMdl)
     {
       
-      //通过$log判断是否是登录用户，非登录用户退回到登录页面
+      #通过$log判断是否是登录用户，非登录用户退回到登录页面
       if(1!==$this->log){
-        $this->error('未登录用户，请先登录系统');
+        return $this->error('未登录用户，请先登录系统');
       //$this->redirect($request->domain());
-      }else{
-        //$totalTableRows接收前端页面传来的分页时每页显示的记录数，默认为10
-        if(!empty($request->param('totalTableRows'))){
-          $totalTableRows=$request->param('totalTableRows');
-        }else{
-          $totalTableRows=10;
-        }
-        
-         // 接收前端分页页数变量：“pageUserNum”
-        if(!empty($request->param('pageTotalNum'))){
-          $pageTotalNum=$request->param('pageTotalNum');
-        }else{
-          $pageTotalNum=1;
-        }
-        
-        // $sortName接收前端页面传来的排序字段名
-        if(!empty($request->param('sortName'))){
-          $sortName=$request->param('sortName');
-        }else{
-          $sortName='_PATNAME';
-        }
-        
-        // $sort接收前端页面传来的排序顺序
-        if(!empty($request->param('sort'))){
-          $sort=$request->param('sort');
-        }else{
-          $sort='_ASC';
-        }
-        
-        // $patStatus接收前端页面传来的专利状态值
-        if(!empty($request->param('patStatus'))){
-          $patStatus=$request->param('patStatus');
-        }else{
-          $patStatus=0;
-        }
-        
-         // 查询词1，'searchPatName'
-        if(!empty($request->param('searchPatName'))){
-          $searchPatName=$request->param('searchPatName');
-        }else{
-          $searchPatName='';
-        } 
-        
-        // 查询词2，'searchDept'
-        if(!empty($request->param('searchDept'))){
-          $searchDept=$request->param('searchDept');
-        }else{
-          $searchDept=0;
-        } 
-        
-        // 查询词3，'searchPatStatus'
-        if(!empty($request->param('searchPatStatus'))){
-          $searchPatStatus=$request->param('searchPatStatus');
-        }else{
-          $searchPatStatus=0;
-        }
-        
-        // 查询词4，'searchPatType'
-        if(!empty($request->param('searchPatType'))){
-          $searchPatType=$request->param('searchPatType');
-        }else{
-          $searchPatType=0;
-        } 
-        
-        // 查询词5，'searchWriter'
-        if(!empty($request->param('searchWriter'))){
-          $searchWriter=$request->param('searchWriter');
-        }else{
-          $searchWriter='';
-        }  
-        
       }
       
-      // 选择排序字段
-      switch($sortName){
-        case '_PATNAME':
-          $strOrder='topic';
-        break;
-            
-        case '_PATTYPE':
-          $strOrder='type';
-        break;
-        
-        case '_AUTHOR':
-          $strOrder='author';
-        break;
-        
-        case '_INVENTOR':
-          $strOrder='inventor';
-        break;
-            
-        case '_PATOWNER':
-          $strOrder='patowner';
-        break;
-            
-        case '_SUBMITDATE':
-          $strOrder='submitdate';
-        break;
-            
-        case '_DEPT':
-          $strOrder='dept';
-        break;
-            
-        case '_PROJECT':
-          $strOrder='pronum';
-        break;
-        
-        case '_PATSTATUS':
-          $strOrder='status';
-        break;
-            
-        //默认按字段“topic”
-        default:
-          $strOrder='topic';  
-          $sortName="_PATNAME";
-        break;
-      } 
+      $searchDefaults=array();
+      $sortDefaults=array('listRows'=>10,'sortName'=>'topic','sortOrder'=>'asc','pageNum'=>1,
+                          'showId'=>0,'period'=>'#total');
       
-      //  组合升序or降序查询
-      if($sort=="_ASC"){
-          $strOrder=$strOrder.' asc';
-      }else{
-          $strOrder=$strOrder.' desc';
-          
-      }
+      #接收前端的排序参数数组
+      $sortData=!empty($request->param('sortData/a'))?$request->param('sortData/a'):$sortDefaults;
+      $sortData=array_merge($sortDefaults,$sortData);
+      #接收前端的搜索参数数组，由前端保证传来的搜索参数值非0，非空。
+      $searchData=!empty($request->param('searchData/a'))?$request->param('searchData/a'):$searchDefaults;
+      $searchData=array_merge($searchDefaults,$searchData);
       
-      // 组合状态查询条件，
-      switch($patStatus){
+      #返回前端进行显示的内容
+      $patList=array();
+      #进行搜索的条件数组
+      $whereArr=[];
+      $map=[];
+      
+      #前端输入的关键字搜索,like关键字，2个
+      $whereArr['topic']=!empty($searchData['topic'])?['like','%'.$searchData['topic'].'%']:'';
+      $whereArr['author']=!empty($searchData['author'])?['like','%'.$searchData['author'].'%']:'';
+      
+      #前端select值搜索，=select值(兼容select标签的multiple属性设置)，3个
+      $whereArr['dept']=!empty($searchData['dept'])?['in',$searchData['dept']]:'';
+      $whereArr['status']=!empty($searchData['status'])?['in',$searchData['status']]:'';
+      $whereArr['type']=!empty($searchData['type'])?['in',$searchData['type']]:'';
+      
+      # 组合状态查询条件，
+      switch($sortData['period']){
         case '#total':
           $map='';
-          
-          // 5个查询词
-          if($searchDept){
-            $map['dept']=$searchDept;
-          }
-          
-          if($searchPatName){
-            $map['topic']=['like','%'.$searchPatName.'%'];
-          }
-          
-          if($searchPatStatus){
-            $map['status']=$searchPatStatus;
-          }
-          
-          if($searchPatType){
-            $map['type']=$searchPatType;
-          }
-          
-          if($searchWriter){
-            $map['author']=['like','%'.$searchWriter.'%'];
-          }
-          
         break;
         // '内审'   
         case '#audit':
@@ -1232,67 +1141,101 @@ class IndexController extends \think\Controller
         default:
           $map='';
         break;
-      }  
-         
-      //使用模型Patinfo
-      $pats = new PatinfoModel;
+      }
       
-      // 查出所有的用户并分页，根据“strOrder”排序，前端页面显示的锚点（hash值）为$fragment，设定分页页数变量：“pageTotalNum”
-      // 带上每页显示记录行数$totalTableRows，实现查询结果分页显示。
-      $patTotal = $pats->where('id','>',0)
+      #将空白元素删除
+      foreach($whereArr as $key=>$val){
+        if(empty($val)){
+          unset($whereArr[$key]);
+        }
+      }
+      
+      #将空白元素删除
+      if(!empty($map)){
+        foreach($map as $key=>$val){
+          if(empty($val)){
+            unset($map[$key]);
+          }
+        } 
+      }
+       
+         
+      #pat模型对象，查询、排序用
+      $queryBase=$patMdl->where('id','>',0)
                         ->where($map)
-                        ->order($strOrder)
-                        ->paginate($totalTableRows,false,['type'=>'bootstrap','fragment'=>$patStatus,'var_page' => 'pageTotalNum',
-                        'query'=>['totalTableRows'=>$totalTableRows]]);
-                        
-      // 获取分页显示
-      $pageTotal = $patTotal->render();
-      // 记录总数
-      $numTotal = $pats->where('id','>',0)->where($map)->count();
+                        ->where($whereArr)
+                        ->order($sortData['sortName'],$sortData['sortOrder']);
+      
+      #查询、排序结果数据集：
+      $baseSet=$queryBase->select();
+      $baseSet=is_array($baseSet)?collection($baseSet):$baseSet;
+      
+      #查询、排序结果总数
+      $searchResultNum=count($baseSet);
+      
+      if($searchResultNum){
+        #本页要显示的记录
+        $patList=$baseSet->slice(($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows']);
+      }
+      
+      #pat模型对象，排序、查询后分页用
+      $pageQuery=$patMdl->where('id','in',$baseSet->column('id'))
+                      ->order($sortData['sortName'],$sortData['sortOrder']);
+      #分页对象，符合查询条件的所有iss记录分页,每页$listRows条记录
+      $pageSet=$pageQuery->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
+                        'query'=>['listRows'=>$sortData['listRows']]]);   
       
       $this->assign([
-              'home'=>$request->domain(),
+        'home'=>$request->domain(),
+        'numTotal'=>$searchResultNum,
+        'patList'=>$patList,
+        'pageSet'=>$pageSet,
+        #排序数组
+        'sortData'=>$sortData,
+        #将数组转换为json字符串，编码为Unicode字符（\uxxxx）。
+        #前端就可以使用json对象的访问方法或是关联数组的访问方法进行使用，若前端文件采用utf-8编码，汉字也可直接解析显示。
+        'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
               
-              // 分页显示所需参数
-              'patTotal'=>$patTotal,
-              'numTotal'=>$numTotal,
-              'pageTotal'=>$pageTotal,
-              'totalTableRows'=>$totalTableRows,
-              'pageTotalNum'=>$pageTotalNum,
-              
-              // 表格搜索字段
-              'searchPatName'=>$searchPatName,
-              'searchDept'=>$searchDept,
-              'searchPatStatus'=>$searchPatStatus,
-              'searchPatType'=>$searchPatType,
-              'searchWriter'=>$searchWriter,
-              
-    
-              
-              // 表格排序信息
-              'sortName'=>$sortName,
-              'sort'=>$sort,
-              'totalTableRows'=>$totalTableRows,
-              
-              // 所return的页面显示的pat状态值$patStatus
-              'patStatus'=>$patStatus,
-              
-        ]);
+      ]);
       return view();
     }
-    
+    #准备前端select组件所需的内容
+    public function getSelComData(PatinfoModel $patMdl)
+    {
+      //通过$log判断是否是登录用户，非登录用户退回到登录页面
+        if(1!==$this->log){
+           return $this->error('未登录用户，请先登录系统');
+            //$this->redirect($request->domain());
+        }
+        $request=$this->request;
+        #定义返回前端的数据结构
+        $resData=[
+          'dept'=>[['txt'=>'','val'=>'','attr'=>'']],
+          'type'=>[['txt'=>'','val'=>'']],
+          'status'=>[['txt'=>'','val'=>'']]
+        ];
+        #接收前端的参数
+        $selNameArr=$request->param('nameArr/a');
+        $period=!empty($request->param('period'))?$request->param('period'):'total';
+        
+        foreach($resData as $key=>$val){
+          $resData[$key]=$patMdl::getPeriodSelData($period,$key,$val[0]);
+        }
+        
+        return $resData;
+    }
     // 获取所有部门信息,不能写成“_dept”，因为前端的HTML文件中的url里不能含有“_”开头的名称，否则就无法访问到，会报错
     public function dept()
     {
       //通过$log判断是否是登录用户，非登录用户退回到登录页面
         if(1!==$this->log){
-            $this->error('未登录用户，请先登录系统');
+           return $this->error('未登录用户，请先登录系统');
             //$this->redirect($request->domain());
-        }else{
-            $dept=DeptModel::all();
-            // 将数组转化为json
-            return json($dept);
         }
+        
+        $dept=DeptModel::all();
+        #将数组转化为json
+        return $dept;
     }
     
     // 获取所有专利状态信息,不能写成“_status”，因为前端的HTML文件中的url里不能含有“_”开头的名称，否则就无法访问到，会报错
@@ -1300,25 +1243,36 @@ class IndexController extends \think\Controller
     {
       //通过$log判断是否是登录用户，非登录用户退回到登录页面
         if(1!==$this->log){
-            $this->error('未登录用户，请先登录系统');
+           return $this->error('未登录用户，请先登录系统');
             //$this->redirect($request->domain());
-        }else{
-            $status=PatinfoModel::field('status')->group('status')->select();
-            return $status;
         }
+        
+        $status=PatinfoModel::field('status')->group('status')->select();
+        foreach($status as $k=>$v){
+          #引用应用公共文件（app/common.php）中定义的数组常量conPatStatusArr，得到'statusEn'值
+          $status[$k]['statusEn']=array_search($v['status'],conPatStatusArr);
+        }
+        return $status;
     }
     
     // 获取所有专利类型信息,不能写成“_type”，因为前端的HTML文件中的url里不能含有“_”开头的名称，否则就无法访问到，会报错
     public function patType()
     {
+      
+      
       //通过$log判断是否是登录用户，非登录用户退回到登录页面
         if(1!==$this->log){
-            $this->error('未登录用户，请先登录系统');
+           return $this->error('未登录用户，请先登录系统');
             //$this->redirect($request->domain());
-        }else{
-            $patType=PatinfoModel::field('type')->group('type')->select();
-            return $patType;
         }
+        
+        $patType=PatinfoModel::field('type')->group('type')->select();
+        foreach($patType as $k=>$v){
+          #引用应用公共文件（app/common.php）中定义的数组常量conPatTypeArr，得到'typeEn'值
+          $patType[$k]['typeEn']=array_search($v['type'],conPatTypeArr);
+        }
+            
+        return $patType;
     }
 
 }

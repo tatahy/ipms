@@ -1,57 +1,55 @@
 <!-- // total.html  -->
 <div id="divTotal" class="tab-pane">
 	
-	<h4 id="h4PatType" class="text-left">专利总数<span class="badge">{$numTotal}</span></h4>
+	<h4 id="h4PatType" class="text-left">
+	
+		<span class="pull-right">
+			<button id="btnSearchInfo" type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divCollapse" title="显示/隐藏专利搜索条件"><span class="glyphicon glyphicon-plus"></span>搜索</button>&nbsp;
+			<button id="btnRefresh" type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+		</span>
+	</h4>
 
 	<!-- // 搜索区域，仅“专利总数”页面显示 -->
 	<div id="divCollapse" class="collapse" style="padding-top:10px;">
-		<div class="label label-info" style="font-size:14px;">搜索条件</div>
-		<form method="get" action="{$home}/admin/index/sys_user#div1" id="userSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;">
+		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divCollapse"  data-toggle="collapse" title="点击隐藏">专利查询条件</a>
+		
+		<form method="" action="" id="fmPatSearch" style="border:1px solid #eee;padding:10px 0px;">
 			<div class="row myRow">
 				<div class="form-group col-sm-4">
-					<label class="" for="searchPatName">名称</label>
-					<input class="form-control" id="searchPatName" name="searchPatName" type="text" value="" placeholder="...不限">
+					<label class="" for="topic">名称</label>
+					<input class="form-control" name="topic" type="text" value="" placeholder="...不限">
 				</div>
 				<div class="form-group col-sm-2">
-					<label class="control-label" for="searchWriter">撰写人</label>
-					<input class="form-control" id="searchWriter" name="searchWriter" type="text" value="" placeholder="...不限">
+					<label class="control-label" for="author">撰写人</label>
+					<input class="form-control" name="author" type="text" value="" placeholder="...不限">
 				</div>
 				
 			</div>
 			<div class="row myRow">
 				<div class="form-group col-sm-5">
-					<label class="control-label" for="searchPatType">类型</label>
+					<label class="control-label" for="type">类型</label>
 					<!-- <select multiple class="form-control" id="searchPatType" name="searchPatType" > -->
-					<select class="form-control" id="searchPatType" name="searchPatType" >
-						<option value="1">1</option>
-						<option value="2">2</option>
-						<option value="3">3</option>
-											
+					<select class="form-control" name="type" >
+						<option value="0">...不限</option>
 					</select>
 				</div>
 				<div class="form-group col-sm-4">
-					<label class="control-label" for="searchDept">部门</label>
+					<label class="control-label" for="dept">部门</label>
 					<!-- <select multiple class="form-control" id="searchDept" name="searchDept"> -->
-					<select class="form-control" id="searchDept" name="searchDept">
-						<option value="_a">a</option>
-						<option value="_b">b</option>
-						<option value="_c">c</option>
-											
+					<select class="form-control" name="dept">
+						<option value="0">...不限</option>
 					</select>
 				</div>					
 				<div class="form-group col-sm-3">
-					<label class="control-label" for="searchPatStatus">状态</label>
+					<label class="control-label" for="status">状态</label>
 					<!-- <select multiple class="form-control" id="searchPatStatus" name="searchPatStatus"> -->
-					<select class="form-control" id="searchPatStatus" name="searchPatStatus">
-						<option value="_a">a</option>
-						<option value="_b">b</option>
-						<option value="_c">c</option>
-											
+					<select class="form-control" name="status">
+						<option value="0">...不限</option>	
 					</select>
 				</div>
 			</div>
 			<div class="row myRow text-right">	
-				<button id="btnSearchPat" type="button" class="btn btn-primary btn-sm">搜索&nbsp;<span class="glyphicon glyphicon-search"></span></button>	
+				<button id="btnSearchPat" type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>搜索</button>	
 				<button type="reset" class="btn btn-primary btn-sm">条件重置</button>
 			</div>					
 		</form>
@@ -67,29 +65,33 @@
 		<p></p>
 	</div>
 	{/neq}
+	
+	<!-- // PatList表格排序信息汇总组件 -->
+	<div id="divTblSortData" data-sort-name="{$sortData.sortName}" data-sort-order="{$sortData.sortOrder}" data-list-rows="{$sortData.listRows}" data-page-num="{$sortData.pageNum}" data-show-id="{$sortData.showId}" data-period="{$sortData.period}" class="sr-only"></div>
+	
 	<div class="table-responsive">
-		<table class="table table-bordered table-striped table-hover">
+		<table id="tblPatList" class="table table-bordered table-striped table-hover">
 			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>专利信息列表&nbsp;<strong class="assType"></strong></h4></caption>
 			<thead>
 				<tr>
 					<th>序号</th>
-					<th><a data-toggle="tooltip" href="#total"  sortName="_PATNAME" sort="{$sort}">名称</a></th>
-					<th><a data-toggle="tooltip" href="#total"  sortName="_PATTYPE" sort="{$sort}">类型</a></th>
-					<th><a data-toggle="tooltip" href="#total"  sortName="_PATSTATUS" sort="{$sort}">状态</a></th>
-					<th><a data-toggle="tooltip" href="#total"  sortName="_SUBMITDATE" sort="{$sort}">提交日期</a></th>
+					<th><a data-sort-name="topic">名称</a></th>
+					<th><a data-sort-name="type">类型</a></th>
+					<th><a data-sort-name="status">状态</a></th>
+					<th><a data-sort-name="submitdate">提交日期</a></th>
 					
-					<th><a data-toggle="tooltip" href="#total"  sortName="_AUTHOR" sort="{$sort}">撰写人</a></th>
-					<th><a data-toggle="tooltip" href="#total"  sortName="_INVENTOR" sort="{$sort}">发明人</a></th>
-					<th><a data-toggle="tooltip" href="#total"  sortName="_PATOWNER" sort="{$sort}">所有人</a></th>
+					<th><a data-sort-name="author">撰写人</a></th>
+					<th><a data-sort-name="inventor">发明人</a></th>
+					<th><a data-sort-name="patowner">所有人</a></th>
 					
-					<th><a data-toggle="tooltip" href="#total"  sortName="_DEPT" sort="{$sort}">所属部门</a></th>
-					<th><a data-toggle="tooltip" href="#total"  sortName="_PROJECT" sort="{$sort}">关联项目</a></th>
+					<th><a data-sort-name="dept">所属部门</a></th>
+					<th><a data-sort-name="pronum">关联项目</a></th>
 				</tr>
 			</thead>
 			<tbody><!-- 此处显示数据库查询后的数据集 -->
-				{volist name="patTotal" id="vo" empty="暂时没有数据"}
+				{volist name="patList" id="vo" empty="暂时没有数据"}
 				<tr>
-					<td>{$i+($pageTotalNum-1)*$totalTableRows}</a></td>
+					<td>{$i+($sortData.pageNum-1)*$sortData.listRows}</a></td>
 					<td class="patInfo"><a href="{$home}/patent/index/patinfo/id/{$vo.id}" target="_blank" data-toggle="tooltip">{$vo.topic}</a></td>
 					{// patent模块的Model层对‘pattype’字段输出值有处理，用getData方法可以得到‘type’字段在数据库中的值}
 					<!-- <td>{$vo->getData('type')}</td> -->
@@ -117,13 +119,13 @@
 		</table>
 	</div>
 	
-	<div id="divTotalTableRows" class="col-sm-12 text-right search">
+	<div id="divListRows" class="row text-right">
 		<!-- // 分页变量 -->
-		<div class="col-sm-10 text-right">{$pageTotal}</div>
+		<div class="col-sm-10 text-right">{$pageSet->render()}</div>
 						
 		<div class="form-group form-group-sm col-sm-2">
 			<span class="">每页记录行数：</span>
-				<select class="form-control" id="totalTableRows">
+				<select class="form-control" id="listRows">
 					<option value="5">5</option>
 					<option value="10">10</option>
 					<option value="20">20</option>
@@ -136,81 +138,227 @@
 </div>
 
 <script>
-// 本页面的pat状态
-var patStatus='{$patStatus}';
+// 本页面的pat所处的阶段
+<!-- var period='{ $sortData}'; -->
+var numTotal={$numTotal};
+
+// 根据本页面的锚点值，决定<h4>的内容
+var setTitle=()=>{
+	let sId=window.location.hash,
+		lab='',
+		txt='',
+		spObj=$('<span></span>').css('padding','6px'),
+		spBdg=$('<span></span>').addClass('badge'),
+		hObj=$('#h4PatType');
+		
+	switch(sId){
+		case'#audit':
+			lab='label label-default';
+			txt='内部审核拟申报专利&nbsp;';
+			spBdg.text(numTotal);
+			break;
+		case'#newAdd':
+			lab='label label-info';
+			txt='拟申报专利';
+			break;
+		case'#apply':
+			lab='label label-primary';
+			txt='申报专利';
+			break;
+		case'#authorize':
+			lab='label label-success';
+			txt='授权（有效期）专利';
+			break;	
+		case'#render':
+			lab='label label-success';
+			txt='续费授权（有效期）专利';
+			break;
+		case'#abandon':
+			lab='label label-info';
+			txt='已放弃专利数&nbsp;';
+			spBdg.text(numTotal);
+			break;
+		case'#reject':
+			lab='label label-info';
+			txt='被驳回专利数&nbsp;';
+			spBdg.text(numTotal);
+			break;
+		case'#invalid':
+			lab='label label-default';
+			txt='无效专利数&nbsp;';
+			spBdg.text(numTotal);
+			break;
+		default:
+			lab='label label-default';
+			txt='专利总数&nbsp;';
+			spBdg.text(numTotal);
+			break;		
+	}
+	spObj.addClass(lab).append(txt,spBdg);
+	hObj.prepend(spObj);
+};
+//对选定的patList列表字段进行升序降序转换，改变该字段表头显示格式
+var sortOrderToggle=()=>{
+	let obj='',
+		glyAsc='&nbsp;<span class="small glyphicon glyphicon-sort-by-attributes"></span>',
+		glyDesc='&nbsp;<span class="small glyphicon glyphicon-sort-by-order-alt"></span>',
+		sortOrder=$('#divTblSortData').data('sortOrder'),
+		sortName=$('#divTblSortData').data('sortName');
+		
+	$('#tblPatList thead a').removeClass('label label-primary');
+	
+	$('#tblPatList thead a').each(function(){
+		if(sortName==$(this).data('sortName')){
+			obj=$(this);
+		}else{
+			$(this).tooltip({placement: 'bottom'});
+		}
+	});
+	
+	if(obj.length){
+		obj.addClass('label label-primary');
+		if(sortOrder == 'asc'){
+			//当前为升序
+			obj.append(glyAsc).data('sortOrder','desc').tooltip({title:'当前为升序。点击后降序',placement: 'top'});
+		}else{
+			//当前为降序
+			obj.append(glyDesc).data('sortOrder','asc').tooltip({title:'当前为降序。点击后升序',placement: 'top'});
+		}
+	}		
+};
+//完善搜索表单的select组件内容
+var setFmSelectCom=(fmObj)=>{
+	let selSet=fmObj.find('select'),
+		selName=[],
+		url='getSelComData',
+		period=$('#divTblSortData').data('period');
+	//发送给后端的与select组件有关的变量
+	let selData={period:period};	
+	//查询表单中选择框的name属性值数组
+	for(var i=0;i<selSet.length;i++){
+		selName[i]=selSet.eq(i).attr('name');
+	}
+	
+	selData=$.extend(selData,{nameArr:selName});
+	//向后端请求组装select组件所需数据
+	$.post(url,selData,function(resData){
+		//挨个组装好所有的select组件
+		for(var i=0;i<selSet.length;i++){
+			let selObj=selSet.eq(i),
+				selName=selObj.attr('name');
+			selObj.empty().append($('<option></option>').val(0).text('…不限'));		
+			//组装option
+			resData.forEach(function(item){
+				let name=item.name,
+					keyArr=item.key,
+					valueArr=item.value;
+					
+				while(selName==name){
+					if(selName=='dept'){
+						valueArr.forEach(function(itmChi,index){
+							selObj.append($('<option></option>').val(itmChi).	text(itmChi +'，简称：'+keyArr[index]));
+						});
+					}else{
+						keyArr.forEach(function(v,k){
+							selObj.append($('<option></option>').val(v).text(valueArr[k]));
+						});
+					}
+				 //破坏循环执行条件，跳出循环。否则循环无限执行 -->
+				<!-- selName=0; -->
+				//直接跳出循环
+					break;
+				}
+			});
+		}
+	});
+	
+};
+//设定搜索表单的各项内容
+var setFmSearchData=(optObj)=>{
+	let fcSet=$('#fmPatSearch').find('.form-control'),
+		keyArr=Object.keys(optObj),
+		valArr=Object.values(optObj);
+	
+	keyArr.forEach(function(item,index){
+		for(var i=0;i<fcSet.length;i++){
+			let subCom=fcSet.eq(i),
+				name=subCom.attr('name');
+			while(item==name){
+				<!-- console.log(typeof valArr[index]); -->
+				//valArr[index]是否为数组
+				if(typeof valArr[index] == 'Object'){
+					valArr[index].forEach(function(v,k){
+						subCom.val(v);
+						console.log(v);	
+					});
+				}else{
+					subCom.val(valArr[index]);
+				}
+				break;
+			}
+		}
+		<!-- console.log(item,valArr[index]);	 -->
+	});
+	
+};
+//载入文件
+var loadTotal=()=>{
+	let url='total',
+		listData={sortData:{},searchData:{}},
+		loadStr='<p class="text-center" style="font-size:28px;">加载中……</p>';
+	//排序有关的参数都从$('#divTblSortData')获取
+	let obj=$('#divTblSortData'),
+		sortData={
+			'sortName':obj.data('sortName'),
+			'sortOrder':obj.data('sortOrder'),
+			'pageNum':obj.data('pageNum'),
+			'listRows':obj.data('listRows'),
+			'showIssId':obj.data('showIssId')
+		},
+		sortDataDefault={'listRows':10,'sortName':'issnum','sortOrder':'asc','pageNum':1,'issEntName':'_PAT','showIssId':0,'issStatus':'_INPROCESS'};
+	
+	
+	//用户搜索有关键值对从表单$('#fmIssPatSearch')获取
+	let formData=new FormData($('#fmPatSearch')[0]),
+		searchData={};
+	
+	//使用Map对象的forEach方法组装键值对
+	formData.forEach(function(val,key){
+		//非0非空的值才进行组装
+		if(val!='' && val!=0){
+			searchData[key]=val;
+		}
+	});
+	
+	<!-- // 转换成json字符串-->
+	JSON.stringify(searchData);
+	
+	sortData=$.extend({},sortDataDefault,sortData);
+	listData.sortData=sortData;
+	listData.searchData=searchData;
+	
+	//加载total.html页面内容到patlist.html页面中<div id="patlist"></div>
+	$("#patlist").html(loadStr).load(url,listData);
+};
+
 //利用自调用匿名函数立即执行的特点，页面初始化
 (function($){
-	var htmlStr='';
-	// 根据本页面的pat状态值patStatus，决定<h4>的内容
-	switch(patStatus){
-		case "#audit":
-			htmlStr='<span class="label label-default" style="padding:6px;">内部审核拟申报专利&nbsp;<span class="badge">{$numTotal}</span></span>';
-		break;
-		
-		case "#newAdd":
-			htmlStr='<span class="label label-info" style="padding:6px;">拟申报专利</span>';
-		break;
-		
-		case "#apply": 
-			htmlStr='<span class="label label-primary" style="padding:6px;">申报专利</span>';
-		break;
-		
-		case "#authorize": 
-			htmlStr='<span class="label label-success" style="padding:6px;">授权（有效期）专利</span>';
-		break;
-		
-		case "#render": 
-			htmlStr='<span class="label label-success" style="padding:6px;">续费授权（有效期）专利</span>';
-		break;
-		
-		case "#abandon": 
-			htmlStr='<span class="label label-info" style="padding:6px;">已放弃专利数&nbsp;<span class="badge">{$numTotal}</span></span>';
-		break;
-		
-		case "#reject": 
-			htmlStr='<span class="label label-info" style="padding:6px;">被驳回专利数&nbsp;<span class="badge">{$numTotal}</span></span>';
-		break;
-		
-		case "#invalid": 
-			htmlStr='<span class="label label-info" style="padding:6px;">无效专利数&nbsp;<span class="badge">{$numTotal}</span></span>';
-		break;
-		
-		<!-- // 带入“显示搜索”和“重置”按钮 -->
-　　	default: 
-			htmlStr='<span class="label label-default" style="padding:6px;">专利总数&nbsp;<span class="badge">{$numTotal}</span></span>&nbsp;<span class="pull-right"><button id="btnSearchInfo" type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divCollapse">显示搜索&nbsp;<span class="caret"></span></button>&nbsp;<button id="btnRefresh" type="button" class="btn btn-primary btn-sm">刷新&nbsp;<span class="glyphicon glyphicon-refresh"></span></button></span>';
-		break;
+	
+	//每个$('#tblIssList thead a')添加属性
+	$('#tblPatList thead a').attr({'href':window.location.hash,'data-title':'点击排序','data-toggle':'tooltip'}).closest('th').addClass('text-center');
+	setTitle();
+	setFmSelectCom($('#fmIssSearch'));
+	
+	if(Object.keys(searchData.length)){
+		setFmSearchData($('#fmIssSearch'),searchData);
 	}
-	$('#h4PatType').html(htmlStr);	
+	sortOrderToggle();
+	// 激活tooltip
+	$('[title]').tooltip();	
 })(jQuery);
 
 $(document).ready(function(){
-	
-	// 输入框#searchPatName的内容
-	$("#searchPatName").val('{$searchPatName}');
-	
-	// 单选框#searchDept的内容
-	showDept($("#searchDept"),[{"text":"...不限","val":"0"}],'{$searchDept}');
-	
-	// 单选框#searchPatStatus的内容
-	showPatStatus($("#searchPatStatus"),[{"text":"...不限","val":"0"}],'{$searchPatStatus}');
-	
-	// 单选框#searchPatType的内容
-	showPatType($("#searchPatType"),[{"text":"...不限","val":"0"}],'{$searchPatType}');
-	
-	// 输入框#searchWriter的内容
-	$("#searchWriter").val('{$searchWriter}');
-	
-	<!-- // 显示搜索条件的div，修改触发"显示"的btn内容-->
-	$("#divCollapse").on("hide.bs.collapse", function(){
-    	$("#btnSearchInfo").html('显示搜索&nbsp;<span class="caret"></span>');
-  	});
-	
-	<!-- // 隐藏搜索条件的div，修改触发"隐藏"的btn内容-->
-  	$("#divCollapse").on("show.bs.collapse", function(){
-    	$("#btnSearchInfo").html('隐藏搜索&nbsp;<span class="glyphicon glyphicon-collapse-up"></span>');
 		
-  	});
-	
 	$("#btnSearchPat").click(function(){
 		<!-- //根据每页显示记录行数加载页面 -->
 		loadTotal($("#totalTableRows").val());
@@ -221,52 +369,12 @@ $(document).ready(function(){
 		$("#patlist").load("total");
 	});
 	
-	// 添加bootstrap的tooltip属性
-	$("#divTotal thead th a").tooltip({title: "点击排序", placement: "bottom"});
-	
-	$('.patInfo a').tooltip({title: '专利信息', placement: 'bottom'});
-	
-	$('.proInfo a').tooltip({title: '项目信息', placement: 'bottom'});
-
-	// 根据后端控制器给出的排序字段{$sortName},排序方式{$sort}，修改th中a的显示形式
-	$("#divTotal thead a").each(function(){
-	
-		var glyAsc='<span class="small glyphicon glyphicon-sort-by-attributes text-muted"></span>';
-		var glyDesc='<span class="small glyphicon glyphicon-sort-by-attributes-alt text-warning"></span>';
-		
-		//排序字段{$sortName}已赋值在a的“sortName”属性中
-		var sortName=$(this).attr("sortName");
-		// 排序方式{$sort}已赋值在a的“sort”属性中
-		var sort=$(this).attr("sort");
-		
-		<!-- // 后端控制器给出的排序字段{$sortName}, -->
-		if (sortName=="{$sortName}"){
-			if(sort=="_ASC"){
-				$(this).append(glyAsc);
-				$(this).attr("sort","_DESC");
-				$(this).attr('data-original-title','点击后降序');
-				// bootstap3中修改tooltip的options属性值
-				<!-- $(this).data("bs.tooltip").options.title="点击后降序"; -->
-				$(this).data("bs.tooltip").options.placement="top";
-			}else{
-				$(this).append(glyDesc);
-				$(this).attr("sort","_ASC");
-				$(this).attr('data-original-title','点击后升序');
-				// bootstap3中修改tooltip的options属性值
-				<!-- $(this).data("bs.tooltip").options.title="点击后降序"; -->
-				$(this).data("bs.tooltip").options.placement="top";
-			}
-		}
-	});
-	
-	// 点击th中的a，表格中的内容根据a中的属性值进行排序
-	$('#divTotal thead a').click(function(){
-		
-		var sort=$(this).attr("sort");
-		var sortName=$(this).attr("sortName");
-		
-		// 得到页面锚点值
-		var fragment = window.location.hash;	
+	//排序
+	$('#tblPatList thead a').click(function(){
+		let sortName=$(this).data('sortName');
+		//排序有关的值向$('#divTblSortData')汇集
+		$('#divTblSortData').data('sortName',sortName);
+		$('#divTblSortData').data('pageNum',1);
 		
 		<!-- //根据每页显示记录行数，pat状态，排序字段，排序方式加载页面 -->
 		loadTotal($("#totalTableRows").val(),patStatus,sortName,sort);
@@ -274,23 +382,29 @@ $(document).ready(function(){
 	});
 
 	<!-- //表格每页显示记录行数 -->
-	$("#totalTableRows").val('{$totalTableRows}'); 
+	$('#listRows').val('{$sortData.listRows}'); 
 	
-	$("#totalTableRows").change(function(){
-		<!-- //根据每页显示记录行数及本页面显示的pat状态“patStatus”加载页面 -->
-		loadTotal($(this).val(),patStatus);
+	$('#listRows').change(function(){
+		let listRows=$(this).val()*1;
+		//排序有关的值向$('#divTblSortData')汇集
+		if(listRows){
+			$('#divTblSortData').data('listRows',listRows);
+			//分页从第一页开始
+			$('#divTblSortData').data('pageNum',1);
+		}
+		
+		loadTotal();
 	
 	});	
 	
 	<!-- // 点击分页中的a，表格中的内容根据a中的属性值进行排序 -->
-	$('#divTotalTableRows a').click(function(event){
+	$('#divListRows a').click(function(event){
 		// a所在分页页数
-		var pageStr=$(this).text();
-		var pageNum;
+		let pageStr=$(this).text(),pageNum,
 		//(li.active)所代表的页数
-		var pageNumActive=$('#divTotalTableRows li.active').children('span').text();
+			pageNumActive=$('#divListRows li.active').children('span').text(),
+			sortName=$('thead').find('.label').data('sortName');
 		
-		// jQuery的preventDefault()方法阻止元素发生默认的行为。阻止访问a的URL
         event.preventDefault();
 		<!-- alert("pageStr:"+pageStr+" active:"+pageNumActive); -->
 		
@@ -305,230 +419,24 @@ $(document).ready(function(){
 			break;
 			
 			default:
-				pageNum=pageStr;
+				pageNum=pageStr*1;
 			break;
 		
 		}
-		<!-- alert("pageNum:"+pageNum); -->
+		//排序有关的值向$('#divTblSortData')汇集
+		if(pageNum){
+			$('#divTblSortData').data('pageNum',pageNum);
+		}
 		
 		<!-- //根据每页显示记录行数，排序字段，排序方式，分页页数加载页面 -->
-		loadTotal($("#totalTableRows").val(),patStatus,"{$sortName}","{$sort}",pageNum)
+		loadTotal();
 	
 	});
 
 
 <!-- function -->
 	
-	//**函数名：loadTotal
- 	//* 作用：加载total.html页面内容到patlist.html页面中<div id="patlist"></div>
-	//* 参数1：rows，类型：数值。值：可为空，默认为10。
-	//* 参数2：patStatus，类型：字符。值：可为空，默认为'total'。
-	//* 参数3：sortName，类型：字符。值：可为空，默认为‘_PATNAME’。
-	//* 参数4：sort，类型：字符。值：可为空，默认为'_ASC'。
-	//* 参数5：pageTotalNum，类型：数值。值：可为空，默认为1。
 	
-	function loadTotal(rows,patStatus,sortName,sort,pageTotalNum){
-		// 为函数的参数赋值
-		var rows=rows;               // 每页显示的记录行数
-		var sortName=sortName;       // 排序字段名称
-		var sort=sort;               // 排序方式
-		var pageTotalNum=pageTotalNum; // 分页页数
-		// 本页的5个查询词
-		var searchDept=$("#searchDept").val();
-		var searchPatName=$("#searchPatName").val();
-		var searchPatStatus=$("#searchPatStatus").val();
-		var searchPatType=$("#searchPatType").val();
-		var searchWriter=$("#searchWriter").val();
-		
-		if(rows){}else{rows=10;}
-		if(patStatus){}else{patStatus='#total';}
-		if(sortName){}else{sortName='_PATNAME';}
-		// 升序or降序
-		if(sort){}else{sort='_ASC';}
-		if(pageTotalNum){}else{pageTotalNum=1;}
-		
-		// 组装通过“post”提交的数据，名称与后端所用一致
-		var sendData = {"sortName":sortName,"sort":sort,"totalTableRows":rows,"pageTotalNum":pageTotalNum,"patStatus":patStatus,"searchDept":searchDept,"searchPatName":searchPatName,"searchPatStatus":searchPatStatus,"searchPatType":searchPatType,"searchWriter":searchWriter};
-		
-		// jquery load()方法，加载total.html页面内容到patlist.html页面中<div id="patlist"></div>
-		$("#patlist").load("total",sendData);
-	
-	}
-	
-	//**
- 	//*/向单选框填充"部门"的内容选项
-	//* 参数1：Obj，必须。类型：对象，值：单选框的对象名称
-	//*参数2：attach，可为空。类型：json数组，值：需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
-	//*参数3：selected，可为空。类型：字符，值：单选框拟选定option项的value值。
- 	//**/
-	function showDept(Obj,attach,selected){
-		<!-- // 应用Ajax向服务器请求“部门”单选框内容所需数据，并组装好HTML语句 -->
-		$.ajax({
-			type : "post",
-			async : true,  //异步请求
-			url : "{$home}/patent/index/dept",
-			// 发送到服务器的数据，可无
-			<!-- data : data, -->
-			timeout:1000,
-			<!-- // 服务器端response的数据类型为json-->
-			dataType:"json",
-			success:function(backData){
-				var data=backData;
-
-				var str="";
-				if(attach){
-					for(i=0;i<attach.length;i++){
-						str+="<option value='"+attach[i].val+"'>"+attach[i].text+"</option>";
-					}
-					
-				}
-				
-				<!-- // 遍历data数组组装HTML语句 -->
-				<!-- // data的结构是数组类的：[{id:1,name:"dept1", abbr:"d1"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
-				$.each(data,function(n1,v1){
-					$.each(v1,function(n2,v2){
-						if(n2=="name"){
-							str+="<option value='"+v2+"'>"+v2+" （简称：";
-						}
-						if(n2=="abbr"){
-							str+=v2+"）</option>";
-						}
-					});
-				});
-				
-				<!--// 清空单选框Obj的所有选项-->
-				Obj.empty();
-				<!--// 添加单选框Obj的新选项-->
-				Obj.append(str);
-				
-				<!-- // value=selected 的项为选定项-->
-				if (selected){
-					Obj.val(selected).attr('selected','selected');
-				}
-			},
-			error: function() {
-               alert("失败dept，请稍后再试！");
-            }
-		});
-	}
-	
-	//**
- 	//* 向单选框填充"专利类型"的内容选项
-	//* 参数1：Obj，类型：对象。值：必须，单选框的对象名称
-	//* 参数2：attach，类型：json数组。值：可为空，需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
-	//*参数3：selected，类型：字符。值：字符，可为空。
- 	//**/ 
-	function showPatType(Obj,attach,selected){
-		<!-- // 应用Ajax向服务器请求“用户组”单选框内容所需数据，并组装好HTML语句 -->
-		$.ajax({
-			type : "post",
-			async : true,  //异步请求
-			url : "{$home}/patent/index/patType",
-			// 发送到服务器的数据，可无
-			<!-- data : data, -->
-			timeout:1000,
-			<!-- // 指定服务器端response的数据类型为json-->
-			dataType:"json",
-			success:function(backData){
-				var data=backData;
-				var str="";
-				if(attach){
-					for(i=0;i<attach.length;i++){
-						str+="<option value='"+attach[i].val+"'>"+attach[i].text+"</option>";
-					}
-					
-				}
-				<!-- // 遍历data数组组装HTML语句 -->
-				<!-- // data的结构是数组类的：[{id:1,pattype: "发明专利"},{}],所以要进行嵌套取出id，name的值组装HTML语句-->
-				$.each(data,function(n1,v1){
-					$.each(v1,function(n2,v2){
-						<!-- if(n2=="id"){ -->
-							<!-- str+="<option value='"+v2+"'>"; -->
-						<!-- } -->
-						if(n2=="type"){
-							str+="<option value='"+v2+"'>"+v2+"</option>";
-						}
-					});
-				});
-				
-				<!--// 清空单选框Obj的所有选项-->
-				Obj.empty();
-				<!--// 添加单选框Obj的新选项-->
-				Obj.append(str);
-				
-				<!-- // value=selected 的项为选定项-->
-				if (selected){
-					Obj.val(selected).attr('selected','selected');
-				}
-				<!-- Obj.val(selected).attr('selected','selected'); -->
-				
-			},
-			error: function() {
-               alert("失败Group，请稍后再试！");
-            }
-		});
-	}
-	
-	//**
- 	//* 向单选框填充"专利状态"的内容选项
-	//* 参数1：Obj，类型：对象。值：必须，单选框的对象名称
-	//* 参数2：attach，类型：json数组。值：可为空，需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
-	//*参数3：selected，类型：字符。值：字符，可为空。
- 	//**/ 
-	function showPatStatus(Obj,attach,selected){
-		<!-- // 应用Ajax向服务器请求“用户组”单选框内容所需数据，并组装好HTML语句 -->
-		$.ajax({
-			type : "post",
-			async : true,  //异步请求
-			url : "{$home}/patent/index/patStatus",
-			// 发送到服务器的数据，可无
-			<!-- data : data, -->
-			timeout:1000,
-			<!-- // 指定服务器端response的数据类型为json-->
-			dataType:"json",
-			success:function(backData){
-				var data=backData;
-				var str="";
-				if(attach){
-					for(i=0;i<attach.length;i++){
-						str+="<option value='"+attach[i].val+"'>"+attach[i].text+"</option>";
-					}
-					
-				}
-				<!-- // 遍历data数组组装HTML语句 -->
-				<!-- // data的结构是数组类的：[{id:1,status:"授权"},{}],所以要进行嵌套取出id，name和abbr的值组装HTML语句-->
-				$.each(data,function(n1,v1){
-					$.each(v1,function(n2,v2){
-						<!-- if(n2=="id"){ -->
-							<!-- str+="<option value='"+v2+"'>"; -->
-						<!-- } -->
-						if(n2=="status"){
-							str+="<option value='"+v2+"'>"+v2+"</option>";
-						}
-					});
-				});
-				
-				<!--// 清空单选框Obj的所有选项-->
-				Obj.empty();
-				<!--// 添加单选框Obj的新选项-->
-				Obj.append(str);
-				
-				<!-- // value=selected 的项为选定项-->
-				if (selected){
-					Obj.val(selected).attr('selected','selected');
-				}
-				<!-- Obj.val(selected).attr('selected','selected'); -->
-				
-			},
-			error: function() {
-               alert("失败Group，请稍后再试！");
-            }
-		});
-	}
-	
-
-
-
 <!-- function -->
 	
 	
