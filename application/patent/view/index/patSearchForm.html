@@ -1,146 +1,92 @@
 <!-- // patSearchForm.html  -->
-<div>
 	
-	<h4 id="period" class="text-left">
-	
-		<span class="pull-right">
-			<button id="btnSearchInfo" type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divCollapse" title="显示/隐藏专利搜索条件"><span class="glyphicon glyphicon-plus"></span>搜索</button>&nbsp;
-			<button id="btnRefresh" type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
-		</span>
-	</h4>
-
-	<!-- // 搜索区域，仅“专利总数”页面显示 -->
-	<div id="divCollapse" class="collapse" style="padding-top:10px;">
-		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divCollapse"  data-toggle="collapse" title="点击隐藏">专利查询条件</a>
-		
-		<form method="" action="" id="fmPatSearch" style="border:1px solid #eee;padding:10px 0px;">
-			<div class="row myRow">
-				<div class="form-group col-sm-4">
-					<label class="" for="topic">名称</label>
-					<input class="form-control" name="topic" type="text" value="" placeholder="...不限">
-				</div>
-				<div class="form-group col-sm-2">
-					<label class="control-label" for="author">撰写人</label>
-					<input class="form-control" name="author" type="text" value="" placeholder="...不限">
-				</div>
-				
-			</div>
-			<div class="row myRow">
-				<div class="form-group col-sm-5">
-					<label class="control-label" for="type">类型</label>
-					<!-- <select multiple class="form-control" id="searchPatType" name="searchPatType" > -->
-					<select class="form-control" name="type" >
-						<option value="0">...不限</option>
-					</select>
-				</div>
-				<div class="form-group col-sm-4">
-					<label class="control-label" for="dept">部门</label>
-					<!-- <select multiple class="form-control" id="searchDept" name="searchDept"> -->
-					<select class="form-control" name="dept">
-						<option value="0">...不限</option>
-					</select>
-				</div>					
-				<div class="form-group col-sm-3">
-					<label class="control-label" for="status">状态</label>
-					<!-- <select multiple class="form-control" id="searchPatStatus" name="searchPatStatus"> -->
-					<select class="form-control" name="status">
-						<option value="0">...不限</option>	
-					</select>
-				</div>
-			</div>
-			<div class="row myRow text-right">	
-				<button id="btnSearchPat" type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>搜索</button>	
-				<button type="reset" class="btn btn-primary btn-sm">条件重置</button>
-			</div>					
-		</form>
-			
-	</div>
-	{neq name="numTotal" value="0"}
+	<!-- // 搜索表单-->	
+<form id="fmPatSearch" style="border:1px solid #eee;padding:10px 0px;margin-top:3px;">
 	<div class="row myRow">
-		<p></p>
-		<div class="text-right">
-			<strong class="assType"></strong><span id="spSearchResult" class="label label-info">列表记录总数</span>：<span class="badge">{$numTotal}</span></span>
+		<div class="form-group col-sm-4">
+			<label class="control-label" for="topic">名称</label>
+			<input class="form-control" name="topic" type="text" value="" placeholder="...不限">
 		</div>
-		<p></p>
+		<div class="form-group col-sm-2">
+			<label class="control-label" for="author">撰写人</label>
+			<input class="form-control" name="author" type="text" value="" placeholder="...不限">
+		</div>
+				
 	</div>
-	{/neq}
-</div>
+	<div class="row myRow">
+		<div class="form-group col-sm-5">
+			<label class="control-label" for="type">类型</label>
+			<!-- <select multiple class="form-control" id="searchPatType" name="searchPatType" > -->
+			<select class="form-control" name="type" >
+				<!-- //js生成 -->
+			</select>
+		</div>
+		<div class="form-group col-sm-4">
+			<label class="control-label" for="dept">部门</label>
+			<!-- <select multiple class="form-control" id="searchDept" name="searchDept"> -->
+			<select class="form-control" name="dept">
+				<!-- //js生成 -->
+			</select>
+		</div>					
+		<div class="form-group col-sm-3">
+			<label class="control-label" for="status">状态</label>
+			<!-- <select multiple class="form-control" id="searchPatStatus" name="searchPatStatus"> -->
+			<select class="form-control" name="status">
+				<!-- //js生成 -->
+			</select>
+		</div>
+	</div>
+	<div class="row myRow text-right">	
+		<button id="btnSearchPat" type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>搜索</button>	
+		<input type="reset" class="btn btn-primary btn-sm" value="条件重置" />
+	</div>					
+</form>
 
 <script>
-// 本页面的pat所处的阶段
-<!-- var period='{ $sortData}'; -->
-var numTotal={$numTotal};
-<!-- var searchData={ $searchData}; -->
 
-// 根据本页面的锚点值，决定<h4>的内容
-var setTitle=()=>{
-	let sId=window.location.hash,
-		lab='',
-		txt='',
-		spObj=$('<span></span>').css('padding','6px'),
-		spBdg=$('<span></span>').addClass('badge'),
-		hObj=$('#period');
+console.log('patSearchForm.html ');
+console.table(sData);
+
+//设定搜索表单的各项内容
+var setFmSearchData=(optObj={})=>{
+	let opt=$.extend({},{topic:'',author:'',type:0,dept:0,status:0},optObj),
+		//计数器
+		n=0;
+
+	for(let el in opt){
+		let obj=$('#fmPatSearch [name="'+el+'"]'),
+			v=opt[el];
+		//多选时
+		if(typeof v== 'object'){
+			v.forEach(function(item){
+				obj.find('option[value="'+item+'"]').prop('selected',true);
+			});
+		}
+		obj.val(v);
 		
-	switch(sId){
-		case'#audit':
-			lab='label label-default';
-			txt='内部审核拟申报专利&nbsp;';
-			spBdg.text(numTotal);
-			break;
-		case'#newAdd':
-			lab='label label-info';
-			txt='拟申报专利';
-			break;
-		case'#apply':
-			lab='label label-primary';
-			txt='申报专利';
-			break;
-		case'#authorize':
-			lab='label label-success';
-			txt='授权（有效期）专利';
-			break;	
-		case'#render':
-			lab='label label-success';
-			txt='续费授权（有效期）专利';
-			break;
-		case'#abandon':
-			lab='label label-info';
-			txt='已放弃专利数&nbsp;';
-			spBdg.text(numTotal);
-			break;
-		case'#reject':
-			lab='label label-info';
-			txt='被驳回专利数&nbsp;';
-			spBdg.text(numTotal);
-			break;
-		case'#invalid':
-			lab='label label-default';
-			txt='无效专利数&nbsp;';
-			spBdg.text(numTotal);
-			break;
-		default:
-			lab='label label-default';
-			txt='专利总数&nbsp;';
-			spBdg.text(numTotal);
-			break;		
+		if(v=='' || v==0){
+			obj.removeClass('alert-info');
+		}else{
+			//不为0或空加底色
+			obj.addClass('alert-info');
+			n++;
+		}
 	}
-	spObj.addClass(lab).append(txt,spBdg);
-	hObj.prepend(spObj);
+	//是否显示表单
+	(n)?$('#divCollapse').addClass('in'):$('#divCollapse').removeClass('in');
+	
+	console.log('patSearchForm.html, setFmSearchData:');
+	console.table(opt);
 };
-//完善搜索表单的select组件内容
+//挨个组装好所有的select组件
 var buildFmSelectCom=()=>{
 	let selSet=$('#fmPatSearch').find('select'),
-		selName=[],
 		url='getSelComData',
-		period=$('#divTblSortData').data('period');
-	//发送给后端的与select组件有关的变量
-	let rqData={period:period};	
+		rqData={period:$('#divTblSortData').data('period')};	
 	
-	rqData=$.extend({},rqData,{nameArr:selName});
 	//向后端请求组装select组件所需数据
 	$.post(url,rqData,function(resData){
-		//挨个组装好所有的select组件
-		console.log(resData);
+		<!-- console.log(resData); -->
 		//查询表单中选择框的name属性值数组
 		for(var i=0;i<selSet.length;i++){
 			let selObj=selSet.eq(i),
@@ -149,67 +95,46 @@ var buildFmSelectCom=()=>{
 			
 			selObj.empty().append($('<option></option>').val(0).text('…不限'));	
 			//组装option 
-			optionArr.forEach(function(item,index){
-				let v=item.val,
-					t=(selName=='dept')?item.txt+'，简称：'+item.abbr:item.txt;
-				
-				selObj.append($('<option></option>').val(v).text(t));
+			optionArr.forEach(function(e){
+				selObj.append($('<option></option>').val(e.val).text(e.txt));
 			});
+			selObj.val(0);		
 		}
+		//设定搜索表单的各项内容
+		setFmSearchData(sData);
 	});
 	
 };
-//设定搜索表单的各项内容
-var setFmSearchData=(optObj)=>{
-	let fcSet=$('#fmPatSearch').find('.form-control'),
-		keyArr=Object.keys(optObj),
-		valArr=Object.values(optObj);
-	
-	keyArr.forEach(function(item,index){
-		for(var i=0;i<fcSet.length;i++){
-			let subCom=fcSet.eq(i),
-				name=subCom.attr('name');
-			while(item==name){
-				<!-- console.log(typeof valArr[index]); -->
-				//valArr[index]是否为数组
-				if(typeof valArr[index] == 'Object'){
-					valArr[index].forEach(function(v,k){
-						subCom.val(v);
-						console.log(v);	
-					});
-				}else{
-					subCom.val(valArr[index]);
-				}
-				break;
-			}
-		}
-		<!-- console.log(item,valArr[index]);	 -->
-	});
-	
-};
-
 
 //利用自调用匿名函数立即执行的特点，页面初始化
 (function($){
-	setTitle();
+	
 	buildFmSelectCom();
-	setFmSearchData(searchData);
 	// 激活tooltip
 	$('[title]').tooltip();	
 })(jQuery);
 
 $(document).ready(function(){
-		
-	
-	
-	
+	let fmObj=$('#fmPatSearch');	
 
-
-<!-- function -->
-	
-	
-<!-- function -->
-	
-	
+	fmObj.find('.form-control').change(function(){
+		//有变化加底色
+		($(this).val()=='' || $(this).val()==0)?$(this).removeClass('alert-info'):$(this).addClass('alert-info');
+	});
+	//表单提交
+	fmObj.submit(function(evt){
+		evt.preventDefault();
+		//载入patList
+		loadPatList();
+	});
+	//表单重置时附加的操作
+	fmObj.find('[type="reset"]').click(function(){
+		fmObj.find('.form-control').removeClass('alert-info');	
+	});
 });
+
+<!-- function -->
+	
+	
+<!-- function -->
 </script>

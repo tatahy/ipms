@@ -12,6 +12,13 @@ use app\admin\model\Dept as DeptModel;
 
 class Patinfo extends Model
 {
+    #引用app\common中定义的常量
+    const PATSTATUS=conPatStatusArr;
+    const PATTYPE=conPatTypeArr;
+    #patent的period与status的对应关系，本模块common.php中定义
+    const PATPERIODSTATUS=conPatPeriodVsStatus;
+    //本类的静态方法中用于访问非静态方法时实例化本类对象
+    static private $obj=null;
     //protected $auto = ['patnum','pronum'];
     protected $insert = ['patnum', 'issinfo_id'];
     //protected $update = [];
@@ -60,10 +67,9 @@ class Patinfo extends Model
     #获取器，获取数据表patinfo中type字段值，转换为中文输出
     protected function getTypeAttr($dBStrEn)
     {
-        $output = $dBStrEn;
-        #引用应用公共文件（app/common.php）中定义的数组常量conPatTypeArr     
-        if (array_key_exists($dBStrEn,conPatTypeArr)) {
-            $output = conPatTypeArr[$dBStrEn];
+        $output = $dBStrEn;    
+        if (array_key_exists($dBStrEn,self::PATTYPE)) {
+            $output = self::PATTYPE[$dBStrEn];
         }
         return $output;
     }
@@ -72,8 +78,7 @@ class Patinfo extends Model
     protected function setTypeAttr($strChi)
     {
         $output = $strChi;
-        #引用应用公共文件（app/common.php）中定义的数组常量conPatTypeArr
-        foreach(conPatTypeArr as $key => $val){
+        foreach(self::PATTYPE as $key => $val){
             if($strChi==$val){
                 $output=$key;
             }
@@ -85,9 +90,8 @@ class Patinfo extends Model
     protected function getStatusAttr($dBStrEn)
     {
         $output = $dBStrEn;
-        #引用应用公共文件（app/common.php）中定义的数组常量conPatStatusArr
-        if (array_key_exists($dBStrEn, conPatStatusArr)) {
-            $output = conPatStatusArr[$dBStrEn];
+        if (array_key_exists($dBStrEn, self::PATSTATUS)) {
+            $output = self::PATSTATUS[$dBStrEn];
         }
         return $output;
     }
@@ -96,21 +100,18 @@ class Patinfo extends Model
     protected function setStatusAttr($strChi)
     {
         $output = $strChi;
-        #引用应用公共文件（app/common.php）中定义的数组常量conPatStatusArr
-        foreach(conPatStatusArr as $key => $val){
+        foreach(self::PATSTATUS as $key => $val){
             if($strChi==$val){
                 $output=$key;
             }
         }
         return $output;
     }
-    
     #得到在period里的所有pat
-    static public function getPeriodSet($period='')
+    static public function getPeriodSql($period='')
     {
-      #patent的period与status的对应关系，本模块common.php中定义
-      $pArr=array_keys(conPatPeriodVsStatus);
-      $psArr=conPatPeriodVsStatus;
+      $pArr=array_keys(self::PATPERIODSTATUS);
+      $psArr=self::PATPERIODSTATUS;
       $period=in_array($period,$pArr)?$period:'total';
       #模型查询中的条件
       if($period=='total'){
@@ -118,61 +119,81 @@ class Patinfo extends Model
       }else{
         $where['status']=['in',$psArr[$period]['status']];
       }
-      $obj=new Patinfo;
-      $patSet=$obj->where($where)->select();
-      unset($obj);
+      self::$obj=new self();
+      $query=self::$obj->where($where);
+      self::$obj=null;
+      return $query;
+    }
+    
+    #得到在period里的所有pat
+    static public function getPeriodSet($period='')
+    {
+      self::$obj=new self();
+      $patSet=self::$obj->getPeriodSql($period)->select();
+      self::$obj=null;
       return $patSet;
     }
     #得到在period里的所有pat的num
     static public function getPeriodNum($period='')
     {
-      $obj=new Patinfo;
-      $num=count($obj->getPeriodSet($period));
-      unset($obj);
-      return $num;
+      $num='';
+      $numArr=[];
+      $pArr=array_keys(self::PATPERIODSTATUS);
+      
+      if(!empty($period)){
+        self::$obj=new self();
+        $num=self::$obj->getPeriodSql($period)->count();
+        self::$obj=null;
+        return $num;
+      }
+      
+      foreach($pArr as $key=>$val){
+        self::$obj=new self();
+        $numArr[$val]=self::$obj->getPeriodSql($val)->count();
+        self::$obj=null;
+      } 
+      return $numArr;
     }
-    #得到在period里的所有pat的num
-    static public function getPeriodSelData($period='',$name='',$arr=[])
+    #得到在period的select组件内容
+    static public function getPeriodSelData($name='',$arr=[],$period='')
     {
-      $resArr=[];
-      $dept=DeptModel::all();
-      $obj=new Patinfo;
-      $patSet=$obj->getPeriodSet($period);
+      $resArr=[]; #返回数组
+      $tArr=[];   #键值转换数组
+      $tempArr=[];#中间数组
+      
+      #组装$tArr
+      if($name=='status') $tArr=self::PATSTATUS;
+      if($name=='type') $tArr=self::PATTYPE;
+      #得到dept的键值转换数组$tArr。abbr为键，name为值的关联数组
+      $deptSet=DeptModel::all();
+      #转换为数据集
+      $deptSet=is_array($deptSet)?collection($deptSet):$deptSet;
+      if($name=='dept') $tArr=array_combine($deptSet->column('abbr'),$deptSet->column('name'));
+      
+      #组装$tempArr
+      self::$obj=new self();
+      $patSet=self::$obj->getPeriodSet($period);
+      self::$obj=null;
       #转换为数据集
       $patSet=is_array($patSet)?collection($patSet):$patSet;
-      $status=array_unique($patSet->column('status'));
-      $type=array_unique($patSet->column('type'));
+      #得到中间数组$tempArr，$name值对应的索引数组（去掉重复值）
+      $tempArr=array_unique($patSet->column($name));
+      #重新排序让数组下标连续
+      sort($tempArr);
       
-      sort($status);
-      sort($type);
-      
-      if($name=='dept'){
-        foreach($dept as $key => $val){
-          $resArr[$key]['txt']=$val['name'];
-          $resArr[$key]['val']=$val['name'];
-          $resArr[$key]['abbr']=$val['abbr'];
+      #组装$resArr，按照$arr的结构
+      foreach($arr as $key => $val){
+        foreach($tempArr as $k => $v){
+          if($key=='txt'){
+            $val=($name=='dept')?$v.'，简称：'.array_search($v,$tArr):$v;
+          }
+          if($key=='val'){
+            $val=($name=='dept')?$v:array_search($v,$tArr);
+          }
+          $resArr[$k][$key]=$val;
         }
       }
-      
-      if($name=='status'){
-        foreach($status as $key => $val){
-          $resArr[$key]['txt']=$val;
-          $resArr[$key]['val']=array_search($val,conPatStatusArr);
-        }
-      }
-      
-      if($name=='type'){
-        foreach($type as $key => $val){
-          $resArr[$key]['txt']=$val;
-          $resArr[$key]['val']=array_search($val,conPatTypeArr);
-        }
-      }
-      
-      
-      
-      unset($obj);
       return $resArr;
-      //return $arr;
     }
 
     /**

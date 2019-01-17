@@ -1,6 +1,11 @@
 
 <!-- pagewrap  -->
 <div>
+	<div style="padding-top:5px;">
+		<p class="text-right" ><strong>列表记录总数</strong>：<span class="badge">{$numTotal}</span>
+		</p>
+	</div>
+	
 	<div class="table-responsive">
 		<table id="tblPatList" class="table table-bordered table-striped table-hover">
 			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>专利信息列表&nbsp;<strong class="assType"></strong></h4></caption>
@@ -72,6 +77,9 @@
 <!-- /pagewrap  -->
 
 <script>
+sData={$searchData};
+<!-- console.log('patList.html'); -->
+<!-- console.table(sData); -->
 //自调用匿名函数立即执行的特点，进行页面初始化。
 (function($){
 	

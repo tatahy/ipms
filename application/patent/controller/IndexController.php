@@ -27,6 +27,8 @@ class IndexController extends \think\Controller
     private $home = '';
     #排序数组
     private $sortData=array();
+    #patent的period与status的对应关系，本应用common.php中定义
+    const PATPERIODSTATUS=conPatPeriodVsStatus;
     // 初始化
     protected function _initialize()
     {
@@ -52,15 +54,17 @@ class IndexController extends \think\Controller
     
     public function index(Request $request,PatinfoModel $patMdl)
     {
-      $this->priLogin();    
-      $periodArr=conPatPeriodVsStatus;
+      $this->priLogin();
+      $numArr=$patMdl::getPeriodNum(); 
+      $periodArr=self::PATPERIODSTATUS;
       foreach($periodArr as $key=>$val){
-        $periodArr[$key]['num']=$patMdl::getPeriodNum($key);
+        $periodArr[$key]['num']=$numArr[$key];
         unset($periodArr[$key]['status']);
       }
+         
       $this->assign([
         'home'=>$this->home,
-        #各个
+        #各个period的数量及名称
         'periodProp'=>json_encode($periodArr,JSON_UNESCAPED_UNICODE),
         'sortData'=>$this->sortData,
         'username'=>$this->username,
@@ -68,247 +72,7 @@ class IndexController extends \think\Controller
       ]);
       return view();
     }
-    
-     //patent列表    
-	public function patlist1(Request $request)
-    {
-        $log=Session::get('log');
-            
-        //通过$log判断是否是登录用户，非登录用户退回到登录页面
-        if(1!==$this->log){
-            $this->error('未登录用户，请先登录系统');
-            //$this->redirect($request->domain());
-        }else{
-            $username=Session::get('username');
-            $pwd=Session::get('pwd');
-            $roles=Session::get('role');
-            //$listrows接收页面传来的分页时每页显示的记录数，初始值为10
-            $listrows=10;
-            if(!empty($request->param('listrows'))){
-                $listrows=$request->param('listrows');
-            }
-        }
-      
-        //使用模型Patinfo
-        $pats = new PatinfoModel;  
-        
-        //利用模型对象得到非“填报”状态的patent总数
-        $numtotal=$pats->where('status','neq','填报')->count();
-        //分页,每页$listrows条记录
-		    $patstotal = $pats->where('status','neq','填报')
-                            ->order('submitdate', 'desc')
-                            ->paginate($listrows,false,['type'=>'bootstrap','var_page'=>'pagetotal',]);             
-        // 获取分页显示
-        $pagetotal = $patstotal->render(); 
-        
-        //利用模型对象得到状态status"="拟申报"）的patent总数
-        $numnew=$pats->where('status','拟申报')->count();
-        //分页,每页$listrows条记录
-        $patsnew = $pats->where('status','拟申报')
-                            ->order('submitdate', 'desc')
-                            ->paginate($listrows,false,['type'=>'bootstrap','var_page'=>'pagenew',]);
-        // 获取分页显示
-        $pagenew = $patsnew->render(); 
-        
-        //利用模型对象得到状态status"="申报"）的patent总数
-        $numapp = $pats->where('status',['=','申报'],['=','申报修改'],'or')->count();
-        //分页,每页$listrows条记录
-        $patsapp = $pats->where('status',['=','申报'],['=','申报修改'],'or')
-                            ->order('applydate', 'desc')
-                            ->paginate($listrows,false,['type'=>'bootstrap','var_page'=>'pageapp',]);
-        // 获取分页显示
-        $pageapp = $patsapp->render(); 
-        
-        //利用模型对象得到有效状态的patent总数
-        $numaut = $pats->where('status',['=','授权'],['=','续费授权'],['=','续费中'],['=','放弃续费'],'or')->count();
-        //分页,每页$listrows条记录
-        $patsaut = $pats->where('status',['=','授权'],['=','续费授权'],['=','续费中'],['=','放弃续费'],'or')
-                            ->order('authrejectdate', 'desc')
-                           ->paginate($listrows,false,['type'=>'bootstrap','var_page' => 'pageaut',]);
-        // 获取分页显示
-        $pageaut = $patsaut->render();
-        
-        //利用模型对象得到状态status"="放弃"）的patent总数
-        $numaba = $pats->where('status','放弃')->count();
-        //分页,每页$listrows条记录
-		    $patsaba = $pats->where('status','放弃')
-                            ->order('nextrenewdate', 'desc')
-                            ->paginate($listrows,false,['type'=>'bootstrap','var_page'=>'pagetoaba',]);
-        // 获取分页显示
-        $pageaba = $patsaba->render();
-        
-        //利用模型对象得到状态status"="驳回"）的patent总数
-        $numrej = $pats->where('status','驳回')->count();
-        //分页,每页$listrows条记录
-        $patsrej = $pats->where('status','驳回')
-                            ->order('nextrenewdate', 'desc')
-                            ->paginate($listrows,false,['type'=>'bootstrap','var_page'=>'pagerej',]);
-        // 获取分页显示
-        $pagerej = $patsrej->render();
-        
-        //利用模型对象得到状态status"="续费"）的patent总数
-        $numren = $pats->where('status',['=','续费授权'],['=','续费中'],'or')->count();
-        //分页,每页$listrows条记录
-        $patsren = $pats->where('status',['=','续费授权'],['=','续费中'],'or')
-                            ->order('renewabandondate', 'desc')
-                            ->paginate($listrows,false,['type'=>'bootstrap','var_page'=>'pageren',]);
-        // 获取分页显示
-        $pageren = $patsren->render();
-        
-        //利用正则表达式匹配出分页所在选项卡<li>,<div>标签的id所含关键字存入$pagex
-        //分页页码存入$pageXnum
-        //上述2类变量值需传入模板文件，用jQuery实现在选中分页所在选项卡内显示内容和连续编号值     
-        $str1=$request->url();
-        preg_match("/page\w{3,}/i",$str1,$matches);
-        if(!empty($matches[0])){
-            $pagex=$matches[0];
-            
-            switch($pagex){
-                case "pagetotal":
-                    $pagetotalnum=$request->param($pagex);
-                    $pagenewnum=1;
-                    $pageappnum=1;
-                    $pageautnum=1;
-                    $pagerennum=1;
-                    $pageabanum=1;
-                    $pagerejnum=1;
-                break;
-                case "pagenew":
-                    $pagetotalnum=1;
-                    $pagenewnum=$request->param($pagex);
-                    $pageappnum=1;
-                    $pageautnum=1;
-                    $pagerennum=1;
-                    $pageabanum=1;
-                    $pagerejnum=1;
-    			break;
-                case "pageapp":
-                    $pagetotalnum=1;
-                    $pagenewnum=1;
-                    $pageappnum=$request->param($pagex);
-                    $pageautnum=1;
-                    $pagerennum=1;
-                    $pageabanum=1;
-                    $pagerejnum=1;
-                break;
-                case "pageaut":
-                    $pagetotalnum=1;
-                    $pagenewnum=1;
-                    $pageappnum=1;
-                    $pageautnum=$request->param($pagex);
-                    $pagerennum=1;
-                    $pageabanum=1;
-                    $pagerejnum=1;
-                break;
-                case "pageaba":
-                    $pagetotalnum=1;
-                    $pagenewnum=1;
-                    $pageappnum=1;
-                    $pageautnum=1;
-                    $pagerennum=1;
-                    $pageabanum=$request->param($pagex);
-                    $pagerejnum=1;
-                break;
-                case "pagerej":
-                    $pagetotalnum=1;
-                    $pagenewnum=1;
-                    $pageappnum=1;
-                    $pageautnum=1;
-                    $pagerennum=1;
-                    $pageabanum=1;
-                    $pagerejnum=$request->param($pagex);
-                break;
-                case "pageren":
-                    $pagetotalnum=1;
-                    $pagenewnum=1;
-                    $pageappnum=1;
-                    $pageautnum=1;
-                    $pageabanum=1;
-                    $pagerejnum=1;
-                    $pagerennum=$request->param($pagex);
-                break;
-                default:
-                break;
-	       }
-        }else{
-            $pagex='pagetotal';
-            $pagetotalnum=1;
-            $pagenewnum=1;
-            $pageappnum=1;
-            $pageautnum=1;
-            $pagerennum=1;
-            $pageabanum=1;
-            $pagerejnum=1;
-        }
-        
-        //preg_match("/php/i", "PHP is the web scripting language of choice.", $matches);
-
-        //--在index.html页面输出自定义信息的HTML代码块
-		$destr= "请求方法:".$request->method()."</br>".
-                "username:".$username."</br>".
-                //"pwd:".sizeof($pwd);
-                "pwd:".$pwd."</br>".
-                "log:".$log."</br>";
-//                "pathinfo(request->url()):".$request->url()."</br>".
-//                "request->param():".implode(" ", $request->param())."</br>".
-//                $pagex."</br>".
-//                "listrows:".$listrows."||模板jQuery post:".$request->param('listrows')."</br>";
-        //--!    
-        
-        $this->assign([
-          //在index.html页面通过'destr'输出自定义的信息
-          'destr'=>$destr,
-          //在index.html页面通过'array'输出自定义的数组内容
-          'array'=>$roles,  
-                            
-          'numtotal'=>$numtotal,
-          'listtotal'=>$patstotal, 
-          'pagetotal'=>$pagetotal,
-          'pagetotalnum'=>$pagetotalnum,
-          
-          'numnew'=>$numnew,
-          'listnew'=>$patsnew,
-          'pagenew'=>$pagenew,
-          'pagenewnum'=>$pagenewnum,
-          
-          'numapp'=>$numapp,
-          'listapp'=>$patsapp,
-          'pageapp'=>$pageapp,
-          'pageappnum'=>$pageappnum,
-          
-          'numaut'=>$numaut,
-          'listaut'=>$patsaut,
-          'pageaut'=>$pageaut,
-          'pageautnum'=>$pageautnum,
-          
-          'numaba'=>$numaba,
-          'listaba'=>$patsaba,
-          'pageaba'=>$pageaba,
-          'pageabanum'=>$pageabanum,
-          
-          'numrej'=>$numrej,
-          'listrej'=>$patsrej,
-          'pagerej'=>$pagerej,
-          'pagerejnum'=>$pagerejnum,
-          
-          'numren'=>$numren,
-          'listren'=>$patsren,
-          'pageren'=>$pageren,
-          'pagerennum'=>$pagerennum,
-          
-          'pagex'=>$pagex,
-          'listrows'=>$listrows,
-          
-          'home'=>$request->domain(),
-          'username'=>$username,
-          
-          'year'=>date('Y')
-
-        ]); 
-        
-        return view();
-    }
-    
+       
     #patent列表    
     public function patList(Request $request,PatinfoModel $patMdl)
     {
@@ -341,12 +105,9 @@ class IndexController extends \think\Controller
           unset($whereArr[$key]);
         }
       }
-      #当前period的pat数据集
-      $patSet=$patMdl::getPeriodSet($sortData['period']);
-      $patSet=is_array($patSet)?collection($patSet):$patSet;
       
       #pat模型对象，查询、排序用
-      $queryBase=$patMdl->where('id','in',$patSet->column('id'))
+      $queryBase=$patMdl->getPeriodSql($sortData['period'])
                         ->where($whereArr)
                         ->order($sortData['sortName'],$sortData['sortOrder']);
       
@@ -386,10 +147,15 @@ class IndexController extends \think\Controller
     #parSearchForm
     public function patSearchForm(Request $request)
     {
-      $this->priLogin();    
+      $this->priLogin();
+      
+      #接收前端的搜索参数数组，由前端保证传来的搜索参数值非0，非空。
+      $searchData=!empty($request->param('searchData/a'))?$request->param('searchData/a'):array();
+      $searchData=array_merge(['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0],$searchData);    
       
       $this->assign([
         'numTotal'=>1,
+        'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
       ]);
       return view();
     }
@@ -1210,7 +976,7 @@ class IndexController extends \think\Controller
         $request=$this->request;
         #定义返回前端的数据结构
         $resData=[
-          'dept'=>[['txt'=>'','val'=>'','attr'=>'']],
+          'dept'=>[['txt'=>'','val'=>'']],
           'type'=>[['txt'=>'','val'=>'']],
           'status'=>[['txt'=>'','val'=>'']]
         ];
@@ -1219,60 +985,10 @@ class IndexController extends \think\Controller
         $period=!empty($request->param('period'))?$request->param('period'):'total';
         
         foreach($resData as $key=>$val){
-          $resData[$key]=$patMdl::getPeriodSelData($period,$key,$val[0]);
+          $resData[$key]=$patMdl::getPeriodSelData($key,$val[0]);
         }
         
         return $resData;
-    }
-    // 获取所有部门信息,不能写成“_dept”，因为前端的HTML文件中的url里不能含有“_”开头的名称，否则就无法访问到，会报错
-    public function dept()
-    {
-      //通过$log判断是否是登录用户，非登录用户退回到登录页面
-        if(1!==$this->log){
-           return $this->error('未登录用户，请先登录系统');
-            //$this->redirect($request->domain());
-        }
-        
-        $dept=DeptModel::all();
-        #将数组转化为json
-        return $dept;
-    }
-    
-    // 获取所有专利状态信息,不能写成“_status”，因为前端的HTML文件中的url里不能含有“_”开头的名称，否则就无法访问到，会报错
-    public function patStatus()
-    {
-      //通过$log判断是否是登录用户，非登录用户退回到登录页面
-        if(1!==$this->log){
-           return $this->error('未登录用户，请先登录系统');
-            //$this->redirect($request->domain());
-        }
-        
-        $status=PatinfoModel::field('status')->group('status')->select();
-        foreach($status as $k=>$v){
-          #引用应用公共文件（app/common.php）中定义的数组常量conPatStatusArr，得到'statusEn'值
-          $status[$k]['statusEn']=array_search($v['status'],conPatStatusArr);
-        }
-        return $status;
-    }
-    
-    // 获取所有专利类型信息,不能写成“_type”，因为前端的HTML文件中的url里不能含有“_”开头的名称，否则就无法访问到，会报错
-    public function patType()
-    {
-      
-      
-      //通过$log判断是否是登录用户，非登录用户退回到登录页面
-        if(1!==$this->log){
-           return $this->error('未登录用户，请先登录系统');
-            //$this->redirect($request->domain());
-        }
-        
-        $patType=PatinfoModel::field('type')->group('type')->select();
-        foreach($patType as $k=>$v){
-          #引用应用公共文件（app/common.php）中定义的数组常量conPatTypeArr，得到'typeEn'值
-          $patType[$k]['typeEn']=array_search($v['type'],conPatTypeArr);
-        }
-            
-        return $patType;
     }
 
 }

@@ -263,11 +263,7 @@ $(document).ready(function(){
 	fmObj.find('.form-control').change(function(){
 		fmEmptyCheck($(this));
 		//有变化加底色
-		if($(this).val()!=''){
-			$(this).addClass('alert-info');
-		}else{
-			$(this).removeClass('alert-info');
-		}
+		($(this).val()=='' || $(this).val()==0)?$(this).removeClass('alert-info'):$(this).addClass('alert-info');
 	});
 	//表单提交按钮按下时修改oprt
 	fmObj.find('button:submit').click(function(){
@@ -276,7 +272,6 @@ $(document).ready(function(){
 	});
 	//表单提交
 	fmObj.submit(function(evt){
-		evt.preventDefault();
 		let url=urlPref+'issOprt',
 			emptyCheckArr=[],
 			emptyCheckObj=$(this).find('.empty-check'),
@@ -287,7 +282,7 @@ $(document).ready(function(){
 			dataEnt={entName:entName,oprt:''},
 			dataCom={topic:$(this).find('[name="topic"]').val(),oprt:oprt,result:''};
 		
-		
+		evt.preventDefault();
 		//输入框非空检查
 		emptyCheckObj.each(function(){
 			emptyCheckArr.push(fmEmptyCheck($(this)));

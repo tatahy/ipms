@@ -17,6 +17,8 @@ class IndexController extends Controller
   //用户权限
   private $authArr=array();
   
+  #patent的period与status的对应关系，本应用common.php中定义
+  const PATPERIODSTATUS=conPatPeriodVsStatus;
   
   public function index(Request $request,PatinfoModel $patMdl,UserModel $userMdl,AssinfoModel $assMdl)
   {
@@ -64,13 +66,8 @@ class IndexController extends Controller
       $this->error('登录失败，用户名或密码错误。');
     } else
     {
-      #patent数据,使用模型Patinfo
-      $pats = new PatinfoModel;
-
       #利用模型对象得到各个patent总数
-      $numpatadd = $patMdl->where('status','in',['_PATS2-END1','_PATS4-2'])->count();
-      $numpatapp = $patMdl->where('status','in',['_PATS3-1','_PATS3-2','_PATS3-END1','_PATS3-END2','_PATS4-1'])->count();
-      $numpataut = $patMdl->where('status','in',['_PATS4-END1','_PATS4-END2'])->count();
+      $numPat=$patMdl::getPeriodNum();
 
       //调用User模型层定义的refreshUserAuth()方法，刷新登录用户的各个模块权限
       $authority = $userMdl->refreshUserAuth($username, $pwd);
@@ -99,9 +96,11 @@ class IndexController extends Controller
       //--!
             
       $this->assign([ //在index.html页面通过'destr'输出自定义的信息
-        'destr' => $destr . "</br>", 'home' => $request->domain(), 'username' => $username,
+        'destr' => $destr . "</br>", 
+        'home' => $request->domain(), 
+        'username' => $username,
         //patent数据
-        'numpatadd' => $numpatadd, 'numpatapp' => $numpatapp, 'numpataut' => $numpataut,
+        'numPat' => $numPat,
         //asset数据
         'assNum'=>$assNum,
         'year' => date('Y'), 
