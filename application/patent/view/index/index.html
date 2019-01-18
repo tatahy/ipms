@@ -6,7 +6,9 @@
 	<ul class="nav nav-pills" style="border-bottom:1px solid #ddd;">
 		<!-- //js生成 -->
 	</ul>
-	<h4 id="period" class="text-left"></h4>
+	<h4 id="period" class="text-left">
+		<!-- //js生成 -->
+	</h4>
 	<div class="text-right">
 		<button type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divCollapse" title="显示/隐藏专利搜索条件">搜索条件</button>&nbsp;
 		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新页面"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
@@ -36,6 +38,7 @@
 <script>
 const periodProp={$periodProp};
 console.log(periodProp);
+
 //定义要加载的搜索表单中各个输入组件属性值
 const searchFormComProp={
 	topic:{name:'topic',tag:'input',val:''},
@@ -56,7 +59,8 @@ const titleProp=[
 	{period:'reject',lab:'label label-info',btn:'btn btn-info',txt:'被驳回专利数&nbsp;'},
 	{period:'invalid',lab:'label label-default',btn:'btn btn-default',txt:'无效专利数&nbsp;'}
 ];
-// 根据本页面的锚点值，决定<h4>的内容
+
+// 根据本页面的锚点值，决定setTitle的内容
 var setTitle=()=>{
 	let sId=window.location.hash,
 		color='',
@@ -93,8 +97,6 @@ var buildNavPillsCom=()=>{
 		obj.append(liObj);
 	}
 };
-//搜索表单初始值
-var sData={topic:'',author:'',type:0,dept:0,status:0};
 
 var initPage=()=>{
 	let sId=window.location.hash,
@@ -204,6 +206,7 @@ function loadPatList(opt={}){
 	rqData.searchData=$.extend({},searchDataDefault,searchData);
 	console.log('index.html, loadPatList:');
 	console.table(rqData.searchData);
+	
 	//加载patList.html页面
 	$("#patList").html(loadStr).load(url,rqData);
 }

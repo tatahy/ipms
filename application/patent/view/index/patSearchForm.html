@@ -1,7 +1,7 @@
 <!-- // patSearchForm.html  -->
 	
-	<!-- // 搜索表单-->	
-<form id="fmPatSearch" style="border:1px solid #eee;padding:10px 0px;margin-top:3px;">
+<!-- // 搜索表单-->	
+<form id="fmPatSearch" style="border:1px solid #eee;padding:10px 0px;margin-top:2px;">
 	<div class="row myRow">
 		<div class="form-group col-sm-4">
 			<label class="control-label" for="topic">名称</label>
@@ -43,7 +43,7 @@
 </form>
 
 <script>
-
+var sData={$searchData};
 console.log('patSearchForm.html ');
 console.table(sData);
 
@@ -100,7 +100,7 @@ var buildFmSelectCom=()=>{
 			});
 			selObj.val(0);		
 		}
-		//设定搜索表单的各项内容
+		//设定搜索表单的各项内容，要完成组装后才能生效。
 		setFmSearchData(sData);
 	});
 	
