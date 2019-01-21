@@ -23,21 +23,8 @@ class IndexController extends Controller
   public function index(Request $request,PatinfoModel $patMdl,UserModel $userMdl,AssinfoModel $assMdl)
   {
     //'username'和'pwd'的来源：session或初次登录时表单POST提交
-    if (!empty($request->post('username')))
-    {
-      $username = $request->post('username');
-    } else
-    {
-      $username = Session::get('username');
-    }
-
-    if (!empty($request->post('pwd')))
-    {
-      $pwd = md5($request->post('pwd'));
-    } else
-    {
-      $pwd = Session::get('pwd');
-    }
+    $username =!empty($request->post('username'))?$request->post('username'):Session::get('username');
+    $pwd = !empty($request->post('pwd'))?md5($request->post('pwd')):Session::get('pwd');
 
     $log = Session::get('log');
 
@@ -63,13 +50,10 @@ class IndexController extends Controller
     //不存在，同验证失败的处理
     if (empty($user))
     {
-      $this->error('登录失败，用户名或密码错误。');
-    } else
-    {
-      #利用模型对象得到各个patent总数
-      $numPat=$patMdl::getPeriodNum();
-
-      //调用User模型层定义的refreshUserAuth()方法，刷新登录用户的各个模块权限
+     return $this->error('登录失败，用户名或密码错误。');
+    } 
+    
+      #调用User模型层定义的refreshUserAuth()方法，刷新登录用户的各个模块权限
       $authority = $userMdl->refreshUserAuth($username, $pwd);
 
       Session::set('userId', $user->id);
@@ -79,35 +63,38 @@ class IndexController extends Controller
       Session::set('dept', $user->dept);
       Session::set('authArr', $authority);
       
-      //根据ass是否有read权限进行赋值
-      if($authority['ass']['read']){
-        $assMdl::initModel($username,$user->dept,$authority['ass']);
-        $assNum=$assMdl->getAssTypeNumArr();
-      }else{
-        $assNum=0;
-      }
-      //--在index.html页面输出自定义信息的HTML代码块
-      $destr = "请求方法:" . $request->method() . "</br>" . "username:" . $username .
-        "</br>" . //"pwd:".sizeof($pwd);
-        "pwd:" . $pwd . "</br>" . "log:" . $log . "</br>" .
-        "<strong>authority Now [JSON string]:</strong>" . json_encode($authority) .
-        "</br>";
-      //"session:".dump($request->session());
-      //--!
-            
-      $this->assign([ //在index.html页面通过'destr'输出自定义的信息
-        'destr' => $destr . "</br>", 
+      #根据ass是否有read权限进行赋值，利用模型对象得到各个asset总数
+      $assNum=$authority['ass']['read']?$assMdl::initModel($username,$user->dept,$authority['ass'])->getAssTypeNumArr():0;
+      
+      #根据pat是否有read权限进行赋值，利用模型对象得到各个patent总数
+      $patNum=$authority['pat']['read']?$patMdl::getPeriodNum():0;
+      
+      $proNum=[
+        'plan'=>'x',
+        'apply'=>'x',
+        'approve'=>'x',
+        'process'=>'x',
+        'done'=>'x',
+        'terminate'=>'x'
+      ];
+      
+      $theNum=[
+        'plan'=>'x',
+        'apply'=>'x',
+        'publish'=>'x'
+      ];
+      
+      $this->assign([
         'home' => $request->domain(), 
         'username' => $username,
-        //patent数据
-        'numPat' => $numPat,
-        //asset数据
-        'assNum'=>$assNum,
+        #各模块统计数据
+        'num' => json_encode(['pat' => $patNum,'ass'=>$assNum,'pro'=>$proNum,'the'=>$theNum],JSON_UNESCAPED_UNICODE),
+              
         'year' => date('Y'), 
         ]);
       //return view();
       return $this->fetch();
-    }
+    
 
   }
 

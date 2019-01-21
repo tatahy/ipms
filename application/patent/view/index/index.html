@@ -149,7 +149,9 @@ $(document).ready(function(){
 		
 		//本身加底色
 		$(this).tab('show');
+		//排序、分页有关的值向$('#divTblSortData')汇集
 		$('#divTblSortData').data('period',period);
+		$('#divTblSortData').data('pageNum',1);
 		setTitle();
 		
 		loadPatList();

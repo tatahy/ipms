@@ -77,7 +77,7 @@ class Issinfo extends Model
       
       self::$obj=new self();
       foreach(self::$issEntCatArr as $val){
-        self::$numArr[$val]=self::$obj->issStatusQuery($val)->count(); 
+        self::$numArr[$val]=count(self::$obj->issStatusQuery($val)); 
       }
       self::$obj->setNumArr();     
       self::$obj=null;

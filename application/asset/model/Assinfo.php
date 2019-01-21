@@ -56,7 +56,8 @@ class Assinfo extends Model
       foreach(self::$aTypeArr as $val){
         self::$numArr[$val]=self::$obj->assTypeQuery($val)->count();
       }     
-      self::$obj=null;
+     // self::$obj=null;
+      return self::$obj;
     }
     
     static function getAccessUser()
