@@ -1,4 +1,4 @@
-<!-- // patSearchForm.html  -->
+<!-- //module:asset, view:index/patSearchForm.html  -->
 	
 <!-- // 搜索表单-->	
 <form id="fmPatSearch" style="border:1px solid #eee;padding:10px 0px;margin-top:2px;">
@@ -81,9 +81,8 @@ var setFmSearchData=(optObj={})=>{
 //挨个组装好所有的select组件
 var buildFmSelectCom=()=>{
 	let selSet=$('#fmPatSearch').find('select'),
-		url='getSelComData',
 		rqData={period:$('#divTblSortData').data('period')};	
-	
+	url=urlBase+'getSelComData';
 	//向后端请求组装select组件所需数据
 	$.post(url,rqData,function(resData){
 		<!-- console.log(resData); -->
@@ -106,14 +105,8 @@ var buildFmSelectCom=()=>{
 	
 };
 
-//利用自调用匿名函数立即执行的特点，页面初始化
-(function($){
+buildFmSelectCom();
 	
-	buildFmSelectCom();
-	// 激活tooltip
-	$('[title]').tooltip();	
-})(jQuery);
-
 $(document).ready(function(){
 	let fmObj=$('#fmPatSearch');	
 

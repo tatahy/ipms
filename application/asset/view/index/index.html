@@ -1,15 +1,9 @@
-{include file="../application/common/header.html" title="固定资产信息" }
+<!-- //module:asset, view:index/index.html  -->
 
-<!-- pagewrap  -->
-<div class="mainFrame">
-<div class="container-fluid">
-	{eq name="read" value="0"}
-	<div style="padding: 50px 0px;font-size:20px;">
-		<p class="text-center">无“固定资产”【查阅】权限，请与系统管理员联系。</p>
-	</div>
-	{else/}
-	<!-- <p>{$mdlSt}</p> -->
+<div>
 	<ul id="ulAssType" class="nav nav-pills" style="border-bottom:1px solid #eee;">
+	<!-- //jQ产生参考模型	 -->
+		<!-- <li class="active"><a class="aTab" href="#total">项目概况&nbsp;|&nbsp;<span class="glyphicon glyphicon-search"></span></a></li> -->
 		<li class="active">
 			<a class="aPill" href="#_ASSS_USUAL" data-ass-type="_ASSS_USUAL">固定资产<span class="spTitle">总计</span>
 			{neq name="assNum['_ASSS_USUAL']" value="0"}
@@ -160,12 +154,10 @@
 		<div id="divLoadAssList">
 			<p class="text-center" style="font-size:20px;">加载中……</p>
 		</div>
-	</div>
-	{/eq}	
-</div>
-</div>
+	</div>	
+
 <!-- Modal "modalAssSingle" -->
-<div class="modal fade" id="modalAssSingle" role="dialog">
+	<div class="modal fade" id="modalAssSingle" role="dialog">
 	<div class="modal-dialog modal-lg">
     
       <!-- Modal content-->
@@ -190,6 +182,8 @@
 		</div>
 	</div>
 
+	</div>
+
 </div>
 <!--/ Modal "modalAssSingle" -->
 
@@ -197,7 +191,8 @@
 
 <script>
 //var searchDataArr={$searchData};
-
+console.log('asset/index:');
+console.log(num);
 var assType='{$assType}';
 
 //**函数名：getJsonLength
@@ -477,4 +472,4 @@ $(document).ready(function(){
 });
 </script>
 
-{include file="../application/common/footer.html"}
+

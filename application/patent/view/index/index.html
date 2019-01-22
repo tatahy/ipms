@@ -1,13 +1,14 @@
-{include file="../application/common/header.html" title="专利信息" }
+
+<!-- //module:asset, view:index/index.html
 
 <!-- pagewrap  -->
-<div class="mainFrame container-fluid">
+<div >
 
-	<ul class="nav nav-pills" style="border-bottom:1px solid #ddd;">
-		<!-- //js生成 -->
+	<ul class="nav nav-pills">
+		<!-- //jQ生成 -->
 	</ul>
 	<h4 id="period" class="text-left">
-		<!-- //js生成 -->
+		<!-- //jQ生成 -->
 	</h4>
 	<div class="text-right">
 		<button type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divCollapse" title="显示/隐藏专利搜索条件">搜索条件</button>&nbsp;
@@ -18,16 +19,13 @@
 		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;padding-top:5px;" href="#divCollapse"  data-toggle="collapse" title="点击隐藏">专利搜索条件</a>
 		<!-- // 搜索表单-->
 		<div id="patSearchForm">
-		<!-- //js生成 -->
+		<!-- //jQ生成 -->
 		</div>
 	</div>
 	
-	<div class="tab-content">
-		<!-- // PatList表格排序信息汇总组件 -->
-		<div id="divTblSortData" data-sort-name="{$sortData.sortName}" data-sort-order="{$sortData.sortOrder}" data-list-rows="{$sortData.listRows}" data-page-num="{$sortData.pageNum}" data-show-id="{$sortData.showId}" data-period="{$sortData.period}" class="sr-only"></div>
-		
+	<div class="tab-content">		
 		<div id="patList">
-		<!-- //js生成 -->
+		<!-- //jQ载入 -->
 		</div>
 	</div>
 	
@@ -37,7 +35,13 @@
 
 <script>
 const periodProp={$periodProp};
-console.log(periodProp);
+<!-- console.log(periodProp); -->
+//设定本页面内向后端请求的url基地址
+var urlBase=urlPrex+'/patent/index/',
+	period='total',
+	sortData={$sortData};
+
+<!-- console.log(num); -->
 
 //定义要加载的搜索表单中各个输入组件属性值
 const searchFormComProp={
@@ -62,50 +66,51 @@ const titleProp=[
 
 // 根据本页面的锚点值，决定setTitle的内容
 var setTitle=()=>{
-	let sId=window.location.hash,
-		color='',
+	let color='',
 		txt='',
 		spObj=$('<span></span>').css({'cursor':'unset'}),
-		num='';
+		n='';
 		spBdg=$('<span></span>').addClass('badge'),
 		hObj=$('#period');
 	
 	for(let i=0;i<titleProp.length;i++){
 		let el=titleProp[i];
-		if(el.period==sId.slice(1)){
+		if(el.period==period){
 			color=el.btn;
 			txt=el.txt;
-			num=(typeof periodProp[el.period])?periodProp[el.period]['num']:'';
-			(num)?spBdg.text(num):'';
+			n=(typeof periodProp[el.period])?periodProp[el.period]['num']:'';
+			(n)?spBdg.text(n):'';
 			break;
 		}
 	}
+	console.log(period);
 	spObj.addClass(color).append(txt,spBdg);
 	hObj.empty().append(spObj);
 };
 //生成nav-pills里的组件
 var buildNavPillsCom=()=>{
-	let obj=$('ul.nav-pills');
-	obj.empty();	
+	let r=$('ul.nav-pills').css('border-bottom','1px solid #ddd');
+	r.empty();	
 	for(let el in periodProp){
-		let num=periodProp[el]['num'],
-			chi=periodProp[el]['chi'],
-			aObj=$('<a></a>').addClass('aTab').css({'padding':'3px 10px','border-bottom-right-radius':'0px','border-bottom-left-radius':'0px'}),
-			liObj=$('<li></li>');
-		aObj.attr('href','#'+el).html(chi);
-		liObj.append(aObj);
-		obj.append(liObj);
+		let chi=periodProp[el]['chi'],
+			a=$('<a></a>').attr({'class':'patPeriod','data-period':el}).css({'padding':'3px 10px','border-bottom-right-radius':'0px','border-bottom-left-radius':'0px','cursor':'pointer'}).html(chi),
+			li=$('<li></li>');
+		
+		li.append(a);
+		r.append(li);
 	}
+	<!--为第一个li标签添加.active -->
+	r.find('li').eq(0).addClass('active');
 };
 
 var initPage=()=>{
-	let sId=window.location.hash,
-		period=sId.slice(1);
+
+	url=urlBase+'patSearchForm';
 	$('#divTblSortData').data('period',period);
 	buildNavPillsCom();
 	setTitle();
 	//载入patSearchForm
-	$('#patSearchForm').load('patSearchForm');
+	$('#patSearchForm').load(url);
 	//载入patList
 	loadPatList();
 };
@@ -119,50 +124,26 @@ var fmReset=()=>{
 	});
 };
 
-//自调用匿名函数立即执行的特点，进行页面初始化。
-(function($){
-	initPage();
-	
-	//选中id为"nav_pat"的标签（header.html文件中的li标签）,添加.active
-	$('#nav_pat').addClass('active');
-	// 激活tooltip
-	$('[title]').tooltip();	
-})(jQuery);
+initPage();
+// 激活tooltip
+$('[title]').tooltip();	
 
 $(document).ready(function(){
-	
-	$('#nav_pat').click(function(){
-		let period='total',
-			sId='#'+period;
-		window.location.hash=sId;
-		$('#divTblSortData').data('period',period);
-		$('.aTab[href="'+sId+'"]').tab('show');
-		loadPatList();
-	});	
+	let aSet=$('.patPeriod');
 	
 	<!-- //点击.aTab中的各个按钮后，显示相应状态的pat内容-->
-	$('.aTab').click(function(){
-        let sId = $(this).attr('href'),  //a的attr属性值
-			period=sId.slice(1);
-		//设置锚点值
-		window.location.hash=sId;
-		
+	aSet.click(function(){
+       period=$(this).data('period');
 		//本身加底色
 		$(this).tab('show');
-		//排序、分页有关的值向$('#divTblSortData')汇集
-		$('#divTblSortData').data('period',period);
-		$('#divTblSortData').data('pageNum',1);
+		//排序、分页有关的值向sortData汇集
+		sortData.period=period;
+		sortData.pageNum=1;
 		setTitle();
 		
 		loadPatList();
     });	
-	
-	$('.aTab').each(function(){
-		<!-- //	为锚点值对应的li添加.active -->
-		if($(this).attr('href')==window.location.hash){
-			$(this).parent().addClass('active');
-		}	
-	});
+
 	<!-- // 页面刷新 -->
 	$('#btnRefresh').click(function(){
 		//所有表单重置
@@ -176,26 +157,19 @@ $(document).ready(function(){
 
 //载入文件
 function loadPatList(opt={}){
-	let url='patList',
-		rqData=$.extend({},{sortData:{},searchData:{}},opt),
+	let	rqData=$.extend({},{sortData:{},searchData:{}},opt),
 		loadStr='<p class="text-center" style="font-size:28px;">加载中……</p>';
 	//排序有关的参数都从$('#divTblSortData')获取
 	let obj=$('#divTblSortData'),
-		sortData={
-			'sortName':obj.data('sortName'),
-			'sortOrder':obj.data('sortOrder'),
-			'pageNum':obj.data('pageNum'),
-			'listRows':obj.data('listRows'),
-			'showId':obj.data('showId'),
-			'period':obj.data('period')
-		},
 		sortDataDefault={listRows:10,sortName:'topic',sortOrder:'asc',pageNum:1,showId:0,period:'total'};
 	
 	//用户搜索有关键值对从表单$('#fmIssPatSearch')获取
 	let formData=new FormData($('#fmPatSearch')[0]),
 		searchDataDefault={topic:'',author:'',type:0,dept:0,status:0};
 		searchData={};
-	
+		
+	//改变向后端请求的url
+	url=urlBase+'patList';
 	//使用Map对象的forEach方法组装hash数组
 	formData.forEach(function(val,key){
 		//非0非空的值才进行组装
@@ -216,4 +190,4 @@ function loadPatList(opt={}){
 <!-- /function  -->
 </script>
 
-{include file="../application/common/footer.html"}
+

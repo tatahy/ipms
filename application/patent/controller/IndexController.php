@@ -66,7 +66,8 @@ class IndexController extends \think\Controller
         'home'=>$this->home,
         #各个period的数量及名称
         'periodProp'=>json_encode($periodArr,JSON_UNESCAPED_UNICODE),
-        'sortData'=>$this->sortData,
+        #排序数组
+        'sortData'=>json_encode($this->sortData,JSON_UNESCAPED_UNICODE),
         'username'=>$this->username,
         'year'=>date('Y')
       ]);
@@ -84,7 +85,8 @@ class IndexController extends \think\Controller
       #接收前端的搜索参数数组，由前端保证传来的搜索参数值非0，非空。
       $searchData=!empty($request->param('searchData/a'))?$request->param('searchData/a'):array();
       $searchData=array_merge([],$searchData);
-      
+      #查询、排序结果总数
+      $searchResultNum=0;
       #返回前端进行显示的内容
       $patList=array();
       #进行搜索的条件数组

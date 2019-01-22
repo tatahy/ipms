@@ -1,0 +1,74 @@
+<!-- //module:project; view:index/index.html  -->
+
+<div>
+	
+	<ul id="patPeriodNav" class="nav nav-pills">
+		<!-- //jQ产生参考模型	 -->
+		<!-- <li class="active"><a class="aTab" href="#total">项目概况&nbsp;|&nbsp;<span class="glyphicon glyphicon-search"></span></a></li> -->
+	</ul>
+		
+	<div class="tab-content">
+		<div id="proList">
+		<!-- //jQ载入 -->
+		</div>
+	</div>
+	
+</div>
+
+<script>
+const patPeriodProp={
+	clsName:'patPeriod',
+	period:[
+		{name:'total',txt:'项目总体情况',color:bs3Color['info']['btn']},
+		{name:'audit',txt:'内审'},
+		{name:'plan',txt:'拟申报'},
+		{name:'apply',txt:'申报'},
+		{name:'approve',txt:'立项'},
+		{name:'process',txt:'在研'},
+		{name:'inspect',txt:'验收'},
+		{name:'done',txt:'结题'},
+		{name:'terminate',txt:'终止'},
+		{name:'reject',txt:'申报未立项'}
+	]
+};
+//根据定义的patPeriodProp生成"navPill"组件
+var buildPatPeriodNavCom=()=>{ 
+	let r=$('#patPeriodNav').css('border-bottom','1px solid #ddd');
+	
+	patPeriodProp.period.forEach(function(e){
+		let a=$('<a></a>').attr({'data-ent':'pat','data-period':e.name,'class':patPeriodProp.clsName}).html(e.txt).css({'padding':'3px 10px','border-bottom-right-radius':'0px','border-bottom-left-radius':'0px','cursor':'pointer'}),
+			rC=$('<li></li>');
+			
+		rC.append(a);
+		r.append(rC);	
+	});
+	<!--为第一个li标签添加.active -->
+	r.find('li').eq(0).addClass('active');
+};
+//改变向后端请求的url
+url=urlPrex+'/project/index/proList';
+
+//利用自调用匿名函数立即执行的特点，页面初始化
+(function($){
+
+	buildPatPeriodNavCom();
+	$('#proList').load(url,rqData);
+	console.log(rqData);
+})(jQuery);
+
+$(document).ready(function(){	
+	let aSet=$('.'+patPeriodProp.clsName);
+	
+	<!-- //点击组件点击后，显示相应状态的pat内容-->
+	aSet.click(function(){
+    	rqData.ent=$(this).data('ent');
+		rqData.period=$(this).data('period');
+		
+		$(this).tab('show');
+		
+		$('#proList').load(url,rqData);
+	});	
+	
+});
+</script>
+

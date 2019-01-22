@@ -1,0 +1,148 @@
+{include file="../application/common/header.html" title="ipmsv3" }
+
+<!-- pagewrap  -->
+<!-- // header文件中有一些css样式规定-->
+<div id="main" class="mainFrame container-fluid" style="padding-top: 80px;">	
+	<!-- //jQ产生参考模型	 -->
+	<!-- <div class="row"> -->
+		<!-- <div class="col-sm-6"> -->
+			<!-- <div class="panel-group"> -->
+				<!-- <div class="panel panel-default"> -->
+					<!-- <div class="panel-heading"><span class="glyphicon glyphicon-wrench"></span>&nbsp;<strong>专利概况</strong></div> -->
+					<!-- <div class="panel-body"> -->
+						<!-- <a href="{$home}/patent/index/index#newAdd" class="btn-info">拟申报专利数：<span class="badge">{ $num.pat.newAdd}</span></a> -->
+						<!-- <a href="{$home}/patent/index/index#apply" class="btn-primary">申报专利数：<span class="badge">{ $num.pat.apply}</span></a> -->
+						<!-- <a href="{$home}/patent/index/index#authorize" class="btn-success">有效专利数：<span class="badge">{ $num.pat.authorize}</span></a> -->
+					
+						<!-- <p class="text-center">无“专利”【查阅】权限，请与系统管理员联系。</p> -->
+						
+					<!-- </div> -->
+					
+				<!-- </div> -->
+			<!-- </div> -->
+		<!-- </div> -->
+			
+	<!-- </div> -->
+
+</div>
+
+
+
+<!-- /pagewrap -->
+
+<script>
+<!-- var num={$num}; -->
+
+const urlIndex=urlPrex+'/index/index/index',
+	noneSufx='模块无【查阅】权限，请与系统管理员联系。',
+//定义本页要显示的系统各个实体，主要属性和数量
+	entProp={
+	pat:{
+		url:urlPrex+'/patent/index/index',
+		txt:'专利概况',
+		gly:glyPrex+'wrench',
+		period:[
+			{name:'newAdd',txt:'拟申报专利数：',color:bs3Color['info']['btn']},
+			{name:'apply',txt:'申报专利数：',color:bs3Color['primary']['btn']},
+			{name:'authorize',txt:'有效专利数：',color:bs3Color['success']['btn']}
+		],
+		noneTxt:'“专利”'+noneSufx
+	},
+	ass:{
+		url:urlPrex+'/asset/index/index',
+		txt:'固定资产',
+		gly:glyPrex+'oil',
+		period:[
+			{name:'_ASSS1',txt:'待定数：',color:bs3Color['info']['btn']},
+			{name:'_ASSS2',txt:'正常数：',color:bs3Color['success']['btn']},
+			{name:'_ASSS3',txt:'异常数：',color:bs3Color['warning']['btn']},
+			{name:'_ASSS4',txt:'停用数：',color:bs3Color['default']['btn']}
+		],
+		noneTxt:'“固定资产”'+noneSufx
+	},
+	pro:{
+		url:urlPrex+'/project/index/index',
+		txt:'项目概况&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
+		gly:glyPrex+'inbox',
+		period:[
+			{name:'plan',txt:'拟申报项目数：',color:bs3Color['info']['btn']},
+			{name:'apply',txt:'申报项目数',color:bs3Color['primary']['btn']},
+			{name:'approve',txt:'立项项目数：',color:bs3Color['warning']['btn']},
+			{name:'process',txt:'在研项目数：',color:bs3Color['primary']['btn']},
+			{name:'done',txt:'结题项目数：',color:bs3Color['success']['btn']},
+			{name:'terminate',txt:'终止项目数：',color:bs3Color['default']['btn']}
+		],
+		noneTxt:'“项目”'+noneSufx
+	},
+	the:{
+		url:urlPrex+'/thesis/index/index',
+		txt:'论文概况&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
+		gly:glyPrex+'list',
+		period:[
+			{name:'plan',txt:'拟发表论文数：',color:bs3Color['info']['btn']},
+			{name:'apply',txt:'投稿论文数：',color:bs3Color['primary']['btn']},
+			{name:'publish',txt:'发表论文数：',color:bs3Color['success']['btn']}
+		],
+		noneTxt:'“论文”'+noneSufx
+	}
+};
+console.log(entProp);
+//根据定义的ent生成"row"组件
+var buildRowCom=()=>{
+	let //计数器
+		n=0,
+		divSet=[];
+	//挨个ent组件
+	for (let ent in num){
+		let numObj=(typeof num[ent]=='object')?num[ent]:0;
+			entObj=entProp[ent],
+			p=$('<p></p>').addClass('text-center').text(entObj.noneTxt),
+			panH=$('<div></div>').addClass('panel-heading').append($('<span></span>').addClass(entObj.gly),'&nbsp;',$('<strong></strong>').html(entObj.txt)),
+			panB=$('<div></div>').addClass('panel-body'),
+			pan=$('<div></div>').addClass('panel-group'),
+			panType=$('<div></div>').addClass('panel panel-default'),
+			div=$('<div></div>').addClass('col-sm-6');
+		
+		if(typeof numObj=='object'){
+			entObj.period.forEach(function(el){
+				let num=numObj[el.name],
+					href=entObj.url+'#'+el.name,
+					a=$('<a></a>').addClass('btn btn-sm').css({'margin':'2px','font-size':'14px'}),
+					spBdg=$('<span></span>').addClass('badge');
+				
+				spBdg.text(num);
+				a.attr('href',href).addClass(el.color).append(el.txt,spBdg);
+				panB.append(a,'&nbsp;');
+			});
+		}		
+		if(numObj==0){
+			panB.append(p);
+		}
+		
+		panType.append(panH,panB);
+		pan.append(panType);
+		//生成一个ent组件
+		divSet[n]=div.append(pan);
+		n++;
+	}
+	//每个row放置2个ent组件
+	for(let i=0;i<Math.ceil(n/2);i++){		
+		let r=$('<div></div>').addClass('row');
+		r.append(divSet[2*i],divSet[(2*i+1)]);
+		$('#main').append(r);
+	}
+};
+
+//利用自调用匿名函数立即执行的特点，页面初始化
+(function($){
+	$('.panel-body').find('a').css({'margin':'2px','font-size':'14px'}).addClass('btn btn-sm').tooltip({title: "查看详情", placement: "bottom"});
+	buildRowCom();
+})(jQuery);
+
+$(document).ready(function(){
+	
+
+});
+</script>
+	
+{include file="../application/common/footer.html"}

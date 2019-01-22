@@ -55,6 +55,7 @@ class IndexController extends Controller
     
       #调用User模型层定义的refreshUserAuth()方法，刷新登录用户的各个模块权限
       $authority = $userMdl->refreshUserAuth($username, $pwd);
+      $num=['pat' => 0,'ass'=>0,'pro'=>0,'the'=>0];
 
       Session::set('userId', $user->id);
       Session::set('username', $username);
@@ -63,13 +64,14 @@ class IndexController extends Controller
       Session::set('dept', $user->dept);
       Session::set('authArr', $authority);
       
+      
       #根据ass是否有read权限进行赋值，利用模型对象得到各个asset总数
-      $assNum=$authority['ass']['read']?$assMdl::initModel($username,$user->dept,$authority['ass'])->getAssTypeNumArr():0;
+      $num['ass']=$authority['ass']['read']?$assMdl::initModel($username,$user->dept,$authority['ass'])->getAssTypeNumArr():0;
       
       #根据pat是否有read权限进行赋值，利用模型对象得到各个patent总数
-      $patNum=$authority['pat']['read']?$patMdl::getPeriodNum():0;
+      $num['pat']=$authority['pat']['read']?$patMdl::getPeriodNum():0;
       
-      $proNum=[
+      $num['pro']=[
         'plan'=>'x',
         'apply'=>'x',
         'approve'=>'x',
@@ -78,7 +80,7 @@ class IndexController extends Controller
         'terminate'=>'x'
       ];
       
-      $theNum=[
+      $num['the']=[
         'plan'=>'x',
         'apply'=>'x',
         'publish'=>'x'
@@ -88,13 +90,11 @@ class IndexController extends Controller
         'home' => $request->domain(), 
         'username' => $username,
         #各模块统计数据
-        'num' => json_encode(['pat' => $patNum,'ass'=>$assNum,'pro'=>$proNum,'the'=>$theNum],JSON_UNESCAPED_UNICODE),
-              
+        'num' => json_encode($num,JSON_UNESCAPED_UNICODE),
+        'test'=>json_encode($authority,JSON_UNESCAPED_UNICODE),
         'year' => date('Y'), 
         ]);
-      //return view();
-      return $this->fetch();
-    
+      return view();
 
   }
 

@@ -79,14 +79,6 @@ footer {
 }
   
 </style>
-  
-  <!-- Tooltips must be initialized with jQuery: select the specified element and call the tooltip() method.
-The following code will enable all tooltips in the document:-->
-<script>
-$(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip();   
-});
-</script>
 
 </head>
 <body>
@@ -106,8 +98,8 @@ $(document).ready(function(){
 		</div>
     <div id="topNavbar" class="collapse navbar-collapse" >
       <ul class="nav navbar-nav">
-	  <!-- // js生成-->
-	  	<!-- //js生成的参考模型 -->
+	  <!-- // jQ生成li组件-->
+	  	<!-- //组件模型 -->
         <!-- <li id="nav_index"><a href="{$home}/index/index/index"><span class="glyphicon glyphicon-home"></span>&nbsp;首页</a></li> -->
         
       </ul>
@@ -123,11 +115,11 @@ $(document).ready(function(){
 <div id="divRqData" data-url="" data-ent="" data-period="" class="sr-only"></div>
 <!-- /pageheader  -->
 
-	
 <script>
-//归纳bootStrap3中的颜色相关属性
+
 const urlPrex='{$home}',
 	glyPrex='glyphicon glyphicon-',
+	//归纳bootStrap3中的颜色相关属性
 	bs3Color={
 		//info
 		info:{lab:'label label-info',btn:'btn-info',txt:'text-info',bg:'bg-info',alt:'alert-info',pan:'panel panel-info'},
@@ -146,6 +138,7 @@ const urlPrex='{$home}',
 		//link
 		link:{btn:'btn-link'}
 	},
+	//nav中li组件主要属性
 	navEntProp={
 		index:{id:'nav_index',url:urlPrex+'/index/index/index',period:'',gly:glyPrex+'home',chi:'首页'},
 		pat:{id:'nav_pat',url:urlPrex+'/patent/index/index',period:'total',gly:glyPrex+'wrench',chi:'专利'},
@@ -153,50 +146,76 @@ const urlPrex='{$home}',
 		the:{id:'nav_the',url:urlPrex+'/thesis/index/thelist',period:'total',gly:glyPrex+'list',chi:'论文'},
 		pro:{id:'nav_pro',url:urlPrex+'/index/index/index',period:'total',gly:glyPrex+'inbox',chi:'项目'},
 	};
+	
+var num={$num};
+	
+//根据定义的navEntProp生成"navLi"组件
+var buildNavLiCom=()=>{ 
+	let r=$('#topNavbar .navbar-nav').eq(0),
+		entity=($('#divRqData').data('ent'))?$('#divRqData').data('ent'):'index';
+		
+	for(let ent in navEntProp){
+		let e=navEntProp[ent],
+			n=num[ent],
+			a=$('<a></a>').data('ent',ent).append($('<span></span>').addClass(e.gly),'&nbsp;',e.chi),
+			rC=$('<li></li>').attr('id',e.id);
+		
+		if(ent!='index' && n==0){
+			rC.addClass('disabled');
+		}	
+		
+		if(ent=='index' || typeof n=='object'){
+			a.css('cursor','pointer');
+		}	
+		rC.append(a);
+		r.append(rC);
+	}
+	<!--为li标签（id为含有entity）添加.active -->
+	$('[id*="'+entity+'"]').addClass('active');
+	
+	console.log(entity);
+	
+}
+
 //load模块对应的Index文件
 var loadIndex=()=>{
 	let obj=$('#main'),
 		loadStr='<p class="text-center" style="font-size:20px;padding-top:20px;">加载中……</p>',
 		dataObj=$('#divRqData'),
-		url=(dataObj.data('url')=='')?urlPrex+'/index/index/index':dataObj.data('url'),
-		rqData={ent:dataObj.data('ent'),period:dataObj.data('period')};
+		rqData={ent:dataObj.data('ent'),period:dataObj.data('period')},
+		url=(dataObj.data('url')=='')?urlPrex+'/index/index/index':navEntProp[rqData.ent]['url'];
 	
-	console.log(url);
-	console.log(rqData);
+	if(rqData.ent=='index'){
+		return window.location.href=urlPrex+'/index/index/index';
+	}
 	
+	console.log('loadIndex():');
+	<!-- //load指定文件 -->	
 	obj.html(loadStr).load(url,rqData,function(){
-		//设置锚点
-		if(rqData.period!=''){
-			window.location.hash='#'+rqData.period;
-		}
-	});
 	
+		console.log(url);
+		console.log(rqData);	
+		window.location.href=url+'#'+rqData.period;
+		<!-- window.location.hash='#'+rqData.period; -->
+		<!-- console.log(window.location.href); -->
+	});
 	
 };
 
-//根据定义的navEntProp生成"navLi"组件
-var buildNavLiCom=()=>{ 
-	let r=$('#topNavbar .navbar-nav').eq(0);
-		
-	for(let ent in navEntProp){
-		let e=navEntProp[ent],
-			a=$('<a></a>').data('ent',ent).append($('<span></span>').addClass(e.gly),'&nbsp;',e.chi).css('cursor','pointer'),
-			rC=$('<li></li>').attr('id',e.id).append(a);
-		r.append(rC);
-	}
-}
 
 //利用自调用匿名函数立即执行的特点，页面初始化
 (function($){
 	buildNavLiCom();
+	// 激活tooltip
+	$('[title]').tooltip();	   
 })(jQuery);
 
 $(document).ready(function(){
 	let navLiSet=$('[id^="nav_"]');
 	
 	navLiSet.children('a').click(function(){
-		let dataObj=$('#divRqData');
-		$.alert($(this).data('ent'));
+		let dataObj=$('#divRqData'),
+			cls=$(this).closest('li').attr('class')?$(this).closest('li').attr('class'):'no class';
 		
 		for(let ent in navEntProp){
 			let e=navEntProp[ent];
@@ -206,10 +225,14 @@ $(document).ready(function(){
 				dataObj.data('period',e.period);
 			}
 		}
-		navLiSet.removeClass('active');
-		<!-- 选中id为"nav_index"的标签（li标签）,添加.active -->
-		$(this).closest('li').addClass('active');
-		loadIndex();
+		
+		if(cls.indexOf('disabled')==-1){
+			loadIndex();
+			<!-- 本级li标签添加.active -->
+			navLiSet.removeClass('active');
+			$(this).closest('li').addClass('active');
+		}
+		
 	});
 
 });

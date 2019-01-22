@@ -1,11 +1,117 @@
-{include file="../application/common/header.html" title="ipmsv3" }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>IPMS</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {/* TP5中的模板注释格式，多行。内容不会出现在发送给浏览器的HTML文件中
+  <!-- 使用cdn提高解析速度 -->
+  <!-- <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.bootcss.com/bootstrap/3.3.6/css/bootstrap3.3.7.min.css">
+  <script src="https://ajax.googleapis.bootcss.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.bootcss.com/bootstrap/3.3.6/js/bootstrap.min.js"></script> -->
+   */}
+  
+ {// TP5中的模板注释格式，单行。<!-- TP5的资源文件加载写法 -->内容不会出现在发送给浏览器的HTML文件中 }  
+  {css href="/home/res/css/bootstrap3.3.7.min.css" }
+  {css href="/home/res/css/style.css" }
+  {js href="/home/res/js/jquery1.12.4.min.js" }
+  {js href="/home/res/js/bootstrap3.3.7.min.js" } 
 
-<!-- pagewrap  -->
-<!-- // header文件中有一些css样式规定-->
-<div id="main" class="mainFrame container-fluid" style="padding-top: 80px;">	
-	<!-- //js产生	 -->
-	
-	<!-- //js生成的参考模型 -->
+  {// TP5中的模板注释格式，单行。<!-- 自定义的页面弹窗 -->}  
+  {js href="/home/res/js/alert.min.js" }
+
+
+{/*<!-- 实现nav固定在页面顶端效果的补充代码块,
+同时还需设置nav的data-offset-top="-3"防止鼠标单击页面时出现跳动-->
+*/}
+<style>
+  .affix {
+      top: 0;
+      width: 100%;
+  }
+
+  .affix + .container-fluid {
+      padding-top: 60px;
+  }
+  
+body {
+  	/* Margin bottom by footer height */
+  	margin-bottom: 70px;
+}  
+
+.mainFrame{
+	margin: 0 10%;
+	padding-top:60px;
+}
+
+footer {
+	//border:1px solid #e3e3e3;
+	background-color:#f5f5f5;
+	padding:5px 0;	
+	position: fixed;
+	/* 确保footer遮盖了分页显示*/
+	z-index: 9;
+	bottom:0;
+	width: 100%;
+	/* Set the fixed height of the footer here */
+	height: 70px;
+  
+}
+
+@media screen and (max-width: 767px) {
+body {
+  	/* Margin bottom by footer height */
+  	margin: 0;
+} 
+
+.mainFrame{
+	margin: 0;
+}
+
+footer {
+	position: relative;
+	background-color:#ffffff;
+	border-top:1px solid #e3e3e3;
+	padding-top:10px;
+	margin-top:40px;
+}
+
+}
+  
+</style>
+
+</head>
+<body>
+<!-- pageheader  -->
+<nav class="navbar navbar-default navbar-fixed-top" data-spy="affix" data-offset-top="-3">
+  <div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#topNavbar">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>                        
+			</button>
+			<a class="navbar-brand" href="http://www.gzgjd.com" title="GZOME主页" target="_blank"><strong>IPMS</strong>
+				<img src="/home/res/images/logo.png" class="img-responsive img-circle margin" style="display:inline" width="45" height="40">
+			</a>
+		</div>
+    <div id="topNavbar" class="collapse navbar-collapse" >
+      <ul class="nav navbar-nav">
+	  <!-- // jQ生成li组件-->
+	  	<!-- //组件模型 -->
+        <!-- <li id="nav_index"><a href="{$home}/index/index/index"><span class="glyphicon glyphicon-home"></span>&nbsp;首页</a></li> -->
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="{$home}/dashboard/index/index#userInfo"><span class="glyphicon glyphicon-user"></span>&nbsp;【{$username}】个人中心</a></li>	
+        <li id="liQuit"><a href="{$home}/index/index/logout"><span class="glyphicon glyphicon-log-out"></span>&nbsp;退出</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div id="main" class="mainFrame container-fluid" style="padding-top: 70px;">	
+	<!-- //jQ产生参考模型	 -->
 	<!-- <div class="row"> -->
 		<!-- <div class="col-sm-6"> -->
 			<!-- <div class="panel-group"> -->
@@ -28,17 +134,48 @@
 
 </div>
 
-
-
-<!-- /pagewrap -->
+<footer>
+	<div class="text-center">
+		<span class=""><a href="#">联系我们</a>&nbsp;┆&nbsp;<a href="{$home}/admin/index/login">管理登录</a></span></br>
+		<span class="">Powered by HY Copyright © {$year-1}-{$year} 广州市光机电技术研究院（GZOME）. All rights reserved</span></br>
+		<span class="">为获得最佳的浏览效果，推荐使用<a href="#">Chrome</a>、 <a href="#">Firefox</a>浏览器</span></br>	
+	</div>
+</footer>
 
 <script>
-var num={$num};
-
-const urlIndex=urlPrex+'/index/index/index',
-	noneSufx='模块无【查阅】权限，请与系统管理员联系。',
+const urlPrex='{$home}',
+	glyPrex='glyphicon glyphicon-',
+	//归纳bootStrap3中的颜色相关属性
+	bs3Color={
+		//info
+		info:{lab:'label label-info',btn:'btn-info',txt:'text-info',bg:'bg-info',alt:'alert-info',pan:'panel panel-info'},
+		//success
+		success:{lab:'label label-success',btn:'btn-success',txt:'text-success',bg:'bg-success',alt:'alert-success',pan:'panel panel-success'},
+		//danger
+		danger:{lab:'label label-danger',btn:'btn-danger',txt:'text-danger',bg:'bg-danger',alt:'alert-danger',pan:'panel panel-danger'},
+		//warning
+		warning:{lab:'label label-warning',btn:'btn-warning',txt:'text-warning',bg:'bg-warning',alt:'alert-warning',pan:'panel panel-warning'},
+		//primary
+		primary:{lab:'label label-primary',btn:'btn-primary',txt:'text-primary',bg:'bg-primary',pan:'panel panel-primary'},
+		//default
+		'default':{lab:'label label-default',btn:'btn-default'},
+		//muted
+		muted:{text:'text-muted'},
+		//link
+		link:{btn:'btn-link'}
+	},
+	//topNav中li组件主要属性
+	topNavProp={
+		index:{id:'nav_index',url:urlPrex+'/index/index/index',period:'',gly:glyPrex+'home',chi:'首页'},
+		pat:{id:'nav_pat',url:urlPrex+'/patent/index/index',period:'total',gly:glyPrex+'wrench',chi:'专利'},
+		ass:{id:'nav_ass',url:urlPrex+'/asset/index/index',period:'_ASSS_USUAL',gly:glyPrex+'oil',chi:'固定资产'},
+		the:{id:'nav_the',url:urlPrex+'/thesis/index/index',period:'total',gly:glyPrex+'list',chi:'论文'},
+		pro:{id:'nav_pro',url:urlPrex+'/project/index/index',period:'total',gly:glyPrex+'inbox',chi:'项目'},
+	},
+	urlIndex=urlPrex+'/index/index/index',
+	noneSufx='模块无【查阅】权限，请与系统管理员联系。';
 //定义本页要显示的系统各个实体，主要属性和数量
-	entProp={
+const entProp={
 	pat:{
 		url:urlPrex+'/patent/index/index',
 		txt:'专利概况',
@@ -88,17 +225,52 @@ const urlIndex=urlPrex+'/index/index/index',
 		noneTxt:'“论文”'+noneSufx
 	}
 };
-console.log(entProp);
+
+var num={$num};
+
+//向后端请求的url
+var url=urlPrex+'/index/index/index',
+//向后端请求时发送的数据
+	rqData={
+		ent:'index',
+		period:''
+	};
+
+//根据定义的topNavProp生成"navLi"组件
+var buildTopNavbarCom=()=>{ 
+	let r=$('#topNavbar .navbar-nav').eq(0),
+		entity=rqData.ent;
+	r.empty();
+	for(let ent in topNavProp){
+		let e=topNavProp[ent],
+			n=num[ent],
+			a=$('<a></a>').attr('data-ent',ent).append($('<span></span>').addClass(e.gly),'&nbsp;',e.chi),
+			rC=$('<li></li>').attr('id',e.id);
+		
+		if(ent!='index' && n==0){
+			rC.addClass('disabled');
+		}	
+		
+		if(ent=='index' || typeof n=='object'){
+			a.css('cursor','pointer');
+		}	
+		rC.append(a);
+		r.append(rC);
+	}
+	<!--为li标签（id为含有entity）添加.active -->
+	$('[id*="'+entity+'"]').addClass('active');
+}
+
 //根据定义的ent生成"row"组件
 var buildRowCom=()=>{
 	let //计数器
 		n=0,
 		divSet=[];
-	//挨个ent组件
+	$('#main').empty();
+	//挨个生成ent组件
 	for (let ent in num){
 		let numObj=(typeof num[ent]=='object')?num[ent]:0;
 			entObj=entProp[ent],
-			navLi=$('#nav_'+ent),
 			p=$('<p></p>').addClass('text-center').text(entObj.noneTxt),
 			panH=$('<div></div>').addClass('panel-heading').append($('<span></span>').addClass(entObj.gly),'&nbsp;',$('<strong></strong>').html(entObj.txt)),
 			panB=$('<div></div>').addClass('panel-body'),
@@ -110,21 +282,16 @@ var buildRowCom=()=>{
 			entObj.period.forEach(function(el){
 				let num=numObj[el.name],
 					href=entObj.url+'#'+el.name,
-					a=$('<a></a>').addClass('btn btn-sm').css({'margin':'2px','font-size':'14px'}),
+					btn=$('<button></button>').addClass('btn btn-sm btnPeriod').css({'margin':'2px','font-size':'14px'}),
 					spBdg=$('<span></span>').addClass('badge');
 				
 				spBdg.text(num);
-				a.attr('href',href).addClass(el.color).append(el.txt,spBdg);
-				panB.append(a,'&nbsp;');
+				btn.attr({'data-url':entObj.url,'data-ent':ent,'data-period':el.name}).addClass(el.color).append(el.txt,spBdg);
+				panB.append(btn);
 			});
-			
-			navLi.removeClass('disabled');
 		}		
 		if(numObj==0){
 			panB.append(p);
-			<!-- navLi.addClass('disabled').empty().append(sp); -->
-			navLi.addClass('disabled');
-			navLi.children('a').attr('href',urlIndex);
 		}
 		
 		panType.append(panH,panB);
@@ -140,18 +307,74 @@ var buildRowCom=()=>{
 		$('#main').append(r);
 	}
 };
-
+//load模块对应的Index文件
+var loadIndex=()=>{
+	let obj=$('#main'),
+		loadStr='<p class="text-center" style="font-size:20px;padding-top:20px;">加载中……</p>';
+	
+	url=topNavProp[rqData.ent]['url'];
+	
+	if(rqData.ent=='index'){
+		buildRowCom();
+	}
+	
+	if(rqData.ent!='index'){
+		<!-- //load指定文件 -->	
+		obj.html(loadStr).load(url,rqData);
+	}
+};
 //利用自调用匿名函数立即执行的特点，页面初始化
 (function($){
 	$('.panel-body').find('a').css({'margin':'2px','font-size':'14px'}).addClass('btn btn-sm').tooltip({title: "查看详情", placement: "bottom"});
+	buildTopNavbarCom();
 	buildRowCom();
+	// 激活tooltip
+	$('[title]').tooltip();	
 })(jQuery);
 
 $(document).ready(function(){
-	<!-- 选中id为"nav_index"的标签（li标签）,添加.active -->
-	$('#nav_index').addClass('active');
+	let navLiSet=$('[id^="nav_"]'),
+		btnSet=$('.btnPeriod');
+	
+	navLiSet.children('a').click(function(){
+		let cls=$(this).closest('li').attr('class')?$(this).closest('li').attr('class'):'no class';
+		
+		for(let ent in topNavProp){
+			let e=topNavProp[ent];
+			if($(this).data('ent')==ent){
+				url=e.url;
+				rqData.ent=ent;
+				rqData.period=e.period;
+			}
+		}
+		
+		if(cls.indexOf('disabled')==-1){
+			<!-- 本级li标签添加.active -->
+			navLiSet.removeClass('active');
+			$(this).closest('li').addClass('active');
+			loadIndex();
+		}
+		
+	});
+	
+	btnSet.click(function(){
+		url=$(this).data('url');
+		rqData.ent=$(this).data('ent');
+		rqData.period=$(this).data('period');
+		
+		
+		console.log(url);
+		console.log(rqData);
+		<!-- window.location.href=url+'#'+rqData.period; -->
+		loadIndex();
+		
+	});
 
 });
 </script>
-	
-{include file="../application/common/footer.html"}
+
+</body>
+</html>
+
+
+
