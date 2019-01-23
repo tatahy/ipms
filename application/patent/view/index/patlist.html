@@ -80,8 +80,6 @@
 var sData=rqData.searchData;
 
 var numTotal={$numTotal};
-console.log('patList.html');
-<!-- console.table(sData); -->
 
 //对PatList进行设置
 //列表字段进行升序降序转换，改变该字段表头显示格式
@@ -103,7 +101,7 @@ var setSortList=()=>{
 			column=$(this).data('sortName');
 		columnArr.push(column);
 		//每个添加属性
-		$(this).removeClass('label label-primary').attr({'data-period':period,'title':'点击排序'}).css('cursor','pointer').closest('th').addClass('text-center');
+		$(this).removeClass('label label-primary').attr({'data-period':rqData.period,'title':'点击排序'}).css('cursor','pointer').closest('th').addClass('text-center');
 		
 		(sortName==column)?$(this).attr({'class':'label label-primary','data-sort-order':sort,'title':title}).tooltip({placement:'top'}).append('&nbsp;',gly):$(this).tooltip({placement:'bottom'});	
 		
@@ -150,7 +148,7 @@ var showSearchResult=()=>{
 		bingoObj.show();
 		listObj.show();
 	}
-	if(n && numTotal==0)	noneObj.show();
+	if(n && numTotal==0) noneObj.show();
 	
 };
 
@@ -176,7 +174,7 @@ $(document).ready(function(){
 			rqData.sortData.pageNum=1;
 		}
 		//载入patList
-		loadEntPeriodList(loadObj);
+		loadEntPeriodList();
 	});	
 	//排序
 	$('#tblPatList thead a').click(function(){
@@ -187,7 +185,7 @@ $(document).ready(function(){
 		rqData.sortData.sortOrder=sortOrder;
 		rqData.sortData.pageNum=1;
 		//载入patList
-		loadEntPeriodList(loadObj);
+		loadEntPeriodList();
 	});	
 	<!-- // 点击分页中的a，表格中的内容根据a中的属性值进行排序 -->
 	$('#divListRows a').click(function(evt){
@@ -218,7 +216,7 @@ $(document).ready(function(){
 			rqData.sortData.pageNum=pageNum;
 		}
 		//载入patList
-		loadEntPeriodList(loadObj);
+		loadEntPeriodList();
 	});
 	//点击a后该行上底色
 	$('#tblPatList tbody a').click(function(){

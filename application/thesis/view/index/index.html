@@ -16,21 +16,20 @@
 </div>
 
 <script>
-let aSet='';
-let loadObj=$('#theList');
-//改变向后端请求的url
-url=domain+'/thesis/index/theList';
 
-buildMainPeriodNavCom($('#thePeriodNav'),rqData.ent);
-aSet=$('#thePeriodNav').find('a');
-loadEntPeriodList(loadObj);
+urlObj.module='thesis';
+urlObj.method='theList';
+
+buildMainPeriodNavCom();
+
+loadEntPeriodList();
 
 <!-- //组件点击后，显示相应period的list-->
-aSet.click(function(){
+$('#thePeriodNav').find('a').click(function(){
     rqData.ent=$(this).data('ent');
 	rqData.period=$(this).data('period');
 		
-	loadEntPeriodList(loadObj);
+	loadEntPeriodList();
 });	
 	
 </script>

@@ -1,11 +1,14 @@
 <!-- //module:asset, view:index/index.html  -->
 
 <div>
-	<ul id="assPeriodNav" class="nav nav-pills" style="border-bottom:1px solid #eee;">
+	<ul id="assPeriodNav" class="nav nav-pills">
 	<!-- //jQ产生参考模型	 -->
 		<!-- <li class="active"><a class="aTab" href="#total">项目概况&nbsp;|&nbsp;<span class="glyphicon glyphicon-search"></span></a></li> -->
 		
 	</ul>
+	<h4 id="assTitle" class="text-left">
+		<!-- //jQ生成 -->
+	</h4>
 	<div id="divTopBtn" class="row text-right" style="margin:10px 0px;">
 		<div class="btn-group">
 			<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" title="选择查询方式"><span class="glyphicon glyphicon-search"></span>查询<span class="caret"></span></button>
@@ -22,81 +25,10 @@
 	<!-- // 一般查询区域-->
 	<div id="divSearchData" class="collapse" >
 		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchData"  data-toggle="collapse" title="点击隐藏">一般查询条件</a>
-		<form id="fmAssSearch" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:2px;">
-			<input class="sr-only" name="reqObj" type="text" value="" />
-			<div class="row myRow">
-			<div class="form-group col-sm-4">
-				<label class="control-label" for="brand_model">名称（品牌型号）</label>
-				<input class="form-control searchBg" id="brand_model" name="brand_model" type="text" value="" placeholder="...不限" />
-										
-			</div>
-			<div class="form-group col-sm-2">
-				<label class="control-label" for="assnum">编号</label>
-				<input class="form-control searchBg" id="assnum" name="assnum" type="text" value="" placeholder="...不限" />
-										
-			</div>
-			
-			<div class="form-group col-sm-3">
-				<label class="control-label" for="code">卡号</label>
-				<input class="form-control searchBg" id="code" name="code" type="text" value="" placeholder="...不限" />
-										
-			</div>
-			
-			<div class="form-group col-sm-3">
-				<label class="control-label" for="bar_code">条形码号</label>
-				<input class="form-control searchBg" id="bar_code" name="bar_code" type="text" value="" placeholder="...不限" />
-										
-			</div>
-			</div>
-			
-			<div class="row myRow">
-			<div class="form-group col-sm-4">
-				<label class="control-label" for="dept_now">现使用部门</label>
-				<!-- <select multiple class="form-control" id="searchPatType" name="searchPatType" > -->
-				<select multiple="multiple" size="4" class="form-control" id="selectDeptNow" name="dept_now" >
-						<option value="">d1</option>
-				</select>
-			</div>
-			<div class="form-group col-sm-2">
-				<label class="control-label" for="status_now">状态</label>
-				<!-- <select multiple class="form-control" id="searchPatType" name="searchPatType" > -->
-				<select multiple="multiple" size="4" class="form-control" id="selectStatusNow" name="status_now" >
-						<option value="">s1</option>
-				</select>
-			</div>
-			<div class="form-group col-sm-2">
-				<label class="control-label" for="place_now">现放置地点</label>
-				<select multiple="multiple" size="4" class="form-control" id="selectPlaceNow" name="place_now" >
-						<option value="">p1</option>
-				</select>
-										
-			</div>
-			<div class="form-group col-sm-2">
-				<label class="control-label" for="keeper_now">现保管人</label>
-				<input class="form-control" name="keeper_now" type="text" value="" placeholder="...不限" />
-										
-			</div>
-			
-			<div class="form-group col-sm-2">
-				<label class="control-label" for="status_now_user_name">登记人</label>
-				<input class="form-control" name="status_now_user_name" type="text" value="" placeholder="...不限" />
-						
-										
-			</div>
-			</div>	
-			
-			<div class="row myRow">
-			<div class="text-right">	
-				<button id="btnSearch" type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>查询</button>
-			
-				<button id="btnSearchReset" type="button" class="btn btn-primary btn-sm">条件重置</button>
-			</div>
-			</div>
-			
-			<!-- <button id="btnAssSearch" type="button" class="btn btn-primary btn-sm">查询&nbsp;<span class="glyphicon glyphicon-search"></span></button> -->
-		
-		</form>
-		<br>
+		<!-- // 搜索表单-->
+		<div id="assSearchForm">
+		<!-- //jQ生成 -->
+		</div>
 	</div>
 	
 	<!-- // 条形码查询区域-->
@@ -111,7 +43,7 @@
 	</div>
 	
 	<div class="tab-content">
-		<div id="divLoadAssList">
+		<div id="assList">
 			<p class="text-center" style="font-size:20px;">加载中……</p>
 		</div>
 	</div>	

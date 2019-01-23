@@ -41,7 +41,7 @@ class IndexController extends \think\Controller
         $this->home=$this->request->domain();
         #排序初始值
         $this->sortData=array('listRows'=>10,'sortName'=>'topic','sortOrder'=>'asc','pageNum'=>1,
-                          'showId'=>0,'period'=>'total');
+                          'showId'=>0);
     }
     private function priLogin()
     {
@@ -60,6 +60,7 @@ class IndexController extends \think\Controller
       foreach($periodArr as $key=>$val){
         $periodArr[$key]['num']=$numArr[$key];
         unset($periodArr[$key]['status']);
+        unset($periodArr[$key]['chi']);
       }
          
       $this->assign([
@@ -78,7 +79,8 @@ class IndexController extends \think\Controller
     public function patList(Request $request,PatinfoModel $patMdl)
     {
       $this->priLogin();    
-      
+      #
+      $period=!empty($request->param('period'))?$request->param('period'):'total';
       #接收前端的排序参数数组
       $sortData=!empty($request->param('sortData/a'))?$request->param('sortData/a'):$this->sortData;
       $sortData=array_merge($this->sortData,$sortData);
@@ -109,7 +111,7 @@ class IndexController extends \think\Controller
       }
       
       #pat模型对象，查询、排序用
-      $queryBase=$patMdl->getPeriodSql($sortData['period'])
+      $queryBase=$patMdl->getPeriodSql($period)
                         ->where($whereArr)
                         ->order($sortData['sortName'],$sortData['sortOrder']);
       

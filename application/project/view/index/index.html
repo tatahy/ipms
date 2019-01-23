@@ -16,22 +16,21 @@
 </div>
 
 <script>
-let aSet='';
-let entObj=$('#proList');
-//改变向后端请求的url
-url=domain+'/project/index/proList';
 
-buildMainPeriodNavCom($('#proPeriodNav'),rqData.ent);
+//改变urlObj
+urlObj.module='project';
+urlObj.method='proList';
 
-aSet=$('#proPeriodNav').find('a');
-loadEntPeriodList(entObj);
+buildMainPeriodNavCom();
+
+loadEntPeriodList();
 
 <!-- //组件点击后，显示相应period的list-->
-aSet.click(function(){
+$('#proPeriodNav').find('a').click(function(){
     rqData.ent=$(this).data('ent');
 	rqData.period=$(this).data('period');
 		
-	loadEntPeriodList(entObj);
+	loadEntPeriodList();
 });	
 </script>
 

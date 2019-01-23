@@ -7,16 +7,16 @@
 	<ul id="patPeriodNav" class="nav nav-pills">
 		<!-- //jQ生成 -->
 	</ul>
-	<h4 id="period" class="text-left">
+	<h4 id="patTitle" class="text-left">
 		<!-- //jQ生成 -->
 	</h4>
 	<div class="text-right">
-		<button type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divCollapse" title="显示/隐藏专利搜索条件">搜索条件</button>&nbsp;
+		<button type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divSearchForm" title="显示/隐藏专利搜索条件">搜索条件</button>&nbsp;
 		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新页面"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 	</div>
 	
-	<div id="divCollapse" class="collapse" style="padding-top:10px;">
-		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;padding-top:5px;" href="#divCollapse"  data-toggle="collapse" title="点击隐藏">专利搜索条件</a>
+	<div id="divSearchForm" class="collapse" style="padding-top:10px;">
+		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;padding-top:5px;" href="#divSearchForm"  data-toggle="collapse" title="点击隐藏">专利搜索条件</a>
 		<!-- // 搜索表单-->
 		<div id="patSearchForm">
 		<!-- //jQ生成 -->
@@ -34,87 +34,49 @@
 <!-- /pagewrap  -->
 
 <script>
-const periodProp={$periodProp};
-console.log(periodProp);
 
-//设定本页面内向后端请求的url基地址
-var urlBase=domain+'/patent/index/',
-	loadObj=$('#patList');
+<!--// console.log(num); -->
 
-rqData.sortData={$sortData};
-<!-- console.log(num); -->
 
 //定义要加载的搜索表单中各个输入组件属性值
-const searchFormComProp={
-	topic:{name:'topic',tag:'input',val:''},
-	author:{name:'author',tag:'input',val:''},
-	type:{name:'type',tag:'select',val:0},
-	dept:{name:'dept',tag:'select',val:0},
-	status:{name:'status',tag:'select',val:0},
-};
-//定义title属性值
-const titleProp=[
-	{period:'total',lab:'label label-primary',btn:'btn btn-primary',txt:'专利总数&nbsp;'},
-	{period:'audit',lab:'label label-info',btn:'btn btn-info',txt:'内部审核拟申报专利&nbsp;'},
-	{period:'newAdd',lab:'label label-info',btn:'btn btn-info',txt:'拟申报专利&nbsp;'},
-	{period:'apply',lab:'label label-primary',btn:'btn btn-primary',txt:'申报专利&nbsp;'},
-	{period:'authorize',lab:'label label-success',btn:'btn btn-success',txt:'授权(有效期)专利&nbsp;'},
-	{period:'render',lab:'label label-success',btn:'btn btn-success',txt:'续费授权(有效期)专利&nbsp;'},
-	{period:'abandon',lab:'label label-info',btn:'btn btn-info',txt:'已放弃专利数&nbsp;'},
-	{period:'reject',lab:'label label-info',btn:'btn btn-info',txt:'被驳回专利数&nbsp;'},
-	{period:'invalid',lab:'label label-default',btn:'btn btn-default',txt:'无效专利数&nbsp;'}
-];
+<!-- const searchFormComProp={ -->
+	<!-- topic:{name:'topic',tag:'input',val:''}, -->
+	<!-- author:{name:'author',tag:'input',val:''}, -->
+	<!-- type:{name:'type',tag:'select',val:0}, -->
+	<!-- dept:{name:'dept',tag:'select',val:0}, -->
+	<!-- status:{name:'status',tag:'select',val:0}, -->
+<!-- }; -->
+urlObj.module='patent';
+const tPropDefault={
+		total:{btn:'btn btn-primary',txt:'专利总数&nbsp;',num:''},
+		audit:{lab:'label label-info',btn:'btn btn-info',txt:'内部审核拟申报专利&nbsp;',num:''},
+		newAdd:{btn:'btn btn-info',txt:'拟申报专利&nbsp;',num:''},
+		apply:{btn:'btn btn-primary',txt:'申报专利&nbsp;',num:''},
+		authorize:{btn:'btn btn-success',txt:'授权(有效期)专利&nbsp;',num:''},
+		invalid:{btn:'btn btn-default',txt:'无效专利数&nbsp;',num:''}
+	};
 
-// 根据本页面的锚点值，决定setTitle的内容
-var setTitle=()=>{
-	let color='',
-		txt='',
-		spObj=$('<span></span>').css({'cursor':'unset'}),
-		n='';
-		spBdg=$('<span></span>').addClass('badge'),
-		hObj=$('#period');
-	
-	for(let i=0;i<titleProp.length;i++){
-		let el=titleProp[i];
-		if(el.period==rqData.period){
-			color=el.btn;
-			txt=el.txt;
-			n=(typeof periodProp[el.period])?periodProp[el.period]['num']:'';
-			(n)?spBdg.text(n):'';
-			break;
-		}
-	}
-	<!-- console.log(period); -->
-	spObj.addClass(color).append(txt,spBdg);
-	hObj.empty().append(spObj);
-};
+
+var titleProp=getTitleProp(tPropDefault,{$periodProp});
 
 var initPage=()=>{
-	buildMainPeriodNavCom($('#patPeriodNav'),rqData.ent);
-	setTitle();
+	buildMainPeriodNavCom();
+	setTitle(titleProp);
 	//载入patSearchForm
-	$('#patSearchForm').load(urlBase+'patSearchForm');
+	urlObj.method='patSearchForm';
+	$('#patSearchForm').load(getRqUrl());
 	//载入patList
-	url=urlBase+'patList';
-	loadEntPeriodList(loadObj);
-};
-//所有查询表单重置
-var fmSearchReset=()=>{
-	let fm=$('form');
-	
-	fm.each(function(){
-		$(this)[0].reset();
-		$(this).find('.form-control').removeClass('alert-info');
-	});
+	loadEntPeriodList();
+	console.log();
 };
 
-initPage();
+rqData.sortData=$.extend({},{$sortData},rqData.sortData);
+initPage();	
 
 $(document).ready(function(){
-	let aSet=$('#patPeriodNav').find('a');
 	
 	<!-- //点击nav中的各个按钮后，显示相应状态的pat内容-->
-	aSet.click(function(){
+	$('#patPeriodNav').find('a').click(function(){
        let period=$(this).data('period');
 		//本身加底色
 		$(this).tab('show');
@@ -122,19 +84,18 @@ $(document).ready(function(){
 		rqData.period=period;
 		rqData.sortData.period=period;
 		rqData.sortData.pageNum=1;
-		setTitle();
-		console.table(rqData);
-		loadEntPeriodList(loadObj);
+		setTitle(titleProp);
+		loadEntPeriodList();
     });	
 
 	<!-- // 页面刷新 -->
 	$('#btnRefresh').click(function(){
-		fmSearchReset();
+		
 		//隐藏搜索条件
-		$('.collapse').removeClass('in');
+		$('#divSearchForm').removeClass('in');
 		//清空查询数据
 		setRqSearchData();
-		loadEntPeriodList(loadObj);
+		fmSearchReset();
 	});	
 });
 

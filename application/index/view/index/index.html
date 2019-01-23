@@ -175,11 +175,10 @@ const domain='{$home}', //域名地址，由后端给定
 //定义前端系统各个实体主要属性(用于jQ构建组件)
 const entProp={
 	pat:{
-		url:domain+'/patent/index/index',
+		module:'patent',
 		txt:'专利概况',
 		gly:glyPrex+'wrench',
 		period:{
-			clsName:'patPeriod',
 			summary:[
 				{name:'newAdd',txt:'拟申报专利数：',color:bs3Color['info']['btn']},
 				{name:'apply',txt:'申报专利数：',color:bs3Color['primary']['btn']},
@@ -197,11 +196,10 @@ const entProp={
 		noneTxt:'“专利”'+noneSufx
 	},
 	ass:{
-		url:domain+'/asset/index/index',
+		module:'asset',
 		txt:'固定资产',
 		gly:glyPrex+'oil',
 		period:{
-			clsName:'assPeriod',
 			summary:[
 				{name:'_ASSS1',txt:'待定数：',color:bs3Color['info']['btn']},
 				{name:'_ASSS2',txt:'正常数：',color:bs3Color['success']['btn']},
@@ -220,11 +218,10 @@ const entProp={
 		noneTxt:'“固定资产”'+noneSufx
 	},
 	pro:{
-		url:domain+'/project/index/index',
+		module:'project',
 		txt:'项目概况&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
 		gly:glyPrex+'inbox',
 		period:{
-			clsName:'proPeriod',
 			summary:[
 				{name:'plan',txt:'拟申报项目数：',color:bs3Color['info']['btn']},
 				{name:'apply',txt:'申报项目数',color:bs3Color['primary']['btn']},
@@ -249,11 +246,10 @@ const entProp={
 		noneTxt:'“项目”'+noneSufx
 	},
 	the:{
-		url:domain+'/thesis/index/index',
+		module:'thesis',
 		txt:'论文概况&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
 		gly:glyPrex+'list',
 		period:{
-			clsName:'thePeriod',
 			summary:[
 				{name:'plan',txt:'拟发表论文数：',color:bs3Color['info']['btn']},
 				{name:'apply',txt:'投稿论文数：',color:bs3Color['primary']['btn']},
@@ -275,19 +271,61 @@ const entProp={
 //定义前端系统各个实体数量对象，由后端给定
 const num={$num};
 
-//向后端请求时的url
-var url=domain+'/index/index/index';
-
 //向后端请求时发送的数据
 var	rqData={
 		ent:'index',
 		period:'',
-		sortData:'',
-		searchData:''
+		sortData:{},
+		searchData:{}
 	};
+var urlObj={module:'index',method:'index',ctl:'index'};
+
+buildTopNavbarCom();
+buildMainRowCom();
+// 激活并设置tooltip
+$('body').tooltip({selector:'[title]',triger:'hover click',placement: 'auto bottom',delay: {show: 200, hide: 100},html: true });	
+
+$(document).ready(function(){
+	let navASet=$('#topNavbar .navbar-nav').eq(0).find('a'),
+		btnSet=$('#mainRow').find('.btnPeriod');
+	navASet.click(function(){
+		let cls=$(this).closest('li').attr('class')?$(this).closest('li').attr('class'):'no class';
+		
+		for(let ent in topNavProp){
+			let e=topNavProp[ent];
+			if($(this).data('ent')==ent){
+				url=e.url;
+				rqData.ent=ent;
+				rqData.period=e.period;
+			}
+		}
+		console.log(rqData);
+		if(cls.indexOf('disabled')==-1){
+			loadIndex();
+		}
+	});
 	
+	btnSet.click(function(){
+		rqData.ent=$(this).data('ent');
+		rqData.period=$(this).data('period');
+		loadIndex();
+	});
+});
+//设定向后端请求的url
+function getRqUrl(){
+	let kArr=['module','ctl','method'],
+		arr=[domain];
+	urlObj=$.extend({},{module:'index',ctl:'index',method:'index'},urlObj);
+	
+	kArr.forEach(function(e){
+		arr.push(urlObj[e]);
+	});
+	
+	return arr.join('/');
+}
+
 //根据定义的topNavProp生成"navLi"组件
-var buildTopNavbarCom=()=>{ 
+function buildTopNavbarCom(){ 
 	let r=$('#topNavbar .navbar-nav').eq(0),
 		entity=rqData.ent;
 	r.empty();
@@ -312,7 +350,7 @@ var buildTopNavbarCom=()=>{
 }
 
 //根据定义的entProp生成"row"组件
-var buildMainRowCom=()=>{
+function buildMainRowCom(){
 	let //计数器
 		n=0,
 		divSet=[];
@@ -358,93 +396,55 @@ var buildMainRowCom=()=>{
 	}
 	
 	//返回btnSet
-	return $('#mainRow').find('.btnPeriod');
-};
-
+	<!-- return console.log($('#mainRow').find('.btnPeriod').length); -->
+}
 //根据定义的entProp生成"Nav"组件
-var buildMainPeriodNavCom=(obj,ent)=>{
-	let r=obj.css('border-bottom','1px solid #ddd'),
+function buildMainPeriodNavCom(){
+	let ent=rqData.ent,
+		//nav加载点
+		obj=$('[id="'+rqData.ent+'PeriodNav"]').css('border-bottom','1px solid #ddd'),
 		pArr=entProp[ent].period.detail;
-	
 	pArr.forEach(function(e){
-		let a=$('<a></a>').attr({'data-ent':ent,'data-period':e.name}).html(e.txt).css({'padding':'3px 10px','border-bottom-right-radius':'0px','border-bottom-left-radius':'0px','cursor':'pointer'}),
-			rC=$('<li></li>');
-			
-		rC.append(a);
-		r.append(rC);	
+		let a=$('<a></a>').css({'padding':'3px 10px','border-bottom-right-radius':'0px','border-bottom-left-radius':'0px','cursor':'pointer'}).attr({'data-ent':ent,'data-period':e.name}).html(e.txt);
+		
+		obj.append($('<li></li>').append(a));
+		
 	});
 	<!--为第一个li标签添加.active -->
-	r.find('li').eq(0).addClass('active');
-};
-
-buildTopNavbarCom();
-buildMainRowCom();
-// 激活并设置tooltip
-$('body').tooltip({selector:'[title]',triger:'hover click',placement: 'auto bottom',delay: {show: 200, hide: 100},html: true });	
-
-$(document).ready(function(){
-	let navASet=$('#topNavbar .navbar-nav').eq(0).find('a'),
-		btnSet=$('#mainRow').find('.btnPeriod');
-	navASet.click(function(){
-		let cls=$(this).closest('li').attr('class')?$(this).closest('li').attr('class'):'no class';
-		
-		for(let ent in topNavProp){
-			let e=topNavProp[ent];
-			if($(this).data('ent')==ent){
-				url=e.url;
-				rqData.ent=ent;
-				rqData.period=e.period;
-			}
-		}
-		console.log(rqData);
-		if(cls.indexOf('disabled')==-1){
-			loadIndex();
-		}
-		
-	});
-	
-	btnSet.click(function(){
-		url=$(this).data('url');
-		rqData.ent=$(this).data('ent');
-		rqData.period=$(this).data('period');
-		
-		console.log(url);
-		console.log(rqData);
-		<!-- window.location.href=url+'#'+rqData.period; -->
-		loadIndex();
-		
-	});
-});
+	obj.find('li').eq(0).addClass('active');
+}
 
 //load模块对应的Index文件
 function loadIndex(){
 	let row=$('#mainRow'),
-		entity=$('#mainPeriod'),
+		//index文件加载点
+		obj=$('#mainPeriod'),
 		ent=rqData.ent,
-		loadStr='<p class="text-center" style="font-size:20px;padding-top:20px;">加载中……</p>';
+		loadStr='<p class="text-center" style="font-size:20px;padding-top:20px;">加载中……</p>',
+		url=topNavProp[ent]['url'];
 	
 	row.hide();
-	entity.empty().hide();
+	obj.empty().hide();
 	
-	url=topNavProp[rqData.ent]['url'];
 	//id="topNavbar"里的li添加active
 	$('[data-ent="'+ent+'"]').tab('show'); 
 	
 	if(ent=='index'){
 		row.show();
 	}else{
-		entity.show().html(loadStr).load(url,rqData);
+		obj.show().html(loadStr).load(url,rqData);
 	}
 }
 //载入实体各个阶段下的列表
-function loadEntPeriodList(obj){
-	let loadStr='<p class="text-center" style="font-size:28px;">加载中……</p>';
+function loadEntPeriodList(){
+	let loadStr='<p class="text-center" style="font-size:28px;">加载中……</p>',
+		//list加载点
+		obj=$('[id="'+rqData.ent+'List"]');
 	
+	urlObj.method=rqData.ent+'List';
 	//id="xxPeriodNav"里的li添加active
 	$('[data-period="'+rqData.period+'"]').tab('show'); 
-	
-	obj.html(loadStr).load(url,rqData);
-	
+	obj.html(loadStr).load(getRqUrl(),rqData);
 }
 //设置向后端请求时的查询数据
 function setRqSearchData(searchObj=''){
@@ -465,6 +465,48 @@ function setRqSearchData(searchObj=''){
 	}
 	
 }
+//得到title的属性
+function getTitleProp(tDefault,tProp=''){
+	if(tProp){
+		for(let p in tProp){
+			tProp[p]=$.extend({},tDefault[p],tProp[p]);
+		}
+	}else{
+		tProp=tDefault;
+	}
+	return tProp;
+}
+//设定Title
+function setTitle(tProp){
+	let spObj=$('<span></span>').css({'cursor':'unset'}),
+		spBdg=$('<span></span>').addClass('badge'),
+		//title加载点
+		obj=$('[id="'+rqData.ent+'Title"]');
+	
+	for(let period in tProp){
+		let e=tProp[period];
+		if(period==rqData.period){
+			spObj.addClass(e.btn).append(e.txt,spBdg.text(e.num));
+			obj.empty().append(spObj);
+			break;
+		}
+	}
+}
+//所有查询表单重置
+function fmSearchReset(){
+	let fm=$('.searchForm');
+	
+	$('#searchNum').children().hide();
+	$('#searchList').show();
+	
+	fm.each(function(){
+		$(this)[0].reset();
+		$(this).find('.form-control').removeClass('alert-info');
+	});
+	//清空查询数据
+	setRqSearchData();
+	loadEntPeriodList();
+};
 
 </script>
 

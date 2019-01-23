@@ -1,7 +1,7 @@
-<!-- //module:patent, view:index/patSearchForm.html  -->
+<!-- //module:asset, view:index/assSearchForm.html  -->
 	
 <!-- // 搜索表单-->	
-<form id="fmPatSearch" class="searchForm" style="border:1px solid #eee;padding:10px 0px;margin-top:2px;">
+<form id="fmPatSearch" style="border:1px solid #eee;padding:10px 0px;margin-top:2px;">
 	<div class="row myRow">
 		<div class="form-group col-sm-4">
 			<label class="control-label" for="topic">名称</label>
@@ -37,42 +37,18 @@
 		</div>
 	</div>
 	<div class="row myRow text-right">	
-		<button type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>搜索</button>	
+		<button id="btnSearchPat" type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>搜索</button>	
 		<input type="reset" class="btn btn-primary btn-sm" value="条件重置" />
 	</div>					
 </form>
 
 <script>
 var sData={$searchData};
-
-buildFmSelectCom();
-	
-$(document).ready(function(){
-	let fmObj=$('#fmPatSearch');	
-
-	fmObj.find('.form-control').change(function(){
-		//有变化加底色
-		($(this).val()=='' || $(this).val()==0)?$(this).removeClass('alert-info'):$(this).addClass('alert-info');
-	});
-	//表单提交
-	fmObj.submit(function(evt){
-		evt.preventDefault();
-		//设置查询数据
-		setRqSearchData(fmObj);
-		//载入patList
-		loadEntPeriodList();
-	});
-	//表单重置时附加的操作
-	fmObj.find('[type="reset"]').click(function(evt){
-		
-		fmSearchReset();
-		//显示搜索条件
-		$('#divSearchForm').addClass('in');
-	});
-});
+console.log('patSearchForm.html ');
+console.table(sData);
 
 //设定搜索表单的各项内容
-function setFmSearchData(optObj={}){
+var setFmSearchData=(optObj={})=>{
 	let opt=$.extend({},{topic:'',author:'',type:0,dept:0,status:0},optObj),
 		//计数器
 		n=0;
@@ -98,14 +74,13 @@ function setFmSearchData(optObj={}){
 	}
 	//是否显示表单
 	(n)?$('#divCollapse').addClass('in'):$('#divCollapse').removeClass('in');
-}
+};
 //挨个组装好所有的select组件
-function  buildFmSelectCom(){
+var buildFmSelectCom=()=>{
 	let selSet=$('#fmPatSearch').find('select'),
-		rData={period:rqData.period};
-	urlObj.method='getSelComData';
+		rData={period:$('#divTblSortData').data('period')};	
 	//向后端请求组装select组件所需数据
-	$.post(getRqUrl(),rData,function(resData){
+	$.post(urlBase+'getSelComData',rData,function(resData){
 		<!-- console.log(resData); -->
 		//查询表单中选择框的name属性值数组
 		for(var i=0;i<selSet.length;i++){
@@ -124,5 +99,30 @@ function  buildFmSelectCom(){
 		setFmSearchData(sData);
 	});
 	
-}
+};
+
+buildFmSelectCom();
+	
+$(document).ready(function(){
+	let fmObj=$('#fmPatSearch');	
+
+	fmObj.find('.form-control').change(function(){
+		//有变化加底色
+		($(this).val()=='' || $(this).val()==0)?$(this).removeClass('alert-info'):$(this).addClass('alert-info');
+	});
+	//表单提交
+	fmObj.submit(function(evt){
+		evt.preventDefault();
+		//设置查询数据
+		setRqSearchData(fmObj);
+		//载入patList
+		loadEntPeriodList(loadObj);
+	});
+	//表单重置时附加的操作
+	fmObj.find('[type="reset"]').click(function(){
+		fmObj.find('.form-control').removeClass('alert-info');	
+	});
+});
+
+
 </script>
