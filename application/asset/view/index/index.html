@@ -1,50 +1,10 @@
 <!-- //module:asset, view:index/index.html  -->
 
 <div>
-	<ul id="ulAssType" class="nav nav-pills" style="border-bottom:1px solid #eee;">
+	<ul id="assPeriodNav" class="nav nav-pills" style="border-bottom:1px solid #eee;">
 	<!-- //jQ产生参考模型	 -->
 		<!-- <li class="active"><a class="aTab" href="#total">项目概况&nbsp;|&nbsp;<span class="glyphicon glyphicon-search"></span></a></li> -->
-		<li class="active">
-			<a class="aPill" href="#_ASSS_USUAL" data-ass-type="_ASSS_USUAL">固定资产<span class="spTitle">总计</span>
-			{neq name="assNum['_ASSS_USUAL']" value="0"}
-			<span class="label label-primary spLabel">{$assNum['_ASSS_USUAL']}</span>
-			{/neq}
-			</a>
-		</li>
-		<li>
-			<a class="aPill" href="#_ASSS1" data-ass-type="_ASSS1"><span class="spTitle">待定</span>
-			{neq name="assNum['_ASSS1']" value="0"}
-			<span class="label label-info spLabel">{$assNum['_ASSS1']}</span>{/neq}
-			</a>
-		</li>
-		<li>
-			<a class="aPill" href="#_ASSS2" data-ass-type="_ASSS2"><span class="spTitle">正常</span>
-			{neq name="assNum['_ASSS2']" value="0"}
-			<span class="label label-success spLabel">{$assNum['_ASSS2']}</span>
-			{/neq}
-			</a>
-		</li>
-		<li>
-			<a class="aPill" href="#_ASSS3" data-ass-type="_ASSS3"><span class="spTitle">异常</span>
-			{neq name="assNum['_ASSS3']" value="0"}
-			<span class="label label-warning spLabel">{$assNum['_ASSS3']}</span>
-			{/neq}
-			</a>
-		</li>
-		<li>
-			<a class="aPill" href="#_ASSS4" data-ass-type="_ASSS4"><span class="spTitle">停用</span>
-			{neq name="assNum['_ASSS4']" value="0"}
-			<span class="label label-default spLabel">{$assNum['_ASSS4']}</span>
-			{/neq}
-			</a>
-		</li>
-		<li>
-			<a class="aPill" href="#_ASSS5" data-ass-type="_ASSS5"><span class="spTitle">销账</span>
-			{neq name="assNum['_ASSS5']" value="0"}
-			<span class="badge spLabel">{$assNum['_ASSS5']}</span>
-			{/neq}
-			</a>
-		</li>
+		
 	</ul>
 	<div id="divTopBtn" class="row text-right" style="margin:10px 0px;">
 		<div class="btn-group">
@@ -402,24 +362,24 @@ var fmReset=()=>{
 	
 	$('.aPill[href="'+sId+'"]').tab('show');
 	
-	// 设置各类tooltip
-	$('.mainFrame').tooltip({selector:'[title]',triger:'hover click',placement: 'auto left',delay: {show: 200, hide: 100},html: true });
+	buildMainPeriodNavCom($('#assPeriodNav'),rqData.ent);
 
 <!-- 选中id为"nav_pat"的标签（header.html文件中的li标签）,添加.active -->
-	$('#nav_ass').addClass('active');	
+	$('#nav_ass').addClass('active');
+
+		
 	
 })(jQuery);
 
 $(document).ready(function(){
-		
-	$('.aPill').click(function(){
-		<!-- assType=$(this).data('assType'); -->
-		assType=$(this).attr('href').slice(1);
+	let aSet=$('.'+entProp[rqData.ent].period.clsName);	
+	
+	aSet.click(function(){
+		assType=$(this).data('period');
 		$(this).tab('show');
 		//一般查询表单重置
 		fmReset();
 		loadAssList();
-
     });
 	
 	//控制collapse

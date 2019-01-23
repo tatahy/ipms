@@ -74,17 +74,13 @@ var setFmSearchData=(optObj={})=>{
 	}
 	//是否显示表单
 	(n)?$('#divCollapse').addClass('in'):$('#divCollapse').removeClass('in');
-	
-	console.log('patSearchForm.html, setFmSearchData:');
-	console.table(opt);
 };
 //挨个组装好所有的select组件
 var buildFmSelectCom=()=>{
 	let selSet=$('#fmPatSearch').find('select'),
-		rqData={period:$('#divTblSortData').data('period')};	
-	url=urlBase+'getSelComData';
+		rData={period:$('#divTblSortData').data('period')};	
 	//向后端请求组装select组件所需数据
-	$.post(url,rqData,function(resData){
+	$.post(urlBase+'getSelComData',rData,function(resData){
 		<!-- console.log(resData); -->
 		//查询表单中选择框的name属性值数组
 		for(var i=0;i<selSet.length;i++){
@@ -117,8 +113,10 @@ $(document).ready(function(){
 	//表单提交
 	fmObj.submit(function(evt){
 		evt.preventDefault();
+		//设置查询数据
+		setRqSearchData(fmObj);
 		//载入patList
-		loadPatList();
+		loadEntPeriodList(loadObj);
 	});
 	//表单重置时附加的操作
 	fmObj.find('[type="reset"]').click(function(){
@@ -126,8 +124,5 @@ $(document).ready(function(){
 	});
 });
 
-<!-- function -->
-	
-	
-<!-- function -->
+
 </script>

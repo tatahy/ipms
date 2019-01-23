@@ -76,9 +76,11 @@
 </div>
 
 <script>
-var sData={$searchData};
+<!--// var sData={$searchData}; -->
+var sData=rqData.searchData;
+
 var numTotal={$numTotal};
-<!-- console.log('patList.html'); -->
+console.log('patList.html');
 <!-- console.table(sData); -->
 
 //对PatList进行设置
@@ -86,8 +88,8 @@ var numTotal={$numTotal};
 var setSortList=()=>{
 	let glyAsc=$('<span></span>').addClass('small glyphicon glyphicon-sort-by-attributes'),
 		glyDesc=$('<span></span>').addClass('small glyphicon glyphicon-sort-by-order-alt'),
-		sortOrder=sortData.sortOrder,
-		sortName=sortData.sortName,
+		sortOrder=rqData.sortData.sortOrder,
+		sortName=rqData.sortData.sortName,
 		tblObj=$('#tblPatList'),
 		aHSet=tblObj.find('thead a'),
 		trSet=tblObj.find('tr'),
@@ -118,7 +120,7 @@ var setSortList=()=>{
 };
 
 var trAddBgColor=(showId='')=>{
-	let id=showId?showId:sortData.showId,
+	let id=showId?showId:rqData.sortData.showId,
 		obj=$('#tblPatList tbody');
 	//去掉所有行的底色
 	obj.find('tr').removeClass('bg-warning');
@@ -163,29 +165,29 @@ initPatList();
 $(document).ready(function(){
 	
 	<!-- //表格每页显示记录行数 -->
-	$('#listRows').val(sortData.listRows); 
+	$('#listRows').val(rqData.sortData.listRows); 
 	
 	$('#listRows').change(function(){
 		let listRows=$(this).val()*1;
 		//排序有关的值向sortData汇集
 		if(listRows){
-			sortData.listRows=listRows;
+			rqData.sortData.listRows=listRows;
 			//分页从第一页开始
-			sortData.pageNum=1;
+			rqData.sortData.pageNum=1;
 		}
 		//载入patList
-		loadPatList();
+		loadEntPeriodList(loadObj);
 	});	
 	//排序
 	$('#tblPatList thead a').click(function(){
 		let sortName=$(this).data('sortName'),
 			sortOrder=$(this).data('sortOrder');
 		//排序有关的值向sortData汇集
-		sortData.sortName=sortName;
-		sortData.sortOrder=sortOrder;
-		sortData.pageNum=1;
+		rqData.sortData.sortName=sortName;
+		rqData.sortData.sortOrder=sortOrder;
+		rqData.sortData.pageNum=1;
 		//载入patList
-		loadPatList();
+		loadEntPeriodList(loadObj);
 	});	
 	<!-- // 点击分页中的a，表格中的内容根据a中的属性值进行排序 -->
 	$('#divListRows a').click(function(evt){
@@ -213,14 +215,14 @@ $(document).ready(function(){
 		}
 		//排序、分页有关的值向sortData汇集
 		if(pageNum){
-			sortData.pageNum=pageNum;
+			rqData.sortData.pageNum=pageNum;
 		}
 		//载入patList
-		loadPatList();
+		loadEntPeriodList(loadObj);
 	});
 	//点击a后该行上底色
 	$('#tblPatList tbody a').click(function(){
-		sortData.showId=$(this).closest('tr').data('showId');
+		rqData.sortData.showId=$(this).closest('tr').data('showId');
 		trAddBgColor();
 	});
 	

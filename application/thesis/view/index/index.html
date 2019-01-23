@@ -16,56 +16,22 @@
 </div>
 
 <script>
-const thePeriodProp={
-	clsName:'thePeriod',
-	period:[
-		{name:'total',txt:'论文总体情况',color:bs3Color['info']['btn']},
-		{name:'audit',txt:'内审'},
-		{name:'plan',txt:'拟发表'},
-		{name:'apply',txt:'投稿'},
-		{name:'accept',txt:'收录'},
-		{name:'publish',txt:'发表'},
-		{name:'reject',txt:'拒稿'}
-	]
-};
-//根据定义的patPeriodProp生成"navPill"组件
-var buildThePeriodNavCom=()=>{ 
-	let r=$('#thePeriodNav').css('border-bottom','1px solid #ddd');
-	
-	thePeriodProp.period.forEach(function(e){
-		let a=$('<a></a>').attr({'data-ent':'pat','data-period':e.name,'class':thePeriodProp.clsName}).html(e.txt).css({'padding':'3px 10px','border-bottom-right-radius':'0px','border-bottom-left-radius':'0px','cursor':'pointer'}),
-			rC=$('<li></li>');
-			
-		rC.append(a);
-		r.append(rC);	
-	});
-	<!--为第一个li标签添加.active -->
-	r.find('li').eq(0).addClass('active');
-};
+let aSet='';
+let loadObj=$('#theList');
 //改变向后端请求的url
-url=urlPrex+'/thesis/index/theList';
+url=domain+'/thesis/index/theList';
 
-//利用自调用匿名函数立即执行的特点，页面初始化
-(function($){
+buildMainPeriodNavCom($('#thePeriodNav'),rqData.ent);
+aSet=$('#thePeriodNav').find('a');
+loadEntPeriodList(loadObj);
 
-	buildThePeriodNavCom();
-	$('#theList').load(url,rqData);
-	console.log(rqData);
-})(jQuery);
-
-$(document).ready(function(){	
-	let aSet=$('.'+thePeriodProp.clsName);
-	
-	<!-- //点击组件点击后，显示相应状态的pat内容-->
-	aSet.click(function(){
-    	rqData.ent=$(this).data('ent');
-		rqData.period=$(this).data('period');
+<!-- //组件点击后，显示相应period的list-->
+aSet.click(function(){
+    rqData.ent=$(this).data('ent');
+	rqData.period=$(this).data('period');
 		
-		$(this).tab('show');
-		
-		$('#theList').load(url,rqData);
-	});	
+	loadEntPeriodList(loadObj);
+});	
 	
-});
 </script>
 

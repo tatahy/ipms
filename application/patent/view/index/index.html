@@ -4,7 +4,7 @@
 <!-- pagewrap  -->
 <div >
 
-	<ul class="nav nav-pills">
+	<ul id="patPeriodNav" class="nav nav-pills">
 		<!-- //jQ生成 -->
 	</ul>
 	<h4 id="period" class="text-left">
@@ -35,12 +35,13 @@
 
 <script>
 const periodProp={$periodProp};
-<!-- console.log(periodProp); -->
-//设定本页面内向后端请求的url基地址
-var urlBase=urlPrex+'/patent/index/',
-	period='total',
-	sortData={$sortData};
+console.log(periodProp);
 
+//设定本页面内向后端请求的url基地址
+var urlBase=domain+'/patent/index/',
+	loadObj=$('#patList');
+
+rqData.sortData={$sortData};
 <!-- console.log(num); -->
 
 //定义要加载的搜索表单中各个输入组件属性值
@@ -75,7 +76,7 @@ var setTitle=()=>{
 	
 	for(let i=0;i<titleProp.length;i++){
 		let el=titleProp[i];
-		if(el.period==period){
+		if(el.period==rqData.period){
 			color=el.btn;
 			txt=el.txt;
 			n=(typeof periodProp[el.period])?periodProp[el.period]['num']:'';
@@ -83,39 +84,22 @@ var setTitle=()=>{
 			break;
 		}
 	}
-	console.log(period);
+	<!-- console.log(period); -->
 	spObj.addClass(color).append(txt,spBdg);
 	hObj.empty().append(spObj);
 };
-//生成nav-pills里的组件
-var buildNavPillsCom=()=>{
-	let r=$('ul.nav-pills').css('border-bottom','1px solid #ddd');
-	r.empty();	
-	for(let el in periodProp){
-		let chi=periodProp[el]['chi'],
-			a=$('<a></a>').attr({'class':'patPeriod','data-period':el}).css({'padding':'3px 10px','border-bottom-right-radius':'0px','border-bottom-left-radius':'0px','cursor':'pointer'}).html(chi),
-			li=$('<li></li>');
-		
-		li.append(a);
-		r.append(li);
-	}
-	<!--为第一个li标签添加.active -->
-	r.find('li').eq(0).addClass('active');
-};
 
 var initPage=()=>{
-
-	url=urlBase+'patSearchForm';
-	$('#divTblSortData').data('period',period);
-	buildNavPillsCom();
+	buildMainPeriodNavCom($('#patPeriodNav'),rqData.ent);
 	setTitle();
 	//载入patSearchForm
-	$('#patSearchForm').load(url);
+	$('#patSearchForm').load(urlBase+'patSearchForm');
 	//载入patList
-	loadPatList();
+	url=urlBase+'patList';
+	loadEntPeriodList(loadObj);
 };
 //所有查询表单重置
-var fmReset=()=>{
+var fmSearchReset=()=>{
 	let fm=$('form');
 	
 	fm.each(function(){
@@ -125,69 +109,35 @@ var fmReset=()=>{
 };
 
 initPage();
-// 激活tooltip
-$('[title]').tooltip();	
 
 $(document).ready(function(){
-	let aSet=$('.patPeriod');
+	let aSet=$('#patPeriodNav').find('a');
 	
-	<!-- //点击.aTab中的各个按钮后，显示相应状态的pat内容-->
+	<!-- //点击nav中的各个按钮后，显示相应状态的pat内容-->
 	aSet.click(function(){
-       period=$(this).data('period');
+       let period=$(this).data('period');
 		//本身加底色
 		$(this).tab('show');
 		//排序、分页有关的值向sortData汇集
-		sortData.period=period;
-		sortData.pageNum=1;
+		rqData.period=period;
+		rqData.sortData.period=period;
+		rqData.sortData.pageNum=1;
 		setTitle();
-		
-		loadPatList();
+		console.table(rqData);
+		loadEntPeriodList(loadObj);
     });	
 
 	<!-- // 页面刷新 -->
 	$('#btnRefresh').click(function(){
-		//所有表单重置
-		fmReset();
+		fmSearchReset();
 		//隐藏搜索条件
 		$('.collapse').removeClass('in');
-		loadPatList();
+		//清空查询数据
+		setRqSearchData();
+		loadEntPeriodList(loadObj);
 	});	
 });
-<!-- function  -->
 
-//载入文件
-function loadPatList(opt={}){
-	let	rqData=$.extend({},{sortData:{},searchData:{}},opt),
-		loadStr='<p class="text-center" style="font-size:28px;">加载中……</p>';
-	//排序有关的参数都从$('#divTblSortData')获取
-	let obj=$('#divTblSortData'),
-		sortDataDefault={listRows:10,sortName:'topic',sortOrder:'asc',pageNum:1,showId:0,period:'total'};
-	
-	//用户搜索有关键值对从表单$('#fmIssPatSearch')获取
-	let formData=new FormData($('#fmPatSearch')[0]),
-		searchDataDefault={topic:'',author:'',type:0,dept:0,status:0};
-		searchData={};
-		
-	//改变向后端请求的url
-	url=urlBase+'patList';
-	//使用Map对象的forEach方法组装hash数组
-	formData.forEach(function(val,key){
-		//非0非空的值才进行组装
-		if(val!='' && val!=0){
-			searchData[key]=val;
-		}
-	});
-	
-	rqData.sortData=$.extend({},sortDataDefault,sortData);
-	rqData.searchData=$.extend({},searchDataDefault,searchData);
-	console.log('index.html, loadPatList:');
-	console.table(rqData.searchData);
-	
-	//加载patList.html页面
-	$("#patList").html(loadStr).load(url,rqData);
-}
-
-<!-- /function  -->
 </script>
 
 
