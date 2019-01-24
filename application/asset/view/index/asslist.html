@@ -1,16 +1,9 @@
 <!-- //module:asset, view:index/assList.html  -->
 
 <!-- pagewrap  -->	
-<div>
-	<div class="row myRow">
-		<div class="text-right">
-			<strong class="assType"></strong>&nbsp;<span id="spSearchResult" class="label label-info">查询结果</span>记录数：<span id="spNum" class="">{$searchResultNum}</span>&nbsp;|&nbsp;数量：<span class="badge">{$quanCount}</span>
-		</div>
-		<P></P>
-	</div>
-    
+<div id="searchList" style="padding-top:10px;">
 	<div class="table-responsive"> 
-		<table id="tblAssList" class="table table-bordered table-hover" data-sort-order="asc">
+		<table id="assListTbl" class="table table-bordered table-hover">
 			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产信息列表&nbsp;<strong class="assType"></strong></h4></caption>
 			<thead>
 				<tr>
@@ -69,9 +62,6 @@
 		</div>
 	
 	</div>
-
-	<p id="pAssNone" class="text-center" ><span class="label label-default" style="font-size:16px;">无符合条件信息</span></p>
-	
 	<!-- //调试用 -->
 	<!-- <p>{$display}</p> -->
 </div>
@@ -84,69 +74,33 @@ var urlPrefix='{$home}/asset/index/';
 const conStatusArr=Object.values({$conAssStatusArr});
 const conLabelArr=Object.values({$conAssStatusLabelArr});
 
-//根据查询记录数决定页面的组件显示
-var pageShowCom=(num,reqObj)=>{
-	if(num!=0){
-		$('#pAssNone').hide();
-		$('#pAssNone').prevAll().show();
-	}else{
-		$('#pAssNone').show();
-		$('#pAssNone').prevAll().hide();
-	}
-	
-	if(reqObj=='form'){
-		$.alert('<span class="label label-info">查询结果</span>&nbsp;记录数：<span>'+num+'</span>');
-	}
-};
-
-//利用自调用匿名函数立即执行的特点，页面初始化
-(function($){
-	pageShowCom({$searchResultNum},'{$reqObj}');
-	
-	let sId=window.location.hash;
-	//传递锚点值,添加tooltip
-	$('.aTblAssSingle').attr('href',sId).tooltip({title: "资产详情", placement: "bottom"});
-	$('.aAssRecords').attr('href',sId).tooltip({title: "状态历史记录", placement: "bottom"});
-	//表格排序asc/desc
-	$('#tblAssList').data('sortOrder','{$sortData.sortOrder}');
-	let spTitle='['+$('#ulAssType li.active a').find('.spTitle').html()+']';
-	//.assType内容随$('#ulAssType li.active a').find('.spTitle')变化
-	$('.assType').html(spTitle);
-	//#spNum的class跟随$('#ulAssType li.active a').find('.spLabel')变化
-	let spLabel=$('#ulAssType li.active a').find('.spLabel').attr('class');
-	if(spLabel){
-		$('#spNum').addClass(spLabel);
-	}else{
-		$('#spNum').addClass('label label-info');
-	}
-	//每个$('thead a')添加属性
-	$('thead a').each(function(){
-		$(this).attr({'href':'#','data-title':'点击排序','data-toggle':'tooltip'}).closest('th').addClass('text-center');
-	});
-	<!-- //表格每页显示记录行数 -->
-	$('#listRows').val('{$sortData.listRows}'); 
-	<!-- // status单元格内容上色-->
-	$('.spStatus').each(function(){
-		var status=$(this).text();
-		var index=0;
-		index=conStatusArr.indexOf(status);
-		$(this).addClass('label label-'+conLabelArr[index]);
-	});
-})(jQuery);
+initUrlObj(rqData.ent);
+initEntList();
 
 $(document).ready(function(){
 	
 	$('#listRows').change(function(){
-		//调用index.html中的loadAssList()
-		loadAssList({'listRows':$(this).val()*1});
+		let listRows=$(this).val()*1;
+		//排序有关的值向sortData汇集
+		if(listRows){
+			rqData.sortData.listRows=listRows;
+			//分页从第一页开始
+			rqData.sortData.pageNum=1;
+		}
+		//载入assList
+		loadEntPeriodList();
 	});	
 	
-	$('thead a').click(function(){
-		
-		//$('#tblAssList').data('sortOrder',$(this).data('sortOrder'));
-		//调用index.html中的loadAssList()
-		loadAssList({'listRows':$('#listRows').val()*1,'sortOrder':$(this).data('sortOrder'),'sortName':$(this).data('sortName')});
-		
+	//排序
+	$('#assListTbl thead a').click(function(){
+		let sortName=$(this).data('sortName'),
+			sortOrder=$(this).data('sortOrder');
+		//排序有关的值向sortData汇集
+		rqData.sortData.sortName=sortName;
+		rqData.sortData.sortOrder=sortOrder;
+		rqData.sortData.pageNum=1;
+		//载入patList
+		loadEntPeriodList();
 	});	
 	
 	$('.aTblAssSingle').click(function(){
@@ -181,7 +135,7 @@ $(document).ready(function(){
 		//(li.active)所代表的页数
 		var pageNumActive=$('#divListRows li.active').children('span').text();
 		var sortName=$('thead').find('.label').data('sortName');
-		var sortOrder=$('#tblAssList').data('sortOrder');
+		var sortOrder=$('#assListTbl').data('sortOrder');
 		<!-- var sortObj=$('thead').find('.label'); -->
 		
 		evt.preventDefault();

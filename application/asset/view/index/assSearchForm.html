@@ -47,6 +47,9 @@ var sData={$searchData};
 console.log('patSearchForm.html ');
 console.table(sData);
 
+initUrlObj(rqData.ent);
+console.log(urlObj);
+
 //设定搜索表单的各项内容
 var setFmSearchData=(optObj={})=>{
 	let opt=$.extend({},{topic:'',author:'',type:0,dept:0,status:0},optObj),
@@ -79,8 +82,9 @@ var setFmSearchData=(optObj={})=>{
 var buildFmSelectCom=()=>{
 	let selSet=$('#fmPatSearch').find('select'),
 		rData={period:$('#divTblSortData').data('period')};	
+	urlObj.method='getSelComData';
 	//向后端请求组装select组件所需数据
-	$.post(urlBase+'getSelComData',rData,function(resData){
+	$.post(getRqUrl(),rData,function(resData){
 		<!-- console.log(resData); -->
 		//查询表单中选择框的name属性值数组
 		for(var i=0;i<selSet.length;i++){

@@ -136,7 +136,7 @@ class IndexController extends \think\Controller
       
       $this->assign([
         'home'=>$this->home,
-        'numTotal'=>$searchResultNum,
+        'searchResultNum'=>$searchResultNum,
         #当前页显示内容
         'patList'=>$patList,
         #分页对象

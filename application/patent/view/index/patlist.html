@@ -1,15 +1,8 @@
 <!-- //module:asset, view:index/patList.html  -->
 
-<div id="searchNum">
-	<p class="text-right bingo" style="padding-top:10px;"><button class="btn btn-info btn-sm" style="cursor:unset;font-size:14px;">搜索结果：<span class="badge">{$numTotal}</span></button>
-	</p>
-		
-	<p class="text-center none" style="padding-top:20px;"><strong>搜索结果</strong>：<span class="label label-default" style="font-size:16px;">无符合条件信息</span></p>
-</div>
-
 <div id="searchList" style="padding-top:10px;">	
 	<div class="table-responsive">
-		<table id="tblPatList" class="table table-bordered table-hover">
+		<table id="patListTbl" class="table table-bordered table-hover">
 			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>专利信息列表&nbsp;<strong class="assType"></strong></h4></caption>
 			<thead>
 				<tr>
@@ -79,89 +72,12 @@
 <!--// var sData={$searchData}; -->
 var sData=rqData.searchData;
 
-var numTotal={$numTotal};
+searchResultNum={$searchResultNum};
 
-//对PatList进行设置
-//列表字段进行升序降序转换，改变该字段表头显示格式
-var setSortList=()=>{
-	let glyAsc=$('<span></span>').addClass('small glyphicon glyphicon-sort-by-attributes'),
-		glyDesc=$('<span></span>').addClass('small glyphicon glyphicon-sort-by-order-alt'),
-		sortOrder=rqData.sortData.sortOrder,
-		sortName=rqData.sortData.sortName,
-		tblObj=$('#tblPatList'),
-		aHSet=tblObj.find('thead a'),
-		trSet=tblObj.find('tr'),
-		column='',
-		columnArr=['num'];
-		
-	aHSet.each(function(){
-		let gly=(sortOrder == 'asc')?glyAsc:glyDesc,
-			sort=(sortOrder == 'asc')?'desc':'asc',
-			title=(sortOrder == 'asc')?'当前为升序。点击后降序':'当前为降序。点击后升序',
-			column=$(this).data('sortName');
-		columnArr.push(column);
-		//每个添加属性
-		$(this).removeClass('label label-primary').attr({'data-period':rqData.period,'title':'点击排序'}).css('cursor','pointer').closest('th').addClass('text-center');
-		
-		(sortName==column)?$(this).attr({'class':'label label-primary','data-sort-order':sort,'title':title}).tooltip({placement:'top'}).append('&nbsp;',gly):$(this).tooltip({placement:'bottom'});	
-		
-	});
-	//每个单元格添加data-column=""，相同的data-column用于组合成一个column
-	columnArr.forEach(function(el,index){
-		trSet.each(function(){ 
-			$(this).children().eq(index).attr('data-column',el);
-		});	
-	});
-		
-	//选中进行排序的列(除标题行外的)向左对齐，添加底色
-	tblObj.find('tbody [data-column="'+sortName+'"]').addClass('text-left bg-info');
-};
+initUrlObj(rqData.ent);
+initEntList();
 
-var trAddBgColor=(showId='')=>{
-	let id=showId?showId:rqData.sortData.showId,
-		obj=$('#tblPatList tbody');
-	//去掉所有行的底色
-	obj.find('tr').removeClass('bg-warning');
-	//给showId所在行上底色
-	obj.find('[data-show-id="'+id+'"]').addClass('bg-warning');
-};
-//显示搜索结果
-var showSearchResult=()=>{
-	let n=0,
-		fmObj=$('#divCollapse'),
-		bingoObj=$('#searchNum p.bingo'),
-		noneObj=$('#searchNum p.none'),
-		listObj=$('#searchList');
-	
-	for(let el in sData){
-		n=(sData[el]=='' || sData[el]==0)?n:n+1;
-	}
-	//是否显示搜索表单
-	n?fmObj.addClass('in'):fmObj.removeClass('in');
-	
-	//搜索结果显示
-	bingoObj.hide();
-	noneObj.hide();
-	listObj.hide();
-	if(n==0) listObj.show();
-	if(n && numTotal){
-		bingoObj.show();
-		listObj.show();
-	}
-	if(n && numTotal==0) noneObj.show();
-	
-};
-
-var initPatList=()=>{
-	setSortList();
-	trAddBgColor();
-	showSearchResult();
-};
-
-initPatList();
-	
 $(document).ready(function(){
-	
 	<!-- //表格每页显示记录行数 -->
 	$('#listRows').val(rqData.sortData.listRows); 
 	
@@ -177,7 +93,7 @@ $(document).ready(function(){
 		loadEntPeriodList();
 	});	
 	//排序
-	$('#tblPatList thead a').click(function(){
+	$('#patListTbl thead a').click(function(){
 		let sortName=$(this).data('sortName'),
 			sortOrder=$(this).data('sortOrder');
 		//排序有关的值向sortData汇集
@@ -196,10 +112,9 @@ $(document).ready(function(){
 			sortName=$('thead').find('.label').data('sortName');
 
 		evt.preventDefault();
-		
+		//用"*"确保进行数字运算，而不是字符串
 		switch(pageStr){
 			case'»':
-				//用"*"确保得到的是加法运算结果，而不是字符串
 				pageNum=(pageNumActive*1+1);
 			break;
 			
@@ -219,15 +134,10 @@ $(document).ready(function(){
 		loadEntPeriodList();
 	});
 	//点击a后该行上底色
-	$('#tblPatList tbody a').click(function(){
+	$('#patListTbl tbody a').click(function(){
 		rqData.sortData.showId=$(this).closest('tr').data('showId');
-		trAddBgColor();
+		setTrBgColor();
 	});
-	
-<!-- function  -->
-
-
-<!-- /function  -->
 	
 });
 </script>

@@ -19,8 +19,7 @@ class IndexController extends \think\Controller
     private $dept = null;
     
     // 初始化
-    protected function _initialize()
-    {
+    protected function _initialize(){
         $this->username=Session::get('username');
         $this->pwd=Session::get('pwd');
         $this->log=Session::get('log');
@@ -28,16 +27,14 @@ class IndexController extends \think\Controller
         $this->dept=Session::get('dept');
     }
     
-    public function index()
-    {
-       $this->_loginUser();
+    public function index(){
+       $this->priLogin();
       
       return view();
     }
     
     // 判断是否为登录用户
-    private function _loginUser()
-    {
+    private function priLogin(){
       //通过$this->log判断是否是登录用户，非登录用户退回到登录页面
       $this->log=Session::get('log');
       
@@ -46,16 +43,22 @@ class IndexController extends \think\Controller
       }    
     }
     
-    public function theList(Request $request)
-    {
+    public function theList(Request $request){
       $period=$request->param('period')?$request->param('period'):'total';
-      $this->_loginUser();
+      $this->priLogin();
       
       $this->assign([
         'period'=>$period
       ]);
       return view();
     
+    }
+    
+    public function theSearchForm(Request $request){
+      $this->priLogin();
+      
+      
+      return '开发中......';
     }
     
     

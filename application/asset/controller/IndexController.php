@@ -63,7 +63,7 @@ class IndexController extends \think\Controller
           'username'=>$this->userName,
           'year'=>date('Y'),
           
-          'sortData'=>$sortData,
+          'sortData'=>json_encode($sortData,JSON_UNESCAPED_UNICODE),
           'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
           'auth'=>json_encode($this->auth,JSON_UNESCAPED_UNICODE),
           // 获取当前数据表字段信息
@@ -80,13 +80,11 @@ class IndexController extends \think\Controller
     public function assList(Request $request,AssinfoModel $assMdl,$sortData=[],$searchData=[])
     {
         $this->priLogin();
-                          
-        $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1,'assType'=>'_ASSS_USUAL');
-        // 接收前端的排序参数数组
+        $period=!empty($request->param('period'))?$request->param('period'):'_ASSS_USUAL';                  
+        $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1);
+        # 接收前端的排序参数数组
         $sortData=!empty($request->param('sortData/a'))?$request->param('sortData/a'):$sortDefaults;
-        $sortData=array_merge($sortDefaults,$sortData);
-        $assType=$sortData['assType'];
-        
+        $sortData=array_merge($sortDefaults,$sortData);        
         
         $searchDefaults=array();
         // 接收前端的搜索参数（json字符串），由前端保证传来的搜索参数值非0，非空。
@@ -132,7 +130,7 @@ class IndexController extends \think\Controller
         }
         
         //分页,每页$listRows条记录
-        $assSet=$assMdl->assTypeQuery($assType,$whereArr)
+        $assSet=$assMdl->assTypeQuery($period,$whereArr)
                       ->order($sortData['sortName'], $sortData['sortOrder'])
                       ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
                         'query'=>['listRows'=>$sortData['listRows']]]);
@@ -141,11 +139,11 @@ class IndexController extends \think\Controller
         $assList=$assSet->render(); 
         
         //记录总数
-        //$searchResultNum=count($this->priAssQueryObj($assType)->where($whereArr)->select()); 
-        $searchResultNum=count($assMdl->assTypeQuery($assType,$whereArr)->select()); 
+        //$searchResultNum=count($this->priAssQueryObj($period)->where($whereArr)->select()); 
+        $searchResultNum=count($assMdl->assTypeQuery($period,$whereArr)->select()); 
                
         //数量总计
-        $quanCount=$assMdl->assTypeQuery($assType,$whereArr)->sum('quantity');
+        $quanCount=$assMdl->assTypeQuery($period,$whereArr)->sum('quantity');
         
         $this->assign([
           'home'=>$request->domain(),
@@ -170,6 +168,28 @@ class IndexController extends \think\Controller
         ]);
         return view();
         
+    }
+    
+    #准备前端select组件所需的内容
+    public function getSelComData(PatinfoModel $patMdl){
+      $this->priLogin();
+      
+      $request=$this->request;
+        #定义返回前端的数据结构
+        $resData=[
+          'dept'=>[['txt'=>'','val'=>'']],
+          'type'=>[['txt'=>'','val'=>'']],
+          'status'=>[['txt'=>'','val'=>'']]
+        ];
+        #接收前端的参数
+        $selNameArr=$request->param('nameArr/a');
+        $period=!empty($request->param('period'))?$request->param('period'):'total';
+        
+        foreach($resData as $key=>$val){
+          $resData[$key]=$patMdl::getPeriodSelData($key,$val[0]);
+        }
+        
+        return $resData;
     }
     
     //响应前端请求，返回信息
@@ -197,8 +217,7 @@ class IndexController extends \think\Controller
       return $res;
     }
     
-     public function tblAssSingle(Request $request,AssinfoModel $assMdl)
-    {
+    public function tblAssSingle(Request $request,AssinfoModel $assMdl){
       $this->priLogin();
       $assSet=$assMdl::get($request->param('id'));
            
@@ -210,8 +229,23 @@ class IndexController extends \think\Controller
       return view();
     }
     
-     public function assRecords(Request $request,AssinfoModel $assMdl,AssrecordModel $assRdMdl)
+    #parSearchForm
+    public function assSearchForm(Request $request)
     {
+      $this->priLogin();
+      
+      #接收前端的搜索参数数组，由前端保证传来的搜索参数值非0，非空。
+      $searchData=!empty($request->param('searchData/a'))?$request->param('searchData/a'):array();
+      $searchData=array_merge(['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0],$searchData);    
+      
+      $this->assign([
+        'numTotal'=>1,
+        'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
+      ]);
+      return view();
+    }
+    
+    public function assRecords(Request $request,AssinfoModel $assMdl,AssrecordModel $assRdMdl){
       $this->priLogin();
       $id=$request->param('id');
       $assSet=$assMdl::get($id);

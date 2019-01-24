@@ -2,9 +2,7 @@
 
 <div>
 	<ul id="assPeriodNav" class="nav nav-pills">
-	<!-- //jQ产生参考模型	 -->
-		<!-- <li class="active"><a class="aTab" href="#total">项目概况&nbsp;|&nbsp;<span class="glyphicon glyphicon-search"></span></a></li> -->
-		
+		<!-- //jQ生成 -->
 	</ul>
 	<h4 id="assTitle" class="text-left">
 		<!-- //jQ生成 -->
@@ -13,9 +11,9 @@
 		<div class="btn-group">
 			<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" title="选择查询方式"><span class="glyphicon glyphicon-search"></span>查询<span class="caret"></span></button>
       		<ul class="dropdown-menu" role="menu">
-				<li><a id="aSearchData" href="#divSearchData" data-toggle="collapse" title="根据输入信息查询"><span class="glyphicon glyphicon-edit"></span>一般查询</a></li>
+				<li><a id="aSearchData" href="#divSearchForm" data-toggle="collapse" title="根据输入信息查询"><span class="glyphicon glyphicon-edit"></span>一般查询</a></li>
     			<li role="separator" class="divider"></li>
-    			<li><a id="aSearchByBarcode" href="#divSearchByBarcode"  data-toggle="collapse" title="输入/ 拍摄条形码图片<br>识别后查询"><span class="glyphicon glyphicon-barcode"></span>条形码查询</a></li>
+    			<li><a id="aSearchByBarcode" href="#divSearchFormBarcode"  data-toggle="collapse" title="输入/ 拍摄条形码图片<br>识别后查询"><span class="glyphicon glyphicon-barcode"></span>条形码查询</a></li>
       		</ul>
     	</div>
   		
@@ -23,8 +21,8 @@
 	</div>
 
 	<!-- // 一般查询区域-->
-	<div id="divSearchData" class="collapse" >
-		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchData"  data-toggle="collapse" title="点击隐藏">一般查询条件</a>
+	<div id="divSearchForm" class="collapse" >
+		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchForm"  data-toggle="collapse" title="点击隐藏">一般查询条件</a>
 		<!-- // 搜索表单-->
 		<div id="assSearchForm">
 		<!-- //jQ生成 -->
@@ -32,8 +30,8 @@
 	</div>
 	
 	<!-- // 条形码查询区域-->
-	<div id="divSearchByBarcode" class="collapse">
-		<a class="label label-primary" style="font-size:14px;border-bottom-radius:0px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchByBarcode"  data-toggle="collapse" title="点击隐藏">条形码查询</a>
+	<div id="divSearchFormBarcode" class="collapse">
+		<a class="label label-primary" style="font-size:14px;border-bottom-radius:0px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchFormBarcode"  data-toggle="collapse" title="点击隐藏">条形码查询</a>
 		
 		<!-- <div id="divBarcodeArea_load"><p class="text-center" style="font-size:20px;">加载中……</p></div> -->
 		
@@ -42,8 +40,16 @@
 		<br>
 	</div>
 	
+	<div id="searchNum">
+		<p class="text-right bingo" style="padding-top:10px;"><button class="btn btn-info btn-sm" style="cursor:unset;font-size:14px;">搜索结果：<span class="badge"></span></button>
+		</p>
+		
+		<p class="text-center none" style="padding-top:20px;"><strong>搜索结果</strong>：<span class="label label-default" style="font-size:16px;">无符合条件信息</span></p>
+	</div>
+	
 	<div class="tab-content">
 		<div id="assList">
+		<!-- //jQ载入 -->
 			<p class="text-center" style="font-size:20px;">加载中……</p>
 		</div>
 	</div>	
@@ -68,8 +74,7 @@
 		</div>
 		
 		<div class="modal-footer">
-        	<input type="button" class="btn btn-primary btn-sm" data-dismiss="modal" value="关闭">  
-          
+        	<input type="button" class="btn btn-primary btn-sm" data-dismiss="modal" value="关闭"> 
         </div>
 		</div>
 	</div>
@@ -79,289 +84,27 @@
 </div>
 <!--/ Modal "modalAssSingle" -->
 
-<!-- /pagewrap  -->
-
 <script>
-//var searchDataArr={$searchData};
-console.log('asset/index:');
-console.log(num);
-var assType='{$assType}';
+rqData.sortData={$sortData};
 
-//**函数名：getJsonLength
- 	//* 作用：得到jsonData的长度
-var getJsonLength=(jsonData)=>{
-	var jsonLength = 0;
-	for(var item in jsonData){
-		jsonLength++;
-	}
- 	return jsonLength;
-};
+initPage();	
 
-//**函数名：glyphiconTextChange
- 	//* 作用：obj内含的glyphicon进行变换
-	//* 参数1：obj，String。值：必须，要交换glyphicon的obj
-	//* 参数2：iconText1，Json。值：可为空，{icon:'glyphicon-xx',text:'xx'}。
-	//* 参数3：iconText2，Json。值：可为空，{icon:'glyphicon-yy',text:'yy'}。
-	//* 无返回值
-var glyphiconTextChange=(obj,iconText1,iconText2)=>{
-	iconText1=$.extend({icon:'glyphicon-collapse-up',text:'隐藏搜索'},iconText1);
-	iconText2=$.extend({icon:'glyphicon-collapse-down',text:'显示搜索'},iconText2);
-	if(obj.find('.'+iconText2.icon).length){
-	    obj.find('.glyphicon').removeClass(iconText2.icon).addClass(iconText1.icon).next('span').html(iconText1.text);
-    }else{
-	    obj.find('.glyphicon').removeClass(iconText1.icon).addClass(iconText2.icon).next('span').html(iconText2.text);
-    }
-};
-
-//**函数名：ajaxShowSelect
- 	//* 作用：本页面ajax过程向服务器请求特定单选框内容所需数据，并组装好HTML语句
-	//* 参数url，类型：字符串。值：不为空。说明：ajax操作的URL。
-	//* 参数sendData，类型：数值。值：传送给后端的键值对数据。
-	//* 参数obj，类型：对象。值：必须，单选框的对象名称
-	//*参数attach，类型：json数组。值：可为空，需要附加的单选框的键值对，[{"text":"...不限","val":"0"},{"text":"xx","val":"xx"}]
-	//*参数selected，类型：字符。值：字符，可为空。
-	//* 返回值：无
-var ajaxShowSelect=(options)=>{
-	var defaults={
-		'url':'selectResponse',
-		'attach':[{"text":"...不限","val":"0"}],
-		'sendData':'',
-		'obj':'',
-		'selected':'',
-	};
-	var data = $.extend({},defaults, options);
-	var arrJson=data.attach;
-	//var req=data.sendData.req;
-	var obj=data.obj;
-	var selected=data.selected;
-	var str='';
+<!-- //点击nav中的各个按钮后，显示相应状态的pat内容-->
+$('#assPeriodNav').find('a').click(function(){	
+	//排序、分页有关的值向sortData汇集
+	rqData.period=$(this).data('period');
+	rqData.sortData.pageNum=1;
+	buildPeriodTitleCom();
+	loadEntPeriodList();
+});	
 	
-	$.post(data.url,data.sendData,function(result){
-		if(arrJson.length){
-			for(i=0;i<arrJson.length;i++){
-				str+='<option value="'+arrJson[i].val+'">'+arrJson[i].text+'</option>';
-			}
-		}
-		// result数组,取出value值组装HTML语句
-		$.each(result,function(n1,v1){
-			str+='<option value="'+v1+'">'+v1+'</option>';	
-		});
-		<!--// 清空单选框Obj的所有选项-->
-		obj.empty();
-		<!--// 添加单选框Obj的新选项-->
-		obj.append(str);
-		<!-- // value=selected 的项为选定项-->
-		if (Array.isArray(selected)){
-			selected.forEach(function(e){
-				obj.val(selected);
-			});
-		}else{
-			obj.val(selected);
-		}
-	});
-};
-
-//**函数名：loadAssList
- 	//* 作用：加载本页面内容到指定div中<div id="divLoadAssList"></div>
-	//* 参数1：listRows，Int。值：可为空，每页显示的记录行数。默认为10。
-	//* 参数2：sortName，String。值：可为空，排序字段名称。默认为‘_TOPIC’。
-	//* 参数3：sortOrder，String。值：可为空，排序方式。默认为'_ASC'。
-	//* 参数4：pageNum，Int。值：可为空，当前页数。默认为1。
-	//* 参数6：serchWord，Array。值：可为空，用户查询关键词键值对。默认为空。
-var loadAssList=(sortData)=>{
+<!-- // 页面刷新 -->
+$('#btnRefresh').click(function(){
+	//隐藏搜索条件
+	$('#divSearchForm').removeClass('in');
+	resetSearchForm();
+});	
 	
-	//排序有关的参数默认值
-	var sortDataDefault={'listRows':10,'sortName':'assnum','sortOrder':'asc','pageNum':1,'assType':assType};
-	sortData=$.extend({},sortDataDefault,sortData);
-	var deptNowArr=$('#selectDeptNow').val();
-	var statusNowArr=$('#selectStatusNow').val();
-	var placeNowArr=$('#selectPlaceNow').val();
-	
-	//用户查询有关键值对从表单$('#fmIssPatSearch')获取
-	var formData=new FormData($('#fmAssSearch')[0]);
-	<!-- for(var pair of formData.entries()){ -->
-		<!-- console.log(pair[0]+','+pair[1]); -->
-	<!-- } -->
-	var searchData={};
-	
-	if(deptNowArr){
-		formData.append('dept_now',deptNowArr);
-	}
-	
-	if(statusNowArr){
-		formData.append('status_now',statusNowArr);
-	}
-	
-	if(placeNowArr){
-		formData.append('place_now',placeNowArr);
-	}
-	
-	//使用Map对象的forEach方法组装键值对
-	formData.forEach(function(val,key){
-		//非0非空的值才进行组装
-		if(val!='' && val!=0){
-			searchData[key]=val;
-		}	
-	});
-	<!-- // 转换成json字符串-->
-	JSON.stringify(searchData);
-		
-	//console.log('sortData:');
-	//console.dir(sortData);
-	
-	// jquery load()方法，文件加载到本页面<div id="divLoadAssList"></div>
-	$('#divLoadAssList').html('<p class="text-center" style="font-size:20px;">加载中……</p>').load('assList',
-		{'sortData':sortData,'searchData':searchData},
-		function(){
-			sortOrderToggle(sortData.sortName);
-			//是否显示assList.html中的$('#spSearchResult')组件
-			if(Object.keys(searchData).length){
-				$('#spSearchResult').show();
-			}else{
-				$('#spSearchResult').hide();
-			}
-			<!-- //设定$('#fmAssSearch')内的select组件的option -->
-			$.when(
-				ajaxShowSelect({'sendData':{'req':$('#selectDeptNow').attr('name'),'assType':assType},'selected':deptNowArr,'obj':$('#selectDeptNow')}),
-				ajaxShowSelect({'sendData':{'req':$('#selectStatusNow').attr('name'),'assType':assType},'selected':statusNowArr,'obj':$('#selectStatusNow')}),
-				ajaxShowSelect({'sendData':{'req':$('#selectPlaceNow').attr('name'),'assType':assType},'selected':placeNowArr,'obj':$('#selectPlaceNow')})
-			).then(
-				function(data, textStatus, jqXHR){
-     			//ajax成功
-				
-				},
-				function(){
-					//ajax失败
-					$.alert('加载失败，请稍后再试！');
-				}
-			);
-		}
-	);
-};
-
-//函数名：sortOrderToggle
-//作用：对选定的assList列表字段进行升序降序转换，改变该字段表头显示格式
-var sortOrderToggle=(sortName)=>{
-	var obj='';
-	var sortOrder=$('#tblAssList').data('sortOrder');
-	var glyAsc='&nbsp;<span class="small glyphicon glyphicon-sort-by-attributes"></span>';
-	var glyDesc='&nbsp;<span class="small glyphicon glyphicon-sort-by-order-alt"></span>';
-	
-	$('thead a').removeClass('label label-primary');
-	
-	$('thead a').each(function(){
-		if(sortName==$(this).data('sortName')){
-			obj=$(this);
-		}else{
-			$(this).tooltip({placement: 'bottom'});
-		}
-	});
-		
-	if(obj.length){
-		obj.addClass('label label-primary');
-		if(sortOrder == 'asc'){
-			//当前为升序
-			obj.append(glyAsc);
-			obj.tooltip({title:'当前为升序。点击后降序',placement: 'top'});
-			obj.data('sortOrder','desc');
-		}else{
-			//当前为降序
-			obj.append(glyDesc);
-			obj.tooltip({title:'当前为降序。点击后升序',placement: 'top'});
-			obj.data('sortOrder','asc');
-		}
-	}		
-};
-
-//所有查询表单重置
-var fmReset=()=>{
-	var fm=$('form');
-	
-	fm.each(function(){
-		$(this)[0].reset();
-		$(this).find('.form-control').removeClass('alert-info');
-		if($(this).attr('id')=='fmRun'){
-			$(this).next().hide().find('span.alert-info').text('');
-		}
-	});
-};
-
-//自调用匿名函数立即执行的特点，进行页面初始化。
-(function($){
-	var sId=window.location.hash;	
-	assType=sId.slice(1);
-	loadAssList({'assType':assType});
-	
-	$('.aPill[href="'+sId+'"]').tab('show');
-	
-	buildMainPeriodNavCom($('#assPeriodNav'),rqData.ent);
-
-<!-- 选中id为"nav_pat"的标签（header.html文件中的li标签）,添加.active -->
-	$('#nav_ass').addClass('active');
-
-		
-	
-})(jQuery);
-
-$(document).ready(function(){
-	let aSet=$('.'+entProp[rqData.ent].period.clsName);	
-	
-	aSet.click(function(){
-		assType=$(this).data('period');
-		$(this).tab('show');
-		//一般查询表单重置
-		fmReset();
-		loadAssList();
-    });
-	
-	//控制collapse
-	$('#divTopBtn').find('a[data-toggle="collapse"]').click(function(){
-		//关闭所有与a[data-toggle="collapse"]有关的div块。与a 中的collapse属性配合，实现点击a时只出现a控制的div块。
-		$('.container-fluid').children('div.collapse').collapse('hide');
-	});
-	
-	<!-- // 页面刷新 -->
-	$('#btnRefresh').click(function(){
-		//一般查询表单重置
-		fmReset();
-		
-		//隐藏一般查询条件
-		$('.collapse').collapse('hide');
-		loadAssList();
-	});
-	
-
-<!-- //表单$('#fmAssSearch')有关的代码块 -->
-	
-	$('#fmAssSearch .form-control').change(function(){
-		if($(this).val()!=0 || $(this).val()!=''){
-			//表单输入项做标识
-			<!-- $(this).closest('div').addClass('has-error'); -->
-			$(this).addClass('alert-info');
-		}else{
-			//表单输入项去掉标识
-			<!-- $(this).closest('div').removeClass('has-error'); -->
-			$(this).removeClass('alert-info');
-		}
-	});
-	
-	//表单提交，开始asset一般查询
-	$('#btnSearch').click(function(){
-		$('#fmAssSearch [name="reqObj"]').val('form');
-		loadAssList();
-	});
-	
-	//表单重置
-	$('#btnSearchReset').click(function(){
-		fmReset();
-	});
-	
-<!-- function  -->
-
-
-<!-- /function  -->
-	
-});
 </script>
 
 

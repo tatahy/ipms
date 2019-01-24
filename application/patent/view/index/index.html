@@ -1,17 +1,15 @@
+<!-- //module:asset, view:index/index.html  -->
 
-<!-- //module:asset, view:index/index.html
-
-<!-- pagewrap  -->
-<div >
-
+<div>
 	<ul id="patPeriodNav" class="nav nav-pills">
-		<!-- //jQ生成 -->
+		<!-- //jQ产生参考模型	 -->
+		<!-- <li class="active"><a data-ent="" data-period="">项目概况&nbsp;|&nbsp;<span class="glyphicon glyphicon-search"></span></a></li> -->
 	</ul>
 	<h4 id="patTitle" class="text-left">
 		<!-- //jQ生成 -->
 	</h4>
 	<div class="text-right">
-		<button type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divSearchForm" title="显示/隐藏专利搜索条件">搜索条件</button>&nbsp;
+		<button type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divSearchForm" title="显示/隐藏搜索条件">搜索条件</button>&nbsp;
 		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新页面"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 	</div>
 	
@@ -23,82 +21,41 @@
 		</div>
 	</div>
 	
+	
+	<div id="searchNum">
+		<p class="text-right bingo" style="padding-top:10px;"><button class="btn btn-info btn-sm" style="cursor:unset;font-size:14px;">搜索结果：<span class="badge"></span></button>
+		</p>
+		
+		<p class="text-center none" style="padding-top:20px;"><strong>搜索结果</strong>：<span class="label label-default" style="font-size:16px;">无符合条件信息</span></p>
+	</div>
+	
 	<div class="tab-content">		
 		<div id="patList">
 		<!-- //jQ载入 -->
 		</div>
 	</div>
-	
-<!-- </div> -->
 </div>
-<!-- /pagewrap  -->
 
 <script>
+rqData.sortData={$sortData};
 
-<!--// console.log(num); -->
-
-
-//定义要加载的搜索表单中各个输入组件属性值
-<!-- const searchFormComProp={ -->
-	<!-- topic:{name:'topic',tag:'input',val:''}, -->
-	<!-- author:{name:'author',tag:'input',val:''}, -->
-	<!-- type:{name:'type',tag:'select',val:0}, -->
-	<!-- dept:{name:'dept',tag:'select',val:0}, -->
-	<!-- status:{name:'status',tag:'select',val:0}, -->
-<!-- }; -->
-urlObj.module='patent';
-const tPropDefault={
-		total:{btn:'btn btn-primary',txt:'专利总数&nbsp;',num:''},
-		audit:{lab:'label label-info',btn:'btn btn-info',txt:'内部审核拟申报专利&nbsp;',num:''},
-		newAdd:{btn:'btn btn-info',txt:'拟申报专利&nbsp;',num:''},
-		apply:{btn:'btn btn-primary',txt:'申报专利&nbsp;',num:''},
-		authorize:{btn:'btn btn-success',txt:'授权(有效期)专利&nbsp;',num:''},
-		invalid:{btn:'btn btn-default',txt:'无效专利数&nbsp;',num:''}
-	};
-
-
-var titleProp=getTitleProp(tPropDefault,{$periodProp});
-
-var initPage=()=>{
-	buildMainPeriodNavCom();
-	setTitle(titleProp);
-	//载入patSearchForm
-	urlObj.method='patSearchForm';
-	$('#patSearchForm').load(getRqUrl());
-	//载入patList
-	loadEntPeriodList();
-	console.log();
-};
-
-rqData.sortData=$.extend({},{$sortData},rqData.sortData);
 initPage();	
 
-$(document).ready(function(){
-	
-	<!-- //点击nav中的各个按钮后，显示相应状态的pat内容-->
-	$('#patPeriodNav').find('a').click(function(){
-       let period=$(this).data('period');
-		//本身加底色
-		$(this).tab('show');
-		//排序、分页有关的值向sortData汇集
-		rqData.period=period;
-		rqData.sortData.period=period;
-		rqData.sortData.pageNum=1;
-		setTitle(titleProp);
-		loadEntPeriodList();
-    });	
+<!-- //点击nav中的各个按钮后，显示相应状态的pat内容-->
+$('#patPeriodNav').find('a').click(function(){	
+	//排序、分页有关的值向sortData汇集
+	rqData.period=$(this).data('period');
+	rqData.sortData.pageNum=1;
+	buildPeriodTitleCom();
+	loadEntPeriodList();
+});	
 
-	<!-- // 页面刷新 -->
-	$('#btnRefresh').click(function(){
-		
-		//隐藏搜索条件
-		$('#divSearchForm').removeClass('in');
-		//清空查询数据
-		setRqSearchData();
-		fmSearchReset();
-	});	
-});
-
+<!-- // 页面刷新 -->
+$('#btnRefresh').click(function(){
+	//隐藏搜索条件
+	$('#divSearchForm').removeClass('in');
+	resetSearchForm();
+});	
 </script>
 
 

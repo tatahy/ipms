@@ -21,11 +21,10 @@ class IndexController extends \think\Controller
     //用户所在部门
     private $dept = null;
     //用户权限
-  private $authArr=array();
+    private $authArr=array();
     
     // 初始化
-    protected function _initialize()
-    {
+    protected function _initialize(){
         $this->username=Session::get('username');
         $this->pwd=Session::get('pwd');
         $this->log=Session::get('log');
@@ -35,16 +34,14 @@ class IndexController extends \think\Controller
         $this->authArr=Session::get('authArr');
     }
     
-    public function index(PatinfoModel $patMdl,AssinfoModel $assMdl)
-    {
-      $this->_loginUser();
+    public function index(){
+      $this->priLogin();
       
       return view();
     }
     
     // 判断是否为登录用户
-    private function _loginUser()
-    {
+    private function priLogin(){
       //通过$this->log判断是否是登录用户，非登录用户退回到登录页面
       $this->log=Session::get('log');
       
@@ -53,16 +50,23 @@ class IndexController extends \think\Controller
       }    
     }
     
-    public function proList(Request $request)
-    {
+    public function proList(Request $request){
       $period=$request->param('period')?$request->param('period'):'total';
-      $this->_loginUser();
+      $this->priLogin();
       
       $this->assign([
         'period'=>$period
       ]);
       return view();
     
-    }    
+    }
+    
+    public function proSearchForm(Request $request){
+      $this->priLogin();
+      
+      
+      return '开发中......';
+    }
+        
     
 }

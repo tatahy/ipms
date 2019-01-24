@@ -72,18 +72,26 @@ class IndexController extends Controller
       $num['pat']=$authority['pat']['read']?$patMdl::getPeriodNum():0;
       
       $num['pro']=[
+        'total'=>'x',
+        'audit'=>'x',
         'plan'=>'x',
         'apply'=>'x',
         'approve'=>'x',
         'process'=>'x',
+        'inspect'=>'x',
         'done'=>'x',
-        'terminate'=>'x'
+        'terminate'=>'x',
+        'reject'=>'x',
       ];
-      
+
       $num['the']=[
+        'total'=>'x',
+        'audit'=>'x',
         'plan'=>'x',
         'apply'=>'x',
-        'publish'=>'x'
+        'accept'=>'x',
+        'publish'=>'x',
+        'reject'=>'x'
       ];
       
       $this->assign([

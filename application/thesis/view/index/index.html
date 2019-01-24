@@ -1,11 +1,25 @@
 <!-- //module:thesis; view:index/index.html  -->
 
 <div>
-	
 	<ul id="thePeriodNav" class="nav nav-pills">
-		<!-- //jQ产生参考模型	 -->
-		<!-- <li class="active"><a class="aTab" href="#total">项目概况&nbsp;|&nbsp;<span class="glyphicon glyphicon-search"></span></a></li> -->
+		<!-- //jQ产生	 -->
 	</ul>
+	<h4 id="theTitle" class="text-left">
+		<!-- //jQ生成 -->
+	</h4>
+	<div class="text-right">
+		<button type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divSearchForm" title="显示/隐藏搜索条件">搜索条件</button>&nbsp;
+		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新页面"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+	</div>
+	
+	
+	<div id="divSearchForm" class="collapse" style="padding-top:10px;">
+		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;padding-top:5px;" href="#divSearchForm"  data-toggle="collapse" title="点击隐藏">论文搜索条件</a>
+		<!-- // 搜索表单-->
+		<div id="theSearchForm">
+		<!-- //jQ生成 -->
+		</div>
+	</div>
 		
 	<div class="tab-content">
 		<div id="theList">
@@ -16,21 +30,22 @@
 </div>
 
 <script>
-
-urlObj.module='thesis';
-urlObj.method='theList';
-
-buildMainPeriodNavCom();
-
-loadEntPeriodList();
+initPage();
 
 <!-- //组件点击后，显示相应period的list-->
 $('#thePeriodNav').find('a').click(function(){
-    rqData.ent=$(this).data('ent');
+    //排序、分页有关的值向sortData汇集
 	rqData.period=$(this).data('period');
-		
+	rqData.sortData.pageNum=1;
+	buildPeriodTitleCom();
 	loadEntPeriodList();
 });	
-	
+
+<!-- // 页面刷新 -->
+$('#btnRefresh').click(function(){
+	//隐藏搜索条件
+	$('#divSearchForm').removeClass('in');
+	fmSearchReset();
+});	
 </script>
 
