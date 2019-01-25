@@ -1,132 +1,72 @@
 <!-- //module:asset, view:index/assSearchForm.html  -->
 	
 <!-- // 搜索表单-->	
-<form id="fmPatSearch" style="border:1px solid #eee;padding:10px 0px;margin-top:2px;">
+<form class="searchForm" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:2px;">
+	<input class="sr-only" name="reqObj" type="text" value="" />
 	<div class="row myRow">
 		<div class="form-group col-sm-4">
-			<label class="control-label" for="topic">名称</label>
-			<input class="form-control" name="topic" type="text" value="" placeholder="...不限">
+			<label class="control-label" for="brand_model">名称（品牌型号）</label>
+			<input class="form-control searchBg" id="brand_model" name="brand_model" type="text" value="" placeholder="...不限" />
+										
 		</div>
 		<div class="form-group col-sm-2">
-			<label class="control-label" for="author">撰写人</label>
-			<input class="form-control" name="author" type="text" value="" placeholder="...不限">
+			<label class="control-label" for="assnum">编号</label>
+			<input class="form-control searchBg" id="assnum" name="assnum" type="text" value="" placeholder="...不限" />
+										
 		</div>
-				
-	</div>
-	<div class="row myRow">
-		<div class="form-group col-sm-5">
-			<label class="control-label" for="type">类型</label>
-			<!-- <select multiple class="form-control" id="searchPatType" name="searchPatType" > -->
-			<select class="form-control" name="type" >
-				<!-- //js生成 -->
-			</select>
-		</div>
-		<div class="form-group col-sm-4">
-			<label class="control-label" for="dept">部门</label>
-			<!-- <select multiple class="form-control" id="searchDept" name="searchDept"> -->
-			<select class="form-control" name="dept">
-				<!-- //js生成 -->
-			</select>
-		</div>					
+			
 		<div class="form-group col-sm-3">
-			<label class="control-label" for="status">状态</label>
-			<!-- <select multiple class="form-control" id="searchPatStatus" name="searchPatStatus"> -->
-			<select class="form-control" name="status">
-				<!-- //js生成 -->
-			</select>
+			<label class="control-label" for="code">卡号</label>
+			<input class="form-control searchBg" id="code" name="code" type="text" value="" placeholder="...不限" />
+		</div>
+			
+		<div class="form-group col-sm-3">
+			<label class="control-label" for="bar_code">条形码号</label>
+			<input class="form-control searchBg" id="bar_code" name="bar_code" type="text" value="" placeholder="...不限" />	
 		</div>
 	</div>
-	<div class="row myRow text-right">	
-		<button id="btnSearchPat" type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>搜索</button>	
+			
+	<div class="row myRow">
+		<div class="form-group col-sm-4">
+			<label class="control-label" for="dept_now">现使用部门</label>
+			<select class="form-control" name="searchPatType" >
+			<!-- <select multiple="multiple" size="4" class="form-control" id="selectDeptNow" name="dept_now" > -->
+				<option value="">d1</option>
+			</select>
+		</div>
+		<div class="form-group col-sm-2">
+			<label class="control-label" for="status_now">状态</label>
+			<select class="form-control" name="searchPatType" >
+			<!-- <select multiple="multiple" size="4" class="form-control" id="selectStatusNow" name="status_now" > -->
+				<option value="">s1</option>
+			</select>
+		</div>
+		<div class="form-group col-sm-2">
+			<label class="control-label" for="place_now">现放置地点</label>
+			<select class="form-control" name="place_now" >
+				<option value="">p1</option>
+			</select>
+		</div>
+		<div class="form-group col-sm-2">
+			<label class="control-label" for="keeper_now">现保管人</label>
+			<input class="form-control" name="keeper_now" type="text" value="" placeholder="...不限" />
+		</div>
+		<div class="form-group col-sm-2">
+			<label class="control-label" for="status_now_user_name">登记人</label>
+			<input class="form-control" name="status_now_user_name" type="text" value="" placeholder="...不限" />
+		</div>
+	</div>	
+			
+	<div class="row myRow text-right">
+		<button id="btnSearch" type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>查询</button>
 		<input type="reset" class="btn btn-primary btn-sm" value="条件重置" />
-	</div>					
+	</div>
+			
 </form>
 
-<script>
-var sData={$searchData};
-console.log('patSearchForm.html ');
-console.table(sData);
-
-initUrlObj(rqData.ent);
-console.log(urlObj);
-
-//设定搜索表单的各项内容
-var setFmSearchData=(optObj={})=>{
-	let opt=$.extend({},{topic:'',author:'',type:0,dept:0,status:0},optObj),
-		//计数器
-		n=0;
-
-	for(let el in opt){
-		let obj=$('#fmPatSearch [name="'+el+'"]'),
-			v=opt[el];
-		//多选时
-		if(typeof v== 'object'){
-			v.forEach(function(item){
-				obj.find('option[value="'+item+'"]').prop('selected',true);
-			});
-		}
-		obj.val(v);
-		
-		if(v=='' || v==0){
-			obj.removeClass('alert-info');
-		}else{
-			//不为0或空加底色
-			obj.addClass('alert-info');
-			n++;
-		}
-	}
-	//是否显示表单
-	(n)?$('#divCollapse').addClass('in'):$('#divCollapse').removeClass('in');
-};
-//挨个组装好所有的select组件
-var buildFmSelectCom=()=>{
-	let selSet=$('#fmPatSearch').find('select'),
-		rData={period:$('#divTblSortData').data('period')};	
-	urlObj.method='getSelComData';
-	//向后端请求组装select组件所需数据
-	$.post(getRqUrl(),rData,function(resData){
-		<!-- console.log(resData); -->
-		//查询表单中选择框的name属性值数组
-		for(var i=0;i<selSet.length;i++){
-			let selObj=selSet.eq(i),
-				selName=selObj.attr('name'),
-				optionArr=resData[selName];
-			
-			selObj.empty().append($('<option></option>').val(0).text('…不限'));	
-			//组装option 
-			optionArr.forEach(function(e){
-				selObj.append($('<option></option>').val(e.val).text(e.txt));
-			});
-			selObj.val(0);		
-		}
-		//设定搜索表单的各项内容，要完成组装后才能生效。
-		setFmSearchData(sData);
-	});
-	
-};
-
-buildFmSelectCom();
-	
-$(document).ready(function(){
-	let fmObj=$('#fmPatSearch');	
-
-	fmObj.find('.form-control').change(function(){
-		//有变化加底色
-		($(this).val()=='' || $(this).val()==0)?$(this).removeClass('alert-info'):$(this).addClass('alert-info');
-	});
-	//表单提交
-	fmObj.submit(function(evt){
-		evt.preventDefault();
-		//设置查询数据
-		setRqSearchData(fmObj);
-		//载入patList
-		loadEntPeriodList(loadObj);
-	});
-	//表单重置时附加的操作
-	fmObj.find('[type="reset"]').click(function(){
-		fmObj.find('.form-control').removeClass('alert-info');	
-	});
-});
-
-
+<script type="text/javascript">
+//对conf.js中定义的全局变量赋值
+rqData.searchData={$searchData};
 </script>
+
+<script type="text/javascript" src="/home/res/js/app/searchForm.js"></script>

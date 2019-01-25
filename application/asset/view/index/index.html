@@ -7,7 +7,7 @@
 	<h4 id="assTitle" class="text-left">
 		<!-- //jQ生成 -->
 	</h4>
-	<div id="divTopBtn" class="row text-right" style="margin:10px 0px;">
+	<div class="row text-right">
 		<div class="btn-group">
 			<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" title="选择查询方式"><span class="glyphicon glyphicon-search"></span>查询<span class="caret"></span></button>
       		<ul class="dropdown-menu" role="menu">
@@ -17,7 +17,7 @@
       		</ul>
     	</div>
   		
-		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新信息列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 	</div>
 
 	<!-- // 一般查询区域-->
@@ -89,7 +89,7 @@ rqData.sortData={$sortData};
 
 initPage();	
 
-<!-- //点击nav中的各个按钮后，显示相应状态的pat内容-->
+<!-- //点击nav中的各个按钮后，loadEntPeriodList()-->
 $('#assPeriodNav').find('a').click(function(){	
 	//排序、分页有关的值向sortData汇集
 	rqData.period=$(this).data('period');
@@ -104,7 +104,5 @@ $('#btnRefresh').click(function(){
 	$('#divSearchForm').removeClass('in');
 	resetSearchForm();
 });	
-	
+
 </script>
-
-

@@ -155,20 +155,21 @@ class Patinfo extends Model
       return $numArr;
     }
     #得到在period的select组件内容
-    static public function getPeriodSelData($name='',$arr=[],$period='')
+    static public function getFieldGroupByArr($field='',$arr=[],$period='')
     {
       $resArr=[]; #返回数组
       $tArr=[];   #键值转换数组
       $tempArr=[];#中间数组
-      
+      #设定arr的默认结构
+      $arr=count($arr)?$arr:['txt'=>'','val'=>''];
       #组装$tArr
-      if($name=='status') $tArr=self::PATSTATUS;
-      if($name=='type') $tArr=self::PATTYPE;
+      if($field=='status') $tArr=self::PATSTATUS;
+      if($field=='type') $tArr=self::PATTYPE;
       #得到dept的键值转换数组$tArr。abbr为键，name为值的关联数组
       $deptSet=DeptModel::all();
       #转换为数据集
       $deptSet=is_array($deptSet)?collection($deptSet):$deptSet;
-      if($name=='dept') $tArr=array_combine($deptSet->column('abbr'),$deptSet->column('name'));
+      if($field=='dept') $tArr=array_combine($deptSet->column('abbr'),$deptSet->column('name'));
       
       #组装$tempArr
       self::$obj=new self();
@@ -176,8 +177,8 @@ class Patinfo extends Model
       self::$obj=null;
       #转换为数据集
       $patSet=is_array($patSet)?collection($patSet):$patSet;
-      #得到中间数组$tempArr，$name值对应的索引数组（去掉重复值）
-      $tempArr=array_unique($patSet->column($name));
+      #得到中间数组$tempArr，$field值对应的索引数组（去掉重复值）
+      $tempArr=array_unique($patSet->column($field));
       #重新排序让数组下标连续
       sort($tempArr);
       
@@ -185,10 +186,10 @@ class Patinfo extends Model
       foreach($arr as $key => $val){
         foreach($tempArr as $k => $v){
           if($key=='txt'){
-            $val=($name=='dept')?$v.'，简称：'.array_search($v,$tArr):$v;
+            $val=($field=='dept')?$v.'，简称：'.array_search($v,$tArr):$v;
           }
           if($key=='val'){
-            $val=($name=='dept')?$v:array_search($v,$tArr);
+            $val=($field=='dept')?$v:array_search($v,$tArr);
           }
           $resArr[$k][$key]=$val;
         }

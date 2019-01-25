@@ -54,7 +54,7 @@ class Assinfo extends Model
       
       self::$obj=new self();
       foreach(self::$aTypeArr as $val){
-        self::$numArr[$val]=self::$obj->assTypeQuery($val)->count();
+        self::$numArr[$val]=self::$obj->assPeriodQuery($val)->count();
       }     
      // self::$obj=null;
       return self::$obj;
@@ -145,14 +145,14 @@ class Assinfo extends Model
       if(count(self::$numArr)){
         $res=self::$numArr[$this->aType];
       }else{
-        $res=$this->assTypeQuery($this->aType)->count();
+        $res=$this->assPeriodQuery($this->aType)->count();
       }
       
       return $res;
     }
     
     //asset查询对象
-    public function assTypeQuery($assType='',$whereArr=[])
+    public function assPeriodQuery($assType='',$whereArr=[])
     {
       
       $this->aType=$assType;

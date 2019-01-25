@@ -54,15 +54,19 @@
 	<!-- //jQ产生 -->
 </div>
 
-<script>
-//定义前端系统各个实体数量对象，由后端给定
-const num={$num};
-const domain='{$home}';
-</script>
-<!-- {js href="/home/res/js/app/index.js" } -->
-<script type="text/javascript" src="/home/res/js/app/index.js"></script>
-
 {include file="../application/common/footer.html"}
 
 
 
+<!-- //embed js code onto this HTML page-->
+<script>
+//对conf.js中定义的全局变量后端赋值
+var num={$num};
+var domain='{$home}';
+</script>
+
+<!-- //embed js code onto this HTML page, 引入全局变量 -->
+<script type="text/javascript" src="/home/res/js/app/conf.js"></script>
+
+<!-- // import js code into this HTML page-->
+<script type="text/javascript" src="/home/res/js/app/main.js"></script>

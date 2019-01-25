@@ -978,18 +978,19 @@ class IndexController extends \think\Controller
             //$this->redirect($request->domain());
         }
         $request=$this->request;
-        #定义返回前端的数据结构
-        $resData=[
-          'dept'=>[['txt'=>'','val'=>'']],
-          'type'=>[['txt'=>'','val'=>'']],
-          'status'=>[['txt'=>'','val'=>'']]
-        ];
+       
+        #定义返回前端的数据
+        $resData=[];
+        #定义模型需返回的数据结构
+        $arr=['txt'=>'','val'=>''];
         #接收前端的参数
-        $selNameArr=$request->param('nameArr/a');
-        $period=!empty($request->param('period'))?$request->param('period'):'total';
+        $fieldArr=$request->param('name/a');
+        $period=!empty($request->param('period'))?$request->param('period'):'';
         
-        foreach($resData as $key=>$val){
-          $resData[$key]=$patMdl::getPeriodSelData($key,$val[0]);
+        if(count($fieldArr)){
+          foreach($fieldArr as $field){
+            $resData[$field]=$patMdl::getFieldGroupByArr($field,$arr);
+          }
         }
         
         return $resData;

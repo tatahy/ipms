@@ -67,79 +67,15 @@
 		</div>
 	</div>
 </div>
-
-<script>
-<!--// var sData={$searchData}; -->
-var sData=rqData.searchData;
-
+<!-- //embed js code onto the HTML page-->
+<script type="text/javascript">
+//对conf.js中定义的全局变量赋值
+rqData.searchData={$searchData};
 searchResultNum={$searchResultNum};
-
-initUrlObj(rqData.ent);
-initEntList();
-
-$(document).ready(function(){
-	<!-- //表格每页显示记录行数 -->
-	$('#listRows').val(rqData.sortData.listRows); 
-	
-	$('#listRows').change(function(){
-		let listRows=$(this).val()*1;
-		//排序有关的值向sortData汇集
-		if(listRows){
-			rqData.sortData.listRows=listRows;
-			//分页从第一页开始
-			rqData.sortData.pageNum=1;
-		}
-		//载入patList
-		loadEntPeriodList();
-	});	
-	//排序
-	$('#patListTbl thead a').click(function(){
-		let sortName=$(this).data('sortName'),
-			sortOrder=$(this).data('sortOrder');
-		//排序有关的值向sortData汇集
-		rqData.sortData.sortName=sortName;
-		rqData.sortData.sortOrder=sortOrder;
-		rqData.sortData.pageNum=1;
-		//载入patList
-		loadEntPeriodList();
-	});	
-	<!-- // 点击分页中的a，表格中的内容根据a中的属性值进行排序 -->
-	$('#divListRows a').click(function(evt){
-		// a所在分页页数
-		let pageStr=$(this).text(),pageNum,
-		//(li.active)所代表的页数
-			pageNumActive=$('#divListRows li.active').children('span').text(),
-			sortName=$('thead').find('.label').data('sortName');
-
-		evt.preventDefault();
-		//用"*"确保进行数字运算，而不是字符串
-		switch(pageStr){
-			case'»':
-				pageNum=(pageNumActive*1+1);
-			break;
-			
-			case'«':
-				pageNum=(pageNumActive*1-1);
-			break;
-			
-			default:
-				pageNum=pageStr*1;
-			break;
-		}
-		//排序、分页有关的值向sortData汇集
-		if(pageNum){
-			rqData.sortData.pageNum=pageNum;
-		}
-		//载入patList
-		loadEntPeriodList();
-	});
-	//点击a后该行上底色
-	$('#patListTbl tbody a').click(function(){
-		rqData.sortData.showId=$(this).closest('tr').data('showId');
-		setTrBgColor();
-	});
-	
-});
 </script>
+
+<!-- // import js code into the HTML page-->
+<script type="text/javascript" src="/home/res/js/app/entList.js"></script>
+
 
 

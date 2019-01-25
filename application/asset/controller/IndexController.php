@@ -130,7 +130,7 @@ class IndexController extends \think\Controller
         }
         
         //分页,每页$listRows条记录
-        $assSet=$assMdl->assTypeQuery($period,$whereArr)
+        $assSet=$assMdl->assPeriodQuery($period,$whereArr)
                       ->order($sortData['sortName'], $sortData['sortOrder'])
                       ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
                         'query'=>['listRows'=>$sortData['listRows']]]);
@@ -140,10 +140,10 @@ class IndexController extends \think\Controller
         
         //记录总数
         //$searchResultNum=count($this->priAssQueryObj($period)->where($whereArr)->select()); 
-        $searchResultNum=count($assMdl->assTypeQuery($period,$whereArr)->select()); 
+        $searchResultNum=count($assMdl->assPeriodQuery($period,$whereArr)->select()); 
                
         //数量总计
-        $quanCount=$assMdl->assTypeQuery($period,$whereArr)->sum('quantity');
+        $quanCount=$assMdl->assPeriodQuery($period,$whereArr)->sum('quantity');
         
         $this->assign([
           'home'=>$request->domain(),
@@ -157,7 +157,7 @@ class IndexController extends \think\Controller
           //排序数组
           'sortData'=>$sortData,
           //搜索数组
-          'searchData'=>$searchData,
+          'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
           //状态有关的设置
           'conAssStatusArr'=>json_encode(conAssStatusArr,JSON_UNESCAPED_UNICODE), 
           'conAssStatusLabelArr'=>json_encode(conAssStatusLabelArr,JSON_UNESCAPED_UNICODE), 
@@ -171,23 +171,29 @@ class IndexController extends \think\Controller
     }
     
     #准备前端select组件所需的内容
-    public function getSelComData(PatinfoModel $patMdl){
+    public function getSelComData(AssinfoModel $assMdl){
       $this->priLogin();
       
       $request=$this->request;
-        #定义返回前端的数据结构
-        $resData=[
-          'dept'=>[['txt'=>'','val'=>'']],
-          'type'=>[['txt'=>'','val'=>'']],
-          'status'=>[['txt'=>'','val'=>'']]
-        ];
+      #定义返回前端的数据
+        $resData=[];
+        #定义模型需返回的数据结构
+        $arr=['txt'=>'','val'=>''];
         #接收前端的参数
-        $selNameArr=$request->param('nameArr/a');
-        $period=!empty($request->param('period'))?$request->param('period'):'total';
+        $fieldArr=$request->param('name/a');
+        $period=!empty($request->param('period'))?$request->param('period'):'';
         
-        foreach($resData as $key=>$val){
-          $resData[$key]=$patMdl::getPeriodSelData($key,$val[0]);
+        if(count($fieldArr)){
+          foreach($fieldArr as $key=>$val){
+            $resData[$val]=[[$val=>$arr]];
+          }
         }
+                       
+        //if(count($fieldArr)){
+//          foreach($fieldArr as $field){
+//            $resData[$field]=$assMdl::getFieldGroupByArr($field,$arr);
+//          }
+//        }
         
         return $resData;
     }
@@ -201,7 +207,7 @@ class IndexController extends \think\Controller
       $assType = empty($request->param('assType'))?0:$request->param('assType');
       
       if($assType){
-        $res=$assMdl->assTypeQuery($assType)->field($req)->group($req)->select();
+        $res=$assMdl->assPeriodQuery($assType)->field($req)->group($req)->select();
       }else{
         $res=$assMdl->field($req)->group($req)->select();
       }

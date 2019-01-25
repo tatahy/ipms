@@ -1,7 +1,7 @@
 <!-- //module:patent, view:index/patSearchForm.html  -->
 	
 <!-- // 搜索表单-->	
-<form id="fmPatSearch" class="searchForm" style="border:1px solid #eee;padding:10px 0px;margin-top:2px;">
+<form class="searchForm" style="border:1px solid #eee;padding:10px 0px;margin-top:2px;">
 	<div class="row myRow">
 		<div class="form-group col-sm-4">
 			<label class="control-label" for="topic">名称</label>
@@ -42,87 +42,9 @@
 	</div>					
 </form>
 
-<script>
-var sData={$searchData};
-
-buildFmSelectCom();
-	
-$(document).ready(function(){
-	let fmObj=$('#fmPatSearch');	
-
-	fmObj.find('.form-control').change(function(){
-		//有变化加底色
-		($(this).val()=='' || $(this).val()==0)?$(this).removeClass('alert-info'):$(this).addClass('alert-info');
-	});
-	//表单提交
-	fmObj.submit(function(evt){
-		evt.preventDefault();
-		//设置查询数据
-		setRqSearchData(fmObj);
-		//载入patList
-		loadEntPeriodList();
-	});
-	//表单重置时附加的操作
-	fmObj.find('[type="reset"]').click(function(evt){
-		
-		resetSearchForm();
-		//显示搜索条件
-		$('#divSearchForm').addClass('in');
-	});
-});
-
-//设定搜索表单的各项内容
-function setFmSearchData(optObj={}){
-	let opt=$.extend({},{topic:'',author:'',type:0,dept:0,status:0},optObj),
-		//计数器
-		n=0;
-
-	for(let el in opt){
-		let obj=$('#fmPatSearch [name="'+el+'"]'),
-			v=opt[el];
-		//多选时
-		if(typeof v== 'object'){
-			v.forEach(function(item){
-				obj.find('option[value="'+item+'"]').prop('selected',true);
-			});
-		}
-		obj.val(v);
-		
-		if(v=='' || v==0){
-			obj.removeClass('alert-info');
-		}else{
-			//不为0或空加底色
-			obj.addClass('alert-info');
-			n++;
-		}
-	}
-	//是否显示表单
-	(n)?$('#divCollapse').addClass('in'):$('#divCollapse').removeClass('in');
-}
-//挨个组装好所有的select组件
-function  buildFmSelectCom(){
-	let selSet=$('#fmPatSearch').find('select'),
-		rData={period:rqData.period};
-	urlObj.method='getSelComData';
-	//向后端请求组装select组件所需数据
-	$.post(getRqUrl(),rData,function(resData){
-		<!-- console.log(resData); -->
-		//查询表单中选择框的name属性值数组
-		for(var i=0;i<selSet.length;i++){
-			let selObj=selSet.eq(i),
-				selName=selObj.attr('name'),
-				optionArr=resData[selName];
-			
-			selObj.empty().append($('<option></option>').val(0).text('…不限'));	
-			//组装option 
-			optionArr.forEach(function(e){
-				selObj.append($('<option></option>').val(e.val).text(e.txt));
-			});
-			selObj.val(0);		
-		}
-		//设定搜索表单的各项内容，要完成组装后才能生效。
-		setFmSearchData(sData);
-	});
-	
-}
+<script type="text/javascript">
+//对conf.js中定义的全局变量赋值
+rqData.searchData={$searchData};
 </script>
+
+<script type="text/javascript" src="/home/res/js/app/searchForm.js"></script>
