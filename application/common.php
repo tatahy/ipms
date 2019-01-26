@@ -301,15 +301,18 @@ const conAssStatusLabelArr=[
 
 #asset的实体定义
 const conAssEntArr=[
+  'name'=>'asset',
+  'abbr'=>'ass',
+  'chi'=>'固定资产',
   'period'=>[
     #除"回收站"以外的其它5类状态,
-    'usual'=>['chi'=>'','status'=>['_ASSS6']],
-    'undetermined'=>['chi'=>'待定','status'=>[]],
-    'normal'=>['chi'=>'正常','status'=>[]],
-    'abnormal'=>['chi'=>'异常','status'=>[]],
-    'suspended'=>['chi'=>'停用','status'=>[]],
-    'removed'=>['chi'=>'销账','status'=>[]],
-    'trashBin'=>['chi'=>'回收站','status'=>[]]    
+    'usual'=>['chi'=>'','statusQuery'=>'notlike','status'=>'_ASSS6'],
+    'undetermined'=>['chi'=>'待定','statusQuery'=>'like','status'=>'_ASSS1%'],
+    'normal'=>['chi'=>'正常','statusQuery'=>'like','status'=>'_ASSS2%'],
+    'abnormal'=>['chi'=>'异常','statusQuery'=>'like','status'=>'_ASSS3%'],
+    'suspended'=>['chi'=>'停用','statusQuery'=>'like','status'=>'_ASSS4%'],
+    'removed'=>['chi'=>'销账','statusQuery'=>'like','status'=>'_ASSS5%'],
+    'trashBin'=>['chi'=>'回收站','statusQuery'=>'','status'=>'_ASSS6']    
   ],
   'oprt'=>[
     '_CREATE'=>'新增',
@@ -323,21 +326,26 @@ const conAssEntArr=[
     '_READ'=>'查阅',
     '_DELETE'=>'删除',
   ],
-  'ent-name'=>['ass'],
-  'ass'=>[
-    'auth-oprt'=>[
-      'read'=>['chi'=>'查阅','oprt'=>[]],
-      'edit'=>['chi'=>'撰写','oprt'=>[]],
-      'audit'=>['chi'=>'审核','oprt'=>[]],
-      'approve'=>['chi'=>'审批','oprt'=>[]],
-      'execute'=>['chi'=>'执行','oprt'=>[]],
-      'maintain'=>['chi'=>'维护','oprt'=>[]]
-    ],
-    'status'=>[
+  'auth'=>[
+    'read'=>['chi'=>'查阅','oprt'=>[]],
+    'edit'=>['chi'=>'撰写','oprt'=>[]],
+    'audit'=>['chi'=>'审核','oprt'=>[]],
+    'approve'=>['chi'=>'审批','oprt'=>[]],
+    'execute'=>['chi'=>'执行','oprt'=>[]],
+    'maintain'=>['chi'=>'维护','oprt'=>[]]
+  ],
+  'status'=>[
       '_ASSS0'=>'*',
       //label-info，待定
-      '_ASSS1'=>'待定',
-      '_ASSS1_1'=>'填报中',
+      '_ASSS1'=>['chi'=>'待定','oprt'=>[]],
+      '_ASSS1_1'=>[
+        'chi'=>'填报中',
+        'oprt'=>[
+          '_UPDATE'=>['next-status'=>[]],
+          '_DELETE'=>['next-status'=>[]],
+          '_SUBMIT'=>['next-status'=>['_ASSS1_2']]
+        ]
+      ],
       '_ASSS1_2'=>'新增_待验收',
       '_ASSS1_3'=>'待分配_初次验收合格',
       '_ASSS1_4'=>'待分配_维修验收合格',
@@ -361,168 +369,6 @@ const conAssEntArr=[
       '_ASSS5'=>'销账',
       //label-danger
       '_ASSS6'=>'回收站'
-    ],
-    
-    'status'=>[//除‘完结’以外的其它状态
-      '_ISST_PATS'=>'*',
-      //label-info，待定
-      '_PATS1'=>['chi'=>'送审','oprt'=>[]],
-      '_PATS1-1'=>[
-        'chi'=>'填报中',
-        'oprt'=>[
-          '_UPDATE'=>['next-status'=>[]],
-          '_DELETE'=>['next-status'=>['display'=>1]],
-          '_SUBMIT'=>['next-status'=>['_PATS2-1']]
-        ]
-      ],
-      '_PATS1-2'=>[
-        'chi'=>'审核完-待修改',
-        'oprt'=>[
-          '_UPDATE'=>['next-status'=>[]],
-          '_SUBMIT'=>['next-status'=>['_PATS2-2']]
-        ]
-      ],
-      '_PATS1-3'=>[
-        'chi'=>'审批完-需完善',
-        'oprt'=>[
-          '_UPDATE'=>['next-status'=>[]],
-          '_SUBMIT'=>['next-status'=>['_PATS2-3']]
-        ]
-      ],
-      //label-success，正常
-      '_PATS2'=>['chi'=>'审核','oprt'=>[]],
-      '_PATS2-1'=>[
-        'chi'=>'新增-专利申请',
-        'oprt'=>[
-          '_UPDATE'=>['next-status'=>[]],
-          '_AUDIT'=>['next-status'=>['_PATS1-2','_PATS3-3','_PATS3-1']]
-        ]
-      ],
-      '_PATS2-2'=>[
-        'chi'=>'送审-已修改',
-        'oprt'=>[
-          '_UPDATE'=>['next-status'=>[]],
-          '_AUDIT'=>['next-status'=>['_PATS1-2','_PATS3-3','_PATS3-1']]
-        ]
-      ],
-      '_PATS2-3'=>[
-        'chi'=>'送审-已完善',
-        'oprt'=>[
-          '_UPDATE'=>['next-status'=>[]],
-          '_AUDIT'=>['next-status'=>['_PATS1-2','_PATS3-3','_PATS3-1']]
-        ]
-      ],
-      //label-warning，异常
-      '_PATS3'=>['chi'=>'审批','oprt'=>[]],
-      '_PATS3-1'=>[
-        'chi'=>'审核-通过',
-        'oprt'=>[
-          '_UPDATE'=>['next-status'=>[]],
-          '_APPROVE'=>['next-status'=>['_PATS4-1','_PATS4-END4','_PATS1-3']]
-        ]
-      ],
-      '_PATS3-2'=>[
-        'chi'=>'新增-续费申请',
-        'oprt'=>[
-          '_UPDATE'=>['next-status'=>[]],
-          '_APPROVE'=>['next-status'=>['_PATS4-1','_PATS4-END5']]
-        ]
-      ],
-      '_PATS3-3'=>[
-        'chi'=>'审核-不予支持',
-        'oprt'=>[
-          '_APPROVE'=>['next-status'=>['_PATS4-1','_PATS4-END4','_PATS1-3']]
-        ]
-      ],
-      //'_PATS3-END1'=>'审批-否决',
-//      '_PATS3-END2'=>'续费-放弃',
-      //label-default，停用
-      '_PATS4'=>['chi'=>'执行','oprt'=>[]],
-      '_PATS4-1'=>[
-        'chi'=>'审批-批准',
-        'oprt'=>[
-          '_UPDATE'=>['next-status'=>[]],
-          '_EXECUTE'=>['next-status'=>['_PATS4-2','_PATS4-3']]
-        ]
-      ],
-      '_PATS4-2'=>[
-        'chi'=>'执行中',
-        'oprt'=>[
-          '_UPDATE'=>['next-status'=>[]],
-          '_EXECUTE'=>['next-status'=>['_PATS4-3']]
-        ]
-      ],
-      '_PATS4-3'=>[
-        'chi'=>'申报-复核',
-        'oprt'=>[
-          '_UPDATE'=>['next-status'=>[]],
-          '_MAINTAIN'=>['next-status'=>['_PATS4-4','_PATS4-5']]
-        ]
-      ],
-      '_PATS4-4'=>[
-        'chi'=>'申报-提交',
-        'oprt'=>[
-          '_UPDATE'=>['next-status'=>[]],
-          '_MAINTAIN'=>['next-status'=>['_PATS4-END1','_PATS4-END2','_PATS4-5']]
-        ]
-      ],
-      '_PATS4-5'=>[
-        'chi'=>'申报-修改',
-        'oprt'=>[
-          '_UPDATE'=>['next-status'=>[]],
-          '_EXECUTE'=>['next-status'=>['_PATS4-3']]
-        ]
-      ],
-      '_PATS4-6'=>[
-        'chi'=>'续费-批准',
-        'oprt'=>[
-          '_UPDATE'=>['next-status'=>[]],
-          '_MAINTAIN'=>['next-status'=>['_PATS4-7']]
-        ]
-      ],
-      '_PATS4-7'=>[
-        'chi'=>'续费-提交',
-        'oprt'=>[
-          '_UPDATE'=>['next-status'=>[]],
-          '_MAINTAIN'=>['next-status'=>['_PATS4-END3']]
-        ]
-      ],
-      '_PATS4-END1'=>[
-        'chi'=>'申报-授权',
-        'oprt'=>[
-          '_UPDATE'=>['next-status'=>[]],
-          '_MAINTAIN'=>['next-status'=>['_PATS_END']]
-        ]
-      ],
-      '_PATS4-END2'=>[
-        'chi'=>'申报-驳回',
-        'oprt'=>[
-          '_UPDATE'=>['next-status'=>[]],
-          '_MAINTAIN'=>['next-status'=>['_PATS_END']]
-        ]
-      ],
-      '_PATS4-END3'=>[
-        'chi'=>'续费-授权',
-        'oprt'=>[
-          '_UPDATE'=>['next-status'=>[]],
-          '_MAINTAIN'=>['next-status'=>['_PATS_END']]
-        ]
-      ],
-      '_PATS4-END4'=>[
-        'chi'=>'审批-否决',
-        'oprt'=>[
-          '_MAINTAIN'=>['next-status'=>['_PATS_END']]
-        ]
-      ],
-      '_PATS4-END5'=>[
-        'chi'=>'续费-放弃',
-        'oprt'=>[
-          '_MAINTAIN'=>['next-status'=>['_PATS_END']]
-        ]
-      ],
-      //label-default，销账
-      '_PATS_END'=>['chi'=>'完结','oprt'=>[]]
-    ]
   ]
 ];
 

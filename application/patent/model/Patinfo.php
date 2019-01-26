@@ -155,8 +155,7 @@ class Patinfo extends Model
       return $numArr;
     }
     #得到在period的select组件内容
-    static public function getFieldGroupByArr($field='',$arr=[],$period='')
-    {
+    static public function getFieldGroupByArr($field='',$arr=[],$period='') {
       $resArr=[]; #返回数组
       $tArr=[];   #键值转换数组
       $tempArr=[];#中间数组

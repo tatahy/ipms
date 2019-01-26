@@ -8,6 +8,8 @@
 namespace app\asset\model;
 
 use think\Model;
+use app\admin\model\Dept as DeptModel;
+
 //启用软删除
 use traits\model\SoftDelete;
 
@@ -29,41 +31,40 @@ class Assinfo extends Model
     // 时间字段输出格式
     protected $dateFormat = 'Y/m/d H:i:s';
 
-    //引用app\common中定义的常量：conAssTypeArr
-    const ASSTYPE=conAssTypeArr;
+    //引用app\common中定义的常量：conAssEntArr
+    const ASSPERIOD=conAssEntArr['period'];
+    const ASSSTATUS=conAssEntArr['status'];
+        
     //本类的静态方法中用于访问非静态方法时实例化本类对象
     static private $obj=null;
     //本类的5个私有静态变量
     static private $userName='';
     static private $userDept='';
     static private $auth=[];
-    static private $aTypeArr=[];
+    static private $periodArr=[];
     static private $numArr=[];
-    
-    
-    private $aType='';
+    //本类的私有变量
+    private $period='';
     private $errStr='not initiate Model Assinfo';
     //本类的5个私有静态变量赋初值  
-    static function initModel($userName,$userDept,$auth)
-    {
+    static function initModel($userName,$userDept,$auth) {
       //使用静态变量的好处就是一次赋初值，本类中和所有实例化的对象都可以用到。
       self::$userName=$userName;
       self::$userDept=$userDept;
       self::$auth=$auth;
-      self::$aTypeArr=array_keys(self::ASSTYPE);
+      self::$periodArr=array_keys(self::ASSPERIOD);
       
       self::$obj=new self();
-      foreach(self::$aTypeArr as $val){
+      foreach(self::$periodArr as $val){
         self::$numArr[$val]=self::$obj->assPeriodQuery($val)->count();
       }     
      // self::$obj=null;
       return self::$obj;
     }
     
-    static function getAccessUser()
-    {
+    static function getAccessUser() {
       return ['userName'=>self::$userName,'dept'=>self::$userDept,
-              'auth'=>self::$auth,'numArr'=>self::$numArr,'ATypeArr'=>self::$aTypeArr];
+              'auth'=>self::$auth,'numArr'=>self::$numArr,'ATypeArr'=>self::$periodArr];
     }
     
    //获取器，获取数据表assinfo中status_now字段值，转换为中文输出
@@ -110,13 +111,13 @@ class Assinfo extends Model
     //检查输入的$assType是否合法
     protected function checkAssTypeStr()
     {    
-      $assType=!empty($this->aType)?$this->aType:'_ASSS_USUAL';
+      $assType=!empty($this->period)?$this->period:'_ASSS_USUAL';
       $res='';
-      if(in_array($assType,self::$aTypeArr,true)){
-        $this->aType=$assType;
+      if(in_array($assType,self::$periodArr,true)){
+        $this->period=$assType;
         $res=true;
       }else{
-        $this->errStr='Wrong assType value! It should be empty or in array:</br>'.json_encode(self::$aTypeArr);
+        $this->errStr='Wrong assType value! It should be empty or in array:</br>'.json_encode(self::$periodArr);
         $res=false;
       }
       return $res;
@@ -137,15 +138,15 @@ class Assinfo extends Model
     //获得各类asset的数量
     public function assTypeNum($assType='')
     {
-      $this->aType=$assType;
+      $this->period=$assType;
       if(!$this->checkAssTypeStr()){
         return $this->errStr;
       }      
       
       if(count(self::$numArr)){
-        $res=self::$numArr[$this->aType];
+        $res=self::$numArr[$this->period];
       }else{
-        $res=$this->assPeriodQuery($this->aType)->count();
+        $res=$this->assPeriodQuery($this->period)->count();
       }
       
       return $res;
@@ -155,7 +156,7 @@ class Assinfo extends Model
     public function assPeriodQuery($assType='',$whereArr=[])
     {
       
-      $this->aType=$assType;
+      $this->period=$assType;
       $auth=self::$auth;
       $dept=self::$userDept;
       $userName=self::$userName;
@@ -202,8 +203,46 @@ class Assinfo extends Model
       }
       return $query;
     }
-    
-
+    #得到在period的select组件内容
+    static public function getFieldGroupByArr($field='',$arr=[],$period='') {
+      $resArr=[]; #返回数组
+      $tArr=[];   #键值转换数组
+      $tempArr=[];#中间数组
+      #设定arr的默认结构
+      $arr=count($arr)?$arr:['txt'=>'','val'=>''];
+      #组装$tArr
+      if($field=='status_now') $tArr=self::ASSSTATUS;
+      #得到dept的键值转换数组$tArr。abbr为键，name为值的关联数组
+      $deptSet=DeptModel::all();
+      #转换为数据集
+      $deptSet=is_array($deptSet)?collection($deptSet):$deptSet;
+      if($field=='dept_now') $tArr=array_combine($deptSet->column('abbr'),$deptSet->column('name'));
+      
+      #组装$tempArr
+      self::$obj=new self();
+      $patSet=self::$obj->getPeriodSet($period);
+      self::$obj=null;
+      #转换为数据集
+      $patSet=is_array($patSet)?collection($patSet):$patSet;
+      #得到中间数组$tempArr，$field值对应的索引数组（去掉重复值）
+      $tempArr=array_unique($patSet->column($field));
+      #重新排序让数组下标连续
+      sort($tempArr);
+      
+      #组装$resArr，按照$arr的结构
+      foreach($arr as $key => $val){
+        foreach($tempArr as $k => $v){
+          if($key=='txt'){
+            $val=($field=='dept')?$v.'，简称：'.array_search($v,$tArr):$v;
+          }
+          if($key=='val'){
+            $val=($field=='dept')?$v:array_search($v,$tArr);
+          }
+          $resArr[$k][$key]=$val;
+        }
+      }
+      return $resArr;
+    }
     /**
      * 获取assent的过程记录
      */
