@@ -3,11 +3,11 @@
 
 //自调用匿名函数具有立即执行的特点,2种结构。
 (function($,p){ 
-	console.log(p);
+	// console.log(p);
 })(jQuery,'p1');
 
 (function($,p){ 
-	console.log(p);
+	// console.log(p);
 }(jQuery,'p2'));
 
 buildTopNavbarCom();
@@ -140,13 +140,13 @@ function buildMainRowCom(){
 			entObj=entProp[ent],
 			perObj=entObj.period.summary,
 			p=$('<p></p>').addClass('text-center').text(entObj.noneTxt),
-			panH=$('<div></div>').addClass('panel-heading').append($('<span></span>').addClass(entObj.gly),'&nbsp;',$('<strong></strong>').html(entObj.txt)),
+			panH=$('<div></div>').addClass('panel-heading').append($('<span></span>').addClass(entObj.gly),'&nbsp;',$('<strong></strong>').html(entObj.chi)),
 			panB=$('<div></div>').addClass('panel-body'),
 			pan=$('<div></div>').addClass('panel-group'),
 			panType=$('<div></div>').addClass('panel panel-default'),
 			div=$('<div></div>').addClass('col-sm-6');
-		
-		if(typeof numObj=='object'){
+	
+		if(typeof numObj=='object' && Object.values(numObj).length){
 			for(let per in perObj){
 				let num=numObj[per],
 					el=perObj[per],
@@ -174,9 +174,6 @@ function buildMainRowCom(){
 		r.append(divSet[2*i],divSet[(2*i+1)]);
 		$('#mainRow').append(r);
 	}
-	
-	//返回btnSet
-	<!-- return console.log($('#mainRow').find('.btnPeriod').length); -->
 }
 //根据定义的entProp生成"Nav"组件
 function buildMainPeriodNavCom(){
@@ -225,7 +222,12 @@ function loadEntPeriodList(){
 	urlObj.method=rqData.ent+'List';
 	//id="xxPeriodNav"里的li添加active
 	$('[data-period="'+rqData.period+'"]').tab('show'); 
-	obj.html(loadStr).load(getRqUrl(),rqData);
+	obj.html(loadStr).load(getRqUrl(),rqData,function(){
+		let periodObj=obj.find('caption strong')
+			periodChi=entProp[rqData.ent].period.detail[rqData.period].txt;
+		//给tbl标题加内容
+		periodObj.text(periodChi);
+	});
 }
 //设置向后端请求时的查询数据
 function setRqSearchData(searchObj=''){

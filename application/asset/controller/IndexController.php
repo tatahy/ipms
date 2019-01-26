@@ -8,33 +8,36 @@ use think\View;
 use app\asset\model\Assinfo as AssinfoModel;
 use app\asset\model\Assrecord as AssrecordModel;
 
-class IndexController extends \think\Controller
-{
-     //用户名
-    private $userName = null;
-    //用户密码
-    private $pwd = null;
-    //用户登录状态
-    private $log = null;
-    //用户角色
-    private $roles=array();
-    //用户所在部门
-    private $dept = null;
-    //用户的asset权限
-    private $auth = [];
-    
-    // 初始化
-    protected function _initialize()
-    {
-        $this->userName=Session::get('username');
-        $this->pwd=Session::get('pwd');
-        $this->log=Session::get('log');
-        $this->roles=Session::get('role');
-        $this->dept=Session::get('dept');
-        $this->auth=Session::get('authArr')['ass'];
-        //使用模型前的初始化，为模型内部使用的变量赋初值，后续的各个方法中无需再初始化，但可以进行修改
-        AssinfoModel::initModel($this->userName,$this->dept,$this->auth); 
-    }
+class IndexController extends \think\Controller {
+  //引用app\common中定义的常量：conAssEntArr
+  const ASSPERIOD=conAssEntArr['period'];
+  
+  //用户名
+  private $userName = null;
+  //用户密码
+  private $pwd = null;
+  //用户登录状态
+  private $log = null;
+  //用户角色
+  private $roles=array();
+  //用户所在部门
+  private $dept = null;
+  //用户的asset权限
+  private $auth = [];
+  //assinfo模型
+  private $assMdl = null;
+  
+  // 初始化
+  protected function _initialize() {
+    $this->userName=Session::get('username');
+    $this->pwd=Session::get('pwd');
+    $this->log=Session::get('log');
+    $this->roles=Session::get('role');
+    $this->dept=Session::get('dept');
+    $this->auth=Session::get('authArr')['ass'];
+    //使用模型前的初始化，为模型内部使用的变量赋初值，后续的各个方法中无需再初始化，但可以进行修改
+    //self::$assMdl=AssinfoModel::initModel($this->userName,$this->dept,$this->auth); 
+  }
     
     //
     private function priLogin(){
@@ -54,33 +57,25 @@ class IndexController extends \think\Controller
         $searchData=array('brand_model'=>'','assnum'=>'','code'=>'','bar_code'=>'','dept_now'=>'','place_now'=>'','keeper_now'=>'');
         
         $this->assign([
-          'read'=>$this->auth['read'],
-                   
-          'assNum'=>$assMdl->getAssTypeNumArr(),
-          'assType'=>'_ASSS_USUAL',
-                    
-          'home'=>$request->domain(),
-          'username'=>$this->userName,
-          'year'=>date('Y'),
           
           'sortData'=>json_encode($sortData,JSON_UNESCAPED_UNICODE),
           'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
-          'auth'=>json_encode($this->auth,JSON_UNESCAPED_UNICODE),
           // 获取当前数据表字段信息
           //'fields'=>json_encode($assMdl->getTableFields(),JSON_UNESCAPED_UNICODE),
           // 获取当前数据表字段类型
           //'fieldsType'=>json_encode($assMdl->getFieldsType(),JSON_UNESCAPED_UNICODE),
-          'mdlSt'=>json_encode($assMdl->getAccessUser(),JSON_UNESCAPED_UNICODE)
+          
         ]);
         return view();
         //return '<style type="text/css">*{ padding: 0; margin: 0; } div{ padding: 4px 48px;} a{color:#2E5CD5;cursor: pointer;text-decoration: none} a:hover{text-decoration:underline; } body{ background: #fff; font-family: "Century Gothic","Microsoft yahei"; color: #333;font-size:18px;} h1{ font-size: 100px; font-weight: normal; margin-bottom: 12px; } p{ line-height: 1.6em; font-size: 42px }</style><div style="padding: 24px 48px;"> <h1>:)</h1><p> ThinkPHP V5<br/><span style="font-size:30px">十年磨一剑 - 为API开发设计的高性能框架</span></p><span style="font-size:22px;">[ V5.0 版本由 <a href="http://www.qiniu.com" target="qiniu">七牛云</a> 独家赞助发布 ]</span></div><script type="text/javascript" src="http://tajs.qq.com/stats?sId=9347272" charset="UTF-8"></script><script type="text/javascript" src="http://ad.topthink.com/Public/static/client.js"></script><thinkad id="ad_bd568ce7058a1091"></thinkad>';
     }
     
     //根据前端的sortData/searchData，选择返回前端的asset list
-    public function assList(Request $request,AssinfoModel $assMdl,$sortData=[],$searchData=[])
+    public function assList(Request $request, AssinfoModel $assMdl, $sortData=[], $searchData=[])
     {
         $this->priLogin();
-        $period=!empty($request->param('period'))?$request->param('period'):'_ASSS_USUAL';                  
+  
+        $period=!empty($request->param('period'))?$request->param('period'):'usual';                  
         $sortDefaults=array('listRows'=>10,'sortName'=>'assnum','sortOrder'=>'asc','pageNum'=>1);
         # 接收前端的排序参数数组
         $sortData=!empty($request->param('sortData/a'))?$request->param('sortData/a'):$sortDefaults;
@@ -130,7 +125,8 @@ class IndexController extends \think\Controller
         }
         
         //分页,每页$listRows条记录
-        $assSet=$assMdl->assPeriodQuery($period,$whereArr)
+        //$assSet=$assMdl->assPeriodQuery($period,$whereArr)
+        $assSet=$assMdl::getPeriodSql($period)->where($whereArr)
                       ->order($sortData['sortName'], $sortData['sortOrder'])
                       ->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
                         'query'=>['listRows'=>$sortData['listRows']]]);
@@ -140,10 +136,10 @@ class IndexController extends \think\Controller
         
         //记录总数
         //$searchResultNum=count($this->priAssQueryObj($period)->where($whereArr)->select()); 
-        $searchResultNum=count($assMdl->assPeriodQuery($period,$whereArr)->select()); 
+        $searchResultNum=count($assMdl::getPeriodSql($period)->where($whereArr)->select()); 
                
         //数量总计
-        $quanCount=$assMdl->assPeriodQuery($period,$whereArr)->sum('quantity');
+        $quanCount=$assMdl::getPeriodSql($period)->where($whereArr)->sum('quantity');
         
         $this->assign([
           'home'=>$request->domain(),
@@ -182,18 +178,12 @@ class IndexController extends \think\Controller
         #接收前端的参数
         $fieldArr=$request->param('name/a');
         $period=!empty($request->param('period'))?$request->param('period'):'';
-        
+                                     
         if(count($fieldArr)){
-          foreach($fieldArr as $key=>$val){
-            $resData[$val]=[[$val=>$arr]];
+          foreach($fieldArr as $field){
+            $resData[$field]=$assMdl::getFieldGroupByArr($field,$arr);
           }
         }
-                       
-        //if(count($fieldArr)){
-//          foreach($fieldArr as $field){
-//            $resData[$field]=$assMdl::getFieldGroupByArr($field,$arr);
-//          }
-//        }
         
         return $resData;
     }

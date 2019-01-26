@@ -3,7 +3,7 @@
 
 initUrlObj(rqData.ent);
 initEntList();
-console.log(searchResultNum);
+
 //本文件有效的变量
 let tbl=$('[id="'+rqData.ent+'ListTbl"]'),
 	listRow=$('#listRows'),

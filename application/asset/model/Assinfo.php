@@ -46,25 +46,11 @@ class Assinfo extends Model
     //本类的私有变量
     private $period='';
     private $errStr='not initiate Model Assinfo';
-    //本类的5个私有静态变量赋初值  
-    static function initModel($userName,$userDept,$auth) {
-      //使用静态变量的好处就是一次赋初值，本类中和所有实例化的对象都可以用到。
-      self::$userName=$userName;
-      self::$userDept=$userDept;
-      self::$auth=$auth;
-      self::$periodArr=array_keys(self::ASSPERIOD);
-      
-      self::$obj=new self();
-      foreach(self::$periodArr as $val){
-        self::$numArr[$val]=self::$obj->assPeriodQuery($val)->count();
-      }     
-     // self::$obj=null;
-      return self::$obj;
-    }
     
-    static function getAccessUser() {
-      return ['userName'=>self::$userName,'dept'=>self::$userDept,
-              'auth'=>self::$auth,'numArr'=>self::$numArr,'ATypeArr'=>self::$periodArr];
+    #初始化模型的访问
+    static public function initModel($username, $dept, $auth) {
+      
+      return self::$obj;
     }
     
    //获取器，获取数据表assinfo中status_now字段值，转换为中文输出
@@ -99,64 +85,19 @@ class Assinfo extends Model
     }
     
     //查询asset的类别
-    protected function scopeAssType($query,$assType)
+    protected function scopePeriod($query,$period)
     {
-      if($assType=='_ASSS_USUAL'){
+      if($period=='usual'){
         $query->where('id','>',0);
       }else{
-        $query->where('status_now','like','%'.$assType.'%');
+        $query->where('status_now','like','%'.$period.'%');
       }
       
     }
-    //检查输入的$assType是否合法
-    protected function checkAssTypeStr()
-    {    
-      $assType=!empty($this->period)?$this->period:'_ASSS_USUAL';
-      $res='';
-      if(in_array($assType,self::$periodArr,true)){
-        $this->period=$assType;
-        $res=true;
-      }else{
-        $this->errStr='Wrong assType value! It should be empty or in array:</br>'.json_encode(self::$periodArr);
-        $res=false;
-      }
-      return $res;
-    }
-    
-    //获得各类asset数量的关联数组
-    public function getAssTypeNumArr()
-    {    
-      if(count(self::$numArr)){
-        $res=self::$numArr;
-      }else{
-        $res=$this->errStr;
-      }
       
-      return $res;
-    }
-        
-    //获得各类asset的数量
-    public function assTypeNum($assType='')
-    {
-      $this->period=$assType;
-      if(!$this->checkAssTypeStr()){
-        return $this->errStr;
-      }      
-      
-      if(count(self::$numArr)){
-        $res=self::$numArr[$this->period];
-      }else{
-        $res=$this->assPeriodQuery($this->period)->count();
-      }
-      
-      return $res;
-    }
-    
     //asset查询对象
-    public function assPeriodQuery($assType='',$whereArr=[])
-    {
-      
-      $this->period=$assType;
+    public function assPeriodQuery($period='',$whereArr=[]) {
+      $this->period=$period;
       $auth=self::$auth;
       $dept=self::$userDept;
       $userName=self::$userName;
@@ -174,14 +115,15 @@ class Assinfo extends Model
       }
       
       //前置查询范围
-      $scopeQ=$this->scope('assType',$assType);
+      $scopeQ=$this->scope('period',$period);
       
       if($auth['read']==1 && $authNum<=1){
         //登录用户的asset权限有且仅有read，仅能查阅自己名下的asset，
-        $query=$scopeQ->where('keeper_now',$userName)->where($whereArr);
+        //$query=$scopeQ->where('keeper_now',$userName)->where($whereArr);
+        $query=$this->getPeriodSql($period)->where('keeper_now',$userName)->where($whereArr);
       }else if($auth['read']==1 && 1==$auth['edit'] && $authNum<=2){
         //登录用户的asset权限有且仅有read和edit，仅能查阅自己部门和自己名下的asset，
-        $scopeArr=($assType=='_ASSS_USUAL')?$scopeArr=array('id'=>['>',0]):$scopeArr=array('status_now'=>['like','%'.$assType.'%']);
+        $scopeArr=($period=='usual')?array('id'=>['>',0]):array('status_now'=>['like','%'.$period.'%']);
         //不能使用已定义的前置查询范围，因为查询的条件是需要在一个前置查询范围内分为2个不同的查询。使用闭包实现
         $query=$this->where(function($query) use($dept,$scopeArr,$whereArr){
                       $query->where($scopeArr)->where('dept_now',$dept)->where($whereArr);
@@ -199,11 +141,60 @@ class Assinfo extends Model
 //                    });
       }
       else{
-        $query=$scopeQ->where($whereArr);
+        //$query=$scopeQ->where($whereArr);
+        $query=$this->getPeriodSql($period)->where($whereArr);
       }
       return $query;
     }
-    #得到在period的select组件内容
+       
+    #得到在period里的query对象
+    static public function getPeriodSql($period='') {
+      $pArr=array_keys(self::ASSPERIOD);
+      #保证$period的值是规定的范围内
+      $period=in_array($period,$pArr)?$period:$pArr[0];
+      #模型查询中的条件
+      $where=[];
+      foreach(self::ASSPERIOD as $key=>$val){
+        if($key == $period){
+          $where['status_now']=empty($val['statusQuery'])?$val['status']:[$val['statusQuery'],$val['status']];
+          break;
+        } 
+      }
+      self::$obj=new self();
+      $query=self::$obj->where($where);
+      self::$obj=null;
+      return $query;
+    }
+    
+    #得到在period里的所有ass
+    static public function getPeriodSet($period='') {
+      self::$obj=new self();
+      $assSet=self::$obj->getPeriodSql($period)->select();
+      self::$obj=null;
+      return $assSet;
+    }
+    #得到在period里的所有pat的num
+    static public function getPeriodNum($period='') {
+      $num='';
+      $numArr=[];
+      $pArr=array_keys(self::ASSPERIOD);
+      
+      if(!empty($period)){
+        self::$obj=new self();
+        $num=self::$obj->getPeriodSql($period)->count();
+        self::$obj=null;
+        return $num;
+      }
+      
+      foreach($pArr as $key=>$val){
+        self::$obj=new self();
+        $numArr[$val]=self::$obj->getPeriodSql($val)->count();
+        self::$obj=null;
+      } 
+      return $numArr;
+    }
+    
+    #得到在period的指定field字段的groupby内容
     static public function getFieldGroupByArr($field='',$arr=[],$period='') {
       $resArr=[]; #返回数组
       $tArr=[];   #键值转换数组

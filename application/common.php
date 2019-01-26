@@ -305,8 +305,8 @@ const conAssEntArr=[
   'abbr'=>'ass',
   'chi'=>'固定资产',
   'period'=>[
-    #除"回收站"以外的其它5类状态,
-    'usual'=>['chi'=>'','statusQuery'=>'notlike','status'=>'_ASSS6'],
+    #usual:除"回收站"以外的其它5类状态,
+    'usual'=>['chi'=>'','statusQuery'=>'<>','status'=>'_ASSS6'],
     'undetermined'=>['chi'=>'待定','statusQuery'=>'like','status'=>'_ASSS1%'],
     'normal'=>['chi'=>'正常','statusQuery'=>'like','status'=>'_ASSS2%'],
     'abnormal'=>['chi'=>'异常','statusQuery'=>'like','status'=>'_ASSS3%'],
@@ -327,48 +327,137 @@ const conAssEntArr=[
     '_DELETE'=>'删除',
   ],
   'auth'=>[
-    'read'=>['chi'=>'查阅','oprt'=>[]],
-    'edit'=>['chi'=>'撰写','oprt'=>[]],
-    'audit'=>['chi'=>'审核','oprt'=>[]],
-    'approve'=>['chi'=>'审批','oprt'=>[]],
-    'execute'=>['chi'=>'执行','oprt'=>[]],
-    'maintain'=>['chi'=>'维护','oprt'=>[]]
+    'read'=>['chi'=>'查阅','oprt'=>['_READ']],
+    'edit'=>['chi'=>'撰写','oprt'=>['_READ','_UPDATE','_CREATE','_SUBMIT','_DELETE']],
+    'audit'=>['chi'=>'审核','oprt'=>['_READ','_UPDATE','_AUDIT']],
+    'approve'=>['chi'=>'审批','oprt'=>['_READ','_UPDATE','_APPROVE']],
+    'maintain'=>['chi'=>'维护','oprt'=>['_READ','_UPDATE','_MAINTAIN','_TRASH','_RESTORE']]
   ],
   'status'=>[
-      '_ASSS0'=>'*',
+      '_ASSS0'=>[
+        'chi'=>'*',
+        'oprt'=>[
+          '_CREATE'=>['nextStatus'=>['_ASSS1_1','_ASSS1_2']]
+        ]
+      ],
       //label-info，待定
       '_ASSS1'=>['chi'=>'待定','oprt'=>[]],
       '_ASSS1_1'=>[
         'chi'=>'填报中',
         'oprt'=>[
-          '_UPDATE'=>['next-status'=>[]],
-          '_DELETE'=>['next-status'=>[]],
-          '_SUBMIT'=>['next-status'=>['_ASSS1_2']]
+          '_UPDATE'=>['nextStatus'=>[]],
+          '_DELETE'=>['nextStatus'=>[]],
+          '_SUBMIT'=>['nextStatus'=>['_ASSS1_2']]
         ]
       ],
-      '_ASSS1_2'=>'新增_待验收',
-      '_ASSS1_3'=>'待分配_初次验收合格',
-      '_ASSS1_4'=>'待分配_维修验收合格',
+      '_ASSS1_2'=>[
+        'chi'=>'新增_待验收',
+        'oprt'=>[
+          '_UPDATE'=>['nextStatus'=>[]],
+          '_SUBMIT'=>['nextStatus'=>['_ASSS1_3','_ASSS3_2','_ASSS3_3']]
+        ]
+      ],
+      '_ASSS1_3'=>[
+        'chi'=>'待分配_初次验收合格',
+        'oprt'=>[
+          '_UPDATE'=>['nextStatus'=>[]],
+          '_AUDIT'=>['nextStatus'=>['_ASSS2_1','_ASSS3_2','_ASSS3_3','_ASSS4_1','_ASSS4_2']]
+        ]
+      ],
+      '_ASSS1_4'=>[
+        'chi'=>'待分配_维修验收合格',
+        'oprt'=>[
+          '_UPDATE'=>['nextStatus'=>[]],
+          '_AUDIT'=>['nextStatus'=>['_ASSS2_1','_ASSS2_2','_ASSS3_2','_ASSS3_3','_ASSS4_1','_ASSS4_2']]
+        ]
+      ],
       //label-success，正常
-      '_ASSS2'=>'正常',
-      '_ASSS2_1'=>'正常_折旧中',
-      '_ASSS2_2'=>'正常_折旧完',
+      '_ASSS2'=>['chi'=>'正常','oprt'=>[]],
+      '_ASSS2_1'=>[
+        'chi'=>'正常_折旧中',
+        'oprt'=>[
+          '_UPDATE'=>['nextStatus'=>[]],
+          '_SUBMIT'=>['nextStatus'=>['_ASSS3_1','_ASSS3_2','_ASSS3_3']]
+        ]
+      ],
+      '_ASSS2_2'=>[
+        'chi'=>'正常_折旧完',
+        'oprt'=>[
+          '_UPDATE'=>['nextStatus'=>[]],
+          '_SUBMIT'=>['nextStatus'=>['_ASSS3_1','_ASSS3_2','_ASSS3_3']]
+        ]
+      ],
       //label-warning，异常
-      '_ASSS3'=>'异常',
-      '_ASSS3_1'=>'异常_待审核',
-      '_ASSS3_2'=>'异常_待维修',
-      '_ASSS3_3'=>'异常_遗失',
+      '_ASSS3'=>['chi'=>'异常','oprt'=>[]],
+      '_ASSS3_1'=>[
+        'chi'=>'异常_待审核',
+        'oprt'=>[
+          '_UPDATE'=>['nextStatus'=>[]],
+          '_AUDIT'=>['nextStatus'=>['_ASSS2_1','_ASSS2_2','_ASSS3_2','_ASSS3_3','_ASSS4_1','_ASSS4_2','_ASSS4_3']],
+          '_TRASH'=>['nextStatus'=>['_ASSS6']]
+        ]
+      ],
+      '_ASSS3_2'=>[
+        'chi'=>'异常_待维修',
+        'oprt'=>[
+          '_UPDATE'=>['nextStatus'=>[]],
+          '_AUDIT'=>['nextStatus'=>['_ASSS3_3','_ASSS4_1','_ASSS1_4']]
+        ]
+      ],
+      '_ASSS3_3'=>[
+        'chi'=>'异常_遗失',
+        'oprt'=>[
+          '_UPDATE'=>['nextStatus'=>[]],
+          '_AUDIT'=>['nextStatus'=>['_ASSS3_2','_ASSS4_1','_ASSS4_3']]
+        ]
+      ],
       //label-default，停用
-      '_ASSS4'=>'停用',
-      '_ASSS4_1'=>'停用_维修中',
-      '_ASSS4_2'=>'停用_封存',
-      '_ASSS4_3'=>'停用_遗失',
-      '_ASSS4_4'=>'待销账_报废',
-      '_ASSS4_5'=>'待销账_遗失',
+      '_ASSS4'=>['chi'=>'停用','oprt'=>[]],
+      '_ASSS4_1'=>[
+        'chi'=>'停用_维修中',
+        'oprt'=>[
+          '_UPDATE'=>['nextStatus'=>[]],
+          '_APPROVE'=>['nextStatus'=>['_ASSS1_4','_ASSS4_3','_ASSS4_4']],
+          '_TRASH'=>['nextStatus'=>['_ASSS6']]
+        ]
+      ],
+      '_ASSS4_2'=>[
+        'chi'=>'停用_封存',
+        'oprt'=>[
+          '_UPDATE'=>['nextStatus'=>[]],
+          '_APPROVE'=>['nextStatus'=>['_ASSS4_4','_ASSS4_5','_ASSS2_2']],
+          '_TRASH'=>['nextStatus'=>['_ASSS6']]
+        ]
+      ],
+      '_ASSS4_3'=>[
+        'chi'=>'停用_遗失',
+        'oprt'=>[
+          '_UPDATE'=>['nextStatus'=>[]],
+          '_APPROVE'=>['nextStatus'=>['_ASSS4_5']]
+        ]
+      ],
+      '_ASSS4_4'=>[
+        'chi'=>'待销账_报废',
+        'oprt'=>[
+          '_UPDATE'=>['nextStatus'=>[]],
+          '_MAINTAIN'=>['nextStatus'=>['_ASSS5']]
+        ]
+      ],
+      '_ASSS4_5'=>[
+        'chi'=>'待销账_遗失',
+        'oprt'=>[
+          '_UPDATE'=>['nextStatus'=>[]],
+          '_MAINTAIN'=>['nextStatus'=>['_ASSS5']]
+        ]
+      ],
       //label-default，销账
-      '_ASSS5'=>'销账',
+      '_ASSS5'=>['chi'=>'销账','oprt'=>[]],
       //label-danger
-      '_ASSS6'=>'回收站'
+      '_ASSS6'=>[
+        'chi'=>'回收站',
+        'oprt'=>[
+          '_RESTORE'=>['_ASSS2_1','_ASSS2_2','_ASSS3_2','_ASSS3_3','_ASSS4_1','_ASSS4_2','_ASSS4_3']]
+      ]
   ]
 ];
 

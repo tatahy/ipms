@@ -66,7 +66,9 @@ class IndexController extends Controller
       
       
       #根据ass是否有read权限进行赋值，利用模型对象得到各个asset总数
-      $num['ass']=$authority['ass']['read']?$assMdl::initModel($username,$user->dept,$authority['ass'])->getAssTypeNumArr():0;
+      $num['ass']=$authority['ass']['read']?$assMdl::getPeriodNum():0;
+      #根据登录用户的ass权限得到可访问的模型对象各个period数量
+      //$num['ass']=$assMdl::setAuth($authority['ass']['read'])->getPeriodNum():0;
       
       #根据pat是否有read权限进行赋值，利用模型对象得到各个patent总数
       $num['pat']=$authority['pat']['read']?$patMdl::getPeriodNum():0;

@@ -45,7 +45,7 @@ var entProp={
 		module:'patent',
 		ctl:['index'],
 		method:['index','patList','patSearchForm','getSelComData'],
-		txt:'专利概况',
+		chi:'专利',
 		gly:glyPrex+'wrench',
 		period:{
 			summary:{
@@ -68,22 +68,22 @@ var entProp={
 		module:'asset',
 		ctl:['index'],
 		method:['index','assList','assSearchForm'],
-		txt:'固定资产',
+		chi:'固定资产',
 		gly:glyPrex+'oil',
 		period:{
 			summary:{
-				_ASSS1:{txt:'待定数：',color:bs3Color['info']['btn']},
-				_ASSS2:{txt:'正常数：',color:bs3Color['success']['btn']},
-				_ASSS3:{txt:'异常数：',color:bs3Color['warning']['btn']},
-				_ASSS4:{txt:'停用数：',color:bs3Color['default']['btn']}
+				undetermined:{txt:'待定数：',color:bs3Color['info']['btn']},
+				normal:{txt:'正常数：',color:bs3Color['success']['btn']},
+				abnormal:{txt:'异常数：',color:bs3Color['warning']['btn']},
+				suspended:{txt:'停用数：',color:bs3Color['default']['btn']}
 			},
 			detail:{
-				_ASSS_USUAL:{txt:'固定资产概况',title:{txt:'固定资产总数&nbsp;',btn:'btn btn-primary',num:''}},
-				_ASSS1:{txt:'待定',title:{txt:'状态待定数&nbsp;',btn:'btn btn-info',num:''}},
-				_ASSS2:{txt:'正常',title:{txt:'状态正常数&nbsp;',btn:'btn btn-success',num:''}},
-				_ASSS3:{txt:'异常',title:{txt:'状态异常数&nbsp;',btn:'btn btn-warning',num:''}},
-				_ASSS4:{txt:'停用',title:{txt:'停止使用数&nbsp;',btn:'btn btn-default',num:''}},
-				_ASSS5:{txt:'销账',title:{txt:'财务销账数&nbsp;',btn:'btn btn-danger',num:''}}
+				usual:{txt:'固定资产概况',title:{txt:'固定资产总数&nbsp;',btn:'btn btn-primary',num:''}},
+				undetermined:{txt:'待定',title:{txt:'状态待定数&nbsp;',btn:'btn btn-info',num:''}},
+				normal:{txt:'正常',title:{txt:'状态正常数&nbsp;',btn:'btn btn-success',num:''}},
+				abnormal:{txt:'异常',title:{txt:'状态异常数&nbsp;',btn:'btn btn-warning',num:''}},
+				suspended:{txt:'停用',title:{txt:'停止使用数&nbsp;',btn:'btn btn-default',num:''}},
+				removed:{txt:'销账',title:{txt:'财务销账数&nbsp;',btn:'btn btn-danger',num:''}}
 			}
 		},
 		noneTxt:'“固定资产”'+noneSufx
@@ -92,7 +92,7 @@ var entProp={
 		module:'project',
 		ctl:['index','proList','proSearchForm'],
 		method:['index'],
-		txt:'项目概况&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
+		chi:'项目概况&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
 		gly:glyPrex+'inbox',
 		period:{
 			summary:{
@@ -122,7 +122,7 @@ var entProp={
 		module:'thesis',
 		ctl:['index','theList','theSearchForm'],
 		method:['index'],
-		txt:'论文概况&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
+		chi:'论文概况&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
 		gly:glyPrex+'list',
 		period:{
 			summary:{
