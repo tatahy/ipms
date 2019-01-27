@@ -1,9 +1,6 @@
 // app/entList.js
 //import {glyPrex,bs3Color,topNavProp,entProp,rqData,urlObj,searchResultNum,year} from 'conf.js';
 
-initUrlObj(rqData.ent);
-initEntList();
-
 //本文件有效的变量
 let tbl=$('[id="'+rqData.ent+'ListTbl"]'),
 	listRow=$('#listRows'),
@@ -23,11 +20,16 @@ listRow.val(rqData.sortData.listRows).change(function(){
 });	
 //表格按选定字段排序
 aHeadSet.click(function(){
-	let sortName=$(this).data('sortName'),
-		sortOrder=$(this).data('sortOrder');
+	let sortName=$(this).data('sortName');
+
+	rqData.sortData.sortOrder=(rqData.sortData.sortOrder=='asc')?'desc':'asc';
+	
 	//排序有关的值向sortData汇集
-	rqData.sortData.sortName=sortName;
-	rqData.sortData.sortOrder=sortOrder;
+	if(rqData.sortData.sortName!=sortName){
+		rqData.sortData.sortName=sortName;
+		rqData.sortData.sortOrder='asc';	
+	}
+
 	rqData.sortData.pageNum=1;
 	//载入entList
 	loadEntPeriodList();

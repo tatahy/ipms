@@ -24,18 +24,18 @@
 			</thead>
 			<tbody><!-- 此处显示数据库查询后的数据集 -->
 				{volist name="assSet" id="vo" empty="暂时没有数据"}
-				<tr>
+				<tr class="text-right">
 					<td class="text-center">{$i+($sortData.pageNum-1)*$sortData.listRows}</td>
-					<td class="text-center"><a class="aTblAssSingle" href="#" data-ass-id="{$vo.id}">{$vo.brand_model}</a></td>
-					<td class="text-right">{$vo.assnum}</td>
+					<td><a class="aTblAssSingle" href="#" data-ass-id="{$vo.id}">{$vo.brand_model}</a></td>
+					<td>{$vo.assnum}</td>
 					<td>{$vo.code}</td>
-					<td class="text-right">{$vo.bar_code}</td>
-					<td class="text-right">{$vo.place_now}</td>
-					<td class="text-right">{$vo.quantity}</td>
-					<td class="text-right">{$vo.dept_now}</td>
-					<td class="text-right">{$vo.keeper_now}</td>
-					<td class="text-right"><a class="aAssRecords" href="#" data-ass-id="{$vo.id}"><span class="spStatus">{$vo.status_now}</span></a></td>
-					<td class="text-right">{$vo.status_now_user_name}</td>
+					<td>{$vo.bar_code}</td>
+					<td>{$vo.place_now}</td>
+					<td>{$vo.quantity}</td>
+					<td>{$vo.dept_now}</td>
+					<td>{$vo.keeper_now}</td>
+					<td><a class="aAssRecords" href="#" data-ass-id="{$vo.id}"><span class="spStatus">{$vo.status_now}</span></a></td>
+					<td>{$vo.status_now_user_name}</td>
 				
 				</tr>
 				{/volist}

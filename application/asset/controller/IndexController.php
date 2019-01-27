@@ -97,6 +97,7 @@ class IndexController extends \think\Controller {
         $whereArr['code']=!empty($searchData['code'])?['like','%'.$searchData['code'].'%']:'';
         $whereArr['bar_code']=!empty($searchData['bar_code'])?['like','%'.$searchData['bar_code'].'%']:'';
         
+        #前端select值搜索，=select值(兼容select标签的multiple属性设置)，3个
         $whereArr['dept_now']=!empty($searchData['dept_now'])?['in',$searchData['dept_now']]:'';
         $whereArr['place_now']=!empty($searchData['place_now'])?['in',$searchData['place_now']]:'';
         //将$searchData['status_now']的值（‘,’分隔的中文字符串）转为数据库中存储的类型编码数组

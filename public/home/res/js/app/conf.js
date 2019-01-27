@@ -32,7 +32,7 @@ const bs3Color={
 const topNavProp={
 		index:{'url':domain+'/index/index/index',period:'',gly:glyPrex+'home',chi:'首页'},
 		pat:{'url':domain+'/patent/index/index',period:'total',gly:glyPrex+'wrench',chi:'专利'},
-		ass:{'url':domain+'/asset/index/index',period:'_ASSS_USUAL',gly:glyPrex+'oil',chi:'固定资产'},
+		ass:{'url':domain+'/asset/index/index',period:'usual',gly:glyPrex+'oil',chi:'固定资产'},
 		pro:{'url':domain+'/project/index/index',period:'total',gly:glyPrex+'inbox',chi:'项目'},
 		the:{'url':domain+'/thesis/index/index',period:'total',gly:glyPrex+'list',chi:'论文'}
 };

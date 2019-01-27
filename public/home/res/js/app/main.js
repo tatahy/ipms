@@ -17,36 +17,37 @@ setEntNumProp();
 $('body').tooltip({selector:'[title]',triger:'hover click',placement:'auto top',delay: {show: 200, hide: 100},html: true });
 
 //jQuery中的HTML文件准备好的函数。
-// $(document).ready(function(){});
-//本文件有效的变量
+$(document).ready(function(){
+
 let navASet=$('#topNavbar .navbar-nav').eq(0).find('a'),
 	btnSet=$('#mainRow').find('.btnPeriod'),
 	yearObj=$('footer .year');
 
 navASet.click(function(){
-		let cls=$(this).closest('li').attr('class')?$(this).closest('li').attr('class'):'no class';
+	let cls=$(this).closest('li').attr('class')?$(this).closest('li').attr('class'):'no class';
 		
-		for(let ent in topNavProp){
-			let e=topNavProp[ent];
-			if($(this).data('ent')==ent){
-				url=e.url;
-				rqData.ent=ent;
-				rqData.period=e.period;
-			}
+	for(let ent in topNavProp){
+		let e=topNavProp[ent];
+		if($(this).data('ent')==ent){
+			url=e.url;
+			rqData.ent=ent;
+			rqData.period=e.period;
 		}
-
-		if(cls.indexOf('disabled')==-1){
-			loadEntIndexFile();
-		}
-	});
-	
-	btnSet.click(function(){
-		rqData.ent=$(this).data('ent');
-		rqData.period=$(this).data('period');
+	}
+		
+	if(cls.indexOf('disabled')==-1){
 		loadEntIndexFile();
-	});
+	}
+});
 	
-	yearObj.html((year-1)+'-'+year);
+btnSet.click(function(){
+	rqData.ent=$(this).data('ent');
+	rqData.period=$(this).data('period');
+	loadEntIndexFile();
+});
+	
+yearObj.html((year-1)+'-'+year);
+});
 
 //让urlObj的取值都在给定的范围内
 function initUrlObj(ent=''){	
@@ -223,10 +224,7 @@ function loadEntPeriodList(){
 	//id="xxPeriodNav"里的li添加active
 	$('[data-period="'+rqData.period+'"]').tab('show'); 
 	obj.html(loadStr).load(getRqUrl(),rqData,function(){
-		let periodObj=obj.find('caption strong')
-			periodChi=entProp[rqData.ent].period.detail[rqData.period].txt;
-		//给tbl标题加内容
-		periodObj.text(periodChi);
+		initEntList();	
 	});
 }
 //设置向后端请求时的查询数据
@@ -297,7 +295,6 @@ function sortEntListTbl() {
 		glyDesc=$('<span></span>').addClass('small glyphicon glyphicon-sort-by-order-alt'),
 		sortOrder=rqData.sortData.sortOrder,
 		sortName=rqData.sortData.sortName,
-		<!-- tblObj=$('#patListTbl'), -->
 		tblObj=$('[id="'+rqData.ent+'ListTbl"]'),
 		aHSet=tblObj.find('thead a'),
 		trSet=tblObj.find('tr'),
@@ -361,6 +358,12 @@ function showSearchResult() {
 }
 //初始化ent list
 function initEntList(){
+	let ent=rqData.ent,
+		periodObj=$('[id="'+ent+'List"]').find('caption strong'),
+		periodChi=entProp[ent].period.detail[rqData.period].txt;
+	initUrlObj(ent);
+	//给tbl标题加内容
+	periodObj.text(periodChi);	
 	sortEntListTbl();
 	setTrBgColor();
 	showSearchResult();

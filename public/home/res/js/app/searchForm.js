@@ -13,6 +13,7 @@ fm.submit(function(evt){
 	evt.preventDefault();
 	//设置查询数据
 	setRqSearchData(fm);
+	console.log(rqData);
 	//载入patList
 	loadEntPeriodList();
 });
