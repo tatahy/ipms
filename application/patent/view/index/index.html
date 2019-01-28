@@ -1,6 +1,6 @@
 <!-- //module:asset, view:index/index.html  -->
 
-<div>
+
 	<ul id="patPeriodNav" class="nav nav-pills">
 		<!-- //jQ产生参考模型	 -->
 		<!-- <li class="active"><a data-ent="" data-period="">项目概况&nbsp;|&nbsp;<span class="glyphicon glyphicon-search"></span></a></li> -->
@@ -8,7 +8,7 @@
 	<h4 id="patTitle" class="text-left">
 		<!-- //jQ生成 -->
 	</h4>
-	<div class="text-right">
+	<div class="text-right" data-show-search-form=false>
 		<button type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divSearchForm" title="显示/隐藏搜索条件">搜索条件</button>&nbsp;
 		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 	</div>
@@ -16,11 +16,10 @@
 	<div id="divSearchForm" class="collapse">
 		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;padding-top:5px;" href="#divSearchForm"  data-toggle="collapse" title="点击隐藏">专利搜索条件</a>
 		<!-- // 搜索表单-->
-		<div id="patSearchForm">
+		<div id="searchForm">
 		<!-- //jQ生成 -->
 		</div>
 	</div>
-	
 	
 	<div id="searchNum">
 		<p class="text-right bingo" style="padding-top:10px;"><button class="btn btn-info btn-sm" style="cursor:unset;font-size:14px;">搜索结果：<span class="badge"></span></button>
@@ -34,10 +33,10 @@
 		<!-- //jQ载入 -->
 		</div>
 	</div>
-</div>
+
 
 <script>
-rqData.sortData={$sortData};
+rqData.sortData.sortName='{$sortName}';
 
 initPage();	
 
@@ -53,7 +52,7 @@ $('#patPeriodNav').find('a').click(function(){
 <!-- // 页面刷新 -->
 $('#btnRefresh').click(function(){
 	//隐藏搜索条件
-	$('#divSearchForm').removeClass('in');
+	$('#divSearchArea').removeClass('in');
 	resetSearchForm();
 });	
 </script>

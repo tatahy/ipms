@@ -69,6 +69,7 @@ class IndexController extends \think\Controller
         'periodProp'=>json_encode($periodArr,JSON_UNESCAPED_UNICODE),
         #排序数组
         'sortData'=>json_encode($this->sortData,JSON_UNESCAPED_UNICODE),
+        'sortName'=>$this->sortData['sortName'],
         'username'=>$this->username,
         'year'=>date('Y')
       ]);
@@ -143,6 +144,7 @@ class IndexController extends \think\Controller
         'pageSet'=>$pageSet,
         #排序数组
         'sortData'=>$sortData,
+        'sortName'=>$sortData['sortName'],
         #搜索数组。JSON_UNESCAPED_UNICODE，保持编码格式。若前端文件采用utf-8编码，汉字就可直接解析显示。
         'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
       ]);

@@ -33,6 +33,18 @@
   .affix + .container-fluid {
       padding-top: 70px;
   }
+  
+  footer {
+	border-top:1px solid #e7e7e7;
+	background-color:#f5f5f5;
+	padding:5px 0;	
+	position: fixed;
+	bottom:0;
+	width: 100%;
+	/* Set the fixed height of the footer here */
+	height: 70px;
+  
+}
   </style>
   
 {/*
@@ -85,9 +97,9 @@ $(document).ready(function(){
 <!-- /pageheader  -->
 
 <!-- pagewrap  -->
-<div id="main" class="container-fluid" >	
+<div id="main" class="container-fluid" style="padding-top:80px;margin: 0 10%;">	
 	<div class="row">
-		<div class="col-sm-12">
+		<div class="col-sm-6">
 			<div class="panel-group">
 				<div class="panel panel-default">
 					<div class="panel-heading"><strong>项目概况</strong></div>
@@ -96,6 +108,19 @@ $(document).ready(function(){
 							<a href="#"><span class="label label-info">申报项目</span></a>
 							<a href="#"><span class="label label-warning">立项项目</span></a>
 							<a href="#"><span class="label label-primary">在研项目</span></a>
+						</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="col-sm-6">
+			<div class="panel-group">
+				<div class="panel panel-default">
+					<div class="panel-heading"><strong>固定资产</strong></div>
+						<div class="panel-body">
+							<a href="#"><span class="label label-default">停用<span class="badge"></span></span></a>
+							<a href="#"><span class="label label-info">待定</span></a>
+							<a href="#"><span class="label label-success">正常</span></a>
 						</div>
 				</div>
 			</div>
@@ -131,18 +156,7 @@ $(document).ready(function(){
 	</div>
 	
 	<div class="row">
-		<div class="col-sm-6">
-			<div class="panel-group">
-				<div class="panel panel-default">
-					<div class="panel-heading"><strong>固定资产</strong></div>
-						<div class="panel-body">
-							<a href="#"><span class="label label-default">停用<span class="badge"></span></span></a>
-							<a href="#"><span class="label label-info">待定</span></a>
-							<a href="#"><span class="label label-success">正常</span></a>
-						</div>
-				</div>
-			</div>
-		</div>
+		
 		
 		
 	</div>

@@ -3,7 +3,7 @@
 var	rqData={
 		ent:'index',
 		period:'',
-		sortData:{},
+		sortData:{listRows:10,sortName:'',sortOrder:'asc',pageNum:1},
 		searchData:{}
 	};
 var urlObj={module:'index',method:'index',ctl:'index'};
@@ -38,6 +38,8 @@ const topNavProp={
 };
 
 const noneSufx='模块无【查阅】权限，请与系统管理员联系。';
+
+var loadStr='<p class="text-center" style="font-size:20px;padding-top:20px;">加载中……</p>';
 
 //定义前端各个实体主要属性(用于jQ构建组件，路由生成等)
 var entProp={

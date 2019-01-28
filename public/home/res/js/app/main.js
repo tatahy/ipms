@@ -10,6 +10,15 @@
 	// console.log(p);
 }(jQuery,'p2'));
 
+// var navEntSet=$('nav .navbar-collapse ul').eq(0).find('a'),
+	// navEntPeriodSet=$('#entPeriod ul nav').find('a'),
+	// yearObj=$('footer .year'),
+	// btnSetPeriod=$('#entSummary').find('.btnPeriod'),
+	// btnTopnavToggle=$('nav .navbar-header').children('.navbar-toggle');
+
+	// btnSearchFormToggle=;
+var navEntPeriod=$('#entPeriod').children('ul.nav');
+	
 buildTopNavbarCom();
 buildMainRowCom();
 setEntNumProp();
@@ -18,12 +27,14 @@ $('body').tooltip({selector:'[title]',triger:'hover click',placement:'auto top',
 
 //jQuery中的HTML文件准备好的函数。
 $(document).ready(function(){
-
-let navASet=$('#topNavbar .navbar-nav').eq(0).find('a'),
-	btnSet=$('#mainRow').find('.btnPeriod'),
-	yearObj=$('footer .year');
-
-navASet.click(function(){
+//本函数中有效的变量
+let navEntSet=$('nav .navbar-collapse ul').eq(0).find('a'),
+	navEntPeriodSet=$('#entPeriod ul nav').find('a'),
+	yearObj=$('footer .year'),
+	btnSetPeriod=$('#entSummary').find('.btnPeriod'),
+	btnTopnavToggle=$('nav .navbar-header').children('.navbar-toggle');
+	
+navEntSet.click(function(){
 	let cls=$(this).closest('li').attr('class')?$(this).closest('li').attr('class'):'no class';
 		
 	for(let ent in topNavProp){
@@ -40,13 +51,18 @@ navASet.click(function(){
 	}
 });
 	
-btnSet.click(function(){
+btnSetPeriod.click(function(){
 	rqData.ent=$(this).data('ent');
 	rqData.period=$(this).data('period');
 	loadEntIndexFile();
 });
 	
 yearObj.html((year-1)+'-'+year);
+
+btnTopnavToggle.click(function(){
+	showTopNavbar();
+});
+
 });
 
 //让urlObj的取值都在给定的范围内
@@ -82,14 +98,20 @@ function initPage(){
 	//1 生成页面navBar
 	buildMainPeriodNavCom();
 	//2 period的title
-	 buildPeriodTitleCom();
+	buildPeriodTitleCom();
 	//3 载入ent的SearchForm
 	urlObj.method=ent+'SearchForm';
-	$('[id="'+ent+'SearchForm"]').load(getRqUrl());
+	$('#searchForm').load(getRqUrl());
+	
+	//载入条码识别模板文件
+	// if(ent=='ass'){
+		// urlObj.method='loadSearchFormBarcode';
+		// $('#divSearchFormBarcode').load(getRqUrl());
+	// }
+	
 	//4 载入ent对应的List
-	
 	loadEntPeriodList();
-	
+	console.log(navEntPeriod.find('a').length);
 }
 //设定向后端请求的url
 function getRqUrl(){
@@ -106,7 +128,7 @@ function getRqUrl(){
 
 //根据定义的topNavProp生成"navLi"组件
 function buildTopNavbarCom(){ 
-	let r=$('#topNavbar .navbar-nav').eq(0),
+	let r=$('nav .navbar-collapse ul').eq(0),
 		entity=rqData.ent;
 	r.empty();
 	for(let ent in topNavProp){
@@ -125,8 +147,8 @@ function buildTopNavbarCom(){
 		rC.append(a);
 		r.append(rC);
 	}
-	<!--为li标签添加.active -->
-	$('[data-ent="'+entity+'"]').tab('show');
+	//为li标签添加.active
+	r.find('[data-ent="'+entity+'"]').tab('show');
 }
 
 //根据定义的entProp生成"row"组件
@@ -134,7 +156,7 @@ function buildMainRowCom(){
 	let //计数器
 		n=0,
 		divSet=[];
-	$('#mainRow').empty();
+	$('#entSummary').empty();
 	//挨个生成ent组件
 	for (let ent in num){
 		let numObj=(typeof num[ent]=='object')?num[ent]:0;
@@ -173,7 +195,7 @@ function buildMainRowCom(){
 	for(let i=0;i<Math.ceil(n/2);i++){		
 		let r=$('<div></div>').addClass('row');
 		r.append(divSet[2*i],divSet[(2*i+1)]);
-		$('#mainRow').append(r);
+		$('#entSummary').append(r);
 	}
 }
 //根据定义的entProp生成"Nav"组件
@@ -194,19 +216,18 @@ function buildMainPeriodNavCom(){
 
 //load模块对应的Index文件
 function loadEntIndexFile(){
-	let row=$('#mainRow'),
+	let row=$('#entSummary'),
 		//index文件加载点
-		obj=$('#mainPeriod'),
+		obj=$('#entPeriod'),
 		ent=rqData.ent,
-		loadStr='<p class="text-center" style="font-size:20px;padding-top:20px;">加载中……</p>',
 		url=topNavProp[ent]['url'];
 		// url=getRqUrl();
 	
 	row.hide();
 	obj.empty().hide();
 	
-	//id="topNavbar"里的li添加active
-	$('[data-ent="'+ent+'"]').tab('show'); 
+	//ul里的li添加active
+	$('nav .navbar-collapse ul').eq(0).find('[data-ent="'+ent+'"]').tab('show'); 
 	
 	if(ent=='index'){
 		row.show();
@@ -216,8 +237,7 @@ function loadEntIndexFile(){
 }
 //载入实体各个阶段下的列表
 function loadEntPeriodList(){
-	let loadStr='<p class="text-center" style="font-size:28px;">加载中……</p>',
-		//list加载点
+	let	//list加载点
 		obj=$('[id="'+rqData.ent+'List"]');
 	
 	urlObj.method=rqData.ent+'List';
@@ -359,13 +379,27 @@ function showSearchResult() {
 //初始化ent list
 function initEntList(){
 	let ent=rqData.ent,
-		periodObj=$('[id="'+ent+'List"]').find('caption strong'),
+		capSObj=$('[id="'+ent+'List"]').find('caption strong'),
 		periodChi=entProp[ent].period.detail[rqData.period].txt;
 	initUrlObj(ent);
 	//给tbl标题加内容
-	periodObj.text(periodChi);	
+	capSObj.text(periodChi);	
 	sortEntListTbl();
 	setTrBgColor();
 	showSearchResult();
 }
-
+//显示topnav
+function showTopNavbar() {
+	let topNavObj=$('body').find('.navbar-collapse');
+	
+	if($('body').find('.topnav-backdrop').length){
+		$('.topnav-backdrop').remove();
+		return topNavObj.removeClass('in');
+	}
+	topNavObj.addClass('in');
+	//添加div组件及其click事件函数，实现点击该组件就隐藏topnav	
+	return $('body').append($('<div></div>').addClass('topnav-backdrop').one('click',function(){
+    		showTopNavbar();
+		})
+	);
+}

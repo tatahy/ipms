@@ -39,8 +39,7 @@ interactive.viewport {
 </style>
 
 
-<div style="border:1px solid #eee;padding:10px 5px;margin-top:2px;">
-	<div class="row myRow">
+<div class="row myRow" style="border:1px solid #eee;padding:10px 5px;">
 	<form id="fmRun" class="form-horizontal col-sm-6">	
 	 	<div class="form-group">
 			<label class="col-sm-4 control-label">条形码图片</label>
@@ -153,9 +152,6 @@ interactive.viewport {
     	<div id="interactive" class="viewport"></div>
     	<!-- <div id="debug" class="detection"></div> -->
 	</div>
-	</div>
-	<div class="row myRow"></div>
-
 </div>
 
 {// TP5中的模板注释格式，单行，绝对路径。<!-- //引入条形码识别插件 -->}  
@@ -294,8 +290,8 @@ function calculateRectFromArea(canvas,area){
 //利用自调用匿名函数立即执行的特点， 页面初始化
 (function($){
 	$('#divBarcodeImg').hide();
-	// 设置tooltip
-	$('#divBarcodeImg [title]').tooltip({triger:'focus hover',placement: 'auto bottom'});
+	<!-- // 设置tooltip -->
+	<!-- $('#divBarcodeImg [title]').tooltip({triger:'focus hover',placement: 'auto bottom'}); -->
 	$('#interactive').prevAll().hide(); 
 })(jQuery);
 
@@ -356,7 +352,7 @@ $(function() {
 	//查询条形码值对应的记录
 	$('#btnBarcodeQuery').click(function(){
 		let code=$(this).prev().text();
-		let fm=$('#fmAssSearch');
+		let fm=$('.searchForm');
 		//一般查询表单重置
 		fm[0].reset();
 		fm.find('.form-control').removeClass('alert-info');
@@ -364,7 +360,10 @@ $(function() {
 		//一般查询表单里输入框input[name="bar_code"]填入code
 		fm.find('[name="reqObj"]').val('barCode');
 		fm.find('[name="bar_code"]').val(code).addClass('alert-info');
-		loadAssList();	
+		<!-- loadAssList();	 -->
+		//设置查询数据
+		setRqSearchData(fm);
+		loadEntPeriodList();
 	});
 
 	//识别处理过程		
@@ -416,8 +415,6 @@ $(function() {
 		$('#fmAssSearch input[name="bar_code"]').val(code).addClass('alert-info');
 		appendCode(code);
 	});
-	
-
 });
 
 </script>

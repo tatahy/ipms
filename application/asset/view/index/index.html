@@ -1,61 +1,64 @@
 <!-- //module:asset, view:index/index.html  -->
 
-<div>
-	<ul id="assPeriodNav" class="nav nav-pills">
-		<!-- //jQ生成 -->
-	</ul>
-	<h4 id="assTitle" class="text-left">
-		<!-- //jQ生成 -->
-	</h4>
-	<div class="row text-right">
-		<div class="btn-group">
-			<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" title="选择搜索方式">搜索<span class="caret"></span></button>
+
+<ul id="assPeriodNav" class="nav nav-pills">
+	<!-- //jQ生成 -->
+</ul>
+<h4 id="assTitle" class="text-left">
+	<!-- //jQ生成 -->
+</h4>
+<div class="text-right" data-show-search-form=true>
+	<div class="btn-group">
+    	<button id="btnSearchFormCollapse" type="button" class="btn btn-primary btn-sm" data-toggle="collapse" title="显示/隐藏搜索条件">搜索条件</button>
+			
+    	<div class="btn-group">
+			<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">更多<span class="caret"></span></button>
       		<ul class="dropdown-menu" role="menu">
-				<li><a id="aSearchData" href="#divSearchForm" data-toggle="collapse" title="根据输入信息搜索"><span class="glyphicon glyphicon-edit"></span>一般搜索</a></li>
+				<li class="liSearchFormCollapse"><a id="aSearchData" href="#divSearchForm" data-toggle="collapse" title="根据输入信息搜索"><span class="glyphicon glyphicon-edit"></span>一般搜索</a></li>
     			<li role="separator" class="divider"></li>
-    			<li><a id="aSearchByBarcode" href="#divSearchFormBarcode"  data-toggle="collapse" title="输入/ 拍摄条形码图片<br>识别后搜索"><span class="glyphicon glyphicon-barcode"></span>条形码搜索</a></li>
+    			<li class="liSearchFormCollapse"><a id="aSearchByBarcode" href="#divSearchFormBarcode"  data-toggle="collapse" title="输入/ 拍摄条形码图片<br>识别后搜索"><span class="glyphicon glyphicon-barcode"></span>条形码搜索</a></li>
       		</ul>
     	</div>
-  		
-		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
-	</div>
+  	</div>
+		
+	<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+</div>
 
-	<!-- // 一般搜索区域-->
-	<div id="divSearchForm" class="collapse" >
-		<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchForm"  data-toggle="collapse" title="点击隐藏">一般搜索条件</a>
-		<!-- // 搜索表单-->
-		<div id="assSearchForm">
-		<!-- //jQ生成 -->
-		</div>
+<!-- // 一般搜索区域-->
+<div id="divSearchForm" class="collapse">
+	<button class="btn btn-primary btn-xs" style="font-weight:700;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" data-target="#divSearchForm"  data-toggle="collapse" title="点击隐藏"><span class="glyphicon glyphicon-edit"></span>一般搜索条件</button>
+	<!-- // 搜索表单-->
+	<div id="searchForm">
+	<!-- //jQ生成 -->
 	</div>
+</div>
 	
-	<!-- // 条形码搜索区域-->
-	<div id="divSearchFormBarcode" class="collapse">
-		<a class="label label-primary" style="font-size:14px;border-bottom-radius:0px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" href="#divSearchFormBarcode"  data-toggle="collapse" title="点击隐藏">条形码搜索</a>
+<br>
+	
+<!-- // 条形码搜索区域-->
+<div id="divSearchFormBarcode" class="collapse">
+	<button class="btn btn-primary btn-xs" style="font-weight:700;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" data-target="#divSearchFormBarcode"  data-toggle="collapse" title="点击隐藏"><span class="glyphicon glyphicon-barcode"></span>条形码搜索</button>
 		
-		<!-- <div id="divBarcodeArea_load"><p class="text-center" style="font-size:20px;">加载中……</p></div> -->
+	<!-- <div id="divBarcodeArea_load"><p class="text-center" style="font-size:20px;">加载中……</p></div> -->
+	{include file="../application/common/decodeBarcode.html"}
+</div>
+	
+<div id="searchNum">
+	<p class="text-right bingo" style="padding-top:10px;"><button class="btn btn-info btn-sm" style="cursor:unset;font-size:14px;">搜索结果：<span class="badge"></span></button>
+	</p>
 		
-		
-		{include file="../application/common/decodeBarcode.html"}
-		<br>
+	<p class="text-center none" style="padding-top:20px;"><strong>搜索结果</strong>：<span class="label label-default" style="font-size:16px;">无符合条件信息</span></p>
+</div>
+	
+<div class="tab-content">
+	<div id="assList">
+	<!-- //jQ载入 -->
+		<p class="text-center" style="font-size:20px;">加载中……</p>
 	</div>
-	
-	<div id="searchNum">
-		<p class="text-right bingo" style="padding-top:10px;"><button class="btn btn-info btn-sm" style="cursor:unset;font-size:14px;">搜索结果：<span class="badge"></span></button>
-		</p>
-		
-		<p class="text-center none" style="padding-top:20px;"><strong>搜索结果</strong>：<span class="label label-default" style="font-size:16px;">无符合条件信息</span></p>
-	</div>
-	
-	<div class="tab-content">
-		<div id="assList">
-		<!-- //jQ载入 -->
-			<p class="text-center" style="font-size:20px;">加载中……</p>
-		</div>
-	</div>	
+</div>	
 
 <!-- Modal "modalAssSingle" -->
-	<div class="modal fade" id="modalAssSingle" role="dialog">
+<div class="modal fade" id="modalAssSingle" role="dialog">
 	<div class="modal-dialog modal-lg">
     
       <!-- Modal content-->
@@ -79,30 +82,127 @@
 		</div>
 	</div>
 
-	</div>
-
 </div>
+
 <!--/ Modal "modalAssSingle" -->
 
 <script>
-rqData.sortData={$sortData};
+rqData.sortData.sortName='{$sortName}';
 
 initPage();	
 
+let collapseSet=$('#entPeriod').children('.collapse'),
+	liCollapseSet=$('#entPeriod').find('.liSearchFormCollapse'),
+	btnCollapseSet=collapseSet.children('button'),
+	flagObj=$('#btnSearchFormCollapse').closest('.text-right');
+
 <!-- //点击nav中的各个按钮后，loadEntPeriodList()-->
-$('#assPeriodNav').find('a').click(function(){	
+$('#entPeriod').children('ul.nav').find('a').click(function(){	
 	//排序、分页有关的值向sortData汇集
 	rqData.period=$(this).data('period');
 	rqData.sortData.pageNum=1;
 	buildPeriodTitleCom();
 	loadEntPeriodList();
 });	
-	
+
 <!-- // 页面刷新 -->
 $('#btnRefresh').click(function(){
 	//隐藏搜索条件
 	$('#divSearchForm').removeClass('in');
 	resetSearchForm();
 });	
+
+$('#btnSearchFormCollapse').click(function(){
+	searchFormToggle();	
+});
+
+liCollapseSet.children('a').click(function(){
+	let liObj=$(this).closest('li'),
+		liClsStr=liObj.attr('class'),
+		id=$(this).attr('href'),
+		divObj=$(id),
+		divClsStr=divObj.attr('class');
+	
+	console.log(divClsStr);
+	//无active
+	if(liClsStr.indexOf('active')==-1 ){
+		liObj.addClass('active');		
+	}
+	
+	//有active
+	if(liClsStr.indexOf('active')!=-1 ) {
+		//对应collapse无in
+		if(divClsStr.indexOf('in')==-1){
+			divObj.collapse('hide');
+		}else{
+			liObj.removeClass('active');
+		}
+	}
+	
+	if(getCollapseInNum()==0) {
+		flagObj.data('showSearchForm',true);
+	}else{
+		flagObj.data('showSearchForm',false);
+	}
+});
+
+btnCollapseSet.click(function(){
+	let id=$(this).data('target');
+	
+	liCollapseSet.children('a').each(function(){
+		if(id==$(this).attr('href')){
+			$(this).closest('li').removeClass('active');
+		}
+	});
+	if(getCollapseInNum()==0) {
+		flagObj.data('showSearchForm',true);
+	}else{
+		flagObj.data('showSearchForm',false);
+	}
+});
+
+function searchFormToggle(){
+	let n=getCollapseInNum(),
+		flag=flagObj.data('showSearchForm');
+
+	if(flag && n==0){	
+		//第一个li
+		liCollapseSet.eq(0).addClass('active');	
+		//第一个collapse	
+		collapseSet.eq(0).collapse('show');	
+	}
+	
+	if(flag && n!=0){	
+		liCollapseSet.each(function(index){
+			let clsStr=$(this).attr('class');
+			(clsStr.indexOf('active')!=-1)?collapseSet.eq(index).collapse('show'):'';
+		});
+	}
+	
+	if(flag==false && n!=0){	
+		liCollapseSet.each(function(index){
+			let clsStr=$(this).attr('class');
+			(clsStr.indexOf('active')!=-1)?$(this).removeClass('active'):'';
+		});
+	}
+	
+	if(flag==false && n==0){	
+		liCollapseSet.removeClass('active');
+	}
+	
+	collapseSet.collapse('hide');
+	
+	flag=!flag;
+	flagObj.data('showSearchForm',flag);
+}
+
+function getCollapseInNum(){
+	let n=0;
+	liCollapseSet.each(function(){
+		let clsStr=$(this).attr('class');
+		n=clsStr.indexOf('active')==-1?n:n+1;
+	});
+	return n;
+}
 
 </script>

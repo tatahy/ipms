@@ -59,6 +59,7 @@ class IndexController extends \think\Controller {
         $this->assign([
           
           'sortData'=>json_encode($sortData,JSON_UNESCAPED_UNICODE),
+          'sortName'=>$sortData['sortName'],
           'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
           // 获取当前数据表字段信息
           //'fields'=>json_encode($assMdl->getTableFields(),JSON_UNESCAPED_UNICODE),
@@ -153,6 +154,7 @@ class IndexController extends \think\Controller {
           
           //排序数组
           'sortData'=>$sortData,
+          'sortName'=>$sortData['sortName'],
           //搜索数组
           'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
           //状态有关的设置
@@ -256,9 +258,10 @@ class IndexController extends \think\Controller {
         ]);
       return view();
     }
-    
-     public function decodeBarcode(Request $request,AssinfoModel $assMdl)
-    {
+    public function loadSearchFormBarcode(){
+      return view();
+    }
+    public function decodeBarcode(Request $request,AssinfoModel $assMdl){
       $this->priLogin();
       $assSet=$assMdl::get($request->param('id'));
            
