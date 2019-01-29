@@ -16,7 +16,7 @@
       		<ul class="dropdown-menu" role="menu">
 				<li class="liSearchFormCollapse"><a id="aSearchData" href="#divSearchForm" data-toggle="collapse" title="根据输入信息搜索"><span class="glyphicon glyphicon-edit"></span>一般搜索</a></li>
     			<li role="separator" class="divider"></li>
-    			<li class="liSearchFormCollapse"><a id="aSearchByBarcode" href="#divSearchFormBarcode"  data-toggle="collapse" title="输入/ 拍摄条形码图片<br>识别后搜索"><span class="glyphicon glyphicon-barcode"></span>条形码搜索</a></li>
+    			<li class="liSearchFormCollapse"><a id="aSearchByBarcode" href="#divSearchFormBarcode" data-toggle="collapse" title="输入/ 拍摄条形码图片<br>识别后搜索"><span class="glyphicon glyphicon-barcode"></span>条形码搜索</a></li>
       		</ul>
     	</div>
   	</div>
@@ -91,11 +91,98 @@ rqData.sortData.sortName='{$sortName}';
 
 initPage();	
 
-let collapseSet=$('#entPeriod').children('.collapse'),
+let divCollapseSet=$('#entPeriod').children('.collapse'),
 	liCollapseSet=$('#entPeriod').find('.liSearchFormCollapse'),
-	btnCollapseSet=collapseSet.children('button'),
+	btnCollapseSet=divCollapseSet.children('button'),
 	flagObj=$('#btnSearchFormCollapse').closest('.text-right');
+	
+//searchFormToggle类
+var searchFormToggleCls=function(){
+	var liSet=liCollapseSet;
+	var divSet=divCollapseSet;
+	var idArr=[];
+	var prop={liShow:'active',divShow:'in',fn:{show:'show',hide:'hide'}}
+	var status={show:false,liShow:false,liShowArr:Array(divSet.length).fill(0),divShow:false,divShowArr:Array(divSet.length).fill(0)};
+	
+	var status1={
+		li:{show:false,showArr:Array(divSet.length).fill(0)},
+		div:{show:false,showArr:Array(divSet.length).fill(0)}
+		};
+	
+	var reducer=(prev,curr)=>prev+curr;
+	var getCollapseInNum=()=>{
+		return status.divShowArr.reduce(reducer);
+	};
+	var initCollapse=()=>{
+		//对status进行初始化
+		status.show=false;
+		divSet.each(function(index){
+			idArr[index]=$(this).attr('id');
+			status.liShowArr[index]=0;
+			status.divShowArr[index]=0;
+		});
+		return setCollapse();
+	};
+	
+	var getStatus=()=>{
+		divSet.each(function(){
+			let divCls=$(this).attr('class'),
+				id=$(this).attr('id'),
+				idx=idArr.indexOf(id);
+			
+			if(divCls.indexOf(prop.divShow)!=-1){
+				status.divShowArr[idx]=1;
+				status.liShowArr[idx]=1;
+			}else{
+				status.divShowArr[idx]=0;
+				status.liShowArr[idx]=0;
+			}	
+		});
+		
+		status.show=(status.divShowArr.reduce(reducer))?true:false;
+		
+		return status;
+	};
+	
+	var setStatus=(opt={})=>{
+		let statusDefault={show:false,liShow:false,liShowArr:Array(divSet.length).fill(0),divShow:false,divShowArr:Array(divSet.length).fill(0)};
+		status=$.extend({},statusDefault,opt);
+		<!-- if(status.show && getCollapseInNum()==0){ -->
+			<!-- status.divShowArr[0]=1; -->
+			<!-- status.liShowArr[0]=1; -->
+		<!-- } -->
+		return status;
+	};
+	//根据status对有关组件进行显示、隐藏
+	var setCollapse=()=>{
+		status.liShowArr.forEach(function(val,idx){
+			liSet.eq(idx).removeClass(prop.liShow);
+			if(val){
+				liSet.eq(idx).addClass(prop.liShow);
+			}
+		});
+		
+		status.divShowArr.forEach(function(val,idx){
+			(val)?divSet.eq(idx).collapse(prop.fn.show):divSet.eq(idx).collapse(prop.fn.hide);
+		});
+	};
+	
+	initCollapse();
+	
+	return {
+		status:status,
+		id:idArr,
+		setStatus:function(opt){return setStatus(opt)},
+		getStatus:function(){return getStatus()},
+		setCollapse:function(){return setCollapse()},
+		initCollapse:function(){return initCollapse()},
+		getCollapseInNum:function(){return getCollapseInNum()}
+		
+	}
+};
 
+var k= searchFormToggleCls();
+console.log(k.status);
 <!-- //点击nav中的各个按钮后，loadEntPeriodList()-->
 $('#entPeriod').children('ul.nav').find('a').click(function(){	
 	//排序、分页有关的值向sortData汇集
@@ -113,96 +200,47 @@ $('#btnRefresh').click(function(){
 });	
 
 $('#btnSearchFormCollapse').click(function(){
-	searchFormToggle();	
+	k.setStatus({show:!k.status.show});
+	k.setCollapse();
 });
 
 liCollapseSet.children('a').click(function(){
-	let liObj=$(this).closest('li'),
-		liClsStr=liObj.attr('class'),
-		id=$(this).attr('href'),
-		divObj=$(id),
-		divClsStr=divObj.attr('class');
+	let id=$(this).attr('href').slice(1),
+		liObj=$(this).closest('li'),
+		idx=k.id.indexOf(id),
+		liCls=liObj.attr('class'),
+		status=k.status;
 	
-	console.log(divClsStr);
-	//无active
-	if(liClsStr.indexOf('active')==-1 ){
-		liObj.addClass('active');		
-	}
-	
-	//有active
-	if(liClsStr.indexOf('active')!=-1 ) {
-		//对应collapse无in
-		if(divClsStr.indexOf('in')==-1){
-			divObj.collapse('hide');
-		}else{
-			liObj.removeClass('active');
-		}
-	}
-	
-	if(getCollapseInNum()==0) {
-		flagObj.data('showSearchForm',true);
+	if(liCls.indexOf('active')!=-1){
+		<!-- liObj.removeClass('active'); -->
+		status.liShowArr[idx]=0;
+		status.divShowArr[idx]=0;
 	}else{
-		flagObj.data('showSearchForm',false);
+		<!-- liObj.addClass('active'); -->
+		status.liShowArr[idx]=1;
+		status.divShowArr[idx]=1;
 	}
+	
+	k.setStatus(status);
+	k.setCollapse();
 });
 
 btnCollapseSet.click(function(){
-	let id=$(this).data('target');
+	let st=k.status,
+		id=$(this).closest('div').attr('id'),
+		idx=k.id.indexOf(id);
 	
-	liCollapseSet.children('a').each(function(){
-		if(id==$(this).attr('href')){
-			$(this).closest('li').removeClass('active');
-		}
-	});
-	if(getCollapseInNum()==0) {
-		flagObj.data('showSearchForm',true);
-	}else{
-		flagObj.data('showSearchForm',false);
-	}
+	console.log(idx+' : ');
+	
+	st.liShowArr[idx]=0;
+	st.divShowArr[idx]=0;
+	
+	status.show=!k.status.show;
+	console.log(st.liShowArr);
+	console.log(st);
+	k.setStatus(st);
+	console.log(k.getStatus());
+	k.setCollapse();
 });
-
-function searchFormToggle(){
-	let n=getCollapseInNum(),
-		flag=flagObj.data('showSearchForm');
-
-	if(flag && n==0){	
-		//第一个li
-		liCollapseSet.eq(0).addClass('active');	
-		//第一个collapse	
-		collapseSet.eq(0).collapse('show');	
-	}
-	
-	if(flag && n!=0){	
-		liCollapseSet.each(function(index){
-			let clsStr=$(this).attr('class');
-			(clsStr.indexOf('active')!=-1)?collapseSet.eq(index).collapse('show'):'';
-		});
-	}
-	
-	if(flag==false && n!=0){	
-		liCollapseSet.each(function(index){
-			let clsStr=$(this).attr('class');
-			(clsStr.indexOf('active')!=-1)?$(this).removeClass('active'):'';
-		});
-	}
-	
-	if(flag==false && n==0){	
-		liCollapseSet.removeClass('active');
-	}
-	
-	collapseSet.collapse('hide');
-	
-	flag=!flag;
-	flagObj.data('showSearchForm',flag);
-}
-
-function getCollapseInNum(){
-	let n=0;
-	liCollapseSet.each(function(){
-		let clsStr=$(this).attr('class');
-		n=clsStr.indexOf('active')==-1?n:n+1;
-	});
-	return n;
-}
 
 </script>
