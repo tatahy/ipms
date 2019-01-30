@@ -4,11 +4,13 @@
 //自调用匿名函数具有立即执行的特点,2种结构。
 (function($,p){ 
 	// console.log(p);
-})(jQuery,'p1');
+})
+(jQuery,'p1');
 
 (function($,p){ 
 	// console.log(p);
-}(jQuery,'p2'));
+}
+(jQuery,'p2'));
 
 // var navEntSet=$('nav .navbar-collapse ul').eq(0).find('a'),
 	// navEntPeriodSet=$('#entPeriod ul nav').find('a'),
@@ -111,7 +113,7 @@ function initPage(){
 	
 	//4 载入ent对应的List
 	loadEntPeriodList();
-	console.log(navEntPeriod.find('a').length);
+	// console.log(navEntPeriod.find('a').length);
 }
 //设定向后端请求的url
 function getRqUrl(){
