@@ -16,7 +16,7 @@
       		<ul class="dropdown-menu" role="menu">
 				<li class=""><a href="#divSearchForm" data-toggle="collapse" data-collapse-switch="li" title="根据输入信息搜索"><span class="glyphicon glyphicon-edit"></span>一般搜索</a></li>
     			<li role="separator" class="divider"></li>
-    			<li class=""><a href="#divSearchFormBarcode" data-toggle="collapse" data-collapse-switch="li" title="输入/ 拍摄条形码图片<br>识别后搜索"><span class="glyphicon glyphicon-barcode"></span>条形码搜索</a></li>
+    			<li class=""><a href="#divSearchFormBarcode" data-toggle="collapse" data-collapse-switch="li" title="根据输入/ 拍摄条形码图片搜索"><span class="glyphicon glyphicon-barcode"></span>条形码搜索</a></li>
       		</ul>
     	</div>
   	</div>
@@ -24,20 +24,23 @@
 	<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 </div>
 
+<br>
 <!-- // 一般搜索区域-->
 <div id="divSearchForm" class="collapse">
-	<button class="btn btn-primary btn-xs" style="font-weight:700;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" data-target="#divSearchForm"  data-toggle="collapse" data-collapse-switch="div" title="点击隐藏"><span class="glyphicon glyphicon-edit"></span>一般搜索条件</button>
+	<span class="text-primary" ><span class="glyphicon glyphicon-edit"></span>一般搜索条件</span>
+	
+	<button type="button" class="close" data-target="#divSearchForm"  data-toggle="collapse" data-collapse-switch="div" title="关闭">&times;</button>
 	<!-- // 搜索表单-->
 	<div id="searchForm">
 	<!-- //jQ生成 -->
 	</div>
 </div>
 	
-<br>
-	
 <!-- // 条形码搜索区域-->
 <div id="divSearchFormBarcode" class="collapse">
-	<button class="btn btn-primary btn-xs" style="font-weight:700;border-bottom-left-radius:0px;border-bottom-right-radius:0px;" data-target="#divSearchFormBarcode"  data-toggle="collapse" data-collapse-switch="div" title="点击隐藏"><span class="glyphicon glyphicon-barcode"></span>条形码搜索</button>
+	<span class="text-primary" ><span class="glyphicon glyphicon-barcode"></span>条形码搜索</span>
+	
+	<button type="button" class="close" data-target="#divSearchFormBarcode" data-toggle="collapse" data-collapse-switch="div" title="关闭">&times;</button>
 		
 	<!-- <div id="divBarcodeArea_load"><p class="text-center" style="font-size:20px;">加载中……</p></div> -->
 	{include file="../application/common/decodeBarcode.html"}
@@ -98,8 +101,8 @@ var collapseSwitchSet=$('[data-collapse-switch]'),
 //searchFormCollapse类
 var searchFormCollapse=function(){
 	//要求liSet.length==divSet.length
-	var divSet=collapseSwitchBtn.parent();
-	var liSet=collapseSwitchA.parent();
+	var divSet=$('[data-collapse-switch="div"]').parent();
+	var liSet=$('[data-collapse-switch="li"]').parent();
 	
 	//自调用匿名函数立即执行，进行赋值
 	var formId=(function(){
@@ -110,43 +113,114 @@ var searchFormCollapse=function(){
 			return arr;
 		}());
 	
-	var fArr=Array(formId.length).fill(false);
 	var prop={liShow:'active',divShow:'in',fn:{show:'show',hide:'hide'}};
 	
-	var statusDefault={trigger:{type:0,index:''},liShow:fArr,divShow:fArr};
+	var statusDefault={trigger:{type:'main',index:''},showIndex:Array(formId.length).fill(false)};
+	<!-- var statusDefault={trigger:{type:0,index:''},liShow:Array(formId.length).fill(false),divShow:Array(formId.length).fill(false)}; -->
 	var status=statusDefault;
+	const zArr=Array(formId.length).fill(false);
+	
+	var reducer=(acc,cur)=>{
+			if(cur){
+				acc++;
+			}
+			return acc;
+		};
 	
 	var getStatus=()=>{
 		divSet.each(function(){
 			let idx=formId.indexOf($(this).attr('id'));
 			
-			if($(this).hasClass(prop.divShow)){
-				status.divShow[idx]=true;
-				status.liShow[idx]=true;
-			}else{
-				status.divShow[idx]=false;
-				status.liShow[idx]=false;
-			}	
+			$(this).hasClass(prop.divShow)?status.showIndex[idx]=true:status.showIndex[idx]=false;
+			
 		});
 		return status;
 	};
 	
 	var setStatus=(opt={})=>{
+		let type='',
+			idx='',
+			idxArr='',
+			showVal='';
+		
 		status =$.extend({},statusDefault,opt);	
+		type=status.trigger.type;
+		idx=status.trigger.index;
+		idxArr=status.showIndex;	
+
+		if(type=='main'){
+			idxArr.reduce(reducer,0)?status.showIndex=zArr:status.showIndex[0]=true;
+			
+			<!-- if(idxArr.reduce(reducer,0)){ -->
+				<!-- for(let i=0;i<idxArr.length;i++){ -->
+					<!-- if(idxArr[i]){ -->
+						<!-- showVal=i; -->
+						<!-- break; -->
+					<!-- } -->
+				<!-- } -->
+				
+				<!-- showVal=idxArr.indexOf('true'); -->
+				
+				<!-- status.showIndex=zArr; -->
+				
+				<!-- if(idxArr.reduce(reducer,0)==1){ -->
+					<!-- status.trigger.index=showVal; -->
+				<!-- } -->
+			<!-- }else{ -->
+				<!-- status.showIndex[0]=true; -->
+			<!-- } -->
+		}
+		if(type=='li'){
+			showVal=status.showIndex[idx];
+			status.showIndex[idx]=!showVal;
+		}
+		if(type=='div'){
+			status.showIndex[idx]=false;
+		}
+
 		return status;
 	};
 	//根据status对有关组件进行显示、隐藏
 	var setCollapse=()=>{
-		status.liShow.forEach(function(v,i){
-			liSet.eq(i).removeClass(prop.liShow);
+		status.showIndex.forEach(function(v,i){
 			if(v){
+				divSet.eq(i).collapse(prop.fn.show);
 				liSet.eq(i).addClass(prop.liShow);
+			}else{
+				divSet.eq(i).collapse(prop.fn.hide);
+				liSet.eq(i).removeClass(prop.liShow);
 			}
 		});
-		status.divShow.forEach(function(v,i){
-			(v)?divSet.eq(i).collapse(prop.fn.show):divSet.eq(i).collapse(prop.fn.hide);
-		});
 		return status;
+	};
+	
+	var toggle=()=>{
+		let type=status.trigger.type,
+			idx=status.trigger.index,
+			showVal='';
+		//只有showIndex[idx]的值有改变，其他的都为false	
+		if(type=='li'){
+			showVal=status.showIndex[idx];
+			status.showIndex=zArr;
+			status.showIndex[idx]=showVal;
+		}
+		if(type=='main'){
+			status.showIndex.forEach(function(v,i){
+				
+			});
+			
+			//点击main时要显示status.showIndex[idx]的div
+			if(idx!=''){
+				<!-- status.showIndex[idx]=true; -->
+			}
+			
+			
+		}
+		
+		<!-- console.log('toggle():'); -->
+		<!-- console.log(status); -->
+		
+		setCollapse();
 	};
 	
 	return {
@@ -154,7 +228,9 @@ var searchFormCollapse=function(){
 		getStatus:function(){return getStatus();},
 		//返回本对象，实现链式操作。
 		setStatus:function(opt){ setStatus(opt); return this;},
-		setCollapse:function(){return setCollapse();}
+		<!-- setStatus:function(opt){ return setStatus(opt);}, -->
+		setCollapse:function(){return setCollapse();},
+		toggle:function(){return toggle();}
 	}
 };
 
@@ -183,40 +259,26 @@ collapseSwitchSet.click(function(){
 	let obj=searchFormCollapse(),
 		st=obj.getStatus(),
 		type=$(this).data('collapseSwitch'),
-		fArr=Array(st.liShow.length).fill(false);
-	let reducer=(acc,cur)=>{
-			if(cur){
-				acc++;
-			}
-			return acc;
-		};
-	let idx='',
-		showVal='';
-			
-	if(type=='main'){
-		if(st.liShow.reduce(reducer,0)+st.divShow.reduce(reducer,0)){
-			st.liShow=fArr;
-			st.divShow=fArr;
-		}else{
-			st.liShow[0]=true;
-			st.divShow[0]=true;
-		}
-	}
+		idx=st.trigger.index;
+		<!-- idx=''; -->
+	
 	if(type=='li'){
 		idx=obj.formId.indexOf($(this).attr('href').slice(1));
-		showVal=st.liShow[idx];
-		st.liShow[idx]=!showVal;
-		st.divShow[idx]=!showVal;
 	}
 	if(type=='div'){
 		idx=obj.formId.indexOf($(this).data('target').slice(1));
-		st.liShow[idx]=false;
-		st.divShow[idx]=false;
-	}
+	}	
+	
 	st.trigger.type=type;
 	st.trigger.index=idx;
-		
-	obj.setStatus(st).setCollapse();
+	
+	<!-- console.log(type+'['+idx+']'+' click:');	 -->
+	<!-- console.log(st);	 -->
+	//点击li显示、隐藏对应的searchForm
+	<!-- console.log(obj.setStatus(st).setCollapse()); -->
+	//只能显示一个searchForm
+	obj.setStatus(st).toggle();
+	
 });
 
 </script>
