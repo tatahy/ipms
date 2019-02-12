@@ -6,7 +6,7 @@ var	rqData={
 		sortData:{listRows:10,sortName:'',sortOrder:'asc',pageNum:1},
 		searchData:{}
 	};
-var urlObj={module:'index',method:'index',ctl:'index'};
+var urlObj={module:'index',method:'index',ctrl:'index'};
 var searchResultNum='';
 //定义前端系统各个实体数量对象,由后端给定??
 // var num='';
@@ -45,7 +45,7 @@ var loadStr='<p class="text-center" style="font-size:20px;padding-top:20px;">加
 var entProp={
 	pat:{
 		module:'patent',
-		ctl:['index'],
+		ctrl:['index'],
 		method:['index','patList','patSearchForm','getSelComData'],
 		chi:'专利',
 		gly:glyPrex+'wrench',
@@ -68,7 +68,7 @@ var entProp={
 	},
 	ass:{
 		module:'asset',
-		ctl:['index'],
+		ctrl:['index'],
 		method:['index','assList','assSearchForm'],
 		chi:'固定资产',
 		gly:glyPrex+'oil',
@@ -92,7 +92,7 @@ var entProp={
 	},
 	pro:{
 		module:'project',
-		ctl:['index','proList','proSearchForm'],
+		ctrl:['index','proList','proSearchForm'],
 		method:['index'],
 		chi:'项目概况&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
 		gly:glyPrex+'inbox',
@@ -122,7 +122,7 @@ var entProp={
 	},
 	the:{
 		module:'thesis',
-		ctl:['index','theList','theSearchForm'],
+		ctrl:['index','theList','theSearchForm'],
 		method:['index'],
 		chi:'论文概况&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
 		gly:glyPrex+'list',

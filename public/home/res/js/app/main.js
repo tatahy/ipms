@@ -26,6 +26,9 @@ buildMainRowCom();
 setEntNumProp();
 // 激活并设置tooltip
 $('body').tooltip({selector:'[title]',triger:'hover click',placement:'auto top',delay: {show: 200, hide: 100},html: true });
+//隐藏
+$('#divSearchBtn').children().hide();
+$('#searchNum').children().hide();
 
 //jQuery中的HTML文件准备好的函数。
 $(document).ready(function(){
@@ -71,7 +74,7 @@ btnTopnavToggle.click(function(){
 function initUrlObj(ent=''){	
 	let arr=Object.keys(entProp),
 		module='index',
-		ctl='index',
+		ctrl='index',
 		method='index',
 		obj='',
 		cArr=[],
@@ -79,22 +82,23 @@ function initUrlObj(ent=''){
 	
 	if(arr.indexOf(ent)!=-1){
 		obj=entProp[ent];
-		cArr=obj.ctl;
+		cArr=obj.ctrl;
 		mArr=obj.method;
 		module=obj.module;
 	}
 	
 	if(typeof obj=='object'){
-		ctl=(cArr.indexOf(urlObj.ctl)!=-1)?urlObj.ctl:ctl;
+		ctrl=(cArr.indexOf(urlObj.ctrl)!=-1)?urlObj.ctrl:ctrl;
 		method=(mArr.indexOf(urlObj.method)!=-1)?urlObj.method:method;
 	}
 	
 	urlObj.module=module;
-	urlObj.ctl=ctl;
+	urlObj.ctrl=ctrl;
 	urlObj.method=method;
 }
 function initPage(){
 	let ent=rqData.ent;
+	
 	initUrlObj(ent);
 	//从上到下依次生成、载入页面中的各个组件
 	//1 生成页面navBar
@@ -114,12 +118,19 @@ function initPage(){
 	//4 载入ent对应的List
 	loadEntPeriodList();
 	// console.log(navEntPeriod.find('a').length);
+	
+	//隐藏
+	if(ent!='ass'){
+		$('#divSearchBtn').children().hide();
+	}
+	$('#searchNum').children().hide();
+	
 }
 //设定向后端请求的url
 function getRqUrl(){
-	let kArr=['module','ctl','method'],
+	let kArr=['module','ctrl','method'],
 		arr=[domain];
-	urlObj=$.extend({},{module:'index',ctl:'index',method:'index'},urlObj);
+	urlObj=$.extend({},{module:'index',ctrl:'index',method:'index'},urlObj);
 	
 	kArr.forEach(function(e){
 		arr.push(urlObj[e]);
@@ -304,6 +315,9 @@ function resetSearchForm(){
 	fm.each(function(){
 		$(this)[0].reset();
 		$(this).find('.form-control').removeClass('alert-info');
+		if($(this).siblings().length){
+			$(this).siblings().hide();
+		}
 	});
 	//清空查询数据
 	setRqSearchData();
@@ -404,4 +418,13 @@ function showTopNavbar() {
     		showTopNavbar();
 		})
 	);
+}
+//给console.log的内容加上颜色
+function consoleColor(str='未输入内容',color='green'){
+	let arr={red:'red',blue:'blue',yellow:'#f0ad4e',green:'#5cb85c'};
+	
+	color=Object.keys(arr).includes(color)?arr[color]:'red';
+	
+	console.log('%c%s','font-size:16px;color:'+color+';',str);
+	
 }
