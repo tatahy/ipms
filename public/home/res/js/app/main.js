@@ -1,5 +1,5 @@
 // app/main.js
-//import {glyPrex,bs3Color,topNavProp,entProp,rqData,urlObj,searchResultNum,year} from 'conf.js';
+// import {glyPrex,loadStr,bs3Color,topNavProp,entProp,rqData,urlObj,searchResultNum,year} from './conf.js';
 
 //自调用匿名函数具有立即执行的特点,2种结构。
 (function($,p){ 
@@ -43,7 +43,8 @@ navEntSet.click(function(){
 	let cls=$(this).closest('li').attr('class')?$(this).closest('li').attr('class'):'no class';
 		
 	for(let ent in topNavProp){
-		let e=topNavProp[ent];
+		let e=topNavProp[ent],
+			url='';
 		if($(this).data('ent')==ent){
 			url=e.url;
 			rqData.ent=ent;
@@ -172,7 +173,7 @@ function buildMainRowCom(){
 	$('#entSummary').empty();
 	//挨个生成ent组件
 	for (let ent in num){
-		let numObj=(typeof num[ent]=='object')?num[ent]:0;
+		let numObj=(typeof num[ent]=='object')?num[ent]:0,
 			entObj=entProp[ent],
 			perObj=entObj.period.summary,
 			p=$('<p></p>').addClass('text-center').text(entObj.noneTxt),
@@ -223,7 +224,7 @@ function buildMainPeriodNavCom(){
 		
 		obj.append($('<li></li>').append(a));
 	}
-	<!--为第一个li标签添加.active -->
+	//为第一个li标签添加.active 
 	obj.find('li').eq(0).addClass('active');
 }
 
@@ -282,7 +283,7 @@ function setRqSearchData(searchObj=''){
 //得到设置entProp中的num属性值
 function setEntNumProp(){
 	for(let ent in entProp){
-		for(per in entProp[ent].period.detail){
+		for(let per in entProp[ent].period.detail){
 			entProp[ent].period.detail[per].title.num=num[ent][per];
 		}
 	}
@@ -315,6 +316,7 @@ function resetSearchForm(){
 	fm.each(function(){
 		$(this)[0].reset();
 		$(this).find('.form-control').removeClass('alert-info');
+		//有邻居都隐藏
 		if($(this).siblings().length){
 			$(this).siblings().hide();
 		}
@@ -424,7 +426,6 @@ function consoleColor(str='未输入内容',color='green'){
 	let arr={red:'red',blue:'blue',yellow:'#f0ad4e',green:'#5cb85c'};
 	
 	color=Object.keys(arr).includes(color)?arr[color]:'red';
-	
 	console.log('%c%s','font-size:16px;color:'+color+';',str);
 	
 }

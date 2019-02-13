@@ -9,7 +9,7 @@
 </h4>
 <div id="divSearchBtn" class="text-right">
 	<div class="btn-group">
-    	<button id="btnSearchFormCollapse" type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-collapse-switch="main" data-collapse-multiple=true title="显示/隐藏搜索条件">搜索条件</button>
+    	<button id="btnSearchFormCollapse" type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-collapse-switch="main" data-collapse-multishow=false title="显示/隐藏搜索条件">搜索条件</button>
 			
     	<div class="btn-group">
 			<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">更多<span class="caret"></span></button>
@@ -105,7 +105,6 @@ var searchFormCollapse=function(){
 	//要求liSet.length==divSet.length
 	var divSet=$('[data-collapse-switch="div"]').parent();
 	var liSet=$('[data-collapse-switch="li"]').parent();
-	
 	//自调用匿名函数立即执行，进行赋值
 	var formId=(function(){
 			let arr=[];
@@ -114,39 +113,46 @@ var searchFormCollapse=function(){
 			});
 			return arr;
 		}());
-	var zArr=()=>{	
-			let arr=Array(formId.length).fill(false);
-			return arr;	
+	//箭头函数定义产生初始数组的方法
+	var zArr=()=>{
+			return Array(formId.length).fill(false);	
 		};
+	//箭头函数，定义数组的reduce方法中使用的reducer	
 	var totalTrue=(acc,cur)=>{
 			if(cur){
 				acc++;
 			}
 			return acc;
 		};
-	var prop={liShow:'active',divShow:'in',fn:{show:'show',hide:'hide'}};
-	var status={trigger:{type:'',index:'',multiple:false},showIndex:zArr()};
+	//BootStrap3的HTML标签class属性及函数参数值fn	
+	var bs3Cls={liShow:'active',divShow:'in',fn:{show:'show',hide:'hide'}};
+	/* 状态对象。
+	 * multishow，bool，是否为多个组件可同时显示。
+	 * type:'main'且multishow:true时，index为数组，记录要显示组件index。
+	 * type:'main'且multishow:false时，index为数字，记录要显示组件index。
+	 * type:'li'/'div'时，index为数字，值为触发状态改变的组件index。
+	 * showArr，array，index为组件的index，value为组件是否显示true/false
+	 */
+	var status={trigger:{type:'',index:'',multishow:false},showArr:zArr()};
 	
 	var getStatus=()=>{
 		let idx='';
 		divSet.each(function(){
 			idx=formId.indexOf($(this).attr('id'));
 			//jQ中的hasClass()方法不起作用？
-			<!-- $(this).hasClass(prop.divShow)?status.showIndex[idx]=true:status.showIndex[idx]=false; -->
-		
-			$(this).attr('class').indexOf(prop.divShow)!=-1?status.showIndex[idx]=true:status.showIndex[idx]=false;
+			<!-- $(this).hasClass(bs3Cls.divShow)?status.showArr[idx]=true:status.showArr[idx]=false; -->
+			$(this).attr('class').indexOf(bs3Cls.divShow)!=-1?status.showArr[idx]=true:status.showArr[idx]=false;
 		});
 		
 		return status;
 	};
 	
 	var reset=()=>{
-		st={trigger:{type:'main',index:'0',multiple:''},showIndex:zArr()};
-		st=setCollapse(st);
-		consoleColor('reset():');
-		console.table(st);
+		status=setCollapse({trigger:{type:'main',index:'0',multishow:''},showArr:zArr()});
+		
+		return status;
 	};
-	
+	//设定status中的值
 	var setStatus=(opt={})=>{
 		let type='',
 			idx='',
@@ -156,101 +162,91 @@ var searchFormCollapse=function(){
 		type=status.trigger.type;
 		idx=status.trigger.index;
 		
-		if(status.trigger.multiple==false){
+		if(status.trigger.multishow==false){
 			return setStatusSingle();
 		}
 
 		if(type=='main'){
-			<!-- status.showIndex.reduce(totalTrue,0)?status.showIndex=zArr():status.showIndex[0]=true; -->
 			if(idx === ''){
-				status.showIndex=zArr();
+				status.showArr=zArr();
 				<!-- status.trigger.index=0; -->
 				status.trigger.index=[0];
-				status.showIndex[0]=true;
+				status.showArr[0]=true;
 			}
-			
 			if(Array.isArray(idx)){
-				showVal=status.showIndex[idx];
-				status.showIndex=zArr();
-				status.showIndex[idx]=!showVal;
-			}
-			
-			if(idx === 'all'){
-				status.showIndex.forEach(function(v,i){
-					status.showIndex[i]=!v;
+				//根据数组idx改变对应status.showArr的值
+				status.showArr.forEach(function(v,i){
+					if(idx.includes(i)){
+						status.showArr[i]=!v;
+					}
 				});
 			}
-			if(idx !== '' && idx !== 'all'){
-				showVal=status.showIndex[idx];
-				status.showIndex=zArr();
-				status.showIndex[idx]=!showVal;
-			}
-			
+			return status;
 		}
+		
+		//根据idx的值修改对应status.showArr值
 		if(type=='li'){
-			showVal=status.showIndex[idx];
-			status.showIndex[idx]=!showVal;
-			<!-- if(status.showIndex.reduce(totalTrue,0)==status.showIndex.length){ -->
-				<!-- status.trigger.index='all'; -->
-			<!-- } -->
+			showVal=status.showArr[idx];
+			status.showArr[idx]=!showVal;
 		}
 		if(type=='div'){
-			status.showIndex[idx]=false;
+			status.showArr[idx]=false;
 		}
-		
-		consoleColor('setStatus():');
-		console.table(status);
-		
+		//根据status.showArr的值再修改status.trigger.index为数组
+		if(status.showArr.reduce(totalTrue,0)){
+			idx=[];
+			status.showArr.forEach(function(v,i){
+				if(v){
+					idx.push(i);
+				}
+			});
+		}
+		status.trigger.index=idx;
 		return status;
 	};
-	//根据status对有关组件进行显示、隐藏
-	var setCollapse=(opt={})=>{
-		
-		setStatus(opt);
-		
-		status.showIndex.forEach(function(v,i){
-			if(v){
-				divSet.eq(i).collapse(prop.fn.show);
-				liSet.eq(i).addClass(prop.liShow);
-			}else{
-				divSet.eq(i).collapse(prop.fn.hide);
-				liSet.eq(i).removeClass(prop.liShow);
-			}
-		});
-		consoleColor('setCollapse():');
-		console.table(status);		
-		return status;
-	};
-	//只能显示一个searchForm及其对应组件
+	//设定status中的值，只能显示一个searchForm及其对应组件
 	var setStatusSingle=()=>{
 		let type=status.trigger.type,
 			idx=status.trigger.index,
 			showVal='';;
 		
-		<!-- consoleColor('toggle():'); -->
-		<!-- console.log(idx);	 -->
-
 		//只有showIndex[idx]的值有改变，其他的都为false	
 		if(type=='li'){
-			showVal=status.showIndex[idx];
-			status.showIndex=zArr();
-			status.showIndex[idx]=!showVal;
+			showVal=status.showArr[idx];
+			status.showArr=zArr();
+			status.showArr[idx]=!showVal;
 		}
 		if(type=='main'){
 			if(idx === ''){
-				status.showIndex=zArr();
+				status.showArr=zArr();
 				status.trigger.index=0;
-				status.showIndex[0]=true;
+				status.showArr[0]=true;
 			}
 			if((typeof idx) == 'number'){
-				showVal=status.showIndex[idx];
-				status.showIndex=zArr();
-				status.showIndex[idx]=!showVal;
+				showVal=status.showArr[idx];
+				status.showArr=zArr();
+				status.showArr[idx]=!showVal;
 			}
 		}
 		if(type=='div'){
-			status.showIndex[idx]=false;
+			status.showArr[idx]=false;
 		}
+		return status;
+	};
+	//根据status对有关组件进行显示、隐藏
+	var setCollapse=(opt={})=>{
+		setStatus(opt);
+		
+		status.showArr.forEach(function(v,i){
+			if(v){
+				divSet.eq(i).collapse(bs3Cls.fn.show);
+				liSet.eq(i).addClass(bs3Cls.liShow);
+			}else{
+				divSet.eq(i).collapse(bs3Cls.fn.hide);
+				liSet.eq(i).removeClass(bs3Cls.liShow);
+			}
+		});
+		<!-- consoleColor('setCollapse():'); -->
 		return status;
 	};
 	
@@ -287,11 +283,8 @@ $('#btnRefresh').click(function(){
 	<!-- $('#divSearchForm').removeClass('in'); -->
 	resetSearchForm();
 	sFCObj.reset();
-	<!-- console.table(sFCObj.status);  -->
-	consoleColor($('.searchForm').length);
+	<!-- consoleColor($('.searchForm').length); -->
 });	
-
-<!-- console.log(searchFormCollapse().status);	 -->
 
 //3类共5个collapse-switch组件的click事件处理函数，
 //任意时刻只有一个组件能click。记录触发click的组件特征值，再由特征值决定组件的显示
@@ -301,48 +294,23 @@ collapseSwitchSet.click(function(){
 	//特征值2
 	let	idx='';
 	//特征值3
-	let	mul=$('[data-collapse-switch="main"]').data('collapseMultiple');
+	let	mul=$('[data-collapse-switch="main"]').data('collapseMultishow');
 	
-	let st='';
-	let n='';
-	let showArr=sFCObj.status.showIndex;
-	let totalTrue=(acc,cur)=>{
-			if(cur){
-				acc++;
-			}
-			return acc;
-		};
-	
-	if(mul){
-		idx=[];
-	}
-	
-	if(type=='li'){
-		n=fmId.indexOf($(this).attr('href').slice(1));
-		Array.isArray(idx)?idx.push(n):idx=n;
+	if(type=='li'){	
+		idx=fmId.indexOf($(this).attr('href').slice(1));
 	}
 	if(type=='div'){
-		n=fmId.indexOf($(this).data('target').slice(1));
-		Array.isArray(idx)?idx.push(n):idx=n;
+		idx=fmId.indexOf($(this).data('target').slice(1));
 	}
 	if(type=='main'){
-		n=trgObj.index;
-		Array.isArray(idx)?idx.push(n):idx=n;
+		idx=trgObj.index;
 	}	
 	
 	trgObj.type=type;
 	trgObj.index=idx;
-	trgObj.multiple=mul;
+	trgObj.multishow=mul;
 	
-	consoleColor(type+' ,'+idx+' click, '+'status.trigger:','red');	
-	console.log(trgObj);
-	console.log(trgObj.index);
-	
-	st=sFCObj.setCollapse({trigger:trgObj});
-	
-	consoleColor('调用sFCObj的setCollapse()后的status：','blue');
-	console.table(st); 
-	
+	sFCObj.setCollapse({trigger:trgObj});
 });
 });
 </script>

@@ -146,4 +146,4 @@ var entProp={
 	}
 }
 
-//export {glyPrex,bs3Color,topNavProp,entProp,rqData,urlObj,searchResultNum,year};
+// export {glyPrex,loadStr,bs3Color,topNavProp,entProp,rqData,urlObj,searchResultNum,year};
