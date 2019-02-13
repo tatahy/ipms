@@ -20,8 +20,7 @@ class IndexController extends Controller
   #patent的period与status的对应关系，本应用common.php中定义
   const PATPERIODSTATUS=conPatPeriodVsStatus;
   
-  public function index(Request $request,PatinfoModel $patMdl,UserModel $userMdl,AssinfoModel $assMdl)
-  {
+  public function index(Request $request,PatinfoModel $patMdl,UserModel $userMdl,AssinfoModel $assMdl) {
     //'username'和'pwd'的来源：session或初次登录时表单POST提交
     $username =!empty($request->post('username'))?$request->post('username'):Session::get('username');
     $pwd = !empty($request->post('pwd'))?md5($request->post('pwd')):Session::get('pwd');
@@ -109,8 +108,7 @@ class IndexController extends Controller
   }
 
   //修改application/config.php的设置将“默认操作”由“index”改为“login”？？
-  public function login(Request $request)
-  {
+  public function login(Request $request){
 
     $this->assign(['home' => $request->domain(), 'year' => date('Y')]);
 
@@ -119,12 +117,16 @@ class IndexController extends Controller
   }
 
 
-  public function logout(Request $request)
-  {
+  public function logout(Request $request){
     Session::clear();
     Session::destroy();
     $this->success('安全退出系统', 'index/login');
 
+  }
+  
+  public function getEntSearchFormVal() {
+    
+    
   }
 
 
