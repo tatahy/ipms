@@ -16,9 +16,19 @@ class IndexController extends Controller
   
   //用户权限
   private $authArr=array();
+  //用户登录状态
+  private $log = 0;
   
   #patent的period与status的对应关系，本应用common.php中定义
   const PATPERIODSTATUS=conPatPeriodVsStatus;
+  
+  private function priLogin(){
+        //通过$log判断是否是登录用户，非登录用户退回到登录页面
+    if(1!==$this->log || count($this->authArr)){
+      return $this->error('未登录用户，请先登录系统');
+      //$this->redirect($request->domain());
+    }
+  }
   
   public function index(Request $request,PatinfoModel $patMdl,UserModel $userMdl,AssinfoModel $assMdl) {
     //'username'和'pwd'的来源：session或初次登录时表单POST提交
@@ -26,7 +36,6 @@ class IndexController extends Controller
     $pwd = !empty($request->post('pwd'))?md5($request->post('pwd')):Session::get('pwd');
 
     $log = Session::get('log');
-
     $data = ['name' => $username, 'pwd' => $pwd, ];
 
     //使用自定义的validate类“Ipvalidate”进行浏览器端验证，类文件目录：application\common\validate
@@ -63,6 +72,8 @@ class IndexController extends Controller
       Session::set('dept', $user->dept);
       Session::set('authArr', $authority);
       
+      $this->authArr=$authority;
+      $this->log=1;
       
       #根据ass是否有read权限进行赋值，利用模型对象得到各个asset总数
       $num['ass']=$authority['ass']['read']?$assMdl::getPeriodNum():0;
@@ -104,7 +115,6 @@ class IndexController extends Controller
         'year' => date('Y'), 
         ]);
       return view();
-
   }
 
   //修改application/config.php的设置将“默认操作”由“index”改为“login”？？
@@ -127,6 +137,47 @@ class IndexController extends Controller
   public function getEntSearchFormVal() {
     
     
+  }
+  
+  public function getResData(Request $request,PatinfoModel $patMdl,AssinfoModel $assMdl) {
+    //$this->priLogin();
+    
+    $num=['pat' => 0,'ass'=>0,'pro'=>0,'the'=>0];
+
+    $rqName=!empty($request->param('rqName'))?$request->param('rqName'):'entNum';
+    
+    #根据ass是否有read权限进行赋值，利用模型对象得到各个asset总数
+      //$num['ass']=$this->authArr['ass']['read']?$assMdl::getPeriodNum():0;
+      $num['ass']=$assMdl::getPeriodNum();
+      
+      #根据pat是否有read权限进行赋值，利用模型对象得到各个patent总数
+      //$num['pat']=$this->authArr['pat']['read']?$patMdl::getPeriodNum():0;
+      $num['pat']=$patMdl::getPeriodNum();
+      
+      $num['pro']=[
+        'total'=>'x',
+        'audit'=>'x',
+        'plan'=>'x',
+        'apply'=>'x',
+        'approve'=>'x',
+        'process'=>'x',
+        'inspect'=>'x',
+        'done'=>'x',
+        'terminate'=>'x',
+        'reject'=>'x',
+      ];
+
+      $num['the']=[
+        'total'=>'x',
+        'audit'=>'x',
+        'plan'=>'x',
+        'apply'=>'x',
+        'accept'=>'x',
+        'publish'=>'x',
+        'reject'=>'x'
+      ];
+
+      return [$rqName=>$num];
   }
 
 

@@ -6,12 +6,11 @@ var	rqData={
 		sortData:{listRows:10,sortName:'',sortOrder:'asc',pageNum:1},
 		searchData:{}
 	};
-var urlObj={module:'index',method:'index',ctrl:'index'};
+var urlObj={domain:'',module:'index',method:'index',ctrl:'index'};
 var searchResultNum='';
 //定义前端系统各个实体数量对象,由后端给定??
-// var num='';
-//系统ip,由后端给定??
-// var domain='';
+var entNum='';
+
 var year=new Date().getFullYear();
 
 const glyPrex='glyphicon glyphicon-';
@@ -146,4 +145,4 @@ var entProp={
 	}
 }
 
-// export {glyPrex,loadStr,bs3Color,topNavProp,entProp,rqData,urlObj,searchResultNum,year};
+// export {glyPrex,entNum,domain,loadStr,bs3Color,topNavProp,entProp,rqData,urlObj,searchResultNum,year};

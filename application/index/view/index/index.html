@@ -1,5 +1,6 @@
 {include file="../application/common/header.html" title="IPMS-查阅"}
-
+<div id="domain" class="sr-only">{$home}</div>
+<div id="entNum" class="sr-only">{$num}</div>
 <nav class="navbar navbar-default navbar-fixed-top" data-spy="affix">
 <div class="container-fluid">
 	<div class="navbar-header">
@@ -106,7 +107,7 @@
 	</div>
 	
 	<div class="tab-content">
-		<div id="searchList">
+		<div id="entList">
 		<!-- //jQ载入3 -->
 		</div>
 	</div>	
@@ -143,13 +144,6 @@
 <!--/ Modal "" -->
 
 {include file="../application/common/footer.html"}
-
-<!-- //embed js code onto this HTML page-->
-<script>
-//定义全局变量，后端赋值
-var num={$num};
-var domain='{$home}';
-</script>
 
 <!-- //import js code into this HTML page, 引入全局变量 -->
 <script type="text/javascript" src="/home/res/js/app/conf.js"></script>
