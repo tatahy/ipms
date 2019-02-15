@@ -1,6 +1,5 @@
 {include file="../application/common/header.html" title="IPMS-查阅"}
-<div id="domain" class="sr-only">{$home}</div>
-<div id="entNum" class="sr-only">{$num}</div>
+<div class="sr-only" data-assign-name="domain" data-assign-value='{$home}'>{$home}</div>
 <nav class="navbar navbar-default navbar-fixed-top" data-spy="affix">
 <div class="container-fluid">
 	<div class="navbar-header">
@@ -49,7 +48,7 @@
 	<!-- </div> -->
 </div>
 
-<div id="entPeriod" class="container-fluid mainFrame">	
+<div id="entPeriod" class="container-fluid mainFrame" hidden=true>	
 		
 	<ul class="nav nav-pills">
 	<!-- //jQ生成3 -->

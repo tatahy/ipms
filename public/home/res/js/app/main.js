@@ -2,122 +2,80 @@
 // import {glyPrex,domain,loadStr,bs3Color,topNavProp,entProp,rqData,urlObj,searchResultNum,year} from './conf.js';
 // import * from './conf.js';
 
-//自调用匿名函数具有立即执行的特点,2种结构。
-(function($,p){ 
-	// console.log(p);
-})
-(jQuery,'p1');
+pageLifeInit();
 
-(function($,p){ 
-	// console.log(p);
-}
-(jQuery,'p2'));
-
-//var navEntPeriod=$('#entPeriod').children('ul.nav');
-// var entNum=ajaxResByPost();
-	
-urlObj.domain=$('#domain').text();
-entNum=JSON.parse($('#entNum').text());
-// entNum=ajaxResByPost({rqName:'entNum',async:false,method:'getResData'});
-// console.table(entNum);
-	
-buildTopNavbar();
-buildEntSummary();
-setEntNumProp();
-// 激活并设置tooltip
-$('body').tooltip({selector:'[title]',triger:'hover click',placement:'auto top',delay: {show: 200, hide: 100},html: true });
-
-//jQuery中的HTML文件准备好的函数。
-$(document).ready(function(){
-//本函数中有效的变量
-	let sumObj=$('#entSummary'),
-		perObj=$('#entPeriod'),
-		navTopEntASet=$('nav .navbar-collapse ul').eq(0).find('a'),
-		yearObj=$('footer .year'),
-		btnEntPeriod=sumObj.find('.btnPeriod'),
-		btnTopnavToggle=$('nav .navbar-header').children('.navbar-toggle');
-	
-	sumObj.show();
-	perObj.hide();
-	
-	navTopEntASet.click(function(){
-		let cls=$(this).closest('li').attr('class')?$(this).closest('li').attr('class'):'no class',
-			ent=$(this).data('ent');
-			
-		$(this).tab('show');
-		sumObj.hide();
-		perObj.hide();
-		ent=='index'?sumObj.show():perObj.show();
-		
-		//为全局变量赋值
-		for(let name in topNavProp){
-			let e=topNavProp[name],
-				url='';
-			if(ent==name){
-				url=e.url;
-				rqData.ent=name;
-				rqData.period=e.period;
-			}
-		}
-		
-		if(cls.indexOf('disabled')==-1 && ent!='index'){
-			pageLifeInit();
-			pageLifeReady();
-		}
-		
-	});
-	
-	btnEntPeriod.click(function(){
-		let ent=$(this).data('ent');
-		sumObj.hide();
-		perObj.show();
-		
-		//ent对应的navTop的li添加'active'
-		navTopEntASet.closest('li').removeClass('active').find('[data-ent="'+ent+'"]').tab('show');
-		
-		rqData.ent=ent;
-		rqData.period=$(this).data('period');
-		
-		pageLifeInit();
-		pageLifeReady();
-	});
-	
-	yearObj.html((year-1)+'-'+year);
-
-	btnTopnavToggle.click(function(){
-		showTopNavbar();
-	});
-
-});
-
-//让urlObj的取值都在给定的范围内
-function initUrlObj(ent=''){	
-	let arr=Object.keys(entProp),
-		module='index',
-		ctrl='index',
-		method='index',
-		obj='',
-		cArr=[],
-		mArr=[];
-	
-	if(arr.indexOf(ent)!=-1){
-		obj=entProp[ent];
-		cArr=obj.ctrl;
-		mArr=obj.method;
-		module=obj.module;
-	}
-	
-	if(typeof obj=='object'){
-		ctrl=(cArr.indexOf(urlObj.ctrl)!=-1)?urlObj.ctrl:ctrl;
-		method=(mArr.indexOf(urlObj.method)!=-1)?urlObj.method:method;
-	}
-	
-	urlObj.module=module;
-	urlObj.ctrl=ctrl;
-	urlObj.method=method;
-}
 //页面生命周期函数-init
 function pageLifeInit(){
+	let resData=ajaxResByPost({getPageInitData:true,async:false});
+	//全局变量赋值
+	urlObj=resData.urlObj;
+	entNum=resData.entNum;
+	setEntProp();
+	console.table(urlObj);
+	
+	//生成组件
+	buildTopNavbar();
+	buildEntSummary();
+	
+	// 激活并设置tooltip
+	$('body').tooltip({selector:'[title]',triger:'hover click',placement:'auto top',delay: {show: 200, hide: 100},html: true });
+	
+	//jQuery中的HTML文件准备好的函数，操作组件
+	$(document).ready(function(){
+		//本函数中有效的变量
+		let sumObj=$('#entSummary'),
+			perObj=$('#entPeriod');
+		let navTopEntASet=$('nav .navbar-collapse ul').eq(0).find('a'),
+			btnEntPeriod=sumObj.find('.btnPeriod'),
+			btnTopnavToggle=$('nav .navbar-header').children('.navbar-toggle');
+	
+		sumObj.show();
+		perObj.hide();
+		
+		$('footer .year').html('2017-'+year);
+
+		btnTopnavToggle.click(function(){
+			showTopNavbar();
+		});
+
+	
+		navTopEntASet.click(function(){
+			let cls=$(this).closest('li').attr('class')?$(this).closest('li').attr('class'):'no class',
+				ent=$(this).data('ent');
+			
+			$(this).tab('show');
+			sumObj.hide();
+			perObj.hide();
+			
+			ent=='index'?sumObj.show():perObj.show();
+		
+			rqData.ent=ent;
+			rqData.period=topNavProp[ent].period;
+			
+			if(cls.indexOf('disabled')==-1 && ent!='index'){
+				pageLifeChange();
+				pageLifeReady();
+			}
+		});
+	
+		btnEntPeriod.click(function(){
+			let ent=$(this).data('ent');
+			sumObj.hide();
+			perObj.show();
+		
+			//ent对应的navTop的li添加'active'
+			navTopEntASet.closest('li').removeClass('active').find('[data-ent="'+ent+'"]').tab('show');
+		
+			rqData.ent=ent;
+			rqData.period=$(this).data('period');
+		
+			pageLifeChange();
+			pageLifeReady();
+		});
+	});
+}
+//页面生命周期函数-change
+function pageLifeChange(){
 	let ent=rqData.ent;
 	
 	initUrlObj(ent);
@@ -131,7 +89,7 @@ function pageLifeInit(){
 	
 	//4 载入ent特定searchForm（ass的条码识别模板文件）？？
 	// if(ent=='ass'){
-		// urlObj.method='loadSearchFormBarcode';
+		// urlObj.action='loadSearchFormBarcode';
 		// $('#divSearchFormBarcode').load(getRqUrl());
 	// }
 	
@@ -140,25 +98,57 @@ function pageLifeInit(){
 }
 //页面生命周期函数-ready
 function pageLifeReady(){
-	let ent=rqData.ent,
-		period=rqData.period,
-		//在pageLifeInit中已生成
-		navEntPeriodSet=$('#entPeriod').children('.nav-pills').find('a');
+	let //在pageLifeChange中已生成
+		navEntPeriodASet=$('#entPeriod').children('.nav-pills').find('a');
 	
-	navEntPeriodSet.click(function(){
+	navEntPeriodASet.click(function(){
 		$(this).tab('show');
 		rqData.period=$(this).data('period');
 		loadEntPeriodList();
 	});
 	
 	//其他操作
+	// 页面刷新
+	$('#btnRefresh').click(function(){
+		//隐藏搜索条件
+		// $('#divSearchArea').removeClass('in');
+		resetSearchForm();
+		loadEntPeriodList();
+	});	
+	
+}
+//让urlObj的取值都在已定义的范围内
+function initUrlObj(ent=''){	
+	let arr=Object.keys(entProp),
+		module='index',
+		ctrl='index',
+		action='index',
+		obj='',
+		cArr=[],
+		mArr=[];
+	
+	if(arr.indexOf(ent)!=-1){
+		obj=entProp[ent];
+		cArr=obj.ctrl;
+		mArr=obj.action;
+		module=obj.module;
+	}
+	
+	if(typeof obj=='object'){
+		ctrl=(cArr.indexOf(urlObj.ctrl)!=-1)?urlObj.ctrl:ctrl;
+		action=(mArr.indexOf(urlObj.action)!=-1)?urlObj.action:action;
+	}
+	
+	urlObj.module=module;
+	urlObj.ctrl=ctrl;
+	urlObj.action=action;
 }
 //设定向后端请求的url
 function getRqUrl(){
-	let kArr=['domain','module','ctrl','method'],
+	let kArr=['domain','module','ctrl','action'],
 		arr=[],
 		url='';
-	urlObj=$.extend({},{module:'index',ctrl:'index',method:'index'},urlObj);
+	urlObj=$.extend({},{module:'index',ctrl:'index',action:'index'},urlObj);
 	
 	kArr.forEach(function(e){
 		arr.push(urlObj[e]);
@@ -271,7 +261,7 @@ function loadEntPeriodList(){
 	let	//加载list的根节点
 		obj=$('#entList');
 	
-	urlObj.method=rqData.ent+'List';
+	urlObj.action=rqData.ent+'List';
 	obj.html(loadStr).load(getRqUrl(),rqData,function(){
 		let ent=rqData.ent,
 			capSObj=$('#entList').find('caption strong'),
@@ -309,7 +299,7 @@ function setRqSearchData(searchObj=''){
 	
 }
 //完善entProp中的num属性值
-function setEntNumProp(){
+function setEntProp(){
 	for(let ent in entProp){
 		for(let per in entProp[ent].period.detail){
 			entProp[ent].period.detail[per].title.num=entNum[ent][per];
@@ -352,7 +342,6 @@ function resetSearchForm(){
 	});
 	//清空查询数据
 	setRqSearchData();
-	loadEntPeriodList();
 }
 
 //对ent List进行排序
@@ -449,12 +438,12 @@ function consoleColor(str='无内容',color='blue'){
 }
 //使用$.post方法向服务器请求特定值。
 function ajaxResByPost(opt={}) {
-	let optDefault={rqName:'',async:true,method:'index'},
+	let optDefault={getPageInitData:false,async:true,action:'index'},
 		url='',
 		resData='';
 	opt=$.extend({},optDefault,opt);
 	
-	urlObj.method=opt.method;
+	urlObj.action=opt.action;
 	
 	url=getRqUrl(),
 	
@@ -466,14 +455,13 @@ function ajaxResByPost(opt={}) {
 		url:url,
 		async:opt.async,
 		type:'POST',
-		data:{rqName:opt.rqName},
+		data:{getPageInitData:opt.getPageInitData},
 		dataType:'json'	,
 		success:function(data){
 			resData=data;
 		}				
 	});
 		
-	// return $.post(getRqUrl(),{rqName:opt.rqName},);
 	return resData;
 	
 	

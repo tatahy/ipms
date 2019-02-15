@@ -6,7 +6,7 @@ var	rqData={
 		sortData:{listRows:10,sortName:'',sortOrder:'asc',pageNum:1},
 		searchData:{}
 	};
-var urlObj={domain:'',module:'index',method:'index',ctrl:'index'};
+var urlObj={domain:'',module:'index',ctrl:'index',action:'index'};
 var searchResultNum='';
 //定义前端系统各个实体数量对象,由后端给定??
 var entNum='';
@@ -29,11 +29,11 @@ const bs3Color={
 };
 	//topNav中li组件主要属性
 const topNavProp={
-		index:{'url':domain+'/index/index/index',period:'',gly:glyPrex+'home',chi:'首页'},
-		pat:{'url':domain+'/patent/index/index',period:'total',gly:glyPrex+'wrench',chi:'专利'},
-		ass:{'url':domain+'/asset/index/index',period:'usual',gly:glyPrex+'oil',chi:'固定资产'},
-		pro:{'url':domain+'/project/index/index',period:'total',gly:glyPrex+'inbox',chi:'项目'},
-		the:{'url':domain+'/thesis/index/index',period:'total',gly:glyPrex+'list',chi:'论文'}
+		index:{'url':urlObj.domain+'/index/index/index',period:'',gly:glyPrex+'home',chi:'首页'},
+		pat:{'url':urlObj.domain+'/patent/index/index',period:'total',gly:glyPrex+'wrench',chi:'专利'},
+		ass:{'url':urlObj.domain+'/asset/index/index',period:'usual',gly:glyPrex+'oil',chi:'固定资产'},
+		pro:{'url':urlObj.domain+'/project/index/index',period:'total',gly:glyPrex+'inbox',chi:'项目'},
+		the:{'url':urlObj.domain+'/thesis/index/index',period:'total',gly:glyPrex+'list',chi:'论文'}
 };
 
 const noneSufx='模块无【查阅】权限，请与系统管理员联系。';
@@ -45,7 +45,7 @@ var entProp={
 	pat:{
 		module:'patent',
 		ctrl:['index'],
-		method:['index','patList','patSearchForm','getSelComData'],
+		action:['index','patList','patSearchForm','getSelComData'],
 		chi:'专利',
 		gly:glyPrex+'wrench',
 		period:{
@@ -68,7 +68,7 @@ var entProp={
 	ass:{
 		module:'asset',
 		ctrl:['index'],
-		method:['index','assList','assSearchForm'],
+		action:['index','assList','assSearchForm'],
 		chi:'固定资产',
 		gly:glyPrex+'oil',
 		period:{
@@ -92,7 +92,7 @@ var entProp={
 	pro:{
 		module:'project',
 		ctrl:['index','proList','proSearchForm'],
-		method:['index'],
+		action:['index'],
 		chi:'项目概况&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
 		gly:glyPrex+'inbox',
 		period:{
@@ -122,7 +122,7 @@ var entProp={
 	the:{
 		module:'thesis',
 		ctrl:['index','theList','theSearchForm'],
-		method:['index'],
+		action:['index'],
 		chi:'论文概况&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
 		gly:glyPrex+'list',
 		period:{

@@ -19,7 +19,7 @@
   {css href="/home/res/css/bs-callout.css" } 
   {js href="/home/res/js/jquery1.12.4.min.js" }
   {js href="/home/res/js/bootstrap3.3.7.min.js" }
-  
+  {js href="/home/res/js/md5.min.js" }
 
 {/*<!-- 实现nav固定在页面顶端效果的补充代码块,
 同时还需设置nav的data-offset-top="-3"防止鼠标单击页面时出现跳动-->
@@ -51,14 +51,6 @@
 <!-- Tooltips must be initialized with jQuery: select the specified element and call the tooltip() method.
 The following code will enable all tooltips in the document:-->
 */}
-<script>
-$(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip();   
-	
-	
-});
-</script>
-
 </head>
 
 <body>
@@ -75,93 +67,136 @@ $(document).ready(function(){
 			<img src="/home/res/images/logo.png" class="img-responsive img-circle margin" style="display:inline" width="45" height="40">
 			</strong></a>
 		</div>
-    <div class="collapse navbar-collapse" id="myNavbar">
-      <ul class="nav navbar-nav navbar-right">
-		<li class="">
-				<form class="navbar-form" role="form" action="{$home}/index/index/index" method="post">
-					<div class="form-group">
-						<label class="sr-only" for="username">用户名</label>
-						<input class="form-control" id="username" name= "username" type="text" placeholder="用户名" required>
-					</div>	
-					<div class="form-group">
-						<label class="sr-only" for="pwd">密码</label>
-						<input class="form-control" id="pwd" name="pwd" type="password" placeholder="密码" required>
-					</div>
-						<button type="submit" class="btn btn-default form-control"><span class="glyphicon glyphicon-log-in"></span>&nbsp;登录</button>
-				</form>
-		</li>
-      </ul>
-    </div>
   </div>
 </nav>
 <!-- /pageheader  -->
 
 <!-- pagewrap  -->
-<div id="main" class="container-fluid" style="padding-top:80px;margin: 0 10%;">	
-	<div class="row">
-		<div class="col-sm-6">
-			<div class="panel-group">
-				<div class="panel panel-default">
-					<div class="panel-heading"><strong>项目概况</strong></div>
-						<div class="panel-body">
-							<a href="#"><span class="label label-default">新增项目</span></a>
-							<a href="#"><span class="label label-info">申报项目</span></a>
-							<a href="#"><span class="label label-warning">立项项目</span></a>
-							<a href="#"><span class="label label-primary">在研项目</span></a>
-						</div>
-				</div>
-			</div>
-		</div>
+<div class="container-fluid" style="padding-top:160px;margin: 0 10%;">	
+	<!-- <div class="row"> -->
+		<!-- <div class="col-sm-6"> -->
+			<!-- <div class="panel-group"> -->
+				<!-- <div class="panel panel-default"> -->
+					<!-- <div class="panel-heading"><strong>项目概况</strong></div> -->
+						<!-- <div class="panel-body"> -->
+							<!-- <a href="#"><span class="label label-default">新增项目</span></a> -->
+							<!-- <a href="#"><span class="label label-info">申报项目</span></a> -->
+							<!-- <a href="#"><span class="label label-warning">立项项目</span></a> -->
+							<!-- <a href="#"><span class="label label-primary">在研项目</span></a> -->
+						<!-- </div> -->
+				<!-- </div> -->
+			<!-- </div> -->
+		<!-- </div> -->
 		
-		<div class="col-sm-6">
-			<div class="panel-group">
-				<div class="panel panel-default">
-					<div class="panel-heading"><strong>固定资产</strong></div>
-						<div class="panel-body">
-							<a href="#"><span class="label label-default">停用<span class="badge"></span></span></a>
-							<a href="#"><span class="label label-info">待定</span></a>
-							<a href="#"><span class="label label-success">正常</span></a>
-						</div>
-				</div>
-			</div>
+		<!-- <div class="col-sm-6"> -->
+			<!-- <div class="panel-group"> -->
+				<!-- <div class="panel panel-default"> -->
+					<!-- <div class="panel-heading"><strong>固定资产</strong></div> -->
+						<!-- <div class="panel-body"> -->
+							<!-- <a href="#"><span class="label label-default">停用<span class="badge"></span></span></a> -->
+							<!-- <a href="#"><span class="label label-info">待定</span></a> -->
+							<!-- <a href="#"><span class="label label-success">正常</span></a> -->
+						<!-- </div> -->
+				<!-- </div> -->
+			<!-- </div> -->
+		<!-- </div> -->
+	<!-- </div> -->
+	
+	<!-- <div class="row"> -->
+		<!-- <div class="col-sm-6"> -->
+			<!-- <div class="panel-group"> -->
+				<!-- <div class="panel panel-default"> -->
+					<!-- <div class="panel-heading"><strong>专利概况</strong></div> -->
+						<!-- <div class="panel-body"> -->
+							<!-- <a href="#"><span class="label label-default">新增专利</span></a> -->
+							<!-- <a href="#"><span class="label label-info">申报专利</span></a> -->
+							<!-- <a href="#"><span class="label label-success">有效专利</span></a> -->
+						<!-- </div> -->
+				<!-- </div> -->
+			<!-- </div> -->
+		<!-- </div> -->
+		
+		<!-- <div class="col-sm-6"> -->
+			<!-- <div class="panel-group"> -->
+				<!-- <div class="panel panel-default"> -->
+					<!-- <div class="panel-heading"><strong>论文概况</strong></div> -->
+						<!-- <div class="panel-body"> -->
+							<!-- <a href="#"><span class="label label-default">新增论文</span></a> -->
+							<!-- <a href="#"><span class="label label-info">投稿论文</span></a> -->
+							<!-- <a href="#"><span class="label label-success">发表论文</span></a> -->
+						<!-- </div> -->
+				<!-- </div> -->
+			<!-- </div> -->
+		<!-- </div> -->
+	<!-- </div> -->
+		
+	<div class="col-lg-4 col-lg-offset-4">
+	<div class="panel panel-info"> 
+		<div class="panel-heading text-center">
+			<h4><strong>用户登录</strong></h4>
+		</div>
+		<div class="panel-body">
+			
+			<form action="{$home}/index/index/index" method="post" >
+                <div class="form-group has-feedback">
+                    <label for="username">用户名</label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                        <input type="text" name="username" class="form-control" placeholder="请输入用户名" maxlength="20" autocomplete="on" required>
+                    </div>
+                </div>
+
+                <div class="form-group has-feedback">
+                    <label for="password">密码</label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                        <input type="password" name="pwd" class="form-control" placeholder="请输入密码" maxlength="10" autocomplete="off" required>
+                    </div>
+                </div>
+
+
+               
+				<br/>
+				
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-log-in"></span>&nbsp;登录</button>
+                </div>
+
+            </form>
+			
 		</div>
 	</div>
-	
-	<div class="row">
-		<div class="col-sm-6">
-			<div class="panel-group">
-				<div class="panel panel-default">
-					<div class="panel-heading"><strong>专利概况</strong></div>
-						<div class="panel-body">
-							<a href="#"><span class="label label-default">新增专利</span></a>
-							<a href="#"><span class="label label-info">申报专利</span></a>
-							<a href="#"><span class="label label-success">有效专利</span></a>
-						</div>
-				</div>
-			</div>
-		</div>
-		
-		<div class="col-sm-6">
-			<div class="panel-group">
-				<div class="panel panel-default">
-					<div class="panel-heading"><strong>论文概况</strong></div>
-						<div class="panel-body">
-							<a href="#"><span class="label label-default">新增论文</span></a>
-							<a href="#"><span class="label label-info">投稿论文</span></a>
-							<a href="#"><span class="label label-success">发表论文</span></a>
-						</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	
-	<div class="row">
-		
-		
-		
 	</div>
 	
 </div>
+
+<script>
+$('[title]').tooltip();   
+
+$(document).ready(function(){
+	    
+	$('form').submit(function(evt) {
+		let url=$(this).attr('action'),
+			data={};
+		evt.preventDefault();
+		$(this).find('[name]').each(function(k,v){
+			let name=$(v).attr('name'),
+				val=$(v).val();
+			
+			if('pwd'==name){
+				data[name]=md5(val);
+			}else{
+				data[name]=val;
+			}
+		});
+		$.post(url,data,function(){
+			//重定向到url
+			window.location.href=url;
+		});
+	});
+	
+});
+</script>
 <!-- /pagewrap -->
 	
 {include file="../application/common/footer.html"}
