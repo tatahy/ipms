@@ -87,11 +87,8 @@ function pageLifeChange(){
 	//3 生成ent的SearchForm
 	buildEntSearchForm();
 	
-	//4 载入ent特定searchForm（ass的条码识别模板文件）？？
-	// if(ent=='ass'){
-		// urlObj.action='loadSearchFormBarcode';
-		// $('#divSearchFormBarcode').load(getRqUrl());
-	// }
+	//4 载入ent的searchForm
+	loadEntSearchForm();
 	
 	//5 载入ent对应的List
 	loadEntPeriodList();
@@ -231,10 +228,6 @@ function buildEntSummary(){
 		$('#entSummary').append(r);
 	}
 }
-//生成ent的搜索表单
-function buildEntSearchForm(){
-	// console.log($('#entPeriod').children('.nav-pills').find('a').length);	
-}
 //根据定义的entProp生成"Nav"组件
 function buildEntPeriodNavPills(){
 	let ent=rqData.ent,
@@ -256,7 +249,26 @@ function buildEntPeriodNavPills(){
 		obj.append(liObj);
 	}
 }
-//载入实体各个阶段下的列表
+//生成ent的搜索表单
+function buildEntSearchForm(){
+	// console.log($('#entPeriod').children('.nav-pills').find('a').length);	
+}
+//载入ent的搜索表单
+function loadEntSearchForm(){
+	let	//加载searchform的根节点
+		obj=$('#entSearchForm'),
+		comObj=obj.children('.divCommon')
+		speObj=obj.children('.divSpecial');
+		ent=rqData.ent;
+	obj.children().hide();
+
+	if(ent=='ass'){
+		speObj.empty().append(110).show();
+	}else{
+		comObj.show();
+	}
+}
+//载入ent各个period的列表
 function loadEntPeriodList(){
 	let	//加载list的根节点
 		obj=$('#entList');

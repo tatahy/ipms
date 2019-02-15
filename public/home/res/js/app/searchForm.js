@@ -48,7 +48,7 @@ function setFmSearchData(opt={}){
 	}
 }
 //挨个组装好所有的select组件
-function  buildFmSelectCom(){
+function buildFmSelectCom(){
 	let selSet=fm.find('select'),
 		rData={period:rqData.period,name:[]};
 	urlObj.method='getSelComData';

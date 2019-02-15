@@ -49,7 +49,6 @@
 </div>
 
 <div id="entPeriod" class="container-fluid mainFrame" hidden=true>	
-		
 	<ul class="nav nav-pills">
 	<!-- //jQ生成3 -->
 	</ul>
@@ -57,41 +56,27 @@
 	<!-- //jQ生成4 -->
 	</h4>
 	
-	<div id="divSearchBtn" class="text-right">
-    	<!-- //jQ生成5 -->
-		<button id="btnSearchFormCollapse" type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divSearchForm" title="显示/隐藏搜索条件">搜索条件</button>
-		
-    	<div class="btn-group">
-    		<button type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-collapse-switch="main" data-collapse-multishow=false title="显示/隐藏搜索条件">搜索条件</button>
-			
-    		<div class="btn-group">
-				<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">更多<span class="caret"></span></button>
-      			<ul class="dropdown-menu" role="menu">
-					<li class=""><a href="#divSearchForm" data-toggle="collapse" data-collapse-switch="li" title="根据输入信息搜索"><span class="glyphicon glyphicon-edit"></span>一般搜索</a></li>
-    				<li role="separator" class="divider"></li>
-    				<li class=""><a href="#divSearchFormBarcode" data-toggle="collapse" data-collapse-switch="li" title="选择/ 拍摄<br>条形码图片搜索"><span class="glyphicon glyphicon-barcode"></span>条形码搜索</a></li>
-      			</ul>
-    		</div>
-  		</div>
-		
-		<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
-  	</div>
-		
-	<!-- // 一般搜索-->
-	<div id="divSearchForm" class="collapse">
-		<br>
-		<span class="text-primary" ><span class="glyphicon glyphicon-edit"></span>一般搜索条件</span>
-	
-		<button type="button" class="close" data-target="#divSearchForm"  data-toggle="collapse" data-collapse-switch="div" title="关闭">&times;</button>
-		<!-- // 一般搜索表单-->
-		<div id="searchForm">
-		<!-- //jQ载入 -->
+	<div id="entSearchForm">
+	<!-- //jQ载入1 -->
+		<div class="divCommon">
+		<div class="text-right" data-show-search-form=false>
+			<button type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divSearchForm" title="显示/隐藏搜索条件">搜索条件</button>&nbsp;
+			<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 		</div>
-	</div>
-	
-	<!-- //特殊搜索， 条形码搜索区域-->
-	<div id="searchFormBarcode">
-		<!-- //jQ载入2 -->
+
+		<div id="divSearchForm" class="collapse">
+			<a class="label label-primary" style="font-size:14px;border-bottom-left-radius:0px;border-bottom-right-radius:0px;padding-top:5px;" href="#divSearchForm"  data-toggle="collapse" title="点击隐藏">搜索条件</a>		
+	<!-- // 一般搜索表单-->	
+			<div>
+			ll
+			</div>
+		</div>
+		</div>
+		
+		<div class="divSpecial">
+		2222
+		</div>
+		
 	</div>
 	
 	<div id="searchNum">
@@ -105,11 +90,10 @@
 		</p>
 	</div>
 	
-	<div class="tab-content">
-		<div id="entList">
+	<div id="entList">
 		<!-- //jQ载入3 -->
-		</div>
-	</div>	
+	</div>
+	
 	
 </div>
 
