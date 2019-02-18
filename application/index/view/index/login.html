@@ -72,7 +72,7 @@ The following code will enable all tooltips in the document:-->
 <!-- /pageheader  -->
 
 <!-- pagewrap  -->
-<div class="container-fluid" style="padding-top:160px;margin: 0 10%;">	
+<div class="container-fluid" style="padding-top:140px;margin: 0 10%;">	
 	<!-- <div class="row"> -->
 		<!-- <div class="col-sm-6"> -->
 			<!-- <div class="panel-group"> -->
@@ -137,7 +137,12 @@ The following code will enable all tooltips in the document:-->
 		</div>
 		<div class="panel-body">
 			
-			<form action="{$home}/index/index/index" method="post" >
+			<div id="alertDiv" class="alert alert-danger" role="alert" hidden="true">
+  				<button type="button" class="close"><span>&times;</span></button>
+  				<strong>重试！</strong> 
+				<span></span>
+			</div>
+			<form action="{$home}/index/index/login" method="post" data-url-index="{$home}/index/index/index">
                 <div class="form-group has-feedback">
                     <label for="username">用户名</label>
                     <div class="input-group">
@@ -154,8 +159,6 @@ The following code will enable all tooltips in the document:-->
                     </div>
                 </div>
 
-
-               
 				<br/>
 				
                 <div class="form-group text-center">
@@ -173,26 +176,110 @@ The following code will enable all tooltips in the document:-->
 <script>
 $('[title]').tooltip();   
 
+class loginForm {
+
+}
+
 $(document).ready(function(){
-	    
-	$('form').submit(function(evt) {
-		let url=$(this).attr('action'),
-			data={};
-		evt.preventDefault();
-		$(this).find('[name]').each(function(k,v){
-			let name=$(v).attr('name'),
-				val=$(v).val();
+	let fm=$('form'),
+		urlLogin=fm.attr('action'),
+		urlIndex=fm.data('urlIndex'),
+		inUesrName=fm.find('[name="username"]'),
+		alertDiv=$('#alertDiv'),
+		alertBtn=alertDiv.children('button'),
+		alertSp=alertDiv.children('span'),
+		errTxt=alertSp.text();
+	//alert显示、隐藏函数
+	let alertDivHide=(msg='success')=>{
+			let hBool=true;
+		
+			//兼容msg==true
+			if(msg!='success' && msg!=true){
+				hBool=false;
+			}
+		
+			alertSp.empty().text(msg);
+			alertDiv.prop('hidden',hBool);
 			
-			if('pwd'==name){
-				data[name]=md5(val);
-			}else{
+			return hBool;
+		};
+	//检查设置AlertDiv状态
+	let checkAlertDiv=()=>{
+		let hBool=alertDiv.prop('hidden'),
+			txt=alertSp.text();
+		//alertDiv显示
+		if(!hBool){
+			return inUesrName.focus();
+		}
+		//有alert内容
+		if(txt){
+			<!-- console.log(txt); -->
+			alertDiv.prop('hidden',false);
+			return inUesrName.focus();
+		}		
+		
+	};
+	//提交表单数据
+	let subMitFmData=(data='')=>{	
+		
+		if(!String(data).length){
+			data={salt:String(Math.ceil(Math.random()*10000))};
+			fm.find('[name]').each(function(k,v){
+				let name=$(v).attr('name'),
+					val=$(v).val();
+				<!-- d[name]=val; -->
 				data[name]=val;
+			
+				if('pwd'==name){
+					//增加随机因子加密pwd
+					data['pwd']=md5(md5(val)+data.salt);
+				}
+			});
+		}
+		
+		$.post(urlLogin,data,function(msg){
+			if(msg=='success'){
+				//跳转到urlIndex
+				window.location.href=urlIndex;
+			}else{
+				alertDivHide(msg);
 			}
 		});
-		$.post(url,data,function(){
-			//重定向到url
-			window.location.href=url;
+	};
+	
+	alertBtn.click(function() {
+		alertDiv.prop('hidden',true);
+		inUesrName.focus();
+		inUesrName.one('focusout',function() {
+			let val=String($(this).val());
+			if(val.length){
+				return subMitFmData({username:val});
+			}
 		});
+	});
+	
+	fm.submit(function(evt) {
+		evt.preventDefault();	
+		return subMitFmData();
+		
+	});
+	
+	fm.find('[name]').change(function() {
+		let bgCls='alert-info',
+			val=String($(this).val()),
+			name=$(this).attr('name');
+		//change加底色
+		<!-- $(this).removeClass(bgCls);		 -->
+		
+		if(val.length ){
+			<!-- $(this).addClass(bgCls); -->
+			(name=='username')?subMitFmData({username:val}):'';
+			
+		}else{
+			(name=='username')?alertDiv.prop('hidden',true):'';
+		}
+
+			
 	});
 	
 });

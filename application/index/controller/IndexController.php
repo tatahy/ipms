@@ -18,20 +18,86 @@ class IndexController extends Controller
   private $authArr=array();
   //用户登录状态
   private $log = 0;
+  //用户登录状态
+  private $username = '';
+  //用户登录状态
+  private $pwd = '';
   
   #patent的period与status的对应关系，本应用common.php中定义
   const PATPERIODSTATUS=conPatPeriodVsStatus;
   
   private function priLogin(){
-        //通过$log判断是否是登录用户，非登录用户退回到登录页面
+  
+    $this->log=Session::has('log')?Session::get('log'):0;
+    //通过$log判断是否是登录用户，非登录用户退回到登录页面
     if(!$this->log){
       return $this->error('未登录用户，请先登录系统','index/login');
-      //$this->redirect($request->domain());
     }
+    //return $this->success('priLogin()调试，'.json_encode(Session::get('authArr')),'login','',10);
+    $this->authArr=Session::get('authArr');
+    $this->username=Session::get('username');
+    $this->pwd=Session::get('pwd');
+    
+    return $this->log;
   }
   
+  #根据传入的参数，检查登录用户信息是否数据库中唯一存在（是就设置Session，并返回true）
+  private function priSetUserLoginSession($data=[]) {
+    #计数器
+    $n=0;
+    $data=array_merge(['salt'=>'','username'=>'','pwd'=>''],$data);
+    
+    //return $this->error('priSetUserLoginSession()调试：','login',$data,10);
+    #参数数量不正确
+    if(count($data)!==3){
+      return '用户名或密码错误';
+    }
+    
+    $salt=$data['salt'];
+    $pwd=$data['pwd'];
+    $userName=$data['username'];
+    
+    #利用模型对象查询已启用的$username，
+    $uSet = UserModel::where('username', $userName)->where('enable',1)->select();
+    
+    if(!count($uSet)){
+      //return $this->error('用户【'.$userName.'】不存在','index/login','',1);
+      return '用户【'.$userName.'】不存在或已被禁用。';
+    }
+    
+    $uSet=is_array($uSet)?collection($uSet):$uSet;
+    
+    #$this->pwd现在的值为数据库的md5值加盐后的md5值，在数据集中的pwd加盐后是否仅存在一个与$this->pwd现在的值相同
+    foreach($uSet as $k=>$v){
+      if($pwd==md5($v['pwd'].$salt)){
+      //if($this->pwd==$v['pwd'].$salt){
+        $n++;
+        $pwd=$v['pwd'];
+      }
+    }
+    
+    if($n!=1){
+      //return $this->error('priSetUserLoginSession()调试：用户名或密码错误','login',$data,1);
+      return '用户名或密码错误';
+    }
+    
+    #调用User模型层定义的refreshUserAuth()方法，刷新登录用户的各个模块权限后，返回结果集
+    $uSet=UserModel::refreshUserAuth($userName,$pwd);
+    #设置登录用户的Session变量      
+    Session::set('userId', $uSet->id);
+    Session::set('username', $uSet->username);
+    Session::set('pwd', $uSet->pwd);
+    Session::set('log', 1);
+    Session::set('dept', $uSet->dept);
+    Session::set('authArr', $uSet->authority);        
+
+    return 'success';
+     
+  }
+
   private function priGetPageInitData() {
     $this->priLogin();
+    
     $request=Request::instance();
     
     $resData=[
@@ -39,7 +105,9 @@ class IndexController extends Controller
         'domain'=>$request->domain(),
         'module'=>$request->module(),
         'ctrl'=>strtolower($request->controller()),
-        'action'=>'index',
+        'action'=>'index'
+        #服务器端信息,TP5中获取全局变量$_SERVER的方法
+        //'server'=>$request->server()
       ],
       'entNum'=>[
         'pat' =>$this->authArr['pat']['read']?PatinfoModel::getPeriodNum():0,
@@ -72,56 +140,39 @@ class IndexController extends Controller
   }
   
   public function index(Request $request,PatinfoModel $patMdl,UserModel $userMdl,AssinfoModel $assMdl) {
-    #'username'和'pwd'的来源：session或初次登录时表单POST提交
-    $username =!empty($request->param('username'))?$request->param('username'):Session::get('username');
-    #前端需保证pwd的值是经过md5加密后的值，因为数据库中存储的就是md5加密后的值
-    $pwd = !empty($request->param('pwd'))?$request->param('pwd'):Session::get('pwd');
-    #
+        
+    $this->priLogin();
+    
     $getPageInitData=!empty($request->param('getPageInitData'))?$request->param('getPageInitData'):false;
-    
-    //通过浏览器端验证后再在数据库中查询是否有相应的用户存在,
-    //连接数据库,利用模型对象查询有效的$username，$pwd在数据库中是否存在并已启用
-    $user = $userMdl::where('username', $username)->where('pwd', $pwd)->where('enable',
-      1)->find();
-
-    //不存在，同验证失败的处理
-    if (empty($user)) {
-     return $this->error('登录失败，用户名或密码错误。','index/login');
-    } 
-    
-    #调用User模型层定义的refreshUserAuth()方法，刷新登录用户的各个模块权限
-    $authority = $userMdl->refreshUserAuth($username, $pwd);
-    Session::set('userId', $user->id);
-    Session::set('username', $username);
-    Session::set('pwd', $pwd);
-    Session::set('log', 1);
-    Session::set('dept', $user->dept);
-    Session::set('authArr', $authority);
-    
-    $this->authArr=$authority;
-    $this->log=1;
-    
+  
     if($getPageInitData){
-      return $this->priGetPageInitData();;
+      return $this->priGetPageInitData();
     }
     
     $this->assign([
       'home' => $request->domain(), 
-      'username' => $username,
-        #各模块统计数据
-        //'num' => json_encode($num,JSON_UNESCAPED_UNICODE),
-//        'test'=>json_encode($authority,JSON_UNESCAPED_UNICODE),
-//        'year' => date('Y'), 
+      'username' => $this->username
     ]);
     return view();
+    //return $this->redirect('index','',302,['salt'=>$salt,'username'=>$this->username,'pwd'=>$this->pwd]);
   }
 
   //修改application/config.php的设置将“默认操作”由“index”改为“login”？？
-  public function login(Request $request){
-
-    $this->assign(['home' => $request->domain(), 'year' => date('Y')]);
-
-    return view();
+  public function login(Request $request,UserModel $userMdl){  
+    #没有request
+    if(!count($request->request())){
+      $this->assign(['home' => $request->domain(), 'year' => date('Y')]);
+      return view();
+    }
+    #前端只发送了'username'值（有值的参数个数为1）
+    if(count($request->request())==1 && !empty($request->param('username'))){
+      $userName=$request->param('username');
+      $uSet=$userMdl->where('username',$userName)->where('enable',1)->select();
+      return count($uSet)?true:'用户【'.$userName.'】不存在或已被禁用。';
+    }
+     
+    #指定前端传送的参数，检查登录用户信息并设置用户Session，返回前端设置结果
+    return $this->priSetUserLoginSession($request->only(['salt','username','pwd']));
 
   }
   public function logout(Request $request){

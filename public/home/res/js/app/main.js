@@ -10,6 +10,7 @@ function pageLifeInit(){
 	//全局变量赋值
 	urlObj=resData.urlObj;
 	entNum=resData.entNum;
+	console.log(resData);
 	setEntProp();
 	console.table(urlObj);
 	
