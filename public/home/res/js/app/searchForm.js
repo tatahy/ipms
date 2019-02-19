@@ -51,8 +51,11 @@ function setFmSearchData(opt={}){
 function buildFmSelectCom(){
 	let selSet=fm.find('select'),
 		rData={period:rqData.period,name:[]};
-	urlObj.method='getSelComData';
-
+	urlObj.action='getSelComData';
+	
+	consoleColor('searchForm.js buildFmSelectCom()','red');
+	console.log(urlObj);
+	
 	selSet.each(function(){
 		rData.name.push($(this).attr('name'));
 	});

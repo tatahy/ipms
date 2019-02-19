@@ -1,0 +1,81 @@
+<!-- //module:index, ctrl:List view:list/patList.html  -->
+
+<!-- <div id="searchList" style="padding-top:10px;">	 -->
+	<div class="table-responsive">
+		<table id="patListTbl" class="table table-bordered table-hover">
+			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>专利信息列表&nbsp;【<strong></strong>】</h4></caption>
+			<thead>
+				<tr>
+					<th class="text-center">序号</th>
+					<th><a data-sort-name="topic">名称</a></th>
+					<th><a data-sort-name="type">类型</a></th>
+					<th><a data-sort-name="status">状态</a></th>
+					<th><a data-sort-name="submitdate">提交日期</a></th>
+					
+					<th><a data-sort-name="author">撰写人</a></th>
+					<th><a data-sort-name="inventor">发明人</a></th>
+					<th><a data-sort-name="patowner">所有人</a></th>
+					
+					<th><a data-sort-name="dept">所属部门</a></th>
+					<th><a data-sort-name="pronum">关联项目</a></th>
+				</tr>
+			</thead>
+			<tbody><!-- 此处显示数据库查询后的数据集 -->
+				{volist name="list" id="vo" empty="暂时没有数据"}
+				<tr data-show-id="{$vo.id}" class="text-right">
+					<td class="text-center">{$i+($sortData.pageNum-1)*$sortData.listRows}</a></td>
+					<td class="patInfo"><a href="{$home}/patent/index/patinfo/id/{$vo.id}" target="_blank" title="专利详情">{$vo.topic}</a></td>
+					{// patent模块的Model层对‘pattype’字段输出值有处理，用getData方法可以得到‘type’字段在数据库中的值}
+					<!-- <td>{$vo->getData('type')}</td> -->
+					<td>{$vo.type}</td>
+					<td>{$vo.status}</td>
+					<td>{$vo.submitdate}</td>
+					
+					<td>{$vo.author}</td>
+					<td>{$vo.inventor}</td>
+					<td>{$vo.patowner}</td>
+					
+					<td>{$vo.dept}</td>
+					<td class="proInfo">
+						{foreach $vo.pronum as $n} 
+							{if $n eq '无'}
+								无
+							{else /}
+								<a href="#" data-toggle="tooltip">{$n}</a>
+							{/if}
+						{/foreach}
+					</td>
+				</tr>
+				{/volist}
+			</tbody>
+		</table>		
+	</div>
+	
+	<div id="divListRows" class="row text-right">
+		<!-- // 分页变量 -->
+		<div class="col-sm-10 text-right">{$pageSet->render()}</div>
+						
+		<div class="form-group form-group-sm col-sm-2">
+			<span class="">每页记录行数：</span>
+				<select class="form-control" id="listRows">
+					<option value="5">5</option>
+					<option value="10">10</option>
+					<option value="20">20</option>
+					<option value="50">50</option>
+				</select>
+						
+		</div>
+	</div>
+<!-- </div> -->
+<!-- //embed js code onto the HTML page-->
+<script type="text/javascript">
+//对conf.js中定义的全局变量赋值
+rqData.searchData={$searchData};
+searchResultNum={$searchResultNum};
+</script>
+
+<!-- // import js code into the HTML page-->
+<script type="text/javascript" src="/home/res/js/app/entList.js"></script>
+
+
+

@@ -42,12 +42,13 @@ class IndexController extends Controller
   }
   
   #根据传入的参数，检查登录用户信息是否数据库中唯一存在（是就设置Session，并返回true）
-  private function priSetUserLoginSession($data=[]) {
+  private function priSetSession($data=[]) {
     #计数器
     $n=0;
+    #参数初始化
     $data=array_merge(['salt'=>'','username'=>'','pwd'=>''],$data);
     
-    //return $this->error('priSetUserLoginSession()调试：','login',$data,10);
+    //return $this->error('priSetSession()调试：','login',$data,10);
     #参数数量不正确
     if(count($data)!==3){
       return '用户名或密码错误';
@@ -68,16 +69,16 @@ class IndexController extends Controller
     $uSet=is_array($uSet)?collection($uSet):$uSet;
     
     #$this->pwd现在的值为数据库的md5值加盐后的md5值，在数据集中的pwd加盐后是否仅存在一个与$this->pwd现在的值相同
-    foreach($uSet as $k=>$v){
-      if($pwd==md5($v['pwd'].$salt)){
-      //if($this->pwd==$v['pwd'].$salt){
+    foreach($uSet->column('pwd') as $k=>$v){
+      if($pwd==md5($v.$salt)){
         $n++;
-        $pwd=$v['pwd'];
+        #用户的数据库保存密码值
+        $pwd=$v;
       }
     }
     
     if($n!=1){
-      //return $this->error('priSetUserLoginSession()调试：用户名或密码错误','login',$data,1);
+      //return $this->error('priSetSession()调试：用户名或密码错误','login',$data,1);
       return '用户名或密码错误';
     }
     
@@ -171,8 +172,8 @@ class IndexController extends Controller
       return count($uSet)?true:'用户【'.$userName.'】不存在或已被禁用。';
     }
      
-    #指定前端传送的参数，检查登录用户信息并设置用户Session，返回前端设置结果
-    return $this->priSetUserLoginSession($request->only(['salt','username','pwd']));
+    #检查登录用户信息并设置用户Session，参数为指定的前端传送数据，返回前端设置结果
+    return $this->priSetSession($request->only(['salt','username','pwd']));
 
   }
   public function logout(Request $request){

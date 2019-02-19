@@ -29,11 +29,11 @@ const bs3Color={
 };
 	//topNav中li组件主要属性
 const topNavProp={
-		index:{'url':urlObj.domain+'/index/index/index',period:'',gly:glyPrex+'home',chi:'首页'},
-		pat:{'url':urlObj.domain+'/patent/index/index',period:'total',gly:glyPrex+'wrench',chi:'专利'},
-		ass:{'url':urlObj.domain+'/asset/index/index',period:'usual',gly:glyPrex+'oil',chi:'固定资产'},
-		pro:{'url':urlObj.domain+'/project/index/index',period:'total',gly:glyPrex+'inbox',chi:'项目'},
-		the:{'url':urlObj.domain+'/thesis/index/index',period:'total',gly:glyPrex+'list',chi:'论文'}
+	index:{period:'',gly:glyPrex+'home',chi:'首页'},
+	pat:{period:'total',gly:glyPrex+'wrench',chi:'专利'},
+	ass:{period:'usual',gly:glyPrex+'oil',chi:'固定资产'},
+	pro:{period:'total',gly:glyPrex+'inbox',chi:'项目'},
+	the:{period:'total',gly:glyPrex+'list',chi:'论文'}
 };
 
 const noneSufx='模块无【查阅】权限，请与系统管理员联系。';

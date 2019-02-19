@@ -73,63 +73,7 @@ The following code will enable all tooltips in the document:-->
 
 <!-- pagewrap  -->
 <div class="container-fluid" style="padding-top:140px;margin: 0 10%;">	
-	<!-- <div class="row"> -->
-		<!-- <div class="col-sm-6"> -->
-			<!-- <div class="panel-group"> -->
-				<!-- <div class="panel panel-default"> -->
-					<!-- <div class="panel-heading"><strong>项目概况</strong></div> -->
-						<!-- <div class="panel-body"> -->
-							<!-- <a href="#"><span class="label label-default">新增项目</span></a> -->
-							<!-- <a href="#"><span class="label label-info">申报项目</span></a> -->
-							<!-- <a href="#"><span class="label label-warning">立项项目</span></a> -->
-							<!-- <a href="#"><span class="label label-primary">在研项目</span></a> -->
-						<!-- </div> -->
-				<!-- </div> -->
-			<!-- </div> -->
-		<!-- </div> -->
-		
-		<!-- <div class="col-sm-6"> -->
-			<!-- <div class="panel-group"> -->
-				<!-- <div class="panel panel-default"> -->
-					<!-- <div class="panel-heading"><strong>固定资产</strong></div> -->
-						<!-- <div class="panel-body"> -->
-							<!-- <a href="#"><span class="label label-default">停用<span class="badge"></span></span></a> -->
-							<!-- <a href="#"><span class="label label-info">待定</span></a> -->
-							<!-- <a href="#"><span class="label label-success">正常</span></a> -->
-						<!-- </div> -->
-				<!-- </div> -->
-			<!-- </div> -->
-		<!-- </div> -->
-	<!-- </div> -->
-	
-	<!-- <div class="row"> -->
-		<!-- <div class="col-sm-6"> -->
-			<!-- <div class="panel-group"> -->
-				<!-- <div class="panel panel-default"> -->
-					<!-- <div class="panel-heading"><strong>专利概况</strong></div> -->
-						<!-- <div class="panel-body"> -->
-							<!-- <a href="#"><span class="label label-default">新增专利</span></a> -->
-							<!-- <a href="#"><span class="label label-info">申报专利</span></a> -->
-							<!-- <a href="#"><span class="label label-success">有效专利</span></a> -->
-						<!-- </div> -->
-				<!-- </div> -->
-			<!-- </div> -->
-		<!-- </div> -->
-		
-		<!-- <div class="col-sm-6"> -->
-			<!-- <div class="panel-group"> -->
-				<!-- <div class="panel panel-default"> -->
-					<!-- <div class="panel-heading"><strong>论文概况</strong></div> -->
-						<!-- <div class="panel-body"> -->
-							<!-- <a href="#"><span class="label label-default">新增论文</span></a> -->
-							<!-- <a href="#"><span class="label label-info">投稿论文</span></a> -->
-							<!-- <a href="#"><span class="label label-success">发表论文</span></a> -->
-						<!-- </div> -->
-				<!-- </div> -->
-			<!-- </div> -->
-		<!-- </div> -->
-	<!-- </div> -->
-		
+			
 	<div class="col-lg-4 col-lg-offset-4">
 	<div class="panel panel-info"> 
 		<div class="panel-heading text-center">
@@ -176,10 +120,6 @@ The following code will enable all tooltips in the document:-->
 <script>
 $('[title]').tooltip();   
 
-class loginForm {
-
-}
-
 $(document).ready(function(){
 	let fm=$('form'),
 		urlLogin=fm.attr('action'),
@@ -220,7 +160,7 @@ $(document).ready(function(){
 		
 	};
 	//提交表单数据
-	let subMitFmData=(data='')=>{	
+	let submitFmData=(data='')=>{	
 		
 		if(!String(data).length){
 			data={salt:String(Math.ceil(Math.random()*10000))};
@@ -238,12 +178,8 @@ $(document).ready(function(){
 		}
 		
 		$.post(urlLogin,data,function(msg){
-			if(msg=='success'){
-				//跳转到urlIndex
-				window.location.href=urlIndex;
-			}else{
-				alertDivHide(msg);
-			}
+			//跳转到urlIndex或显示错误
+			(msg=='success')?window.location.assign(urlIndex):alertDivHide(msg);
 		});
 	};
 	
@@ -253,14 +189,14 @@ $(document).ready(function(){
 		inUesrName.one('focusout',function() {
 			let val=String($(this).val());
 			if(val.length){
-				return subMitFmData({username:val});
+				return submitFmData({username:val});
 			}
 		});
 	});
 	
 	fm.submit(function(evt) {
 		evt.preventDefault();	
-		return subMitFmData();
+		return submitFmData();
 		
 	});
 	
@@ -268,18 +204,13 @@ $(document).ready(function(){
 		let bgCls='alert-info',
 			val=String($(this).val()),
 			name=$(this).attr('name');
-		//change加底色
-		<!-- $(this).removeClass(bgCls);		 -->
-		
-		if(val.length ){
-			<!-- $(this).addClass(bgCls); -->
-			(name=='username')?subMitFmData({username:val}):'';
-			
-		}else{
-			(name=='username')?alertDiv.prop('hidden',true):'';
+		//change增、消底色
+		<!-- $(this).addClass(bgCls); -->
+		<!-- $(this).removeClass(bgCls); -->
+		if(name=='username'){
+			return (val.length)?submitFmData({username:val}):alertDiv.prop('hidden',true);
 		}
-
-			
+		
 	});
 	
 });
