@@ -147,13 +147,13 @@ class Patinfo extends Model
       return $numArr;
     }
     #得到在period的指定field字段的groupby内容
-    static public function getFieldGroupByArr($field='',$arr=[],$period='') {
-      $resArr=[]; #返回数组
+    static public function getFieldGroupByArr($field,$arr=[],$period='') {
       $tArr=[];   #键值转换数组
       $tempArr=[];#中间数组
-      #设定arr的默认结构
-      $arr=count($arr)?$arr:['txt'=>'','val'=>''];
-      #组装$tArr
+    #设定返回数组的默认结构
+      $arr=array_merge(['num'=>0,'val'=>[''],'txt'=>['']],$arr);
+      
+    #组装$tArr
       if($field=='status') $tArr=self::PATSTATUS;
       if($field=='type') $tArr=self::PATTYPE;
       #得到dept的键值转换数组$tArr。abbr为键，name为值的关联数组
@@ -162,7 +162,7 @@ class Patinfo extends Model
       $deptSet=is_array($deptSet)?collection($deptSet):$deptSet;
       if($field=='dept') $tArr=array_combine($deptSet->column('abbr'),$deptSet->column('name'));
       
-      #组装$tempArr
+    #组装$tempArr
       self::$obj=new self();
       $patSet=self::$obj->getPeriodSet($period);
       self::$obj=null;
@@ -173,19 +173,16 @@ class Patinfo extends Model
       #重新排序让数组下标连续
       sort($tempArr);
       
-      #组装$resArr，按照$arr的结构
-      foreach($arr as $key => $val){
-        foreach($tempArr as $k => $v){
-          if($key=='txt'){
-            $val=($field=='dept')?$v.'，简称：'.array_search($v,$tArr):$v;
-          }
-          if($key=='val'){
-            $val=($field=='dept')?$v:array_search($v,$tArr);
-          }
-          $resArr[$k][$key]=$val;
+    #$arr赋值
+      $arr['num']=count($tempArr);
+      if($arr['num']){
+        foreach($tempArr as $k => $v){          
+          $arr['txt'][$k]=($field=='dept')?$v.', 简称: '.array_search($v,$tArr):$v;
+          $arr['val'][$k]=($field=='dept')?$v:array_search($v,$tArr);
         }
       }
-      return $resArr;
+      
+      return $arr;
     }
 
     /**

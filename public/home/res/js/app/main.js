@@ -49,7 +49,8 @@ function pageLifeInit(){
 			perObj.hide();
 			
 			ent=='index'?sumObj.show():perObj.show();
-		
+			
+			rqData=initRqData();
 			rqData.ent=ent;
 			rqData.period=topNavProp[ent].period;
 			
@@ -100,10 +101,13 @@ function pageLifeReady(){
 		navEntPeriodASet=$('#entPeriod').children('.nav-pills').find('a');
 	
 	navEntPeriodASet.click(function(){
+		let sData=$(this).data();
 		$(this).tab('show');
-		rqData.period=$(this).data('period');
-		//2 生成ent的period的title
+		rqData.ent=sData.ent;
+		rqData.period=sData.period;
+		// 生成ent的period的title
 		buildEntPeriodTitle();
+		loadEntSearchForm();
 		loadEntPeriodList();
 	});
 	
@@ -142,6 +146,23 @@ function initUrlObj(ent=''){
 	urlObj.module=module;
 	urlObj.ctrl=ctrl;
 	urlObj.action=action;
+}
+var	rqData={
+		ent:'index',
+		period:'',
+		sortData:{listRows:10,sortName:'',sortOrder:'asc',pageNum:1},
+		searchData:{},
+		queryField:{}
+	};
+//让rqData回到初始值
+function initRqData(){	
+	return {
+		ent:'index',
+		period:'',
+		sortData:{listRows:10,sortName:'',sortOrder:'asc',pageNum:1},
+		searchData:{},
+		queryField:{}
+	};	
 }
 //设定向后端请求的url
 function getRqUrl(){
@@ -262,21 +283,53 @@ function loadEntSearchForm(){
 		fmCom=sfSet.eq(0),
 		fmSpe=sfSet.eq(1);
 	//选择操作节点并显示
-	let obj=(rqData.ent=='ass')?fmSpe.prop('hidden',false):fmCom.prop('hidden',false).find('div .searchForm');
+	let obj=(rqData.ent=='ass')?fmSpe.prop('hidden',false):fmCom.prop('hidden',false).find('div.searchForm');
 	
 	//
 	urlObj.module='index';
 	urlObj.ctrl='SearchForm';
 	urlObj.action='index';
-	
-	consoleColor('loadEntSearchForm():');
-	console.log(getRqUrl());
-	console.log(rqData);
+
 	//searchForm的加载
-	obj.html(loadStr).load(getRqUrl(),rqData,function(msg){
-		
+	obj.html(loadStr).load(getRqUrl(),rqData,function(){	
+		//searchForm加载完成后rqData.queryField赋值
+		rqData.queryField=setRqQueryField(obj.find('form.common'));	
+				
+		setEntSearchFormSelCom(obj.find('form.common'));
 	});
 		
+}
+//挨个组装好指定form的select组件
+function setEntSearchFormSelCom(fm){
+	let selSet=fm.find('select');
+	
+	if(typeof fm !='object' || fm[0].localName !=='form'){
+		return false;
+	}
+	
+	urlObj.ctrl='searchForm';
+	urlObj.action='getSelOptData';
+	
+	//向后端请求组装select组件所需数据
+	$.post(getRqUrl(),rqData,function(optData){
+		consoleColor('main.js setEntSearchFormSelCom() post data:','red');
+		console.log(optData);
+		for(var i=0;i<selSet.length;i++){
+			let selObj=selSet.eq(i),
+				selName=selObj.attr('name'),
+				optObj=optData[selName];
+			
+			// rqData.queryField[selName]=optObj;
+			
+			selObj.empty().append($('<option></option>').val(0).text('…不限'));	
+			//组装option
+			for(var m=0;m<optObj.num;m++){
+				selObj.append($('<option></option>').val(optObj.val[m]).text(optObj.txt[m]));
+			}
+			selObj.val(0);		
+		}
+		
+	});
 }
 //载入ent各个period的列表
 function loadEntPeriodList(){
@@ -322,8 +375,36 @@ function setRqSearchData(searchObj=''){
 				rqData.searchData[key]=val;
 			}
 		});		
+	}	
+}
+//设置向后端请求时的查询数据
+function setRqQueryField(fm=''){
+	let hashArr={};
+	
+	if(typeof fm !='object' || fm[0].localName !=='form'){
+		return false;
 	}
 	
+	fm.find('[name]').each(function(){
+		let n=$(this).attr('name'),
+			v=$(this).val()==null?0:$(this).val(),
+			lName=$(this)[0].localName;
+		hashArr[n]={val:v,tagName:lName};
+		//搜集select及其option的特征值
+		if(lName=='select'){
+			let len=$(this).find('option').length,
+				opt={num:len,val:[''],txt:['']};
+			if(len){
+				$(this).find('option').each(function(index,el){
+					opt.val[index]=$(el).val();
+					opt.txt[index]=$(el).text();
+				});
+			}
+			hashArr[n]['option']=opt;
+		}
+	});
+	
+	return hashArr;
 }
 //完善entProp中的num属性值
 function setEntProp(){
@@ -354,7 +435,7 @@ function buildEntPeriodTitle(){
 }
 //所有查询表单重置
 function resetSearchForm(){
-	let fm=$('.searchForm');
+	let fm=$('form');
 	
 	$('#searchNum').children().hide();
 	$('#entList').show();

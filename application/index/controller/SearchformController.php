@@ -6,8 +6,13 @@ use think\Request;
 use think\Session;
 use think\Controller;
 
+use app\index\model\Assinfo;
+use app\index\model\Patinfo;
+
 # 继承了think\Controller类，可直接调用think\View，think\Request类的方法
-# 类名与类文件名相同
+# 类名与类文件名相同,
+# 若配置文件conf.php中'controller_suffix' 设为true，则类名需以‘Controller’结尾，
+# 且‘Controller’之前的单词必须第一个字母大写，其余小写，否则类无法加载会报‘控制器不存在’。
 class SearchformController extends Controller {
   //用户权限
   private $authArr=array();
@@ -17,18 +22,17 @@ class SearchformController extends Controller {
   private $username = '';
   //用户登录状态
   private $pwd = '';
-  
-  private $searchField=[
-    'pat'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0]
+  //定义前端可搜索的数据库字段
+  const SEARCHDBFIELD=[
+    'pat'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0],
+    'ass'=>['topic'=>''],
+    'pro'=>['topic'=>''],
+    'the'=>['topic'=>'']
   ];
+  #单个select返回前端的数据结构
+  const SELECTSINGLE=['num'=>0,'val'=>[''],'txt'=>['']];
   
-  #patent的period与status的对应关系，本应用common.php中定义
-  const SEARCHFIELD=[
-    'pat'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0]
-  ];
-  
-  
-  
+  #验证是否为登录用户
   private function priLogin(){
   
     $this->log=Session::has('log')?Session::get('log'):0;
@@ -44,9 +48,9 @@ class SearchformController extends Controller {
     return $this->log;
   }
   
-  private function priGetSearchForm ($arr) {
+  private function priGetFormCommon ($arr) {
     $ent=array_key_exists('ent',$arr)?$arr['ent']:'pat'; 
-    $searchData= array_key_exists('searchData',$arr)?$arr['searchData']:$this->searchField[$ent]; 
+    $searchData= array_key_exists('searchData',$arr)?$arr['searchData']:self::SEARCHDBFIELD[$ent]; 
     
     $fileName=$ent.'searchform';
         
@@ -58,6 +62,31 @@ class SearchformController extends Controller {
     //return $this->fetch($fileName);
   }
   
+  private function priGetEntDBfieldGroup($ent,$period,$field){
+    $res=self::SELECTSINGLE;
+    #模型对象
+    $mdl='';   
+    
+    #选择模型对象
+    switch($ent){
+      case 'pat':
+        $mdl= new Patinfo;
+        break;
+      case 'ass':
+        $mdl= new Assinfo;
+        break;
+      case 'pro':
+        
+        break;
+      case 'the':
+        
+        break;
+    }
+    $res=$mdl->getFieldGroupByArr($field,$res,$period);
+    
+    return $res;
+  }
+  
   public function index () {
     $this->priLogin();
     
@@ -65,17 +94,29 @@ class SearchformController extends Controller {
     
     $rqArr=$reqObj->only(['ent','searchData']);
     
-    return $this->priGetSearchForm($rqArr);
+    return $this->priGetFormCommon($rqArr);
    // return $rqArr;
   }
-  
-  
-  
-  #直接调用think\View，think\Request类的方法
-  public function example() {
+   
+  #
+  public function getSelOptData() {
+    $this->priLogin();
     
-    //
-    $this->assign('domain',$this->request->url(true));
-    return $this->fetch('example');
+    $selArr=[];
+    
+    $reqObj=$this->request;  
+    $ent=$reqObj->param('ent');
+    $period=$reqObj->param('period');
+    $fmArr=$reqObj->param('queryField/a');
+   // $reqArr=$reqObj->request()['queryField'];
+    
+    #每个select赋初值
+    foreach($fmArr as $k=>$v){
+      if($v['tagName']=='select'){
+        $selArr[$k]=$this->priGetEntDBfieldGroup($ent,$period,$k);
+      }
+    }
+    
+    return $selArr;
   }
 }

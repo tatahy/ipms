@@ -24,8 +24,7 @@
 	
 	<button type="button" class="close" data-target="#searchFormCommon"  data-toggle="collapse" data-collapse-switch="div" title="关闭">&times;</button>
 	<!-- // 一般搜索表单-->	
-	<form class="searchForm" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:0px;">
-		<input class="sr-only" name="reqObj" type="text" value="" />
+	<form class="searchForm common" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:0px;">
 		<div class="row myRow">
 			<div class="form-group col-sm-4">
 				<label class="control-label" for="brand_model">名称（品牌型号）</label>
@@ -111,12 +110,9 @@
 	{include file="../application/common/decodeBarcode.html"}
 </div>
 
-
-
-
 <script type="text/javascript">
 //对conf.js中定义的全局变量赋值
-rqData.searchData={$searchData};
+<!-- rqData.searchData={$searchData}; -->
 </script>
 
 <script type="text/javascript" src="/home/res/js/app/searchForm.js"></script>

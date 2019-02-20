@@ -195,13 +195,12 @@ class Assinfo extends Model
     }
     
     #得到在period的指定field字段的groupby内容
-    static public function getFieldGroupByArr($field='',$arr=[],$period='') {
-      $resArr=[]; #返回数组
+    static public function getFieldGroupByArr($field,$arr=[],$period='') {
       $tempArr=[];#中间数组
-      #设定arr的默认结构
-      $arr=count($arr)?$arr:['txt'=>'','val'=>''];
+    #设定返回数组的默认结构
+      $arr=array_merge(['num'=>0,'val'=>[''],'txt'=>['']],$arr);
 
-      #组装$tempArr
+    #组装$tempArr
       self::$obj=new self();
       $patSet=self::$obj->getPeriodSet($period);
       self::$obj=null;
@@ -212,13 +211,15 @@ class Assinfo extends Model
       #重新排序让数组下标连续
       sort($tempArr);
       
-      #组装$resArr，按照$arr的结构
-      foreach($arr as $key => $val){
-        foreach($tempArr as $k => $v){
-          $resArr[$k][$key]=$v;
+    #$arr赋值
+      $arr['num']=count($tempArr);
+      if($arr['num']){
+        foreach($tempArr as $k => $v){          
+          $arr['txt'][$k]=$v;
+          $arr['val'][$k]=$v;
         }
       }
-      return $resArr;
+      return $arr;
     }
     /**
      * 获取assent的过程记录

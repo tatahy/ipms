@@ -1,0 +1,79 @@
+<!-- //module:asset, view:index/assList.html  -->
+
+<!-- pagewrap  -->	
+<div id="searchList" style="padding-top:10px;">
+	<div class="table-responsive"> 
+		<table id="assListTbl" class="table table-bordered table-hover">
+			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>固定资产信息列表&nbsp;【<strong></strong>】</h4></caption>
+			<thead>
+				<tr>
+					<th class="text-center">序号</th>
+					<th><a data-sort-name="brand_model">名称</a></th>
+					<th><a data-sort-name="assnum">编号</a></th>
+					<th><a data-sort-name="code">卡号</a></th>
+					<th><a data-sort-name="bar_code">条形码号</a></th>
+					<th><a data-sort-name="place_now">现放置地点</a></th>
+					<th><a data-sort-name="quantity">数量</a></th>
+					<th><a data-sort-name="dept_now">现使用部门</a></th>
+					<th><a data-sort-name="keeper_now">现保管人</a></th>
+					<th><a data-sort-name="status_now">状态</a></th>
+					<th><a data-sort-name="status_now_user_name">登记人</a></th>
+					
+				</tr>
+			
+			</thead>
+			<tbody><!-- 此处显示数据库查询后的数据集 -->
+				{volist name="list" id="vo" empty="暂时没有数据"}
+				<tr class="text-right">
+					<td class="text-center">{$i+($sortData.pageNum-1)*$sortData.listRows}</td>
+					<td><a class="aTblAssSingle" href="#" data-ass-id="{$vo.id}">{$vo.brand_model}</a></td>
+					<td>{$vo.assnum}</td>
+					<td>{$vo.code}</td>
+					<td>{$vo.bar_code}</td>
+					<td>{$vo.place_now}</td>
+					<td>{$vo.quantity}</td>
+					<td>{$vo.dept_now}</td>
+					<td>{$vo.keeper_now}</td>
+					<td><a class="aAssRecords" href="#" data-ass-id="{$vo.id}"><span class="spStatus">{$vo.status_now}</span></a></td>
+					<td>{$vo.status_now_user_name}</td>
+				
+				</tr>
+				{/volist}
+			
+			</tbody>
+			
+		</table>
+	
+	</div>
+		
+	<div id="divListRows" class="row text-right">
+		<!-- // 分页变量 -->
+		<div class="col-sm-10">{$pageSet->render()}</div>
+		
+		<div class="form-group form-group-sm col-sm-2">
+			<span class="">每页显示记录数：</span>
+			<select class="form-control" id="listRows">
+				<option value="5">5</option>
+				<option value="10">10</option>
+				<option value="20">20</option>
+				<option value="50">50</option>
+			</select>
+						
+		</div>
+	
+	</div>
+	<!-- //调试用 -->
+	<!-- <p>{ $display}</p> -->
+</div>
+
+<!-- /pagewrap  -->
+
+<script type="text/javascript">
+//对conf.js中定义的全局变量赋值
+rqData.searchData={$searchData};
+searchResultNum={$searchResultNum};
+
+</script>
+
+<script type="text/javascript" src="/home/res/js/app/entList.js"></script>
+

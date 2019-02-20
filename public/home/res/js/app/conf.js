@@ -4,7 +4,8 @@ var	rqData={
 		ent:'index',
 		period:'',
 		sortData:{listRows:10,sortName:'',sortOrder:'asc',pageNum:1},
-		searchData:{}
+		searchData:{},
+		queryField:{}
 	};
 var urlObj={domain:'',module:'index',ctrl:'index',action:'index'};
 var searchResultNum='';

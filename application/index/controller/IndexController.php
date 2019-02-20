@@ -140,7 +140,7 @@ class IndexController extends Controller
     return $resData;
   }
   
-  public function index(Request $request,PatinfoModel $patMdl,UserModel $userMdl,AssinfoModel $assMdl) {
+  public function index(Request $request) {
         
     $this->priLogin();
     
@@ -183,9 +183,12 @@ class IndexController extends Controller
     $this->success('安全退出系统', 'index/login','',1);
   }
   
-  public function getEntSearchFormVal() {
+  #直接调用think\View，think\Request类的方法
+  public function example() {
     
-    
+    //
+    $this->assign('domain',$this->request->url(true));
+    return $this->fetch('example');
   }
-  
+ 
 }

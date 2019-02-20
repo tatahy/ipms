@@ -6,9 +6,9 @@ use think\Request;
 use think\Session;
 use think\Controller;
 
-use app\index\model\User as UserModel;
-use app\index\model\Patinfo as PatinfoModel;
-use app\index\model\Assinfo as AssinfoModel;
+use app\index\model\User; 
+use app\index\model\Patinfo;
+use app\index\model\Assinfo;
 
 # 继承了think\Controller类，可直接调用think\View，think\Request类的方法
 # 类名与类文件名相同
@@ -23,7 +23,10 @@ class ListController extends Controller {
   private $pwd = '';
   
   private $searchField=[
-    'pat'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0]
+    'pat'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0],
+    'ass'=>['topic'=>''],
+    'pro'=>['topic'=>''],
+    'the'=>['topic'=>''],
   ];
   
   private $sortData=['listRows'=>10,'sortName'=>'','sortOrder'=>'asc','pageNum'=>1,'showId'=>0];
@@ -46,9 +49,12 @@ class ListController extends Controller {
   private function priGetList ($arr) {
         
     $ent=array_key_exists('ent',$arr)?$arr['ent']:'pat'; 
-    $searchData= array_key_exists('searchData',$arr)?$armr['searchData']:$this->searchField[$ent]; 
+    $searchData= array_key_exists('searchData',$arr)?$arr['searchData']:$this->searchField[$ent]; 
     $sortData= array_key_exists('sortData',$arr)?$arr['sortData']:$this->sortData; 
     $period=array_key_exists('period',$arr)?$arr['period']:'';
+    //return $arr;
+    $queryField=array_key_exists('queryField',$arr)?$arr['queryField']:[];
+    
     #查询、排序结果总数
     $searchResultNum=0;
     #模型对象
@@ -60,16 +66,32 @@ class ListController extends Controller {
     
     $fileName=$ent.'List';
     
-    ##
+    ##组装$whereArr
+    if(count($queryField)){
+      foreach($queryField as $field=>$v){
+        $operator='like';
+        $queryStr=!empty($searchData[$field])?'%'.$searchData[$field].'%':'';
+        
+        if($v['tagName']=='select'){
+          $operator='in';
+          $queryStr=!empty($searchData[$field])?$searchData[$field]:'';
+        }
+        
+        if($queryStr){
+          $whereArr[$field]=[$operator,$queryStr];
+        }
+        $whereArr[$field]=$queryStr;
+      }
       
-      #前端输入的关键字搜索,like关键字，2个
-      $whereArr['topic']=!empty($searchData['topic'])?['like','%'.$searchData['topic'].'%']:'';
-      $whereArr['author']=!empty($searchData['author'])?['like','%'.$searchData['author'].'%']:'';
-      
-      #前端select值搜索，=select值(兼容select标签的multiple属性设置)，3个
-      $whereArr['dept']=!empty($searchData['dept'])?['in',$searchData['dept']]:'';
-      $whereArr['status']=!empty($searchData['status'])?['in',$searchData['status']]:'';
-      $whereArr['type']=!empty($searchData['type'])?['in',$searchData['type']]:'';
+    }
+      //#前端input值搜索,like操作符
+//      $whereArr['topic']=!empty($searchData['topic'])?['like','%'.$searchData['topic'].'%']:'';
+//      $whereArr['author']=!empty($searchData['author'])?['like','%'.$searchData['author'].'%']:'';
+//      
+//      #前端select值搜索，in操作符
+//      $whereArr['dept']=!empty($searchData['dept'])?['in',$searchData['dept']]:'';
+//      $whereArr['status']=!empty($searchData['status'])?['in',$searchData['status']]:'';
+//      $whereArr['type']=!empty($searchData['type'])?['in',$searchData['type']]:'';
       
       #将空白元素删除
       foreach($whereArr as $key=>$val){
@@ -81,10 +103,10 @@ class ListController extends Controller {
       #选择模型对象
       switch($ent){
         case 'pat':
-          $mdl= new PatinfoModel;
+          $mdl= new Patinfo;
           break;
         case 'ass':
-          $mdl= new AssinfoModel;
+          $mdl= new Assinfo;
           break;
         case 'pro':
         
@@ -133,7 +155,6 @@ class ListController extends Controller {
       ]);
     
     ##
-    
     return view($fileName);
     //return $this->fetch($fileName);
   }
@@ -141,20 +162,12 @@ class ListController extends Controller {
   public function index () {
     $this->priLogin();
     
-    $rqArr=$this->request;
     
+    $rqArr=$this->request->request();
+    
+  
     return $this->priGetList($rqArr);
-   // return is_array($rqArr);
-    //return $rqArr;
+   
   }
   
-  
-  
-  #直接调用think\View，think\Request类的方法
-  public function example() {
-    
-    //
-    $this->assign('domain',$this->request->url(true));
-    return $this->fetch('example');
-  }
 }
