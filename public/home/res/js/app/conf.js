@@ -9,7 +9,7 @@ var	rqData={
 	};
 var urlObj={domain:'',module:'index',ctrl:'index',action:'index'};
 var searchResultNum='';
-//定义前端系统各个实体数量对象,由后端给定??
+//定义前端系统各个实体数量对象,由后端给定
 var entNum='';
 
 var year=new Date().getFullYear();
@@ -94,7 +94,7 @@ var entProp={
 		module:'project',
 		ctrl:['index','proList','proSearchForm'],
 		action:['index'],
-		chi:'项目概况&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
+		chi:'项目&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
 		gly:glyPrex+'inbox',
 		period:{
 			summary:{
@@ -124,7 +124,7 @@ var entProp={
 		module:'thesis',
 		ctrl:['index','theList','theSearchForm'],
 		action:['index'],
-		chi:'论文概况&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
+		chi:'论文&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
 		gly:glyPrex+'list',
 		period:{
 			summary:{

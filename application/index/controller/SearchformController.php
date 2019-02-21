@@ -25,7 +25,8 @@ class SearchformController extends Controller {
   //定义前端可搜索的数据库字段
   const SEARCHDBFIELD=[
     'pat'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0],
-    'ass'=>['topic'=>''],
+    'ass'=>['brand_model'=>'','dept_now'=>0,'keeper_now'=>'','assnum'=>'','code'=>'',
+            'bar_code'=>'','status_now'=>0,'place_now'=>0,'status_now_user_name'=>''],
     'pro'=>['topic'=>''],
     'the'=>['topic'=>'']
   ];

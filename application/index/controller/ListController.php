@@ -49,110 +49,104 @@ class ListController extends Controller {
   private function priGetList ($arr) {
         
     $ent=array_key_exists('ent',$arr)?$arr['ent']:'pat'; 
-    $searchData= array_key_exists('searchData',$arr)?$arr['searchData']:$this->searchField[$ent]; 
+    #要求$searchData的键名必须是数据库中的字段名
+    $searchData= array_key_exists('searchData',$arr)?$arr['searchData']:[];
     $sortData= array_key_exists('sortData',$arr)?$arr['sortData']:$this->sortData; 
     $period=array_key_exists('period',$arr)?$arr['period']:'';
-    //return $arr;
+    #要求$queryField的键名必须是数据库中的字段名
     $queryField=array_key_exists('queryField',$arr)?$arr['queryField']:[];
+    
     
     #查询、排序结果总数
     $searchResultNum=0;
     #模型对象
     $mdl='';    
-    #返回前端进行显示的内容
-    $list=array();
     #进行搜索的条件数组
-    $whereArr=[]; 
-    
+    $whereArr=[];
+    #模板文件中进行显示的结果集
+    $list=array(); 
+    #返回前端的模板文件名
     $fileName=$ent.'List';
     
-    ##组装$whereArr
-    if(count($queryField)){
-      foreach($queryField as $field=>$v){
-        $operator='like';
-        $queryStr=!empty($searchData[$field])?'%'.$searchData[$field].'%':'';
-        
-        if($v['tagName']=='select'){
+    ##组装$whereArr，要求$searchData的键名必须是数据库中的字段名
+    if(count($searchData)){
+      foreach($searchData as $field=>$v){
+        if($queryField[$field]['tagName']=='input'){
+          $operator='like';
+          $queryVal=!empty($v)?'%'.$v.'%':'';
+        }
+        if($queryField[$field]['tagName']=='select'){
           $operator='in';
-          $queryStr=!empty($searchData[$field])?$searchData[$field]:'';
+          $queryVal=!empty($v)?$v:'';
         }
         
-        if($queryStr){
-          $whereArr[$field]=[$operator,$queryStr];
-        }
-        $whereArr[$field]=$queryStr;
+        $whereArr[$field]=(!empty($queryVal))?[$operator,$queryVal]:'';  
       }
-      
-    }
-      //#前端input值搜索,like操作符
-//      $whereArr['topic']=!empty($searchData['topic'])?['like','%'.$searchData['topic'].'%']:'';
-//      $whereArr['author']=!empty($searchData['author'])?['like','%'.$searchData['author'].'%']:'';
-//      
-//      #前端select值搜索，in操作符
-//      $whereArr['dept']=!empty($searchData['dept'])?['in',$searchData['dept']]:'';
-//      $whereArr['status']=!empty($searchData['status'])?['in',$searchData['status']]:'';
-//      $whereArr['type']=!empty($searchData['type'])?['in',$searchData['type']]:'';
-      
-      #将空白元素删除
+    }      
+    
+    #将空白元素删除
+    if(count($whereArr)){
       foreach($whereArr as $key=>$val){
         if(empty($val)){
           unset($whereArr[$key]);
         }
       }
+    }
       
-      #选择模型对象
-      switch($ent){
-        case 'pat':
-          $mdl= new Patinfo;
-          break;
-        case 'ass':
-          $mdl= new Assinfo;
-          break;
-        case 'pro':
-        
-          break;
-        case 'the':
-        
-          break;
-      }
       
-      #pat模型对象，查询、排序用
-      $queryBase=$mdl->getPeriodSql($period)
-                        ->where($whereArr)
-                        ->order($sortData['sortName'],$sortData['sortOrder']);
+    #选择模型对象
+    switch($ent){
+      case 'pat':
+        $mdl= new Patinfo;
+        break;
+      case 'ass':
+        $mdl= new Assinfo;
+        break;
+      case 'pro':
+          
+        break;
+      case 'the':
+          
+        break;
+    }
       
-      #查询、排序结果数据集：
-      $baseSet=$queryBase->select();
-      $baseSet=is_array($baseSet)?collection($baseSet):$baseSet;
+    #模型对象，查询、排序用
+    $queryBase=$mdl->getPeriodSql($period)
+                    ->where($whereArr)
+                    ->order($sortData['sortName'],$sortData['sortOrder']);
       
-      #查询、排序结果总数
-      $searchResultNum=count($baseSet);
+    #查询、排序结果数据集：
+    $baseSet=$queryBase->select();
+    $baseSet=is_array($baseSet)?collection($baseSet):$baseSet;
       
-      if($searchResultNum){
-        #本页要显示的记录
-        $list=$baseSet->slice(($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows']);
-      }
+    #查询、排序结果总数
+    $searchResultNum=count($baseSet);
       
-      #pat模型对象，排序、查询后分页用
-      $pageQuery=$mdl->where('id','in',$baseSet->column('id'))
-                      ->order($sortData['sortName'],$sortData['sortOrder']);
-      #分页对象，符合查询条件的所有iss记录分页,每页$listRows条记录
-      $pageSet=$pageQuery->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
+    if($searchResultNum){
+      #要显示的结果集
+      $list=$baseSet->slice(($sortData['pageNum']-1)*$sortData['listRows'],$sortData['listRows']);
+    }
+      
+    #模型对象，排序、查询后分页用
+    $pageQuery=$mdl->where('id','in',$baseSet->column('id'))
+                    ->order($sortData['sortName'],$sortData['sortOrder']);
+    #分页对象，符合查询条件的所有iss记录分页,每页$listRows条记录
+    $pageSet=$pageQuery->paginate($sortData['listRows'],false,['type'=>'bootstrap','var_page' =>'pageNum','page'=>$sortData['pageNum'],
                         'query'=>['listRows'=>$sortData['listRows']]]);
       
-      $this->assign([
-        'home'=>$this->request->domain(),
-        'searchResultNum'=>$searchResultNum,
-        #当前页显示内容
-        'list'=>$list,
-        #分页对象
-        'pageSet'=>$pageSet,
-        #排序数组
-        'sortData'=>$sortData,
-        'sortName'=>$sortData['sortName'],
-        #搜索数组。JSON_UNESCAPED_UNICODE，保持编码格式。若前端文件采用utf-8编码，汉字就可直接解析显示。
-        'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
-      ]);
+    $this->assign([
+      'home'=>$this->request->domain(),
+      'searchResultNum'=>$searchResultNum,
+      #当前页显示内容
+      'list'=>$list,
+      #分页对象
+      'pageSet'=>$pageSet,
+      #排序数组
+      'sortData'=>$sortData,
+//      'sortName'=>$sortData['sortName'],
+//      #搜索数组。JSON_UNESCAPED_UNICODE，保持编码格式。若前端文件采用utf-8编码，汉字就可直接解析显示。
+//      'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
+    ]);
     
     ##
     return view($fileName);

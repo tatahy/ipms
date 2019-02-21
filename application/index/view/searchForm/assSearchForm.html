@@ -9,12 +9,12 @@
       		<ul class="dropdown-menu" role="menu">
 				<li class=""><a href="#searchFormCommon" data-toggle="collapse" data-collapse-switch="li" title="根据输入信息搜索"><span class="glyphicon glyphicon-edit"></span>一般搜索</a></li>
     			<li role="separator" class="divider"></li>
-    			<li class=""><a href="#divSearchFormBarcode" data-toggle="collapse" data-collapse-switch="li" title="选择/ 拍摄<br>条形码图片搜索"><span class="glyphicon glyphicon-barcode"></span>条形码搜索</a></li>
+    			<li class=""><a href="#searchFormBarcode" data-toggle="collapse" data-collapse-switch="li" title="选择/ 拍摄<br>条形码图片搜索"><span class="glyphicon glyphicon-barcode"></span>条形码搜索</a></li>
       		</ul>
     	</div>
   	</div>
 		
-	<button id="btnRefresh" type="button" class="btn btn-primary btn-sm" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+	<button type="button" class="btn btn-primary btn-sm btnPageRefresh" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 </div>
 
 <!-- // 一般搜索-->
@@ -28,7 +28,7 @@
 		<div class="row myRow">
 			<div class="form-group col-sm-4">
 				<label class="control-label" for="brand_model">名称（品牌型号）</label>
-				<input class="form-control searchBg" id="brand_model" name="brand_model" type="text" value="" placeholder="...不限" />	
+				<input class="form-control searchBg" name="brand_model" type="text" value="" placeholder="...不限" />	
 			</div>
 			<div class="form-group col-sm-4">
 				<label class="control-label" for="dept_now">现使用部门</label>
@@ -53,18 +53,18 @@
 		<div id="queryInputNum" class="row myRow collapse">
 			<div class="form-group col-sm-4">
 				<label class="control-label" for="assnum">编号</label>
-				<input class="form-control searchBg" id="assnum" name="assnum" type="text" value="" placeholder="...不限" />
+				<input class="form-control searchBg" name="assnum" type="text" value="" placeholder="...不限" />
 										
 			</div>
 			
 			<div class="form-group col-sm-4">
 				<label class="control-label" for="code">卡号</label>
-				<input class="form-control searchBg" id="code" name="code" type="text" value="" placeholder="...不限" />
+				<input class="form-control searchBg" name="code" type="text" value="" placeholder="...不限" />
 			</div>
 			
 			<div class="form-group col-sm-4">
 				<label class="control-label" for="bar_code">条形码号</label>
-				<input class="form-control searchBg" id="bar_code" name="bar_code" type="text" value="" placeholder="...不限" />	
+				<input class="form-control searchBg" name="bar_code" type="text" value="" placeholder="...不限" />	
 			</div>
 		</div>
 		<div id="queryInputTime" class="row myRow collapse">
@@ -100,14 +100,14 @@
 </div>
 
 <!-- //特殊搜索， 条形码搜索区域-->
-<div id="searchFormBarcode">
+<div id="searchFormBarcode" class="collapse">
 	<br>
 	<span class="text-primary" ><span class="glyphicon glyphicon-barcode"></span>条形码搜索</span>
 	
-	<button type="button" class="close" data-target="#divSearchFormBarcode" data-toggle="collapse" data-collapse-switch="div" title="关闭">&times;</button>
+	<button type="button" class="close" data-target="#searchFormBarcode" data-toggle="collapse" data-collapse-switch="div" title="关闭">&times;</button>
 		
 	<!-- <div id="divBarcodeArea_load"><p class="text-center" style="font-size:20px;">加载中……</p></div> -->
-	{include file="../application/common/decodeBarcode.html"}
+	{include file="../application/index/view/searchForm/decodeBarcode.html"}
 </div>
 
 <script type="text/javascript">
@@ -115,4 +115,10 @@
 <!-- rqData.searchData={$searchData}; -->
 </script>
 
+{// TP5中的模板注释格式，单行，绝对路径。<!-- //引入条形码识别插件 -->}  
+{js href="/plugins/quaggaJs/quagga.min.js" }
+
 <script type="text/javascript" src="/home/res/js/app/searchForm.js"></script>
+
+<script type="text/javascript" src="/home/res/js/app/decodeBarcode.js"></script>
+<!-- <script type="module" src="/home/res/js/app/searchForm.js"></script> -->

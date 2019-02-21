@@ -352,11 +352,12 @@ $(function() {
 	//查询条形码值对应的记录
 	$('#btnBarcodeQuery').click(function(){
 		let code=$(this).prev().text();
-		let fm=$('.searchForm');
+		let fm=$('form .common');
 		//一般查询表单重置
+		consoleColor("$('#btnBarcodeQuery').click", 'green');
+		console.log(fm.find('[name]').length)
 		fm[0].reset();
 		fm.find('.form-control').removeClass('alert-info');
-
 		//一般查询表单里输入框input[name="bar_code"]填入code
 		fm.find('[name="reqObj"]').val('barCode');
 		fm.find('[name="bar_code"]').val(code).addClass('alert-info');
