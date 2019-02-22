@@ -18,13 +18,14 @@
 </div>
 
 <!-- // 一般搜索-->
-<div id="searchFormCommon" class="collapse">
+<div id="divFmQuery" class="collapse">
 	<br>
 	<span class="text-primary" ><span class="glyphicon glyphicon-edit"></span>一般搜索条件</span>
 	
-	<button type="button" class="close" data-target="#searchFormCommon"  data-toggle="collapse" data-collapse-switch="div" title="关闭">&times;</button>
+	<button type="button" class="close" data-target="#divFmQuery" data-toggle="collapse" data-collapse-switch="div" title="关闭">&times;</button>
+	<div class="formParent">
 	<!-- // 一般搜索表单-->	
-	<form class="searchForm common" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:0px;">
+	<form class="fmQuery" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:0px;">
 		<div class="row myRow">
 			<div class="form-group col-sm-4">
 				<label class="control-label" for="brand_model">名称（品牌型号）</label>
@@ -97,16 +98,16 @@
 		</div>
 			
 	</form>
+	</div>
 </div>
 
 <!-- //特殊搜索， 条形码搜索区域-->
-<div id="searchFormBarcode" class="collapse">
+<div class="formParent collapse">
 	<br>
 	<span class="text-primary" ><span class="glyphicon glyphicon-barcode"></span>条形码搜索</span>
 	
 	<button type="button" class="close" data-target="#searchFormBarcode" data-toggle="collapse" data-collapse-switch="div" title="关闭">&times;</button>
 		
-	<!-- <div id="divBarcodeArea_load"><p class="text-center" style="font-size:20px;">加载中……</p></div> -->
 	{include file="../application/index/view/searchForm/decodeBarcode.html"}
 </div>
 

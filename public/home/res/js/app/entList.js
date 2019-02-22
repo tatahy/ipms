@@ -1,4 +1,4 @@
-// app/entList.js
+// app/entOprtList.js
 //import {glyPrex,bs3Color,topNavProp,entProp,rqData,urlObj,searchResultNum,year} from 'conf.js';
 
 //本文件有效的变量

@@ -58,26 +58,26 @@
 	
 	<div id="entSearchForm">
 	
-		<div class="formCommon">
+		<div class="searchForm">
 		<div class="text-right" data-show-search-form=false>
-			<button type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divSearchForm" title="显示/隐藏搜索条件"><span class="glyphicon glyphicon-edit"></span>搜索条件</button>&nbsp;
-			<button type="button" class="btn btn-primary btn-sm btnPageRefresh" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+			<button type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divFmQuery" title="显示/隐藏搜索条件"><span class="glyphicon glyphicon-edit"></span>搜索条件</button>&nbsp;
+			<button id="btnRefresh" type="button" class="btn btn-primary btn-sm btnPageRefresh" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
 		</div>
 
-		<div id="divSearchForm" class="collapse">
+		<div id="divFmQuery" class="collapse">
 			<br>
 			<span class="text-primary">【<strong>搜索条件</strong>】</span>
 	
-			<button type="button" class="close" data-target="#divSearchForm"  data-toggle="collapse" title="关闭">&times;</button>
+			<button type="button" class="close" data-target="#divFmQuery"  data-toggle="collapse" title="关闭">&times;</button>
 	
 	<!-- // 一般搜索表单-->	
-			<div class="searchForm">
+			<div class="formParent">
 			<!-- //jQ载入1 -->
 			</div>
 		</div>
 		</div>
 		
-		<div class="formSpecial">
+		<div class="searchForm">
 		<!-- //jQ载入1 -->
 		</div>
 		
@@ -137,4 +137,4 @@
 <script type="text/javascript" src="/home/res/js/app/main.js"></script>
 
 <!-- //import js module into this HTML page -->
-<!-- <script type="module" src="/home/res/js/app/main.js"></script> -->
+<!-- <script type="module" src="/home/res/js/app/index.js"></script> -->

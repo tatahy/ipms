@@ -155,7 +155,7 @@ class IndexController extends Controller
       'username' => $this->username
     ]);
     return view();
-    //return $this->redirect('index','',302,['salt'=>$salt,'username'=>$this->username,'pwd'=>$this->pwd]);
+    //return json_encode(['tpl'=>view(),'home'=> $request->domain()]);
   }
 
   //修改application/config.php的设置将“默认操作”由“index”改为“login”？？

@@ -2,18 +2,30 @@
 // import {glyPrex,domain,loadStr,bs3Color,topNavProp,entProp,rqData,urlObj,searchResultNum,year} from './conf.js';
 // import * from './conf.js';
 
-pageInit();
+$.when(
+	//请求页面初始数据
+	$.post('index/index/index',{getPageInitData:true})
+).then(function(resData){
+		//页面初始化
+		pageInit(resData);
+		pageReady();
+	},function(){
+		$.alert('页面初始化失败。');
+	}
+);
 
 //页面生命周期函数-init
-function pageInit(){
-	let resData=ajaxResByPost({getPageInitData:true,async:false});
+function pageInit(resData){
 	//全局变量赋值
-	rqData=initRqData();
 	urlObj=resData.urlObj;
 	entNum=resData.entNum;
-	console.log(resData);
-	setEntProp();
-	console.log(getRqUrl());
+	rqData=initRqData();
+	//完善entProp中的num属性值
+	for(let ent in entProp){
+		for(let per in entProp[ent].period.detail){
+			entProp[ent].period.detail[per].title.num=entNum[ent][per];
+		}
+	}
 	
 	//生成组件
 	buildTopNavbar();
@@ -21,135 +33,283 @@ function pageInit(){
 	
 	// 激活并设置tooltip
 	$('body').tooltip({selector:'[title]',triger:'hover click',placement:'auto top',delay: {show: 200, hide: 100},html: true });
+	$('footer .year').html('2017-'+year);
+}
+//page-ready后处理各种事件
+function pageReady(){
+	let sumNod=$('#entSummary').show(),
+		perNod=$('#entPeriod').hide();
+	let entASet=$('nav .navbar-collapse ul').eq(0).find('a'),
+		btnEntPeriod=sumNod.find('.btnPeriod'),
+		btnTopnavToggle=$('nav .navbar-header').children('.navbar-toggle');
 	
-	//jQuery中的HTML文件准备好的函数，操作组件
-	$(document).ready(function(){
-		//本函数中有效的变量
-		let sumObj=$('#entSummary'),
-			perObj=$('#entPeriod');
-		let navTopEntASet=$('nav .navbar-collapse ul').eq(0).find('a'),
-			btnEntPeriod=sumObj.find('.btnPeriod'),
-			btnTopnavToggle=$('nav .navbar-header').children('.navbar-toggle');
-	
-		sumObj.show();
-		perObj.hide();
+	btnTopnavToggle.click(function(){
+		showTopNavbar();
+	});
+
+	entASet.click(function(){
+		let cls=$(this).closest('li').attr('class')?$(this).closest('li').attr('class'):'no class',
+		ent=$(this).data('ent');
+			
+		$(this).tab('show');
+		sumNod.hide();
+		perNod.hide();
+			
+		ent=='index'?sumNod.show():perNod.show();
 		
-		$('footer .year').html('2017-'+year);
-
-		btnTopnavToggle.click(function(){
-			showTopNavbar();
-		});
-
-	
-		navTopEntASet.click(function(){
-			let cls=$(this).closest('li').attr('class')?$(this).closest('li').attr('class'):'no class',
-				ent=$(this).data('ent');
-			
-			$(this).tab('show');
-			sumObj.hide();
-			perObj.hide();
-			
-			ent=='index'?sumObj.show():perObj.show();
-			
+		if(rqData.ent!=ent){
 			initRqData();
 			rqData.ent=ent;
 			rqData.period=topNavProp[ent].period;
-			
 			if(cls.indexOf('disabled')==-1 && ent!='index'){
 				entLoad();
 				// entReady();
 			}
-		});
+		}
+	});
 	
-		btnEntPeriod.click(function(){
-			let ent=$(this).data('ent');
-			sumObj.hide();
-			perObj.show();
+	btnEntPeriod.click(function(){
+		let ent=$(this).data('ent');
+		sumNod.hide();
+		perNod.show();
 		
-			//ent对应的navTop的li添加'active'
-			navTopEntASet.closest('li').removeClass('active').find('[data-ent="'+ent+'"]').tab('show');
+		//ent对应的navTop的li添加'active'
+		entASet.closest('li').removeClass('active').find('[data-ent="'+ent+'"]').tab('show');
 		
-			rqData.ent=ent;
-			rqData.period=$(this).data('period');
+		rqData.ent=ent;
+		rqData.period=$(this).data('period');
 		
-			entLoad();
-			// entReady();
-		});
+		entLoad();
+		// entReady();
 	});
 }
-//ent-change
-function entLoad(){
-	let ent=rqData.ent;
-	
-	let	sfSet=$('#entSearchForm').children().prop('hidden',true),
-		fmCom=sfSet.eq(0),
-		fmSpe=sfSet.eq(1);
+//ent-load
+function entLoad(){	
+	let	divSet=$('#entSearchForm').children('.searchForm').prop('hidden',true),
+		oneFmDiv=divSet.eq(0),
+		multiFmDiv=divSet.eq(1);
 	//选择操作节点并显示
-	let searchFmP=(rqData.ent=='ass')?fmSpe.prop('hidden',false):fmCom.prop('hidden',false).find('div.searchForm');
+	let loadFmNod=(rqData.ent=='ass')?multiFmDiv.prop('hidden',false):oneFmDiv.prop('hidden',false).find('div.formParent');
 	// let url=urlObj.domain+'/index/SearchForm/index';
-	let uForm='/index/SearchForm/index';
-	let listP=$('#entList');
-	let uList='/index/List/index';
+	let loadListNod=$('#entList');
 	
-	consoleColor('entLoad(), rqData:');
-	console.log(rqData);
-	// initUrlObj(ent);
-	//从上到下依次生成、载入页面中的各个组件
-	//1 生成ent的nav-pills
+	//生成ent的nav-pills
 	buildEntPeriodNavPills();
-	
-	//2 生成ent的period的title
+	//生成ent的period的title
 	buildEntPeriodTitle();
-		
-	/* //3 载入ent的searchForm
-	loadEntSearchForm();
-	
-	//4 载入ent对应的List
-	loadEntPeriodList();
-	
-	entReady(); */
 	
 	$.when(
-		//载入entSearchForm
-		$.post(uForm,rqData),
-		//载入entPeriodList
-		$.post(uList,rqData),
+		//异步请求entSearchForm模板
+		$.post('/index/SearchForm/index',rqData),
+		//异步请求entPeriodList模板
+		$.post('/index/List/index',rqData),
 	).then(function(p1,p2){
+		//载入获得的模板
+		loadFmNod.html(p1[0]);
+		//载入获得的模板
+		loadListNod.html(p2[0]);
 		
-		searchFmP.html(p1[0]);
-		listP.html(p2[0]);
-		console.log(p1);
-		
-		entReady();
+		return entReady();
 	},function(){
-		//'entLoad()--error'
-		$.alert('failed');
+		return  $.alert('请求数据失败。');
 	});
 }
 //ent-ready
 function entReady(){
 	let //在entLoad中已生成
-		navEntPeriodASet=$('#entPeriod').children('.nav-pills').find('a');
-
-	navEntPeriodASet.click(function(){
+		entPeriodASet=$('#entPeriod').children('.nav-pills').find('a');
+	
+	setRqData();
+	setEntQueryForm();
+	setEntPeriodList();
+	
+	entPeriodASet.click(function(){
 		let sData=$(this).data();
 		$(this).tab('show');
-		rqData.ent=sData.ent;
-		rqData.period=sData.period;
-		// 生成ent的period的title
-		buildEntPeriodTitle();
-		loadEntSearchForm();
-		loadEntPeriodList();
+		if(rqData.period!=sData.period){
+			rqData.ent=sData.ent;
+			rqData.period=sData.period;
+
+			return entLoad();	
+		}
+	});
+	consoleColor('entReady() rqData','red');
+	console.log(rqData);
+	//对searchForm的操作
+	entOprtQueryForm();
+	
+	//对list的操作
+	entOprtList();
+}
+
+function entOprtQueryForm() {
+	let fmQ=$('form.fmQuery');
+
+	fmQ.find('.form-control').change(function(){
+		//有变化加底色
+		($(this).val()=='' || $(this).val()==0)?$(this).removeClass('alert-info'):$(this).addClass('alert-info');
+	});
+	//表单提交
+	fmQ.submit(function(evt){
+		evt.preventDefault();
+		//设置查询数据
+		setRqSearchDataBy(fmQ);
+		consoleColor('searchForm.js fmCom.submit, rqData:');
+		console.log(rqData);
+		
+		return entLoad();
+	});
+	//表单重置时附加的操作
+	fmQ.find('[type="reset"]').click(function(evt){
+		return resetSearchForm();
+	});
+
+	// 页面刷新 
+	/* $('.btnPageRefresh').click(function(){
+		resetSearchForm();
+		// sFCObj.reset();
+		return entLoad();
+	}); */
+
+	$('#btnRefresh').click(function(){
+		resetSearchForm();
+		// sFCObj.reset();
+		return entLoad();
+	});		
+}
+
+function entOprtList() {
+	let tblNod=$('#entList table'),
+		listRowNod=$('#listRows'),
+		aHeadSet=tblNod.find('thead a'),
+		aBodySet=tblNod.find('tbody a'),
+		aPageSet=$('#divListRows a');
+	
+	//表格每页显示记录行数；表格按选定行数显示
+	listRowNod.val(rqData.sortData.listRows).change(function(){
+		//排序有关的值向sortData汇集
+		rqData.sortData.listRows=$(this).val()*1;
+		//分页从第一页开始
+		rqData.sortData.pageNum=1;
+		
+		return entLoad();
+	});	
+	//表格按选定字段排序
+	aHeadSet.click(function(){
+		let sortName=$(this).data('sortName');
+
+		rqData.sortData.sortOrder=(rqData.sortData.sortOrder=='asc')?'desc':'asc';
+	
+		//排序有关的值向sortData汇集
+		if(rqData.sortData.sortName!=sortName){
+			rqData.sortData.sortName=sortName;
+			rqData.sortData.sortOrder='asc';	
+		}
+
+		rqData.sortData.pageNum=1;
+	
+		return entLoad();
+	});	
+	//表格中点击a后，标签所在行上底色
+	aBodySet.click(function(){
+		rqData.sortData.showId=$(this).closest('tr').data('showId');
+		
+		return setTrBgColor();
+	});
+	//表格显示分页内容
+	aPageSet.click(function(evt){
+		// a所在分页页数
+		let pageStr=$(this).text(),
+			pageNum=0
+			showId=$('#entList').find('tbody tr').eq(0).data('showId'),
+		//(li.active)所代表的页数
+			pageNumActive=$('#divListRows li.active').children('span').text(),
+			sortName=$('thead').find('.label').data('sortName');
+
+		evt.preventDefault();
+		//用"*"确保进行数字运算，而不是字符串
+		switch(pageStr){
+			case'»':
+				pageNum=(pageNumActive*1+1);
+				break;
+			case'«':
+				pageNum=(pageNumActive*1-1);
+				break;
+			default:
+				pageNum=pageStr*1;
+				break;
+		}
+		//排序、分页有关的值向sortData汇集
+		if(pageNum){
+			rqData.sortData.pageNum=pageNum;
+		}
+		
+		return entLoad();
+	});
+}
+//setRqData
+function setRqData() {	
+	let fm=$('form.fmQuery'),
+		entHArr=$('#entPeriod').find('.nav-pills li.active a').data(),
+		sortName=$('#entList').find('[data-sort-name]').eq(0).data('sortName'),
+		showId=$('#entList').find('[data-show-id]').eq(0).data('showId');
+		
+	rqData.ent=entHArr.ent;
+	rqData.period=entHArr.period;
+	
+	if(rqData.sortData.sortName==''){
+		rqData.sortData.sortName=sortName;	
+	}
+	
+	fm.find('[name]').each(function(){
+		let n=$(this).attr('name'),
+			//null转为0
+			v=$(this).val()==null?0:$(this).val(),
+			lName=$(this)[0].localName;
+			
+		//赋值rqData.searchData，非0非空的值才进行组装
+		if(v){
+			rqData.searchData[n]=v;
+		}
+		
+		//赋值rqData.queryField，表单输入项及其特征值
+		rqData.queryField[n]={val:v,tagName:lName};
+		//添加select的option特征值
+		if(lName=='select'){
+			let len=$(this).find('option').length,
+				opt={num:len,val:[''],txt:['']};
+			if(len){
+				$(this).find('option').each(function(index,el){
+					opt.val[index]=$(el).val();
+					opt.txt[index]=$(el).text();
+				});
+			}
+			rqData.queryField[n]['option']=opt;
+		}
 	});
 	
-	//其他操作
-	// 页面刷新
-	// $('.btnPageRefresh').click(function(){
-		// resetSearchForm();
-		// loadEntPeriodList();
-	// });	
-	$.alert('entReady()--finished');
+	return rqData;
 }
+function setEntPeriodList(){	
+	let ent=rqData.ent,
+		period=rqData.period,
+		capSNod=$('#entList').find('caption strong'),
+		periodChi=entProp[ent].period.detail[period].txt,
+		fmQuery=$('form.fmQuery');
+
+	//显示分页的第一页
+	rqData.sortData.pageNum=1;
+	
+	//tbl标题加内容
+	capSNod.text(periodChi);
+	//tbl排序	
+	sortEntListTbl();
+	//指定行加底色	
+	setTrBgColor();
+	//显示搜索结果数
+	showSearchResult();	
+}
+
 //让urlObj的取值都在已定义的范围内
 function initUrlObj(ent=''){	
 	let arr=Object.keys(entProp),
@@ -179,13 +339,14 @@ function initUrlObj(ent=''){
 
 //让rqData回到初始值
 function initRqData(){	
-	return {
+	rqData={
 		ent:'index',
 		period:'',
-		sortData:{listRows:10,sortName:'',sortOrder:'asc',pageNum:1},
+		sortData:{listRows:10,sortName:'',sortOrder:'asc',pageNum:1,showId:''},
 		searchData:{},
 		queryField:{}
 	};	
+	return rqData;
 }
 //设定向后端请求的url
 function getRqUrl(){
@@ -297,42 +458,10 @@ function buildEntPeriodNavPills(){
 	}
 }
 
-//载入ent的搜索表单
-function loadEntSearchForm(){
-	let	sfSet=$('#entSearchForm').children().prop('hidden',true),
-		fmCom=sfSet.eq(0),
-		fmSpe=sfSet.eq(1);
-	//选择操作节点并显示
-	let obj=(rqData.ent=='ass')?fmSpe.prop('hidden',false):fmCom.prop('hidden',false).find('div.searchForm');
-	
-	//
-	urlObj.module='index';
-	urlObj.ctrl='SearchForm';
-	urlObj.action='index';
-	
-	consoleColor('loadEntSearchForm() before load, obj:','red');
-	console.log(rqData);
-	
-	//searchForm的加载
-	/* obj.html(loadStr).load(getRqUrl(),rqData,function(){	
-		let fm=obj.find('form.common');
-		consoleColor('loadEntSearchForm() after load, rqData:','red');
-		
-		rqData.searchData=setRqSearchDataBy(fm);
-		rqData.queryField=setRqQueryFieldBy(fm);
-		console.log(rqData);
-		setEntSearchForm(fm);
-	}); */
-	
-	return $.post(getRqUrl(),rqData,function(res){	
-		// console.log(res.data);
-		// obj.html(res);
-	});
-		
-}
 //设定指定form的各个表单项
-function setEntSearchForm(fm){
-	let selSet=fm.find('select'),
+function setEntQueryForm(){
+	let fm=$('form.fmQuery'),
+		selSet=fm.find('select'),
 		inSet=fm.find('input'),
 		//查询字段名数组
 		sNameArr=Object.keys(rqData.searchData);
@@ -384,38 +513,7 @@ function setEntSearchForm(fm){
 		});		
 	});
 }
-//载入ent各个period的列表
-function loadEntPeriodList(){
-	let	//加载list的根节点
-		obj=$('#entList');
-	
-	urlObj.module='index';
-	urlObj.ctrl='List';
-	urlObj.action='index';
-	
-	/* obj.html(loadStr).load(getRqUrl(),rqData,function(){
-		let ent=rqData.ent,
-			capSObj=$('#entList').find('caption strong'),
-			periodChi=entProp[ent].period.detail[rqData.period].txt;
-		
-		//显示分页的第一页
-		rqData.sortData.pageNum=1;
-		
-		consoleColor('loadEntPeriodList()','red');
-		console.log(rqData);
-		
-		//给tbl标题加内容
-		capSObj.text(periodChi);	
-		sortEntListTbl();
-		setTrBgColor();
-		showSearchResult();	
-	}); */
-	
-	return $.post(getRqUrl(),rqData,function(res){	
-		obj.html(res);
-	});
-	
-}
+
 //组装向后端请求时的searchData，不带参数就是清空searchData
 function setRqSearchDataBy(fm=''){
 	let formData='';
@@ -465,14 +563,6 @@ function setRqQueryFieldBy(fm=''){
 	
 	return rqData.queryField;
 }
-//完善entProp中的num属性值
-function setEntProp(){
-	for(let ent in entProp){
-		for(let per in entProp[ent].period.detail){
-			entProp[ent].period.detail[per].title.num=entNum[ent][per];
-		}
-	}
-}
 //构建title组件
 function buildEntPeriodTitle(){
 	let ent=(rqData.ent=='index')?'pat':rqData.ent,
@@ -508,7 +598,7 @@ function resetSearchForm(){
 		}
 	});
 	//清空查询数据
-	setRqSearchDataBy();
+	return setRqSearchDataBy();
 }
 
 //对ent List进行排序
@@ -518,9 +608,9 @@ function sortEntListTbl() {
 		glyDesc=$('<span></span>').addClass('small glyphicon glyphicon-sort-by-order-alt'),
 		sortOrder=rqData.sortData.sortOrder,
 		sortName=rqData.sortData.sortName,
-		tblObj=$('[id="'+rqData.ent+'ListTbl"]'),
-		aHSet=tblObj.find('thead a'),
-		trSet=tblObj.find('tr'),
+		tblNod=$('#entList table'),
+		aHSet=tblNod.find('thead a'),
+		trSet=tblNod.find('tr'),
 		column='',
 		columnArr=['num'];
 		
@@ -544,16 +634,17 @@ function sortEntListTbl() {
 	});
 		
 	//选中进行排序的列(除标题行外的)向左对齐，添加底色
-	tblObj.find('tbody [data-column="'+sortName+'"]').addClass('text-left bg-info');
+	tblNod.find('tbody [data-column="'+sortName+'"]').addClass('text-left bg-info');
 }
 
-function setTrBgColor(showId='') {
-	let id=showId?showId:rqData.sortData.showId,
-		obj=$('#patListTbl tbody');
+function setTrBgColor() {
+	let id=rqData.sortData.showId,
+		nod=$('#entList table');
 	//去掉所有行的底色
-	obj.find('tr').removeClass('bg-warning');
+	nod.find('tr').removeClass('bg-warning');
+	
 	//给showId所在行上底色
-	obj.find('[data-show-id="'+id+'"]').addClass('bg-warning');
+	nod.find('[data-show-id="'+id+'"]').addClass('bg-warning');
 }
 
 function showSearchResult() {
