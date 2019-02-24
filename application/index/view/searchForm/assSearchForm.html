@@ -7,9 +7,9 @@
     	<div class="btn-group">
 			<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">更多<span class="caret"></span></button>
       		<ul class="dropdown-menu" role="menu">
-				<li class=""><a href="#searchFormCommon" data-toggle="collapse" data-collapse-switch="li" title="根据输入信息搜索"><span class="glyphicon glyphicon-edit"></span>一般搜索</a></li>
+				<li class=""><a href="#divFmQuery" data-toggle="collapse" data-collapse-switch="li" title="根据输入信息搜索"><span class="glyphicon glyphicon-edit"></span>一般搜索</a></li>
     			<li role="separator" class="divider"></li>
-    			<li class=""><a href="#searchFormBarcode" data-toggle="collapse" data-collapse-switch="li" title="选择/ 拍摄<br>条形码图片搜索"><span class="glyphicon glyphicon-barcode"></span>条形码搜索</a></li>
+    			<li class=""><a href="#divFmBarcode" data-toggle="collapse" data-collapse-switch="li" title="选择/ 拍摄<br>条形码图片搜索"><span class="glyphicon glyphicon-barcode"></span>条形码搜索</a></li>
       		</ul>
     	</div>
   	</div>
@@ -21,9 +21,7 @@
 <div id="divFmQuery" class="collapse">
 	<br>
 	<span class="text-primary" ><span class="glyphicon glyphicon-edit"></span>一般搜索条件</span>
-	
 	<button type="button" class="close" data-target="#divFmQuery" data-toggle="collapse" data-collapse-switch="div" title="关闭">&times;</button>
-	<div class="formParent">
 	<!-- // 一般搜索表单-->	
 	<form class="fmQuery" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:0px;">
 		<div class="row myRow">
@@ -98,15 +96,13 @@
 		</div>
 			
 	</form>
-	</div>
 </div>
 
 <!-- //特殊搜索， 条形码搜索区域-->
-<div class="formParent collapse">
+<div id="divFmBarcode" class="collapse">
 	<br>
 	<span class="text-primary" ><span class="glyphicon glyphicon-barcode"></span>条形码搜索</span>
-	
-	<button type="button" class="close" data-target="#searchFormBarcode" data-toggle="collapse" data-collapse-switch="div" title="关闭">&times;</button>
+	<button type="button" class="close" data-target="#divFmBarcode" data-toggle="collapse" data-collapse-switch="div" title="关闭">&times;</button>
 		
 	{include file="../application/index/view/searchForm/decodeBarcode.html"}
 </div>
@@ -119,7 +115,7 @@
 {// TP5中的模板注释格式，单行，绝对路径。<!-- //引入条形码识别插件 -->}  
 {js href="/plugins/quaggaJs/quagga.min.js" }
 
-<script type="text/javascript" src="/home/res/js/app/searchForm.js"></script>
+<!-- <script type="text/javascript" src="/home/res/js/app/searchForm.js"></script> -->
 
 <script type="text/javascript" src="/home/res/js/app/decodeBarcode.js"></script>
 <!-- <script type="module" src="/home/res/js/app/searchForm.js"></script> -->

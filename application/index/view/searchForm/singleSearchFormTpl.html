@@ -1,0 +1,30 @@
+<!-- //module:index, ctrl:SearchForm view:searchForm/singleSearchFormTpl.html  -->
+<div class="text-right">
+	<button type="button" class="btn btn-primary btn-sm" data-toggle="collapse" data-target="#divFmQuery" title="显示/隐藏搜索条件"><span class="glyphicon glyphicon-edit"></span>搜索条件</button>&nbsp;
+	<button type="button" class="btn btn-primary btn-sm btnPageRefresh" title="刷新列表"><span class="glyphicon glyphicon-refresh"></span>刷新</button>
+</div>
+
+<div id="divFmQuery" class="collapse">
+	<br>
+	<span class="text-primary">【<strong>搜索条件</strong>】</span>
+	<button type="button" class="close" data-target="#divFmQuery"  data-toggle="collapse" title="关闭">&times;</button>
+
+<!-- // 搜索表单-->	
+	<form class="fmQuery" style="border:1px solid #eee;padding:10px 0px;margin-top:2px;">
+		{block name="formElement"}
+		
+		
+		{/block}
+		<div class="row myRow text-right">	
+			<button type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>搜索</button>	
+			<input type="reset" class="btn btn-primary btn-sm" value="条件重置" />
+		</div>					
+	</form>
+</div>	
+
+<script type="text/javascript">
+//对conf.js中定义的全局变量赋值
+<!-- rqData.searchData={ $searchData}; -->
+</script>
+
+<!-- <script type="text/javascript" src="/home/res/js/app/searchForm.js"></script> -->

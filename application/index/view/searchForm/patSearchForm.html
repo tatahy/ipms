@@ -1,7 +1,9 @@
 <!-- //module:index, ctrl:SearchForm view:searchForm/patSearchForm.html  -->
 
-<!-- // 搜索表单-->	
-	<form class="fmQuery" style="border:1px solid #eee;padding:10px 0px;margin-top:2px;">
+<!-- //继承模板文件。路径为相对于入口文件index.php -->
+{extend name="../application/index/view/searchForm/singleSearchFormTpl.html" /}
+
+{block name="formElement"}
 		<div class="row myRow">
 			<div class="form-group col-sm-4">
 				<label class="control-label" for="topic">名称</label>
@@ -35,15 +37,5 @@
 				</select>
 			</div>
 		</div>
-		<div class="row myRow text-right">	
-			<button type="submit" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-search"></span>搜索</button>	
-			<input type="reset" class="btn btn-primary btn-sm" value="条件重置" />
-	</div>					
-</form>
-
-<script type="text/javascript">
-//对conf.js中定义的全局变量赋值
-<!-- rqData.searchData={ $searchData}; -->
-</script>
-
-<!-- <script type="text/javascript" src="/home/res/js/app/searchForm.js"></script> -->
+		
+{/block}

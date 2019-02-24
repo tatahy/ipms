@@ -1,8 +1,9 @@
 <!-- //module:index, ctrl:List view:list/patList.html  -->
 
-<!-- <div id="searchList" style="padding-top:10px;">	 -->
-	<div class="table-responsive">
-		<table class="table table-bordered table-hover">
+<!-- //继承模板文件。路径为相对于入口文件index.php -->
+{extend name="../application/index/view/list/listTpl.html" /}
+
+{block name="listElement"}
 			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>专利信息列表&nbsp;【<strong></strong>】</h4></caption>
 			<thead>
 				<tr>
@@ -48,33 +49,6 @@
 				</tr>
 				{/volist}
 			</tbody>
-		</table>		
-	</div>
-	
-	<div id="divListRows" class="row text-right">
-		<!-- // 分页变量 -->
-		<div class="col-sm-10 text-right">{$pageSet->render()}</div>
-						
-		<div class="form-group form-group-sm col-sm-2">
-			<span class="">每页记录行数：</span>
-				<select class="form-control" id="listRows">
-					<option value="5">5</option>
-					<option value="10">10</option>
-					<option value="20">20</option>
-					<option value="50">50</option>
-				</select>
-						
-		</div>
-	</div>
-<!-- </div> -->
-<!-- //embed js code onto the HTML page-->
-<script type="text/javascript">
-//对conf.js中定义的全局变量赋值
-searchResultNum={$searchResultNum};
-</script>
-
-<!-- // import js code into the HTML page-->
-<!-- <script type="text/javascript" src="/home/res/js/app/entList.js"></script> -->
-
+{/block}
 
 

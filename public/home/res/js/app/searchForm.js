@@ -1,8 +1,6 @@
 // app/searchForm.js
 
 
-// rqData.sortData.sortName='{$sortName}';
-
 //searchFormCollapse类
 var searchFormCollapse=function(){
 	//要求liSet.length==divSet.length
@@ -191,13 +189,6 @@ fmCom.submit(function(evt){
 fmCom.find('[type="reset"]').click(function(evt){
 	resetSearchForm();
 });
-
-// 页面刷新 
-$('.btnPageRefresh').click(function(){
-	resetSearchForm();
-	sFCObj.reset();
-	loadEntPeriodList();
-});	
 
 //3类共5个collapse-switch组件的click事件处理函数，
 //任意时刻只有一个组件能click。记录触发click的组件特征值，再由特征值决定组件的显示
