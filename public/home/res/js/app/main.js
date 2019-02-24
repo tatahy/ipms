@@ -2,6 +2,167 @@
 // import {glyPrex,domain,loadStr,bs3Color,topNavProp,entProp,rqData,urlObj,searchResultNum,year} from './conf.js';
 // import * from './conf.js';
 
+//匿名类，然后赋值给变量searchFormCollapse，（类表达式定义的类，不会进行提升）要先声明再使用，否则就会报‘ReferenceError’错
+var searchFormCollapse= class {
+	constructor(){
+		let self=this;
+		self.name=searchFormCollapse;
+		self.divSet=$('[data-collapse-switch="div"]').parent();
+		self.liSet=$('[data-collapse-switch="li"]').parent();
+		self.bs3Cls={liShow:'active',divShow:'in',fn:{show:'show',hide:'hide'}};
+		self.formId=self.initFormId();
+		self.status=self.initStatus();		
+	}
+	initFormId(){
+		let arr=[];
+		this.divSet.each(function(index){
+			arr[index]=$(this).attr('id');
+		});
+		return arr;
+	}
+	initStatus(){		
+		/* 状态对象。
+	 * multishow，bool，是否为多个组件可同时显示。
+	 * type:'main'且multishow:true时，index为数组，记录要显示组件index。
+	 * type:'main'且multishow:false时，index为数字，记录要显示组件index。
+	 * type:'li'/'div'时，index为数字，值为触发状态改变的组件index。
+	 * showArr，array，index为组件的index，value为组件是否显示true/false
+	 */
+		return {trigger:{type:'',index:'',multishow:false},showArr:this.zArr()};
+    }
+	zArr(){
+		return Array(this.formId.length).fill(false);
+	}
+	
+	//定义数组的reduce方法中使用的reducer	
+	totalTrue(acc,cur){
+		if(cur){
+			acc++;
+		}
+		return acc;
+	}
+	getStatus(){
+		let self=this,
+			idx='';
+		self.divSet.each(function(){
+			idx=self.formId.indexOf($(this).attr('id'));
+			//jQ中的hasClass()方法不起作用？
+			<!-- $(this).hasClass(self.bs3Cls.divShow)?status.showArr[idx]=true:status.showArr[idx]=false; -->
+			$(this).attr('class').indexOf(self.bs3Cls.divShow)!=-1?self.status.showArr[idx]=true:self.status.showArr[idx]=false;
+		});
+		return self.status;
+	}
+	reset() {
+		let self=this;
+		self.status= self.setCollapse({trigger:{type:'main',index:'0',multishow:''},showArr:self.zArr()});
+		
+		return self.status;
+	}
+	//设定status中的值
+	setStatus(opt={}) {
+		let self=this;
+		let type='',
+			idx='',
+			showVal='',
+			status=$.extend({},self.status,opt);
+		
+		type=status.trigger.type;
+		idx=status.trigger.index;
+		
+		if(status.trigger.multishow==false){
+			self.status=status;
+			return self.setStatusSingle();
+		}
+
+		if(type=='main'){
+			if(idx === ''){
+				status.showArr=self.zArr();
+				// status.trigger.index=0;
+				status.trigger.index=[0];
+				status.showArr[0]=true;
+			}
+			if(Array.isArray(idx)){
+				//根据数组idx改变对应status.showArr的值
+				status.showArr.forEach(function(v,i){
+					if(idx.includes(i)){
+						status.showArr[i]=!v;
+					}
+				});
+			}
+			
+			return self.status=status;
+		}
+		
+		//根据idx的值修改对应status.showArr值
+		if(type=='li'){
+			showVal=status.showArr[idx];
+			status.showArr[idx]=!showVal;
+		}
+		if(type=='div'){
+			status.showArr[idx]=false;
+		}
+		//根据status.showArr的值再修改status.trigger.index为数组
+		if(status.showArr.reduce(totalTrue,0)){
+			idx=[];
+			status.showArr.forEach(function(v,i){
+				if(v){
+					idx.push(i);
+				}
+			});
+		}
+		status.trigger.index=idx;
+		return self.status=status;
+	}
+	//设定status中的值，只能显示一个searchForm及其对应组件
+	setStatusSingle(){
+		let self=this,
+			status=self.status;
+		let type=status.trigger.type,
+			idx=status.trigger.index,
+			showVal='';;
+		
+		//只有showIndex[idx]的值有改变，其他的都为false	
+		if(type=='li'){
+			showVal=status.showArr[idx];
+			status.showArr=self.zArr();
+			status.showArr[idx]=!showVal;
+		}
+		if(type=='main'){
+			if(idx === ''){
+				status.showArr=self.zArr();
+				status.trigger.index=0;
+				status.showArr[0]=true;
+			}
+			if((typeof idx) == 'number'){
+				showVal=status.showArr[idx];
+				status.showArr=self.zArr();
+				status.showArr[idx]=!showVal;
+			}
+		}
+		if(type=='div'){
+			status.showArr[idx]=false;
+		}
+		return self.status=status;
+	}
+	//根据status对有关组件进行显示、隐藏
+	setCollapse(opt={}) {
+		let self=this;
+		let	status=self.setStatus(opt),
+			bs3Cls=self.bs3Cls;
+		
+		status.showArr.forEach(function(v,i){
+			if(v){
+				self.divSet.eq(i).collapse(bs3Cls.fn.show);
+				self.liSet.eq(i).addClass(bs3Cls.liShow);
+			}else{
+				self.divSet.eq(i).collapse(bs3Cls.fn.hide);
+				self.liSet.eq(i).removeClass(bs3Cls.liShow);
+			}
+		});
+		return self.status=status;
+	}
+};
+
 $.when(
 	//请求页面初始数据
 	$.post('index/index/index',{getPageInitData:true})
@@ -117,7 +278,7 @@ function entReady(){
 		clpsSwithcSet=$('[data-collapse-switch]'),
 		btnRefresh=$('.btnPageRefresh');
 	//collapse类的定义
-	let	sFCObj=searchFormCollapse,
+	let	sFCObj=new searchFormCollapse(),
 		fmId=sFCObj.formId,
 		trgObj=sFCObj.status.trigger;
 	
@@ -141,9 +302,9 @@ function entReady(){
 		let mSwitch=$('[data-collapse-switch="main"]');
 		//特征值1
 		let	type=$(this).data('collapseSwitch');
-	//特征值2
+		//特征值2
 		let	idx='';
-	//特征值3
+		//特征值3
 		let	mul=mSwitch.length?mSwitch.data('collapseMultishow'):false;
 	
 		if(type=='li'){	
@@ -750,157 +911,3 @@ function ajaxResByPost(opt={}) {
 		
 	return resData;	
 }
-//searchFormCollapse类
-var searchFormCollapse={
-	//要求liSet.length==divSet.length
-	divSet:$('[data-collapse-switch="div"]').parent(),
-	liSet:$('[data-collapse-switch="li"]').parent(),
-	//BootStrap3的HTML标签class属性及函数参数值fn	
-	bs3Cls:{liShow:'active',divShow:'in',fn:{show:'show',hide:'hide'}},
-	/* 状态对象。
-	 * multishow，bool，是否为多个组件可同时显示。
-	 * type:'main'且multishow:true时，index为数组，记录要显示组件index。
-	 * type:'main'且multishow:false时，index为数字，记录要显示组件index。
-	 * type:'li'/'div'时，index为数字，值为触发状态改变的组件index。
-	 * showArr，array，index为组件的index，value为组件是否显示true/false
-	 */
-	status:{trigger:{type:'',index:'',multishow:false},showArr:this.zArr},
-	
-	formId:function(){
-		let self=this,
-			arr=[];
-		self.divSet.each(function(index){
-			arr[index]=$(this).attr('id');
-		});
-		return arr;
-	},
-	//箭头函数定义产生初始数组的方法
-	zArr:function(){
-		let self=this;
-		return Array(slef.formId.length).fill(false);	
-	},
-	//定义数组的reduce方法中使用的reducer	
-	totalTrue:function(acc,cur){
-		if(cur){
-			acc++;
-		}
-		return acc;
-	},
-	getStatus:function() {
-		let self=this,
-			idx='';
-		self.divSet.each(function(){
-			idx=self.formId.indexOf($(this).attr('id'));
-			//jQ中的hasClass()方法不起作用？
-			<!-- $(this).hasClass(self.bs3Cls.divShow)?status.showArr[idx]=true:status.showArr[idx]=false; -->
-			$(this).attr('class').indexOf(self.bs3Cls.divShow)!=-1?self.status.showArr[idx]=true:self.status.showArr[idx]=false;
-		});
-		return self.status;
-	},
-	reset:function() {
-		let self=this;
-		self.status= self.setCollapse({trigger:{type:'main',index:'0',multishow:''},showArr:zArr()});
-		
-		return self.status;
-	},
-	//设定status中的值
-	setStatus:function(opt={}) {
-		let self=this;
-		let type='',
-			idx='',
-			showVal='';
-		
-		self.status =$.extend({},self.status,opt);	
-		type=self.status.trigger.type;
-		idx=self.status.trigger.index;
-		
-		if(self.status.trigger.multishow==false){
-			return self.setStatusSingle();
-		}
-
-		if(type=='main'){
-			if(idx === ''){
-				self.status.showArr=zArr();
-				// status.trigger.index=0;
-				self.status.trigger.index=[0];
-				self.status.showArr[0]=true;
-			}
-			if(Array.isArray(idx)){
-				//根据数组idx改变对应status.showArr的值
-				self.status.showArr.forEach(function(v,i){
-					if(idx.includes(i)){
-						self.status.showArr[i]=!v;
-					}
-				});
-			}
-			return self.status;
-		}
-		
-		//根据idx的值修改对应status.showArr值
-		if(type=='li'){
-			showVal=self.status.showArr[idx];
-			self.status.showArr[idx]=!showVal;
-		}
-		if(type=='div'){
-			self.status.showArr[idx]=false;
-		}
-		//根据status.showArr的值再修改status.trigger.index为数组
-		if(self.status.showArr.reduce(totalTrue,0)){
-			idx=[];
-			self.status.showArr.forEach(function(v,i){
-				if(v){
-					idx.push(i);
-				}
-			});
-		}
-		self.status.trigger.index=idx;
-		return self.status;
-	},
-	//设定status中的值，只能显示一个searchForm及其对应组件
-	setStatusSingle:function(){
-		let self=this;
-		let type=self.status.trigger.type,
-			idx=self.status.trigger.index,
-			showVal='';;
-		
-		//只有showIndex[idx]的值有改变，其他的都为false	
-		if(type=='li'){
-			showVal=self.status.showArr[idx];
-			self.status.showArr=zArr();
-			self.status.showArr[idx]=!showVal;
-		}
-		if(type=='main'){
-			if(idx === ''){
-				self.status.showArr=self.zArr;
-				self.status.trigger.index=0;
-				self.status.showArr[0]=true;
-			}
-			if((typeof idx) == 'number'){
-				showVal=self.status.showArr[idx];
-				self.status.showArr=zArr();
-				self.status.showArr[idx]=!showVal;
-			}
-		}
-		if(type=='div'){
-			self.status.showArr[idx]=false;
-		}
-		return self.status;
-	},
-	//根据status对有关组件进行显示、隐藏
-	setCollapse:function(opt={}) {
-		let self=this;
-		self.setStatus(opt);
-		
-		self.status.showArr.forEach(function(v,i){
-			if(v){
-				self.divSet.eq(i).collapse(self.bs3Cls.fn.show);
-				self.liSet.eq(i).addClass(self.bs3Cls.liShow);
-			}else{
-				self.divSet.eq(i).collapse(self.bs3Cls.fn.hide);
-				self.liSet.eq(i).removeClass(self.bs3Cls.liShow);
-			}
-		});
-		<!-- consoleColor('setCollapse():'); -->
-		return self.status;
-	}
-};

@@ -14,7 +14,7 @@ var searchFormCollapse={
 	 * type:'li'/'div'时，index为数字，值为触发状态改变的组件index。
 	 * showArr，array，index为组件的index，value为组件是否显示true/false
 	 */
-	status;{trigger:{type:'',index:'',multishow:false},showArr:zArr()},
+	status;{trigger:{type:'',index:'',multishow:false},showArr:self.zArr},
 	
 	formId:function(){
 		let self=this,
@@ -49,7 +49,7 @@ var searchFormCollapse={
 	},
 	reset:function() {
 		let self=this;
-		self.status= self.setCollapse({self.trigger:{type:'main',index:'0',multishow:''},showArr:zArr()});
+		self.status= self.setCollapse({self.trigger:{type:'main',index:'0',multishow:''},showArr:self.zArr});
 		
 		return self.status;
 	},
@@ -70,7 +70,7 @@ var searchFormCollapse={
 
 		if(type=='main'){
 			if(idx === ''){
-				self.status.showArr=zArr();
+				self.status.showArr=self.zArr;
 				// status.trigger.index=0;
 				self.status.trigger.index=[0];
 				self.status.showArr[0]=true;
@@ -105,7 +105,7 @@ var searchFormCollapse={
 		}
 		self.status.trigger.index=idx;
 		return self.status;
-	};
+	},
 	//设定status中的值，只能显示一个searchForm及其对应组件
 	setStatusSingle:function(){
 		let self=this;
@@ -116,18 +116,18 @@ var searchFormCollapse={
 		//只有showIndex[idx]的值有改变，其他的都为false	
 		if(type=='li'){
 			showVal=self.status.showArr[idx];
-			self.status.showArr=zArr();
+			self.status.showArr=self.zArr;
 			self.status.showArr[idx]=!showVal;
 		}
 		if(type=='main'){
 			if(idx === ''){
-				self.status.showArr=zArr();
+				self.status.showArr=self.zArr;
 				self.status.trigger.index=0;
 				self.status.showArr[0]=true;
 			}
 			if((typeof idx) == 'number'){
 				showVal=self.status.showArr[idx];
-				self.status.showArr=zArr();
+				self.status.showArr=self.zArr;
 				self.status.showArr[idx]=!showVal;
 			}
 		}
@@ -135,7 +135,7 @@ var searchFormCollapse={
 			self.status.showArr[idx]=false;
 		}
 		return self.status;
-	};
+	},
 	//根据status对有关组件进行显示、隐藏
 	setCollapse:function(opt={}) {
 		let self=this;

@@ -1,7 +1,8 @@
 // app/searchForm.js
 
 
-//searchFormCollapse类
+//searchFormCollapse类（基于函数定义的类，会自动进行提升）
+// function searchFormCollapse(){
 var searchFormCollapse=function(){
 	//要求liSet.length==divSet.length
 	var divSet=$('[data-collapse-switch="div"]').parent();
