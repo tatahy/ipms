@@ -46,7 +46,7 @@ class ListController extends Controller {
     return $this->log;
   }
   
-  private function priGetList ($arr) {
+  private function priGetListTplFile ($arr) {
         
     $ent=array_key_exists('ent',$arr)?$arr['ent']:'pat'; 
     #要求$searchData的键名必须是数据库中的字段名
@@ -160,7 +160,7 @@ class ListController extends Controller {
     $rqArr=$this->request->request();
     
   
-    return $this->priGetList($rqArr);
+    return $this->priGetListTplFile($rqArr);
    
   }
   

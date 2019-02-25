@@ -23,7 +23,7 @@
 	<span class="text-primary" ><span class="glyphicon glyphicon-edit"></span>一般搜索条件</span>
 	<button type="button" class="close" data-target="#divFmQuery" data-toggle="collapse" data-collapse-switch="div" title="关闭">&times;</button>
 	<!-- // 一般搜索表单-->	
-	<form class="fmQuery" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:0px;">
+	<form class="fmQuery" data-form-type="query" style="border:1px solid #eee;padding:10px 0px 10px 0px;margin-top:0px;">
 		<div class="row myRow">
 			<div class="form-group col-sm-4">
 				<label class="control-label" for="brand_model">名称（品牌型号）</label>
@@ -113,9 +113,11 @@
 </script>
 
 {// TP5中的模板注释格式，单行，绝对路径。<!-- //引入条形码识别插件 -->}  
-{js href="/plugins/quaggaJs/quagga.min.js" }
+<!-- {js href="/plugins/quaggaJs/quagga.min.js" } -->
+<!-- {js href="/plugins/quaggaJs/quagga.js" } -->
 
 <!-- <script type="text/javascript" src="/home/res/js/app/searchForm.js"></script> -->
 
-<script type="text/javascript" src="/home/res/js/app/decodeBarcode.js"></script>
+<!-- <script type="text/javascript" src="/home/res/js/app/decodeBarcode.js"></script> -->
+
 <!-- <script type="module" src="/home/res/js/app/searchForm.js"></script> -->

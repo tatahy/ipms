@@ -47,7 +47,7 @@ var searchFormCollapse= class {
 		self.divSet.each(function(){
 			idx=self.formId.indexOf($(this).attr('id'));
 			//jQ中的hasClass()方法不起作用？
-			<!-- $(this).hasClass(self.bs3Cls.divShow)?status.showArr[idx]=true:status.showArr[idx]=false; -->
+			// $(this).hasClass(self.bs3Cls.divShow)?status.showArr[idx]=true:status.showArr[idx]=false; 
 			$(this).attr('class').indexOf(self.bs3Cls.divShow)!=-1?self.status.showArr[idx]=true:self.status.showArr[idx]=false;
 		});
 		return self.status;
@@ -102,7 +102,7 @@ var searchFormCollapse= class {
 			status.showArr[idx]=false;
 		}
 		//根据status.showArr的值再修改status.trigger.index为数组
-		if(status.showArr.reduce(totalTrue,0)){
+		if(status.showArr.reduce(self.totalTrue(),0)){
 			idx=[];
 			status.showArr.forEach(function(v,i){
 				if(v){
@@ -224,7 +224,6 @@ function pageReady(){
 			rqData.period=topNavProp[ent].period;
 			if(cls.indexOf('disabled')==-1 && ent!='index'){
 				entLoad();
-				// entReady();
 			}
 		}
 	});
@@ -241,12 +240,11 @@ function pageReady(){
 		rqData.period=$(this).data('period');
 		
 		entLoad();
-		// entReady();
 	});
 }
 //ent-load
 function entLoad(){	
-	//选择操作节点并显示
+	//选择操作节点
 	let loadFmNod=$('#entSearchForm'),
 		loadListNod=$('#entList');
 	// let url=urlObj.domain+'/index/SearchForm/index';
@@ -285,6 +283,7 @@ function entReady(){
 	setRqData();
 	setEntQueryForm();
 	setEntPeriodList();
+	
 	//周期导航菜单click事件
 	entPeriodASet.click(function(){
 		let sData=$(this).data();
@@ -297,7 +296,7 @@ function entReady(){
 		}
 	});
 	//3类共5个collapse-switch组件的click事件，
-//任意时刻只有一个组件能click。记录触发click的组件特征值，再由特征值决定组件的显示
+	//任意时刻只有一个组件能click。记录触发click的组件特征值，再由特征值决定组件的显示
 	clpsSwithcSet.click(function(){
 		let mSwitch=$('[data-collapse-switch="main"]');
 		//特征值1
@@ -329,21 +328,22 @@ function entReady(){
 		// sFCObj.reset();
 		return entLoad();
 	});	
-	consoleColor('entReady() rqData','red');
-	console.log(rqData);
-	//对searchForm的操作
+	// consoleColor('entReady() rqData','red');
+	// console.log(rqData);
+	
+	//对QueryForm的操作
 	entOprtQueryForm();
+	
+	//对BarcodeForm的操作
+	entOprtBarcodeForm();
 	
 	//对list的操作
 	entOprtList();
-
 }
 
 function entOprtQueryForm() {
 	let fmQ=$('form.fmQuery');
-	//是否显示fmQ
-	(Object.keys(rqData.searchData).length)?fmQ.closest('div').addClass('in'):fmQ.closest('div').removeClass('in');
-		
+	
 	fmQ.find('.form-control').change(function(){
 		//有变化加底色
 		($(this).val()=='' || $(this).val()==0)?$(this).removeClass('alert-info'):$(this).addClass('alert-info');
@@ -353,16 +353,249 @@ function entOprtQueryForm() {
 		evt.preventDefault();
 		//设置查询数据
 		setRqSearchDataBy(fmQ);
-		consoleColor('searchForm.js fmCom.submit, rqData:');
-		console.log(rqData);
-		
 		return entLoad();
 	});
 	//表单重置时附加的操作
 	fmQ.find('[type="reset"]').click(function(evt){
-		return resetSearchForm();
+		resetSearchForm();
+		//载入list
+		return loadEntPeriodList();
 	});
 	
+}
+
+function entOprtBarcodeForm() {
+//封装对象。含条形码进行识别所需参数的预处理，识别过程。
+var barcode={
+	//将形如aaa_bb-cc-dd的字符串转换为aaa.bbCcDd
+	convertNameToState:function(name) {
+		return name.replace('_','.').split('-').reduce(function(result,val){
+			return result+val.charAt(0).toUpperCase()+val.substring(1);
+		});
+	},
+    _accessByPath: function(obj, path, val) {
+        var parts = path.split('.'),
+            depth = parts.length,
+            setter = (typeof val !== "undefined") ? true : false;	
+		// console.log('_accessByPath | parts:'+parts+' depth:'+depth+' setter:'+setter+' val:'+val);
+		// console.log('_accessByPath |'+typeof obj);
+        return parts.reduce(function(o, key, i) {
+            if (setter && (i + 1) === depth) {
+                o[key] = val;
+            }
+            return key in o ? o[key] : {};
+        }, obj);
+    },
+	decode: function(src) {
+        var self = this,
+        config = $.extend({}, self.state, {src: src});
+		Quagga.decodeSingle(config, function(result){});
+    },
+	setState: function(path, val) {
+		var self=this;
+		var typeStr = typeof self._accessByPath(self.inputMapper,path);
+		
+		// console.log('func setState() recieved: '+path+':'+val); 
+		// console.log('**1 self.inputMapper: '+JSON.stringify(self.inputMapper)); 		
+		// console.log('**2 self._accessByPath: '+typeStr); 
+		// console.log(self._accessByPath(self.inputMapper,path)); 
+		
+		if(typeStr==='function'){
+			//通过self._accessByPath(self.inputMapper,path)函数转换val
+			val=self._accessByPath(self.inputMapper,path)(val);
+		}
+	
+		self._accessByPath(self.state,path,val);
+		//console.log('**3 '+JSON.stringify(self.state)); 
+	},
+	inputMapper: {
+        inputStream: {
+            size: function(v){
+                return parseInt(v);
+            }
+        },
+        numOfWorkers: function(v) {
+            return parseInt(v);
+        },
+        decoder: {
+            readers: function(v) {
+                if (v === 'ean_extended') {
+                    return [{
+                        format: 'ean_reader',
+                        config: {
+                            supplements: [
+                                'ean_5_reader', 'ean_2_reader'
+                            ]
+                        }
+                    }];
+                }
+                return [{
+                    format: v + '_reader',
+                    config: {}
+                }];
+            }
+        }
+    },
+	state: {
+		inputStream:{
+			size:800,
+			singleChannel:false
+		},
+		locator:{
+			patchSize:'medium',
+			halfSample:true	
+		},
+		decoder:{
+			readers:[{
+				format:'code_93_reader',
+				config:{}
+			}]
+		},
+		locate:true,
+		src:null
+	}
+};
+
+//$(document).ready(function(){});可简写为$(function(){});
+// $(function() {
+	$('#fmRun input[type=file]').change(function(){
+		var fileObj=$(this)[0];
+		$('#fmRun .form-control').removeClass('alert-info');
+		
+		$('#divBarcodeImg').hide();
+		// onProcessedFlag=0;
+		
+		if(fileObj.files && fileObj.files.length){
+			barcode.decode(URL.createObjectURL(fileObj.files[0]));
+			$(this).addClass('alert-info');
+			$('#divBarcodeImg').show().children('.alert').hide();
+			// onProcessedFlag=1;
+		}
+		console.table(fileObj.files[0]);
+	});
+	//开始识别条码		
+	$('#btnRun').click(function(){
+		let input=$('#fmRun input[type=file]')[0],
+			src='';
+		
+		if(input.files && input.files.length){
+			src=URL.createObjectURL(input.files[0]);
+			barcode.decode(src);
+		}else{
+			$.alert('<p class="text-center">请选择需识别的条形码图片<p>');
+		}
+	});
+	//表单输入项发生改变
+	$('#fmRun').find('[name]').on('change','input,select',function(){
+		let val=$(this).attr('type')==='checkbox'?$(this).prop('checked'):$(this).val(),
+			name=$(this).attr('name'),
+			state=barcode.convertNameToState(name); 
+		$(this).addClass('alert-info');	
+		// console.log("Value of "+ state + " changed to " + val);
+        barcode.setState(state, val);
+	});
+	//表单重置
+	$('#fmRun button:reset').click(function(){
+		$('#divBarcodeImg').prop('hidden',true).find('.viewport').empty();
+		resetSearchForm();	
+		//载入list
+		return loadEntPeriodList();
+	});
+	
+	//识别处理过程		
+	Quagga.onProcessed(function(result){
+		// console.table(result);
+		var drawingCtx=Quagga.canvas.ctx.overlay,
+        	drawingCanvas = Quagga.canvas.dom.overlay,
+        	area;
+		//有识别结果数据
+		if (result) {
+        	//绿色方框标识出条形码区域
+			if (result.boxes) {
+            	drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
+            	result.boxes.filter(function (box) {
+                	return box !== result.box;
+            	}).forEach(function (box) {
+                	Quagga.ImageDebug.drawPath(box, {x: 0, y: 1}, drawingCtx, {color: "green", lineWidth: 2});
+            	});
+        	}
+			//识别出条形码值，条形码区域方框为蓝色
+        	if (result.box) {
+            	Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, drawingCtx, {color: "#00F", lineWidth: 2});
+        	}
+			//识别出条形码值，条形码上添加红色横线
+        	if (result.codeResult && result.codeResult.code) {
+            	Quagga.ImageDebug.drawPath(result.line, {x: 'x', y: 'y'}, drawingCtx, {color: 'red', lineWidth: 3});
+        	}
+			//若已定义barcode.state.inputStream.area，则由calculateRectFromArea()函数计算方框4个点的像素坐标
+        	if (barcode.state.inputStream.area) {
+            	area = calculateRectFromArea(drawingCanvas, barcode.state.inputStream.area);
+           	 	drawingCtx.strokeStyle = "#0F0";
+            	drawingCtx.strokeRect(area.x, area.y, area.width, area.height);
+        	}
+			//没有识别出条形码值
+			if(!(result.hasOwnProperty('codeResult'))){
+				queryByCode();				
+			}
+    	}else{
+			//没有识别结果数据
+			queryByCode();	
+		}
+	});
+	
+	//成功识别条形码值后的处理
+	Quagga.onDetected(function(result){
+		queryByCode(result.codeResult.code);
+	});
+// });
+
+//显示识别结果和查询结果
+function queryByCode(code='') {
+	// let objSuccess=$('#divBarcodeImg div.alert-success').prop('hidden',true);
+	// let objWarning=$('#divBarcodeImg div.alert-warning').prop('hidden',true);
+	
+	let objSuccess=$('#divBarcodeImg div.alert-success').hide();
+	let objWarning=$('#divBarcodeImg div.alert-warning').hide();
+
+	consoleColor('fn:queryByCode, code:','green');
+	console.log(code);	
+	
+	if(code){
+		objSuccess.show().find('span.alert-info').text(code);
+		//设置查询数据
+		rqData.searchSource=$('#fmRun').data('formType');
+		rqData.searchData={bar_code:code};
+		
+		//向后端发起查询并显示查询结果
+		loadEntPeriodList();
+		// return entLoad();	
+	}else{
+		/* objWarning.show(); */
+		console.log('else');	
+		objWarning.show();
+	}	
+}
+
+function calculateRectFromArea(canvas,area){
+	var canvasWidth=canvas.width,
+		canvasHeight=canvas.height,
+		top=parseInt(area.top)/100,
+		right=parseInt(area.right)/100,
+		bottom=parseInt(area.bottom)/100,
+		left=parseInt(area.left)/100;
+	
+	top *= canvasHeight;
+    right = canvasWidth - canvasWidth*right;
+    bottom = canvasHeight - canvasHeight*bottom;
+    left *= canvasWidth;
+
+	return {
+		x:left,	
+		y:top,
+		width:right-left,
+		height:bottom-top
+	};
+}
 }
 
 function entOprtList() {
@@ -392,7 +625,6 @@ function entOprtList() {
 			rqData.sortData.sortName=sortName;
 			rqData.sortData.sortOrder='asc';	
 		}
-
 		rqData.sortData.pageNum=1;
 	
 		return entLoad();
@@ -477,12 +709,12 @@ function setRqData() {
 	
 	return rqData;
 }
+//设置list
 function setEntPeriodList(){	
 	let ent=rqData.ent,
 		period=rqData.period,
 		capSNod=$('#entList').find('caption strong'),
-		periodChi=entProp[ent].period.detail[period].txt,
-		fmQuery=$('form.fmQuery');
+		periodChi=entProp[ent].period.detail[period].txt;
 
 	//显示分页的第一页
 	rqData.sortData.pageNum=1;
@@ -530,6 +762,7 @@ function initRqData(){
 		ent:'index',
 		period:'',
 		sortData:{listRows:10,sortName:'',sortOrder:'asc',pageNum:1,showId:''},
+		searchSource:'',
 		searchData:{},
 		queryField:{}
 	};	
@@ -645,23 +878,28 @@ function buildEntPeriodNavPills(){
 	}
 }
 
-//设定指定form的各个表单项
+//设定$('form.fmQuery')的各个表单项
 function setEntQueryForm(){
 	let fm=$('form.fmQuery'),
 		selSet=fm.find('select'),
 		inSet=fm.find('input'),
+		searchSrc=rqData.searchSource,
 		//查询字段名数组
 		sNameArr=Object.keys(rqData.searchData);
 	
 	urlObj.ctrl='searchForm';
 	urlObj.action='getSelOptData';
 	
-	consoleColor('main.js setEntSearchForm() before post, rqData:','red');
-	console.log(rqData);
-	console.log(getRqUrl());
+	// if(searchSrc!=fm.data('formType')){
+		
+		// return $('[data-form-type="'+searchSrc+'"]').closest('.collapse').collapse();
+		
+	// }
 	
-	//设定input的显示值和底色
 	if(sNameArr.length){
+		//显示整个form
+		fm.closest('.collapse').collapse();
+			//设定input的显示值和底色，并显示
 		inSet.each(function(){
 			let n=$(this).attr('name');
 			if(sNameArr.includes(n)){
@@ -669,23 +907,23 @@ function setEntQueryForm(){
 				$(this).val(rqData.searchData[n]);
 				//上底色
 				$(this).addClass('alert-info');
+				//显示
+				$(this).closest('.collapse').collapse();
 			}
 		});
 	}
 	
-	//向后端请求组装select组件所需数据
-	$.post(getRqUrl(),rqData,function(optData){
-		consoleColor('main.js setEntSearchForm() after post resData:','red');
-		console.log(optData);
+	$.when(
+		$.post(getRqUrl(),rqData)
+	).then(function(optData){
 		
 		//组装select的option，并设定显示值和底色
 		selSet.each(function(){
 			let selName=$(this).attr('name'),
 				optObj=optData[selName],
 				v=0;
-			
-			$(this).empty().append($('<option></option>').val(0).text('…不限'));	
 			//组装option
+			$(this).empty().append($('<option></option>').val(0).text('…不限'));	
 			for(var m=0;m<optObj.num;m++){
 				$(this).append($('<option></option>').val(optObj.val[m]).text(optObj.txt[m]));
 			}
@@ -694,11 +932,25 @@ function setEntQueryForm(){
 				v=rqData.searchData[selName];
 				//上底色
 				$(this).addClass('alert-info');
+				if(v){
+					//显示
+					$(this).closest('.collapse').collapse();
+				}
 			}
+			//option的value中无v
+			// if(optObj.val.length && !optObj.val.includes(v)){
+				// $.alert('option 添加'+v);
+			// }
+			
 			//设定select的显示值
-			$(this).val(v);		
-		});		
-	});
+			$(this).val(v);	
+				
+		});	
+	},function(){
+		$.alert('与服务器连接失败。');
+	}
+	);
+	
 }
 
 //组装向后端请求时的searchData，不带参数就是清空searchData
@@ -709,6 +961,7 @@ function setRqSearchDataBy(fm=''){
 	if(typeof fm !='object' || fm[0].localName !=='form'){
 		return rqData.searchData;
 	}
+	rqData.searchSource=fm.data('formType');
 	//用户搜索有关键值对从表单searchObj获取
 	formData=new FormData(fm[0]);
 	//使用Map对象的forEach方法组装hash数组
@@ -779,13 +1032,13 @@ function resetSearchForm(){
 	fm.each(function(){
 		$(this)[0].reset();
 		$(this).find('.form-control').removeClass('alert-info');
-		//有邻居都隐藏
 		if($(this).siblings().length){
 			$(this).siblings().hide();
 		}
 	});
 	//清空查询数据
 	return setRqSearchDataBy();
+	
 }
 
 //对ent List进行排序
@@ -885,6 +1138,22 @@ function consoleColor(str='无内容',color='blue'){
 	return console.log('%c%s',`font-size:16px;color:${color};`,str);
 	
 }
+//
+function loadEntPeriodList() {
+	let rData=rqData.searchData;
+		listNod=$('#entList');
+	
+	urlObj.module='index';
+	urlObj.ctrl='list';
+	urlObj.action='index';
+	consoleColor('loadEntPeriodList() rqData','green');
+	console.log(rqData);
+	
+	listNod.html(loadStr).load(getRqUrl(),rqData,function(){
+		setEntPeriodList();
+	});
+}
+
 //使用$.post方法向服务器请求特定值。
 function ajaxResByPost(opt={}) {
 	let optDefault={getPageInitData:false,async:true,action:'index',data:''},

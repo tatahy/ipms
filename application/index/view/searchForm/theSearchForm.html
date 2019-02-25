@@ -1,0 +1,41 @@
+<!-- //module:index, ctrl:SearchForm view:searchForm/patSearchForm.html  -->
+
+<!-- //继承模板文件。路径为相对于入口文件index.php -->
+{extend name="../application/index/view/searchForm/singleSearchFormTpl.html" /}
+
+{block name="formElement"}
+		<div class="row myRow">
+			<div class="form-group col-sm-4">
+				<label class="control-label" for="topic">名称</label>
+				<input class="form-control" name="topic" type="text" value="" placeholder="...不限">
+			</div>
+			<div class="form-group col-sm-2">
+				<label class="control-label" for="author">撰写人</label>
+				<input class="form-control" name="author" type="text" value="" placeholder="...不限">
+			</div>	
+		</div>
+		<div class="row myRow">
+			<div class="form-group col-sm-5">
+				<label class="control-label" for="type">类型</label>
+				<!-- <select multiple class="form-control" id="searchPatType" name="searchPatType" > -->
+				<select class="form-control" name="type" >
+					<!-- //js生成 -->
+				</select>
+			</div>
+			<div class="form-group col-sm-4">
+				<label class="control-label" for="dept">部门</label>
+			<!-- <select multiple class="form-control" id="searchDept" name="searchDept"> -->
+				<select class="form-control" name="dept">
+					<!-- //js生成 -->
+				</select>
+			</div>					
+			<div class="form-group col-sm-3">
+				<label class="control-label" for="status">状态</label>
+			<!-- <select multiple class="form-control" id="searchPatStatus" name="searchPatStatus"> -->
+				<select class="form-control" name="status">
+					<!-- //js生成 -->
+				</select>
+			</div>
+		</div>
+		
+{/block}

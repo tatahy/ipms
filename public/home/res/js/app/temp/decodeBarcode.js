@@ -1,7 +1,7 @@
 // decodeBarcode.js -->
 
-//封装对条形码进行识别所需参数的预处理过程，识别过程。
-var App={
+//封装对条形码进行识别所需参数的预处理，识别过程。
+var barcode={
 	//将形如aaa_bb-cc-dd的字符串转换为aaa.bbCcDd
 	convertNameToState:function(name) {
 		return name.replace('_','.').split('-').reduce(function(result,val){
@@ -90,51 +90,10 @@ var App={
 		src:null
 	}
 };
-//显示识别结果和查询结果
-function queryByCode(code='') {
-	let objSuccess=$('#divBarcodeImg div.alert-success').hide();
-	let objWarning=$('#divBarcodeImg div.alert-warning').hide();
-		
-	if(code){
-		objSuccess.show().find('span.alert-info').text(code);
-		//设置查询数据
-		rqData.searchData={bar_code:code};
-		console.log(rqData.searchData);
-		//向后端发起查询并显示查询结果
-		loadEntPeriodList();
-	}else{
-		objWarning.show();
-	}	
-}
 
-function calculateRectFromArea(canvas,area){
-	var canvasWidth=canvas.width,
-		canvasHeight=canvas.height,
-		top=parseInt(area.top)/100,
-		right=parseInt(area.right)/100,
-		bottom=parseInt(area.bottom)/100,
-		left=parseInt(area.left)/100;
-	
-	top *= canvasHeight;
-    right = canvasWidth - canvasWidth*right;
-    bottom = canvasHeight - canvasHeight*bottom;
-    left *= canvasWidth;
-
-	return {
-		x:left,	
-		y:top,
-		width:right-left,
-		height:bottom-top
-	};
-}
-//利用自调用匿名函数立即执行的特点， 页面初始化
-(function($){
-	$('#divBarcodeImg').hide();
-	$('#interactive').prevAll().hide(); 
-})(jQuery);
 
 //$(document).ready(function(){});可简写为$(function(){});
-$(function() {
+// $(function() {
 	$('#fmRun input[type=file]').change(function(){
 		var fileObj=$(this)[0];
 		$('#fmRun .form-control').removeClass('alert-info');
@@ -143,7 +102,7 @@ $(function() {
 		onProcessedFlag=0;
 		
 		if(fileObj.files && fileObj.files.length){
-			App.decode(URL.createObjectURL(fileObj.files[0]));
+			barcode.decode(URL.createObjectURL(fileObj.files[0]));
 			$(this).addClass('alert-info');
 			$('#divBarcodeImg').show();
 			onProcessedFlag=1;
@@ -152,11 +111,12 @@ $(function() {
 	});
 	//开始识别条码		
 	$('#btnRun').click(function(){
-		var input=$('#fmRun input[type=file]')[0];
-			
+		let input=$('#fmRun input[type=file]')[0],
+			src='';
+		
 		if(input.files && input.files.length){
-			let src=URL.createObjectURL(input.files[0])
-			App.decode(src);
+			src=URL.createObjectURL(input.files[0]);
+			barcode.decode(src);
 		}else{
 			$.alert('<p class="text-center">请选择需识别的条形码图片<p>');
 		}
@@ -165,17 +125,17 @@ $(function() {
 	$('#fmRun').find('[name]').on('change','input,select',function(){
 		var val=$(this).attr('type')==='checkbox'?$(this).prop('checked'):$(this).val(),
 			name=$(this).attr('name'),
-			state=App.convertNameToState(name); 
+			state=barcode.convertNameToState(name); 
 		$(this).addClass('alert-info');	
 		// console.log("Value of "+ state + " changed to " + val);
-        App.setState(state, val);
+        barcode.setState(state, val);
 	});
 	//表单重置
 	$('#fmRun button:reset').click(function(){
-		$('#fmRun .form-control').removeClass('alert-info');
-		$('#divBarcodeImg span').html('');
-		$('#divBarcodeImg').hide();
-		
+		$('#divBarcodeImg').hide().find('.viewport').empty();
+		resetSearchForm();	
+		//载入list
+		return loadEntPeriodList();
 	});
 	
 	//识别处理过程		
@@ -203,9 +163,9 @@ $(function() {
         	if (result.codeResult && result.codeResult.code) {
             	Quagga.ImageDebug.drawPath(result.line, {x: 'x', y: 'y'}, drawingCtx, {color: 'red', lineWidth: 3});
         	}
-			//若已定义App.state.inputStream.area，则由calculateRectFromArea()函数计算方框4个点的像素坐标
-        	if (App.state.inputStream.area) {
-            	area = calculateRectFromArea(drawingCanvas, App.state.inputStream.area);
+			//若已定义barcode.state.inputStream.area，则由calculateRectFromArea()函数计算方框4个点的像素坐标
+        	if (barcode.state.inputStream.area) {
+            	area = calculateRectFromArea(drawingCanvas, barcode.state.inputStream.area);
            	 	drawingCtx.strokeStyle = "#0F0";
             	drawingCtx.strokeRect(area.x, area.y, area.width, area.height);
         	}
@@ -223,7 +183,50 @@ $(function() {
 	Quagga.onDetected(function(result){
 		queryByCode(result.codeResult.code);
 	});
-});
+// });
 
+//显示识别结果和查询结果
+function queryByCode(code='') {
+	let objSuccess=$('#divBarcodeImg div.alert-success').prop('hidden',true);
+	let objWarning=$('#divBarcodeImg div.alert-warning').prop('hidden',true);
 
+	consoleColor('fn:queryByCode, code:','green');
+	console.log(code);	
+	
+	if(code){
+		objSuccess.prop('hidden',false).find('span.alert-info').text(code);
+		//设置查询数据
+		rqData.searchSource=$('#fmRun').data('formType');
+		rqData.searchData={bar_code:code};
+		
+		//向后端发起查询并显示查询结果
+		loadEntPeriodList();
+		// return entLoad();	
+	}else{
+		/* objWarning.show(); */
+		console.log('else');	
+		objWarning.prop('hidden',false);
+	}	
+}
+
+function calculateRectFromArea(canvas,area){
+	var canvasWidth=canvas.width,
+		canvasHeight=canvas.height,
+		top=parseInt(area.top)/100,
+		right=parseInt(area.right)/100,
+		bottom=parseInt(area.bottom)/100,
+		left=parseInt(area.left)/100;
+	
+	top *= canvasHeight;
+    right = canvasWidth - canvasWidth*right;
+    bottom = canvasHeight - canvasHeight*bottom;
+    left *= canvasWidth;
+
+	return {
+		x:left,	
+		y:top,
+		width:right-left,
+		height:bottom-top
+	};
+}
 

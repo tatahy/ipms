@@ -40,7 +40,7 @@ interactive.viewport {
 
 
 <div class="row myRow formParent " style="border:1px solid #eee;padding:10px 5px;">
-	<form id="fmRun" class="searchForm form-horizontal col-sm-6 ">	
+	<form id="fmRun" class="searchForm form-horizontal col-sm-6" data-form-type="barcode" >	
 	 	<div class="form-group">
 			<label class="col-sm-4 control-label">条形码图片</label>
 			<div class="col-sm-8">
@@ -140,16 +140,14 @@ interactive.viewport {
 		</div>
 	
     </form>
-	<div id="divBarcodeImg" class="col-sm-6">
+	<div id="divBarcodeImg" class="col-sm-6" hidden=true>
 		<div class="alert alert-success">
     		<strong>识别成功！</strong>条形码识别结果：<span class="alert-info" style="font-size:16px;"></span>
   		</div>
 		
-		<div class="alert alert-warning alert-dismissible" role="alert">
-  			<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-  			<strong>识别失败！</strong> 调整参数，再点击【<span class="text-primary"><span class="glyphicon glyphicon-equalizer"></span>识别</span>】按钮。
+		<div class="alert alert-warning">
+			<strong>识别失败！</strong> 调整参数，再点击【<span class="text-primary"><span class="glyphicon glyphicon-equalizer"></span>识别</span>】按钮。
 		</div>
-		
     	<div id="interactive" class="viewport"></div>
     	<!-- <div id="debug" class="detection"></div> -->
 	</div>

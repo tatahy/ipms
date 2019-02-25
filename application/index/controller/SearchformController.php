@@ -49,7 +49,7 @@ class SearchformController extends Controller {
     return $this->log;
   }
   
-  private function priGetFormCommon ($arr) {
+  private function priGetFormTplFile ($arr) {
     $ent=array_key_exists('ent',$arr)?$arr['ent']:'pat'; 
     $searchData= array_key_exists('searchData',$arr)?$arr['searchData']:self::SEARCHDBFIELD[$ent]; 
     
@@ -95,7 +95,7 @@ class SearchformController extends Controller {
     
     $rqArr=$reqObj->only(['ent','searchData']);
     
-    return $this->priGetFormCommon($rqArr);
+    return $this->priGetFormTplFile($rqArr);
    // return $rqArr;
   }
    
