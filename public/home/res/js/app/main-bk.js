@@ -1,22 +1,6 @@
 // app/main.js
-
-// import conf from './conf.js';
-import * as conf from './conf.js';
-
-// console.log(conf);
-
-const glyPrex=conf.glyPrex;
-const bs3Color=conf.bs3Color;
-const year=conf.year;
-
-var entNum=conf.entNum;
-var loadStr=conf.loadStr;
-var topNavProp=conf.topNavProp;
-var entProp=conf.entProp;
-var rqData=conf.rqData;
-var urlObj=conf.urlObj;
-var searchResultNum=conf.searchResultNum;
-
+// import {glyPrex,domain,loadStr,bs3Color,topNavProp,entProp,rqData,urlObj,searchResultNum,year} from './conf.js';
+// import * from './conf.js';
 
 //匿名类，然后赋值给变量searchFormCollapse，（类表达式定义的类，不会进行提升）要先声明再使用，否则就会报‘ReferenceError’错
 var searchFormCollapse= class {

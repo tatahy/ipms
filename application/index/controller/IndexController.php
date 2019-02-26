@@ -41,7 +41,7 @@ class IndexController extends Controller
     return $this->log;
   }
   
-  #根据传入的参数，检查登录用户信息是否数据库中唯一存在（是就设置Session，并返回true）
+  #根据传入的参数，检查登录用户信息是否数据库中唯一存在（是就设置Session，并返回'success'）
   private function priSetSession($data=[]) {
     #计数器
     $n=0;

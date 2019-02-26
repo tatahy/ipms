@@ -30,7 +30,7 @@ const bs3Color={
 		link:{btn:'btn-link'}
 };
 	//topNav中li组件主要属性
-var topNavProp={
+const topNavProp={
 	index:{period:'',gly:glyPrex+'home',chi:'首页'},
 	pat:{period:'total',gly:glyPrex+'wrench',chi:'专利'},
 	ass:{period:'usual',gly:glyPrex+'oil',chi:'固定资产'},
@@ -147,4 +147,4 @@ var entProp={
 	}
 }
 
-export {glyPrex,entNum,loadStr,bs3Color,topNavProp,entProp,rqData,urlObj,searchResultNum,year};
+// export {glyPrex,entNum,domain,loadStr,bs3Color,topNavProp,entProp,rqData,urlObj,searchResultNum,year};
