@@ -1,24 +1,25 @@
 // app/conf.js
-//向后端请求时发送的数据
-var	rqData={
+//采用默认导出
+
+export default {
+	userName:'',
+	//向后端请求时发送的数据
+	rqData:{
 		ent:'index',
 		period:'',
 		sortData:{listRows:10,sortName:'',sortOrder:'asc',pageNum:1,showId:''},
 		searchSource:'',
 		searchData:{},
 		queryField:{}
-	};
-var urlObj={domain:'',module:'index',ctrl:'index',action:'index'};
-var searchResultNum='';
+	},
+	urlObj:{domain:'',module:'index',ctrl:'index',action:'index'},
+	searchResultNum:'',
 //定义前端系统各个实体数量对象,由后端给定
-var entNum='';
-
-var year=new Date().getFullYear();
-
-const glyPrex='glyphicon glyphicon-';
-
+	entNum:'',
+	year:new Date().getFullYear(),
+	glyPrex:'glyphicon glyphicon-',
 //归纳bootStrap3中的颜色相关属性
-const bs3Color={
+	bs3Color:{
 		info:{lab:'label label-info',btn:'btn-info',txt:'text-info',bg:'bg-info',alt:'alert-info',pan:'panel panel-info'},
 		success:{lab:'label label-success',btn:'btn-success',txt:'text-success',bg:'bg-success',alt:'alert-success',pan:'panel panel-success'},
 		danger:{lab:'label label-danger',btn:'btn-danger',txt:'text-danger',bg:'bg-danger',alt:'alert-danger',pan:'panel panel-danger'},
@@ -28,33 +29,30 @@ const bs3Color={
 		'default':{lab:'label label-default',btn:'btn-default'},
 		muted:{text:'text-muted'},
 		link:{btn:'btn-link'}
-};
+	},
 	//topNav中li组件主要属性
-var topNavProp={
-	index:{period:'',gly:glyPrex+'home',chi:'首页'},
-	pat:{period:'total',gly:glyPrex+'wrench',chi:'专利'},
-	ass:{period:'usual',gly:glyPrex+'oil',chi:'固定资产'},
-	pro:{period:'total',gly:glyPrex+'inbox',chi:'项目'},
-	the:{period:'total',gly:glyPrex+'list',chi:'论文'}
-};
-
-const noneSufx='模块无【查阅】权限，请与系统管理员联系。';
-
-var loadStr='<p class="text-center" style="font-size:20px;padding-top:20px;">加载中……</p>';
-
+	topNavProp:{
+	index:{period:'',gly:'glyphicon glyphicon-home',chi:'首页'},
+	pat:{period:'total',gly:'glyphicon glyphicon-wrench',chi:'专利'},
+	ass:{period:'usual',gly:'glyphicon glyphicon-oil',chi:'固定资产'},
+	pro:{period:'total',gly:'glyphicon glyphicon-inbox',chi:'项目'},
+	the:{period:'total',gly:'glyphicon glyphicon-list',chi:'论文'}
+	},
+	noneSufx:'模块无【查阅】权限，请与系统管理员联系。',
+	loadStr:'<p class="text-center" style="font-size:20px;padding-top:20px;">加载中……</p>',
 //定义前端各个实体主要属性(用于jQ构建组件，路由生成等)
-var entProp={
+	entProp:{
 	pat:{
 		module:'patent',
 		ctrl:['index'],
 		action:['index','patList','patSearchForm','getSelComData'],
 		chi:'专利',
-		gly:glyPrex+'wrench',
+		gly:'glyphicon glyphicon-wrench',
 		period:{
 			summary:{
-				newAdd:{txt:'拟申报专利数：',color:bs3Color['info']['btn']},
-				apply:{txt:'申报专利数：',color:bs3Color['primary']['btn']},
-				authorize:{txt:'有效专利数：',color:bs3Color['success']['btn']}
+				newAdd:{txt:'拟申报专利数：',color:'btn-info'},
+				apply:{txt:'申报专利数：',color:'btn-primary'},
+				authorize:{txt:'有效专利数：',color:'btn-success'}
 			},
 			detail:{
 				total:{txt:'专利概况',title:{btn:'btn btn-primary',txt:'专利总数&nbsp;',num:''}},
@@ -65,20 +63,20 @@ var entProp={
 				invalid:{txt:'无授权(无效)',title:{btn:'btn btn-default',txt:'无效专利数&nbsp;',num:''}}
 			}
 		},
-		noneTxt:'“专利”'+noneSufx
+		noneTxt:'"专利"模块无【查阅】权限，请与系统管理员联系。'
 	},
 	ass:{
 		module:'asset',
 		ctrl:['index'],
 		action:['index','assList','assSearchForm'],
 		chi:'固定资产',
-		gly:glyPrex+'oil',
+		gly:'glyphicon glyphicon-oil',
 		period:{
 			summary:{
-				undetermined:{txt:'待定数：',color:bs3Color['info']['btn']},
-				normal:{txt:'正常数：',color:bs3Color['success']['btn']},
-				abnormal:{txt:'异常数：',color:bs3Color['warning']['btn']},
-				suspended:{txt:'停用数：',color:bs3Color['default']['btn']}
+				undetermined:{txt:'待定数：',color:'btn-info'},
+				normal:{txt:'正常数：',color:'btn-success'},
+				abnormal:{txt:'异常数：',color:'btn-warning'},
+				suspended:{txt:'停用数：',color:'btn-default'}
 			},
 			detail:{
 				usual:{txt:'固定资产概况',title:{txt:'固定资产总数&nbsp;',btn:'btn btn-primary',num:''}},
@@ -89,22 +87,22 @@ var entProp={
 				removed:{txt:'销账',title:{txt:'财务销账数&nbsp;',btn:'btn btn-danger',num:''}}
 			}
 		},
-		noneTxt:'“固定资产”'+noneSufx
+		noneTxt:'"固定资产"模块无【查阅】权限，请与系统管理员联系。'
 	},
 	pro:{
 		module:'project',
 		ctrl:['index','proList','proSearchForm'],
 		action:['index'],
 		chi:'项目&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
-		gly:glyPrex+'inbox',
+		gly:'glyphicon glyphicon-inbox',
 		period:{
 			summary:{
-				plan:{txt:'拟申报项目数：',color:bs3Color['info']['btn']},
-				apply:{txt:'申报项目数',color:bs3Color['primary']['btn']},
-				approve:{txt:'立项项目数：',color:bs3Color['warning']['btn']},
-				process:{txt:'在研项目数：',color:bs3Color['danger']['btn']},
-				done:{txt:'结题项目数：',color:bs3Color['success']['btn']},
-				terminate:{txt:'终止项目数：',color:bs3Color['default']['btn']}
+				plan:{txt:'拟申报项目数：',color:'btn-info'},
+				apply:{txt:'申报项目数',color:'btn-primary'},
+				approve:{txt:'立项项目数：',color:'btn-warning'},
+				process:{txt:'在研项目数：',color:'btn-danger'},
+				done:{txt:'结题项目数：',color:'btn-success'},
+				terminate:{txt:'终止项目数：',color:'btn-default'}
 			},
 			detail:{
 				total:{txt:'项目总体情况',title:{btn:'btn btn-primary',txt:'项目总数&nbsp;',num:''}},
@@ -119,19 +117,19 @@ var entProp={
 				reject:{txt:'申报未立项',title:{btn:'btn btn-default',txt:'申报未立项项目数&nbsp;',num:''}}
 			}
 		},
-		noneTxt:'“项目”'+noneSufx
+		noneTxt:'"项目"模块无【查阅】权限，请与系统管理员联系。'
 	},
 	the:{
 		module:'thesis',
 		ctrl:['index','theList','theSearchForm'],
 		action:['index'],
 		chi:'论文&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
-		gly:glyPrex+'list',
+		gly:'glyphicon glyphicon-list',
 		period:{
 			summary:{
-				plan:{txt:'拟发表论文数：',color:bs3Color['info']['btn']},
-				apply:{txt:'投稿论文数：',color:bs3Color['primary']['btn']},
-				publish:{txt:'发表论文数：',color:bs3Color['success']['btn']}
+				plan:{txt:'拟发表论文数：',color:'btn-info'},
+				apply:{txt:'投稿论文数：',color:'btn-primary'},
+				publish:{txt:'发表论文数：',color:'btn-success'}
 			},
 			detail:{
 				total:{txt:'论文总体情况',title:{btn:'btn btn-primary',txt:'论文总数&nbsp;',num:''}},
@@ -143,8 +141,9 @@ var entProp={
 				reject:{txt:'拒稿',title:{btn:'btn btn-default',txt:'被拒绝发表论文数&nbsp;',num:''}}
 			}
 		},
-		noneTxt:'“论文”'+noneSufx
+		noneTxt:'"论文"模块无【查阅】权限，请与系统管理员联系。'
+	}
 	}
 }
 
-export {glyPrex,entNum,loadStr,bs3Color,topNavProp,entProp,rqData,urlObj,searchResultNum,year};
+// export {glyPrex,entNum,domain,loadStr,bs3Color,topNavProp,entProp,rqData,urlObj,searchResultNum,year};

@@ -1,6 +1,12 @@
-// app/conf.js
+// app/conf-export-default.js
+//采用默认导出
 
-export default conf={
+/* 导入文件import语句如下：
+import c from './conf-export-default.js';
+
+c为导入文件中使用的hash对象，其键值为本文件的各个导出键值对 */
+
+export default {
 	//向后端请求时发送的数据
 	rqData:{
 		ent:'index',

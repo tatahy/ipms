@@ -1,232 +1,123 @@
 // app/main.js
 
-// import conf from './conf.js';
-import * as conf from './conf.js';
+//conf.js中采用默认输出，c为本文件中使用的hash对象，其键值为'./conf.js'各个导出键值对
+import c from './conf.js';
 
-// console.log(conf);
+import {SearchFormCollapse} from './SearchFormCollapse.class.js';
+import {Barcode} from './Barcode.class.js';
 
-const glyPrex=conf.glyPrex;
-const bs3Color=conf.bs3Color;
-const year=conf.year;
-
-var entNum=conf.entNum;
-var loadStr=conf.loadStr;
-var topNavProp=conf.topNavProp;
-var entProp=conf.entProp;
-var rqData=conf.rqData;
-var urlObj=conf.urlObj;
-var searchResultNum=conf.searchResultNum;
-
-
-//匿名类，然后赋值给变量searchFormCollapse，（类表达式定义的类，不会进行提升）要先声明再使用，否则就会报‘ReferenceError’错
-var searchFormCollapse= class {
-	constructor(){
-		let self=this;
-		self.name=searchFormCollapse;
-		self.divSet=$('[data-collapse-switch="div"]').parent();
-		self.liSet=$('[data-collapse-switch="li"]').parent();
-		self.bs3Cls={liShow:'active',divShow:'in',fn:{show:'show',hide:'hide'}};
-		self.formId=self.initFormId();
-		self.status=self.initStatus();		
-	}
-	/* //定义伪属性formId
-	get formId() {
-        let arr=[];
-		this.divSet.each(function(index){
-			arr[index]=$(this).attr('id');
-		});
-		return arr;
-    }
-	//定义伪属性status
-	get status() {
-        return {trigger:{type:'',index:'',multishow:false},showArr:Array(this.formId.length).fill(false)};
-    }
-	//向伪属性status赋值
-	set status(opt) {
-		return this.setStatus(opt);
-	}*/
-	initFormId(){
-		let arr=[];
-		this.divSet.each(function(index){
-			arr[index]=$(this).attr('id');
-		});
-		return arr;
-	} 
-	initStatus(){		
-		/* 状态对象。
-	 * multishow，bool，是否为多个组件可同时显示。
-	 * type:'main'且multishow:true时，index为数组，记录要显示组件index。
-	 * type:'main'且multishow:false时，index为数字，记录要显示组件index。
-	 * type:'li'/'div'时，index为数字，值为触发状态改变的组件index。
-	 * showArr，array，index为组件的index，value为组件是否显示true/false
-	 */
-		return {trigger:{type:'',index:'',multishow:false},showArr:this.zArr()};
-    }
-	zArr(){
-		return Array(this.formId.length).fill(false);
-	}
+var App={
+	data:{
+		glyPrex:c.glyPrex,
+		bs3Color:c.bs3Color,
+		year:c.year,
+		entNum:c.entNum,
+		loadStr:c.loadStr,
+		topNavProp:c.topNavProp,
+		entProp:c.entProp,
+		rqData:c.rqData,
+		urlObj:c.urlObj,
+		searchResultNum:c.searchResultNum,
+		sfcCls:SearchFormCollapse,
+		Barcode:Barcode
+	},
+	initData:async function initData(){
+		let d=this.data;
+		let resData = await $.post('index/index/index',{getPageInitData:true});
+		
+	/* Promise.all(resData.urlObj.domain).then(function(val){
+		console.log(val);
+	}); */
 	
-	//定义数组的reduce方法中使用的reducer	
-	totalTrue(acc,cur){
-		if(cur){
-			acc++;
+		console.log(resData);
+		//全局变量赋值
+		d.urlObj=resData.urlObj;
+		d.entNum=resData.entNum;
+		d.rqData=initRqData();
+		//完善entProp中的num属性值
+		for(let ent in d.entProp){
+			for(let per in d.entProp[ent].period.detail){
+				d.entProp[ent].period.detail[per].title.num=d.entNum[ent][per];
+			}
 		}
-		return acc;
-	}
-	getStatus(){
-		let self=this,
-			idx='';
-		self.divSet.each(function(){
-			idx=self.formId.indexOf($(this).attr('id'));
-			//jQ中的hasClass()方法不起作用？
-			// $(this).hasClass(self.bs3Cls.divShow)?status.showArr[idx]=true:status.showArr[idx]=false; 
-			$(this).attr('class').indexOf(self.bs3Cls.divShow)!=-1?self.status.showArr[idx]=true:self.status.showArr[idx]=false;
-		});
-		return self.status;
-	}
-	reset() {
+	},
+	exit:function(err){
+		$.alert(err);
+	},
+	start:async function start(){
 		let self=this;
-		self.status= self.setCollapse({trigger:{type:'main',index:'0',multishow:''},showArr:self.zArr()});
+		let result=await self.initData();
+		// let val=await Promise.all([result1,result2]);
 		
-		return self.status;
-	}
-	//设定status中的值
-	setStatus(opt={}) {
-		let self=this;
-		let type='',
-			idx='',
-			showVal='',
-			status=$.extend({},self.status,opt);
+		if(result){
+			self.pageInit();
+			self.pageReady();
+		}
+	},
+	pageInit:function() {
 		
-		type=status.trigger.type;
-		idx=status.trigger.index;
+	},
+	pageReady:function() {
 		
-		if(status.trigger.multishow==false){
-			self.status=status;
-			return self.setStatusSingle();
-		}
-
-		if(type=='main'){
-			if(idx === ''){
-				status.showArr=self.zArr();
-				// status.trigger.index=0;
-				status.trigger.index=[0];
-				status.showArr[0]=true;
-			}
-			if(Array.isArray(idx)){
-				//根据数组idx改变对应status.showArr的值
-				status.showArr.forEach(function(v,i){
-					if(idx.includes(i)){
-						status.showArr[i]=!v;
-					}
-				});
-			}
-			
-			return self.status=status;
-		}
-		
-		//根据idx的值修改对应status.showArr值
-		if(type=='li'){
-			showVal=status.showArr[idx];
-			status.showArr[idx]=!showVal;
-		}
-		if(type=='div'){
-			status.showArr[idx]=false;
-		}
-		//根据status.showArr的值再修改status.trigger.index为数组
-		if(status.showArr.reduce(self.totalTrue(),0)){
-			idx=[];
-			status.showArr.forEach(function(v,i){
-				if(v){
-					idx.push(i);
-				}
-			});
-		}
-		status.trigger.index=idx;
-		return self.status=status;
-	}
-	//设定status中的值，只能显示一个searchForm及其对应组件
-	setStatusSingle(){
-		let self=this,
-			status=self.status;
-		let type=status.trigger.type,
-			idx=status.trigger.index,
-			showVal='';;
-		
-		//只有showIndex[idx]的值有改变，其他的都为false	
-		if(type=='li'){
-			showVal=status.showArr[idx];
-			status.showArr=self.zArr();
-			status.showArr[idx]=!showVal;
-		}
-		if(type=='main'){
-			if(idx === ''){
-				status.showArr=self.zArr();
-				status.trigger.index=0;
-				status.showArr[0]=true;
-			}
-			if((typeof idx) == 'number'){
-				showVal=status.showArr[idx];
-				status.showArr=self.zArr();
-				status.showArr[idx]=!showVal;
-			}
-		}
-		if(type=='div'){
-			status.showArr[idx]=false;
-		}
-		return self.status=status;
-	}
-	//根据status对有关组件进行显示、隐藏
-	setCollapse(opt={}) {
-		let self=this;
-		let	status=self.setStatus(opt),
-			bs3Cls=self.bs3Cls;
-		
-		status.showArr.forEach(function(v,i){
-			if(v){
-				self.divSet.eq(i).collapse(bs3Cls.fn.show);
-				self.liSet.eq(i).addClass(bs3Cls.liShow);
-			}else{
-				self.divSet.eq(i).collapse(bs3Cls.fn.hide);
-				self.liSet.eq(i).removeClass(bs3Cls.liShow);
-			}
-		});
-		return self.status=status;
-	}
+	},
 };
 
-$.when(
-	//请求页面初始数据
+/* App.initData().then(
+	App.pageInit();
+	App.pageReady();
+).catch(
+	App.exit(err);
+);
+ */
+App.start().catch(
+	App.exit(err);
+);
+
+/* $.when(
+	// 请求页面初始数据
 	$.post('index/index/index',{getPageInitData:true})
 ).then(function(resData){
-		//页面初始化
+		// 页面初始化
 		pageInit(resData);
 		pageReady();
 	},function(){
 		$.alert('页面初始化失败。');
 	}
-);
+); */
 
-//页面生命周期函数-init
-function pageInit(resData){
-	//全局变量赋值
-	urlObj=resData.urlObj;
-	entNum=resData.entNum;
-	rqData=initRqData();
-	//完善entProp中的num属性值
-	for(let ent in entProp){
-		for(let per in entProp[ent].period.detail){
-			entProp[ent].period.detail[per].title.num=entNum[ent][per];
+console.log(pageInit());
+// pageReady();
+
+//页面生命周期函数-init，页面初始化
+function pageInit(){
+	
+	$.when(
+		//请求页面初始数据
+		$.post('index/index/index',{getPageInitData:true})
+	).then(function(resData){
+		//全局变量赋值
+		urlObj=resData.urlObj;
+		entNum=resData.entNum;
+		rqData=initRqData();
+		//完善entProp中的num属性值
+		for(let ent in entProp){
+			for(let per in entProp[ent].period.detail){
+				entProp[ent].period.detail[per].title.num=entNum[ent][per];
+			}
 		}
-	}
 	
-	//生成组件
-	buildTopNavbar();
-	buildEntSummary();
+		//生成组件
+		buildTopNavbar();
+		buildEntSummary();
 	
-	// 激活并设置tooltip
-	$('body').tooltip({selector:'[title]',triger:'hover click',placement:'auto top',delay: {show: 200, hide: 100},html: true });
-	$('footer .year').html('2017-'+year);
+		// 激活并设置tooltip
+		$('body').tooltip({selector:'[title]',triger:'hover click',placement:'auto top',delay: {show: 200, hide: 100},html: true });
+		$('footer .year').html('2017-'+year);
+		return true;
+		},function(){
+			return false;
+		}
+	);
 }
 //page-ready后处理各种事件
 function pageReady(){
@@ -235,6 +126,9 @@ function pageReady(){
 	let entASet=$('nav .navbar-collapse ul').eq(0).find('a'),
 		btnEntPeriod=sumNod.find('.btnPeriod'),
 		btnTopnavToggle=$('nav .navbar-header').children('.navbar-toggle');
+	
+	consoleColor('pageReady() entNum:');
+	console.log(entNum);
 	
 	btnTopnavToggle.click(function(){
 		showTopNavbar();
@@ -308,7 +202,7 @@ function entReady(){
 		clpsSwithcSet=$('[data-collapse-switch]'),
 		btnRefresh=$('.btnPageRefresh');
 	//collapse类的定义
-	let	sFCObj=new searchFormCollapse(),
+	let	sFCObj=new sfcCls(),
 		fmId=sFCObj.formId,
 		trgObj=sFCObj.status.trigger;
 	
@@ -397,99 +291,53 @@ function entOprtQueryForm() {
 }
 
 function entOprtBarcodeForm() {
-//定义对象。封装条形码进行识别所需参数的预处理，识别过程。
-var Barcode={
-	//将形如aaa_bb-cc-dd的字符串转换为aaa.bbCcDd
-	convertNameToState:function(name) {
-		return name.replace('_','.').split('-').reduce(function(result,val){
-			return result+val.charAt(0).toUpperCase()+val.substring(1);
-		});
-	},
-    _accessByPath: function(obj, path, val) {
-        var parts = path.split('.'),
-            depth = parts.length,
-            setter = (typeof val !== "undefined") ? true : false;	
-		// console.log('_accessByPath | parts:'+parts+' depth:'+depth+' setter:'+setter+' val:'+val);
-		// console.log('_accessByPath |'+typeof obj);
-        return parts.reduce(function(o, key, i) {
-            if (setter && (i + 1) === depth) {
-                o[key] = val;
-            }
-            return key in o ? o[key] : {};
-        }, obj);
-    },
-	decode: function(src) {
-        var self = this,
-        config = $.extend({}, self.state, {src: src});
-		Quagga.decodeSingle(config, function(result){});
-    },
-	setState: function(path, val) {
-		var self=this;
-		var typeStr = typeof self._accessByPath(self.inputMapper,path);
-		
-		// console.log('func setState() recieved: '+path+':'+val); 
-		// console.log('**1 self.inputMapper: '+JSON.stringify(self.inputMapper)); 		
-		// console.log('**2 self._accessByPath: '+typeStr); 
-		// console.log(self._accessByPath(self.inputMapper,path)); 
-		
-		if(typeStr==='function'){
-			//通过self._accessByPath(self.inputMapper,path)函数转换val
-			val=self._accessByPath(self.inputMapper,path)(val);
-		}
+	//显示识别结果和查询结果
+	let queryByCode=(code='') =>{
+		// let objSuccess=$('#divBarcodeImg div.alert-success').prop('hidden',true);
+		// let objWarning=$('#divBarcodeImg div.alert-warning').prop('hidden',true);
 	
-		self._accessByPath(self.state,path,val);
-		//console.log('**3 '+JSON.stringify(self.state)); 
-	},
-	inputMapper: {
-        inputStream: {
-            size: function(v){
-                return parseInt(v);
-            }
-        },
-        numOfWorkers: function(v) {
-            return parseInt(v);
-        },
-        decoder: {
-            readers: function(v) {
-                if (v === 'ean_extended') {
-                    return [{
-                        format: 'ean_reader',
-                        config: {
-                            supplements: [
-                                'ean_5_reader', 'ean_2_reader'
-                            ]
-                        }
-                    }];
-                }
-                return [{
-                    format: v + '_reader',
-                    config: {}
-                }];
-            }
-        }
-    },
-	state: {
-		inputStream:{
-			size:800,
-			singleChannel:false
-		},
-		locator:{
-			patchSize:'medium',
-			halfSample:true	
-		},
-		decoder:{
-			readers:[{
-				format:'code_93_reader',
-				config:{}
-			}]
-		},
-		locate:true,
-		src:null
-	}
-};
+		let objSuccess=$('#divBarcodeImg div.alert-success').hide();
+		let objWarning=$('#divBarcodeImg div.alert-warning').hide();
 
-//$(document).ready(function(){});可简写为$(function(){});
-// $(function() {
+		consoleColor('fn:queryByCode, code:','green');
+		console.log(code);	
+	
+		if(code){
+			objSuccess.show().find('span.alert-info').text(code);
+			//设置查询数据
+			rqData.searchSource=$('#fmRun').data('formType');
+			rqData.searchData={bar_code:code};
+		
+			//向后端发起查询并显示查询结果
+			loadEntPeriodList();
+		// return entLoad();	
+		}else{
+			/* objWarning.show(); */
+			console.log('else');	
+			objWarning.show();
+		}	
+	}
+
+	let calculateRectFromArea=(canvas,area)=>{
+		let canvasWidth=canvas.width,
+			canvasHeight=canvas.height,
+			top=parseInt(area.top)/100,
+			right=parseInt(area.right)/100,
+			bottom=parseInt(area.bottom)/100,
+			left=parseInt(area.left)/100;
+	
+		top *= canvasHeight;
+    	right = canvasWidth - canvasWidth*right;
+    	bottom = canvasHeight - canvasHeight*bottom;
+    	left *= canvasWidth;
+
+		return {
+			x:left,	
+			y:top,
+			width:right-left,
+			height:bottom-top
+		};
+	}
 	$('#fmRun input[type=file]').change(function(){
 		var fileObj=$(this)[0];
 		$('#fmRun .form-control').removeClass('alert-info');
@@ -579,55 +427,6 @@ var Barcode={
 	Quagga.onDetected(function(result){
 		queryByCode(result.codeResult.code);
 	});
-// });
-
-//显示识别结果和查询结果
-function queryByCode(code='') {
-	// let objSuccess=$('#divBarcodeImg div.alert-success').prop('hidden',true);
-	// let objWarning=$('#divBarcodeImg div.alert-warning').prop('hidden',true);
-	
-	let objSuccess=$('#divBarcodeImg div.alert-success').hide();
-	let objWarning=$('#divBarcodeImg div.alert-warning').hide();
-
-	consoleColor('fn:queryByCode, code:','green');
-	console.log(code);	
-	
-	if(code){
-		objSuccess.show().find('span.alert-info').text(code);
-		//设置查询数据
-		rqData.searchSource=$('#fmRun').data('formType');
-		rqData.searchData={bar_code:code};
-		
-		//向后端发起查询并显示查询结果
-		loadEntPeriodList();
-		// return entLoad();	
-	}else{
-		/* objWarning.show(); */
-		console.log('else');	
-		objWarning.show();
-	}	
-}
-
-function calculateRectFromArea(canvas,area){
-	var canvasWidth=canvas.width,
-		canvasHeight=canvas.height,
-		top=parseInt(area.top)/100,
-		right=parseInt(area.right)/100,
-		bottom=parseInt(area.bottom)/100,
-		left=parseInt(area.left)/100;
-	
-	top *= canvasHeight;
-    right = canvasWidth - canvasWidth*right;
-    bottom = canvasHeight - canvasHeight*bottom;
-    left *= canvasWidth;
-
-	return {
-		x:left,	
-		y:top,
-		width:right-left,
-		height:bottom-top
-	};
-}
 }
 
 function entOprtList() {
@@ -1172,7 +971,7 @@ function consoleColor(str='无内容',color='blue'){
 }
 //
 function loadEntPeriodList() {
-	let rData=rqData.searchData;
+	let rData=rqData.searchData,
 		listNod=$('#entList');
 	
 	urlObj.module='index';

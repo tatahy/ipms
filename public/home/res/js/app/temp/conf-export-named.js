@@ -1,4 +1,10 @@
-// app/conf.js
+// app/conf-export-named.js，采用命名导出
+
+/* 导入文件import语句如下：
+/* import * as conf from './conf-export-named.js';
+
+conf为导入文件中使用的‘Module’对象，不仅有本文件命名的各个导出键值对，还有各个键对应的getter和setter */
+
 //向后端请求时发送的数据
 var	rqData={
 		ent:'index',
@@ -147,4 +153,4 @@ var entProp={
 	}
 }
 
-// export {glyPrex,entNum,domain,loadStr,bs3Color,topNavProp,entProp,rqData,urlObj,searchResultNum,year};
+export {glyPrex,entNum,loadStr,bs3Color,topNavProp,entProp,rqData,urlObj,searchResultNum,year};

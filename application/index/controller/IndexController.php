@@ -102,6 +102,7 @@ class IndexController extends Controller
     $request=Request::instance();
     
     $resData=[
+      'userName'=>$this->username,
       'urlObj'=>[
         'domain'=>$request->domain(),
         'module'=>$request->module(),
@@ -157,6 +158,12 @@ class IndexController extends Controller
     return view();
     //return json_encode(['tpl'=>view(),'home'=> $request->domain()]);
   }
+  
+ // public function getInitData() {
+//    $this->priLogin();
+//    
+//    return $this->priGetPageInitData();
+//  }
 
   //修改application/config.php的设置将“默认操作”由“index”改为“login”？？
   public function login(Request $request,UserModel $userMdl){  
