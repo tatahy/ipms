@@ -112,7 +112,12 @@ function pageReady(){
 			rqData.ent=ent;
 			rqData.period=topNavProp[ent].period;
 			if(cls.indexOf('disabled')==-1 && ent!='index'){
-				entLoad();
+				entLoad().catch((e)=>console.log(e));
+				// return entLoad();
+				/* entLoad()
+					.then(function(){
+					return entReady();
+				}); */
 			}
 		}
 	});
@@ -128,58 +133,76 @@ function pageReady(){
 		rqData.ent=ent;
 		rqData.period=$(this).data('period');
 		
-		entLoad();
+		entLoad().catch((e)=>console.log(e));
+		// return entLoad();
+		/* entLoad()
+		.then(function(){
+			return entReady();
+		}); */
 	});
 }
-
+//async 定义了一个promise对象
+//异步加载ent对应的searchForm和list
 async function aLoadEntObj(url,data,type){
 	//load节点
 	let loadNod='';
-	let resObj=await $.post(url,data);
-	// let resObj=await fetch(url,opt);
+	
+	let opt={
+		method:'POST',
+		body:JSON.stringify(data),
+		headers:{
+			'Content-Type':'application/json'
+			// 'Content-Type':''
+		}
+	};
 	let result=false;
+	
+	// fetch() 返回的是一个response对象，await让代码暂停在该行直至返回所要求的数据。
+	let resObj=await fetch(url,opt);
+	let content=await resObj.text();
+	result=resObj.ok;
 	
 	if(type=='list'){
 		loadNod=$('#entList');
 	}
-	
 	if(type=='form'){
 		loadNod=$('#entSearchForm');
 	}
-	
-	// if(result=='success'){
-	if(resObj){
-		loadNod.html(resObj);
-		result='success';
-	}
-	// console.log(resObj);
+	loadNod.html(content);
+	// console.log(resObj.body);
 	return result;
 }
 
 async function entLoad(){	
-	let r1= aLoadEntObj('/index/SearchForm/index',rqData,'form');
-	let r2= aLoadEntObj('/index/List/index',rqData,'list');
-	
-	let valArr=await Promise.all([r1,r2]);
-	
-	// return console.log(valArr);
-	let totalSuccess=(acc,cur)=>{
-		if(cur =='success'){
+	let totalTrue=(acc,cur)=>{
+		if(cur){
 			acc++;
 		}
 		return acc;
 	};
+	let r1= aLoadEntObj('/index/SearchForm/index',rqData,'form');
+	let r2= aLoadEntObj('/index/List/index',rqData,'list');
+	let valArr=await Promise.all([r1,r2]);
 	
-	// if(valArr.reduce(totalSuccess(),0)!=2){
-		// return '内容载入失败。'
-	// }
+	if(valArr.reduce(totalTrue,0)!=2){
+		return '内容载入失败。'
+	}
 	
 	//生成ent的nav-pills
 	buildEntPeriodNavPills();
 	//生成ent的period的title
 	buildEntPeriodTitle();
+	console.log(valArr);
 	
-	return entReady();
+	setRqData();
+	// setEntQueryForm();
+	aSetEntQueryForm()
+	.catch((e)=>console.log(e));
+	
+	setEntPeriodList();
+	
+	entReady();
+	// return true;
 }
 
 //ent-load
@@ -200,7 +223,7 @@ async function entLoad(){
 		$.post('/index/List/index',rqData),
 	).then(function(p1,p2){
 		
-		console.log(p1[]);
+		console.log(p1);
 		//载入获得的模板
 		loadFmNod.html(p1[0]);
 		//载入获得的模板
@@ -210,8 +233,9 @@ async function entLoad(){
 	},function(){
 		return  $.alert('请求数据失败。');
 	});
-} */
-
+}
+ */
+ 
 //ent-ready
 function entReady(){
 	let //在entLoad中已生成
@@ -223,9 +247,6 @@ function entReady(){
 		fmId=sFCObj.formId,
 		trgObj=sFCObj.status.trigger;
 	
-	setRqData();
-	setEntQueryForm();
-	setEntPeriodList();
 	
 	//周期导航菜单click事件
 	entPeriodASet.click(function(){
@@ -235,7 +256,8 @@ function entReady(){
 			rqData.ent=sData.ent;
 			rqData.period=sData.period;
 
-			return entLoad();	
+			entLoad().catch((e)=>console.log(e));
+			// return entLoad();	
 		}
 	});
 	//3类共5个collapse-switch组件的click事件，
@@ -269,19 +291,18 @@ function entReady(){
 	btnRefresh.click(function(){
 		resetSearchForm();
 		// sFCObj.reset();
-		return entLoad();
+		entLoad().catch((e)=>console.log(e));
+		// return entLoad();
 	});	
-	// consoleColor('entReady() rqData','red');
-	// console.log(rqData);
 	
 	//对QueryForm的操作
 	entOprtQueryForm();
 	
 	//对BarcodeForm的操作
-	entOprtBarcodeForm();
+	// entOprtBarcodeForm();
 	
 	//对list的操作
-	entOprtList();
+	// entOprtList();
 }
 
 function entOprtQueryForm() {
@@ -296,13 +317,16 @@ function entOprtQueryForm() {
 		evt.preventDefault();
 		//设置查询数据
 		setRqSearchDataBy(fmQ);
-		return entLoad();
+		entLoad().catch((e)=>console.log(e));
+		// return entLoad();
 	});
 	//表单重置时附加的操作
 	fmQ.find('[type="reset"]').click(function(evt){
 		resetSearchForm();
 		//载入list
-		return loadEntPeriodList();
+		aLoadEntPeriodList()
+		.catch((e)=>console.log(e));
+		// return loadEntPeriodList();
 	});
 	
 }
@@ -326,7 +350,8 @@ function entOprtBarcodeForm() {
 			rqData.searchData={bar_code:code};
 		
 			//向后端发起查询并显示查询结果
-			loadEntPeriodList();
+			aLoadEntPeriodList().catch((e)=>console.log(e));
+			// loadEntPeriodList()
 		// return entLoad();	
 		}else{
 			/* objWarning.show(); */
@@ -396,7 +421,8 @@ function entOprtBarcodeForm() {
 		$('#divBarcodeImg').prop('hidden',true).find('.viewport').empty();
 		resetSearchForm();	
 		//载入list
-		return loadEntPeriodList();
+		aLoadEntPeriodList().catch((e)=>console.log(e));
+		// return loadEntPeriodList();
 	});
 	
 	//识别处理过程		
@@ -451,7 +477,7 @@ function entOprtList() {
 		listRowNod=$('#listRows'),
 		aHeadSet=tblNod.find('thead a'),
 		aBodySet=tblNod.find('tbody a'),
-		aPageSet=$('#divListRows a');
+		aPageSet=$('#divListRows').find('a');
 	
 	//表格每页显示记录行数；表格按选定行数显示
 	listRowNod.val(rqData.sortData.listRows).change(function(){
@@ -460,7 +486,8 @@ function entOprtList() {
 		//分页从第一页开始
 		rqData.sortData.pageNum=1;
 		
-		return entLoad();
+		entLoad().catch((e)=>console.log(e));
+		// return entLoad();
 	});	
 	//表格按选定字段排序
 	aHeadSet.click(function(){
@@ -475,7 +502,8 @@ function entOprtList() {
 		}
 		rqData.sortData.pageNum=1;
 	
-		return entLoad();
+		entLoad().catch((e)=>console.log(e));
+		// return entLoad();
 	});	
 	//表格中点击a后，标签所在行上底色
 	aBodySet.click(function(){
@@ -487,13 +515,14 @@ function entOprtList() {
 	aPageSet.click(function(evt){
 		// a所在分页页数
 		let pageStr=$(this).text(),
-			pageNum=0
+			pageNum=0,
 			showId=$('#entList').find('tbody tr').eq(0).data('showId'),
 		//(li.active)所代表的页数
 			pageNumActive=$('#divListRows li.active').children('span').text(),
 			sortName=$('thead').find('.label').data('sortName');
 
 		evt.preventDefault();
+		console.log(aPageSet.length);
 		//用"*"确保进行数字运算，而不是字符串
 		switch(pageStr){
 			case'»':
@@ -511,7 +540,9 @@ function entOprtList() {
 			rqData.sortData.pageNum=pageNum;
 		}
 		
-		return entLoad();
+		entLoad().catch((e)=>console.log(e));
+		
+		// return entLoad();
 	});
 }
 //setRqData
@@ -801,6 +832,86 @@ function setEntQueryForm(){
 	
 }
 
+//设定$('form.fmQuery')的各个表单项
+async function aSetEntQueryForm(){
+	let fm=$('form.fmQuery'),
+		selSet=fm.find('select'),
+		inSet=fm.find('input'),
+		searchSrc=rqData.searchSource,
+		//查询字段名数组
+		sNameArr=Object.keys(rqData.searchData);
+	let resObj='';
+	let opt={
+		method:'POST',
+		body:JSON.stringify(rqData),
+		headers:{
+			'Content-Type':'application/json'
+		}
+	};
+	let optData='';
+	let result=false;
+	
+	urlObj.ctrl='searchForm';
+	urlObj.action='getSelOptData';
+	
+	
+	if(sNameArr.length){
+		//显示整个form
+		fm.closest('.collapse').collapse();
+			//设定input的显示值和底色，并显示
+		inSet.each(function(){
+			let n=$(this).attr('name');
+			if(sNameArr.includes(n)){
+				//赋值
+				$(this).val(rqData.searchData[n]);
+				//上底色
+				$(this).addClass('alert-info');
+				//显示
+				$(this).closest('.collapse').collapse();
+			}
+		});
+	}
+	
+	resObj=await fetch(getRqUrl(),opt);
+	optData=await resObj.json();
+	result=resObj.ok;
+		
+	if(optData){
+	//组装select的option，并设定显示值和底色
+	selSet.each(function(){
+		let selName=$(this).attr('name'),
+			optObj=optData[selName],
+			v=0;
+		//组装option
+		$(this).empty().append($('<option></option>').val(0).text('…不限'));	
+		for(var m=0;m<optObj.num;m++){
+			$(this).append($('<option></option>').val(optObj.val[m]).text(optObj.txt[m]));
+		}
+			
+		if(sNameArr.length && sNameArr.includes(selName)){
+			v=rqData.searchData[selName];
+			//上底色
+			$(this).addClass('alert-info');
+			if(v){
+				//显示
+				$(this).closest('.collapse').collapse();
+			}
+		}
+			//option的value中无v
+			// if(optObj.val.length && !optObj.val.includes(v)){
+				// $.alert('option 添加'+v);
+			// }
+			
+			//设定select的显示值
+		$(this).val(v);	
+				
+	});	
+	result=true;
+	}
+	
+	return result;
+}
+
 //组装向后端请求时的searchData，不带参数就是清空searchData
 function setRqSearchDataBy(fm=''){
 	let formData='';
@@ -880,9 +991,10 @@ function resetSearchForm(){
 	fm.each(function(){
 		$(this)[0].reset();
 		$(this).find('.form-control').removeClass('alert-info');
-		if($(this).siblings().length){
+		// console.log($(this).siblings().length);
+		/* if($(this).siblings().length>1){
 			$(this).siblings().hide();
-		}
+		} */
 	});
 	//清空查询数据
 	return setRqSearchDataBy();
@@ -942,7 +1054,7 @@ function showSearchResult() {
 		sData=rqData.searchData,
 		//计数器
 		n=0;
-		
+	searchResultNum=parseInt($('#searchResultNum').text());
 	consoleColor('main.js showSearchResult(), rqData:');
 	console.log(rqData);
 	
@@ -986,6 +1098,43 @@ function consoleColor(str='无内容',color='blue'){
 	return console.log('%c%s',`font-size:16px;color:${color};`,str);
 	
 }
+
+async function aLoadEntPeriodList() {
+	let rData=rqData.searchData,
+		listNod=$('#entList');
+	let resObj='';
+	let content=''
+	let result=false;
+	let opt={
+		method:'POST',
+		body:JSON.stringify(rqData),
+		headers:{
+			'Content-Type':'application/json'
+		}
+	};
+	
+	
+	urlObj.module='index';
+	urlObj.ctrl='list';
+	urlObj.action='index';
+	consoleColor('aloadEntPeriodList() rqData','green');
+	console.log(rqData);
+	
+	resObj=await fetch(getRqUrl(),opt);
+	content=await Promise.resolve(resObj.text());
+	result=resObj.ok;
+	
+	listNod.html(content);
+	
+	setEntPeriodList();
+	
+	entReady();
+	// listNod.html(loadStr).load(getRqUrl(),rqData,function(){
+		// setEntPeriodList();
+	// });
+	
+	return result;
+}
 //
 function loadEntPeriodList() {
 	let rData=rqData.searchData,
@@ -1002,29 +1151,4 @@ function loadEntPeriodList() {
 	});
 }
 
-//使用$.post方法向服务器请求特定值。
-function ajaxResByPost(opt={}) {
-	let optDefault={getPageInitData:false,async:true,action:'index',data:''},
-		resData='';
-	opt=$.extend({},optDefault,opt);
-	
-	urlObj.action=opt.action;
-	
-	// consoleColor('ajaxResByPost()');
-	// console.log(opt);
-	// console.log(getRqUrl());
-	
-	$.ajax({	
-		url:getRqUrl(),
-		async:opt.async,
-		type:'POST',
-		data:opt,
-		dataType:'json'	,
-		success:function(data){
-			resData=data;
-			// return data;
-		}				
-	});
-		
-	return resData;	
-}
+//各个事件处理函数

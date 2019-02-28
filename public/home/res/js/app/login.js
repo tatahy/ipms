@@ -2,7 +2,7 @@
 
 $('[title]').tooltip();   
 
-$(document).ready(function(){
+// $(document).ready(function(){
 	let fm=$('form'),
 		urlLogin=fm.attr('action'),
 		urlIndex=fm.data('urlIndex'),
@@ -93,5 +93,5 @@ $(document).ready(function(){
 		}
 		
 	});
-	
-});
+	$('footer .year').html('2017-'+new Date().getFullYear());
+// });

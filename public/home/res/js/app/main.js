@@ -70,7 +70,7 @@ var App={
 );
  */
 App.start().catch(
-	App.exit(err);
+	App.exit(err)
 );
 
 /* $.when(

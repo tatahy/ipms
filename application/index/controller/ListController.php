@@ -148,18 +148,17 @@ class ListController extends Controller {
 //      'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
     ]);
     
-    ##
+    #
     return view($fileName);
     //return $this->fetch($fileName);
   }
   
   public function index () {
     $this->priLogin();
+    #前端传来json字符串
+    $rqArr=$this->request->param();
     
-    
-    $rqArr=$this->request->request();
-    
-  
+    //return json_encode($rqArr);
     return $this->priGetListTplFile($rqArr);
    
   }

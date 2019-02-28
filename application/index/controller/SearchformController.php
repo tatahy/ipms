@@ -104,13 +104,13 @@ class SearchformController extends Controller {
     $this->priLogin();
     
     $selArr=[];
-    
-    $reqObj=$this->request;  
-    $ent=$reqObj->param('ent');
-    $period=$reqObj->param('period');
-    $fmArr=$reqObj->param('queryField/a');
-   // $reqArr=$reqObj->request()['queryField'];
-    
+    #前端传来json字符串
+    $reqArr=$this->request->param(); 
+    #选用部分 
+    $ent=$reqArr['ent'];
+    $period=$reqArr['period'];
+    $fmArr=$reqArr['queryField'];
+
     #每个select赋初值
     foreach($fmArr as $k=>$v){
       if($v['tagName']=='select'){
@@ -118,6 +118,7 @@ class SearchformController extends Controller {
       }
     }
     
-    return $selArr;
+   #返回前端json字符串
+    return json($selArr);
   }
 }
