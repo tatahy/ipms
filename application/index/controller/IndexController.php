@@ -95,7 +95,7 @@ class IndexController extends Controller
     return 'success';
      
   }
-
+  
   private function priGetPageInitData() {
     $this->priLogin();
     
@@ -138,19 +138,19 @@ class IndexController extends Controller
       ]
     ];
     
-    return $resData;
+    return json($resData);
   }
   
   public function index(Request $request) {
         
     $this->priLogin();
     
-    $getPageInitData=!empty($request->param('getPageInitData'))?$request->param('getPageInitData'):false;
-  
-    if($getPageInitData){
-      return $this->priGetPageInitData();
-    }
-    
+    //$getPageInitData=!empty($request->param('getPageInitData'))?$request->param('getPageInitData'):false;
+//  
+//    if($getPageInitData){
+//      return $this->priGetPageInitData();
+//    }
+
     $this->assign([
       'home' => $request->domain(), 
       'username' => $this->username
@@ -159,11 +159,11 @@ class IndexController extends Controller
     //return json_encode(['tpl'=>view(),'home'=> $request->domain()]);
   }
   
- // public function getInitData() {
-//    $this->priLogin();
-//    
-//    return $this->priGetPageInitData();
-//  }
+  public function getInitData() {
+    $this->priLogin();
+    
+    return $this->priGetPageInitData();
+  }
 
   //修改application/config.php的设置将“默认操作”由“index”改为“login”？？
   public function login(Request $request,UserModel $userMdl){  
