@@ -145,7 +145,7 @@ function entGetReady() {
 	.finally(()=>{console.log('finally');return entOprtEvent();});
 }
 
-//异步加载ent对应的searchForm和list
+//异步加载ent对应的searchForm和list，加载成功后异步设置searchForm
 async function entLoad(){	
 	let totalTrue=(acc,cur)=>{
 		if(cur){
@@ -155,6 +155,7 @@ async function entLoad(){
 	};
 	let r1= aLoadEntObj('form');
 	let r2= aLoadEntObj('list');
+	let r3='';
 	//await关键字，表示开启异步过程并等待结果
 	let valArr=await Promise.all([r1,r2]);
 	
@@ -162,26 +163,26 @@ async function entLoad(){
 		return '内容载入失败。'
 	}
 	
+	r3=await aSetEntQueryForm();
+	
+	if(!r3){
+		return '表单设置失败。';
+	}
+	
 	return true;
 }
 
 //ent-ready
 async function entReady(){	
-	let asyRlt=await aSetEntQueryForm();
 	
-	// console.log(asyRlt);
-	
-	if(!asyRlt){
-		return '表单设置失败。';
-	}
-	//生成ent的nav-pills
-	buildEntPeriodNavPills();
 	//生成ent的period的title
 	buildEntPeriodTitle();
-	
-	setRqData();
-	
+	//生成ent的nav-pills
+	buildEntPeriodNavPills();
+	//设置表格
 	setEntPeriodList();
+	//设置rqData
+	setRqData();
 	
 	return true;
 }
@@ -205,7 +206,10 @@ function entOprtEvent(){
 			rqData.ent=sData.ent;
 			rqData.period=sData.period;
 
-			return entGetReady();	
+			// return entGetReady();
+			buildEntPeriodTitle();
+			
+			refreshEntObj(true);	
 		}
 	});
 	//3类共5个collapse-switch组件的click事件，
@@ -282,8 +286,33 @@ async function aLoadEntObj(type){
 	return result;
 }
 
-
-
+function refreshEntObj(len=0) {
+	if(!len){
+		len=Object.keys(rqData.searchData).length;
+	}
+	
+	if(len){
+		//异步刷新queryform表单内容。
+		aSetEntQueryForm()
+		.catch((e)=>console.log(e))
+		.finally(()=>{
+			return console.log(true);
+		});
+	}
+		
+	// 异步重载list
+	aLoadEntObj('list')
+	.then(result=>{
+		console.log(result);
+		setRqData(); 
+		setEntPeriodList();
+	})
+	.catch((e)=>console.log(e))
+	.finally(()=>{
+		return entOprtList();
+		// return entOprtEvent();
+	});		
+}
 //ent-load
 /* function entLoad(){	
 	//选择操作节点
@@ -327,14 +356,27 @@ function entOprtQueryForm() {
 		evt.preventDefault();
 		//设置查询数据
 		setRqSearchDataBy(fmQ);
-		// return Promise.resolve(entGetReady());
-		return entGetReady();
+		
+		refreshEntObj(true);
 	});
 	//表单重置时附加的操作
 	fmQ.find('[type="reset"]').click(function(evt){
+		let len=Object.keys(rqData.searchData).length;
 		resetSearchForm();
 		
-		// 载入list
+		/* if(len){
+			//重新载入form
+			aSetEntQueryForm()
+			.catch((e)=>console.log(e))
+			.finally(()=>{
+				return console.log(true);
+			// return entOprtEvent();
+			});
+			
+			// return entGetReady();
+		}
+		
+		// 重新载入list
 		aLoadEntObj('list')
 		.then(result=>{
 			console.log(result);
@@ -345,7 +387,10 @@ function entOprtQueryForm() {
 		.finally(()=>{
 			return entOprtList();
 			// return entOprtEvent();
-		});
+		}); */
+		
+		refreshEntObj(len);
+		
 	});
 	
 }
@@ -626,7 +671,7 @@ function setRqData() {
 			lName=$(this)[0].localName;
 			
 		//赋值rqData.searchData，非0非空的值才进行组装
-		if(v){
+		if(v!=0){
 			rqData.searchData[n]=v;
 		}
 		
@@ -917,20 +962,10 @@ async function aSetEntQueryForm(){
 	let result=false;
 	
 	consoleColor('aSetEntQueryForm() rqData:','red');
-	// urlObj.ctrl='searchForm';
-	// urlObj.action='getSelOptData';
+	
 	rqData.searchSource=fm.data('formType');
 	setRqQueryFieldBy(fm);
-	
-	setRqSearchDataBy(fm);
-
-	// console.log(JSON.stringify(rqData));
-	console.log(rqData);
-	
-	for(let e in rqData.searchData){
-		console.log(e+rqData.searchData[e]);
-	}
-	
+	// setRqSearchDataBy(fm);
 	opt.body= JSON.stringify(rqData);
 	
 	resObj=await fetch('/index/searchForm/getSelOptData',opt);
@@ -943,7 +978,8 @@ async function aSetEntQueryForm(){
 	
 	if(sNameArr.length){
 		//显示整个form
-		fm.closest('.collapse').collapse();
+		// fm.closest('.collapse').collapse();
+		fm.closest('.collapse').addClass('in');
 			//设定input的显示值和底色，并显示
 		inSet.each(function(){
 			let n=$(this).attr('name');
@@ -953,7 +989,8 @@ async function aSetEntQueryForm(){
 				//上底色
 				$(this).addClass('alert-info');
 				//显示
-				$(this).closest('.collapse').collapse();
+				// $(this).closest('.collapse').collapse();
+				$(this).closest('.collapse').addClass('in');
 			}
 		});
 	}
@@ -1092,11 +1129,16 @@ function sortEntListTbl() {
 		sortOrder=rqData.sortData.sortOrder,
 		sortName=rqData.sortData.sortName,
 		tblNod=$('#entList table'),
-		aHSet=tblNod.find('thead a'),
+		aHSet=tblNod.find('[data-sort-name]'),
 		trSet=tblNod.find('tr'),
 		column='',
 		columnArr=['num'];
-		
+	
+	if(sortName==''){
+		sortName=aHSet.eq(0).data('sortName');
+		rqData.sortData.sortName=sortName;
+	}
+	
 	aHSet.each(function(){
 		let gly=(sortOrder == 'asc')?glyAsc:glyDesc,
 			sort=(sortOrder == 'asc')?'desc':'asc',
@@ -1140,6 +1182,9 @@ function showSearchResult() {
 	searchResultNum=parseInt($('#searchResultNum').text());
 	consoleColor('main.js showSearchResult(), rqData:');
 	console.log(rqData);
+	// for(let e in rqData.searchData){
+		// console.log(e);
+	// }
 	
 	bingoObj.find('.badge').text(searchResultNum);
 	for(let el in sData){
@@ -1182,56 +1227,5 @@ function consoleColor(str='无内容',color='blue'){
 	
 }
 
-async function aLoadEntPeriodList() {
-	let rData=rqData.searchData,
-		listNod=$('#entList');
-	let resObj='';
-	let content=''
-	let result=false;
-	let opt={
-		method:'POST',
-		body:JSON.stringify(rqData),
-		headers:{
-			'Content-Type':'application/json'
-		}
-	};
-	
-	
-	urlObj.module='index';
-	urlObj.ctrl='list';
-	urlObj.action='index';
-	consoleColor('aloadEntPeriodList() rqData','green');
-	console.log(rqData);
-	
-	resObj=await fetch(getRqUrl(),opt);
-	content=await Promise.resolve(resObj.text());
-	result=resObj.ok;
-	
-	listNod.html(content);
-	
-	setEntPeriodList();
-	
-	entReady();
-	// listNod.html(loadStr).load(getRqUrl(),rqData,function(){
-		// setEntPeriodList();
-	// });
-	
-	return result;
-}
-//
-function loadEntPeriodList() {
-	let rData=rqData.searchData,
-		listNod=$('#entList');
-	
-	urlObj.module='index';
-	urlObj.ctrl='list';
-	urlObj.action='index';
-	consoleColor('loadEntPeriodList() rqData','green');
-	console.log(rqData);
-	
-	listNod.html(loadStr).load(getRqUrl(),rqData,function(){
-		setEntPeriodList();
-	});
-}
 
 //各个事件处理函数

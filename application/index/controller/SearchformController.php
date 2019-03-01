@@ -51,20 +51,44 @@ class SearchformController extends Controller {
   
   private function priGetFormTplFile ($arr) {
     $ent=array_key_exists('ent',$arr)?$arr['ent']:'pat'; 
-    $searchData= array_key_exists('searchData',$arr)?$arr['searchData']:self::SEARCHDBFIELD[$ent]; 
+   // $searchData= array_key_exists('searchData',$arr)?$arr['searchData']:self::SEARCHDBFIELD[$ent]; 
     
     $fileName=$ent.'searchform';
         
-    $this->assign([
-      'numTotal'=>1,
-      'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
-    ]);
+    //$this->assign([
+//      'numTotal'=>1,
+//      'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
+//    ]);
     return view($fileName);
     //return $this->fetch($fileName);
   }
-  
-  private function priGetEntDBfieldGroup($ent,$period,$field){
-    $res=self::SELECTSINGLE;
+  //根据参数组装模型查询用$whereArr
+  private function priGetMdlWhereArr ($searchArr,$searchTypeArr) {
+    $whereArr=[];
+    
+    if(count($searchArr)==0 || count($searchTypeArr)==0){
+      return $whereArr;
+    }
+    ##组装$whereArr，要求$searchArr的键名必须是数据库中的字段名
+    foreach($searchArr as $field=>$v){
+      if(!empty($v)){
+        switch($searchTypeArr[$field]['tagName']){
+          case 'input':
+            $operator='like';
+            $queryVal='%'.$v.'%';
+            break;
+          case 'select':
+            $operator='in';
+            $queryVal=$v;
+            break;
+        }
+        $whereArr[$field]=[$operator,$queryVal];  
+      }
+    }     
+    
+    return $whereArr;
+  }
+  private function priGetEntDBfieldGroup($ent,$period,$field,$whereArr=[]){
     #模型对象
     $mdl='';   
     
@@ -83,9 +107,8 @@ class SearchformController extends Controller {
         
         break;
     }
-    $res=$mdl->getFieldGroupByArr($field,$res,$period);
     
-    return $res;
+    return $mdl->getFieldGroupByArr($field,self::SELECTSINGLE,$period,$whereArr);
   }
   
   public function index () {
@@ -109,12 +132,15 @@ class SearchformController extends Controller {
     #选用部分 
     $ent=$reqArr['ent'];
     $period=$reqArr['period'];
+    $searchData=array_key_exists('searchData',$reqArr)?$reqArr['searchData']:[];
     $fmArr=$reqArr['queryField'];
+    
+    $whereArr=count($searchData)?$this->priGetMdlWhereArr($searchData,$fmArr):[];
 
     #每个select赋初值
     foreach($fmArr as $k=>$v){
       if($v['tagName']=='select'){
-        $selArr[$k]=$this->priGetEntDBfieldGroup($ent,$period,$k);
+        $selArr[$k]=$this->priGetEntDBfieldGroup($ent,$period,$k,$whereArr);
       }
     }
     

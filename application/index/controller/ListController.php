@@ -45,6 +45,32 @@ class ListController extends Controller {
     
     return $this->log;
   }
+  //根据参数组装模型查询用$whereArr
+  private function priGetMdlWhereArr ($searchArr,$searchTypeArr) {
+    $whereArr=[];
+    
+    if(count($searchArr)==0 || count($searchTypeArr)==0){
+      return $whereArr;
+    }
+    ##组装$whereArr，要求$searchArr的键名必须是数据库中的字段名
+    foreach($searchArr as $field=>$v){
+      if(!empty($v)){
+        switch($searchTypeArr[$field]['tagName']){
+          case 'input':
+            $operator='like';
+            $queryVal='%'.$v.'%';
+            break;
+          case 'select':
+            $operator='in';
+            $queryVal=$v;
+            break;
+        }
+        $whereArr[$field]=[$operator,$queryVal];  
+      }
+    }     
+    
+    return $whereArr;
+  }
   
   private function priGetListTplFile ($arr) {
         
@@ -56,44 +82,17 @@ class ListController extends Controller {
     #要求$queryField的键名必须是数据库中的字段名
     $queryField=array_key_exists('queryField',$arr)?$arr['queryField']:[];
     
-    
     #查询、排序结果总数
     $searchResultNum=0;
     #模型对象
     $mdl='';    
-    #进行搜索的条件数组
-    $whereArr=[];
+    #进行模型查询的条件数组
+    $whereArr=count($searchData)?$this->priGetMdlWhereArr($searchData,$queryField):[];
     #模板文件中进行显示的结果集
     $list=array(); 
     #返回前端的模板文件名
     $fileName=$ent.'List';
-    
-    ##组装$whereArr，要求$searchData的键名必须是数据库中的字段名
-    if(count($searchData)){
-      foreach($searchData as $field=>$v){
-        if($queryField[$field]['tagName']=='input'){
-          $operator='like';
-          $queryVal=!empty($v)?'%'.$v.'%':'';
-        }
-        if($queryField[$field]['tagName']=='select'){
-          $operator='in';
-          $queryVal=!empty($v)?$v:'';
-        }
-        
-        $whereArr[$field]=(!empty($queryVal))?[$operator,$queryVal]:'';  
-      }
-    }      
-    
-    #将空白元素删除
-    if(count($whereArr)){
-      foreach($whereArr as $key=>$val){
-        if(empty($val)){
-          unset($whereArr[$key]);
-        }
-      }
-    }
-      
-      
+          
     #选择模型对象
     switch($ent){
       case 'pat':

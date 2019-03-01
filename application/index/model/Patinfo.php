@@ -147,7 +147,7 @@ class Patinfo extends Model
       return $numArr;
     }
     #得到在period的指定field字段的groupby内容
-    static public function getFieldGroupByArr($field,$arr=[],$period='') {
+    static public function getFieldGroupByArr($field,$arr=[],$period='',$whereArr=[]) {
       $tArr=[];   #键值转换数组
       $tempArr=[];#中间数组
     #设定返回数组的默认结构
@@ -164,8 +164,17 @@ class Patinfo extends Model
       
     #组装$tempArr
       self::$obj=new self();
-      $patSet=self::$obj->getPeriodSet($period);
+      if(count($whereArr)){
+        $patSet=self::$obj->getPeriodSql($period)->where($whereArr)->select();
+      }else{
+        $patSet=self::$obj->getPeriodSet($period);
+      }
       self::$obj=null;
+      
+      if(count($patSet)==0){
+        return $arr;
+      }
+      
       #转换为数据集
       $patSet=is_array($patSet)?collection($patSet):$patSet;
       #得到中间数组$tempArr，$field值对应的索引数组（去掉重复值）
