@@ -8,8 +8,10 @@ use think\Controller;
 
 use app\common\validate\Ipvalidate;
 use app\index\model\User as UserModel;
-use app\patent\model\Patinfo as PatinfoModel;
-use app\asset\model\Assinfo as AssinfoModel;
+use app\index\model\Patinfo as PatinfoModel;
+use app\index\model\Assinfo as AssinfoModel;
+use app\index\model\Theinfo as TheinfoModel;
+use app\index\model\Proinfo as ProinfoModel;
 
 class IndexController extends Controller
 {
@@ -108,34 +110,16 @@ class IndexController extends Controller
         'module'=>$request->module(),
         'ctrl'=>strtolower($request->controller()),
         'action'=>'index'
-        #服务器端信息,TP5中获取全局变量$_SERVER的方法
-        //'server'=>$request->server()
       ],
       'entNum'=>[
-        'pat' =>$this->authArr['pat']['read']?PatinfoModel::getPeriodNum():0,
+        'pat'=>$this->authArr['pat']['read']?PatinfoModel::getPeriodNum():0,
         'ass'=>$this->authArr['ass']['read']?AssinfoModel::getPeriodNum():0,
-        'pro'=>[
-          'total'=>'x',
-          'audit'=>'x',
-          'plan'=>'x',
-          'apply'=>'x',
-          'approve'=>'x',
-          'process'=>'x',
-          'inspect'=>'x',
-          'done'=>'x',
-          'terminate'=>'x',
-          'reject'=>'x',
-        ],
-        'the'=>[
-          'total'=>'x',
-          'audit'=>'x',
-          'plan'=>'x',
-          'apply'=>'x',
-          'accept'=>'x',
-          'publish'=>'x',
-          'reject'=>'x'
-        ]
-      ]
+        'pro'=>$this->authArr['pro']['read']?ProinfoModel::getPeriodNum():0,
+        'the'=>$this->authArr['the']['read']?TheinfoModel::getPeriodNum():0
+      ],
+      'authArr'=>$this->authArr,
+      #服务器端信息,TP5中获取全局变量$_SERVER的方法
+      'server'=>$request->server()
     ];
     
     return json($resData);
@@ -153,7 +137,8 @@ class IndexController extends Controller
 
     $this->assign([
       'home' => $request->domain(), 
-      'username' => $this->username
+      'username' => $this->username,
+      'authArr'=>json_encode($this->authArr),
     ]);
     return view();
     //return json_encode(['tpl'=>view(),'home'=> $request->domain()]);

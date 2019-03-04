@@ -13,9 +13,9 @@ use app\admin\model\Dept as DeptModel;
 class Patinfo extends Model
 {
     #引用app\common中定义的常量
-    const PATSTATUS=conPatStatusArr;
-    const PATTYPE=conPatTypeArr;
-    const PATPERIODSTATUS=conPatPeriodVsStatus;
+    const PATTYPE=conPatEntArr['type'];
+    const PATPERIOD=conPatEntArr['period'];
+    const ENTTITY='patent';
     //本类的静态方法中用于访问非静态方法时实例化本类对象
     static private $obj=null;
     //protected $auto = ['patnum','pronum'];
@@ -62,57 +62,63 @@ class Patinfo extends Model
     }
 
     #修改器，修改存入数据表patinfo中type字段值，转换为类型编码
-    protected function setTypeAttr($strChi) {
-        $output = $strChi;
-        foreach(self::PATTYPE as $key => $val){
-            if($strChi==$val){
-                $output=$key;
-            }
-        }
+    protected function setTypeAttr($strChi) {    
+        //中英文对照数组
+        $k=array_search($strChi, self::PATTYPE);
+        
+        $output = $k?$tArr[$k]:$strChi;
+       
         return $output;
     }
     
     #获取器，获取数据表patinfo中type字段值，转换为中文输出
     protected function getTypeAttr($dBStrEn) {
-        $output = $dBStrEn;    
-        if (array_key_exists($dBStrEn,self::PATTYPE)) {
-            $output = self::PATTYPE[$dBStrEn];
-        }
+        //中英文对照数组
+        $tArr=self::PATTYPE;
+        $output =array_key_exists($dBStrEn,$tArr)?$tArr[$dBStrEn]:$dBStrEn;
+        
         return $output;
     }
     
     #修改器，修改存入数据表Patinfo中status字段值，转换为类型编码。
     protected function setStatusAttr($strChi) {
-        $output = $strChi;
-        foreach(self::PATSTATUS as $key => $val){
-            if($strChi==$val){
-                $output=$key;
-            }
-        }
+        //中英文对照数组
+        $tArr=_commonStatustEn2ChiArr(self::ENTTITY);
+        $k=array_search($strChi, $tArr);
+        
+        $output = $k?$tArr[$k]:$strChi;
+       
         return $output;
     }
     
     #获取器，获取数据表patinfo中status字段值，转换为中文输出
     protected function getStatusAttr($dBStrEn) {
-        $output = $dBStrEn;
-        if (array_key_exists($dBStrEn, self::PATSTATUS)) {
-            $output = self::PATSTATUS[$dBStrEn];
-        }
+        //中英文对照数组
+        $tArr=_commonStatustEn2ChiArr(self::ENTTITY);
+        
+        $output =array_key_exists($dBStrEn, $tArr)?$tArr[$dBStrEn]:$dBStrEn;
+        
         return $output;
     }
     
     #得到在period里的query对象
     static public function getPeriodSql($period='') {
-      $pArr=array_keys(self::PATPERIODSTATUS);
-      $psArr=self::PATPERIODSTATUS;
+      $psArr=self::PATPERIOD;
+      $pArr=array_keys($psArr);
+      
       #保证$period的值是规定的范围内
       $period=in_array($period,$pArr)?$period:'total';
+      
       #模型查询中的条件
-      if($period=='total'){
-        $where['id']=['>',0];
-      }else{
-        $where['status']=['in',$psArr[$period]['status']];
-      }
+      $field=($period==$pArr[0])?'id':'status';
+      $where[$field]=[$psArr[$period]['queryExp'],$psArr[$period]['status']];
+      
+      #模型查询中的条件
+     // if($period=='total'){
+//        $where['id']=['>',0];
+//      }else{
+//        $where['status']=['in',$psArr[$period]['status']];
+//      }
       self::$obj=new self();
       $query=self::$obj->where($where);
       self::$obj=null;
@@ -130,7 +136,8 @@ class Patinfo extends Model
     static public function getPeriodNum($period='') {
       $num='';
       $numArr=[];
-      $pArr=array_keys(self::PATPERIODSTATUS);
+      $pArr=array_keys(self::PATPERIOD);
+      //$pArr=self::PATPERIOD;
       
       if(!empty($period)){
         self::$obj=new self();
@@ -154,7 +161,7 @@ class Patinfo extends Model
       $arr=array_merge(['num'=>0,'val'=>[''],'txt'=>['']],$arr);
       
     #组装$tArr
-      if($field=='status') $tArr=self::PATSTATUS;
+      if($field=='status') $tArr=_commonStatustEn2ChiArr(self::ENTTITY);
       if($field=='type') $tArr=self::PATTYPE;
       #得到dept的键值转换数组$tArr。abbr为键，name为值的关联数组
       $deptSet=DeptModel::all();

@@ -146,8 +146,9 @@ class User extends Model
      */
     static public function refreshUserAuth($username,$pwd)
     {
-      $obj=new User;
+      $obj=new self();
       $user=$obj->where('username',$username)->where('pwd',$pwd)->where('enable',1)->find();
+      $id=$user->id;
       $usergroup_id= explode(",", $user->usergroup_id);//$usergroup_id=array(8,9,10)
       #app/common.php中预定义的权限实体
       $authEntArr=conAuthEntArr;
@@ -170,12 +171,13 @@ class User extends Model
       }
                  
       #使用静态方法，向User表更新信息，赋值有变化就会更新和返回对象，无变化则无更新和对象返回。
-      //$obj::update([
-//          'authority'  => $authArr,
-//        ], ['username' => $username,'pwd'=>$pwd]);
+      $obj::update([
+          'authority'  => $authArr,
+      ], ['id' => $id]);
+       // ], ['username' => $username,'pwd'=>$pwd]);
 
       $user['authority']=$authArr;
-      unset($obj);
+      $obj=null;
       return $user;
     }
 }

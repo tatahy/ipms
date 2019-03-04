@@ -93,7 +93,8 @@ export default {
 		module:'project',
 		ctrl:['index','proList','proSearchForm'],
 		action:['index'],
-		chi:'项目&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
+		// chi:'项目&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
+		chi:'项目',
 		gly:'glyphicon glyphicon-inbox',
 		period:{
 			summary:{
@@ -123,7 +124,8 @@ export default {
 		module:'thesis',
 		ctrl:['index','theList','theSearchForm'],
 		action:['index'],
-		chi:'论文&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
+		// chi:'论文&nbsp;<span class="bg-primary">&nbsp;开发中&nbsp;</span>',
+		chi:'论文',
 		gly:'glyphicon glyphicon-list',
 		period:{
 			summary:{

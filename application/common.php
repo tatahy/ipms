@@ -6,7 +6,7 @@
  * 所有的公共函数都以"fn"开头，再遵循下划线小写字母命名法，fn_xx_yy_zz。
  * 所有的公共常量都以"con"开头，再遵循驼峰命名法。
  */
-
+ 
 //定义需要进行权限管理的模块/实体及其属性，方便使用及横向和纵向的扩展
 const conAuthEntArr=[
         '_ISS-_PAT'=>[
@@ -67,6 +67,7 @@ const conAuthEntArr=[
           'chi'=>'论文',
           'rank'=>'common',
           'auth'=>[
+            'read'=>['chi'=>'查阅','val'=>0],
             'edit'=>['chi'=>'撰写','val'=>0],
             'audit'=>['chi'=>'审核','val'=>0],
             'approve'=>['chi'=>'审批','val'=>0],
@@ -79,6 +80,7 @@ const conAuthEntArr=[
           'chi'=>'项目',
           'rank'=>'important',
           'auth'=>[
+            'read'=>['chi'=>'查阅','val'=>0],
             'edit'=>['chi'=>'撰写','val'=>0],
             'audit'=>['chi'=>'审核','val'=>0],
             'approve'=>['chi'=>'审批','val'=>0],
@@ -119,37 +121,147 @@ const conAuthEntArr=[
         ]
 ];
 
-//patent的类型数组
-const conPatTypeArr=[
-                    '_PATT1'=>'发明专利',
-                    '_PATT2'=>'实用新型专利',
-                    '_PATT3'=>'外观设计专利',
-                    '_PATT4'=>'软件版权专利',
-                    '_PATT5'=>'著作权专利',
-                    '_PATT6'=>'集成电路专利',
-                    '_PATT7'=>'其他',
-                    ];
-//patent的状态数组
-const conPatStatusArr=[
-                    '_PATS1'=>'填报',
-                    '_PATS2'=>'内审',
-                    '_PATS2-1'=>'内审中',
-                    '_PATS2-2'=>'内审-审核通过',
-                    '_PATS2-3'=>'内审-修改',
-                    '_PATS2-END1'=>'内审-批准申报',
-                    '_PATS2-END2'=>'内审-否决',
-                    '_PATS3'=>'申报',
-                    '_PATS3-1'=>'申报中',
-                    '_PATS3-2'=>'申报-修改',
-                    '_PATS3-END1'=>'申报-授权',
-                    '_PATS3-END2'=>'申报-驳回',
-                    '_PATS4'=>'续费',
-                    '_PATS4-1'=>'续费中',
-                    '_PATS4-2'=>'续费-同意续费',
-                    '_PATS4-END1'=>'续费-放弃',
-                    '_PATS4-END2'=>'续费-授权',
-                    '_PATS5'=>'超期无效',
-                    ];
+
+
+#project的实体定义
+const conPatEntArr=[
+  'name'=>'patent',
+  'abbr'=>'pat',
+  'chi'=>'专利',
+  'type'=>[
+    '_PATT1'=>'发明专利',
+    '_PATT2'=>'实用新型专利',
+    '_PATT3'=>'外观设计专利',
+    '_PATT4'=>'软件版权专利',
+    '_PATT5'=>'著作权专利',
+    '_PATT6'=>'集成电路专利',
+    '_PATT7'=>'其他',
+  ],
+  'period'=>[    
+    'total'=>['chi'=>'专利概况','queryExp'=>'>','status'=>0],
+    'audit'=>['chi'=>'内审','queryExp'=>'in','status'=>['_PATS1','_PATS2-1','_PATS2-2','_PATS2-3','_PATS2-END2']],
+    'newAdd'=>['chi'=>'拟申报','queryExp'=>'in','status'=>['_PATS2-END1','_PATS4-2']],
+    'apply'=>['chi'=>'申报','queryExp'=>'in','status'=>['_PATS3-1','_PATS3-2','_PATS3-END1','_PATS4-1']],
+    'authorize'=>['chi'=>'授权(有效)','queryExp'=>'in','status'=>['_PATS4-END1','_PATS4-END2']],
+    'invalid'=>['chi'=>'无授权(无效)','queryExp'=>'in','status'=>['_PATS5','_PATS3-END2']]
+  ],
+  'oprt'=>[
+  
+  ],
+  'auth'=>[
+  
+  ],
+  'status'=>[
+    '_PATS1'=>[
+      'chi'=>'填报',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PATS2'=>[
+      'chi'=>'内审',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PATS2-1'=>[
+      'chi'=>'内审中',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PATS2-2'=>[
+      'chi'=>'内审-审核通过',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PATS2-3'=>[
+      'chi'=>'内审-修改',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PATS2-END1'=>[
+      'chi'=>'内审-批准申报',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PATS2-END2'=>[
+      'chi'=>'内审-否决',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PATS3'=>[
+      'chi'=>'申报',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PATS3-1'=>[
+      'chi'=>'申报中',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PATS3-2'=>[
+      'chi'=>'申报-修改',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PATS3-END1'=>[
+      'chi'=>'申报-授权',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PATS3-END2'=>[
+      'chi'=>'申报-驳回',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PATS4'=>[
+      'chi'=>'续费',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PATS4-1'=>[
+      'chi'=>'续费中',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PATS4-2'=>[
+      'chi'=>'续费-同意续费',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PATS4-END1'=>[
+      'chi'=>'续费-放弃',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PATS4-END2'=>[
+      'chi'=>'续费-授权',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PATS5'=>[
+      'chi'=>'超期无效',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ]
+  ]
+];         
 #patent的period与status的对应关系
 const conPatPeriodVsStatus=[
   'total'=>['chi'=>'专利概况','status'=>[]],
@@ -159,49 +271,271 @@ const conPatPeriodVsStatus=[
   'authorize'=>['chi'=>'授权(有效)','status'=>['_PATS4-END1','_PATS4-END2']],
   'invalid'=>['chi'=>'无授权(无效)','status'=>['_PATS5','_PATS3-END2']]
 ];
+
+//patent的类型数组
+const conPatTypeArr=[
+  '_PATT1'=>'发明专利',
+  '_PATT2'=>'实用新型专利',
+  '_PATT3'=>'外观设计专利',
+  '_PATT4'=>'软件版权专利',
+  '_PATT5'=>'著作权专利',
+  '_PATT6'=>'集成电路专利',
+  '_PATT7'=>'其他',
+];
+//patent的状态数组
+const conPatStatusArr=[
+  '_PATS1'=>'填报',
+  '_PATS2'=>'内审',
+  '_PATS2-1'=>'内审中',
+  '_PATS2-2'=>'内审-审核通过',
+  '_PATS2-3'=>'内审-修改',
+  '_PATS2-END1'=>'内审-批准申报',
+  '_PATS2-END2'=>'内审-否决',
+  '_PATS3'=>'申报',
+  '_PATS3-1'=>'申报中',
+  '_PATS3-2'=>'申报-修改',
+  '_PATS3-END1'=>'申报-授权',
+  '_PATS3-END2'=>'申报-驳回',
+  '_PATS4'=>'续费',
+  '_PATS4-1'=>'续费中',
+  '_PATS4-2'=>'续费-同意续费',
+  '_PATS4-END1'=>'续费-放弃',
+  '_PATS4-END2'=>'续费-授权',
+  '_PATS5'=>'超期无效',
+];
+
+#thesis的实体定义
+const conTheEntArr=[
+  'name'=>'thesis',
+  'abbr'=>'the',
+  'chi'=>'论文',
+  'type'=>[
+    '_THET1'=>'国家级出版物',
+    '_THET2'=>'省级出版物',
+    '_THET3'=>'市级出版物',
+    '_THET4'=>'境外出版物',
+    '_THET5'=>'会议文集',
+  ],
+  'period'=>[
+    'total'=>['chi'=>'','queryExp'=>'>','status'=>0],
+    'audit'=>['chi'=>'内审','queryExp'=>'=','status'=>'_THES1'],
+    'plan'=>['chi'=>'拟发表','queryExp'=>'=','status'=>'_THES2'],
+    'apply'=>['chi'=>'投稿','queryExp'=>'=','status'=>'_THES3'],
+    'accept'=>['chi'=>'收录','queryExp'=>'=','status'=>'_THES4'],
+    'publish'=>['chi'=>'发表','queryExp'=>'=','status'=>'_THES5'],
+    'reject'=>['chi'=>'拒稿','queryExp'=>'=','status'=>'_THES6'],
+  ],
+  'oprt'=>[
+  
+  ],
+  'auth'=>[
+  
+  ],
+  'status'=>[
+    '_THES1'=>[
+      'chi'=>'内审',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_THES2'=>[
+      'chi'=>'拟发表',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_THES3'=>[
+      'chi'=>'投稿',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_THES4'=>[
+      'chi'=>'收录',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_THES5'=>[
+      'chi'=>'发表',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_THES6'=>[
+      'chi'=>'拒稿',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ]
+  ]
+];
                     
 //thesis的类型数组
 const conTheTypeArr=[
-                    '_THET1'=>'市级出版物',
-                    '_THET2'=>'省级出版物',
-                    '_THET3'=>'国家级出版物',
-                    '_THET4'=>'境外出版物',
-                    '_THET5'=>'会议文集',
-
-                    ];
+  '_THET1'=>'国家级出版物',
+  '_THET2'=>'省级出版物',
+  '_THET3'=>'市级出版物',
+  '_THET4'=>'境外出版物',
+  '_THET5'=>'会议文集',
+];
 //thesis的状态数组
 const conTheStatusArr=[
-                    '_THES1'=>'拟发表',
-                    '_THES2'=>'投稿',
-                    '_THES3'=>'收录',
-                    '_THES4'=>'发表',
-                    '_THES5'=>'拒稿',
-               
-                    ];
+  '_THES1'=>'内审',
+  '_THES2'=>'拟发表',
+  '_THES3'=>'投稿',
+  '_THES4'=>'收录',
+  '_THES5'=>'发表',
+  '_THES6'=>'拒稿',
+];
+
+#project的实体定义
+const conProEntArr=[
+  'name'=>'project',
+  'abbr'=>'pro',
+  'chi'=>'项目',
+  'type'=>[
+    '_PROT1'=>'国家级',
+    '_PROT2'=>'省级',
+    '_PROT3'=>'市级',
+    '_PROT4'=>'客户委托',
+    '_PROT5'=>'外包',
+    '_PROT6'=>'自研',
+  ],
+  'period'=>[
+    'total'=>['chi'=>'','queryExp'=>'>','status'=>0],
+    'audit'=>['chi'=>'内审','queryExp'=>'like','status'=>'_PROS1'.'%'],
+    'plan'=>['chi'=>'拟申报','queryExp'=>'=','status'=>'_PROS1-END1'],
+		'apply'=>['chi'=>'申报','queryExp'=>'like','status'=>'_PROS2'.'%'],
+		'approve'=>['chi'=>'立项','queryExp'=>'=','status'=>'_PROS3'],
+		'process'=>['chi'=>'在研','queryExp'=>'=','status'=>'_PROS4'],
+		'inspect'=>['chi'=>'验收','queryExp'=>'=','status'=>'_PROS5'],
+		'done'=>['chi'=>'结题','queryExp'=>'=','status'=>'_PROS6'],
+		'terminate'=>['chi'=>'终止','queryExp'=>'=','status'=>'_PROS7'],
+		'reject'=>['chi'=>'申报未立项','queryExp'=>'=','status'=>'_PROS2-END2'],
+  ],
+  'oprt'=>[
+  
+  ],
+  'auth'=>[
+  
+  ],
+  'status'=>[
+    '_PROS1'=>[
+      'chi'=>'内审',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PROS1-1'=>[
+      'chi'=>'内审-初审中',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PROS1-2'=>[
+      'chi'=>'内审-终审中',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PROS1-END1'=>[
+      'chi'=>'内审-批准',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PROS1-END2'=>[
+      'chi'=>'内审-否决',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PROS2'=>[
+      'chi'=>'申报',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PROS2-1'=>[
+      'chi'=>'申报-准备',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PROS2-2'=>[
+      'chi'=>'申报-提交',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PROS2-END1'=>[
+      'chi'=>'申报-受理',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PROS2-END2'=>[
+      'chi'=>'申报-驳回',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PROS3'=>[
+      'chi'=>'立项',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PROS4'=>[
+      'chi'=>'在研',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PROS5'=>[
+      'chi'=>'验收',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PROS6'=>[
+      'chi'=>'结题',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+    '_PROS7'=>[
+      'chi'=>'终止',
+      'oprt'=>[
+        '_CREATE'=>['nextStatus'=>[]]
+      ]
+    ],
+  ]
+];                    
 //projec的类型数组
 const conProTypeArr=[
-                    '_PROT1'=>'市级',
-                    '_PROT2'=>'省级',
-                    '_PROT3'=>'国家级',
-                    '_PROT4'=>'客户委托',
-                    '_PROT5'=>'外包',
-                    '_PROT6'=>'自研',
-
-                    ];
+  '_PROT1'=>'国家级',
+  '_PROT2'=>'省级',
+  '_PROT3'=>'市级',
+  '_PROT4'=>'客户委托',
+  '_PROT5'=>'外包',
+  '_PROT6'=>'自研',
+];
 //thesis的状态数组
 const conProStatusArr=[
-                    '_PROS1'=>'申报',
-                    '_PROS1-1'=>'申报-准备',
-                    '_PROS1-2'=>'申报-提交',
-                    '_PROS1-END1'=>'申报-受理',
-                    '_PROS1-END2'=>'申报-驳回',
-                    '_PROS2'=>'立项',
-                    '_PROS3'=>'在研',
-                    '_PROS4'=>'验收',
-                    '_PROS5'=>'结题',
-                    '_PROS6'=>'终止',
-               
-                    ];
+  '_PROS1'=>'申报',
+  '_PROS1-1'=>'申报-准备',
+  '_PROS1-2'=>'申报-提交',
+  '_PROS1-END1'=>'申报-受理',
+  '_PROS1-END2'=>'申报-驳回',
+  '_PROS2'=>'立项',
+  '_PROS3'=>'在研',
+  '_PROS4'=>'验收',
+  '_PROS5'=>'结题',
+  '_PROS6'=>'终止',
+];
+
 //attachment的类型数组
 const conAttTypeArr=[
                     '_ATTT1'=>'申请',
@@ -304,15 +638,18 @@ const conAssEntArr=[
   'name'=>'asset',
   'abbr'=>'ass',
   'chi'=>'固定资产',
+  'type'=>[
+    
+  ],
   'period'=>[
     #usual:除"回收站"以外的其它5类状态,
-    'usual'=>['chi'=>'','statusQuery'=>'<>','status'=>'_ASSS6'],
-    'undetermined'=>['chi'=>'待定','statusQuery'=>'like','status'=>'_ASSS1%'],
-    'normal'=>['chi'=>'正常','statusQuery'=>'like','status'=>'_ASSS2%'],
-    'abnormal'=>['chi'=>'异常','statusQuery'=>'like','status'=>'_ASSS3%'],
-    'suspended'=>['chi'=>'停用','statusQuery'=>'like','status'=>'_ASSS4%'],
-    'removed'=>['chi'=>'销账','statusQuery'=>'like','status'=>'_ASSS5%'],
-    'trashBin'=>['chi'=>'回收站','statusQuery'=>'','status'=>'_ASSS6']    
+    'usual'=>['chi'=>'','queryExp'=>'<>','status'=>'_ASSS6'],
+    'undetermined'=>['chi'=>'待定','queryExp'=>'like','status'=>'_ASSS1%'],
+    'normal'=>['chi'=>'正常','queryExp'=>'like','status'=>'_ASSS2%'],
+    'abnormal'=>['chi'=>'异常','queryExp'=>'like','status'=>'_ASSS3%'],
+    'suspended'=>['chi'=>'停用','queryExp'=>'like','status'=>'_ASSS4%'],
+    'removed'=>['chi'=>'销账','queryExp'=>'like','status'=>'_ASSS5%'],
+    'trashBin'=>['chi'=>'回收站','queryExp'=>'=','status'=>'_ASSS6']    
   ],
   'oprt'=>[
     '_CREATE'=>'新增',
@@ -898,31 +1235,30 @@ const conIssTheStatusArr=[//除‘完结’以外的其它状态
                     ];
 //issue的Pro状态数组细分共6类?个，大类间用下划线“_”分隔，大类里的小项用连字符“-”分隔
 const conIssProStatusArr=[//除‘完结’以外的其它状态
-                    '_ISST_PROS'=>'*',
-                    //label-info，送审
-                    '_PROS1'=>'送审',
-                    '_PROS1-1'=>'',
-                    //label-success，审核
-                    '_PROS2'=>'审核',
-                    '_PROS2-1'=>'',
-                    '_PROS2-2'=>'送审-已修改',
-                    '_PROS2-3'=>'送审-已完善',
-                    //'_PROS2-END'=>'审核-拒绝',
-                    //label-warning，审批
-                    '_PROS3'=>'审批',
-                    '_PROS3-1'=>'审核-通过',
-                    '_PROS3-2'=>'审核-不予支持',
-                    '_PROS3-3'=>'复核-通过',
-                    '_PROS3-4'=>'复核-不予支持',
-                    //'_PROS3-END'=>'审批-否决',
-                    //label-primary，执行
-                    '_PROS4'=>'执行',
-                    '_PROS4-1'=>'审批-批准',
-                    '_PROS4-END1'=>'审批-否决',
-                    //label-default，完结
-                    '_PROS_END'=>'完结'
-                    ];
-
+  '_ISST_PROS'=>'*',
+  //label-info，送审
+  '_PROS1'=>'送审',
+  '_PROS1-1'=>'',
+  //label-success，审核
+  '_PROS2'=>'审核',
+  '_PROS2-1'=>'',
+  '_PROS2-2'=>'送审-已修改',
+  '_PROS2-3'=>'送审-已完善',
+  //'_PROS2-END'=>'审核-拒绝',
+  //label-warning，审批
+  '_PROS3'=>'审批',
+  '_PROS3-1'=>'审核-通过',
+  '_PROS3-2'=>'审核-不予支持',
+  '_PROS3-3'=>'复核-通过',
+  '_PROS3-4'=>'复核-不予支持',
+  //'_PROS3-END'=>'审批-否决',
+  //label-primary，执行
+  '_PROS4'=>'执行',
+  '_PROS4-1'=>'审批-批准',
+  '_PROS4-END1'=>'审批-否决',
+  //label-default，完结
+  '_PROS_END'=>'完结'
+];
 
   /**
      * 各个模块权限设置初始值
@@ -1065,8 +1401,7 @@ const conIssProStatusArr=[//除‘完结’以外的其它状态
      * 将iss权限数组的$key转为中文
      * 参数$authArr，类型：数组。值：不为空。说明：需要进行数组键名转换的数组。
      */
-  function _commonAuthArrKeyToCHN($authArr=array())
-  {
+  function _commonAuthArrKeyToCHN($authArr=array()) {
       $issTemp=array();
       foreach($authArr as $k=>$v){
               switch($k){
@@ -1120,3 +1455,27 @@ const conIssProStatusArr=[//除‘完结’以外的其它状态
     
   }
 
+
+#得到ent的status的中英文对照数组
+function _commonStatustEn2ChiArr($ent){
+  $sArr=[];
+  switch($ent){
+    case 'asset':
+      $sArr=conAssEntArr['status'];
+      break;
+    case 'patent':
+      $sArr=conPatEntArr['status'];
+      break;
+    case 'project':
+      $sArr=conProEntArr['status'];
+      break;
+    case 'thesis':
+      $sArr=conTheEntArr['status'];
+      break;
+  }
+  $arr=[];
+  foreach($sArr as $k=>$v){
+    $arr[$k]=$v['chi'];
+  }
+  return $arr;
+}

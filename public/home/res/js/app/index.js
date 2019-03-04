@@ -17,7 +17,7 @@ var urlObj=c.urlObj;
 var searchResultNum=c.searchResultNum;
 // console.log(c);
 
-import {SearchFormCollapse as sfcCls} from './SearchFormCollapse.class.js';
+// import {SearchFormCollapse as sfcCls} from './SearchFormCollapse.class.js';
 import {Barcode} from './Barcode.class.js';
 // console.log(Barcode);
 
@@ -29,24 +29,23 @@ import {Barcode} from './Barcode.class.js';
 		// console.log(err);
 // });
 
-start().then(function(){
-	$.alert('用户【'+userName+'】登录成功。');
-}).catch((err)=>{
+initData()
+.then(function(uName){
+	let str='数据初始化失败。页面无法正常显示。';
+	
+	if(uName){
+		str='用户【'+uName+'】登录成功。';
+		pageInit();
+		pageReady();
+	}
+	return $.alert(str);
+})
+.catch((err)=>{
 	console.log(err);
+})
+.finally(()=>{
+	
 });
-
-//定义async函数start()，默认返回的是一个promise对象。将对initData()的then()处理代码进行封装。
-async function start(){
-	//await关键字，表示开启异步过程并等待结果
-	let result=await initData();
-	// let result=await Promise.resolve(initData());
-	if(!result) return $.alert('数据初始化失败。页面无法正常显示。');	
-	
-	pageInit();
-	pageReady();
-	
-	
-}
 
 //定义async函数initData()进行全局变量赋值，默认返回的是一个promise对象。
 async function initData() {
@@ -54,12 +53,10 @@ async function initData() {
 	// let resData = await $.post('/index/index/getInitData');
 	//fetch()方法返回的是一个Promise对象，这个promise对象resolve成一个response对象，这个response对象是对所发起的request的响应结果。
 	let resObj = await fetch('/index/index/getInitData');
+	//完成response对象内容解析
 	let resData =await resObj.json();
+	// let resData =await resObj.blob();
 	
-	// console.log(resObj);
-	// console.log(Promise.resolve(resObj));
-	
-	// console.log(resData);
 	//全局变量赋值
 	userName=resData.userName;
 	urlObj=resData.urlObj;
@@ -71,7 +68,7 @@ async function initData() {
 			entProp[ent].period.detail[per].title.num=entNum[ent][per];
 		}
 	}
-	return true;
+	return userName;
 }
 
 //页面生命周期函数-init，页面初始化
@@ -84,16 +81,13 @@ function pageInit(){
 	$('body').tooltip({selector:'[title]',triger:'hover click',placement:'auto top',delay: {show: 200, hide: 100},html: true });
 	$('footer .year').html('2017-'+year);
 }
-//page-ready后处理各种事件
+//page-init成功后处理各种事件
 function pageReady(){
 	let sumNod=$('#entSummary').show(),
 		perNod=$('#entPeriod').hide();
 	let entASet=$('nav .navbar-collapse ul').eq(0).find('a'),
 		btnEntPeriod=sumNod.find('.btnPeriod'),
 		btnTopnavToggle=$('nav .navbar-header').children('.navbar-toggle');
-	
-	// consoleColor('pageReady() entNum:');
-	// console.log(entNum);
 	
 	btnTopnavToggle.click(function(){
 		showTopNavbar();
@@ -102,7 +96,11 @@ function pageReady(){
 	entASet.click(function(){
 		let cls=$(this).closest('li').attr('class')?$(this).closest('li').attr('class'):'no class',
 		ent=$(this).data('ent');
-			
+		
+		if(cls.indexOf('disabled')!=-1 ){
+			return true;			
+		}
+		
 		$(this).tab('show');
 		sumNod.hide();
 		perNod.hide();
@@ -113,7 +111,7 @@ function pageReady(){
 			initRqData();
 			rqData.ent=ent;
 			rqData.period=topNavProp[ent].period;
-			if(cls.indexOf('disabled')==-1 && ent!='index'){
+			if(ent!='index'){
 				// entLoad().catch((e)=>console.log(e));
 				// return entLoad();
 				// entLoad().then(()=>{return entReady()});
@@ -140,9 +138,15 @@ function pageReady(){
 function entGetReady() {
 	// Promise.resolve(entLoad())
 	entLoad()
-	.then(result=>{console.log(result); return entReady();})
+	.then(result=>{
+		console.log(result); 
+		return entReady();
+	})
 	.catch((e)=>console.log(e))
-	.finally(()=>{console.log('finally');return entOprtEvent();});
+	.finally(()=>{
+		console.log('finally');
+		return entOprtEvent();
+	});
 }
 
 //异步加载ent对应的searchForm和list，加载成功后异步设置searchForm
@@ -153,8 +157,8 @@ async function entLoad(){
 		}
 		return acc;
 	};
-	let r1= aLoadEntObj('form');
-	let r2= aLoadEntObj('list');
+	let r1= asyLoadEntObj('form');
+	let r2= asyLoadEntObj('list');
 	let r3='';
 	//await关键字，表示开启异步过程并等待结果
 	let valArr=await Promise.all([r1,r2]);
@@ -163,7 +167,7 @@ async function entLoad(){
 		return '内容载入失败。'
 	}
 	
-	r3=await aSetEntQueryForm();
+	r3=await asySetEntQueryForm();
 	
 	if(!r3){
 		return '表单设置失败。';
@@ -173,7 +177,7 @@ async function entLoad(){
 }
 
 //ent-ready
-async function entReady(){	
+function entReady(){	
 	
 	//生成ent的period的title
 	buildEntPeriodTitle();
@@ -189,15 +193,13 @@ async function entReady(){
 
 function entOprtEvent(){
 	let //在entLoad中已生成
-		// entPeriodASet=$('#entPeriod').children('.nav-pills').find('a'),
 		entPeriodASet=$('[data-period]'),
 		clpsSwithcSet=$('[data-collapse-switch]'),
 		btnRefresh=$('.btnPageRefresh');
 	//collapse类的定义
-	// let	sFCObj=SearchFormCollapse,
-	let	sFCObj=new sfcCls(),
-		fmId=sFCObj.formId,
-		trgObj=sFCObj.status.trigger;
+	// let	sFCObj=new sfcCls(),
+		// fmId=sFCObj.formId,
+		// trgObj=sFCObj.status.trigger;
 	//周期导航菜单click事件
 	entPeriodASet.click(function(){
 		let sData=$(this).data();
@@ -212,8 +214,30 @@ function entOprtEvent(){
 			refreshEntObj(true);	
 		}
 	});
+	
+	console.log(clpsSwithcSet.length);
+	
+	if(clpsSwithcSet.length){
+		//动态加载类
+		import('./SearchFormCollapse.class.js')
+			.then(sFCObj=>{
+				// let fmId=sFCObj.formId,
+					// trgObj=sFCObj.status.trigger;
+				// let sFCObj= Promise.resolve(module);
+				console.log(Object.prototype.toString(sFCObj));
+				
+				
+			})
+			.catch(err=>{
+				console.log(err);
+			});	
+			
+		// let sFCObj=Promise.resolve(import('./SearchFormCollapse.class.js'));
+		// console.log(sFCObj);
+				
+	}
 	//3类共5个collapse-switch组件的click事件，
-	//任意时刻只有一个组件能click。记录触发click的组件特征值，再由特征值决定组件的显示
+	/* //任意时刻只有一个组件能click。记录触发click的组件特征值，再由特征值决定组件的显示
 	clpsSwithcSet.click(function(){
 		let mSwitch=$('[data-collapse-switch="main"]');
 		//特征值1
@@ -238,7 +262,8 @@ function entOprtEvent(){
 		trgObj.multishow=mul;
 	
 		sFCObj.setCollapse({trigger:trgObj});
-	});
+	}); */
+	
 	// 页面刷新 
 	btnRefresh.click(function(){
 		resetSearchForm();
@@ -247,19 +272,17 @@ function entOprtEvent(){
 		return entGetReady();
 	});	
 	
-	//对QueryForm的操作
-	entOprtQueryForm();
-	
 	//对BarcodeForm的操作
 	entOprtBarcodeForm();
-	
+	//对QueryForm的操作
+	entOprtQueryForm();
 	//对list的操作
 	entOprtList();
 }
 
 //async 定义了一个promise对象
 //异步加载ent对应的searchForm和list
-async function aLoadEntObj(type){
+async function asyLoadEntObj(type){
 	let conf={
 			list:{node:$('#entList'),url:'/index/list/index'},
 			form:{node:$('#entSearchForm'),url:'/index/searchForm/index'}
@@ -293,7 +316,7 @@ function refreshEntObj(len=0) {
 	
 	if(len){
 		//异步刷新queryform表单内容。
-		aSetEntQueryForm()
+		asySetEntQueryForm()
 		.catch((e)=>console.log(e))
 		.finally(()=>{
 			return console.log(true);
@@ -301,14 +324,15 @@ function refreshEntObj(len=0) {
 	}
 		
 	// 异步重载list
-	aLoadEntObj('list')
+	asyLoadEntObj('list')
 	.then(result=>{
+		consoleColor("asyLoadEntObj('list'):");
 		console.log(result);
-		setRqData(); 
-		setEntPeriodList();
 	})
 	.catch((e)=>console.log(e))
 	.finally(()=>{
+		setRqData(); 
+		setEntPeriodList();
 		return entOprtList();
 		// return entOprtEvent();
 	});		
@@ -364,33 +388,7 @@ function entOprtQueryForm() {
 		let len=Object.keys(rqData.searchData).length;
 		resetSearchForm();
 		
-		/* if(len){
-			//重新载入form
-			aSetEntQueryForm()
-			.catch((e)=>console.log(e))
-			.finally(()=>{
-				return console.log(true);
-			// return entOprtEvent();
-			});
-			
-			// return entGetReady();
-		}
-		
-		// 重新载入list
-		aLoadEntObj('list')
-		.then(result=>{
-			console.log(result);
-			setRqData(); 
-			setEntPeriodList();
-		})
-		.catch((e)=>console.log(e))
-		.finally(()=>{
-			return entOprtList();
-			// return entOprtEvent();
-		}); */
-		
 		refreshEntObj(len);
-		
 	});
 	
 }
@@ -414,9 +412,13 @@ function entOprtBarcodeForm() {
 			rqData.searchData={bar_code:code};
 		
 			//向后端发起查询并显示查询结果
-			aLoadEntPeriodList().catch((e)=>console.log(e));
-			// loadEntPeriodList()
-		// return entLoad();	
+			asyLoadEntObj('list')
+			.then(()=>{
+				sortEntListTbl();
+				showSearchResult();
+			})
+			.catch((e)=>console.log(e));
+	
 		}else{
 			/* objWarning.show(); */
 			console.log('else');	
@@ -444,6 +446,18 @@ function entOprtBarcodeForm() {
 			height:bottom-top
 		};
 	}
+	
+	
+	//动态加载类
+		/* import('./Barcode.class.js')
+			.then(Barcode=>{
+				event....
+				
+			})
+			.catch(err=>{
+				console.log(err);
+			});	 */
+	
 	$('#fmRun input[type=file]').change(function(){
 		var fileObj=$(this)[0];
 		$('#fmRun .form-control').removeClass('alert-info');
@@ -485,17 +499,7 @@ function entOprtBarcodeForm() {
 		$('#divBarcodeImg').prop('hidden',true).find('.viewport').empty();
 		resetSearchForm();	
 		// 载入list
-		aLoadEntObj('list')
-		.then(result=>{
-			console.log(result);
-			setRqData(); 
-			setEntPeriodList();
-		})
-		.catch((e)=>console.log(e))
-		.finally(()=>{
-			return entOprtList();
-			// return entOprtEvent();
-		});
+		refreshEntObj();
 	});
 	
 	//识别处理过程		
@@ -560,17 +564,7 @@ function entOprtList() {
 		rqData.sortData.pageNum=1;
 		
 		// 载入list
-		aLoadEntObj('list')
-		.then(result=>{
-			console.log(result);
-			setRqData(); 
-			setEntPeriodList();
-		})
-		.catch((e)=>console.log(e))
-		.finally(()=>{
-			return entOprtList();
-			// return entOprtEvent();
-		});
+		refreshEntObj();
 		
 	});	
 	//表格按选定字段排序
@@ -587,17 +581,7 @@ function entOprtList() {
 		rqData.sortData.pageNum=1;
 	
 		// 载入list
-		aLoadEntObj('list')
-		.then(result=>{
-			console.log(result);
-			setRqData(); 
-			setEntPeriodList();
-		})
-		.catch((e)=>console.log(e))
-		.finally(()=>{
-			return entOprtList();
-			// return entOprtEvent();
-		});
+		refreshEntObj();
 	});	
 	//表格中点击a后，标签所在行上底色
 	aBodySet.click(function(){
@@ -633,21 +617,7 @@ function entOprtList() {
 		}
 		
 		// 载入list
-		aLoadEntObj('list')
-		.then(result=>{
-			console.log(result);
-			setRqData(); 
-			setEntPeriodList();
-		})
-		.catch((e)=>console.log(e))
-		.finally(()=>{
-			return entOprtList();
-			// return entOprtEvent();
-		});
-		
-		//载入list
-		// setRqData();
-		// return entGetReady();
+		refreshEntObj();
 	});
 }
 //setRqData
@@ -944,7 +914,7 @@ function setEntQueryForm(){
 }
 
 //设定$('form.fmQuery')的各个表单项
-async function aSetEntQueryForm(){
+async function asySetEntQueryForm(){
 	let fm=$('form.fmQuery'),
 		selSet=fm.find('select'),
 		inSet=fm.find('input'),
@@ -961,7 +931,7 @@ async function aSetEntQueryForm(){
 	let optData='';
 	let result=false;
 	
-	consoleColor('aSetEntQueryForm() rqData:','red');
+	consoleColor('asySetEntQueryForm() rqData:','red');
 	
 	rqData.searchSource=fm.data('formType');
 	setRqQueryFieldBy(fm);
@@ -978,8 +948,8 @@ async function aSetEntQueryForm(){
 	
 	if(sNameArr.length){
 		//显示整个form
-		// fm.closest('.collapse').collapse();
-		fm.closest('.collapse').addClass('in');
+		fm.closest('.collapse').collapse('show');
+		// fm.closest('.collapse').addClass('in');
 			//设定input的显示值和底色，并显示
 		inSet.each(function(){
 			let n=$(this).attr('name');
@@ -989,8 +959,8 @@ async function aSetEntQueryForm(){
 				//上底色
 				$(this).addClass('alert-info');
 				//显示
-				// $(this).closest('.collapse').collapse();
-				$(this).closest('.collapse').addClass('in');
+				$(this).closest('.collapse').collapse('show');
+				// $(this).closest('.collapse').addClass('in');
 			}
 		});
 	}

@@ -1,6 +1,6 @@
 // app/SearchFormCollapse.class.js
 
-export class SearchFormCollapse {
+export default class SearchFormCollapse {
 	constructor(){
 		let self=this;
 		self.name=SearchFormCollapse;

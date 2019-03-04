@@ -7,8 +7,10 @@ use think\Session;
 use think\Controller;
 
 use app\index\model\User; 
-use app\index\model\Patinfo;
-use app\index\model\Assinfo;
+use app\index\model\Patinfo as PatinfoModel;
+use app\index\model\Assinfo as AssinfoModel;
+use app\index\model\Theinfo as TheinfoModel;
+use app\index\model\Proinfo as ProinfoModel;
 
 # 继承了think\Controller类，可直接调用think\View，think\Request类的方法
 # 类名与类文件名相同
@@ -25,8 +27,8 @@ class ListController extends Controller {
   private $searchField=[
     'pat'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0],
     'ass'=>['topic'=>''],
-    'pro'=>['topic'=>''],
-    'the'=>['topic'=>''],
+    'pro'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0],
+    'the'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0],
   ];
   
   private $sortData=['listRows'=>10,'sortName'=>'','sortOrder'=>'asc','pageNum'=>1,'showId'=>0];
@@ -93,19 +95,19 @@ class ListController extends Controller {
     #返回前端的模板文件名
     $fileName=$ent.'List';
           
-    #选择模型对象
+     #选择模型对象
     switch($ent){
       case 'pat':
-        $mdl= new Patinfo;
+        $mdl= new PatinfoModel();
         break;
       case 'ass':
-        $mdl= new Assinfo;
+        $mdl= new AssinfoModel();
         break;
       case 'pro':
-          
+        $mdl= new ProinfoModel();
         break;
       case 'the':
-          
+        $mdl= new TheinfoModel();
         break;
     }
       
