@@ -644,11 +644,11 @@ const conAssEntArr=[
   'period'=>[
     #usual:除"回收站"以外的其它5类状态,
     'usual'=>['chi'=>'','queryExp'=>'<>','status'=>'_ASSS6'],
-    'undetermined'=>['chi'=>'待定','queryExp'=>'like','status'=>'_ASSS1%'],
-    'normal'=>['chi'=>'正常','queryExp'=>'like','status'=>'_ASSS2%'],
-    'abnormal'=>['chi'=>'异常','queryExp'=>'like','status'=>'_ASSS3%'],
-    'suspended'=>['chi'=>'停用','queryExp'=>'like','status'=>'_ASSS4%'],
-    'removed'=>['chi'=>'销账','queryExp'=>'like','status'=>'_ASSS5%'],
+    'undetermined'=>['chi'=>'待定','queryExp'=>'like','status'=>'_ASSS1'.'%'],
+    'normal'=>['chi'=>'正常','queryExp'=>'like','status'=>'_ASSS2'.'%'],
+    'abnormal'=>['chi'=>'异常','queryExp'=>'like','status'=>'_ASSS3'.'%'],
+    'suspended'=>['chi'=>'停用','queryExp'=>'like','status'=>'_ASSS4'.'%'],
+    'removed'=>['chi'=>'销账','queryExp'=>'like','status'=>'_ASSS5'.'%'],
     'trashBin'=>['chi'=>'回收站','queryExp'=>'=','status'=>'_ASSS6']    
   ],
   'oprt'=>[

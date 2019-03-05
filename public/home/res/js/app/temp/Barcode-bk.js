@@ -1,4 +1,9 @@
-// app/Barcode.class.js
+// app/Barcode.js
+
+// 导入条形码识别插件??
+// import Quagga from '../plugins/quaggaJs/quagga.min.js';
+// import {default:Quagga} from '../plugins/quaggaJs/quagga.js';
+// export {default:Quagga} from '../plugins/quaggaJs/quagga.js';
 
 //定义对象。封装条形码进行识别所需参数的预处理，识别过程。
 export var Barcode={
@@ -90,3 +95,5 @@ export var Barcode={
 		src:null
 	}
 };
+
+// export {Barcode,Quagga};

@@ -1,5 +1,4 @@
-//index.js
-// app/main.js
+//app/index.js
 
 //conf.js中采用默认输出，c为本文件中使用的hash对象，其键值为'./conf.js'各个导出键值对
 import c from './conf.js';
@@ -15,21 +14,8 @@ var entProp=c.entProp;
 var rqData=c.rqData;
 var urlObj=c.urlObj;
 var searchResultNum=c.searchResultNum;
-// console.log(c);
 
-// import {SearchFormCollapse as sfcCls} from './SearchFormCollapse.class.js';
-import {Barcode} from './Barcode.class.js';
-// console.log(Barcode);
-
-
-// initData().then(function(){
-	// pageInit();
-	// pageReady();
-// }).catch((err)=>{
-		// console.log(err);
-// });
-
-initData()
+asyInitData()
 .then(function(uName){
 	let str='数据初始化失败。页面无法正常显示。';
 	
@@ -47,8 +33,8 @@ initData()
 	
 });
 
-//定义async函数initData()进行全局变量赋值，默认返回的是一个promise对象。
-async function initData() {
+//定义async函数asyInitData()进行全局变量赋值，默认返回的是一个promise对象。
+async function asyInitData() {
 	//$.post()方法返回的是jqXHR对象，这个jqXHR对象是对所发起的request的响应结果
 	// let resData = await $.post('/index/index/getInitData');
 	//fetch()方法返回的是一个Promise对象，这个promise对象resolve成一个response对象，这个response对象是对所发起的request的响应结果。
@@ -112,9 +98,9 @@ function pageReady(){
 			rqData.ent=ent;
 			rqData.period=topNavProp[ent].period;
 			if(ent!='index'){
-				// entLoad().catch((e)=>console.log(e));
-				// return entLoad();
-				// entLoad().then(()=>{return entReady()});
+				// asyEntLoad().catch((e)=>console.log(e));
+				// return asyEntLoad();
+				// asyEntLoad().then(()=>{return entReady()});
 				return entGetReady();
 			}
 		}
@@ -136,21 +122,23 @@ function pageReady(){
 }
 //使用Promise对象实现异步的顺序处理？？
 function entGetReady() {
-	// Promise.resolve(entLoad())
-	entLoad()
+	// Promise.resolve(asyEntLoad())
+	asyEntLoad()
 	.then(result=>{
-		console.log(result); 
-		return entReady();
+		// console.log(result); 
+		entReady();
+		entEvent();
+		// return entReady();
 	})
 	.catch((e)=>console.log(e))
 	.finally(()=>{
-		console.log('finally');
-		return entOprtEvent();
+		// console.log('finally');
+		// return entEvent();
 	});
 }
 
 //异步加载ent对应的searchForm和list，加载成功后异步设置searchForm
-async function entLoad(){	
+async function asyEntLoad(){	
 	let totalTrue=(acc,cur)=>{
 		if(cur){
 			acc++;
@@ -191,15 +179,12 @@ function entReady(){
 	return true;
 }
 
-function entOprtEvent(){
-	let //在entLoad中已生成
+function entEvent(){
+	let //在asyEntLoad中已生成
 		entPeriodASet=$('[data-period]'),
 		clpsSwithcSet=$('[data-collapse-switch]'),
 		btnRefresh=$('.btnPageRefresh');
-	//collapse类的定义
-	// let	sFCObj=new sfcCls(),
-		// fmId=sFCObj.formId,
-		// trgObj=sFCObj.status.trigger;
+
 	//周期导航菜单click事件
 	entPeriodASet.click(function(){
 		let sData=$(this).data();
@@ -208,62 +193,54 @@ function entOprtEvent(){
 			rqData.ent=sData.ent;
 			rqData.period=sData.period;
 
-			// return entGetReady();
 			buildEntPeriodTitle();
-			
-			refreshEntObj(true);	
+			asyRefreshEntObj(true);	
 		}
 	});
 	
-	console.log(clpsSwithcSet.length);
-	
+	// console.log(clpsSwithcSet.length);
 	if(clpsSwithcSet.length){
 		//动态加载类
 		import('./SearchFormCollapse.class.js')
-			.then(sFCObj=>{
-				// let fmId=sFCObj.formId,
-					// trgObj=sFCObj.status.trigger;
-				// let sFCObj= Promise.resolve(module);
-				console.log(Object.prototype.toString(sFCObj));
-				
-				
-			})
-			.catch(err=>{
-				console.log(err);
-			});	
-			
-		// let sFCObj=Promise.resolve(import('./SearchFormCollapse.class.js'));
-		// console.log(sFCObj);
-				
+		.then(cls=>{
+			let sFCObj=new cls.default;
+			let fmId=sFCObj.formId,
+				trgObj=sFCObj.status.trigger;
+
+			//3类共5个collapse-switch组件的click事件，
+			//任意时刻只有一个组件能click。记录触发click的组件特征值，再由特征值决定组件的显示
+			clpsSwithcSet.click(function(){
+				let mSwitch=$('[data-collapse-switch="main"]');
+				//特征值1
+				let	type=$(this).data('collapseSwitch');
+				//特征值2
+				let	idx='';
+				//特征值3
+				let	mul=mSwitch.length?mSwitch.data('collapseMultishow'):false;
+	
+				if(type=='li'){	
+					idx=fmId.indexOf($(this).attr('href').slice(1));
+				}
+				if(type=='div'){
+					idx=fmId.indexOf($(this).data('target').slice(1));
+				}
+				if(type=='main'){
+					idx=trgObj.index;
+				}	
+	
+				trgObj.type=type;
+				trgObj.index=idx;
+				trgObj.multishow=mul;
+	
+				sFCObj.setCollapse({trigger:trgObj});
+			});
+	
+		})
+		.catch(err=>{
+			console.log(err);
+		});					
 	}
-	//3类共5个collapse-switch组件的click事件，
-	/* //任意时刻只有一个组件能click。记录触发click的组件特征值，再由特征值决定组件的显示
-	clpsSwithcSet.click(function(){
-		let mSwitch=$('[data-collapse-switch="main"]');
-		//特征值1
-		let	type=$(this).data('collapseSwitch');
-		//特征值2
-		let	idx='';
-		//特征值3
-		let	mul=mSwitch.length?mSwitch.data('collapseMultishow'):false;
-	
-		if(type=='li'){	
-			idx=fmId.indexOf($(this).attr('href').slice(1));
-		}
-		if(type=='div'){
-			idx=fmId.indexOf($(this).data('target').slice(1));
-		}
-		if(type=='main'){
-			idx=trgObj.index;
-		}	
-	
-		trgObj.type=type;
-		trgObj.index=idx;
-		trgObj.multishow=mul;
-	
-		sFCObj.setCollapse({trigger:trgObj});
-	}); */
-	
+
 	// 页面刷新 
 	btnRefresh.click(function(){
 		resetSearchForm();
@@ -296,21 +273,25 @@ async function asyLoadEntObj(type){
 			}
 		};
 	let result=false;
-	// fetch() 返回的是一个response对象，await让代码暂停在该行直至返回所要求的数据。
-	let resObj=await fetch(conf[type].url,opt);
-	let content=await resObj.text();
 	//load节点
 	let loadNod=conf[type].node;
 	
-	result=resObj.ok;
+	// fetch() 返回的是一个response对象，await让代码暂停在该行直至返回所要求的数据。
+	// let resObj=await fetch(conf[type].url,opt);
+	// let content=await resObj.text();
+	// result=resObj.ok;
+	// console.log(resObj);
+	//$.post()返回的是一个jqXHR对象，该对象也是Promise对象，await该jqXHR对象得到其responseText属性值，大小要比上述resObj对象小
+	let content=await $.post(conf[type].url,rqData);
+	result=(content)?true:false;
 	
 	loadNod.html(content);
 	// console.log(resObj.body);
 	return result;
 }
 
-function refreshEntObj(len=0) {
-	if(!len){
+async function asyRefreshEntObj(len=0) {
+	/* if(!len){
 		len=Object.keys(rqData.searchData).length;
 	}
 	
@@ -326,48 +307,47 @@ function refreshEntObj(len=0) {
 	// 异步重载list
 	asyLoadEntObj('list')
 	.then(result=>{
-		consoleColor("asyLoadEntObj('list'):");
-		console.log(result);
+		// consoleColor("asyLoadEntObj('list'):");
+		// console.log(result);
 	})
 	.catch((e)=>console.log(e))
 	.finally(()=>{
 		setRqData(); 
 		setEntPeriodList();
 		return entOprtList();
-		// return entOprtEvent();
-	});		
-}
-//ent-load
-/* function entLoad(){	
-	//选择操作节点
-	let loadFmNod=$('#entSearchForm'),
-		loadListNod=$('#entList');
-	// let url=urlObj.domain+'/index/SearchForm/index';
-	//生成ent的nav-pills
-	buildEntPeriodNavPills();
-	//生成ent的period的title
-	buildEntPeriodTitle();
+	});	 */
+	let totalTrue=(acc,cur)=>{
+		if(cur){
+			acc++;
+		}
+		return acc;
+	};
+	let r1= true;
+	let r2= asyLoadEntObj('list');
+	let result=false;	
+	let valArr='';
 	
-	$.when(
-		//异步请求entSearchForm模板
-		$.post('/index/SearchForm/index',rqData),
-		//异步请求entPeriodList模板
-		$.post('/index/List/index',rqData),
-	).then(function(p1,p2){
-		
-		console.log(p1);
-		//载入获得的模板
-		loadFmNod.html(p1[0]);
-		//载入获得的模板
-		loadListNod.html(p2[0]);
-		
-		return entReady();
-	},function(){
-		return  $.alert('请求数据失败。');
-	});
+	if(!len){
+		len=Object.keys(rqData.searchData).length;
+	}
+	
+	if(len){
+		//异步刷新queryform表单内容。
+		r1=asySetEntQueryForm();
+	}
+	
+	//await关键字，表示开启异步过程并等待结果
+	valArr=await Promise.all([r1,r2]);
+	
+	if(valArr.reduce(totalTrue,0)){
+		result=true;
+		setRqData(); 
+		setEntPeriodList();		
+	}
+	
+	return entOprtList();
 }
- */
- 
+
 function entOprtQueryForm() {
 	let fmQ=$('form.fmQuery');
 	
@@ -381,131 +361,48 @@ function entOprtQueryForm() {
 		//设置查询数据
 		setRqSearchDataBy(fmQ);
 		
-		refreshEntObj(true);
+		asyRefreshEntObj(true);
 	});
 	//表单重置时附加的操作
 	fmQ.find('[type="reset"]').click(function(evt){
 		let len=Object.keys(rqData.searchData).length;
 		resetSearchForm();
 		
-		refreshEntObj(len);
+		asyRefreshEntObj(len);
 	});
-	
 }
 
 function entOprtBarcodeForm() {
 	//显示识别结果和查询结果
 	let queryByCode=(code='') =>{
-		// let objSuccess=$('#divBarcodeImg div.alert-success').prop('hidden',true);
-		// let objWarning=$('#divBarcodeImg div.alert-warning').prop('hidden',true);
-	
 		let objSuccess=$('#divBarcodeImg div.alert-success').hide();
 		let objWarning=$('#divBarcodeImg div.alert-warning').hide();
 
-		consoleColor('fn:queryByCode, code:','green');
-		console.log(code);	
-	
 		if(code){
 			objSuccess.show().find('span.alert-info').text(code);
 			//设置查询数据
 			rqData.searchSource=$('#fmRun').data('formType');
 			rqData.searchData={bar_code:code};
 		
-			//向后端发起查询并显示查询结果
+			//向后端发起异步查询并显示查询结果
 			asyLoadEntObj('list')
 			.then(()=>{
-				sortEntListTbl();
-				showSearchResult();
+				setEntPeriodList();
 			})
 			.catch((e)=>console.log(e));
-	
 		}else{
-			/* objWarning.show(); */
-			console.log('else');	
 			objWarning.show();
 		}	
-	}
+	};
 
-	let calculateRectFromArea=(canvas,area)=>{
-		let canvasWidth=canvas.width,
-			canvasHeight=canvas.height,
-			top=parseInt(area.top)/100,
-			right=parseInt(area.right)/100,
-			bottom=parseInt(area.bottom)/100,
-			left=parseInt(area.left)/100;
-	
-		top *= canvasHeight;
-    	right = canvasWidth - canvasWidth*right;
-    	bottom = canvasHeight - canvasHeight*bottom;
-    	left *= canvasWidth;
-
-		return {
-			x:left,	
-			y:top,
-			width:right-left,
-			height:bottom-top
-		};
-	}
-	
-	
-	//动态加载类
-		/* import('./Barcode.class.js')
-			.then(Barcode=>{
-				event....
-				
-			})
-			.catch(err=>{
-				console.log(err);
-			});	 */
-	
-	$('#fmRun input[type=file]').change(function(){
-		var fileObj=$(this)[0];
-		$('#fmRun .form-control').removeClass('alert-info');
+	//动态加载对象
+	import('./Barcode.js')
+	.then(module=>{
+		let Barcode= module.Barcode;
+		Barcode.init($('#fmRun'));
 		
-		$('#divBarcodeImg').hide();
-		// onProcessedFlag=0;
-		
-		if(fileObj.files && fileObj.files.length){
-			Barcode.decode(URL.createObjectURL(fileObj.files[0]));
-			$(this).addClass('alert-info');
-			$('#divBarcodeImg').show().children('.alert').hide();
-			// onProcessedFlag=1;
-		}
-		console.table(fileObj.files[0]);
-	});
-	//开始识别条码		
-	$('#btnRun').click(function(){
-		let input=$('#fmRun input[type=file]')[0],
-			src='';
-		
-		if(input.files && input.files.length){
-			src=URL.createObjectURL(input.files[0]);
-			Barcode.decode(src);
-		}else{
-			$.alert('<p class="text-center">请选择需识别的条形码图片<p>');
-		}
-	});
-	//表单输入项发生改变
-	$('#fmRun').find('[name]').on('change','input,select',function(){
-		let val=$(this).attr('type')==='checkbox'?$(this).prop('checked'):$(this).val(),
-			name=$(this).attr('name'),
-			state=Barcode.convertNameToState(name); 
-		$(this).addClass('alert-info');	
-		// console.log("Value of "+ state + " changed to " + val);
-        Barcode.setState(state, val);
-	});
-	//表单重置
-	$('#fmRun button:reset').click(function(){
-		$('#divBarcodeImg').prop('hidden',true).find('.viewport').empty();
-		resetSearchForm();	
-		// 载入list
-		refreshEntObj();
-	});
-	
-	//识别处理过程		
-	Quagga.onProcessed(function(result){
-		// console.table(result);
-		var drawingCtx=Quagga.canvas.ctx.overlay,
+		Quagga.onProcessed(function(result){
+			var drawingCtx=Quagga.canvas.ctx.overlay,
         	drawingCanvas = Quagga.canvas.dom.overlay,
         	area;
 		//有识别结果数据
@@ -529,7 +426,7 @@ function entOprtBarcodeForm() {
         	}
 			//若已定义Barcode.state.inputStream.area，则由calculateRectFromArea()函数计算方框4个点的像素坐标
         	if (Barcode.state.inputStream.area) {
-            	area = calculateRectFromArea(drawingCanvas, Barcode.state.inputStream.area);
+            	area = Barcode.getArea(drawingCanvas, Barcode.state.inputStream.area);
            	 	drawingCtx.strokeStyle = "#0F0";
             	drawingCtx.strokeRect(area.x, area.y, area.width, area.height);
         	}
@@ -541,12 +438,24 @@ function entOprtBarcodeForm() {
 			//没有识别结果数据
 			queryByCode();	
 		}
-	});
-	
-	//成功识别条形码值后的处理
-	Quagga.onDetected(function(result){
-		queryByCode(result.codeResult.code);
-	});
+			
+		});
+		
+		Quagga.onDetected(function(result){
+			queryByCode(result.codeResult.code);
+		});
+		
+		//表单重置
+		$('#fmRun button:reset').click(function(){
+			$('#divBarcodeImg').prop('hidden',true).find('.viewport').empty();
+			resetSearchForm();	
+			// 载入list
+			asyRefreshEntObj();
+		});
+	})
+	.catch(err=>{
+		console.log(err);
+	});		
 }
 
 function entOprtList() {
@@ -564,7 +473,7 @@ function entOprtList() {
 		rqData.sortData.pageNum=1;
 		
 		// 载入list
-		refreshEntObj();
+		asyRefreshEntObj();
 		
 	});	
 	//表格按选定字段排序
@@ -581,7 +490,7 @@ function entOprtList() {
 		rqData.sortData.pageNum=1;
 	
 		// 载入list
-		refreshEntObj();
+		asyRefreshEntObj();
 	});	
 	//表格中点击a后，标签所在行上底色
 	aBodySet.click(function(){
@@ -617,7 +526,7 @@ function entOprtList() {
 		}
 		
 		// 载入list
-		refreshEntObj();
+		asyRefreshEntObj();
 	});
 }
 //setRqData
@@ -681,33 +590,6 @@ function setEntPeriodList(){
 	setTrBgColor();
 	//显示搜索结果数
 	showSearchResult();	
-}
-
-//让urlObj的取值都在已定义的范围内
-function initUrlObj(ent=''){	
-	let arr=Object.keys(entProp),
-		module='index',
-		ctrl='index',
-		action='index',
-		obj='',
-		cArr=[],
-		mArr=[];
-	
-	if(arr.indexOf(ent)!=-1){
-		obj=entProp[ent];
-		cArr=obj.ctrl;
-		mArr=obj.action;
-		module=obj.module;
-	}
-	
-	if(typeof obj=='object'){
-		ctrl=(cArr.indexOf(urlObj.ctrl)!=-1)?urlObj.ctrl:ctrl;
-		action=(mArr.indexOf(urlObj.action)!=-1)?urlObj.action:action;
-	}
-	
-	urlObj.module=module;
-	urlObj.ctrl=ctrl;
-	urlObj.action=action;
 }
 
 //让rqData回到初始值
@@ -833,87 +715,6 @@ function buildEntPeriodNavPills(){
 }
 
 //设定$('form.fmQuery')的各个表单项
-function setEntQueryForm(){
-	let fm=$('form.fmQuery'),
-		selSet=fm.find('select'),
-		inSet=fm.find('input'),
-		//查询字段名数组
-		sNameArr='';
-	
-	urlObj.ctrl='searchForm';
-	urlObj.action='getSelOptData';
-	
-	rqData.searchSource=fm.data('formType');
-	// setRqQueryFieldBy(fm);
-	// setRqSearchDataBy(fm);
-	//查询字段名数组
-	sNameArr=Object.keys(rqData.searchData);
-	
-	console.log(rqData);
-	// if(searchSrc!=fm.data('formType')){
-		
-		// return $('[data-form-type="'+searchSrc+'"]').closest('.collapse').collapse();
-		
-	// }
-	
-	if(sNameArr.length){
-		//显示整个form
-		fm.closest('.collapse').collapse();
-			//设定input的显示值和底色，并显示
-		inSet.each(function(){
-			let n=$(this).attr('name');
-			if(sNameArr.includes(n)){
-				//赋值
-				$(this).val(rqData.searchData[n]);
-				//上底色
-				$(this).addClass('alert-info');
-				//显示
-				$(this).closest('.collapse').collapse();
-			}
-		});
-	}
-	
-	$.when(
-		$.post(getRqUrl(),rqData)
-	).then(function(optData){
-		
-		//组装select的option，并设定显示值和底色
-		selSet.each(function(){
-			let selName=$(this).attr('name'),
-				optObj=optData[selName],
-				v=0;
-			//组装option
-			$(this).empty().append($('<option></option>').val(0).text('…不限'));	
-			for(var m=0;m<optObj.num;m++){
-				$(this).append($('<option></option>').val(optObj.val[m]).text(optObj.txt[m]));
-			}
-			
-			if(sNameArr.length && sNameArr.includes(selName)){
-				v=rqData.searchData[selName];
-				//上底色
-				$(this).addClass('alert-info');
-				if(v){
-					//显示
-					$(this).closest('.collapse').collapse();
-				}
-			}
-			//option的value中无v
-			// if(optObj.val.length && !optObj.val.includes(v)){
-				// $.alert('option 添加'+v);
-			// }
-			
-			//设定select的显示值
-			$(this).val(v);	
-				
-		});	
-	},function(){
-		$.alert('与服务器连接失败。');
-	}
-	);
-	
-}
-
-//设定$('form.fmQuery')的各个表单项
 async function asySetEntQueryForm(){
 	let fm=$('form.fmQuery'),
 		selSet=fm.find('select'),
@@ -931,40 +732,17 @@ async function asySetEntQueryForm(){
 	let optData='';
 	let result=false;
 	
-	consoleColor('asySetEntQueryForm() rqData:','red');
-	
 	rqData.searchSource=fm.data('formType');
 	setRqQueryFieldBy(fm);
-	// setRqSearchDataBy(fm);
+	
 	opt.body= JSON.stringify(rqData);
 	
 	resObj=await fetch('/index/searchForm/getSelOptData',opt);
 	optData=await resObj.json();
 	result=resObj.ok;
-	
-	console.log(rqData);
-	
+
 	sNameArr=Object.keys(rqData.searchData);
-	
-	if(sNameArr.length){
-		//显示整个form
-		fm.closest('.collapse').collapse('show');
-		// fm.closest('.collapse').addClass('in');
-			//设定input的显示值和底色，并显示
-		inSet.each(function(){
-			let n=$(this).attr('name');
-			if(sNameArr.includes(n)){
-				//赋值
-				$(this).val(rqData.searchData[n]);
-				//上底色
-				$(this).addClass('alert-info');
-				//显示
-				$(this).closest('.collapse').collapse('show');
-				// $(this).closest('.collapse').addClass('in');
-			}
-		});
-	}
-		
+
 	if(optData){
 	//组装select的option，并设定显示值和底色
 	selSet.each(function(){
@@ -996,6 +774,22 @@ async function asySetEntQueryForm(){
 				
 	});	
 	result=true;
+	}
+	
+	if(sNameArr.length){
+		//显示整个form
+		fm.closest('.collapse').collapse('show');
+		inSet.each(function(){
+			let n=$(this).attr('name');
+			if(sNameArr.includes(n)){
+				//赋值
+				$(this).val(rqData.searchData[n]);
+				//上底色
+				$(this).addClass('alert-info');
+				//显示
+				$(this).closest('.collapse').collapse('show');
+			}
+		});
 	}
 	
 	return result;
@@ -1059,14 +853,14 @@ function buildEntPeriodTitle(){
 		spObj=$('<span></span>').css({'cursor':'unset'}),
 		spBdg=$('<span></span>').addClass('badge'),
 		//生成title的根节点
-		obj=$('#entPeriod').children('h4.title');
+		nod=$('#entPeriod').children('h4.title');
 		// obj=$('[id="'+ent+'Title"]');
-	obj.empty();
+	nod.empty();
 	for(let p in tProp){
 		let e=tProp[p].title;
 		if(p==rqData.period){
 			spObj.addClass(e.btn).append(e.txt,spBdg.text(e.num));
-			obj.empty().append(spObj);
+			nod.empty().append(spObj);
 			break;
 		}
 	}
@@ -1150,11 +944,6 @@ function showSearchResult() {
 		//计数器
 		n=0;
 	searchResultNum=parseInt($('#searchResultNum').text());
-	consoleColor('main.js showSearchResult(), rqData:');
-	console.log(rqData);
-	// for(let e in rqData.searchData){
-		// console.log(e);
-	// }
 	
 	bingoObj.find('.badge').text(searchResultNum);
 	for(let el in sData){

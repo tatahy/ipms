@@ -192,31 +192,38 @@ class Assinfo extends Model
     
     #得到在period的指定field字段的groupby内容
     static public function getFieldGroupByArr($field,$arr=[],$period='') {
+      $valArr=[]; 
+      $keyArr=[];      
       $tempArr=[];#中间数组
       #键值转换数组
       $tArr=($field=='status_now')?_commonStatustEn2ChiArr(self::ENTTITY):[];   
     #设定返回数组的默认结构
       $arr=array_merge(['num'=>0,'val'=>[''],'txt'=>['']],$arr);
-
-    #组装$tempArr
+      
       self::$obj=new self();
       $aSet=self::$obj->getPeriodSet($period);
       self::$obj=null;
       #转换为数据集
       $aSet=is_array($aSet)?collection($aSet):$aSet;
-      #得到中间数组$tempArr，$field值对应的索引数组（去掉重复值）
-      $tempArr=array_unique($aSet->column($field));
-      #重新排序让数组下标连续
-      sort($tempArr);
+    #得到$field字段值。若定义了$field字段的修改器，此处为经过修改器后的输出值（去掉重复值）
+      $valArr=array_unique($aSet->column($field));
+      if(!count($valArr)){
+        return $arr;
+      }
       
+    #组装$tempArr
+      foreach($valArr as $k => $v){
+        $keyArr[$k]=($field=='status_now')?array_search($v,$tArr):$v;
+      }
+      $tempArr=array_combine($keyArr,$valArr);
+      
+      #对中间数组以键名升序排序
+      ksort($tempArr);
     #$arr赋值
       $arr['num']=count($tempArr);
-      if($arr['num']){
-        foreach($tempArr as $k => $v){           
-          $arr['txt'][$k]=$v;
-          $arr['val'][$k]=($field=='status_now')?array_search($v,$tArr):$v;
-        }
-      }
+      $arr['val']=array_keys($tempArr);
+      $arr['txt']=array_values($tempArr);
+      
       return $arr;
     }
     /**
