@@ -34,7 +34,7 @@ class Assinfo extends Model
     //引用app\common中定义的常量：conAssEntArr
     const ASSPERIOD=conAssEntArr['period'];
    // const ASSSTATUS=conAssEntArr['status'];
-    const ENTTITY='asset';
+    const ENTITY='asset';
         
     //本类的静态方法中用于访问非静态方法时实例化本类对象
     static private $obj=null;
@@ -58,7 +58,7 @@ class Assinfo extends Model
     protected function getStatusNowAttr($dBStrEn)
     {
         //引用公共文件（common.php）中定义的函数_commonStatustEn2ChiArr($ent)
-        $sArr=_commonStatustEn2ChiArr(self::ENTTITY);
+        $sArr=_commonStatustEn2ChiArr(self::ENTITY);
         
         $output =array_key_exists($dBStrEn, $sArr)?$sArr[$dBStrEn]:$dBStrEn;
         
@@ -69,7 +69,7 @@ class Assinfo extends Model
     protected function setStatusNowAttr($strChi)
     {
         //中英文对照数组
-        $sArr=_commonStatustEn2ChiArr(self::ENTTITY);
+        $sArr=_commonStatustEn2ChiArr(self::ENTITY);
         $k=array_search($strChi, $tArr);
         
         $output = $k?$tArr[$k]:$strChi;
@@ -79,8 +79,9 @@ class Assinfo extends Model
     //全局查询范围，框架在查询时会自动调用
     protected static function base($query)
     {
+        $query->where('id','>',0);
         //
-        $query->whereNull('delete_time')->where('id','>',0);
+        //$query->whereNull('delete_time')->where('id','>',0);
         //$query->where('delete_time',0)->where('id','>',0);
     }
     
@@ -191,17 +192,31 @@ class Assinfo extends Model
     }
     
     #得到在period的指定field字段的groupby内容
-    static public function getFieldGroupByArr($field,$arr=[],$period='') {
+    static public function getFieldGroupByArr($field,$arr=[],$period='',$whereArr=[]) {
       $valArr=[]; 
-      $keyArr=[];      
+      $keyArr=[];     
       $tempArr=[];#中间数组
-      #键值转换数组
-      $tArr=($field=='status_now')?_commonStatustEn2ChiArr(self::ENTTITY):[];   
+      $tArr=[];   #键值转换数组
     #设定返回数组的默认结构
       $arr=array_merge(['num'=>0,'val'=>[''],'txt'=>['']],$arr);
-      
+    
+    #组装$tArr
+      if($field=='status_now') $tArr=_commonStatustEn2ChiArr(self::ENTITY);      
+      if($field=='dept_now') {
+        #得到dept的键值转换数组$tArr。abbr为键，name为值的关联数组
+        $deptSet=DeptModel::all();
+        #转换为数据集
+        $deptSet=is_array($deptSet)?collection($deptSet):$deptSet;
+        $tArr=array_combine($deptSet->column('abbr'),$deptSet->column('name'));
+      }
+   
+      #组装$tempArr
       self::$obj=new self();
-      $aSet=self::$obj->getPeriodSet($period);
+      if(count($whereArr)){
+        $aSet=self::$obj->getPeriodSql($period)->where($whereArr)->select();
+      }else{
+        $aSet=self::$obj->getPeriodSet($period);
+      }
       self::$obj=null;
       #转换为数据集
       $aSet=is_array($aSet)?collection($aSet):$aSet;
@@ -210,10 +225,19 @@ class Assinfo extends Model
       if(!count($valArr)){
         return $arr;
       }
+      if(!count($tArr)){
+        $tArr=array_combine($valArr,$valArr);
+      }
       
-    #组装$tempArr
+      #组装$tempArr
       foreach($valArr as $k => $v){
-        $keyArr[$k]=($field=='status_now')?array_search($v,$tArr):$v;
+        $keyArr[$k]=array_search($v,$tArr);
+        if($field=='dept_now'){
+         // $valArr[$k]=$v.', 简称: '.array_search($v,$tArr);
+          $abbr=array_search($v,$tArr)?array_search($v,$tArr):'无';
+          $valArr[$k]=$v.', 简称: '.$abbr;
+          $keyArr[$k]=$v;
+        }
       }
       $tempArr=array_combine($keyArr,$valArr);
       

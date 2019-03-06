@@ -33,8 +33,8 @@ class Proinfo extends Model
 
     //引用app\common中定义的常量：conProEntArr
     const PROPERIOD=conProEntArr['period'];
-    const PROTYPE=conProEntArr['type'];
-    const ENTTITY='project';
+    const ENTTYPE=conProEntArr['type'];
+    const ENTITY='project';
         
     //本类的静态方法中用于访问非静态方法时实例化本类对象
     static private $obj=null;
@@ -58,7 +58,7 @@ class Proinfo extends Model
     protected function getStatusAttr($dBStrEn)
     {
         //中英文对照数组
-        $tArr=_commonStatustEn2ChiArr(self::ENTTITY);
+        $tArr=_commonStatustEn2ChiArr(self::ENTITY);
         
         $output =array_key_exists($dBStrEn, $tArr)?$tArr[$dBStrEn]:$dBStrEn;
         
@@ -69,7 +69,7 @@ class Proinfo extends Model
     protected function setStatusAttr($strChi)
     {
         //中英文对照数组
-        $tArr=_commonStatustEn2ChiArr(self::ENTTITY);
+        $tArr=_commonStatustEn2ChiArr(self::ENTITY);
         $k=array_search($strChi, $tArr);
         
         $output = $k?$tArr[$k]:$strChi;
@@ -80,7 +80,7 @@ class Proinfo extends Model
     protected function getTypeAttr($dBStrEn)
     {
         //中英文对照数组
-        $tArr=self::PROTYPE;
+        $tArr=self::ENTTYPE;
         
         $output =array_key_exists($dBStrEn, $tArr)?$tArr[$dBStrEn]:$dBStrEn;
         
@@ -91,7 +91,7 @@ class Proinfo extends Model
     protected function setTypeAttr($strChi)
     {
         //中英文对照数组
-        $tArr=self::PROTYPE;
+        $tArr=self::ENTTYPE;
         $k=array_search($strChi, $tArr);
         
         $output = $k?$tArr[$k]:$strChi;
@@ -217,19 +217,23 @@ class Proinfo extends Model
     
     #得到在period的指定field字段的groupby内容
     static public function getFieldGroupByArr($field,$arr=[],$period='',$whereArr=[]) {
-      $tArr='';   #键值转换数组
+      $valArr=[]; 
+      $keyArr=[];     
       $tempArr=[];#中间数组
+      $tArr=[];   #键值转换数组
     #设定返回数组的默认结构
       $arr=array_merge(['num'=>0,'val'=>[''],'txt'=>['']],$arr);
       
     #组装$tArr
-      if($field=='status') $tArr=_commonStatustEn2ChiArr(self::ENTTITY);
-      if($field=='type') $tArr=self::PROTYPE;
-      #得到dept的键值转换数组$tArr。abbr为键，name为值的关联数组
-      $deptSet=DeptModel::all();
-      #转换为数据集
-      $deptSet=is_array($deptSet)?collection($deptSet):$deptSet;
-      if($field=='dept') $tArr=array_combine($deptSet->column('abbr'),$deptSet->column('name'));
+      if($field=='status') $tArr=_commonStatustEn2ChiArr(self::ENTITY);
+      if($field=='type') $tArr=self::ENTTYPE;
+      if($field=='dept') {
+        #得到dept的键值转换数组$tArr。abbr为键，name为值的关联数组
+        $deptSet=DeptModel::all();
+        #转换为数据集
+        $deptSet=is_array($deptSet)?collection($deptSet):$deptSet;
+        $tArr=array_combine($deptSet->column('abbr'),$deptSet->column('name'));
+      }
       
     #组装$tempArr
       self::$obj=new self();

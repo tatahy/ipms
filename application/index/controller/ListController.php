@@ -26,7 +26,8 @@ class ListController extends Controller {
   
   private $searchField=[
     'pat'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0],
-    'ass'=>['topic'=>''],
+    'ass'=>['brand_model'=>'','dept_now'=>0,'keeper_now'=>'','assnum'=>'','code'=>'',
+            'bar_code'=>'','status_now'=>0,'place_now'=>0,'status_now_user_name'=>''],
     'pro'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0],
     'the'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0],
   ];

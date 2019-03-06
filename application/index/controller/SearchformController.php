@@ -71,7 +71,7 @@ class SearchformController extends Controller {
     if(count($searchArr)==0 || count($searchTypeArr)==0){
       return $whereArr;
     }
-    ##组装$whereArr，要求$searchArr的键名必须是数据库中的字段名
+    #组装$whereArr，要求$searchArr的键名必须是数据库中的字段名
     foreach($searchArr as $field=>$v){
       if(!empty($v)){
         switch($searchTypeArr[$field]['tagName']){
@@ -137,7 +137,9 @@ class SearchformController extends Controller {
     $searchData=array_key_exists('searchData',$reqArr)?$reqArr['searchData']:[];
     $fmArr=$reqArr['queryField'];
     
-    $whereArr=count($searchData)?$this->priGetMdlWhereArr($searchData,$fmArr):[];
+    //$whereArr=count($searchData)?$this->priGetMdlWhereArr($searchData,$fmArr):[];
+    
+    $whereArr=$this->priGetMdlWhereArr($searchData,$fmArr);
 
     #每个select赋初值
     foreach($fmArr as $k=>$v){
