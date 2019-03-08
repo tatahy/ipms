@@ -17,8 +17,6 @@ var rqData=c.rqData;
 var urlObj=c.urlObj;
 var searchResultNum=c.searchResultNum;
 
-export {rqData,asyLoadEntObj,setEntPeriodList,resetSearchForm,asyRefreshEntObj,setRqSearchDataBy,setTrBgColor,entGetReady};
-
 asyInitData()
 .then(function(uName){
 	let str='数据初始化失败。页面无法正常显示。';
@@ -42,10 +40,22 @@ async function asyInitData() {
 	//$.post()方法返回的是jqXHR对象，这个jqXHR对象是对所发起的request的响应结果，无需解析
 	// let resData = await $.post('/index/index/getInitData');
 	//fetch()方法返回的是一个Promise对象，这个promise对象resolve成一个response对象，这个response对象是对所发起的request的响应结果。
-	let resObj = await fetch('/index/index/getInitData');
-	//完成response对象内容解析
+	let opt={
+			method:'POST',
+			headers:{
+				'Content-Type':'application/json'
+			},
+			//带上cookie
+			credentials:'include'
+		};
+	let resObj = await fetch('/index/index/getInitData',opt);
+	// 完成response对象内容解析
 	let resData =await resObj.json();
 	// let resData =await resObj.blob();
+	
+	// console.log(resObj);
+	// console.log(resData);
+	// console.log(document.cookie);
 	
 	//全局变量赋值
 	userName=resData.userName;
@@ -210,7 +220,8 @@ async function asyLoadEntObj(type){
 			headers:{
 				'Content-Type':'application/json'
 				// 'Content-Type':''
-			}
+			},
+			credentials:'include'
 		};
 	let result=false;
 	//load节点
@@ -277,9 +288,9 @@ async function asyRefreshEntObj(objStr='') {
 		setEntPeriodList();		
 	}
 	//更新完后回到list的event中，为什么？
-	//因为是异步更新，要保证list中的其他event能够响应，就需要返回到原来的list的event中
+	//因为是异步更新，要保证list中的其他event能够响应，就需要返回到原来list的event中
 	return eve.list();
-	// return entEventList();
+
 }
 
 //setRqData
@@ -481,7 +492,8 @@ async function asySetEntQueryForm(){
 			body:'',
 			headers:{
 				'Content-Type':'application/json'
-			}
+			},
+			credentials:'include'
 		};
 	let optData='';
 	let result=false;
@@ -740,3 +752,5 @@ function consoleColor(str='无内容',color='blue'){
 	return console.log('%c%s',`font-size:16px;color:${color};`,str);
 	
 }
+
+export {rqData,asyLoadEntObj,setEntPeriodList,resetSearchForm,asyRefreshEntObj,setRqSearchDataBy,setTrBgColor,entGetReady,consoleColor,entEvent};

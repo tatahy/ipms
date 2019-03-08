@@ -92,10 +92,11 @@ class ListController extends Controller {
     #进行模型查询的条件数组
     $whereArr=count($searchData)?$this->priGetMdlWhereArr($searchData,$queryField):[];
     #模板文件中进行显示的结果集
-    $list=array(); 
+    $list=array();
+    
     #返回前端的模板文件名
-    $fileName=$ent.'List';
-          
+    $fileName=implode('-',['list',$ent]); 
+            
      #选择模型对象
     switch($ent){
       case 'pat':

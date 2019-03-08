@@ -189,30 +189,23 @@ class Proinfo extends Model
     
     #得到在period里的所有pro记录集
     static public function getPeriodSet($period='') {
-      self::$obj=new self();
-      $assSet=self::$obj->getPeriodSql($period)->select();
-      self::$obj=null;
-      return $assSet;
+      return self::getPeriodSql($period)->select();
     }
+    
     #得到在period里的所有pro的num
     static public function getPeriodNum($period='') {
-      $num='';
       $numArr=[];
       $pArr=array_keys(self::PROPERIOD);
       
       if(!empty($period)){
-        self::$obj=new self();
-        $num=self::$obj->getPeriodSql($period)->count();
-        self::$obj=null;
-        return $num;
+        return self::getPeriodSql($period)->count();
       }
       
       foreach($pArr as $key=>$val){
-        self::$obj=new self();
-        $numArr[$val]=self::$obj->getPeriodSql($val)->count();
-        self::$obj=null;
+        $numArr[$val]=self::getPeriodSql($val)->count();
       } 
       return $numArr;
+      
     }
     
     #得到在period的指定field字段的groupby内容
@@ -236,13 +229,12 @@ class Proinfo extends Model
       }
       
     #组装$tempArr
-      self::$obj=new self();
       if(count($whereArr)){
-        $proSet=self::$obj->getPeriodSql($period)->where($whereArr)->select();
+        $proSet=self::getPeriodSql($period)->where($whereArr)->select();
       }else{
-        $proSet=self::$obj->getPeriodSet($period);
+        $proSet=self::getPeriodSet($period);
       }
-      self::$obj=null;
+      
       #转换为数据集
       $proSet=is_array($proSet)?collection($proSet):$proSet;
       

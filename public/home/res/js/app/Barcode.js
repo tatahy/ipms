@@ -2,12 +2,16 @@
 
 // 导入条形码识别插件??
 // import Quagga from '../plugins/quaggaJs/quagga.min.js';
-// import {default:Quagga} from '../plugins/quaggaJs/quagga.js';
-// export {default:Quagga} from '../plugins/quaggaJs/quagga.js';
+// import {module.exports as Quagga} from '../plugins/quaggaJs/quagga.js';
+
+// export {root as Quagga} from '../plugins/quaggaJs/quagga.min.js';
 
 // import '../plugins/quaggaJs/quagga.min.js';
 
-//定义导出对象。封装条形码进行识别所需参数的预处理，识别过程。
+//导入index.js中定义的变量、函数
+import {rqData,resetSearchForm,asyRefreshEntObj} from './index.js';
+
+//定义导出对象Barcode。封装条形码进行识别所需参数的预处理，识别过程。
 export var Barcode={
 	init:function(fm) {
 		let self=this;
@@ -59,7 +63,7 @@ export var Barcode={
 			if(input.files && input.files.length){	
 				self.decode(URL.createObjectURL(input.files[0]));
 			}else{
-				$.alert('<p class="text-center">请选择需识别的条形码图片<p>');
+				$.alert('<p class="text-center" ><span class="label label-warning" style="font-size:16px;" >请选择条形码图片</span><p>');
 			}
 		});
 		//表单输入项发生改变
@@ -71,6 +75,13 @@ export var Barcode={
 			
 			$(this).addClass('alert-info');	
         	self.setState(state, val);
+		});
+		//表单重置
+		node.fm.find('button:reset').click(function(){
+			node.img.prop('hidden',true).find('.viewport').empty();
+			resetSearchForm();	
+			//异步更新list
+			asyRefreshEntObj('list');
 		});
 	},
 	_accessByPath: function(obj, path, val) {
@@ -95,12 +106,16 @@ export var Barcode={
 		node.file.off('change');
 		node.run.off('click');
 		node.inSet.off('change');
+		node.fm.find('button:reset').off('click');
 	},
 	//调用Qugga插件识别条码
 	decode: function(src) {
         let self = this,
         	config = $.extend({}, self.state, {src: src});
-		Quagga.decodeSingle(config, function(result){});
+		Quagga.decodeSingle(config, result=>{
+			self.setCode(result);
+			return self.processCode();
+		});
     },
 	setState: function(path, val) {
 		let self=this;
@@ -112,8 +127,6 @@ export var Barcode={
 		}
 	
 		self._accessByPath(self.state,path,val);
-		
-		// console.log(JSON.stringify(self.state));
 		self.detachListenners();
 		self.init(self._node.fm);
 	},
@@ -122,7 +135,9 @@ export var Barcode={
 	},
 	setCode:function(result){
 		this.code=dealDecodeResult(result);
-		return this.code;
+	},
+	processCode:function(){
+		return queryByCode(this.code);	
 	},
 	inputMapper: {
         inputStream: {
@@ -170,7 +185,7 @@ export var Barcode={
 		locate:true,
 		src:null
 	}
-};
+}
 
 function calculateRectFromArea(canvas,area){
 	let canvasWidth=canvas.width,
@@ -198,7 +213,7 @@ function dealDecodeResult(result){
         drawingCanvas = Quagga.canvas.dom.overlay,
         area='';
 	//条形码值赋值
-	let code=result.codeResult?result.codeResult.code:'';
+	let code='';
 			
 	//有识别结果数据
 	if (result) {
@@ -218,6 +233,7 @@ function dealDecodeResult(result){
 		//识别出条形码值，条形码上添加红色横线
         if (result.codeResult && result.codeResult.code) {
             Quagga.ImageDebug.drawPath(result.line, {x: 'x', y: 'y'}, drawingCtx, {color: 'red', lineWidth: 3});
+			code=result.codeResult.code;
         }
 		//若已定义Barcode.state.inputStream.area，则由calculateRectFromArea()函数计算方框4个点的像素坐标
         if (Barcode.state.inputStream.area) {
@@ -227,6 +243,25 @@ function dealDecodeResult(result){
         }
     }
 	return code;
+}
+
+//定义函数，显示识别结果和查询结果
+function queryByCode(code='') {
+	let fm=Barcode._node.fm;
+	let img=Barcode._node.img;
+	let nodSuccess=img.find('.alert-success').hide();
+	let nodWarning=img.find('.alert-warning').hide();
+	if(code){
+		nodSuccess.show().find('span.alert-info').text(code);
+		//设置查询数据
+		rqData.searchSource=fm.data('formType');
+		rqData.searchData={bar_code:code};
+		
+		//向后端发起异步查询并显示查询结果
+		asyRefreshEntObj('list');
+	}else{
+		nodWarning.show();
+	}	
 }
 
 // export {Barcode,Quagga};

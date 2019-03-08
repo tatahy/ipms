@@ -1,54 +1,17 @@
 
-// app/eventHandler.js
+// app/Event.js
 
 //导入index.js中定义的变量、函数
-import {rqData,asyLoadEntObj,setEntPeriodList,resetSearchForm,asyRefreshEntObj,setRqSearchDataBy,setTrBgColor,entGetReady} from './index.js';
+import {rqData,resetSearchForm,asyRefreshEntObj,setRqSearchDataBy,setTrBgColor,entGetReady,consoleColor} from './index.js';
 
-//定义导出对象。封装各个事件处理函数
+//定义导出对象Event。封装各个事件处理函数
 export var Event={
 	//BarcodeForm的event
 	barcodeForm:function() {
-		let fm=$('#fmRun');
-		let img=fm.next();
-		//定义箭头函数，显示识别结果和查询结果
-		let queryByCode=(code='') =>{
-			let nodSuccess=img.find('.alert-success').hide();
-			let nodWarning=img.find('.alert-warning').hide();
-			if(code){
-				nodSuccess.show().find('span.alert-info').text(code);
-				//设置查询数据
-				rqData.searchSource=$('#fmRun').data('formType');
-				rqData.searchData={bar_code:code};
-		
-				//向后端发起异步查询并显示查询结果
-				asyLoadEntObj('list')
-				.then(()=>{
-					setEntPeriodList();
-				})
-				.catch((e)=>console.log(e));
-			}else{
-				nodWarning.show();
-			}	
-		};
-
 		//动态加载模块
 		import('./Barcode.js')
 		.then(module=>{
-			let Barcode= module.Barcode;
-			Barcode.init(fm);
-			//调用Quagga插件的事件处理函数
-			Quagga.onProcessed(function(result){
-				Barcode.setCode(result);
-				queryByCode(Barcode.code);
-			});	
-		
-			//Barcode表单重置
-			$('#fmRun button:reset').click(function(){
-				$('#divBarcodeImg').prop('hidden',true).find('.viewport').empty();
-				resetSearchForm();	
-				//异步更新list
-				asyRefreshEntObj();
-			});
+			module.Barcode.init($('#fmRun'));
 		})
 		.catch(err=>{
 			console.log(err);
@@ -139,7 +102,7 @@ export var Event={
 			rqData.sortData.pageNum=1;
 		
 			//异步更新list
-			asyRefreshEntObj();
+			asyRefreshEntObj('list');
 		
 		});	
 		//表格按选定字段排序
@@ -156,7 +119,7 @@ export var Event={
 			rqData.sortData.pageNum=1;
 	
 			//异步更新list
-			asyRefreshEntObj();
+			asyRefreshEntObj('list');
 		});	
 		//表格中点击a后，标签所在行上底色
 		aBodySet.click(function(){
@@ -192,7 +155,7 @@ export var Event={
 			}
 		
 			//异步更新list
-			asyRefreshEntObj();
+			asyRefreshEntObj('list');
 		});
 	},
 	//页面刷新

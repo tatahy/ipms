@@ -53,16 +53,10 @@ class SearchformController extends Controller {
   
   private function priGetFormTplFile ($arr) {
     $ent=array_key_exists('ent',$arr)?$arr['ent']:'pat'; 
-   // $searchData= array_key_exists('searchData',$arr)?$arr['searchData']:self::SEARCHDBFIELD[$ent]; 
     
-    $fileName=$ent.'searchform';
-        
-    //$this->assign([
-//      'numTotal'=>1,
-//      'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
-//    ]);
+    $fileName=implode('-',['search','form',$ent]);
+   
     return view($fileName);
-    //return $this->fetch($fileName);
   }
   //根据参数组装模型查询用$whereArr
   private function priGetMdlWhereArr ($searchArr,$searchTypeArr) {

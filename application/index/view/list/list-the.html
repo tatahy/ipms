@@ -1,10 +1,10 @@
-<!-- //module:index, ctrl:List view:list/proList.html  -->
+<!-- //module:index, ctrl:List view:list/list-the.html  -->
 
 <!-- //继承模板文件。路径为相对于入口文件index.php -->
-{extend name="../application/index/view/list/listTpl.html" /}
+{extend name="../application/index/view/list/list-temple.html" /}
 
 {block name="listElement"}
-			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>项目信息列表&nbsp;【<strong></strong>】</h4></caption>
+			<caption class="text-center" style="border-bottom:1px solid #eee;"><h4>论文信息列表&nbsp;【<strong></strong>】</h4></caption>
 			<thead>
 				<tr>
 					<th class="text-center">序号</th>
@@ -15,17 +15,21 @@
 					<th><a data-sort-name="author">撰写人</a></th>
 					
 					<th><a data-sort-name="dept">所属部门</a></th>
+					<th><a data-sort-name="pronum">关联项目</a></th>
 				</tr>
 			</thead>
 			<tbody><!-- 此处显示数据库查询后的数据集 -->
 				{volist name="list" id="vo" empty="暂时没有数据"}
 				<tr data-show-id="{$vo.id}" class="text-right">
 					<td class="text-center">{$i+($sortData.pageNum-1)*$sortData.listRows}</a></td>
-					<td class="proInfo"><a href="{$home}/project/index/proinfo/id/{$vo.id}" target="_blank" title="项目详情">{$vo.topic}</a></td>
+					<td class="theInfo"><a href="{$home}/thesis/index/theinfo/id/{$vo.id}" target="_blank" title="论文详情">{$vo.topic}</a></td>
 					<td>{$vo.type}</td>
 					<td>{$vo.status}</td>
 					<td>{$vo.author}</td>
 					<td>{$vo.dept}</td>
+					<td class="proInfo">
+						
+					</td>
 				</tr>
 				{/volist}
 			</tbody>

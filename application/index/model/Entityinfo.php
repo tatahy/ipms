@@ -8,76 +8,80 @@
 namespace app\index\model;
 
 use think\Model;
+use think\Db;
+
 use app\admin\model\Dept as DeptModel;
 
-class Mdlcommon extends Model
-{
+//定义抽象类
+abstract class Entityinfo extends Model implements EntityinfoInterface {
+   
    //仅用于子类的属性
-    //本类的静态方法中用于访问非静态方法时实例化本类对象
-    static protected $obj=null;
-    protected $entPeriod=null;
-    protected $entType=null;
-    protected $entity=null;
-        
-    //const ENTPERIOD=conTheEntArr['period'];
-//    const ENTTYPE=conTheEntArr['type'];
-//    const ENTITY='thesis';
+    protected static $entPeriod=[];
+    protected static $entType=[];
+    protected static $entity=[];
+    //要操作的数据表名
+    protected static $tblName='';
+   // protected static $obj=null;
     
+    protected $userName;
+    protected $dept;
+    protected $auth;
+    
+    //需要实现静态方法，用于初始化module
+    abstract function initModel($userName, $dept, $auth);
+    
+    //static function getSelfMdl(){
+//      if(is_null(self::$obj)){
+//        self::$obj=new self();
+//      }
+//      return self::$obj;
+//    }
     #得到在period里的query对象
-    static public function getPeriodSql($period='') {
-      self::$obj=new self();
-      $psArr=self::$obj->entPeriod;
-      $pArr=array_keys($psArr);
+    static function getPeriodSql($period='') {
       
+      $psArr=self::$entPeriod;
+      $pArr=array_keys($psArr);
+      #模型查询中的字段
+      $field='id';
       #保证$period的值是规定的范围内
       $period=in_array($period,$pArr)?$period:'total';
       
-      #模型查询中的条件
-      $field=($period==$pArr[0])?'id':'status';
-      $where[$field]=[$psArr[$period]['queryExp'],$psArr[$period]['status']];
+      #模型查询中的字段
+      if($period!=$pArr[0]){
+        $field=(self::$entity=='asset')?'status_now':'status';
+      }
       
-      #模型查询中的条件
-     // if($period=='total'){
-//        $where['id']=['>',0];
-//      }else{
-//        $where['status']=['in',$psArr[$period]['status']];
-//      }
+      $whereArr[$field]=[$psArr[$period]['queryExp'],$psArr[$period]['status']];
       
-      $query=self::$obj->where($where);
-      self::$obj=null;
+      
+      $query=Db::table(self::$tblName)->where($whereArr);
+      //$query=Model::where($whereArr);#
+      
       return $query;
     }
     
     #得到在period里的所有pat
-    static public function getPeriodSet($period='') {
-      self::$obj=new self();
-      $patSet=self::$obj->getPeriodSql($period)->select();
-      self::$obj=null;
-      return $patSet;
+    static function getPeriodSet($period='') {
+      return self::getPeriodSql($period)->select();
     }
     #得到在period里的所有pat的num
-    static public function getPeriodNum($period='') {
-      self::$obj=new self();
+    static function getPeriodNum($period='') {
       $num='';
       $numArr=[];
-      $pArr=array_keys(self::$obj->entPeriod);
-      //$pArr=self::ENTPERIOD;
+      $pArr=array_keys(self::$entPeriod);
       
       if(!empty($period)){
-        $num=self::$obj->getPeriodSql($period)->count();
-        self::$obj=null;
-        return $num;
+        return self::getPeriodSql($period)->count();
       }
       
       foreach($pArr as $key=>$val){
-        $numArr[$val]=self::$obj->getPeriodSql($val)->count();
+        $numArr[$val]=self::getPeriodSql($val)->count();
       } 
-      self::$obj=null;
       return $numArr;
     }
     #得到在period的指定field字段的groupby内容
     static public function getFieldGroupByArr($field,$arr=[],$period='',$whereArr=[]) {
-      self::$obj=new self();
+      
       $valArr=[]; 
       $keyArr=[];     
       $tempArr=[];#中间数组
@@ -87,7 +91,7 @@ class Mdlcommon extends Model
     
     #组装$tArr
       if($field=='type') $tArr=self::$entType;
-      if($field=='status_now' || $field=='status') $tArr=_commonStatustEn2ChiArr(self::$obj->entity);      
+      if($field=='status_now' || $field=='status') $tArr=_commonStatustEn2ChiArr(self::$entity);      
       if($field=='dept_now' || $field=='dept') {
         #得到dept的键值转换数组$tArr。abbr为键，name为值的关联数组
         $deptSet=DeptModel::all();
@@ -97,17 +101,15 @@ class Mdlcommon extends Model
       }
    
       #组装$tempArr
-      
       if(count($whereArr)){
-        $aSet=self::$obj->getPeriodSql($period)->where($whereArr)->select();
+        $entSet=self::getPeriodSql($period)->where($whereArr)->select();
       }else{
-        $aSet=self::$obj->getPeriodSet($period);
+        $entSet=self::getPeriodSet($period);
       }
-      self::$obj=null;
       #转换为数据集
-      $aSet=is_array($aSet)?collection($aSet):$aSet;
+      $entSet=is_array($entSet)?collection($entSet):$entSet;
     #得到$field字段值。若定义了$field字段的修改器，此处为经过修改器后的输出值（去掉重复值）
-      $valArr=array_unique($aSet->column($field));
+      $valArr=array_unique($entSet->column($field));
       if(!count($valArr)){
         return $arr;
       }

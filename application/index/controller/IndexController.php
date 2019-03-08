@@ -119,7 +119,9 @@ class IndexController extends Controller
       ],
       'authArr'=>$this->authArr,
       #服务器端信息,TP5中获取全局变量$_SERVER的方法
-      'server'=>$request->server()
+      'server'=>$request->server(),
+      'cookie'=>$request->cookie(),
+      //'session'=>$request->session(),
     ];
     
     return json($resData);
