@@ -16,14 +16,17 @@ use app\index\model\Proinfo as ProinfoModel;
 # 若配置文件conf.php中'controller_suffix' 设为true，则类名需以‘Controller’结尾，
 # 且‘Controller’之前的单词必须第一个字母大写，其余小写，否则类无法加载会报‘控制器不存在’。
 class SearchformController extends Controller {
-  //用户权限
+   //用户权限
   private $authArr=array();
   //用户登录状态
   private $log = 0;
   //用户登录状态
-  private $username = '';
+  private $userName = '';
   //用户登录状态
   private $pwd = '';
+  //用户所属部门
+  private $dept = '';
+  
   //定义前端可搜索的数据库字段
   const SEARCHDBFIELD=[
     'pat'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0],
@@ -45,7 +48,8 @@ class SearchformController extends Controller {
     }
     //return $this->success('priLogin()调试，'.json_encode(Session::get('authArr')),'login','',10);
     $this->authArr=Session::get('authArr');
-    $this->username=Session::get('username');
+    $this->userName=Session::get('username');
+    $this->dept=Session::get('dept');
     $this->pwd=Session::get('pwd');
     
     return $this->log;
@@ -85,10 +89,12 @@ class SearchformController extends Controller {
     return $whereArr;
   }
   private function priGetEntDBfieldGroup($ent,$period,$field,$whereArr=[]){
-    #模型对象
-    $mdl='';   
-    
-    #选择模型对象
+       
+    return $this->priGetMdl($ent)->getFieldGroupByArr($field,self::SELECTSINGLE,$period,$whereArr);
+  }
+  //选择模型对象并初始化
+  private function priGetMdl($ent) {
+    $mdl=null;
     switch($ent){
       case 'pat':
         $mdl= new PatinfoModel();
@@ -104,7 +110,7 @@ class SearchformController extends Controller {
         break;
     }
     
-    return $mdl->getFieldGroupByArr($field,self::SELECTSINGLE,$period,$whereArr);
+    return $mdl->initModel($this->userName,$this->dept,$this->authArr[$ent]);  
   }
   
   public function index () {

@@ -7,13 +7,14 @@
 
 namespace app\index\model;
 
-use app\index\model\Entityinfo;
+use think\Model;
 use app\admin\model\Dept as DeptModel;
 
 //启用软删除
 use traits\model\SoftDelete;
 
-class Assinfo extends Entityinfo {
+class Assinfo extends Model
+{
     //启用软删除
     use SoftDelete;
     //protected $auto = ['assnum','pronum'];
@@ -38,6 +39,7 @@ class Assinfo extends Entityinfo {
     //本类的静态方法中用于访问非静态方法时实例化本类对象
     static private $obj=null;
     //本类的5个私有静态变量
+    static private $userName='';
     static private $userDept='';
     static private $auth=[];
     static private $periodArr=[];
@@ -46,21 +48,18 @@ class Assinfo extends Entityinfo {
     private $period='';
     private $errStr='not initiate Model Assinfo';
     
-    //继承自父类的变量
-    //引用app\common中定义的常量：conAssEntArr
-    protected $entPeriod=conAssEntArr['period'];
-    protected $entType=[];
-    protected $entity='asset';
-   
-     public function getEntity() {
-      return $this->entity;
+    #初始化模型的访问
+    static public function initModel($username, $dept, $auth) {
+      
+      return self::$obj;
     }
     
    //获取器，获取数据表assinfo中status_now字段值，转换为中文输出
     protected function getStatusNowAttr($dBStrEn)
     {
-        //中英文对照数组
-        $sArr=$this->statusArr;
+        //引用公共文件（common.php）中定义的函数_commonStatustEn2ChiArr($ent)
+        $sArr=_commonStatustEn2ChiArr(self::ENTITY);
+        
         $output =array_key_exists($dBStrEn, $sArr)?$sArr[$dBStrEn]:$dBStrEn;
         
         return $output;
@@ -70,8 +69,10 @@ class Assinfo extends Entityinfo {
     protected function setStatusNowAttr($strChi)
     {
         //中英文对照数组
-        $sArr=array_flip($this->statusArr);
-        $output =array_key_exists($strChi, $sArr)?$sArr[$strChi]:$strChi;
+        $sArr=_commonStatustEn2ChiArr(self::ENTITY);
+        $k=array_search($strChi, $tArr);
+        
+        $output = $k?$tArr[$k]:$strChi;
        
         return $output;
     }
@@ -92,13 +93,15 @@ class Assinfo extends Entityinfo {
       }else{
         $query->where('status_now','like','%'.$period.'%');
       }
+      
     }
+      
     //asset查询对象
     public function assPeriodQuery($period='',$whereArr=[]) {
       $this->period=$period;
       $auth=self::$auth;
       $dept=self::$userDept;
-      $userName=$this->userName;
+      $userName=self::$userName;
       $authNum=0;
       if(!$this->checkAssTypeStr()){
         return $this->errStr;
@@ -145,9 +148,108 @@ class Assinfo extends Entityinfo {
       return $query;
     }
        
+    #得到在period里的query对象
+    static public function getPeriodSql($period='') {
+      $pArr=self::ASSPERIOD;
+      #保证$period的值是规定的范围内
+      $period=in_array($period,array_keys($pArr))?$period:$pArr[0];
+      #模型查询中的条件    
+      $where['status_now']=[$pArr[$period]['queryExp'],$pArr[$period]['status']];
+    
+      self::$obj=new self();
+      $query=self::$obj->where($where);
+      self::$obj=null;
+      #返回查询结果集
+      return $query;
+    }
+    
+    #得到在period里的所有ass
+    static public function getPeriodSet($period='') {
+      self::$obj=new self();
+      $assSet=self::$obj->getPeriodSql($period)->select();
+      self::$obj=null;
+      return $assSet;
+    }
+    #得到在period里的所有pat的num
+    static public function getPeriodNum($period='') {
+      $num='';
+      $numArr=[];
+      $pArr=array_keys(self::ASSPERIOD);
+      
+      if(!empty($period)){
+        self::$obj=new self();
+        $num=self::$obj->getPeriodSql($period)->count();
+        self::$obj=null;
+        return $num;
+      }
+      
+      foreach($pArr as $key=>$val){
+        self::$obj=new self();
+        $numArr[$val]=self::$obj->getPeriodSql($val)->count();
+        self::$obj=null;
+      } 
+      return $numArr;
+    }
+    
+    #得到在period的指定field字段的groupby内容
+    static public function getFieldGroupByArr($field,$arr=[],$period='',$whereArr=[]) {
+      $valArr=[]; 
+      $keyArr=[];     
+      $tempArr=[];#中间数组
+      $tArr=[];   #键值转换数组
+    #设定返回数组的默认结构
+      $arr=array_merge(['num'=>0,'val'=>[''],'txt'=>['']],$arr);
+    
+    #组装$tArr
+      if($field=='status_now') $tArr=_commonStatustEn2ChiArr(self::ENTITY);      
+      if($field=='dept_now') {
+        #得到dept的键值转换数组$tArr。abbr为键，name为值的关联数组
+        $deptSet=DeptModel::all();
+        #转换为数据集
+        $deptSet=is_array($deptSet)?collection($deptSet):$deptSet;
+        $tArr=array_combine($deptSet->column('abbr'),$deptSet->column('name'));
+      }
    
-    
-    
+      #组装$tempArr
+      self::$obj=new self();
+      if(count($whereArr)){
+        $aSet=self::$obj->getPeriodSql($period)->where($whereArr)->select();
+      }else{
+        $aSet=self::$obj->getPeriodSet($period);
+      }
+      self::$obj=null;
+      #转换为数据集
+      $aSet=is_array($aSet)?collection($aSet):$aSet;
+    #得到$field字段值。若定义了$field字段的修改器，此处为经过修改器后的输出值（去掉重复值）
+      $valArr=array_unique($aSet->column($field));
+      if(!count($valArr)){
+        return $arr;
+      }
+      if(!count($tArr)){
+        $tArr=array_combine($valArr,$valArr);
+      }
+      
+      #组装$tempArr
+      foreach($valArr as $k => $v){
+        $keyArr[$k]=array_search($v,$tArr);
+        if($field=='dept_now'){
+         // $valArr[$k]=$v.', 简称: '.array_search($v,$tArr);
+          $abbr=array_search($v,$tArr)?array_search($v,$tArr):'无';
+          $valArr[$k]=$v.', 简称: '.$abbr;
+          $keyArr[$k]=$v;
+        }
+      }
+      $tempArr=array_combine($keyArr,$valArr);
+      
+      #对中间数组以键名升序排序
+      ksort($tempArr);
+    #$arr赋值
+      $arr['num']=count($tempArr);
+      $arr['val']=array_keys($tempArr);
+      $arr['txt']=array_values($tempArr);
+      
+      return $arr;
+    }
     /**
      * 获取assent的过程记录
      */

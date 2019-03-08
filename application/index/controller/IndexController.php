@@ -20,10 +20,12 @@ class IndexController extends Controller
   private $authArr=array();
   //用户登录状态
   private $log = 0;
-  //用户登录状态
-  private $username = '';
-  //用户登录状态
+  //用户名
+  private $userName = '';
+  //用户密码
   private $pwd = '';
+  //用户所属部门
+  private $dept = '';
   
   #patent的period与status的对应关系，本应用common.php中定义
   const PATPERIODSTATUS=conPatPeriodVsStatus;
@@ -37,7 +39,8 @@ class IndexController extends Controller
     }
     //return $this->success('priLogin()调试，'.json_encode(Session::get('authArr')),'login','',10);
     $this->authArr=Session::get('authArr');
-    $this->username=Session::get('username');
+    $this->userName=Session::get('username');
+    $this->dept=Session::get('dept');
     $this->pwd=Session::get('pwd');
     
     return $this->log;
@@ -100,23 +103,43 @@ class IndexController extends Controller
   
   private function priGetPageInitData() {
     $this->priLogin();
-    
+    $mdl=null;
     $request=Request::instance();
     
+    $entNum=['pat'=>0,'ass'=>0,'pro'=>0,'the'=>0];
+    
+    foreach($entNum as $key=>$val){
+      //选择mdl
+      if($this->authArr[$key]['read']){
+        switch($key){
+          case 'pat':
+            $mdl=new PatinfoModel();
+            break;
+          case 'ass':
+            $mdl=new AssinfoModel();
+            break;
+          case 'pro':
+            $mdl=new ProinfoModel();
+            break;
+          case 'the':
+            $mdl=new TheinfoModel();
+            break;
+        }
+      
+        $entNum[$key]=$mdl->initModel($this->userName,$this->dept,$this->authArr[$key])->getPeriodNum();
+        $mdl=null;
+      }
+    }
+    
     $resData=[
-      'userName'=>$this->username,
+      'userName'=>$this->userName,
       'urlObj'=>[
         'domain'=>$request->domain(),
         'module'=>$request->module(),
         'ctrl'=>strtolower($request->controller()),
         'action'=>'index'
       ],
-      'entNum'=>[
-        'pat'=>$this->authArr['pat']['read']?PatinfoModel::getPeriodNum():0,
-        'ass'=>$this->authArr['ass']['read']?AssinfoModel::getPeriodNum():0,
-        'pro'=>$this->authArr['pro']['read']?ProinfoModel::getPeriodNum():0,
-        'the'=>$this->authArr['the']['read']?TheinfoModel::getPeriodNum():0
-      ],
+      'entNum'=>$entNum,
       'authArr'=>$this->authArr,
       #服务器端信息,TP5中获取全局变量$_SERVER的方法
       'server'=>$request->server(),
@@ -139,7 +162,7 @@ class IndexController extends Controller
 
     $this->assign([
       'home' => $request->domain(), 
-      'username' => $this->username,
+      'username' => $this->userName,
       'authArr'=>json_encode($this->authArr),
     ]);
     return view();

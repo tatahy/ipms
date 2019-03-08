@@ -20,9 +20,11 @@ class ListController extends Controller {
   //用户登录状态
   private $log = 0;
   //用户登录状态
-  private $username = '';
+  private $userName = '';
   //用户登录状态
   private $pwd = '';
+  //用户所属部门
+  private $dept = '';
   
   private $searchField=[
     'pat'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0],
@@ -43,7 +45,8 @@ class ListController extends Controller {
     }
     //return $this->success('priLogin()调试，'.json_encode(Session::get('authArr')),'login','',10);
     $this->authArr=Session::get('authArr');
-    $this->username=Session::get('username');
+    $this->userName=Session::get('username');
+    $this->dept=Session::get('dept');
     $this->pwd=Session::get('pwd');
     
     return $this->log;
@@ -97,22 +100,9 @@ class ListController extends Controller {
     #返回前端的模板文件名
     $fileName=implode('-',['list',$ent]); 
             
-     #选择模型对象
-    switch($ent){
-      case 'pat':
-        $mdl= new PatinfoModel();
-        break;
-      case 'ass':
-        $mdl= new AssinfoModel();
-        break;
-      case 'pro':
-        $mdl= new ProinfoModel();
-        break;
-      case 'the':
-        $mdl= new TheinfoModel();
-        break;
-    }
-      
+    #选择模型对象
+    $mdl=$this->priGetMdl($ent);
+    
     #模型对象，查询、排序用
     $queryBase=$mdl->getPeriodSql($period)
                     ->where($whereArr)
@@ -154,6 +144,26 @@ class ListController extends Controller {
     #
     return view($fileName);
     //return $this->fetch($fileName);
+  }
+  //选择模型对象并初始化
+  private function priGetMdl($ent) {
+    $mdl=null;
+    switch($ent){
+      case 'pat':
+        $mdl= new PatinfoModel();
+        break;
+      case 'ass':
+        $mdl= new AssinfoModel();
+        break;
+      case 'pro':
+        $mdl= new ProinfoModel();
+        break;
+      case 'the':
+        $mdl= new TheinfoModel();
+        break;
+    }
+    
+    return $mdl->initModel($this->userName,$this->dept,$this->authArr[$ent]);  
   }
   
   public function index () {

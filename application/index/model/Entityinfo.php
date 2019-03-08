@@ -13,33 +13,40 @@ use think\Db;
 use app\admin\model\Dept as DeptModel;
 
 //定义抽象类
-abstract class Entityinfo extends Model implements EntityinfoInterface {
+//abstract class Entityinfo extends Model implements EntityinfoInterface {
+abstract class Entityinfo extends Model {
    
    //仅用于子类的属性
-    protected static $entPeriod=[];
-    protected static $entType=[];
-    protected static $entity=[];
-    //要操作的数据表名
-    protected static $tblName='';
-   // protected static $obj=null;
-    
+    protected $entPeriod=[];
+    protected $entType=[];
+    protected $entity=[];
+    protected $entAuth;
     protected $userName;
     protected $dept;
-    protected $auth;
+    protected $statusArr=[];
+    //覆盖构造方法
+    public function __construct($data = []){
+      parent::__construct($data);
+      $this->statusArr=_commonStatustEn2ChiArr($this->entity);
+    }
     
-    //需要实现静态方法，用于初始化module
-    abstract function initModel($userName, $dept, $auth);
+    //需要实现的方法，用于初始化model
+    abstract function getEntity();
     
-    //static function getSelfMdl(){
-//      if(is_null(self::$obj)){
-//        self::$obj=new self();
-//      }
-//      return self::$obj;
-//    }
-    #得到在period里的query对象
-    static function getPeriodSql($period='') {
+    #初始化模型的访问
+    public function initModel($username='', $dept='', $authArr=[]) {
       
-      $psArr=self::$entPeriod;
+      $this->entAuth=$authArr;
+      $this->userName=$username;
+      $this->dept=$dept;
+     
+      return $this;
+    }
+    
+    #得到在period里的query对象
+    public function getPeriodSql($period='') {
+      
+      $psArr=$this->entPeriod;
       $pArr=array_keys($psArr);
       #模型查询中的字段
       $field='id';
@@ -48,39 +55,37 @@ abstract class Entityinfo extends Model implements EntityinfoInterface {
       
       #模型查询中的字段
       if($period!=$pArr[0]){
-        $field=(self::$entity=='asset')?'status_now':'status';
+        $field=($this->entity=='asset')?'status_now':'status';
       }
       
       $whereArr[$field]=[$psArr[$period]['queryExp'],$psArr[$period]['status']];
       
-      
-      $query=Db::table(self::$tblName)->where($whereArr);
-      //$query=Model::where($whereArr);#
+      $query=$this->where($whereArr);
       
       return $query;
     }
     
     #得到在period里的所有pat
-    static function getPeriodSet($period='') {
-      return self::getPeriodSql($period)->select();
+    public function getPeriodSet($period='') {
+      return $this->getPeriodSql($period)->select();
     }
     #得到在period里的所有pat的num
-    static function getPeriodNum($period='') {
+    public function getPeriodNum($period='') {
       $num='';
       $numArr=[];
-      $pArr=array_keys(self::$entPeriod);
+      $pArr=array_keys($this->entPeriod);
       
       if(!empty($period)){
-        return self::getPeriodSql($period)->count();
+        return $this->getPeriodSql($period)->count();
       }
       
       foreach($pArr as $key=>$val){
-        $numArr[$val]=self::getPeriodSql($val)->count();
+        $numArr[$val]=$this->getPeriodSql($val)->count();
       } 
       return $numArr;
     }
     #得到在period的指定field字段的groupby内容
-    static public function getFieldGroupByArr($field,$arr=[],$period='',$whereArr=[]) {
+    public function getFieldGroupByArr($field,$arr=[],$period='',$whereArr=[]) {
       
       $valArr=[]; 
       $keyArr=[];     
@@ -90,8 +95,8 @@ abstract class Entityinfo extends Model implements EntityinfoInterface {
       $arr=array_merge(['num'=>0,'val'=>[''],'txt'=>['']],$arr);
     
     #组装$tArr
-      if($field=='type') $tArr=self::$entType;
-      if($field=='status_now' || $field=='status') $tArr=_commonStatustEn2ChiArr(self::$entity);      
+      if($field=='type') $tArr=$this->entType;
+      if($field=='status_now' || $field=='status') $tArr=_commonStatustEn2ChiArr($this->entity);      
       if($field=='dept_now' || $field=='dept') {
         #得到dept的键值转换数组$tArr。abbr为键，name为值的关联数组
         $deptSet=DeptModel::all();
@@ -102,9 +107,9 @@ abstract class Entityinfo extends Model implements EntityinfoInterface {
    
       #组装$tempArr
       if(count($whereArr)){
-        $entSet=self::getPeriodSql($period)->where($whereArr)->select();
+        $entSet=$this->getPeriodSql($period)->where($whereArr)->select();
       }else{
-        $entSet=self::getPeriodSet($period);
+        $entSet=$this->getPeriodSet($period);
       }
       #转换为数据集
       $entSet=is_array($entSet)?collection($entSet):$entSet;

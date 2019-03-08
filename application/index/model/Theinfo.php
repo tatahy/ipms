@@ -29,59 +29,22 @@ class Theinfo extends Entityinfo {
     protected $autoWriteTimestamp = true;
     // 时间字段输出格式
     protected $dateFormat = 'Y/m/d H:i:s';
-
-    //引用app\common中定义的常量：conAssEntArr
-    const THEPERIOD=conTheEntArr['period'];
-    const ENTTYPE=conTheEntArr['type'];
-    const ENTITY='thesis';
-    
+   
     //继承自父类的变量
-    protected static $entPeriod;
-    protected static $entType;
-    protected static $entity;
-    //要操作的数据表名
-    protected static $tblName='';
-    protected static $obj=null;
-    protected $userName;
-    protected $dept;
-    protected $auth;
-        
-    //本类的5个私有静态变量
-    private static $periodArr=[];
-    private static $numArr=[];
+    //引用app\common中定义的常量：conTheEntArr
+    protected $entPeriod=conTheEntArr['period'];
+    protected $entType=conTheEntArr['type'];
+    protected $entity='thesis';
     
-    //本类的私有变量
-    private $period='';
-    private $errStr='not initiate Model Theinfo';
-    
-  //  function __construct(){
-      //$this->entity=$entity;
-//      $this->entPeriod=$entPeriod;
-//      $this->entType=$entType;
-      //parent::__construct();
-//      self::$entity=self::ENTITY;
-//      self::$entPeriod=self::THEPERIOD;
-//      self::$entType=self::ENTTYPE;
-//      
-//    }
-//    
-    #初始化模型的访问
-    public function initModel($username, $dept, $auth) {
-      $this->$userName=$username;
-      $this->$dept=$dept;
-      $this->$auth=$auth;
-      
-      if(is_null(self::$obj)){
-        self::$obj=new self();
-      }
-      return self::$obj;
+    public function getEntity() {
+      return $this->entity;
     }
+    
     //获取器，获取数据表theinfo中type字段值，转换为中文输出
     protected function getTypeAttr($dBStrEn)
     {
         //中英文对照数组
-        $tArr=self::ENTTYPE;
-        
+        $tArr=$this->entType;
         $output =array_key_exists($dBStrEn, $tArr)?$tArr[$dBStrEn]:$dBStrEn;
         
         return $output;
@@ -91,10 +54,8 @@ class Theinfo extends Entityinfo {
     protected function setTypeAttr($strChi)
     {
         //中英文对照数组
-        $tArr=self::ENTTYPE;
-        $k=array_search($strChi, $tArr);
-        
-        $output = $k?$tArr[$k]:$strChi;
+        $tArr=array_flip($this->entType);
+        $output =array_key_exists($strChi, $tArr)?$tArr[$strChi]:$strChi;
        
         return $output;
     }
@@ -103,8 +64,8 @@ class Theinfo extends Entityinfo {
     protected function getStatusAttr($dBStrEn)
     {
         //中英文对照数组
-        $tArr=_commonStatustEn2ChiArr(self::ENTITY);
-        
+        //$tArr=_commonStatustEn2ChiArr('thesis');
+        $tArr= $this->statusArr;
         $output =array_key_exists($dBStrEn, $tArr)?$tArr[$dBStrEn]:$dBStrEn;
         
         return $output;
@@ -114,10 +75,8 @@ class Theinfo extends Entityinfo {
     protected function setStatusAttr($strChi)
     {
         //中英文对照数组
-        $tArr=_commonStatustEn2ChiArr(self::ENTITY);
-        $k=array_search($strChi, $tArr);
-        
-        $output = $k?$tArr[$k]:$strChi;
+        $tArr= array_flip($this->statusArr);
+        $output =array_key_exists($strChi, $tArr)?$tArr[$strChi]:$strChi;
        
         return $output;
     }

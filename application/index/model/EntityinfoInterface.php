@@ -7,18 +7,17 @@
 
 namespace app\index\model;
 
-//定义抽象类
+//定义类接口
 interface EntityinfoInterface {
    
     #得到在period里的query对象
-    static function getPeriodSql();
-    
+    public function getPeriodSql();
     #得到在period里的所有pat
-    static function getPeriodSet();
+    public function getPeriodSet();
     #得到在period里的所有pat的num
-    static function getPeriodNum();
+    public function getPeriodNum();
     #得到在period的指定field字段的groupby内容
-    static public function getFieldGroupByArr($field);
+    public function getFieldGroupByArr($field);
 
    
 }
