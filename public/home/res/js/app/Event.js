@@ -20,8 +20,9 @@ export var Event={
 		});		
 	},
 	//多个查询表单的显示隐藏
-	clpsSwitch:function() {
-			//动态加载类
+	clpsSwitch:function() {	
+
+		//动态加载类
 		import('./SearchFormCollapse.class.js')
 		.then(cls=>{
 			let clpsSwitchSet=$('[data-collapse-switch]');
@@ -31,6 +32,7 @@ export var Event={
 			//3类共5个collapse-switch组件的click事件，
 			//任意时刻只有一个组件能click。记录触发click的组件特征值，再由特征值决定组件的显示
 			clpsSwitchSet.click(function(){
+				let fmSet=$('#entSearchForm form');
 				let mSwitch=$('[data-collapse-switch="main"]');
 				//特征值1
 				let	type=$(this).data('collapseSwitch');
@@ -48,7 +50,7 @@ export var Event={
 				if(type=='main'){
 					idx=trgObj.index;
 				}	
-	
+				
 				trgObj.type=type;
 				trgObj.index=idx;
 				trgObj.multishow=mul;
@@ -167,8 +169,8 @@ export var Event={
 		let refreshBtn=$('.btnPageRefresh');
 		refreshBtn.click(function(){
 			resetSearchForm();
-		return entGetReady();
-	});	
+			return entGetReady();
+		});	
 	},
 	//周期导航菜单click事件
 	entPeriod:function() {

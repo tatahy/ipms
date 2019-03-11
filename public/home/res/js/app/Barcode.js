@@ -254,7 +254,7 @@ function dealDecodeResult(result){
 
 //定义函数，显示识别结果和查询结果
 function queryByCode(code='') {
-	let d=App.data;
+	let rData=App.data.rqData;
 	let fm=Barcode._node.fm;
 	let img=Barcode._node.img;
 	let nodSuccess=img.find('.alert-success').hide();
@@ -262,8 +262,8 @@ function queryByCode(code='') {
 	if(code){
 		nodSuccess.show().find('span.alert-info').text(code);
 		//设置查询数据
-		d.rqData.searchSource=fm.data('formType');
-		d.rqData.searchData={bar_code:code};
+		rData.searchSource=fm.data('formType');
+		rData.searchData={bar_code:code};
 		
 		//向后端发起异步查询并显示查询结果
 		asyRefreshEntObj('list');

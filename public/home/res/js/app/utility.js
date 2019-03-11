@@ -6,6 +6,8 @@ import {Event as eve} from './Event.js';
 
 import {App} from './main.js';
 
+import {Modal} from './Modal.js';
+
 //定义async函数asyInitData()进行全局变量赋值，默认返回的是一个promise对象。
 async function asyInitData() {
 	let d=App.data;	//$.post()方法返回的是jqXHR对象，这个jqXHR对象是对所发起的request的响应结果，无需解析
@@ -55,6 +57,7 @@ function pageInit(){
 //page-init成功后处理各种事件
 function pageReady(){
 	let d=App.data;
+	// let rData=App.data.rqData;
 	let sumNod=$('#entSummary').show(),
 		perNod=$('#entPeriod').hide();
 	let entASet=$('nav .navbar-collapse ul').eq(0).find('a'),
@@ -87,6 +90,15 @@ function pageReady(){
 				return entGetReady();
 			}
 		}
+		
+		/* if(rData.ent!=ent){
+			initRqData();
+			rData.ent=ent;
+			rData.period=App.data.topNavProp[ent].period;
+			if(ent!='index'){
+				return entGetReady();
+			}
+		} */
 	});
 	
 	btnEntPeriod.click(function(){
@@ -182,14 +194,14 @@ function entEvent(){
 //async 定义了一个promise对象
 //异步加载ent对应的searchForm和list
 async function asyLoadEntObj(type){
-	let d=App.data;
+	let rData=App.data.rqData;
 	let conf={
 			list:{node:$('#entList'),url:'/index/list/index'},
 			form:{node:$('#entSearchForm'),url:'/index/searchForm/index'}
 		};
 	let opt={
 			method:'POST',
-			body:JSON.stringify(d.rqData),
+			body:JSON.stringify(rData),
 			headers:{
 				'Content-Type':'application/json'
 				// 'Content-Type':''
@@ -206,7 +218,7 @@ async function asyLoadEntObj(type){
 	// result=resObj.ok;
 	// console.log(resObj);
 	//$.post()返回的是一个jqXHR对象，该对象也是Promise对象，await该jqXHR对象得到其responseText属性值，大小要比上述resObj对象小
-	let content=await $.post(conf[type].url,d.rqData);
+	let content=await $.post(conf[type].url,rData);
 	result=(content)?true:false;
 	
 	loadNod.html(content);
@@ -268,17 +280,17 @@ async function asyRefreshEntObj(objStr='') {
 
 //setRqData
 function setRqData() {	
-	let d=App.data;
+	let rData=App.data.rqData;
 	let fm=$('form.fmQuery'),
 		entHArr=$('#entPeriod').find('.nav-pills li.active a').data(),
 		sortName=$('#entList').find('[data-sort-name]').eq(0).data('sortName'),
 		showId=$('#entList').find('[data-show-id]').eq(0).data('showId');
 		
-	d.rqData.ent=entHArr.ent;
-	d.rqData.period=entHArr.period;
+	rData.ent=entHArr.ent;
+	rData.period=entHArr.period;
 	
-	if(d.rqData.sortData.sortName==''){
-		d.rqData.sortData.sortName=sortName;	
+	if(rData.sortData.sortName==''){
+		rData.sortData.sortName=sortName;	
 	}
 	
 	fm.find('[name]').each(function(){
@@ -289,11 +301,11 @@ function setRqData() {
 			
 		//赋值rqData.searchData，非0非空的值才进行组装
 		if(v!=0){
-			d.rqData.searchData[name]=v;
+			rData.searchData[name]=v;
 		}
 		
 		//赋值rqData.queryField，表单输入项及其特征值
-		d.rqData.queryField[name]={val:v,tagName:lName};
+		rData.queryField[name]={val:v,tagName:lName};
 		//添加select的option特征值
 		if(lName=='select'){
 			let len=$(this).find('option').length,
@@ -305,22 +317,23 @@ function setRqData() {
 					opt.txt[index]=$(el).text();
 				});
 			} */
-			d.rqData.queryField[name]['option']=opt;
+			rData.queryField[name]['option']=opt;
 		}
 	});
 	
-	return d.rqData;
+	return rData;
 }
 //设置list
 function setEntPeriodList(){	
 	let d=App.data;
-	let ent=d.rqData.ent,
-		period=d.rqData.period,
+	let rData=d.rqData;
+	let ent=rData.ent,
+		period=rData.period,
 		capSNod=$('#entList').find('caption strong'),
 		periodChi=d.entProp[ent].period.detail[period].txt;
 
 	//显示分页的第一页
-	d.rqData.sortData.pageNum=1;
+	rData.sortData.pageNum=1;
 	
 	//tbl标题加内容
 	capSNod.text(periodChi);
@@ -459,12 +472,13 @@ function buildEntPeriodNavPills(){
 
 //设定$('form.fmQuery')的各个表单项
 async function asySetEntQueryForm(){
-	let d=App.data;
+	let rData=App.data.rqData;
 	let fm=$('form.fmQuery'),
 		selSet=fm.find('select'),
 		inSet=fm.find('input'),
 		//查询字段名数组
-		sNameArr='';
+		sNameArr=Object.keys(rData.searchData);
+	let len=sNameArr.length;
 	let resObj='';
 	let opt={
 			method:'POST',
@@ -478,18 +492,14 @@ async function asySetEntQueryForm(){
 	let optData='';
 	let result=false;
 	
-	// if(d.rqData.searchSource!='query'){
-	if(d.rqData.searchSource=='barcode'){
-		return;
-	}
 	setRqQueryFieldBy(fm);
-	opt.body= JSON.stringify(d.rqData);
+	opt.body= JSON.stringify(rData);
 	
 	resObj=await fetch('/index/searchForm/getSelOptData',opt);
 	optData=await resObj.json();
 	result=resObj.ok;
-
-	sNameArr=Object.keys(d.rqData.searchData);
+	
+	// console.log(rData);
 
 	if(optData){
 	//组装select的option，并设定显示值和底色
@@ -503,8 +513,8 @@ async function asySetEntQueryForm(){
 			$(this).append($('<option></option>').val(optObj.val[m]).text(optObj.txt[m]));
 		}
 			
-		if(sNameArr.length && sNameArr.includes(selName)){
-			v=d.rqData.searchData[selName];
+		if(len && sNameArr.includes(selName)){
+			v=rData.searchData[selName];
 			//上底色
 			$(this).addClass('alert-info');
 			if(v){
@@ -523,8 +533,12 @@ async function asySetEntQueryForm(){
 	});	
 	result=true;
 	}
+	//barcode表单查询时，仅有一个查询项
+	if(rData.searchSource=='barcode' && rData.searchData.bar_code){
+		len=len-1;
+	}
 	
-	if(sNameArr.length){
+	if(len){
 		//显示整个form
 		fm.closest('.collapse').collapse('show');
 		inSet.each(function(){
@@ -545,14 +559,14 @@ async function asySetEntQueryForm(){
 
 //组装向后端请求时的searchData，不带参数就是清空searchData
 function setRqSearchDataBy(fm=''){
-	let d=App.data;
+	let rData=App.data.rqData;
 	let formData='';
-	d.rqData.searchData={};
+	rData.searchData={};
 	
 	if(typeof fm !='object' || fm[0].localName !=='form'){
-		return d.rqData.searchData;
+		return rData.searchData;
 	}
-	d.rqData.searchSource=fm.data('formType');
+	rData.searchSource=fm.data('formType');
 	
 	//用户搜索有关键值对从表单searchObj获取
 	formData=new FormData(fm[0]);
@@ -560,18 +574,18 @@ function setRqSearchDataBy(fm=''){
 	formData.forEach(function(val,key){
 		//非0非空的值才进行组装
 		if(val!='' && val!=0){
-			d.rqData.searchData[key]=val;
+			rData.searchData[key]=val;
 		}
 	});		
-	return d.rqData.searchData;
+	return rData.searchData;
 }
 //组装向后端请求时的queryField，不带参数就是清空queryField
 function setRqQueryFieldBy(fm=''){
-	let d=App.data;
-	d.rqData.queryField={};
+	let rData=App.data.rqData;
+	rData.queryField={};
 	
 	if(typeof fm !='object' || fm[0].localName !=='form'){
-		return d.rqData.queryField;
+		return rData.queryField;
 	}
 	
 	fm.find('[name]').each(function(){
@@ -579,7 +593,7 @@ function setRqQueryFieldBy(fm=''){
 			v=$(this).val()==null?0:$(this).val(),
 			lName=$(this)[0].localName;
 		//表单输入项及其特征值
-		d.rqData.queryField[n]={val:v,tagName:lName};
+		rData.queryField[n]={val:v,tagName:lName};
 		//添加select的option特征值
 		if(lName=='select'){
 			let len=$(this).find('option').length,
@@ -591,16 +605,17 @@ function setRqQueryFieldBy(fm=''){
 					opt.txt[index]=$(el).text();
 				});
 			} */
-			d.rqData.queryField[n]['option']=opt;
+			rData.queryField[n]['option']=opt;
 		}
 	});
 	
-	return d.rqData.queryField;
+	return rData.queryField;
 }
 //构建title组件
 function buildEntPeriodTitle(){
 	let d=App.data;
-	let ent=(d.rqData.ent=='index')?'pat':d.rqData.ent,
+	let rData=d.rqData;
+	let ent=(rData.ent=='index')?'pat':rData.ent,
 		tProp=d.entProp[ent].period.detail,
 		spObj=$('<span></span>').css({'cursor':'unset'}),
 		spBdg=$('<span></span>').addClass('badge'),
@@ -610,7 +625,7 @@ function buildEntPeriodTitle(){
 	nod.empty();
 	for(let p in tProp){
 		let e=tProp[p].title;
-		if(p==d.rqData.period){
+		if(p==rData.period){
 			spObj.addClass(e.btn).append(e.txt,spBdg.text(e.num));
 			nod.empty().append(spObj);
 			break;
@@ -631,6 +646,9 @@ function resetSearchForm(){
 		if($(this).data('formType')=='barcode'){
 			$(this).siblings().hide();
 		}
+		// if($(this).data('formType')=='query'){
+			// asyRefreshEntObj();
+		// }
 	});
 	//清空查询数据
 	return setRqSearchDataBy();
@@ -640,11 +658,11 @@ function resetSearchForm(){
 //对ent List进行排序
 //列表字段进行升序降序转换，改变该字段表头显示格式
 function sortEntListTbl() {
-	let d=App.data;
+	let rData=App.data.rqData;
 	let glyAsc=$('<span></span>').addClass('small glyphicon glyphicon-sort-by-attributes'),
 		glyDesc=$('<span></span>').addClass('small glyphicon glyphicon-sort-by-order-alt'),
-		sortOrder=d.rqData.sortData.sortOrder,
-		sortName=d.rqData.sortData.sortName,
+		sortOrder=rData.sortData.sortOrder,
+		sortName=rData.sortData.sortName,
 		tblNod=$('#entList table'),
 		aHSet=tblNod.find('[data-sort-name]'),
 		trSet=tblNod.find('tr'),
@@ -653,7 +671,7 @@ function sortEntListTbl() {
 	
 	if(sortName==''){
 		sortName=aHSet.eq(0).data('sortName');
-		d.rqData.sortData.sortName=sortName;
+		rData.sortData.sortName=sortName;
 	}
 	
 	aHSet.each(function(){
@@ -663,7 +681,7 @@ function sortEntListTbl() {
 			column=$(this).data('sortName');
 		columnArr.push(column);
 		//每个添加属性
-		$(this).removeClass('label label-primary').attr({'data-period':d.rqData.period,'title':'点击排序'}).css('cursor','pointer').closest('th').addClass('text-center');
+		$(this).removeClass('label label-primary').attr({'data-period':rData.period,'title':'点击排序'}).css('cursor','pointer').closest('th').addClass('text-center');
 		
 		(sortName==column)?$(this).attr({'class':'label label-primary','data-sort-order':sort,'title':title}).tooltip({placement:'top'}).append('&nbsp;',gly):$(this).tooltip({placement:'bottom'});	
 		
@@ -712,6 +730,11 @@ function showSearchResult() {
 	if(n && d.searchResultNum){
 		bingoObj.show();
 		listObj.show();
+		
+		// Modal.small({cont:'<div class="text-center"><button class="btn btn-warning btn-sm" style="cursor:unset;font-size:14px;">搜索结果：<span class="badge">'+d.searchResultNum+'</span></button></div>'});
+		
+		$.alert('<div class="text-center"><button class="btn btn-warning btn-sm" style="cursor:unset;font-size:14px;">搜索结果：<span class="badge">'+d.searchResultNum+'</span></button></div>');
+
 	}
 	if(n && d.searchResultNum==0) noneObj.show();
 }

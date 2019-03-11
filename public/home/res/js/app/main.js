@@ -5,6 +5,8 @@ import c from './conf.js';
 
 import {asyInitData,pageInit,pageReady} from './utility.js';
 
+import {Modal} from './Modal.js';
+
 export var App={
 	data:{
 		glyPrex:c.glyPrex,
@@ -43,12 +45,12 @@ App.initData()
 	.then(uName=>{
 		let str='数据初始化失败。页面无法正常显示。';
 		if(uName){
-			str='用户【'+uName+'】登录成功。';
+			str='<p></p><div class="text-center" style="font-size:18px;">登录成功，欢迎回来!</div>';
 			App.pageInit();
 			App.pageReady();
-			// console.log(App.pageInit);
 		}
-		return $.alert(str);
+		// return Modal.small(str,{headBg:'bg-warning',title:'<strong class="label label-warning">'+uName+'</strong>'+'登录系统'});
+		return Modal.small(str);
 	})
 	.catch(err=>{
 		return App.exit(err);
