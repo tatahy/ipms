@@ -2,7 +2,9 @@
 // app/Event.js
 
 //导入index.js中定义的变量、函数
-import {rqData,resetSearchForm,asyRefreshEntObj,setRqSearchDataBy,setTrBgColor,entGetReady,consoleColor} from './index.js';
+// import {rqData,resetSearchForm,asyRefreshEntObj,setRqSearchDataBy,setTrBgColor,entGetReady,consoleColor} from './index.js';
+import {App} from './main.js';
+import {resetSearchForm,asyRefreshEntObj,setRqSearchDataBy,setTrBgColor,entGetReady,consoleColor} from './utility.js';
 
 //定义导出对象Event。封装各个事件处理函数
 export var Event={
@@ -11,7 +13,7 @@ export var Event={
 		//动态加载模块
 		import('./Barcode.js')
 		.then(module=>{
-			module.Barcode.init($('#fmRun'));
+			module.Barcode.init($('#fmBarcode'));
 		})
 		.catch(err=>{
 			console.log(err);
@@ -62,6 +64,7 @@ export var Event={
 	},
 	//一般查询表单的event
 	queryForm: function() {
+		let d=App.data;
 		let fmQ=$('form.fmQuery');
 	
 		fmQ.find('.form-control').change(function(){
@@ -79,7 +82,7 @@ export var Event={
 		});
 		//表单重置时附加的操作
 		fmQ.find('[type="reset"]').click(function(evt){
-			let len=Object.keys(rqData.searchData).length;
+			let len=Object.keys(d.rqData.searchData).length;
 			resetSearchForm();
 		
 			//异步更新list、queryForm
@@ -88,6 +91,7 @@ export var Event={
 	},
 	//list的event
 	list:function() {
+		let d=App.data;
 		let tblNod=$('#entList table'),
 			listRowNod=$('#listRows'),
 			aHeadSet=tblNod.find('thead a'),
@@ -95,11 +99,11 @@ export var Event={
 			aPageSet=$('#divListRows').find('a');
 	
 		//表格每页显示记录行数；表格按选定行数显示
-		listRowNod.val(rqData.sortData.listRows).change(function(){
+		listRowNod.val(d.rqData.sortData.listRows).change(function(){
 			//排序有关的值向sortData汇集
-			rqData.sortData.listRows=$(this).val()*1;
+			d.rqData.sortData.listRows=$(this).val()*1;
 			//分页从第一页开始
-			rqData.sortData.pageNum=1;
+			d.rqData.sortData.pageNum=1;
 		
 			//异步更新list
 			asyRefreshEntObj('list');
@@ -109,21 +113,21 @@ export var Event={
 		aHeadSet.click(function(){
 			let sortName=$(this).data('sortName');
 
-			rqData.sortData.sortOrder=(rqData.sortData.sortOrder=='asc')?'desc':'asc';
+			d.rqData.sortData.sortOrder=(d.rqData.sortData.sortOrder=='asc')?'desc':'asc';
 	
 			//排序有关的值向sortData汇集
-			if(rqData.sortData.sortName!=sortName){
-				rqData.sortData.sortName=sortName;
-				rqData.sortData.sortOrder='asc';	
+			if(d.rqData.sortData.sortName!=sortName){
+				d.rqData.sortData.sortName=sortName;
+				d.rqData.sortData.sortOrder='asc';	
 			}
-			rqData.sortData.pageNum=1;
+			d.rqData.sortData.pageNum=1;
 	
 			//异步更新list
 			asyRefreshEntObj('list');
 		});	
 		//表格中点击a后，标签所在行上底色
 		aBodySet.click(function(){
-			rqData.sortData.showId=$(this).closest('tr').data('showId');
+			d.rqData.sortData.showId=$(this).closest('tr').data('showId');
 		
 			return setTrBgColor();
 		});
@@ -151,7 +155,7 @@ export var Event={
 			}
 			//排序、分页有关的值向sortData汇集
 			if(pageNum){
-				rqData.sortData.pageNum=pageNum;
+				d.rqData.sortData.pageNum=pageNum;
 			}
 		
 			//异步更新list
@@ -168,14 +172,15 @@ export var Event={
 	},
 	//周期导航菜单click事件
 	entPeriod:function() {
+		let d=App.data;
 		let periodASet=$('[data-period]');
 		
 		periodASet.click(function(){
 			let sData=$(this).data();
 			$(this).tab('show');
-			if(rqData.period!=sData.period){
-				rqData.ent=sData.ent;
-				rqData.period=sData.period;
+			if(d.rqData.period!=sData.period){
+				d.rqData.ent=sData.ent;
+				d.rqData.period=sData.period;
 
 				//异步更新list、queryForm
 				asyRefreshEntObj();	

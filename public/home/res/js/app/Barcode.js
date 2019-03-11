@@ -9,7 +9,10 @@
 // import '../plugins/quaggaJs/quagga.min.js';
 
 //导入index.js中定义的变量、函数
-import {rqData,resetSearchForm,asyRefreshEntObj} from './index.js';
+// import {rqData,resetSearchForm,asyRefreshEntObj} from './index.js';
+
+import {App} from './main.js';
+import {resetSearchForm,asyRefreshEntObj} from './utility.js';
 
 //定义导出对象Barcode。封装条形码进行识别所需参数的预处理，识别过程。
 export var Barcode={
@@ -51,6 +54,8 @@ export var Barcode={
 			
 			if(fileObj.files && fileObj.files.length){
 				self.decode(URL.createObjectURL(fileObj.files[0]));
+				//添加表单标记
+				App.data.rqData.searchSource=node.fm.data('formType');
 				//加底色
 				$(this).addClass('alert-info');
 				node.img.show().children('.alert').hide();
@@ -62,6 +67,8 @@ export var Barcode={
 		
 			if(input.files && input.files.length){	
 				self.decode(URL.createObjectURL(input.files[0]));
+				//添加表单标记
+				App.data.rqData.searchSource=node.fm.data('formType');
 			}else{
 				$.alert('<p class="text-center" ><span class="label label-warning" style="font-size:16px;" >请选择条形码图片</span><p>');
 			}
@@ -247,6 +254,7 @@ function dealDecodeResult(result){
 
 //定义函数，显示识别结果和查询结果
 function queryByCode(code='') {
+	let d=App.data;
 	let fm=Barcode._node.fm;
 	let img=Barcode._node.img;
 	let nodSuccess=img.find('.alert-success').hide();
@@ -254,8 +262,8 @@ function queryByCode(code='') {
 	if(code){
 		nodSuccess.show().find('span.alert-info').text(code);
 		//设置查询数据
-		rqData.searchSource=fm.data('formType');
-		rqData.searchData={bar_code:code};
+		d.rqData.searchSource=fm.data('formType');
+		d.rqData.searchData={bar_code:code};
 		
 		//向后端发起异步查询并显示查询结果
 		asyRefreshEntObj('list');

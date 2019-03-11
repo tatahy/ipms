@@ -1,76 +1,55 @@
 // app/main.js
 
-//conf.js中采用默认输出，c为本文件中使用的hash对象，其键值为'./conf.js'各个导出键值对
+//conf.js中采用默认输出
 import c from './conf.js';
 
-import {SearchFormCollapse} from './SearchFormCollapse.class.js';
-import {Barcode} from './Barcode.js';
+import {asyInitData,pageInit,pageReady} from './utility.js';
 
-var App={
+export var App={
 	data:{
 		glyPrex:c.glyPrex,
 		bs3Color:c.bs3Color,
 		year:c.year,
+		userName:c.userName,
 		entNum:c.entNum,
 		loadStr:c.loadStr,
 		topNavProp:c.topNavProp,
 		entProp:c.entProp,
 		rqData:c.rqData,
 		urlObj:c.urlObj,
-		searchResultNum:c.searchResultNum,
-		sfcCls:SearchFormCollapse,
-		Barcode:Barcode
+		searchResultNum:c.searchResultNum
 	},
-	initData:async function initData(){
-		let d=this.data;
-		let resData = await $.post('index/index/index',{getPageInitData:true});
+	//定义异步函数进行data的初始化
+	initData:async function(){
+		let self=this;
+		//使用utility.js中的异步函数
+		self.data=await asyInitData();
 		
-	/* Promise.all(resData.urlObj.domain).then(function(val){
-		console.log(val);
-	}); */
-	
-		console.log(resData);
-		//全局变量赋值
-		d.urlObj=resData.urlObj;
-		d.entNum=resData.entNum;
-		d.rqData=initRqData();
-		//完善entProp中的num属性值
-		for(let ent in d.entProp){
-			for(let per in d.entProp[ent].period.detail){
-				d.entProp[ent].period.detail[per].title.num=d.entNum[ent][per];
-			}
-		}
+		return self.data.userName;
 	},
 	exit:function(err){
-		$.alert(err);
-	},
-	start:async function start(){
-		let self=this;
-		let result=await self.initData();
-		// let val=await Promise.all([result1,result2]);
-		
-		if(result){
-			self.pageInit();
-			self.pageReady();
-		}
+		// $.alert(err);
+		console.log(err);
 	},
 	pageInit:function() {
-		
+		return pageInit();
 	},
 	pageReady:function() {
-		
+		return pageReady();
 	},
 };
 
-/* App.initData().then(
-	App.pageInit();
-	App.pageReady();
-).catch(
-	App.exit(err);
-);
- */
-App.start().catch(
-	App.exit(err)
-);
-
-
+App.initData()
+	.then(uName=>{
+		let str='数据初始化失败。页面无法正常显示。';
+		if(uName){
+			str='用户【'+uName+'】登录成功。';
+			App.pageInit();
+			App.pageReady();
+			// console.log(App.pageInit);
+		}
+		return $.alert(str);
+	})
+	.catch(err=>{
+		return App.exit(err);
+	});

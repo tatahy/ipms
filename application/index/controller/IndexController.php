@@ -142,8 +142,8 @@ class IndexController extends Controller
       'entNum'=>$entNum,
       'authArr'=>$this->authArr,
       #服务器端信息,TP5中获取全局变量$_SERVER的方法
-      'server'=>$request->server(),
-      'cookie'=>$request->cookie(),
+      //'server'=>$request->server(),
+//      'cookie'=>$request->cookie(),
       //'session'=>$request->session(),
     ];
     
