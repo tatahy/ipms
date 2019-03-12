@@ -48,7 +48,7 @@ async function asyInitData() {
 function pageInit(){
 	//生成组件
 	buildTopNavbar();
-	buildEntSummary();
+	buildEntCharts();
 	// 激活并设置tooltip
 	$('body').tooltip({selector:'[title]',triger:'hover click',placement:'auto top',delay: {show: 200, hide: 100},html: true });
 	//设置页脚年份
@@ -58,7 +58,7 @@ function pageInit(){
 function pageReady(){
 	let d=App.data;
 	// let rData=App.data.rqData;
-	let sumNod=$('#entSummary').show(),
+	let sumNod=$('#entChart').show(),
 		perNod=$('#entPeriod').hide();
 	let entASet=$('nav .navbar-collapse ul').eq(0).find('a'),
 		btnEntPeriod=sumNod.find('.btnPeriod'),
@@ -86,7 +86,14 @@ function pageReady(){
 			initRqData();
 			d.rqData.ent=ent;
 			d.rqData.period=d.topNavProp[ent].period;
+			
+			//添加锚点？
+			// window.location.hash=ent;
+			//url添加查询字段？？
+			// window.location.search=`ent=${ent}`;
+						
 			if(ent!='index'){
+				
 				return entGetReady();
 			}
 		}
@@ -398,6 +405,128 @@ function buildTopNavbar(){
 	//为li标签添加.active
 	r.find('[data-ent="'+entity+'"]').tab('show');
 }
+//根据定义的entProp生成"canvas"组件
+function buildEntCharts() {
+	let d=App.data;
+	let //计数器
+		n=0,
+		divSet=[];
+		
+	$('#entChart').empty();
+	
+	//挨个生成ent组件
+	for (let ent in d.entNum){
+		let numObj=(typeof d.entNum[ent]=='object')?d.entNum[ent]:0,
+			entObj=d.entProp[ent],
+			perObj=entObj.period.summary,
+			p=$('<p></p>').addClass('text-center').text(entObj.noneTxt),
+			panH=$('<div></div>').addClass('panel-heading').append($('<span></span>').addClass(entObj.gly),'&nbsp;',$('<strong></strong>').html(entObj.chi)),
+			panB=$('<div></div>').addClass('panel-body text-center'),
+			pan=$('<div></div>').addClass('panel-group'),
+			panType=$('<div></div>').addClass('panel panel-default'),
+			div=$('<div></div>').addClass('col-sm-6');
+		let idStr=`cvs-${ent}`;
+		
+	
+	
+		if(typeof numObj=='object' && Object.values(numObj).length){
+			let cvsNod=$('<canvas></canvas>').attr({'id':idStr,'height':'200'}).text('canvas coming');
+			let dhntDataSet={
+				data:[],
+				backgroundColor:[],
+				label:'xxx'
+			};
+			let perName=[];
+			let chartDhnut='';
+			let btnSet=[];
+			let other={
+				num:Object.values(numObj)[0],
+				rgb:'#f5f5f5',
+				txt:'其他'
+			};
+			//计数器
+			let m=0;
+			
+			//生成btnSet
+			for(let per in perObj){
+				let num=numObj[per],
+					el=perObj[per],
+					btn=$('<button></button>').attr({'class':'btn btn-xs btnPeriod','title':'查看详情'}).css({'margin':'2px','font-size':'14px'}),
+					spBdg=$('<span></span>').addClass('badge');
+				
+				if(num){
+					spBdg.text(num);
+					btn.attr({'data-ent':ent,'data-period':per}).addClass(el.color).append(el.txt+'&nbsp;',spBdg);
+				
+					if(el.color=='btn-default'){
+						btn.css('backgroundColor','#ccc');
+					}
+					
+					btnSet[m]=btn;
+					
+					//chart中的数组赋值
+					dhntDataSet.data[m]=num;
+					dhntDataSet.backgroundColor[m]=el.rgb;
+					perName[m]=el.txt;
+					//计算其他项数量
+					other.num-=num;
+					
+					m++;
+				}
+			}
+			// chart中添加'其他'项
+			if(other.num){				
+				dhntDataSet.data.push(other.num);
+				dhntDataSet.backgroundColor.push(other.rgb);
+				perName.push(other.txt);
+			}
+			
+			//生成chart
+			chartDhnut=new Chart(cvsNod,{
+				// type:'doughnut',
+				type:'pie',
+				data:{
+					datasets:[dhntDataSet],
+					labels:perName
+				},
+				options:{
+					responsive:true,
+					legend:{
+						display:true,
+						position:'right',
+					},
+					title:{
+						display:false,
+						text:'圆环图'
+					},
+					animation:{
+						animateScale:true,
+						animateRotate:true
+					}
+				}
+			});
+			//组装panB
+			panB.append(cvsNod,'<br />',btnSet);
+		}		
+		
+		if(numObj==0){
+			panB.append(p);
+		}
+		
+		panType.append(panH,panB);
+		pan.append(panType);
+		//生成一个ent组件
+		divSet[n]=div.append(pan);
+		n++;
+	}
+	
+	//每个row放置2个ent组件
+	for(let i=0;i<Math.ceil(n/2);i++){		
+		let r=$('<div></div>').addClass('row');
+		r.append(divSet[2*i],divSet[(2*i+1)]);
+		$('#entChart').append(r);
+	}
+}
 
 //根据定义的entProp生成"row"组件
 function buildEntSummary(){
@@ -426,7 +555,11 @@ function buildEntSummary(){
 					spBdg=$('<span></span>').addClass('badge');
 				
 				spBdg.text(num);
-				btn.attr({'data-ent':ent,'data-period':per}).addClass(el.color).append(el.txt,spBdg);
+				btn.attr({'data-ent':ent,'data-period':per}).addClass(el.color).append(el.txt+'&nbsp;',spBdg);
+				if(el.color=='btn-default'){
+					btn.css('backgroundColor','#ccc');
+				}
+				
 				panB.append(btn);
 			}
 		}		
@@ -617,7 +750,7 @@ function buildEntPeriodTitle(){
 	let rData=d.rqData;
 	let ent=(rData.ent=='index')?'pat':rData.ent,
 		tProp=d.entProp[ent].period.detail,
-		spObj=$('<span></span>').css({'cursor':'unset'}),
+		spObj=$('<span></span>').addClass('btn').css({'cursor':'unset'}),
 		spBdg=$('<span></span>').addClass('badge'),
 		//生成title的根节点
 		nod=$('#entPeriod').children('h4.title');
@@ -627,7 +760,12 @@ function buildEntPeriodTitle(){
 		let e=tProp[p].title;
 		if(p==rData.period){
 			spObj.addClass(e.btn).append(e.txt,spBdg.text(e.num));
+			if(e.btn=='btn-default'){
+				spObj.css('backgroundColor','#ccc');
+			}
 			nod.empty().append(spObj);
+			
+			
 			break;
 		}
 	}
@@ -681,7 +819,7 @@ function sortEntListTbl() {
 			column=$(this).data('sortName');
 		columnArr.push(column);
 		//每个添加属性
-		$(this).removeClass('label label-primary').attr({'data-period':rData.period,'title':'点击排序'}).css('cursor','pointer').closest('th').addClass('text-center');
+		$(this).removeClass('label label-primary').attr({'data-period':rData.period,'title':'点击排序'}).css({'cursor':'pointer','font-size':'14px'},).closest('th').addClass('text-center');
 		
 		(sortName==column)?$(this).attr({'class':'label label-primary','data-sort-order':sort,'title':title}).tooltip({placement:'top'}).append('&nbsp;',gly):$(this).tooltip({placement:'bottom'});	
 		

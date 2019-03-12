@@ -21,6 +21,8 @@
 	{// TP5中的模板注释格式，单行。<!-- 自定义的页面弹窗 -->}  
 	<!-- //条形码识别插件  -->
 	{js href="/home/res/js/plugins/quaggaJs/quagga.min.js" }
+	<!-- //chartJs插件  -->
+	{js href="/home/res/js/plugins/chartJs-2.7.3/Chart.min.js" }
 	<!-- // md5加密函数-->
 	{js href="/home/res/js/md5.min.js" }
   	{js href="/home/res/js/alert.min.js" }
@@ -64,32 +66,32 @@ footer {
 }
 
 @media screen and (max-width: 767px) {
-body {
-  	/* Margin bottom by footer height */
-  	margin: 0;
-} 
+	body {
+  		/* Margin bottom by footer height */
+  		margin: 0;
+	} 
 
-/* 产生点击层，配合js实现点击屏幕空白处隐藏sidnav*/
-.topnav-backdrop {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 10;
-  background-color: transparent;
-}
+	/* 产生点击层，配合js实现点击屏幕空白处隐藏sidnav*/
+	.topnav-backdrop {
+ 		position: fixed;
+  		top: 0;
+  		right: 0;
+  		bottom: 0;
+  		left: 0;
+  		z-index: 10;
+  		background-color: transparent;
+	}
 
-.mainFrame{
-	margin: 0;
-}
+	.mainFrame{
+		margin: 0;
+	}
 
-footer {
-	position: relative;
-	background-color:#ffffff;
-	padding-top:10px;
-	margin-top:40px;
-}
+	footer {
+		position: relative;
+		background-color:#ffffff;
+		padding-top:10px;
+		margin-top:40px;
+	}
 
 }
   

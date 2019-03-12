@@ -50,17 +50,17 @@ export default {
 		gly:'glyphicon glyphicon-wrench',
 		period:{
 			summary:{
-				newAdd:{txt:'拟申报专利数：',color:'btn-info'},
-				apply:{txt:'申报专利数：',color:'btn-primary'},
-				authorize:{txt:'有效专利数：',color:'btn-success'}
+				newAdd:{txt:'拟申报',color:'btn-info',rgb:'#5bc0de'},
+				apply:{txt:'申报',color:'btn-primary',rgb:'#337ab7'},
+				authorize:{txt:'有效',color:'btn-success',rgb:'#5cb85c'}
 			},
 			detail:{
-				total:{txt:'专利概况',title:{btn:'btn btn-primary',txt:'专利总数&nbsp;',num:''}},
-				audit:{txt:'内审',title:{lab:'label label-info',btn:'btn btn-info',txt:'内部审核拟申报专利&nbsp;',num:''}},
-				newAdd:{txt:'拟申报',title:{btn:'btn btn-info',txt:'拟申报专利&nbsp;',num:''}},
-				apply:{txt:'申报',title:{btn:'btn btn-primary',txt:'申报专利&nbsp;',num:''}},
-				authorize:{txt:'授权(有效)',title:{btn:'btn btn-success',txt:'授权(有效期)专利&nbsp;',num:''}},
-				invalid:{txt:'无授权(无效)',title:{btn:'btn btn-default',txt:'无效专利数&nbsp;',num:''}}
+				total:{txt:'专利概况',title:{btn:'btn-primary',txt:'专利总数&nbsp;',num:''}},
+				audit:{txt:'内审',title:{lab:'label label-info',btn:'btn-info',txt:'内部审核拟申报专利&nbsp;',num:''}},
+				newAdd:{txt:'拟申报',title:{btn:'btn-info',txt:'拟申报专利&nbsp;',num:''}},
+				apply:{txt:'申报',title:{btn:'btn-primary',txt:'申报专利&nbsp;',num:''}},
+				authorize:{txt:'授权(有效)',title:{btn:'btn-success',txt:'授权(有效期)专利&nbsp;',num:''}},
+				invalid:{txt:'无授权(无效)',title:{btn:'btn-default',txt:'无效专利数&nbsp;',num:''}}
 			}
 		},
 		noneTxt:'"专利"模块无【查阅】权限，请与系统管理员联系。'
@@ -73,18 +73,18 @@ export default {
 		gly:'glyphicon glyphicon-oil',
 		period:{
 			summary:{
-				undetermined:{txt:'待定数：',color:'btn-info'},
-				normal:{txt:'正常数：',color:'btn-success'},
-				abnormal:{txt:'异常数：',color:'btn-warning'},
-				suspended:{txt:'停用数：',color:'btn-default'}
+				undetermined:{txt:'待定',color:'btn-info',rgb:'#5bc0de'},
+				normal:{txt:'正常',color:'btn-success',rgb:'#5cb85c'},
+				abnormal:{txt:'异常',color:'btn-warning',rgb:'#f0ad4e'},
+				suspended:{txt:'停用',color:'btn-default',rgb:'#ccc'}
 			},
 			detail:{
-				usual:{txt:'固定资产概况',title:{txt:'固定资产总数&nbsp;',btn:'btn btn-primary',num:''}},
-				undetermined:{txt:'待定',title:{txt:'状态待定数&nbsp;',btn:'btn btn-info',num:''}},
-				normal:{txt:'正常',title:{txt:'状态正常数&nbsp;',btn:'btn btn-success',num:''}},
-				abnormal:{txt:'异常',title:{txt:'状态异常数&nbsp;',btn:'btn btn-warning',num:''}},
-				suspended:{txt:'停用',title:{txt:'停止使用数&nbsp;',btn:'btn btn-default',num:''}},
-				removed:{txt:'销账',title:{txt:'财务销账数&nbsp;',btn:'btn btn-danger',num:''}}
+				usual:{txt:'固定资产概况',title:{txt:'固定资产总数&nbsp;',btn:'btn-primary',num:''}},
+				undetermined:{txt:'待定',title:{txt:'状态待定数&nbsp;',btn:'btn-info',num:''}},
+				normal:{txt:'正常',title:{txt:'状态正常数&nbsp;',btn:'btn-success',num:''}},
+				abnormal:{txt:'异常',title:{txt:'状态异常数&nbsp;',btn:'btn-warning',num:''}},
+				suspended:{txt:'停用',title:{txt:'停止使用数&nbsp;',btn:'btn-default',num:''}},
+				removed:{txt:'销账',title:{txt:'财务销账数&nbsp;',btn:'btn-danger',num:''}}
 			}
 		},
 		noneTxt:'"固定资产"模块无【查阅】权限，请与系统管理员联系。'
@@ -98,24 +98,24 @@ export default {
 		gly:'glyphicon glyphicon-inbox',
 		period:{
 			summary:{
-				plan:{txt:'拟申报项目数：',color:'btn-info'},
-				apply:{txt:'申报项目数',color:'btn-primary'},
-				approve:{txt:'立项项目数：',color:'btn-warning'},
-				process:{txt:'在研项目数：',color:'btn-danger'},
-				done:{txt:'结题项目数：',color:'btn-success'},
-				terminate:{txt:'终止项目数：',color:'btn-default'}
+				plan:{txt:'拟申报',color:'btn-info',rgb:'#5bc0de'},
+				apply:{txt:'申报',color:'btn-primary',rgb:'#337ab7'},
+				approve:{txt:'立项',color:'btn-warning',rgb:'#f0ad4e'},
+				process:{txt:'在研',color:'btn-danger',rgb:'#d9534f'},
+				done:{txt:'结题',color:'btn-success',rgb:'#5cb85c'},
+				terminate:{txt:'终止',color:'btn-default',rgb:'#ccc'}
 			},
 			detail:{
-				total:{txt:'项目总体情况',title:{btn:'btn btn-primary',txt:'项目总数&nbsp;',num:''}},
-				audit:{txt:'内审',title:{btn:'btn btn-info',txt:'内部审核中项目数&nbsp;',num:''}},
-				plan:{txt:'拟申报',title:{btn:'btn btn-info',txt:'内审通过拟申报项目数&nbsp;',num:''}},
-				apply:{txt:'申报',title:{btn:'btn btn-primary',txt:'申报过程中项目数&nbsp;',num:''}},
-				approve:{txt:'立项',title:{btn:'btn btn-warning',txt:'立项批准项目数&nbsp;',num:''}},
-				process:{txt:'在研',title:{btn:'btn btn-danger',txt:'执行中项目数&nbsp;',num:''}},
-				inspect:{txt:'验收',title:{btn:'btn btn-primary',txt:'验收过程中项目数&nbsp;',num:''}},
-				done:{txt:'结题',title:{btn:'btn btn-success',txt:'结束(基本达成项目预期)项目数&nbsp;',num:''}},
-				terminate:{txt:'终止',title:{btn:'btn btn-default',txt:'终止(未达成项目预期)项目数&nbsp;',num:''}},
-				reject:{txt:'申报未立项',title:{btn:'btn btn-default',txt:'申报未立项项目数&nbsp;',num:''}}
+				total:{txt:'项目总体情况',title:{btn:'btn-primary',txt:'项目总数&nbsp;',num:''}},
+				audit:{txt:'内审',title:{btn:'btn-info',txt:'内部审核中项目数&nbsp;',num:''}},
+				plan:{txt:'拟申报',title:{btn:'btn-info',txt:'内审通过拟申报项目数&nbsp;',num:''}},
+				apply:{txt:'申报',title:{btn:'btn-primary',txt:'申报过程中项目数&nbsp;',num:''}},
+				approve:{txt:'立项',title:{btn:'btn-warning',txt:'立项批准项目数&nbsp;',num:''}},
+				process:{txt:'在研',title:{btn:'btn-danger',txt:'执行中项目数&nbsp;',num:''}},
+				inspect:{txt:'验收',title:{btn:'btn-primary',txt:'验收过程中项目数&nbsp;',num:''}},
+				done:{txt:'结题',title:{btn:'btn-success',txt:'结束(基本达成项目预期)项目数&nbsp;',num:''}},
+				terminate:{txt:'终止',title:{btn:'btn-default',txt:'终止(未达成项目预期)项目数&nbsp;',num:''}},
+				reject:{txt:'申报未立项',title:{btn:'btn-default',txt:'申报未立项项目数&nbsp;',num:''}}
 			}
 		},
 		noneTxt:'"项目"模块无【查阅】权限，请与系统管理员联系。'
@@ -129,18 +129,18 @@ export default {
 		gly:'glyphicon glyphicon-list',
 		period:{
 			summary:{
-				plan:{txt:'拟发表论文数：',color:'btn-info'},
-				apply:{txt:'投稿论文数：',color:'btn-primary'},
-				publish:{txt:'发表论文数：',color:'btn-success'}
+				plan:{txt:'拟发表',color:'btn-info',rgb:'#5bc0de'},
+				apply:{txt:'投稿',color:'btn-primary',rgb:'#337ab7'},
+				publish:{txt:'发表',color:'btn-success',rgb:'#5cb85c'}
 			},
 			detail:{
-				total:{txt:'论文总体情况',title:{btn:'btn btn-primary',txt:'论文总数&nbsp;',num:''}},
-				audit:{txt:'内审',title:{btn:'btn btn-info',txt:'内部审核中论文数&nbsp;',num:''}},
-				plan:{txt:'拟发表',title:{btn:'btn btn-info',txt:'内审通过拟发表论文数&nbsp;',num:''}},
-				apply:{txt:'投稿',title:{btn:'btn btn-primary',txt:'投稿过程中论文数&nbsp;',num:''}},
-				accept:{txt:'收录',title:{btn:'btn btn-warning',txt:'已收录论文数&nbsp;',num:''}},
-				publish:{txt:'发表',title:{btn:'btn btn-success',txt:'已公开发表论文数&nbsp;',num:''}},
-				reject:{txt:'拒稿',title:{btn:'btn btn-default',txt:'被拒绝发表论文数&nbsp;',num:''}}
+				total:{txt:'论文总体情况',title:{btn:'btn-primary',txt:'论文总数&nbsp;',num:''}},
+				audit:{txt:'内审',title:{btn:'btn-info',txt:'内部审核中论文数&nbsp;',num:''}},
+				plan:{txt:'拟发表',title:{btn:'btn-info',txt:'内审通过拟发表论文数&nbsp;',num:''}},
+				apply:{txt:'投稿',title:{btn:'btn-primary',txt:'投稿过程中论文数&nbsp;',num:''}},
+				accept:{txt:'收录',title:{btn:'btn-warning',txt:'已收录论文数&nbsp;',num:''}},
+				publish:{txt:'发表',title:{btn:'btn-success',txt:'已公开发表论文数&nbsp;',num:''}},
+				reject:{txt:'拒稿',title:{btn:'btn-default',txt:'被拒绝发表论文数&nbsp;',num:''}}
 			}
 		},
 		noneTxt:'"论文"模块无【查阅】权限，请与系统管理员联系。'

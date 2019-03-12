@@ -16,7 +16,8 @@
 					<th><a data-sort-name="quantity">数量</a></th>
 					<th><a data-sort-name="dept_now">现使用部门</a></th>
 					<th><a data-sort-name="keeper_now">现保管人</a></th>
-					<th><a data-sort-name="status_now">状态</a></th>
+					<th><a data-sort-name="status_now">现状</a></th>
+					<th><a data-sort-name="update_time">登记时间</a></th>
 					<th><a data-sort-name="status_now_user_name">登记人</a></th>
 					
 				</tr>
@@ -35,6 +36,7 @@
 					<td>{$vo.dept_now}</td>
 					<td>{$vo.keeper_now}</td>
 					<td><a class="aAssRecords" href="#" data-ass-id="{$vo.id}"><span class="spStatus">{$vo.status_now}</span></a></td>
+					<td>{$vo.update_time}</td>
 					<td>{$vo.status_now_user_name}</td>
 				
 				</tr>
