@@ -440,7 +440,8 @@ var	tblTrBg=(id='')=>{
 
 //btnOprt点击
 var btnOprtClick=(obj,url)=>{
-	let data={oprt:obj.data('oprt'),id:obj.closest('tr').data('id'),reqEnt:obj.data('reqEnt')},
+	let trNod=obj.closest('tr');
+	let data={oprt:obj.data('oprt'),id:trNod.data('id'),reqEnt:obj.data('reqEnt')},
 		e=oprtBtnProp[data.oprt],
 		mdObj=$('#modalSingle'),
 		tdObj='',
@@ -448,7 +449,7 @@ var btnOprtClick=(obj,url)=>{
 		oprtStr='【<span class="'+e.color.txt+'">'+e.glyCom+e.chi+'</span>】';
 		
 	//是表格内的oprt按钮
-	if(obj.closest('tr').length){
+	if(trNod.length){
 		tblTrBg(data.id);
 		//分页参数向$('#pageParam')汇集
 		$('#pageParam').data('showId',data.id);
@@ -474,9 +475,11 @@ var btnOprtClick=(obj,url)=>{
 		<!-- }); -->
 		
 		mdObj.find('.modal-header').removeClass('bg-info bg-danger bg-warning').addClass(e.color.bg);			
-		mdObj.find('.modal-body').html('<p class="text-center" style="font-size:28px;">加载中……</p>').load(url,data,function(){
-			mdObj.find('h4').html(oprtStr+'用户组');
-				
+		mdObj.find('.modal-body')
+		.html('<p class="text-center" style="font-size:28px;">加载中……</p>')
+		.load(url,data,function(){
+			let name=trNod.find('.name').text();
+			mdObj.find('h4').html(oprtStr+name);
 		});
 		mdObj.on('shown.bs.modal', function () {
             $('#fmUsergroup').find('.inputCheck').eq(0).focus();

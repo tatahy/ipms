@@ -439,7 +439,7 @@ function buildEntCharts() {
 		//有数据的ent才生成组件
 		if(typeof numObj=='object' && Object.values(numObj).length){
 			let cvsNod=$('<canvas></canvas>').attr({'id':idStr,'height':'200'}).text('canvas coming');
-			let chartDataSet={
+			let chartData={
 					data:[],
 					backgroundColor:[],
 					label:'xxx'
@@ -474,8 +474,8 @@ function buildEntCharts() {
 					btnSet[m]=btn;
 					
 					//chart中的数组赋值
-					chartDataSet.data[m]=num;
-					chartDataSet.backgroundColor[m]=el.rgb;
+					chartData.data[m]=num;
+					chartData.backgroundColor[m]=el.rgb;
 					perName[m]=el.txt;
 					//计算其他项数量
 					other.num-=num;
@@ -485,8 +485,8 @@ function buildEntCharts() {
 			}
 			// chart中添加'其他'项
 			if(other.num){				
-				chartDataSet.data.push(other.num);
-				chartDataSet.backgroundColor.push(other.rgb);
+				chartData.data.push(other.num);
+				chartData.backgroundColor.push(other.rgb);
 				perName.push(other.txt);
 			}
 			
@@ -495,7 +495,7 @@ function buildEntCharts() {
 				// type:'doughnut',
 				type:chartType,
 				data:{
-					datasets:[chartDataSet],
+					datasets:[chartData],
 					labels:perName
 				},
 				options:{

@@ -4,9 +4,9 @@
 <div id="divUsergroup" data-user-id="{$user.id}" style="margin-top:10px;">
 	
 	<div class="btn-group">
-    	<button type="button" class="btn btn-warning" style="padding:1px 5px;font-size:16px;" data-toggle="collapse" data-target="#divUserBasicInfo" title="显示/隐藏基本信息"><span class="glyphicon glyphicon-duplicate"></span>基本信息</button>
+    	<button type="button" class="btn btn-primary" style="padding:1px 5px;font-size:16px;" data-toggle="collapse" data-target="#divUserBasicInfo" title="显示/隐藏基本信息"><span class="glyphicon glyphicon-duplicate"></span>基本信息</button>
     	<div class="btn-group">
-      		<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" style="padding:1px 5px;font-size:16px;">修改<span class="caret"></span></button>
+      		<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="padding:1px 5px;font-size:16px;">修改<span class="caret"></span></button>
       		<ul class="dropdown-menu" role="menu">
 				<li><a href="#userInfo" class="aModalTrig" data-toggle="tooltip" data-title="修改个人基本信息" data-div-part="info"><span class="glyphicon glyphicon-edit"></span>基本信息</a></li>
     			<li role="separator" class="divider"></li>
@@ -32,17 +32,17 @@
 	</div>
 	<hr>
 	
-	<button type="button" class="btn btn-warning" style="padding:1px 5px;font-size:16px;" data-toggle="collapse" data-target="#divUserAuth"title="显示/隐藏系统权限"><span class="glyphicon glyphicon-alert"></span>系统权限</button>
+	<button type="button" class="btn btn-primary" style="padding:1px 5px;font-size:16px;" data-toggle="collapse" data-target="#divUserAuth"title="显示/隐藏系统权限"><span class="glyphicon glyphicon-alert"></span>系统权限</button>
 	<br />
 	<br />
-	<p id="authRank" style="padding-left:20px;"><strong>权限类别：</strong></p>
+	<p id="authRank" style="padding-left:20px;"><strong>系统模块类别：</strong></p>
 
 	<div id="divUserAuth" class="row myRow collaps in" style="margin-top:10px;">		
 		
 	</div>
 	<hr>
 		
-	<button type="button" class="btn btn-warning" style="padding:1px 5px;font-size:16px;" data-toggle="collapse" data-target="#divUserGroup" title="显示/隐藏所属用户组"><span class="glyphicon glyphicon-education"></span>所属用户组</button>
+	<button type="button" class="btn btn-primary" style="padding:1px 5px;font-size:16px;" data-toggle="collapse" data-target="#divUserGroup" title="显示/隐藏所属用户组"><span class="glyphicon glyphicon-education"></span>所属用户组</button>
 	
 	<div id="divUserGroup" class="row myRow collaps in" style="margin-top:10px;">		
 		<ul class="list-group">
@@ -176,53 +176,6 @@ var uAuth={$user}['authority'];
 //必填输入框内容有效性判断结果数组
 var check = [];
 
-//**函数名：textEnToChi
- 	//* 作用：本页面特定英文字符串转换成中文字符串
-	//* 参数text，类型：字符串。值：不为空。说明：待转换的英文字符串。
-	//* 返回值：中文字符串
-var textEnToChi=(text)=>{
-	switch(text){
-		case 'edit':
-            text='编辑';
-        break;
-        case 'audit':
-            text='审核';
-        break;
-        case 'approve':
-            text='审批';
-        break;
-        case 'execute':
-            text='执行';
-        break;
-        case 'maintain':
-            text='维护';
-        break;
-       //...................附件.....................
-        case 'upload':
-            text='上传';
-        break;
-        case 'download':
-            text='下载';
-        break;
-        case 'erase':
-            text='删除';
-        break;
-        case 'move':
-            text='移动';
-        break;
-        case 'copy':
-            text='复制';
-        break;
-		case 'enable':
-	        text='启用';
-         break;
-		case 'read':
-	        text='查阅';
-         break;
-	}
-	return text;
-};
-
 var modalUserInfoShow=(h4Html,divPart)=>{
 	var modalObj=$('#modalUserInfo');
 	modalObj.find('.modal-header h4 span').html(h4Html);
@@ -241,13 +194,15 @@ var modalUserInfoShow=(h4Html,divPart)=>{
 
 //生成auth的显示组件。根据查询到的auth数据uSet.authority，参照已定义的authEntProp变量
 var buildAuthCom=(uAuth)=>{
-	let rankArr=Object.keys(authColor),
-		rSet=[],		
+	let rSet={},
+		num={},	
 		//循环计数器
 		m=0;
-
-	rankArr.forEach(function(el){
+	
+	//按权限类别赋初值
+	Object.keys(authColor).forEach(function(el){
 		rSet[el]=[];
+		num[el]=0;
 	});		
 	
 	//生成各项auth的组件，遍历hash数组：uAuth
@@ -273,37 +228,42 @@ var buildAuthCom=(uAuth)=>{
 		for(var auth in authObj){
 			let e=authEntProp[ent]['auth'][auth],
 				v=authObj[auth],
-				tColor=(v==1)?txtColor:'text-muted',
-				glySym=(v==1)?'glyphicon glyphicon-ok':'glyphicon glyphicon-unchecked',
-				gly=$('<span></span>').addClass(glySym),
-				chi=(v==1)?$('<strong></strong>').addClass('spAuthKey').text(e.chi):$('<span></span>').addClass('spAuthKey text-muted').text(e.chi),
-				spCom=$('<span></span>').addClass(tColor).append(chi,gly);
+				<!-- gly=$('<span></span>').addClass('glyphicon glyphicon-ok'), -->
+				chi=$('<strong></strong>').text(e.chi),
+				spCom=$('<span></span>').addClass(txtColor).append(chi,'&nbsp;');
 			
-			spSet[i]=$('<span></span>').append(spCom,'&nbsp;&nbsp;'); 
+			if(v){
+				//生成单个权限组件
+				spSet[i]=$('<span></span>').append(spCom,'&nbsp;&nbsp;'); 
 			
-			//循环计数器
-			i++;
-			
+				//单个模块权限总数
+				i++;
+			}
 		}
-		c2.append(spSet);
-		rSet[rank][m]=rCom.append(c1,c2);
-		//循环计数器
-		m++;
+		if(i){
+			c2.append(spSet);
+			rSet[rank][m]=rCom.append(c1,c2);
+			//有权限的模块总数
+			m++;
+			//rank类模块的总数
+			num[rank]++;
+		}
 	}
-	rankArr.forEach(function(el){
-		//分类显示
-		$('#divUserAuth').append(rSet[el]);
-	});	
-	
 	
 	//生成#authRank的内容
-	for(let el in authColor){
+	for(let el in num){
 		let e=authColor[el],
-			spObj=$('<span></span>').css({'padding':'3px 5px','border-radius':'3px','font-size':'12px'}),
-			txt=e.chi,
-			labColor=e.bs3.lab;
-		$('#authRank').append('&nbsp;',spObj.addClass(labColor).text(txt));
-	}	
+			spObj=$('<span></span>').css({'padding':'3px 5px','border-radius':'3px','font-size':'12px'});
+			
+		//生成权限类别标签	
+		if(num[el]){
+			$('#authRank').append('&nbsp;',spObj.addClass(e.bs3.lab).text(e.chi));
+		}
+		
+		//权限分类按模块显示
+		$('#divUserAuth').append(rSet[el]);
+	}
+	
 };
 
 //利用自调用匿名函数立即执行的特点， 页面初始化
@@ -441,12 +401,6 @@ $(document).ready(function(){
 	//$('.nav .active').removeClass('active');
 	//侧边栏本页对应a添加数字,其所在li加acitve
 	//$('.nav a[href="'+window.location.hash+'"]').closest('li').addClass('active');
-	
-	//将span的text转换成中文
-	$('.spAuthKey').each(function(){
-		var str=$(this).text();
-		$(this).text(textEnToChi(str));
-   	});
 	
 	// 设置各类tooltip
 	$('#divUsergroup [data-toggle="tooltip"]').tooltip({triger:'focus',placement: 'auto bottom'});	

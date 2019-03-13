@@ -814,8 +814,7 @@ class IndexController extends \think\Controller
     }      
     # 部门组CDUR，接收客户端通过Ajax，post来的参数，返回json数据
     #前端传来的oprt值:_CREATE、_UPDATE、_ADDNEW、_EDIT、_DISABLE、_ENABLE、_DELETE
-    public function deptOprt(Request $request,DeptModel $deptMdl,$oprt='_CREATE',$id='0')
-    {
+    public function deptOprt(Request $request,DeptModel $deptMdl,$oprt='_CREATE',$id='0'){
       $this->_loginUser();
     
       $oprt=$request->param('oprt');
@@ -949,11 +948,54 @@ class IndexController extends \think\Controller
      }
       
     }
+  #计算用户的系统权限
+  public function calculateUserAuth(Request $request){
+    $this->_loginUser();
     
+    $ugId=!empty($request->param('joinedGroupId'))?explode(",", $request->param('joinedGroupId')):[];
+    #app/common.php中预定义的权限实体
+    $authEntArr=conAuthEntArr;
+    $ent=[];
+    $authArr=[];
     
+    foreach($authEntArr as $k=>$v){
+      #将ent名称转为全小写，并去掉字符串中的下划线，
+      $k=strtolower(strtr($k,['_'=>'']));
+      $authEntArr[$k]=$v;
+    }
     
+    #将$ugId中各个值对应的authoriy逐个merge进$authArr
+    if(count($ugId)){
+      
+      foreach($ugId as $id){
+        #得到$id对应的authority关联数组
+        $temp=UsergroupModel::get($id)->authority;
+        if(count($temp)){
+          $ent=array_keys($temp);
+          foreach($ent as $v){
+            #$authArr[$v]没有定义就赋初值
+            if(!isset($authArr[$v])){
+              $authArr[$v]=[];
+            }
+            #$authArr[$v]合并后去重
+            $authArr[$v]=array_unique(array_merge($authArr[$v],array_keys($temp[$v])));
+          }    
+        }
+      }
+    }
+    $ent=array_keys($authArr);
     
-    
+    foreach($authArr as $key=>$arr){
+      $authArr[$key]=[];
+      foreach($arr as $v){
+        #app/common.php中预定义的权限实体
+        $temp=$authEntArr[$key]['auth'][$v];
+        $temp['val']=1;
+        $authArr[$key][$v]= $temp;
+      }
+    }
+    return json($authArr);
+  }
     
 }
 

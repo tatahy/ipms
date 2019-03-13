@@ -74,7 +74,7 @@
 			{volist name="$userList" id="vo" empty="无查询结果"}
 				<tr class="text-center" data-id="{$vo.id}">
 					<td>{$i+($pageNum-1)*$listRows}</td>
-					<td><strong>{$vo.username}</strong></td>
+					<td><strong class="name">{$vo.username}</strong></td>
 					<td>{$vo.dept}</td>
 					<td>{$vo.mobile}</td>
 					<td>{$vo.usergroup_id}</td>
