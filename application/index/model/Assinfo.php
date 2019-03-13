@@ -78,9 +78,8 @@ class Assinfo extends Entityinfo {
     //全局查询范围，框架在查询时会自动调用
     protected static function base($query)
     {
-        $query->where('id','>',0);
         //
-        //$query->whereNull('delete_time')->where('id','>',0);
+        $query->whereNull('delete_time')->where('id','>',0);
         //$query->where('delete_time',0)->where('id','>',0);
     }
     
@@ -145,9 +144,6 @@ class Assinfo extends Entityinfo {
       return $query;
     }
        
-   
-    
-    
     /**
      * 获取assent的过程记录
      */
@@ -155,7 +151,6 @@ class Assinfo extends Entityinfo {
     {
         return $this->hasMany('Patrecord')->order('acttime desc');
     }
-
 
 }
 

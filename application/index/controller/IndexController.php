@@ -77,7 +77,7 @@ class IndexController extends Controller
     foreach($uSet->column('pwd') as $k=>$v){
       if($pwd==md5($v.$salt)){
         $n++;
-        #用户的数据库保存密码值
+        #用户密码(数据库保存值)
         $pwd=$v;
       }
     }
