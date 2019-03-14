@@ -348,6 +348,8 @@ function setEntPeriodList(){
 	sortEntListTbl();
 	//指定行加底色	
 	setTrBgColor();
+	//设定entList的checkBox、radio组件
+	setSheetChkRdCom();
 	//显示搜索结果数
 	showSearchResult();	
 }
@@ -357,6 +359,7 @@ function initRqData(){
 	App.data.rqData={
 		ent:'index',
 		period:'',
+		sheet:{mode:'none',idArr:[],type:''},
 		sortData:{listRows:10,sortName:'',sortOrder:'asc',pageNum:1,showId:''},
 		searchSource:'',
 		searchData:{},
@@ -858,6 +861,56 @@ function setTrBgColor() {
 	//给showId所在行上底色
 	nod.find('[data-show-id="'+id+'"]').addClass('bg-warning');
 }
+//设定entList的checkBox、radio组件
+function setSheetChkRdCom(mode='') {
+	let sheet=App.data.rqData.sheet;
+	let modeArr=['none','all','select'];
+	let shCheckBoxSet=$('#entList table').find('[name="sheetId"]'),
+		labelSet=shCheckBoxSet.closest('label'),
+		shRadioNod=$('#entList').find('[name="sheetMode"]'),
+		shSelectNod=$('#entList').find('[name="sheetType"]');
+	
+	if(modeArr.indexOf(mode)==-1){
+		mode=sheet.mode;
+	}else{
+		sheet.mode=mode;
+	}
+
+	shRadioNod.each(function(){
+		if(mode==$(this).val()){
+			$(this).prop('checked',true);
+		}
+	});
+	// shSelectNod.closest('div').show();	
+	shSelectNod.parent().show();	
+	
+	if(mode=="none"){		
+		shCheckBoxSet.prop({'checked':false,'disabled':false});	
+		labelSet.prop('hidden',true);
+		shSelectNod.closest('div').hide();
+		sheet.idArr=[];
+		sheet.type='';
+	}
+	
+	if(mode=="all"){
+		shCheckBoxSet.prop({'checked':true,'disabled':true});
+		labelSet.prop('hidden',false);
+		for(let i=0;i<shCheckBoxSet.length;i++){
+			sheet.idArr[i]=parseInt(shCheckBoxSet.eq(i).val());
+		}
+		sheet.type=shSelectNod.val();
+	}
+	if(mode=="select"){
+		shCheckBoxSet.prop({'checked':true,'disabled':false});
+		labelSet.prop('hidden',false);
+		for(let i=0;i<shCheckBoxSet.length;i++){
+			sheet.idArr[i]=parseInt(shCheckBoxSet.eq(i).val());
+		}
+		sheet.type=shSelectNod.val();
+	}
+	App.data.rqData.sheet=sheet;
+	return console.log(App.data.rqData.sheet);
+}
 
 function showSearchResult() {
 	let d=App.data;
@@ -920,7 +973,7 @@ function consoleColor(str='无内容',color='blue'){
 	
 }
 
-export {asyEntLoad,asyInitData,asyLoadEntObj,asyRefreshEntObj,asySetEntQueryForm,	buildEntPeriodNavPills,buildEntPeriodTitle,buildEntSummary,	buildTopNavbar,consoleColor,entEvent,entGetReady,getRqUrl,	initRqData,pageInit,pageReady,resetSearchForm,setEntPeriodList,setRqData,setRqQueryFieldBy,setRqSearchDataBy,setTrBgColor,showSearchResult,showTopNavbar,sortEntListTbl};
+export {asyEntLoad,asyInitData,asyLoadEntObj,asyRefreshEntObj,asySetEntQueryForm,	buildEntPeriodNavPills,buildEntPeriodTitle,buildEntSummary,	buildTopNavbar,consoleColor,entEvent,entGetReady,getRqUrl,	initRqData,pageInit,pageReady,resetSearchForm,setEntPeriodList,setRqData,setRqQueryFieldBy,setRqSearchDataBy,setTrBgColor,setSheetChkRdCom,showSearchResult,showTopNavbar,sortEntListTbl};
 	
 	
 	

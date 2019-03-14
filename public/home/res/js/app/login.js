@@ -45,9 +45,10 @@ $('[title]').tooltip();
 		
 		if(!String(data).length){
 			data={salt:String(Math.ceil(Math.random()*10000))};
-			fm.find('[name]').each(function(k,v){
-				let name=$(v).attr('name'),
-					val=$(v).val();
+			// fm.find('[name]').each(function(index,e){
+			fm.find('[name]').each(function(){
+				let name=$(this).attr('name'),
+					val=$(this).val();
 				// d[name]=val; 
 				data[name]=val;
 			

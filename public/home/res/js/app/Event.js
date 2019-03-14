@@ -4,7 +4,7 @@
 //导入index.js中定义的变量、函数
 // import {rqData,resetSearchForm,asyRefreshEntObj,setRqSearchDataBy,setTrBgColor,entGetReady,consoleColor} from './index.js';
 import {App} from './main.js';
-import {resetSearchForm,asyRefreshEntObj,setRqSearchDataBy,setTrBgColor,entGetReady,consoleColor} from './utility.js';
+import {resetSearchForm,asyRefreshEntObj,setRqSearchDataBy,setTrBgColor,setSheetChkRdCom,entGetReady,consoleColor} from './utility.js';
 
 //定义导出对象Event。封装各个事件处理函数
 export var Event={
@@ -21,7 +21,6 @@ export var Event={
 	},
 	//多个查询表单的显示隐藏
 	clpsSwitch:function() {	
-
 		//动态加载类
 		import('./SearchFormCollapse.class.js')
 		.then(cls=>{
@@ -93,13 +92,36 @@ export var Event={
 	},
 	//list的event
 	list:function() {
+		let self=this;
 		let d=App.data;
 		let tblNod=$('#entList table'),
 			listRowNod=$('#listRows'),
 			aHeadSet=tblNod.find('thead a'),
 			aBodySet=tblNod.find('tbody a'),
-			aPageSet=$('#divListRows').find('a');
-	
+			aPageSet=$('#divListRows').find('a'),
+			shRadioNod=$('#entList').find('[name="sheetMode"]'),
+			shSelectNod=$('#entList').find('[name="sheetType"]'),
+			shCheckBoxSet=$('#entList').find('[name="sheetId"]');		
+		
+		shRadioNod.click(function(){
+			setSheetChkRdCom($(this).val());
+		});
+		shSelectNod.change(function(){
+			App.data.rqData.sheet.type=$(this).val();
+		});
+		shCheckBoxSet.click(function(){
+			let id=parseInt($(this).val());
+			let index=App.data.rqData.sheet.idArr.indexOf(id);
+			//添加id
+			if($(this).prop('checked') && index==-1){
+				App.data.rqData.sheet.idArr.push(id);
+			}
+			//删除id
+			if(!$(this).prop('checked') && index!=-1){
+				App.data.rqData.sheet.idArr.splice(index, 1);
+			}
+		});
+		
 		//表格每页显示记录行数；表格按选定行数显示
 		listRowNod.val(d.rqData.sortData.listRows).change(function(){
 			//排序有关的值向sortData汇集
