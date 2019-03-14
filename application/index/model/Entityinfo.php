@@ -12,11 +12,11 @@ use think\Db;
 
 use app\admin\model\Dept as DeptModel;
 
-//定义抽象类
+#定义抽象类
 //abstract class Entityinfo extends Model implements EntityinfoInterface {
 abstract class Entityinfo extends Model {
    
-   //仅用于子类的属性
+   #仅用于子类的属性
     protected $entPeriod=[];
     protected $entType=[];
     protected $entity=[];
@@ -24,13 +24,13 @@ abstract class Entityinfo extends Model {
     protected $userName;
     protected $dept;
     protected $statusArr=[];
-    //覆盖构造方法
+    #覆盖构造方法
     public function __construct($data = []){
       parent::__construct($data);
       $this->statusArr=_commonStatustEn2ChiArr($this->entity);
     }
     
-    //需要实现的方法，用于初始化model
+    #需要实现的方法，用于初始化model
     abstract function getEntity();
     
     #初始化模型的访问
@@ -118,7 +118,7 @@ abstract class Entityinfo extends Model {
       if(!count($valArr)){
         return $arr;
       }
-      //其他字段的$tArr
+      #其他字段的$tArr
       if(!count($tArr)){
         $tArr=array_combine($valArr,$valArr);
       }
@@ -134,7 +134,6 @@ abstract class Entityinfo extends Model {
         }
       }
       $tempArr=array_combine($keyArr,$valArr);
-      
       #对中间数组以键名升序排序
       ksort($tempArr);
     #$arr赋值

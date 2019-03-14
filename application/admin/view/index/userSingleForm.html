@@ -10,13 +10,13 @@
 			
 		</div>
 				
-		<a style="padding-left:10px;font-size:14px;" data-toggle="collapse" href="#divUserAuth" title="显示/隐藏系统权限">用户系统权限...</a>
+		<a style="padding-left:10px;font-size:16px;" data-toggle="collapse" href="#divUserAuth" title="显示/隐藏系统权限">用户系统模块权限...</a>
 		<p><p/>
 		<p id="authRank" style="padding-left:20px;"></p>
 		<div id="divUserAuth" class="row myRow collapse" style="margin-top:10px;">
 			<span class="label label-default" style="margin-left:40px;font-size:100%">无</span>
 		</div>	
-		
+	
 		<hr>
 		<!-- 空白行 -->
 		<p>   <p/>
@@ -124,7 +124,9 @@ var buildAuthCom=(uAuth='')=>{
 	let rSet={},
 		num={},	
 		//循环计数器
-		m=0;
+		m=0
+		colNod=$('#divUserAuth'),
+		tagNod=$('#authRank');
 	//定义权限涉及的颜色属性，权限重要性分类
 	let authColor={
 		common:{bs3:bs3Color.success,chi:'普通'},
@@ -132,78 +134,86 @@ var buildAuthCom=(uAuth='')=>{
 		critical:{bs3:bs3Color.danger,chi:'关键'}
 	};
 	
-	$('#divUserAuth').removeClass('in').empty().append('<span class="label label-default" style="margin-left:40px;font-size:100%">无</span>');
+	if(typeof uAuth != 'object'){
+		colNod.empty().append('<span class="label label-default" style="margin-left:40px;font-size:100%">无</span>');
+		if(colNod.hasClass('in')){
+			<!-- colNod.removeClass('in'); -->
+			colNod.collapse();
+		}
+		tagNod.empty();
+		return ;	
+	}
 	
-	$('#authRank').empty();	
-	
-	if(uAuth){
 	//按权限类别赋初值
-		Object.keys(authColor).forEach(function(el){
-			rSet[el]=[];
-			num[el]=0;
-		});	
-		//生成各项auth的组件，遍历hash数组：uAuth
-		//ent=='admin'...
-		for(var ent in uAuth){
- 			let authObj=uAuth[ent],
-				name=authEntProp[ent]['chi'],
-				sumAuth=0,
-				//循环计数器
-				i=0,
-				spSet=[], 
-				rank=authEntProp[ent]['rank'],
-		    	//父标签底色类型
-				bgColor=authColor[rank]['bs3']['lab'],
-				//标签背景色
-				txtColor=authColor[rank]['bs3']['txt'],
-				rCom=$('<div></div>').addClass('form-group col-sm-6'),
-				c1=$('<label></label>').addClass('control-label '+bgColor).html(name).css({'padding':'3px 5px','border-radius':'3px','font-size':'14px'}),
-				c2=$('<div></div>').css({'padding':'5px','border-bottom':'solid 1px #ccc'});
+	Object.keys(authColor).forEach(function(el){
+		rSet[el]=[];
+		num[el]=0;
+	});	
+	//生成各项auth的组件，遍历hash数组：uAuth
+	//ent=='admin'...
+	for(var ent in uAuth){
+ 		let authObj=uAuth[ent],
+			name=authEntProp[ent]['chi'],
+			sumAuth=0,
+			//循环计数器
+			i=0,
+			spSet=[], 
+			rank=authEntProp[ent]['rank'],
+		    //父标签底色类型
+			bgColor=authColor[rank]['bs3']['lab'],
+			//标签背景色
+			txtColor=authColor[rank]['bs3']['txt'],
+			rCom=$('<div></div>').addClass('form-group col-sm-6'),
+			c1=$('<label></label>').addClass('control-label '+bgColor).html(name).css({'padding':'3px 5px','border-radius':'3px','font-size':'14px'}),
+			c2=$('<div></div>').css({'padding':'5px 20px','border-bottom':'solid 1px #ccc'});
 		
-			//遍历hash数组：authObj，
-			//auth=='read'...
-			for(var auth in authObj){
-				let e=authEntProp[ent]['auth'][auth],
-					v=authObj[auth],
-					chi=$('<strong></strong>').text(e.chi),
-					spCom=$('<span></span>').addClass(txtColor).append(chi,'&nbsp;');
+		//遍历hash数组：authObj，
+		//auth=='read'...
+		for(var auth in authObj){
+			let e=authEntProp[ent]['auth'][auth],
+				v=authObj[auth],
+				chi=$('<strong></strong>').text(e.chi),
+				spCom=$('<span></span>').addClass(txtColor).append(chi,'&nbsp;');
 			
-				if(v){
-					//生成单个权限组件
-					spSet[i]=$('<span></span>').append(spCom,'&nbsp;&nbsp;'	); 
-			
-					//单个模块权限总数
-					i++;
-				}
-			}
-			if(i){
-				c2.append(spSet);
-				rSet[rank][m]=rCom.append(c1,c2);
-				//有权限的模块总数
-				m++;
-				//rank类模块的总数
-				num[rank]++;
+			if(v){
+				//生成单个权限组件
+				spSet[i]=$('<span></span>').append(spCom,'&nbsp;&nbsp;'	); 
+				//单个模块权限总数
+				i++;
 			}
 		}
-		
-		if(m){
-			$('#authRank').empty().append('<strong>系统模块类别：</strong>&nbsp;');
-			$('#divUserAuth').empty().addClass('in');
-		}
-		//生成#authRank的内容
-		for(let el in num){
-			let e=authColor[el],
-				spObj=$('<span></span>').css({'padding':'3px 5px','border-radius':'3px','font-size':'12px'});
-			
-			//生成权限类别标签	
-			if(num[el]){
-				$('#authRank').append('&nbsp;',spObj.addClass(e.bs3.lab).text(e.chi));
-			}
-		
-			//权限分类按模块显示
-			$('#divUserAuth').append(rSet[el]);
+		if(i){
+			c2.append(spSet);
+			rSet[rank][m]=rCom.append(c1,c2);
+			//有权限的模块总数
+			m++;
+			//rank类模块的总数
+			num[rank]++;
 		}
 	}
+	
+	if(m){
+		tagNod.empty().append('<strong>系统模块类别：</strong>&nbsp;');
+		colNod.empty(); 
+		<!-- if(colNod.attr('class').indexOf('in')==-1){ -->
+		if(!colNod.hasClass('in')){
+			colNod.collapse('show');
+		}
+	
+	}
+
+	//生成#authRank的内容
+	for(let el in num){
+		let e=authColor[el],
+			spObj=$('<span></span>').css({'padding':'3px 5px','border-radius':'3px','font-size':'12px'});	
+		//生成权限类别标签	
+		if(num[el]){
+			tagNod.append('&nbsp;',spObj.addClass(e.bs3.lab).text(e.chi));
+		}
+		//权限按模块分类显示
+		colNod.append(rSet[el]);
+	}
+	return;
 };
 
 var	buildFormGroupCom=(node)=>{
@@ -329,14 +339,15 @@ var getJoinedGroupStr=()=>{
 var ajaxBuildAuthCom=()=>{
 	let idStr=getJoinedGroupStr();
 	
-	if(idStr.length){
-		$.post('calculateUserAuth',{joinedGroupId:idStr},function(uAuth){
-			if(uAuth){
-				buildAuthCom(uAuth);
-			}
-		});
+	if(!idStr.length){
+		return buildAuthCom();
 	}
-	buildAuthCom();
+	
+	$.post('calculateUserAuth',{joinedGroupId:idStr},function(uAuth){
+		if(uAuth){
+			buildAuthCom(uAuth);
+		}
+	});
 	
 };
 
