@@ -2,9 +2,7 @@
 
 //conf.js中采用默认输出
 import c from './conf.js';
-
 import {asyInitData,pageInit,pageReady} from './utility.js';
-
 import {Modal} from './Modal.js';
 
 export var App={
@@ -57,3 +55,6 @@ App.initData()
 	.catch(err=>{
 		return App.exit(err);
 	});
+
+//将导出变量App定义为本模块export的default变量
+export {App as default};

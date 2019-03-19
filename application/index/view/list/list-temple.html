@@ -15,34 +15,38 @@
 	
 	<div id="divListRows" class="row text-right myRow form-inline">		
 		<!-- // 分页变量 -->
-		<div class="form-group">{$pageSet->render()}</div>
-		
-		<div class="form-group">
+		<div class="form-group">{$pageNode}</div>
+		<div class="form-group" style="margin:20px 0;">
 			<span class="">每页显示记录数：</span>
 			<select class="form-control" id="listRows">
 				<option value="5">5</option>
 				<option value="10">10</option>
 				<option value="20">20</option>
 				<option value="50">50</option>
-			</select>
-						
+			</select>			
 		</div>
-	
 	</div>
 	
-	<div class="row myRow text-right form-inline">
-		<div class="form-group">
-      		<strong>本页记录导出：</strong>
+	<div class="row myRow text-right ">
+      	<div class="form-group">
+			<strong>记录导出：</strong>
 			<label class="radio-inline"><input type="radio" name="sheetMode" value="all">全选</label>
-			<label class="radio-inline"><input type="radio" name="sheetMode" value="select">部分</label>
-			<label class="radio-inline"><input type="radio" name="sheetMode" value="none">无</label>
-    	</div>
+		<label class="radio-inline"><input type="radio" name="sheetMode" value="excluded">部分</label>
+		<label class="radio-inline"><input type="radio" name="sheetMode" value="none">无</label>
+  		</div>
+	</div>
+	
+	<div id="divFileDownload" class="row myRow text-right form-inline" hidden="true">
 		<div class="form-group">
 			<strong>&nbsp;&nbsp;导出文件类型：</strong>
 			<select class="form-control" name="sheetType">
-				<option value="xlsx" selected>Office Excel 2007</option>
+				<option value="xlsx" selected>MS Office Excel 2007</option>
 				<option value="csv">逗号分隔符文件</option>
 			</select>
 		</div>
+		<div class="form-group">
+			<button class="btn btn-sm btn-primary" value="" title="导出所选记录"><span class="glyphicon glyphicon-download-alt"></span>&nbsp;导出</button>
+		</div>
 	</div>
 	<br>
+	

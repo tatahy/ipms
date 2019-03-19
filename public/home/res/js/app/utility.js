@@ -3,8 +3,8 @@
 //conf.js中采用默认输出，c为本文件中使用的hash对象，其键值为'./conf.js'各个导出键值对
 // import c from './conf.js';
 import {Event as eve} from './Event.js';
-
-import {App} from './main.js';
+//导入main.js中定义的default变量为App
+import App from './main.js';
 
 import {Modal} from './Modal.js';
 
@@ -864,11 +864,12 @@ function setTrBgColor() {
 //设定entList的checkBox、radio组件
 function setSheetChkRdCom(mode='') {
 	let sheet=App.data.rqData.sheet;
-	let modeArr=['none','all','select'];
+	let modeArr=['none','all','excluded'];
 	let shCheckBoxSet=$('#entList table').find('[name="sheetId"]'),
 		labelSet=shCheckBoxSet.closest('label'),
 		shRadioNod=$('#entList').find('[name="sheetMode"]'),
-		shSelectNod=$('#entList').find('[name="sheetType"]');
+		shSelectNod=$('#entList').find('[name="sheetType"]'),
+		divFileDownload=$('#divFileDownload');
 	
 	if(modeArr.indexOf(mode)==-1){
 		mode=sheet.mode;
@@ -882,14 +883,14 @@ function setSheetChkRdCom(mode='') {
 		}
 	});
 	// shSelectNod.closest('div').show();	
-	shSelectNod.parent().show();	
+	divFileDownload.prop('hidden',false);	
 	
 	if(mode=="none"){		
 		shCheckBoxSet.prop({'checked':false,'disabled':false});	
 		labelSet.prop('hidden',true);
-		shSelectNod.closest('div').hide();
 		sheet.idArr=[];
 		sheet.type='';
+		divFileDownload.prop('hidden',true);	
 	}
 	
 	if(mode=="all"){
@@ -898,14 +899,12 @@ function setSheetChkRdCom(mode='') {
 		for(let i=0;i<shCheckBoxSet.length;i++){
 			sheet.idArr[i]=parseInt(shCheckBoxSet.eq(i).val());
 		}
+		sheet.idArr=[];
 		sheet.type=shSelectNod.val();
 	}
-	if(mode=="select"){
+	if(mode=="excluded"){
 		shCheckBoxSet.prop({'checked':true,'disabled':false});
 		labelSet.prop('hidden',false);
-		for(let i=0;i<shCheckBoxSet.length;i++){
-			sheet.idArr[i]=parseInt(shCheckBoxSet.eq(i).val());
-		}
 		sheet.type=shSelectNod.val();
 	}
 	App.data.rqData.sheet=sheet;

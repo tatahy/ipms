@@ -132,8 +132,8 @@ class ListController extends Controller {
       'searchResultNum'=>$searchResultNum,
       #当前页显示内容
       'list'=>$list,
-      #分页对象
-      'pageSet'=>$pageSet,
+      #分页对象（html字符串）
+      'pageNode'=>$pageSet->render(),
       #排序数组
       'sortData'=>$sortData,
 //      'sortName'=>$sortData['sortName'],
@@ -141,7 +141,7 @@ class ListController extends Controller {
 //      'searchData'=>json_encode($searchData,JSON_UNESCAPED_UNICODE),
     ]);
     
-    #
+    #渲染页面文件并输出
     return view($fileName);
     //return $this->fetch($fileName);
   }

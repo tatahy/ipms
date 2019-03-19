@@ -13,7 +13,8 @@ export var Event={
 		//动态加载模块
 		import('./Barcode.js')
 		.then(module=>{
-			module.Barcode.init($('#fmBarcode'));
+			let Barcode=module.Barcode;
+			Barcode.init($('#fmBarcode'));
 		})
 		.catch(err=>{
 			console.log(err);
@@ -111,15 +112,20 @@ export var Event={
 		});
 		shCheckBoxSet.click(function(){
 			let id=parseInt($(this).val());
-			let index=App.data.rqData.sheet.idArr.indexOf(id);
-			//添加id
-			if($(this).prop('checked') && index==-1){
-				App.data.rqData.sheet.idArr.push(id);
+			let arr=App.data.rqData.sheet.idArr;
+			let index=arr.indexOf(id);
+			//添加id值，没选中且不在数组内
+			if(!$(this).prop('checked') && index==-1){
+				arr.push(id);
 			}
-			//删除id
-			if(!$(this).prop('checked') && index!=-1){
-				App.data.rqData.sheet.idArr.splice(index, 1);
+			//删除id值，选中且在数组内
+			if($(this).prop('checked') && index!=-1){
+				arr.splice(index, 1);
 			}
+			
+			App.data.rqData.sheet.idArr=arr;
+			console.log(index);
+			console.log(App.data.rqData.sheet);
 		});
 		
 		//表格每页显示记录行数；表格按选定行数显示
