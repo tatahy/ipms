@@ -4,7 +4,7 @@
 //导入index.js中定义的变量、函数
 // import {rqData,resetSearchForm,asyRefreshEntObj,setRqSearchDataBy,setTrBgColor,entGetReady,consoleColor} from './index.js';
 import {App} from './main.js';
-import {resetSearchForm,asyRefreshEntObj,setRqSearchDataBy,setTrBgColor,setSheetChkRdCom,entGetReady,consoleColor} from './utility.js';
+import {resetSearchForm,asyRefreshEntObj,setRqSearchDataBy,setTrBgColor,setSheetChkRdCom,entGetReady,consoleColor,getRqUrl} from './utility.js';
 
 //定义导出对象Event。封装各个事件处理函数
 export var Event={
@@ -95,17 +95,21 @@ export var Event={
 	list:function() {
 		let self=this;
 		let d=App.data;
-		let tblNod=$('#entList table'),
-			listRowNod=$('#listRows'),
-			aHeadSet=tblNod.find('thead a'),
+		let tblNod=$('#entList table');
+		let	aHeadSet=tblNod.find('thead a'),
 			aBodySet=tblNod.find('tbody a'),
 			aPageSet=$('#divListRows').find('a'),
+			listRowNod=$('#listRows'),
 			shRadioNod=$('#entList').find('[name="sheetMode"]'),
 			shSelectNod=$('#entList').find('[name="sheetType"]'),
-			shCheckBoxSet=$('#entList').find('[name="sheetId"]');		
+			shCheckBoxSet=$('#entList').find('[name="sheetId"]'),
+			btnOutputFile=$('#divFileDownload').find('button');		
 		
 		shRadioNod.click(function(){
-			setSheetChkRdCom($(this).val());
+			let mode=$(this).val();
+			if(mode!=App.data.rqData.sheet.mode){
+				return setSheetChkRdCom(mode);
+			}
 		});
 		shSelectNod.change(function(){
 			App.data.rqData.sheet.type=$(this).val();
@@ -190,6 +194,27 @@ export var Event={
 		
 			//异步更新list
 			asyRefreshEntObj('list');
+		});
+		btnOutputFile.click(function(){
+			let urlObj=App.data.urlObj;
+			console.log('btnOutputFile.click');
+			console.log(App.data.urlObj);
+			
+			urlObj.ctrl='list';
+			urlObj.action='makeListFile';
+			
+			console.log(App.data.rqData);	
+			
+			$.post(getRqUrl(urlObj),App.data.rqData,function(fileName){
+				
+				if(fileName){
+					$.alert('记录导出成功，是否下载？');
+					// urlObj.action='downloadListFile';
+					// $.post(getRqUrl(urlObj),{'fileName':fileName});
+				}
+			});
+			
+			
 		});
 	},
 	//页面刷新

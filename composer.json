@@ -24,12 +24,19 @@
         "topthink/think-testing": "^1.0",
         "topthink/think-sae": "^1.0",
         "topthink/think-queue": "^1.0",
-        "topthink/think-migration": "^1.0"
+        "topthink/think-migration": "^1.0",
+        "phpoffice/phpspreadsheet": "^1.6"
     },
     "extra": {
         "think-path": "thinkphp"
     },
     "config": {
         "preferred-install": "dist"
+    },
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://packagist.phpcomposer.com"
+        }
     }
 }

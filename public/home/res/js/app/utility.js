@@ -368,17 +368,18 @@ function initRqData(){
 	return App.data.rqData;
 }
 //设定向后端请求的url
-function getRqUrl(){
+function getRqUrl(opt=''){
 	let kArr=['domain','module','ctrl','action'],
 	// let kArr=['module','ctrl','action'],
 		arr=[],
-		url='';
-	App.data.urlObj=$.extend({},{module:'index',ctrl:'index',action:'index'},App.data.urlObj);
+		url='',
+		urlObj=App.data.urlObj;
+	urlObj=$.extend({},{module:'index',ctrl:'index',action:'index'},opt);
 	
 	kArr.forEach(function(e,i){
-		arr[i]=(App.data.urlObj[e]);
+		arr[i]=(urlObj[e]);
 	});
-	
+	App.data.urlObj=urlObj;
 	return arr.join('/');
 	// return url;
 }

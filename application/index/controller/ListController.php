@@ -12,6 +12,10 @@ use app\index\model\Assinfo as AssinfoModel;
 use app\index\model\Theinfo as TheinfoModel;
 use app\index\model\Proinfo as ProinfoModel;
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
+
 # 继承了think\Controller类，可直接调用think\View，think\Request类的方法
 # 类名与类文件名相同
 class ListController extends Controller {
@@ -58,7 +62,7 @@ class ListController extends Controller {
     if(count($searchArr)==0 || count($searchTypeArr)==0){
       return $whereArr;
     }
-    ##组装$whereArr，要求$searchArr的键名必须是数据库中的字段名
+    #组装$whereArr，要求$searchArr的键名必须是数据库中的字段名
     foreach($searchArr as $field=>$v){
       if(!empty($v)){
         switch($searchTypeArr[$field]['tagName']){
@@ -165,6 +169,44 @@ class ListController extends Controller {
     
     return $mdl->initModel($this->userName,$this->dept,$this->authArr[$ent]);  
   }
+  //得到特定的list数据集转为指定的文件
+  private function priMakeListFile($set=[],$type='xlsx') {
+    $arr=[];
+    $spreadSheet= new Spreadsheet();
+    $sheet= $spreadSheet->getActiveSheet();
+    $title=TheinfoModel::getTableFields();
+    if(array_search('delete_time',$title)){
+      unset($title[array_search('delete_time',$title)]);
+    }
+    $arr[0]=$title;
+    
+    for($i=1;$i<=count($set);$i++){
+      foreach($title as $k=>$v){
+        $arr[$i][$k]=$set[$i-1][$v];
+      }
+    }
+    #2维数组写入数据表
+    $sheet->fromArray($arr,null);
+    
+    $fileName=Md5(strtotime("now")).'.xlsx';
+    $path='./downloads/'.$fileName;
+    $writer=new Xlsx($spreadSheet);
+    $writer->save($path);
+    
+    //header('Content-Type:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+//    header('Content-Disposition:attachment;filename="'.$fileName.'"');
+//    header('Cache-Control:max-age=0');
+//    $writer=new Xlsx($spreadSheet);
+//    $writer->save('php://output');
+       
+    $spreadSheet->disconnectWorksheets();
+    unset($spreadSheet);
+    
+    if(!file_exists($path)){
+            $this->error('记录导出到文件失败。');  
+    }
+    return $fileName;
+  }
   
   public function index () {
     $this->priLogin();
@@ -175,5 +217,50 @@ class ListController extends Controller {
     return $this->priGetListTplFile($rqArr);
    
   }
+  
+  public function makeListFile() {
+    $this->priLogin();
+    
+    #前端传来json字符串
+    $arr=$this->request->param();
+    #模型对象
+    $mdl='';
+    #查询字段
+    $whereArr['id']=['>',0];
+    
+    #取出需要的字段
+    $ent= array_key_exists('ent',$arr)?$arr['ent']:[];
+    $period=array_key_exists('period',$arr)?$arr['period']:'';
+    $sheet= array_key_exists('sheet',$arr)?$arr['sheet']:['mode'=>'','idArr'=>[],'type'=>'']; 
+    
+    $mdl=$this->priGetMdl($ent);
+
+    if($sheet['mode']=='excluded'){
+      
+      if(isset($sheet['idArr']) && $mdl->getPeriodNum($period)==count($sheet['idArr'])){
+        return '没有记录被选中！';
+      }
+      
+      if(isset($sheet['idArr'])){
+        #查询字段
+        $whereArr['id']=['notin',$sheet['idArr']];
+      }
+      
+    }
+    #结果数据集
+    $set=$mdl->getPeriodSql($period)->where($whereArr)->select();
+    $mdl=null;
+
+    return $this->priMakeListFile($set,$sheet['type']);
+  }
+  
+  public function downloadListFile($fileName='') {
+      
+    return _commonDownloadFile($fileName);
+    
+  }
+  
+  
+   
   
 }
