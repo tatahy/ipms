@@ -66,9 +66,10 @@ class Patinfo extends Entityinfo {
     }
 
     #获取器，将字符串Pronum转换为数组输出
-    protected function getPronumAttr($value) {
-        return explode(",", $value);
-    }
+   // protected function getPronumAttr($value) {
+//        return explode(",", $value);
+//    }
+
     #获取器，获取数据表patinfo中type字段值，转换为中文输出
     protected function getTypeAttr($dBStrEn) {
         //中英文对照数组

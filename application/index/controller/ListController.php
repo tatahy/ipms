@@ -13,8 +13,7 @@ use app\index\model\Theinfo as TheinfoModel;
 use app\index\model\Proinfo as ProinfoModel;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
+use PhpOffice\PhpSpreadsheet\IOFactory as PhpSpreadsheetIO;
 
 # 继承了think\Controller类，可直接调用think\View，think\Request类的方法
 # 类名与类文件名相同
@@ -170,27 +169,19 @@ class ListController extends Controller {
     return $mdl->initModel($this->userName,$this->dept,$this->authArr[$ent]);  
   }
   //得到特定的list数据集转为指定的文件
-  private function priMakeListFile($set=[],$type='xlsx') {
-    $arr=[];
+  private function priMakeListFile($arr=[],$type='xlsx') {
+    
     $spreadSheet= new Spreadsheet();
     $sheet= $spreadSheet->getActiveSheet();
-    $title=TheinfoModel::getTableFields();
-    if(array_search('delete_time',$title)){
-      unset($title[array_search('delete_time',$title)]);
-    }
-    $arr[0]=$title;
-    
-    for($i=1;$i<=count($set);$i++){
-      foreach($title as $k=>$v){
-        $arr[$i][$k]=$set[$i-1][$v];
-      }
-    }
+
     #2维数组写入数据表
     $sheet->fromArray($arr,null);
+    $type=strtolower($type);
+    $fileName=Md5(strtotime("now")).'.'.$type;
     
-    $fileName=Md5(strtotime("now")).'.xlsx';
     $path='./downloads/'.$fileName;
-    $writer=new Xlsx($spreadSheet);
+    
+    $writer=PhpSpreadsheetIO::createWriter($spreadSheet,ucfirst($type));
     $writer->save($path);
     
     //header('Content-Type:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -203,7 +194,7 @@ class ListController extends Controller {
     unset($spreadSheet);
     
     if(!file_exists($path)){
-            $this->error('记录导出到文件失败。');  
+      $fileName='';  
     }
     return $fileName;
   }
@@ -220,42 +211,69 @@ class ListController extends Controller {
   
   public function makeListFile() {
     $this->priLogin();
+    $res=['result'=>'','fileName'=>''];
     
-    #前端传来json字符串
+    #前端传来json对象
     $arr=$this->request->param();
-    #模型对象
-    $mdl='';
+    
     #查询字段
     $whereArr['id']=['>',0];
+    #写入数据表的数组
+    $sheetArr=[];
     
     #取出需要的字段
-    $ent= array_key_exists('ent',$arr)?$arr['ent']:[];
+    $ent= array_key_exists('ent',$arr)?$arr['ent']:'';
     $period=array_key_exists('period',$arr)?$arr['period']:'';
-    $sheet= array_key_exists('sheet',$arr)?$arr['sheet']:['mode'=>'','idArr'=>[],'type'=>'']; 
+    $sheet= array_key_exists('sheet',$arr)?$arr['sheet']:['mode'=>'','idArr'=>[],'type'=>''];
     
+    if(!$ent){
+      $res['result']=false;
+      return $res;
+    }
+    
+    #模型对象
     $mdl=$this->priGetMdl($ent);
 
     if($sheet['mode']=='excluded'){
-      
+      #查询结果数与要排除的记录数一致
       if(isset($sheet['idArr']) && $mdl->getPeriodNum($period)==count($sheet['idArr'])){
-        return '没有记录被选中！';
+        $res['result']=false;
+        return $res;
       }
       
       if(isset($sheet['idArr'])){
         #查询字段
         $whereArr['id']=['notin',$sheet['idArr']];
       }
-      
     }
+    
+    $head= array_key_exists('head',$sheet)?$sheet['head']:['fieldEn'=>$mdl->getTableFields(),'fieldChi'=>[]]; 
+    
     #结果数据集
-    $set=$mdl->getPeriodSql($period)->where($whereArr)->select();
+    $set=$mdl->getPeriodSql($period)->where($whereArr)->select();    
+    #数据表标题行
+    $sheetArr[0]=(count($head['fieldChi']))?$head['fieldChi']:$head['fieldEn'];
+    #数据表内容行
+    for($i=1;$i<=count($set);$i++){
+      foreach($head['fieldEn'] as $k=>$v){
+        $sheetArr[$i][$k]=$set[$i-1][$v];
+      }
+    }
+    
+    $res['fileName']=$this->priMakeListFile($sheetArr,$sheet['type']);
+    
+    if(!empty($res['fileName'])){
+      $res['result']=true;
+    }
     $mdl=null;
-
-    return $this->priMakeListFile($set,$sheet['type']);
+    return $res;
+  
   }
   
-  public function downloadListFile($fileName='') {
-      
+  public function downloadListFile() {
+    $this->priLogin();
+    #前端传来文件名
+    $fileName=$this->request->param('fileName');
     return _commonDownloadFile($fileName);
     
   }

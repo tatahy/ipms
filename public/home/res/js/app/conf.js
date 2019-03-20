@@ -7,7 +7,7 @@ export default {
 	rqData:{
 		ent:'index',
 		period:'',
-		sheet:{mode:'none',idArr:[],type:''},
+		sheet:{mode:'none',idArr:[],type:'',head:{}},
 		sortData:{listRows:10,sortName:'',sortOrder:'asc',pageNum:1,showId:''},
 		searchSource:'',
 		searchData:{},

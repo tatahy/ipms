@@ -1479,17 +1479,18 @@ function _commonStatustEn2ChiArr($ent){
   }
   return $arr;
 }
-#
-function _commonDownloadFile($fileName){
-   $path='./downloads/'.$fileName;
+#通知浏览器以附件形式进行文件下载
+function _commonDownloadFile($fileName,$dir=''){
+  $path=!empty($dir)?$dir.$fileName:'./downloads/'.$fileName;
     
     if(!file_exists($path)){
-      $this->error('记录导出到文件失败。');  
+      return;
     }else{
       header("Content-Type:application/octet-stream");
       header("Content-Disposition:attachment;filename=".$fileName);
       header('Content-Length:'.filesize($path));
       readfile($path);
+      unlink($path);
       exit();
     }   
 }

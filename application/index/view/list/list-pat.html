@@ -39,13 +39,8 @@
 					
 					<td>{$vo.dept}</td>
 					<td class="proInfo">
-						{foreach $vo.pronum as $n} 
-							{if $n eq '无'}
-								无
-							{else /}
-								<a href="#" data-toggle="tooltip">{$n}</a>
-							{/if}
-						{/foreach}
+						{$vo.pronum}
+						
 					</td>
 				</tr>
 				{/volist}

@@ -128,10 +128,10 @@ function entGetReady() {
 	asyEntLoad()
 	//已成功加载list和form
 	.then(result=>{
-		//生成ent的period的title
-		buildEntPeriodTitle();
 		//生成ent的nav-pills
 		buildEntPeriodNavPills();
+		//生成ent的period的title
+		buildEntPeriodTitle();
 		//设置list
 		setEntPeriodList();
 		//设置rqData
@@ -139,10 +139,6 @@ function entGetReady() {
 		//加载entEvent()
 		entEvent();
 	})
-	/* .then(()=>{
-		//加载entEvent()
-		entEvent();
-	}) */
 	.catch((e)=>console.log(e))
 	.finally(()=>{
 		// console.log('finally');
@@ -226,6 +222,7 @@ async function asyLoadEntObj(type){
 	// console.log(resObj);
 	//$.post()返回的是一个jqXHR对象，该对象也是Promise对象，await该jqXHR对象得到其responseText属性值，大小要比上述resObj对象小
 	let content=await $.post(conf[type].url,rData);
+	
 	result=(content)?true:false;
 	
 	loadNod.html(content);
@@ -359,7 +356,7 @@ function initRqData(){
 	App.data.rqData={
 		ent:'index',
 		period:'',
-		sheet:{mode:'none',idArr:[],type:''},
+		sheet:{mode:'none',idArr:[],type:'',head:{}},
 		sortData:{listRows:10,sortName:'',sortOrder:'asc',pageNum:1,showId:''},
 		searchSource:'',
 		searchData:{},
@@ -383,7 +380,18 @@ function getRqUrl(opt=''){
 	return arr.join('/');
 	// return url;
 }
-
+//得到列表的排序字段en和chi值
+function getListSortField(){
+	let aSet=$('#entList').find('thead [data-sort-name]');
+	let field={fieldEn:[],fieldChi:[]};
+	
+	aSet.each(function(index,el){
+		field.fieldEn[index]=$(el).data('sortName');
+		field.fieldChi[index]=$(el).text();
+	});
+	
+	return field;
+}
 //根据定义的topNavProp生成"navLi"组件
 function buildTopNavbar(){ 
 	let d=App.data;
@@ -973,7 +981,7 @@ function consoleColor(str='无内容',color='blue'){
 	
 }
 
-export {asyEntLoad,asyInitData,asyLoadEntObj,asyRefreshEntObj,asySetEntQueryForm,	buildEntPeriodNavPills,buildEntPeriodTitle,buildEntSummary,	buildTopNavbar,consoleColor,entEvent,entGetReady,getRqUrl,	initRqData,pageInit,pageReady,resetSearchForm,setEntPeriodList,setRqData,setRqQueryFieldBy,setRqSearchDataBy,setTrBgColor,setSheetChkRdCom,showSearchResult,showTopNavbar,sortEntListTbl};
+export {asyEntLoad,asyInitData,asyLoadEntObj,asyRefreshEntObj,asySetEntQueryForm,	buildEntPeriodNavPills,buildEntPeriodTitle,buildEntSummary,	buildTopNavbar,consoleColor,entEvent,entGetReady,getRqUrl,getListSortField,initRqData,pageInit,pageReady,resetSearchForm,setEntPeriodList,setRqData,setRqQueryFieldBy,setRqSearchDataBy,setTrBgColor,setSheetChkRdCom,showSearchResult,showTopNavbar,sortEntListTbl};
 	
 	
 	

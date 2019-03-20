@@ -42,9 +42,9 @@ export var Modal={
 		}else{
 			node.head.hide();
 		}
-		node.title.html(self.title);
+		node.title.empty().append(self.title);
 		node.size.addClass(self.size);
-		node.load.html(cont);
+		node.load.empty().append(cont);
 		
 		node.root.modal();
 	},

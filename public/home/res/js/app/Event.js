@@ -4,7 +4,8 @@
 //导入index.js中定义的变量、函数
 // import {rqData,resetSearchForm,asyRefreshEntObj,setRqSearchDataBy,setTrBgColor,entGetReady,consoleColor} from './index.js';
 import {App} from './main.js';
-import {resetSearchForm,asyRefreshEntObj,setRqSearchDataBy,setTrBgColor,setSheetChkRdCom,entGetReady,consoleColor,getRqUrl} from './utility.js';
+import {resetSearchForm,asyRefreshEntObj,setRqSearchDataBy,setTrBgColor,setSheetChkRdCom,entGetReady,consoleColor,getRqUrl,getListSortField} from './utility.js';
+import {Modal} from './Modal.js';
 
 //定义导出对象Event。封装各个事件处理函数
 export var Event={
@@ -202,18 +203,24 @@ export var Event={
 			
 			urlObj.ctrl='list';
 			urlObj.action='makeListFile';
-			
+			App.data.rqData.sheet.head=getListSortField();
 			console.log(App.data.rqData);	
 			
-			$.post(getRqUrl(urlObj),App.data.rqData,function(fileName){
-				
-				if(fileName){
-					$.alert('记录导出成功，是否下载？');
-					// urlObj.action='downloadListFile';
-					// $.post(getRqUrl(urlObj),{'fileName':fileName});
+			$.post(getRqUrl(urlObj),App.data.rqData,function(res){
+				let aNod=$('<a></a>');
+				let pNod=$('<p></p>').addClass('text-center');
+				let opt={headBg:'bg-warning',title:'记录导出失败'};
+				if(res.result){
+					urlObj.action='downloadListFile';
+					
+					aNod.attr({'href':getRqUrl(urlObj)+'/fileName/'+res.fileName,'target':'_self',title:'点击下载文件'}).text('下载导出文件').css('font-size','16px');
+					pNod.append($('<br />'),aNod);
+					opt.headBg='bg-info';
+					opt.title='记录导出成功';
 				}
+				Modal.small(pNod,opt);
+				// console.log(res);
 			});
-			
 			
 		});
 	},
