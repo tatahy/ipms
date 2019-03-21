@@ -874,50 +874,46 @@ function setTrBgColor() {
 function setSheetChkRdCom(mode='') {
 	let sheet=App.data.rqData.sheet;
 	let modeArr=['none','all','excluded'];
-	let shCheckBoxSet=$('#entList table').find('[name="sheetId"]'),
-		labelSet=shCheckBoxSet.closest('label'),
-		shRadioNod=$('#entList').find('[name="sheetMode"]'),
-		shSelectNod=$('#entList').find('[name="sheetType"]'),
-		divFileDownload=$('#divFileDownload');
+	let sheetIdSet=$('#entList table').find('[name="sheetId"]'),
+		sheetTypeRoot=$('#divSheetType'),
+		sheetTypeNod=sheetTypeRoot.find('select'),
+		sheetModeRoot=$('#divSheetMode'),
+		labStr='label-primary';
 	
 	if(modeArr.indexOf(mode)==-1){
 		mode=sheet.mode;
 	}else{
 		sheet.mode=mode;
 	}
-
-	shRadioNod.each(function(){
-		if(mode==$(this).val()){
-			$(this).prop('checked',true);
-		}
-	});
-	// shSelectNod.closest('div').show();	
-	divFileDownload.prop('hidden',false);	
-	
+	//默认显示（mode=='none'）
+	sheetTypeRoot.prop('hidden',true);
+	sheetIdSet.css('margin',0).prop({'checked':false,'disabled':false}).parent().prop('hidden',true).css('margin',0);
+	sheet.type='';
 	if(mode=="none"){		
-		shCheckBoxSet.prop({'checked':false,'disabled':false});	
-		labelSet.prop('hidden',true);
 		sheet.idArr=[];
-		sheet.type='';
-		divFileDownload.prop('hidden',true);	
+		labStr='label-default';
 	}
 	
 	if(mode=="all"){
-		shCheckBoxSet.prop({'checked':true,'disabled':true});
-		labelSet.prop('hidden',false);
-		for(let i=0;i<shCheckBoxSet.length;i++){
-			sheet.idArr[i]=parseInt(shCheckBoxSet.eq(i).val());
-		}
+		sheetTypeRoot.prop('hidden',false);
+		sheetIdSet.prop({'checked':true,'disabled':true}).parent().prop('hidden',false);
+		sheet.type=sheetTypeNod.val();
 		sheet.idArr=[];
-		sheet.type=shSelectNod.val();
 	}
 	if(mode=="excluded"){
-		shCheckBoxSet.prop({'checked':true,'disabled':false});
-		labelSet.prop('hidden',false);
-		sheet.type=shSelectNod.val();
+		sheetTypeRoot.prop('hidden',false);
+		sheetIdSet.prop('checked',true).parent().prop('hidden',false);
+		sheet.type=sheetTypeNod.val();
 	}
+	//全局sheet变量重新赋值
 	App.data.rqData.sheet=sheet;
-	return console.log(App.data.rqData.sheet);
+	
+	//恢复radio中label的class初始值
+	sheetModeRoot.find('label').attr('class','radio-inline label label-default');
+	//设定radio选中项及添加label的class值
+	sheetModeRoot.find('[value="'+mode+'"]').prop('checked',true).parent().removeClass('label-default').addClass(labStr);
+	
+	return sheet;
 }
 
 function showSearchResult() {

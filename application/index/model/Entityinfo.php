@@ -66,7 +66,7 @@ abstract class Entityinfo extends Model {
     }
     
     #得到在period里的所有pat
-    public function getPeriodSet($period='',$whereArr=[]) {
+    public function getPeriodSet($period='') {
       return $this->getPeriodSql($period)->select();
     }
     #得到在period里的所有pat的num

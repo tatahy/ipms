@@ -99,13 +99,12 @@ export var Event={
 		let tblNod=$('#entList table');
 		let	aHeadSet=tblNod.find('thead a'),
 			aBodySet=tblNod.find('tbody a'),
+			shCheckBoxSet=tblNod.find('[name="sheetId"]'),
 			aPageSet=$('#divListRows').find('a'),
 			listRowNod=$('#listRows'),
-			shRadioNod=$('#entList').find('[name="sheetMode"]'),
-			shSelectNod=$('#entList').find('[name="sheetType"]'),
-			shCheckBoxSet=$('#entList').find('[name="sheetId"]'),
-			btnOutputFile=$('#divFileDownload').find('button');		
-		
+			shRadioNod=$('#divSheetMode').find('input'),
+			shSelectNod=$('#divSheetType').find('select'),
+			btnOutputFile=$('#divSheetType').find('button');		
 		shRadioNod.click(function(){
 			let mode=$(this).val();
 			if(mode!=App.data.rqData.sheet.mode){
@@ -129,8 +128,7 @@ export var Event={
 			}
 			
 			App.data.rqData.sheet.idArr=arr;
-			console.log(index);
-			console.log(App.data.rqData.sheet);
+			
 		});
 		
 		//表格每页显示记录行数；表格按选定行数显示
@@ -198,32 +196,45 @@ export var Event={
 		});
 		btnOutputFile.click(function(){
 			let urlObj=App.data.urlObj;
-			console.log('btnOutputFile.click');
-			console.log(App.data.urlObj);
 			
 			urlObj.ctrl='list';
-			urlObj.action='makeListFile';
+			urlObj.action='listFileMake';
+			//导出表格的标题行信息
 			App.data.rqData.sheet.head=getListSortField();
-			console.log(App.data.rqData);	
 			
 			$.post(getRqUrl(urlObj),App.data.rqData,function(res){
-				let aNod=$('<a></a>');
+				let aNod=$('<a></a>').css('font-size','16px');
 				let pNod=$('<p></p>').addClass('text-center');
 				let opt={headBg:'bg-warning',title:'记录导出失败'};
 				if(res.result){
-					urlObj.action='downloadListFile';
-					
-					aNod.attr({'href':getRqUrl(urlObj)+'/fileName/'+res.fileName,'target':'_self',title:'点击下载文件'}).text('下载导出文件').css('font-size','16px');
-					pNod.append($('<br />'),aNod);
+					urlObj.action='listFileDownload';
+					//生成下载文件的链接
+					aNod.attr({'href':getRqUrl(urlObj)+'/fileName/'+res.msg,'target':'_self',title:'点击下载文件'}).text('下载导出文件');
+
 					opt.headBg='bg-info';
 					opt.title='记录导出成功';
+				}else{
+					aNod.addClass('text-warning').text(res.msg);
 				}
-				Modal.small(pNod,opt);
-				// console.log(res);
+				// Modal.small(pNod.append($('<br />'),aNod),opt);
+				Modal.large(pNod.append($('<br />'),aNod),opt);
+				
+				Modal.addEvent('hidden.bs.modal',function(){
+					let fName=res.msg;
+					let flag=res.result;
+					
+					if(flag){
+						urlObj.ctrl='list';
+						urlObj.action='listFileDelete';
+						//发出删除文件的请求
+						$.post(getRqUrl(urlObj),{fileName:fName});
+					}
+				});
 			});
 			
 		});
 	},
+	
 	//页面刷新
 	pageRefresh:function() {
 		let refreshBtn=$('.btnPageRefresh');

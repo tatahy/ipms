@@ -1480,17 +1480,42 @@ function _commonStatustEn2ChiArr($ent){
   return $arr;
 }
 #通知浏览器以附件形式进行文件下载
-function _commonDownloadFile($fileName,$dir=''){
+function _commonFileDownload($fileName,$dir=''){
   $path=!empty($dir)?$dir.$fileName:'./downloads/'.$fileName;
     
-    if(!file_exists($path)){
-      return;
-    }else{
-      header("Content-Type:application/octet-stream");
-      header("Content-Disposition:attachment;filename=".$fileName);
-      header('Content-Length:'.filesize($path));
-      readfile($path);
-      unlink($path);
-      exit();
-    }   
+  if(!file_exists($path)){
+    return;
+  }
+    
+  //header('Content-Type:application/octet-stream');
+//  header('Content-Disposition:attachment;filename='.$fileName);
+//  header('Content-Length:'.filesize($path));
+//  readfile($path);
+//  unlink($path);
+//  return exit();
+
+  #只读方式打开文件
+  $file=fopen($path,'r');
+  header('Content-Type: application/octet-stream');
+  header('Content-Ranges: bytes');
+  header('Content-Length:'.filesize($path));
+  header('Content-Disposition: attachment; filename='.$fileName);
+  #输出文件
+  echo fread($file,filesize($path));
+
+  fclose($file);
+  //unlink($path);
+  exit();
+       
+}
+
+function _commonFileDelete($fileName,$dir=''){
+  $path=!empty($dir)?$dir.$fileName:'./downloads/'.$fileName;
+    
+  if(!file_exists($path)){
+    return;
+  }
+  
+  unlink($path);
+  return;
 }

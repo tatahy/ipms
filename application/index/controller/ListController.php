@@ -209,15 +209,13 @@ class ListController extends Controller {
    
   }
   
-  public function makeListFile() {
+  public function listFileMake() {
     $this->priLogin();
-    $res=['result'=>'','fileName'=>''];
+    $res=['result'=>'','msg'=>''];
     
     #前端传来json对象
     $arr=$this->request->param();
-    
-    #查询字段
-    $whereArr['id']=['>',0];
+   
     #写入数据表的数组
     $sheetArr=[];
     
@@ -225,32 +223,42 @@ class ListController extends Controller {
     $ent= array_key_exists('ent',$arr)?$arr['ent']:'';
     $period=array_key_exists('period',$arr)?$arr['period']:'';
     $sheet= array_key_exists('sheet',$arr)?$arr['sheet']:['mode'=>'','idArr'=>[],'type'=>''];
+    #要求$searchData的键名必须是数据库中的字段名
+    $searchData= array_key_exists('searchData',$arr)?$arr['searchData']:[];
+    #要求$queryField的键名必须是数据库中的字段名
+    $queryField=array_key_exists('queryField',$arr)?$arr['queryField']:[];
+    #进行模型查询的条件数组
+    $whereArr=count($searchData)?$this->priGetMdlWhereArr($searchData,$queryField):[];
+    #查询字段
+    //$whereArr['id']=['>',0];
     
     if(!$ent){
       $res['result']=false;
-      return $res;
+      return json($res);
     }
     
     #模型对象
     $mdl=$this->priGetMdl($ent);
 
-    if($sheet['mode']=='excluded'){
+    if($sheet['mode']=='excluded' && array_key_exists('idArr',$sheet)){
       #查询结果数与要排除的记录数一致
-      if(isset($sheet['idArr']) && $mdl->getPeriodNum($period)==count($sheet['idArr'])){
+      if($mdl->getPeriodSql($period)->where($whereArr)->count()==count($sheet['idArr'])){
         $res['result']=false;
-        return $res;
+        $res['msg']='未选中需导出的记录。';
+        $mdl=null;
+        return json($res);
       }
       
-      if(isset($sheet['idArr'])){
-        #查询字段
-        $whereArr['id']=['notin',$sheet['idArr']];
-      }
+      #添加查询字段
+      $whereArr['id']=['notin',$sheet['idArr']];
     }
     
     $head= array_key_exists('head',$sheet)?$sheet['head']:['fieldEn'=>$mdl->getTableFields(),'fieldChi'=>[]]; 
     
     #结果数据集
-    $set=$mdl->getPeriodSql($period)->where($whereArr)->select();    
+    $set=$mdl->getPeriodSql($period)->where($whereArr)->select();
+    $mdl=null;
+        
     #数据表标题行
     $sheetArr[0]=(count($head['fieldChi']))?$head['fieldChi']:$head['fieldEn'];
     #数据表内容行
@@ -259,22 +267,28 @@ class ListController extends Controller {
         $sheetArr[$i][$k]=$set[$i-1][$v];
       }
     }
+    #调用priMakeListFile()生成文件，返回生成的文件名
+    $res['msg']=$this->priMakeListFile($sheetArr,$sheet['type']);
     
-    $res['fileName']=$this->priMakeListFile($sheetArr,$sheet['type']);
-    
-    if(!empty($res['fileName'])){
+    if(!empty($res['msg'])){
       $res['result']=true;
     }
-    $mdl=null;
-    return $res;
-  
+    
+    return json($res);
   }
   
-  public function downloadListFile() {
+  public function listFileDownload() {
     $this->priLogin();
     #前端传来文件名
     $fileName=$this->request->param('fileName');
-    return _commonDownloadFile($fileName);
+    return _commonFileDownload($fileName);
+    
+  }
+  public function listFileDelete() {
+    $this->priLogin();
+    #前端传来文件名
+    $fileName=$this->request->param('fileName');
+    return _commonFileDelete($fileName);
     
   }
   

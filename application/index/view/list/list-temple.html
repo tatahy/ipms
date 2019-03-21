@@ -20,23 +20,24 @@
 			<span class="">每页显示记录数：</span>
 			<select class="form-control" id="listRows">
 				<option value="5">5</option>
-				<option value="10">10</option>
+				<option value="10" selected>10</option>
 				<option value="20">20</option>
 				<option value="50">50</option>
 			</select>			
 		</div>
 	</div>
 	
-	<div class="row myRow text-right ">
-      	<div class="form-group">
-			<strong>记录导出：</strong>
-			<label class="radio-inline"><input type="radio" name="sheetMode" value="all">全选</label>
-		<label class="radio-inline"><input type="radio" name="sheetMode" value="excluded">部分</label>
-		<label class="radio-inline"><input type="radio" name="sheetMode" value="none">无</label>
-  		</div>
+	<div id="divSheetMode" class="row myRow text-right ">
+		<div class="form-group">
+			<strong style="margin-right:10px;">记录导出：</strong>
+			<label class="radio-inline label label-default"><input type="radio" name="sheetMode" value="all">全选</label>&nbsp;&nbsp;
+			<label class="radio-inline label label-default"><input type="radio" name="sheetMode" value="excluded">部分</label>&nbsp;&nbsp;
+			<label class="radio-inline label label-default"><input type="radio" name="sheetMode" value="none">无</label>
+		</div>
+		
 	</div>
 	
-	<div id="divFileDownload" class="row myRow text-right form-inline" hidden="true">
+	<div id="divSheetType" class="row myRow text-right form-inline" hidden="true">
 		<div class="form-group">
 			<strong>&nbsp;&nbsp;导出文件类型：</strong>
 			<select class="form-control" name="sheetType">
@@ -45,7 +46,7 @@
 			</select>
 		</div>
 		<div class="form-group">
-			<button class="btn btn-sm btn-primary" value="" title="导出所选记录"><span class="glyphicon glyphicon-download-alt"></span>&nbsp;导出</button>
+			<button class="btn btn-sm btn-primary" title="导出所选记录"><span class="glyphicon glyphicon-download-alt"></span>&nbsp;导出</button>
 		</div>
 	</div>
 	<br>
