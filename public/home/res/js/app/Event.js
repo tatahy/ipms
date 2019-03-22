@@ -787,40 +787,44 @@ async function asySetEntQueryForm(){
 	let result=false;
 	
 	setRqQueryFieldBy(fm);
-	opt.body= JSON.stringify(rData);
 	
+	//使用fetch
+	/* opt.body= JSON.stringify(rData);
 	resObj=await fetch('/index/searchForm/getSelOptData',opt);
 	optData=await resObj.json();
-	result=resObj.ok;
+	result=resObj.ok; */
+	
+	//使用jQuery的post要比fetch花费更少时间得到数据。
+	optData=await $.post('/index/searchForm/getSelOptData',rData);
 	
 	// console.log(rData);
 
 	if(optData){
-	//组装select的option，并设定显示值和底色
-	selSet.each(function(){
-		let selName=$(this).attr('name'),
-			optObj=optData[selName],
-			v=0;
-		//组装option
-		$(this).empty().append($('<option></option>').val(0).text('…不限'));	
-		for(var m=0;m<optObj.num;m++){
-			$(this).append($('<option></option>').val(optObj.val[m]).text(optObj.txt[m]));
-		}
-			
-		if(len && sNameArr.includes(selName)){
-			v=rData.searchData[selName];
-			//上底色
-			$(this).addClass('alert-info');
-			if(v){
-				//显示
-				$(this).closest('.collapse').collapse();
+		//组装select的option，并设定显示值和底色
+		selSet.each(function(){
+			let selName=$(this).attr('name'),
+				optObj=optData[selName],
+				v=0;
+			//组装option
+			$(this).empty().append($('<option></option>').val(0).text('…不限'));	
+			for(var m=0;m<optObj.num;m++){
+				$(this).append($('<option></option>').val(optObj.val[m]).text(optObj.txt[m]));
 			}
-		}
-		//设定select的显示值
-		$(this).val(v);	
+			
+			if(len && sNameArr.includes(selName)){
+				v=rData.searchData[selName];
+				//上底色
+				$(this).addClass('alert-info');
+				if(v){
+					//显示
+					$(this).closest('.collapse').collapse();
+				}
+			}
+			//设定select的显示值
+			$(this).val(v);	
 				
-	});	
-	result=true;
+		});	
+		result=true;
 	}
 	//barcode表单查询时，仅有一个查询项。
 	if(rData.searchSource=='barcode' && rData.searchData.bar_code){
