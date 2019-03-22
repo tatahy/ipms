@@ -272,4 +272,5 @@ function queryByCode(code='') {
 	}	
 }
 
-// export {Barcode,Quagga};
+//将导出变量App定义为本模块export的default变量
+export {Barcode as default};

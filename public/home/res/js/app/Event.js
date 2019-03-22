@@ -4,13 +4,15 @@
 //导入index.js中定义的变量、函数
 // import {rqData,resetSearchForm,asyRefreshEntObj,setRqSearchDataBy,setTrBgColor,entGetReady,consoleColor} from './index.js';
 import {App} from './main.js';
-import {resetSearchForm,asyRefreshEntObj,setRqSearchDataBy,setTrBgColor,setSheetChkRdCom,entGetReady,consoleColor,getRqUrl,getListSortField} from './utility.js';
+import {resetSearchForm,asyRefreshEntObj,buildEntPeriodTitle,setRqSearchDataBy,setTrBgColor,setSheetChkRdCom,setEntPeriodList,entGetReady,consoleColor,getRqUrl,getListSortField} from './utility.js';
 import {Modal} from './Modal.js';
+import Barcode from './Barcode.js';
+import sFCCls from './SearchFormCollapse.class.js';
 
 //定义导出对象Event。封装各个事件处理函数
 export var Event={
 	//BarcodeForm的event
-	barcodeForm:function() {
+	/* barcodeForm:function() {
 		//动态加载模块
 		import('./Barcode.js')
 		.then(module=>{
@@ -19,15 +21,15 @@ export var Event={
 		})
 		.catch(err=>{
 			console.log(err);
-		});		
-	},
+		});			
+	}, */
 	//多个查询表单的显示隐藏
-	clpsSwitch:function() {	
+	/* clpsSwitch:function() {	
 		//动态加载类
 		import('./SearchFormCollapse.class.js')
-		.then(cls=>{
+		.then(sFCCls=>{
 			let clpsSwitchSet=$('[data-collapse-switch]');
-			let sFCObj=new cls.default;
+			let sFCObj=new sFCCls.default;
 			let fmId=sFCObj.formId,
 				trgObj=sFCObj.status.trigger;
 			//3类共5个collapse-switch组件的click事件，
@@ -64,6 +66,47 @@ export var Event={
 			console.log(err);
 		});	
 		// };
+	}, */
+	barcodeForm:function() {
+		Barcode.init($('#fmBarcode'));
+	},
+	//多个查询表单的显示隐藏
+	clpsSwitch:function() {	
+		
+		let clpsSwitchSet=$('[data-collapse-switch]');
+		let sFCObj=new sFCCls;
+		let fmId=sFCObj.formId,
+		
+		trgObj=sFCObj.status.trigger;
+		//3类共5个collapse-switch组件的click事件，
+		//任意时刻只有一个组件能click。记录触发click的组件特征值，再由特征值决定组件的显示
+		clpsSwitchSet.click(function(){
+			let fmSet=$('#entSearchForm form');
+			let mSwitch=$('[data-collapse-switch="main"]');
+			//特征值1
+			let	type=$(this).data('collapseSwitch');
+			//特征值2
+			let	idx='';
+			//特征值3
+			let	mul=mSwitch.length?mSwitch.data('collapseMultishow'):false;
+	
+			if(type=='li'){	
+				idx=fmId.indexOf($(this).attr('href').slice(1));
+			}
+			if(type=='div'){
+				idx=fmId.indexOf($(this).data('target').slice(1));
+			}
+			if(type=='main'){
+				idx=trgObj.index;
+			}	
+				
+			trgObj.type=type;
+			trgObj.index=idx;
+			trgObj.multishow=mul;
+	
+			sFCObj.setCollapse({trigger:trgObj});
+	
+		});
 	},
 	//一般查询表单的event
 	queryForm: function() {
@@ -104,7 +147,10 @@ export var Event={
 			listRowNod=$('#listRows'),
 			shRadioNod=$('#divSheetMode').find('input'),
 			shSelectNod=$('#divSheetType').find('select'),
-			btnOutputFile=$('#divSheetType').find('button');		
+			btnOutputFile=$('#divSheetType').find('button');
+		
+		setEntPeriodList();	
+		
 		shRadioNod.click(function(){
 			let mode=$(this).val();
 			if(mode!=App.data.rqData.sheet.mode){
@@ -254,9 +300,10 @@ export var Event={
 			if(d.rqData.period!=sData.period){
 				d.rqData.ent=sData.ent;
 				d.rqData.period=sData.period;
-
+				//更新标题
+				buildEntPeriodTitle();
 				//异步更新list、queryForm
-				asyRefreshEntObj();	
+				return asyRefreshEntObj();	
 			}
 		});
 	}

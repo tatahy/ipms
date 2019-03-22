@@ -63,6 +63,18 @@ function pageReady(){
 	let entASet=$('nav .navbar-collapse ul').eq(0).find('a'),
 		btnEntPeriod=sumNod.find('.btnPeriod'),
 		btnTopnavToggle=$('nav .navbar-header').children('.navbar-toggle');
+	let getReady=(ent,period='')=>{
+		initRqData();
+		d.rqData.ent=ent;
+		d.rqData.period=!period?d.topNavProp[ent].period:period;
+		if(ent!='index'){
+			//生成ent的nav-pills
+			buildEntPeriodNavPills();
+			//生成ent的period的title
+			buildEntPeriodTitle();
+			return entGetReady();
+		}
+	};
 	
 	btnTopnavToggle.click(function(){
 		showTopNavbar();
@@ -83,67 +95,34 @@ function pageReady(){
 		ent=='index'?sumNod.show():perNod.show();
 		
 		if(d.rqData.ent!=ent){
-			initRqData();
-			d.rqData.ent=ent;
-			d.rqData.period=d.topNavProp[ent].period;
-			
-			//添加锚点？
-			// window.location.hash=ent;
-			//url添加查询字段？？
-			// window.location.search=`ent=${ent}`;
-						
-			if(ent!='index'){
-				
-				return entGetReady();
-			}
+			return getReady(ent);
 		}
-		
-		/* if(rData.ent!=ent){
-			initRqData();
-			rData.ent=ent;
-			rData.period=App.data.topNavProp[ent].period;
-			if(ent!='index'){
-				return entGetReady();
-			}
-		} */
 	});
 	
 	btnEntPeriod.click(function(){
 		let ent=$(this).data('ent');
+		let period=$(this).data('period');
 		sumNod.hide();
 		perNod.show();
 		
 		//ent对应的navTop的li添加'active'
 		entASet.closest('li').removeClass('active').find('[data-ent="'+ent+'"]').tab('show');
-		initRqData();
-		d.rqData.ent=ent;
-		d.rqData.period=$(this).data('period');
-		
-		return entGetReady();
+		return getReady(ent,period);
 	});
 }
 //使用Promise对象实现异步的顺序处理？？
 function entGetReady() {
-	// Promise.resolve(asyEntLoad())
+	
 	asyEntLoad()
 	//已成功加载list和form
 	.then(result=>{
-		//生成ent的nav-pills
-		buildEntPeriodNavPills();
-		//生成ent的period的title
-		buildEntPeriodTitle();
-		//设置list
-		setEntPeriodList();
+		
 		//设置rqData
 		setRqData();
-		//加载entEvent()
-		entEvent();
+		//加载addEntEvent()
+		addEntEvent();
 	})
-	.catch((e)=>console.log(e))
-	.finally(()=>{
-		// console.log('finally');
-		// return entEvent();
-	});
+	.catch(err=>{console.log(err);});
 }
 
 //异步加载ent对应的searchForm和list，加载成功后异步设置searchForm
@@ -173,7 +152,7 @@ async function asyEntLoad(){
 	return true;
 }
 
-function entEvent(){
+function addEntEvent(){
 	let clpsSwitchSet=$('[data-collapse-switch]'),
 		nodBarcode=$('#divFmBarcode');
 	
@@ -189,8 +168,9 @@ function entEvent(){
 	if(clpsSwitchSet.length){
 		eve.clpsSwitch();
 	}
-		
+	
 	eve.list();
+	
 	eve.queryForm();
 }
 
@@ -266,15 +246,9 @@ async function asyRefreshEntObj(objStr='') {
 	//await关键字，表示开启异步过程并等待结果
 	valArr=await Promise.all([r1,r2]);
 	
-	if(r2){
-		//更新标题
-		buildEntPeriodTitle();
-	}
-	
 	if(valArr.reduce(totalTrue,0)){
 		result=true;
-		setRqData(); 
-		setEntPeriodList();		
+		setRqData(); 		
 	}
 	//更新完后回到list的event中，为什么？
 	//因为是异步更新，要保证list中的其他event能够响应，就需要返回到原来list的event中
@@ -333,14 +307,13 @@ function setEntPeriodList(){
 	let rData=d.rqData;
 	let ent=rData.ent,
 		period=rData.period,
-		capSNod=$('#entList').find('caption strong'),
 		periodChi=d.entProp[ent].period.detail[period].txt;
 
 	//显示分页的第一页
 	rData.sortData.pageNum=1;
 	
 	//tbl标题加内容
-	capSNod.text(periodChi);
+	$('#entList table').find('caption strong').text(periodChi);
 	//tbl排序	
 	sortEntListTbl();
 	//指定行加底色	
@@ -977,7 +950,7 @@ function consoleColor(str='无内容',color='blue'){
 	
 }
 
-export {asyEntLoad,asyInitData,asyLoadEntObj,asyRefreshEntObj,asySetEntQueryForm,	buildEntPeriodNavPills,buildEntPeriodTitle,buildEntSummary,	buildTopNavbar,consoleColor,entEvent,entGetReady,getRqUrl,getListSortField,initRqData,pageInit,pageReady,resetSearchForm,setEntPeriodList,setRqData,setRqQueryFieldBy,setRqSearchDataBy,setTrBgColor,setSheetChkRdCom,showSearchResult,showTopNavbar,sortEntListTbl};
+export {asyEntLoad,asyInitData,asyLoadEntObj,asyRefreshEntObj,asySetEntQueryForm,	buildEntPeriodNavPills,buildEntPeriodTitle,buildEntSummary,	buildTopNavbar,consoleColor,addEntEvent,entGetReady,getRqUrl,getListSortField,initRqData,pageInit,pageReady,resetSearchForm,setEntPeriodList,setRqData,setRqQueryFieldBy,setRqSearchDataBy,setTrBgColor,setSheetChkRdCom,showSearchResult,showTopNavbar,sortEntListTbl};
 	
 	
 	
