@@ -8,14 +8,14 @@
 
 // import '../plugins/quaggaJs/quagga.min.js';
 
-//导入index.js中定义的变量、函数
-// import {rqData,resetSearchForm,asyRefreshEntObj} from './index.js';
-
 import {App} from './main.js';
-import {resetSearchForm,asyRefreshEntObj} from './utility.js';
+import {resetSearchForm,asyRefreshEntObj} from './Event.js';
+
+//将导出变量App定义为本模块export的default变量
+export {Barcode as default};
 
 //定义导出对象Barcode。封装条形码进行识别所需参数的预处理，识别过程。
-export var Barcode={
+var Barcode={
 	init:function(fm) {
 		let self=this;
 		if(typeof fm !='object' || fm[0].localName !=='form'){
@@ -271,6 +271,3 @@ function queryByCode(code='') {
 		nodWarning.show();
 	}	
 }
-
-//将导出变量App定义为本模块export的default变量
-export {Barcode as default};

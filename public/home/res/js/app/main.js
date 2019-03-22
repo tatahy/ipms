@@ -2,10 +2,13 @@
 
 //conf.js中采用默认输出
 import c from './conf.js';
-import {asyInitData,pageInit,pageReady} from './utility.js';
+import {asyInitData,buildTopNavbar,buildEntCharts} from './utility.js';
 import {Modal} from './Modal.js';
+import {Event as eve} from './Event.js';
 
-export var App={
+export {App};
+
+var App={
 	data:{
 		glyPrex:c.glyPrex,
 		bs3Color:c.bs3Color,
@@ -20,7 +23,7 @@ export var App={
 		searchResultNum:c.searchResultNum
 	},
 	//定义异步函数进行data的初始化
-	initData:async function(){
+	initData: async function(){
 		let self=this;
 		//使用utility.js中的异步函数
 		self.data=await asyInitData();
@@ -32,10 +35,17 @@ export var App={
 		console.log(err);
 	},
 	pageInit:function() {
-		return pageInit();
+		let self=this;
+		//生成组件
+		buildTopNavbar();
+		buildEntCharts();
+		// 激活并设置tooltip
+		$('body').tooltip({selector:'[title]',triger:'hover click',placement:'auto top',delay: {show: 200, hide: 100},html: true });
+		//设置页脚年份
+		$('footer .year').html('2017-'+self.data.year);
 	},
 	pageReady:function() {
-		return pageReady();
+		return eve.init();
 	},
 };
 
@@ -55,6 +65,3 @@ App.initData()
 	.catch(err=>{
 		return App.exit(err);
 	});
-
-//将导出变量App定义为本模块export的default变量
-export {App as default};
