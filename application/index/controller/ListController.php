@@ -107,8 +107,7 @@ class ListController extends Controller {
     $mdl=$this->priGetMdl($ent);
     
     #模型对象，查询、排序用
-    $queryBase=$mdl->getPeriodSql($period)
-                    ->where($whereArr)
+    $queryBase=$mdl->getPeriodSql($period,$whereArr)
                     ->order($sortData['sortName'],$sortData['sortOrder']);
       
     #查询、排序结果数据集：
@@ -242,7 +241,7 @@ class ListController extends Controller {
 
     if($sheet['mode']=='excluded' && array_key_exists('idArr',$sheet)){
       #查询结果数与要排除的记录数一致
-      if($mdl->getPeriodSql($period)->where($whereArr)->count()==count($sheet['idArr'])){
+      if($mdl->getPeriodSql($period,$whereArr)->count()==count($sheet['idArr'])){
         $res['result']=false;
         $res['msg']='未选中需导出的记录。';
         $mdl=null;
@@ -256,7 +255,7 @@ class ListController extends Controller {
     $head= array_key_exists('head',$sheet)?$sheet['head']:['fieldEn'=>$mdl->getTableFields(),'fieldChi'=>[]]; 
     
     #结果数据集
-    $set=$mdl->getPeriodSql($period)->where($whereArr)->select();
+    $set=$mdl->getPeriodSql($period,$whereArr)->select();
     $mdl=null;
         
     #数据表标题行

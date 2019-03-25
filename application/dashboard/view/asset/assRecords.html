@@ -55,19 +55,21 @@
 	</table>
 	</div>
 	
-	<a id="aCollapse" class="label label-info" style="font-size:16px;" data-toggle="popover" title="状态全过程记录">状态历史记录<span class="glyphicon glyphicon-menu-up"></span></a>
+	<a id="aCollapse" class="label label-info" style="font-size:16px;" data-toggle="popover">状态历史记录<span class="glyphicon glyphicon-menu-up"></span></a>
 	
 	<div id="divPanel" class="panel-group collaps in" style="margin-top:10px;">
 		{volist name="assRdSet" id="vo" empty="暂无信息"}
 		<div class="panel panel-info">
 			<div class="panel-heading">
 				<div class="row panel-title ">
-					<div class="panel-title col-sm-8 text-left">{$totalNum-$i+1}
-						<strong class="text-primary">{$vo.status_now_user_name}</strong>【{$vo.oprt}】完成，状态为<a class="aPanelCollapse" data-toggle="collapse" href="#collapse{$i}" title="查看详情"><span class="spStatus">{$vo.status_now}</span></a>
+					<div class="panel-title col-sm-7 text-left">{$totalNum-$i+1}
+						保管人【<strong class="text-primary">{$vo.keeper_now}</strong>】，状态&nbsp;<a class="aPanelCollapse" data-toggle="collapse" href="#collapse{$i}" title="查看详情"><span class="spStatus">{$vo.status_now}</span></a>
 					</div>
-					<div class="col-sm-4 text-right" style="font-size:14px;">{$vo.create_time}</div>
+					
+					<div class="col-sm-5 text-right" style="font-size:14px;">{$vo.create_time}，<strong class="text-primary">{$vo.status_now_user_name}</strong>【{$vo.oprt}】完成</div>
 				</div>
 			</div>
+			
 			<div id="collapse{$i}" class="panel-collapse collapse">
 			
 			<div class="row" style="margin:5px;">

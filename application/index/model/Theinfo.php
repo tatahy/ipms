@@ -32,12 +32,31 @@ class Theinfo extends Entityinfo {
    
     //继承自父类的变量
     //引用app\common中定义的常量：conTheEntArr
-    protected $entPeriod=conTheEntArr['period'];
     protected $entType=conTheEntArr['type'];
-    protected $entity='thesis';
+    protected $entPeriod=conTheEntArr['period'];
+    protected $entity=conTheEntArr['name'];
+    protected $entityAbbr=conTheEntArr['abbr'];
     
-    public function getEntity() {
-      return $this->entity;
+    public function getUserAuthSql($whereArr=[]) {
+      $auth=$this->entAuth;
+      $username=$this->userName;
+      $dept=$this->dept;
+      $authNum=0;
+      
+      foreach($auth as $v){
+        if($v){
+          $authNum++;
+        }
+      }
+      #无权限的全局查询结果
+      if(!$authNum){
+        return $this->where('id','<',0);
+      }
+      
+      #其他权限时的全局查询结果
+      $query=$this->where('id','>',0)->where($whereArr);
+      
+      return $query;
     }
     
     //获取器，获取数据表theinfo中type字段值，转换为中文输出

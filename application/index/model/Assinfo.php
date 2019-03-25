@@ -30,13 +30,6 @@ class Assinfo extends Entityinfo {
     // 时间字段输出格式
     protected $dateFormat = 'Y/m/d H:i:s';
 
-    //引用app\common中定义的常量：conAssEntArr
-    const ASSPERIOD=conAssEntArr['period'];
-   // const ASSSTATUS=conAssEntArr['status'];
-    const ENTITY='asset';
-        
-    //本类的静态方法中用于访问非静态方法时实例化本类对象
-    static private $obj=null;
     //本类的5个私有静态变量
     static private $userDept='';
     static private $auth=[];
@@ -46,14 +39,49 @@ class Assinfo extends Entityinfo {
     private $period='';
     private $errStr='not initiate Model Assinfo';
     
-    //继承自父类的变量
+    #继承自父类的变量 
+    protected $entType=[];
     //引用app\common中定义的常量：conAssEntArr
     protected $entPeriod=conAssEntArr['period'];
-    protected $entType=[];
-    protected $entity='asset';
+    protected $entity=conAssEntArr['name'];
+    protected $entityAbbr=conAssEntArr['abbr'];
    
-     public function getEntity() {
-      return $this->entity;
+    public function getUserAuthSql($whereArr=[]) {
+      $auth=$this->entAuth;
+      $userName=$this->userName;
+      $dept=$this->dept;
+      $authNum=0;
+      
+      foreach($auth as $v){
+        if($v){
+          $authNum++;
+        }
+      }
+      #无权限的全局查询结果
+      if(!$authNum){
+        return $this->where('id','<',0);
+      }
+      
+      #登录用户的asset权限有且仅有read，仅能查阅自己名下的asset，
+      if($authNum==1 && $auth['read']){
+        $query=$this->where('keeper_now',$userName)->where($whereArr);
+      }
+      #登录用户的asset权限有且仅有read和edit，仅能查阅自己部门和自己名下的asset，
+      if($authNum==2 && $auth['read'] && $auth['edit']){
+        #查询的条件是需要在一个前置查询范围内分为2个不同的查询。使用闭包实现
+        $query=$this->where(function($query) use($dept,$whereArr){
+                          $query->where('dept_now',$dept)->where($whereArr);
+                        })
+                      ->whereOr(function($query) use($dept,$userName,$whereArr){
+                          $query->where('dept_now','<>',$dept)->where('keeper_now',$userName)->where($whereArr);
+                        });
+      }
+      #其他权限时的全局查询结果
+      if($authNum>2){
+        $query=$this->where('id','>',0)->where($whereArr);
+      }
+            
+      return $query;
     }
     
    //获取器，获取数据表assinfo中status_now字段值，转换为中文输出
@@ -78,9 +106,9 @@ class Assinfo extends Entityinfo {
     //全局查询范围，框架在查询时会自动调用
     protected static function base($query)
     {
-        //
-        $query->whereNull('delete_time')->where('id','>',0);
-        //$query->where('delete_time',0)->where('id','>',0);
+      #启用软删除时要前置‘->whereNull('delete_time')’
+      $query->whereNull('delete_time');
+     // $query->whereNull('delete_time')->where('id','>',0);
     }
     
     //查询asset的类别

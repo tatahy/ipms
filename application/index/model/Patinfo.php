@@ -14,7 +14,8 @@ class Patinfo extends Entityinfo {
     #引用app\common中定义的常量
     const ENTTYPE=conPatEntArr['type'];
     const PATPERIOD=conPatEntArr['period'];
-    const ENTITY='patent';
+    const ENTITY=conPatEntArr['name'];
+    const ENTITYABBR=conPatEntArr['abbr'];
     //本类的静态方法中用于访问非静态方法时实例化本类对象
     static private $obj=null;
     //protected $auto = ['patnum','pronum'];
@@ -24,14 +25,36 @@ class Patinfo extends Entityinfo {
     //只读字段，这个字段的值一旦写入，就无法更改。
     protected $readonly = ['patnum', 'issinfo_id'];
     
-    //继承自父类的变量
-    //引用app\common中定义的常量：conPatEntArr
-    protected $entPeriod=conPatEntArr['period'];
+        
+    #继承自父类的变量 
+    //引用app\common中定义的常量：conAssEntArr
     protected $entType=conPatEntArr['type'];
-    protected $entity='patent';
+    protected $entPeriod=conPatEntArr['period'];
+    protected $entity=conPatEntArr['name'];
+    protected $entityAbbr=conPatEntArr['abbr'];
     
-    public function getEntity() {
-      return $this->entity;
+    
+    public function getUserAuthSql($whereArr=[]) {
+      $auth=$this->entAuth;
+      $username=$this->userName;
+      $dept=$this->dept;
+      $authNum=0;
+      
+      foreach($auth as $v){
+        if($v){
+          $authNum++;
+        }
+      }
+      
+      #无权限的全局查询结果
+      if(!$authNum){
+        return $this->where('id','<',0);
+      }
+      
+      #其他权限时的全局查询结果
+      $query=$this->where('id','>',0)->where($whereArr);
+      
+      return $query;
     }
 
     //设置patnum字段的值为pat+yyyy+0000的形式，即是在当年进行流水编号

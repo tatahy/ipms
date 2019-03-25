@@ -20,18 +20,22 @@ abstract class Entityinfo extends Model {
     protected $entPeriod=[];
     protected $entType=[];
     protected $entity=[];
+    protected $entityAbbr=[];
+    
+    protected $statusArr=[];
+    
     protected $entAuth;
     protected $userName;
     protected $dept;
-    protected $statusArr=[];
+   
     #覆盖构造方法
     public function __construct($data = []){
       parent::__construct($data);
       $this->statusArr=_commonStatustEn2ChiArr($this->entity);
     }
     
-    #需要实现的方法，用于初始化model
-    abstract function getEntity();
+    #需要实现的方法，用于初始化model后根据登录用户权限所能得到的查询范围
+    abstract function getUserAuthSql();
     
     #初始化模型的访问
     public function initModel($username='', $dept='', $authArr=[]) {
@@ -44,7 +48,7 @@ abstract class Entityinfo extends Model {
     }
     
     #得到在period里的query对象
-    public function getPeriodSql($period='') {
+    public function getPeriodSql($period='',$whereArr=[]) {
       
       $psArr=$this->entPeriod;
       $pArr=array_keys($psArr);
@@ -58,29 +62,31 @@ abstract class Entityinfo extends Model {
         $field=($this->entity=='asset')?'status_now':'status';
       }
       
-      $whereArr[$field]=[$psArr[$period]['queryExp'],$psArr[$period]['status']];
+      $arr[$field]=[$psArr[$period]['queryExp'],$psArr[$period]['status']];
       
-      $query=$this->where($whereArr);
+      $whereArr=array_merge($whereArr,$arr);
+      
+      $query=$this->getUserAuthSql($whereArr);
       
       return $query;
     }
     
     #得到在period里的所有pat
-    public function getPeriodSet($period='') {
-      return $this->getPeriodSql($period)->select();
+    public function getPeriodSet($period='',$whereArr=[]) {
+      return $this->getPeriodSql($period,$whereArr=[])->select();
     }
     #得到在period里的所有pat的num
-    public function getPeriodNum($period='') {
+    public function getPeriodNum($period='',$whereArr=[]) {
       $num='';
       $numArr=[];
       $pArr=array_keys($this->entPeriod);
       
       if(!empty($period)){
-        return $this->getPeriodSql($period)->count();
+        return $this->getPeriodSql($period,$whereArr=[])->count();
       }
       
       foreach($pArr as $key=>$val){
-        $numArr[$val]=$this->getPeriodSql($val)->count();
+        $numArr[$val]=$this->getPeriodSql($val,$whereArr=[])->count();
       } 
       return $numArr;
     }
@@ -107,7 +113,7 @@ abstract class Entityinfo extends Model {
    
       #组装$tempArr
       if(count($whereArr)){
-        $entSet=$this->getPeriodSql($period)->where($whereArr)->select();
+        $entSet=$this->getPeriodSql($period,$whereArr)->select();
       }else{
         $entSet=$this->getPeriodSet($period);
       }

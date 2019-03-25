@@ -30,14 +30,33 @@ class Proinfo extends Entityinfo {
     // 时间字段输出格式
     protected $dateFormat = 'Y/m/d H:i:s';
     
-    //继承自父类的变量
+    #继承自父类的变量 
     //引用app\common中定义的常量：conProEntArr
-    protected $entPeriod=conProEntArr['period'];
     protected $entType=conProEntArr['type'];
-    protected $entity='project';
+    protected $entPeriod=conProEntArr['period'];
+    protected $entity=conProEntArr['name'];
+    protected $entityAbbr=conProEntArr['abbr'];
    
-     public function getEntity() {
-      return $this->entity;
+    public function getUserAuthSql($whereArr=[]) {
+      $auth=$this->entAuth;
+      $username=$this->userName;
+      $dept=$this->dept;
+      $authNum=0;
+      
+      foreach($auth as $v){
+        if($v){
+          $authNum++;
+        }
+      }
+      #无权限的全局查询结果
+      if(!$authNum){
+        return $this->where('id','<',0);
+      }
+      
+      #其他权限时的全局查询结果
+      $query=$this->where('id','>',0)->where($whereArr);
+      
+      return $query;
     }
     
    //获取器，获取数据表proinfo中status字段值，转换为中文输出

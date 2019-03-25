@@ -789,13 +789,13 @@ async function asySetEntQueryForm(){
 	setRqQueryFieldBy(fm);
 	
 	//使用fetch
-	/* opt.body= JSON.stringify(rData);
+	opt.body= JSON.stringify(rData);
 	resObj=await fetch('/index/searchForm/getSelOptData',opt);
 	optData=await resObj.json();
-	result=resObj.ok; */
+	result=resObj.ok;
 	
-	//使用jQuery的post要比fetch花费更少时间得到数据。
-	optData=await $.post('/index/searchForm/getSelOptData',rData);
+	//使用jQuery的post要比fetch花费更少时间得到数据？？。
+	// optData=await $.post('/index/searchForm/getSelOptData',rData);
 	
 	// console.log(rData);
 
