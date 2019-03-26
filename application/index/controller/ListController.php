@@ -7,10 +7,7 @@ use think\Session;
 use think\Controller;
 
 use app\index\model\User; 
-use app\index\model\Patinfo as PatinfoModel;
-use app\index\model\Assinfo as AssinfoModel;
-use app\index\model\Theinfo as TheinfoModel;
-use app\index\model\Proinfo as ProinfoModel;
+use app\index\model\EntinfoFactory as EntinfoMdl;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\IOFactory as PhpSpreadsheetIO;
@@ -103,8 +100,8 @@ class ListController extends Controller {
     #返回前端的模板文件名
     $fileName=implode('-',['list',$ent]); 
             
-    #选择模型对象
-    $mdl=$this->priGetMdl($ent);
+    #选择模型对象并初始化
+    $mdl= EntinfoMdl::factory($ent)->initModel($this->userName,$this->dept,$this->authArr[$ent]);
     
     #模型对象，查询、排序用
     $queryBase=$mdl->getPeriodSql($period,$whereArr)
@@ -147,26 +144,7 @@ class ListController extends Controller {
     return view($fileName);
     //return $this->fetch($fileName);
   }
-  //选择模型对象并初始化
-  private function priGetMdl($ent) {
-    $mdl=null;
-    switch($ent){
-      case 'pat':
-        $mdl= new PatinfoModel();
-        break;
-      case 'ass':
-        $mdl= new AssinfoModel();
-        break;
-      case 'pro':
-        $mdl= new ProinfoModel();
-        break;
-      case 'the':
-        $mdl= new TheinfoModel();
-        break;
-    }
-    
-    return $mdl->initModel($this->userName,$this->dept,$this->authArr[$ent]);  
-  }
+  
   //得到特定的list数据集转为指定的文件
   private function priMakeListFile($arr=[],$type='xlsx') {
     
@@ -236,8 +214,8 @@ class ListController extends Controller {
       return json($res);
     }
     
-    #模型对象
-    $mdl=$this->priGetMdl($ent);
+    #选择模型对象并初始化
+    $mdl= EntinfoMdl::factory($ent)->initModel($this->userName,$this->dept,$this->authArr[$ent]);
 
     if($sheet['mode']=='excluded' && array_key_exists('idArr',$sheet)){
       #查询结果数与要排除的记录数一致

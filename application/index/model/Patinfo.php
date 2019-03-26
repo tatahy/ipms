@@ -8,9 +8,12 @@
 namespace app\index\model;
 
 use app\index\model\Entityinfo;
+
+use app\index\model\EntinfoFactory;
 use app\admin\model\Dept as DeptModel;
 
-class Patinfo extends Entityinfo {
+//class Patinfo extends Entityinfo {
+class Patinfo extends EntinfoFactory {
     #引用app\common中定义的常量
     const ENTTYPE=conPatEntArr['type'];
     const PATPERIOD=conPatEntArr['period'];
@@ -32,30 +35,6 @@ class Patinfo extends Entityinfo {
     protected $entPeriod=conPatEntArr['period'];
     protected $entity=conPatEntArr['name'];
     protected $entityAbbr=conPatEntArr['abbr'];
-    
-    
-    public function getUserAuthSql($whereArr=[]) {
-      $auth=$this->entAuth;
-      $username=$this->userName;
-      $dept=$this->dept;
-      $authNum=0;
-      
-      foreach($auth as $v){
-        if($v){
-          $authNum++;
-        }
-      }
-      
-      #无权限的全局查询结果
-      if(!$authNum){
-        return $this->where('id','<',0);
-      }
-      
-      #其他权限时的全局查询结果
-      $query=$this->where('id','>',0)->where($whereArr);
-      
-      return $query;
-    }
 
     //设置patnum字段的值为pat+yyyy+0000的形式，即是在当年进行流水编号
     protected function setPatnumAttr()

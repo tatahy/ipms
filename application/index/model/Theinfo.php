@@ -7,13 +7,16 @@
 
 namespace app\index\model;
 
-use app\index\model\Entityinfo;
+//use app\index\model\Entityinfo;
+
+use app\index\model\EntinfoFactory;
 use app\admin\model\Dept as DeptModel;
 
 //启用软删除
 use traits\model\SoftDelete;
 
-class Theinfo extends Entityinfo {
+//class Theinfo extends Entityinfo {
+class Theinfo extends EntinfoFactory {
     //启用软删除
     use SoftDelete;
     //protected $auto = ['assnum','pronum'];
@@ -36,28 +39,6 @@ class Theinfo extends Entityinfo {
     protected $entPeriod=conTheEntArr['period'];
     protected $entity=conTheEntArr['name'];
     protected $entityAbbr=conTheEntArr['abbr'];
-    
-    public function getUserAuthSql($whereArr=[]) {
-      $auth=$this->entAuth;
-      $username=$this->userName;
-      $dept=$this->dept;
-      $authNum=0;
-      
-      foreach($auth as $v){
-        if($v){
-          $authNum++;
-        }
-      }
-      #无权限的全局查询结果
-      if(!$authNum){
-        return $this->where('id','<',0);
-      }
-      
-      #其他权限时的全局查询结果
-      $query=$this->where('id','>',0)->where($whereArr);
-      
-      return $query;
-    }
     
     //获取器，获取数据表theinfo中type字段值，转换为中文输出
     protected function getTypeAttr($dBStrEn)

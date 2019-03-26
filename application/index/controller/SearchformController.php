@@ -6,10 +6,7 @@ use think\Request;
 use think\Session;
 use think\Controller;
 
-use app\index\model\Patinfo as PatinfoModel;
-use app\index\model\Assinfo as AssinfoModel;
-use app\index\model\Theinfo as TheinfoModel;
-use app\index\model\Proinfo as ProinfoModel;
+use app\index\model\EntinfoFactory as EntinfoMdl;
 
 # 继承了think\Controller类，可直接调用think\View，think\Request类的方法
 # 类名与类文件名相同,
@@ -28,13 +25,13 @@ class SearchformController extends Controller {
   private $dept = '';
   
   //定义前端可搜索的数据库字段
-  const SEARCHDBFIELD=[
-    'pat'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0],
-    'ass'=>['brand_model'=>'','dept_now'=>0,'keeper_now'=>'','assnum'=>'','code'=>'',
-            'bar_code'=>'','status_now'=>0,'place_now'=>0,'status_now_user_name'=>''],
-    'pro'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0],
-    'the'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0]
-  ];
+  //const SEARCHDBFIELD=[
+//    'pat'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0],
+//    'ass'=>['brand_model'=>'','dept_now'=>0,'keeper_now'=>'','assnum'=>'','code'=>'',
+//            'bar_code'=>'','status_now'=>0,'place_now'=>0,'status_now_user_name'=>''],
+//    'pro'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0],
+//    'the'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0]
+//  ];
   #单个select返回前端的数据结构
   const SELECTSINGLE=['num'=>0,'val'=>[''],'txt'=>['']];
   
@@ -89,30 +86,12 @@ class SearchformController extends Controller {
     return $whereArr;
   }
   private function priGetEntDBfieldGroup($ent,$period,$field,$whereArr=[]){
-       
-    return $this->priGetMdl($ent)->getFieldGroupByArr($field,self::SELECTSINGLE,$period,$whereArr);
-  }
-  //选择模型对象并初始化
-  private function priGetMdl($ent) {
-    $mdl=null;
-    switch($ent){
-      case 'pat':
-        $mdl= new PatinfoModel();
-        break;
-      case 'ass':
-        $mdl= new AssinfoModel();
-        break;
-      case 'pro':
-        $mdl= new ProinfoModel();
-        break;
-      case 'the':
-        $mdl= new TheinfoModel();
-        break;
-    }
-    
-    return $mdl->initModel($this->userName,$this->dept,$this->authArr[$ent]);  
+    //选择模型对象并初始化
+    $mdl= EntinfoMdl::factory($ent)->initModel($this->userName,$this->dept,$this->authArr[$ent]);
+    return $mdl->getFieldGroupByArr($field,self::SELECTSINGLE,$period,$whereArr);
   }
   
+ 
   public function index () {
     $this->priLogin();
     

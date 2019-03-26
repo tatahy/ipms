@@ -8,12 +8,15 @@
 namespace app\index\model;
 
 use app\index\model\Entityinfo;
+
+use app\index\model\EntinfoFactory;
 use app\admin\model\Dept as DeptModel;
 
 //启用软删除
 use traits\model\SoftDelete;
 
-class Assinfo extends Entityinfo {
+//class Assinfo extends Entityinfo {
+class Assinfo extends EntinfoFactory {
     //启用软删除
     use SoftDelete;
     //protected $auto = ['assnum','pronum'];
@@ -46,6 +49,7 @@ class Assinfo extends Entityinfo {
     protected $entity=conAssEntArr['name'];
     protected $entityAbbr=conAssEntArr['abbr'];
    
+    #重写父类的getUserAuthSql()方法
     public function getUserAuthSql($whereArr=[]) {
       $auth=$this->entAuth;
       $userName=$this->userName;

@@ -8,12 +8,15 @@
 namespace app\index\model;
 
 use app\index\model\Entityinfo;
+
+use app\index\model\EntinfoFactory;
 use app\admin\model\Dept as DeptModel;
 
 //启用软删除
 use traits\model\SoftDelete;
 
-class Proinfo extends Entityinfo {
+//class Proinfo extends Entityinfo {
+class Proinfo extends EntinfoFactory {
     //启用软删除
     use SoftDelete;
     //protected $auto = ['assnum','pronum'];
@@ -36,28 +39,6 @@ class Proinfo extends Entityinfo {
     protected $entPeriod=conProEntArr['period'];
     protected $entity=conProEntArr['name'];
     protected $entityAbbr=conProEntArr['abbr'];
-   
-    public function getUserAuthSql($whereArr=[]) {
-      $auth=$this->entAuth;
-      $username=$this->userName;
-      $dept=$this->dept;
-      $authNum=0;
-      
-      foreach($auth as $v){
-        if($v){
-          $authNum++;
-        }
-      }
-      #无权限的全局查询结果
-      if(!$authNum){
-        return $this->where('id','<',0);
-      }
-      
-      #其他权限时的全局查询结果
-      $query=$this->where('id','>',0)->where($whereArr);
-      
-      return $query;
-    }
     
    //获取器，获取数据表proinfo中status字段值，转换为中文输出
     protected function getStatusAttr($dBStrEn)

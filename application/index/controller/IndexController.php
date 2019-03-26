@@ -8,10 +8,7 @@ use think\Controller;
 
 use app\common\validate\Ipvalidate;
 use app\index\model\User as UserModel;
-use app\index\model\Patinfo as PatinfoModel;
-use app\index\model\Assinfo as AssinfoModel;
-use app\index\model\Theinfo as TheinfoModel;
-use app\index\model\Proinfo as ProinfoModel;
+use app\index\model\EntinfoFactory as EntinfoMdl;
 
 class IndexController extends Controller
 {
@@ -108,25 +105,12 @@ class IndexController extends Controller
     
     $entNum=['pat'=>0,'ass'=>0,'pro'=>0,'the'=>0];
     
-    foreach($entNum as $key=>$val){
+    foreach($entNum as $ent=>$val){
       //选择mdl
-      if($this->authArr[$key]['read']){
-        switch($key){
-          case 'pat':
-            $mdl=new PatinfoModel();
-            break;
-          case 'ass':
-            $mdl=new AssinfoModel();
-            break;
-          case 'pro':
-            $mdl=new ProinfoModel();
-            break;
-          case 'the':
-            $mdl=new TheinfoModel();
-            break;
-        }
-      
-        $entNum[$key]=$mdl->initModel($this->userName,$this->dept,$this->authArr[$key])->getPeriodNum();
+      if($this->authArr[$ent]['read']){
+        #选择模型对象并初始化
+        $mdl= EntinfoMdl::factory($ent)->initModel($this->userName,$this->dept,$this->authArr[$ent]);
+        $entNum[$ent]=$mdl->getPeriodNum();
         $mdl=null;
       }
     }
@@ -159,11 +143,15 @@ class IndexController extends Controller
 //    if($getPageInitData){
 //      return $this->priGetPageInitData();
 //    }
-
+    
+    $ent=!empty($request->param('ent'))?$request->param('ent'):'';
+    $period=!empty($request->param('period'))?$request->param('period'):'';
+    
     $this->assign([
       'home' => $request->domain(), 
-      'username' => $this->userName,
-      'authArr'=>json_encode($this->authArr),
+      'userName' => $this->userName,
+      //'test'=>json_encode($ent.$period),
+      
     ]);
     return view();
     //return json_encode(['tpl'=>view(),'home'=> $request->domain()]);

@@ -25,9 +25,10 @@ var App={
 	//定义异步函数进行data的初始化
 	initData: async function(){
 		let self=this;
+		
 		//使用utility.js中的异步函数
 		self.data=await asyInitData();
-		
+			
 		return self.data.userName;
 	},
 	exit:function(err){
@@ -59,8 +60,7 @@ App.initData()
 		
 		App.pageInit();
 		App.pageReady();
-		
-		return Modal.small(str);		
+		// return Modal.small(str);		
 	})
 	.catch(err=>{
 		return App.exit(err);

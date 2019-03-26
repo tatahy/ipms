@@ -14,58 +14,84 @@ var Event={
 	init:function() {
 		let self=this;
 		let d=App.data;
-		// let rData=App.data.rqData;
-		let sumNod=$('#entChart').show(),
-			perNod=$('#entPeriod').hide();
 		let entASet=$('nav .navbar-collapse ul').eq(0).find('a'),
-			btnEntPeriod=sumNod.find('.btnPeriod'),
+			btnEntPeriod=$('#entChart').find('.btnPeriod'),
 			btnTopnavToggle=$('nav .navbar-header').children('.navbar-toggle');
-		let getReady=(ent,period='')=>{
+		let ent='index';
+		let period='';
+		let getReady=()=>{
+				let entDefalt=Object.keys(d.entProp);
+				let periodDefalt=[];
+				let ent='index';
+				let period='';
+				let sumNod=$('#entChart'),
+					perNod=$('#entPeriod');
+				let searchStr=window.location.hash;
+				
+				if(window.location.hash.indexOf('ent')!=-1){
+					window.location.hash.slice(1).split('&').forEach(function(item,index){
+						item=item.split('=');
+						//限定ent、period的取值在App.data.entProp中
+						if(item[0]=='ent'){
+							index=entDefalt.indexOf(item[1]);
+							ent=(index!=-1)?entDefalt[index]:ent;
+						}
+						if(item[0]=='period' && ent!='index'){
+							periodDefalt=Object.keys(d.entProp[ent].period.detail);
+							index=periodDefalt.indexOf(item[1]);
+							period=(index!=-1)?periodDefalt[index]:'';
+						}
+					});
+					window.location.hash=(!period)?`ent=${ent}`:`ent=${ent}&period=${period}`;
+					
+				}	
+				
 				initRqData();
 				d.rqData.ent=ent;
 				d.rqData.period=!period?d.topNavProp[ent].period:period;
+				
+				sumNod.hide();
+				perNod.hide();
+				
 				if(ent!='index'){
 					//生成ent的nav-pills
 					buildEntPeriodNavPills();
 					//生成ent的period的title
 					buildEntPeriodTitle();
+					console.log(ent);
+					console.log(period);
+					perNod.show();
+					//ent对应的navTop的li添加'active'
+					entASet.closest('li').removeClass('active').find('[data-ent="'+ent+'"]').tab('show');
 					return self.reloadEvent();
+				}else{
+					return sumNod.show();
 				}
+				
 			};
-	
+		
 		btnTopnavToggle.click(function(){
 			showTopNavbar();
 		});
 
 		entASet.click(function(){
-			let cls=$(this).closest('li').attr('class')?$(this).closest('li').attr('class'):'no class',
-				ent=$(this).data('ent');
-		
+			let cls=$(this).closest('li').attr('class')?$(this).closest('li').attr('class'):'no class';
+					
 			if(cls.indexOf('disabled')!=-1 ){
 				return true;			
 			}
-		
-			$(this).tab('show');
-			sumNod.hide();
-			perNod.hide();
-			
-			ent=='index'?sumNod.show():perNod.show();
-		
-			if(d.rqData.ent!=ent){
-				return getReady(ent);
-			}
+			window.location.hash='ent='+$(this).data('ent');			
+			return getReady();
 		});
 	
 		btnEntPeriod.click(function(){
-			let ent=$(this).data('ent');
-			let period=$(this).data('period');
-			sumNod.hide();
-			perNod.show();
-		
-			//ent对应的navTop的li添加'active'
-			entASet.closest('li').removeClass('active').find('[data-ent="'+ent+'"]').tab('show');
-			return getReady(ent,period);
-		});		
+			window.location.hash='ent='+$(this).data('ent')+'&period='+$(this).data('period');	
+			return getReady();
+		});	
+		//只能写在最后，不然前面的内容就不会加载。
+		if(window.location.hash.indexOf('ent')!=-1){
+			return getReady();
+		}	
 	},
 	addEvent:function(){
 		let self=this;
@@ -92,10 +118,10 @@ var Event={
 	//使用Promise对象实现异步的顺序处理？？
 	reloadEvent:function() {
 		let self=this;
+		
 		asyEntLoad()
 		//已成功加载list和form
 		.then(result=>{
-		
 			//设置rqData
 			setRqData();
 			//加载addEvent
@@ -396,8 +422,14 @@ var Event={
 				d.rqData.period=sData.period;
 				//更新标题
 				buildEntPeriodTitle();
+				
+				//添加搜索条件浏览器就会立即更新页面 window.location.search=`?ent=${sData.ent}&period=${sData.period}`;
+				//添加锚点值浏览器则不会立即更新页面，仅仅在url后面添加锚点值
+				window.location.hash=`ent=${sData.ent}&period=${sData.period}`;
+				
 				//异步更新list、queryForm
-				return asyRefreshEntObj();	
+				return asyRefreshEntObj();
+				
 			}
 		});
 	}
@@ -705,12 +737,12 @@ async function asyLoadEntObj(type){
 	let loadNod=conf[type].node;
 	
 	// fetch() 返回的是一个response对象，await让代码暂停在该行直至返回所要求的数据。
-	// let resObj=await fetch(conf[type].url,opt);
-	// let content=await resObj.text();
+	let resObj=await fetch(conf[type].url,opt);
+	let content=await resObj.text();
 	// result=resObj.ok;
 	// console.log(resObj);
-	//$.post()返回的是一个jqXHR对象，该对象也是Promise对象，await该jqXHR对象得到其responseText属性值，大小要比上述resObj对象小
-	let content=await $.post(conf[type].url,rData);
+	//$.post()返回的是一个jqXHR对象，该对象也是Promise对象，await该jqXHR对象得到其responseText属性值。
+	// let content=await $.post(conf[type].url,rData);
 	
 	result=(content)?true:false;
 	
