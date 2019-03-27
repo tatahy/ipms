@@ -29,7 +29,7 @@ class EntinfoFactory extends Model {
    #覆盖构造方法
   public function __construct($data = []){
     parent::__construct($data);
-    $this->statusArr=_commonStatustEn2ChiArr($this->entity);
+    $this->statusArr=fn_status_array_en2_chi($this->entity);
   }
   
   public static function factory($ent){
@@ -126,7 +126,7 @@ class EntinfoFactory extends Model {
     
     #组装$tArr
       if($field=='type') $tArr=$this->entType;
-      if($field=='status_now' || $field=='status') $tArr=_commonStatustEn2ChiArr($this->entity);      
+      if($field=='status_now' || $field=='status') $tArr=fn_status_array_en2_chi($this->entity);      
       if($field=='dept_now' || $field=='dept') {
         #得到dept的键值转换数组$tArr。abbr为键，name为值的关联数组
         $deptSet=DeptModel::all();

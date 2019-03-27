@@ -1457,7 +1457,7 @@ const conIssProStatusArr=[//除‘完结’以外的其它状态
 
 
 #得到ent的status的中英文对照数组
-function _commonStatustEn2ChiArr($ent){
+function fn_status_array_en2_chi($ent){
   $sArr=[];
   switch($ent){
     case 'asset':
@@ -1480,7 +1480,7 @@ function _commonStatustEn2ChiArr($ent){
   return $arr;
 }
 #通知浏览器以附件形式进行文件下载
-function _commonFileDownload($fileName,$dir=''){
+function fn_file_download($fileName,$dir=''){
   $path=!empty($dir)?$dir.$fileName:'./downloads/'.$fileName;
     
   if(!file_exists($path)){
@@ -1509,7 +1509,7 @@ function _commonFileDownload($fileName,$dir=''){
        
 }
 
-function _commonFileDelete($fileName,$dir=''){
+function fn_file_delete($fileName,$dir=''){
   $path=!empty($dir)?$dir.$fileName:'./downloads/'.$fileName;
     
   if(!file_exists($path)){
@@ -1517,5 +1517,5 @@ function _commonFileDelete($fileName,$dir=''){
   }
   
   unlink($path);
-  return;
+  exit();
 }

@@ -258,15 +258,14 @@ class ListController extends Controller {
     $this->priLogin();
     #前端传来文件名
     $fileName=$this->request->param('fileName');
-    return _commonFileDownload($fileName);
+    return fn_file_download($fileName);
     
   }
   public function listFileDelete() {
     $this->priLogin();
     #前端传来文件名
     $fileName=$this->request->param('fileName');
-    return _commonFileDelete($fileName);
-    
+    return fn_file_delete($fileName);
   }
   
   

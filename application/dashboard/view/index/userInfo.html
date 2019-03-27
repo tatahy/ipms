@@ -15,7 +15,7 @@
     	</div>
   	</div>
 	
-	<div id="divUserBasicInfo" class="row myRow collaps in" style="margin-top:10px;">		
+	<div id="divUserBasicInfo" class="row myRow collapse in" style="margin-top:10px;">		
 		
 		<div class="col-sm-3">
 			<span>用户名：<strong style="font-size:16px;">{$user.username}</strong></span>	
@@ -31,27 +31,27 @@
 		
 	</div>
 	<hr>
-	
-	<button type="button" class="btn btn-primary" style="padding:1px 5px;font-size:16px;" data-toggle="collapse" data-target="#divUserAuth"title="显示/隐藏系统权限"><span class="glyphicon glyphicon-alert"></span>系统权限</button>
-	<br />
-	<br />
-	<p id="authRank" style="padding-left:20px;"><strong>系统模块类别：</strong></p>
-
-	<div id="divUserAuth" class="row myRow collaps in" style="margin-top:10px;">		
-		
-	</div>
-	<hr>
 		
 	<button type="button" class="btn btn-primary" style="padding:1px 5px;font-size:16px;" data-toggle="collapse" data-target="#divUserGroup" title="显示/隐藏所属用户组"><span class="glyphicon glyphicon-education"></span>所属用户组</button>
 	
-	<div id="divUserGroup" class="row myRow collaps in" style="margin-top:10px;">		
+	<div id="divUserGroup" class="row myRow collapse in" style="margin-top:10px;">		
 		<ul class="list-group">
 			{volist name="userGroup" id="vo"}			
-			<a class="list-group-item col-sm-4" style="border:0px;">【<span class="label label-info">{$vo.name}</span>】：{$vo.description}</a>
+			<a class="list-group-item col-sm-4" style="border:0px;">【<strong class="text-info">{$vo.name}</strong>】{$vo.description}</a>
 			<!-- <li class="list-group-item">【<span class="label label-info">{$vo.name}</span>】：{$vo.description}</li> -->
 			{/volist}
 		</ul>	
 			
+	</div>
+	<hr>
+	
+	<button type="button" class="btn btn-primary" style="padding:1px 5px;font-size:16px;" data-toggle="collapse" data-target="#divUserAuth"title="显示/隐藏系统权限"><span class="glyphicon glyphicon-alert"></span>系统模块权限</button>
+	<br />
+	<br />
+	<p id="authRank" style="padding-left:20px;"><strong>系统模块类别：</strong></p>
+
+	<div id="divUserAuth" class="row myRow collapse" style="margin-top:10px;">		
+		
 	</div>
 
 </div>
@@ -263,7 +263,8 @@ var buildAuthCom=(uAuth)=>{
 		//权限分类按模块显示
 		$('#divUserAuth').append(rSet[el]);
 	}
-	
+	<!-- $('#divUserAuth').collapse('hide'); -->
+	<!-- $('#divUserAuth').addClass('collapse'); -->
 };
 
 //利用自调用匿名函数立即执行的特点， 页面初始化
