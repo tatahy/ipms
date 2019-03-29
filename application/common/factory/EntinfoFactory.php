@@ -2,10 +2,10 @@
 
 /**
  * @author TATA
- * @copyright 2017
+ * @copyright 2019
  */
 #用于动态获取$ent对应的modal
-namespace app\index\model;
+namespace app\common\factory;
 
 use think\Model;
 use think\Db;
@@ -26,19 +26,21 @@ class EntinfoFactory extends Model {
   protected $userName;
   protected $dept;
    
-   #覆盖构造方法
+  #覆盖父类构造方法
   public function __construct($data = []){
     parent::__construct($data);
     $this->statusArr=fn_status_array_en2_chi($this->entity);
   }
   
-  public static function factory($ent){
-    #通过命名空间直接定位要使用的类，再实例化。'__NAMESPACE__'的值是自己的命名空间字符串
-    $className= __NAMESPACE__.DS.ucfirst($ent).'info';
+  public static function factory($ent,$nameSpace){
+    #$nameSpace:继承类所在命名空间。
+    #通过命名空间直接定位要使用的类，
+    $className= $nameSpace.DS.ucfirst($ent).'info';
+    #返回实例化的对象。
     return new $className();
   }
   
-  #初始化模型的访问
+  #初始化模型
     public function initModel($username='', $dept='', $authArr=[]) {
       
       $this->entAuth=$authArr;
@@ -172,10 +174,7 @@ class EntinfoFactory extends Model {
       $arr['txt']=array_values($tempArr);
       
       return $arr;
-      
     }
-    
-    
     
 }
 

@@ -7,9 +7,9 @@
 
 namespace app\index\model;
 
-use app\index\model\Entityinfo;
+//use app\index\model\EntinfoFactory;
 
-use app\index\model\EntinfoFactory;
+use app\common\factory\EntinfoFactory;
 use app\admin\model\Dept as DeptModel;
 
 //class Patinfo extends Entityinfo {

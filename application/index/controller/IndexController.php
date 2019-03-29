@@ -4,44 +4,16 @@ namespace app\index\controller;
 
 use think\Request;
 use think\Session;
-use think\Controller;
 
-use app\common\validate\Ipvalidate;
+use app\index\controller\CommonController;
 use app\index\model\User as UserModel;
-use app\index\model\EntinfoFactory as EntinfoMdl;
 
-class IndexController extends Controller
-{
-  
-  //用户权限
-  private $authArr=array();
-  //用户登录状态
-  private $log = 0;
-  //用户名
-  private $userName = '';
-  //用户密码
-  private $pwd = '';
-  //用户所属部门
-  private $dept = '';
+use app\common\factory\EntinfoFactory as EntinfoMdl;
+
+class IndexController extends CommonController {
   
   #patent的period与status的对应关系，本应用common.php中定义
   const PATPERIODSTATUS=conPatPeriodVsStatus;
-  
-  private function priLogin(){
-  
-    $this->log=Session::has('log')?Session::get('log'):0;
-    //通过$log判断是否是登录用户，非登录用户退回到登录页面
-    if(!$this->log){
-      return $this->error('未登录用户，请先登录系统','index/login');
-    }
-    //return $this->success('priLogin()调试，'.json_encode(Session::get('authArr')),'login','',10);
-    $this->authArr=Session::get('authArr');
-    $this->userName=Session::get('username');
-    $this->dept=Session::get('dept');
-    $this->pwd=Session::get('pwd');
-    
-    return $this->log;
-  }
   
   #根据传入的参数，检查登录用户信息是否数据库中唯一存在（是就设置Session，并返回'success'）
   private function priSetSession($data=[]) {
@@ -99,7 +71,7 @@ class IndexController extends Controller
   }
   
   private function priGetPageInitData() {
-    $this->priLogin();
+    $this->chkLogin();
     $mdl=null;
     $request=Request::instance();
     
@@ -109,7 +81,7 @@ class IndexController extends Controller
       //选择mdl
       if($this->authArr[$ent]['read']){
         #选择模型对象并初始化
-        $mdl= EntinfoMdl::factory($ent)->initModel($this->userName,$this->dept,$this->authArr[$ent]);
+        $mdl= $this->getMdl($ent);
         $entNum[$ent]=$mdl->getPeriodNum();
         $mdl=null;
       }
@@ -136,7 +108,7 @@ class IndexController extends Controller
   
   public function index(Request $request) {
         
-    $this->priLogin();
+    $this->chkLogin();
     
     //$getPageInitData=!empty($request->param('getPageInitData'))?$request->param('getPageInitData'):false;
 //  
@@ -158,7 +130,7 @@ class IndexController extends Controller
   }
   
   public function getInitData() {
-    $this->priLogin();
+    $this->chkLogin();
     
     return $this->priGetPageInitData();
   }

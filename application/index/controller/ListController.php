@@ -2,30 +2,17 @@
 
 namespace app\index\controller;
 
-use think\Request;
-use think\Session;
-use think\Controller;
-
-use app\index\model\User; 
-use app\index\model\EntinfoFactory as EntinfoMdl;
+use app\common\factory\EntinfoFactory as EntinfoMdl;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\IOFactory as PhpSpreadsheetIO;
 
-# 继承了think\Controller类，可直接调用think\View，think\Request类的方法
+use app\index\controller\CommonController;
+
+# 继承了CommonController类，可直接调用think\View，think\Request类的方法
 # 类名与类文件名相同
-class ListController extends Controller {
-  //用户权限
-  private $authArr=array();
-  //用户登录状态
-  private $log = 0;
-  //用户登录状态
-  private $userName = '';
-  //用户登录状态
-  private $pwd = '';
-  //用户所属部门
-  private $dept = '';
-  
+class ListController extends CommonController {
+   
   private $searchField=[
     'pat'=>['topic'=>'','author'=>'','type'=>0,'dept'=>0,'status'=>0],
     'ass'=>['brand_model'=>'','dept_now'=>0,'keeper_now'=>'','assnum'=>'','code'=>'',
@@ -36,48 +23,7 @@ class ListController extends Controller {
   
   private $sortData=['listRows'=>10,'sortName'=>'','sortOrder'=>'asc','pageNum'=>1,'showId'=>0];
   
-  private function priLogin(){
-  
-    $this->log=Session::has('log')?Session::get('log'):0;
-    //通过$log判断是否是登录用户，非登录用户退回到登录页面
-    if(!$this->log){
-      return $this->error('未登录用户，请先登录系统','index/login');
-    }
-    //return $this->success('priLogin()调试，'.json_encode(Session::get('authArr')),'login','',10);
-    $this->authArr=Session::get('authArr');
-    $this->userName=Session::get('username');
-    $this->dept=Session::get('dept');
-    $this->pwd=Session::get('pwd');
     
-    return $this->log;
-  }
-  //根据参数组装模型查询用$whereArr
-  private function priGetMdlWhereArr ($searchArr,$searchTypeArr) {
-    $whereArr=[];
-    
-    if(count($searchArr)==0 || count($searchTypeArr)==0){
-      return $whereArr;
-    }
-    #组装$whereArr，要求$searchArr的键名必须是数据库中的字段名
-    foreach($searchArr as $field=>$v){
-      if(!empty($v)){
-        switch($searchTypeArr[$field]['tagName']){
-          case 'input':
-            $operator='like';
-            $queryVal='%'.$v.'%';
-            break;
-          case 'select':
-            $operator='in';
-            $queryVal=$v;
-            break;
-        }
-        $whereArr[$field]=[$operator,$queryVal];  
-      }
-    }     
-    
-    return $whereArr;
-  }
-  
   private function priGetListTplFile ($arr) {
         
     $ent=array_key_exists('ent',$arr)?$arr['ent']:'pat'; 
@@ -93,7 +39,7 @@ class ListController extends Controller {
     #模型对象
     $mdl='';    
     #进行模型查询的条件数组
-    $whereArr=count($searchData)?$this->priGetMdlWhereArr($searchData,$queryField):[];
+    $whereArr=count($searchData)?$this->getMdlWhereArr($searchData,$queryField):[];
     #模板文件中进行显示的结果集
     $list=array();
     
@@ -101,8 +47,8 @@ class ListController extends Controller {
     $fileName=implode('-',['list',$ent]); 
             
     #选择模型对象并初始化
-    $mdl= EntinfoMdl::factory($ent)->initModel($this->userName,$this->dept,$this->authArr[$ent]);
-    
+    $mdl=$this->getMdl($ent);
+   
     #模型对象，查询、排序用
     $queryBase=$mdl->getPeriodSql($period,$whereArr)
                     ->order($sortData['sortName'],$sortData['sortOrder']);
@@ -177,7 +123,7 @@ class ListController extends Controller {
   }
   
   public function index () {
-    $this->priLogin();
+    $this->chkLogin();
     #前端传来json字符串
     $rqArr=$this->request->param();
     
@@ -187,7 +133,7 @@ class ListController extends Controller {
   }
   
   public function listFileMake() {
-    $this->priLogin();
+    $this->chkLogin();
     $res=['result'=>'','msg'=>''];
     
     #前端传来json对象
@@ -205,7 +151,7 @@ class ListController extends Controller {
     #要求$queryField的键名必须是数据库中的字段名
     $queryField=array_key_exists('queryField',$arr)?$arr['queryField']:[];
     #进行模型查询的条件数组
-    $whereArr=count($searchData)?$this->priGetMdlWhereArr($searchData,$queryField):[];
+    $whereArr=count($searchData)?$this->getMdlWhereArr($searchData,$queryField):[];
     #查询字段
     //$whereArr['id']=['>',0];
     
@@ -215,7 +161,7 @@ class ListController extends Controller {
     }
     
     #选择模型对象并初始化
-    $mdl= EntinfoMdl::factory($ent)->initModel($this->userName,$this->dept,$this->authArr[$ent]);
+    $mdl=$this->getMdl($ent);
 
     if($sheet['mode']=='excluded' && array_key_exists('idArr',$sheet)){
       #查询结果数与要排除的记录数一致
@@ -255,14 +201,14 @@ class ListController extends Controller {
   }
   
   public function listFileDownload() {
-    $this->priLogin();
+    $this->chkLogin();
     #前端传来文件名
     $fileName=$this->request->param('fileName');
     return fn_file_download($fileName);
     
   }
   public function listFileDelete() {
-    $this->priLogin();
+    $this->chkLogin();
     #前端传来文件名
     $fileName=$this->request->param('fileName');
     return fn_file_delete($fileName);
