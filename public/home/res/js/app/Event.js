@@ -53,6 +53,8 @@ var Event={
 				sumNod.hide();
 				perNod.hide();
 				
+				//ent对应的navTop的li添加'active'
+				entASet.closest('li').removeClass('active').find('[data-ent="'+ent+'"]').tab('show');
 				if(ent!='index'){
 					//生成ent的nav-pills
 					buildEntPeriodNavPills();
@@ -61,8 +63,6 @@ var Event={
 					console.log(ent);
 					console.log(period);
 					perNod.show();
-					//ent对应的navTop的li添加'active'
-					entASet.closest('li').removeClass('active').find('[data-ent="'+ent+'"]').tab('show');
 					return self.reloadEvent();
 				}else{
 					return sumNod.show();
