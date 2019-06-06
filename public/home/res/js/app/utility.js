@@ -203,8 +203,8 @@ function buildEntCharts() {
 					spBdg=$('<span></span>').addClass('badge');
 				
 				if(num){
-					spBdg.text(num);
-					btn.attr({'data-ent':ent,'data-period':per}).addClass(el.color).append(el.txt+'&nbsp;',spBdg);
+					spBdg.text(num);	//btn.attr({'data-ent':ent,'data-period':per}).addClass(el.color).append(el.txt+'&nbsp;',spBdg);
+					btn.attr({'data-ent':ent,'data-period':per}).addClass(el.color).append(el.txt);
 				
 					if(el.color=='btn-default'){
 						btn.css('backgroundColor','#ccc');
@@ -215,7 +215,8 @@ function buildEntCharts() {
 					//chart中的数组赋值
 					chartData.data[m]=num;
 					chartData.backgroundColor[m]=el.rgb;
-					perName[m]=el.txt;
+					perName[m]=el.txt+':'+num;
+					
 					//计算其他项数量
 					other.num-=num;
 					
@@ -226,7 +227,7 @@ function buildEntCharts() {
 			if(other.num){				
 				chartData.data.push(other.num);
 				chartData.backgroundColor.push(other.rgb);
-				perName.push(other.txt);
+				perName.push(other.txt+':'+other.num);
 			}
 			
 			//生成chart
