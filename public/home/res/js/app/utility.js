@@ -162,13 +162,14 @@ function buildEntCharts() {
 		let numObj=(typeof d.entNum[ent]=='object')?d.entNum[ent]:0,
 			entObj=d.entProp[ent],
 			perObj=entObj.period.summary,
-			p=$('<p></p>').addClass('text-center').text(entObj.noneTxt),
-			aNod=$('<a></a>').attr({'data-toggle':'collapse','href':`#col-${ent}`,'title':'隐藏/显示概况'}).append($('<span></span>').addClass(entObj.gly),'&nbsp;',$('<strong></strong>').html(entObj.chi)),
-			panH=$('<div></div>').addClass('panel-heading').append(aNod),
-			panB=$('<div></div>').addClass('panel-body text-center'),
-			panCol=$('<div></div>').attr({'id':`col-${ent}`,'class':'panel-collapse collapse'}),
-			panType=$('<div></div>').addClass('panel panel-default'),
-			div=$('<div></div>').addClass('col-sm-6');
+			p=$('<p/>',{'class':'text-center'}).text(entObj.noneTxt),
+			// aNod=$('<a></a>').attr({'data-toggle':'collapse','href':`#col-${ent}`,'title':'隐藏/显示概况'}).append($('<span></span>').addClass(entObj.gly),'&nbsp;',$('<strong></strong>').html(entObj.chi)),
+			aNod=$('<a/>',{'data-toggle':'collapse','href':`#col-${ent}`,'title':'隐藏/显示概况'}).append($('<span/>',{'class':entObj.gly}),'&nbsp;',$('<strong/>').html(entObj.chi)),
+			panH=$('<div/>',{'class':'panel-heading'}).append(aNod),
+			panB=$('<div/>',{'class':'panel-body text-center'}),
+			panCol=$('<div/>',{'id':`col-${ent}`,'class':'panel-collapse collapse'}),
+			panType=$('<div/>',{'class':'panel panel-default'}),
+			div=$('<div/>',{'class':'col-sm-6'});
 		let idStr=`cvs-${ent}`;
 		
 		//显示pat项或ass项
@@ -177,7 +178,10 @@ function buildEntCharts() {
 		}
 		//有数据的ent才生成组件
 		if(typeof numObj=='object' && Object.values(numObj).length){
-			let cvsNod=$('<canvas></canvas>').attr({'id':idStr,'height':'200'}).text('canvas coming');
+			let cvsNod=$('<canvas/>',{
+							'id':idStr,
+							'height':'200'
+						}).text('canvas coming');
 			let chartData={
 					data:[],
 					backgroundColor:[],
@@ -185,7 +189,7 @@ function buildEntCharts() {
 				},
 				chartType=(ent=='ass')?'doughnut':'pie',
 				chartObj='';
-			let perName=[];
+			let perName=[],perNum=[],labArr=[];
 			let other={
 				num:Object.values(numObj)[0],
 				rgb:'#f5f5f5',
@@ -198,13 +202,18 @@ function buildEntCharts() {
 			//生成btnSet
 			for(let per in perObj){
 				let num=numObj[per],
-					el=perObj[per],
-					btn=$('<button></button>').attr({'class':'btn btn-xs btnPeriod','title':'查看详情'}).css({'margin':'2px','font-size':'14px'}),
-					spBdg=$('<span></span>').addClass('badge');
+					el=perObj[per];
+				let	btn=$('<button/>',{
+							'class':'btn btn-xs btnPeriod',
+							'title':'查看详情',
+							'style':'margin:2px;font-size:14px;'
+						}),
+					spBdg=$('<span/>',{'class':'badge'});
 				
 				if(num){
-					spBdg.text(num);	//btn.attr({'data-ent':ent,'data-period':per}).addClass(el.color).append(el.txt+'&nbsp;',spBdg);
-					btn.attr({'data-ent':ent,'data-period':per}).addClass(el.color).append(el.txt);
+					spBdg.text(num);	
+					btn.attr({'data-ent':ent,'data-period':per}).addClass(el.color).append(el.txt+'&nbsp;',spBdg);
+					// btn.attr({'data-ent':ent,'data-period':per}).addClass(el.color).append(el.txt);
 				
 					if(el.color=='btn-default'){
 						btn.css('backgroundColor','#ccc');
@@ -215,8 +224,9 @@ function buildEntCharts() {
 					//chart中的数组赋值
 					chartData.data[m]=num;
 					chartData.backgroundColor[m]=el.rgb;
-					perName[m]=el.txt+':'+num;
-					
+					// perName[m]=el.txt+':'+num;
+					perName[m]=el.txt;
+					labArr[m]=el.txt+':'+num;
 					//计算其他项数量
 					other.num-=num;
 					
@@ -227,7 +237,8 @@ function buildEntCharts() {
 			if(other.num){				
 				chartData.data.push(other.num);
 				chartData.backgroundColor.push(other.rgb);
-				perName.push(other.txt+':'+other.num);
+				perName.push(other.txt);
+				labArr.push(other.txt+':'+other.num);
 			}
 			
 			//生成chart
@@ -235,18 +246,29 @@ function buildEntCharts() {
 				// type:'doughnut',
 				type:chartType,
 				data:{
+					labels:perName,
 					datasets:[chartData],
-					labels:perName
+					
 				},
 				options:{
 					responsive:true,
 					legend:{
 						display:true,
 						position:'right',
+						labels: {
+                			// fontColor: 'rgb(255, 99, 132)',
+                			fontSize: 14,
+							// generateLabels:function(){
+								// return {
+									// text:labArr,
+								// };
+							// }
+            			}
 					},
 					title:{
 						display:true,
-						text:'数量分布概况'
+						text:'数量分布概况',
+						fontSize: 14,
 					},
 					animation:{
 						animateScale:true,
@@ -263,6 +285,9 @@ function buildEntCharts() {
 			//生成一个ent组件
 			divSet[n]=div.append(panType);
 			n++;
+			
+			console.log(perName);
+			console.log(labArr);
 		}
 		
 		/*
@@ -284,6 +309,8 @@ function buildEntCharts() {
 		r.append(divSet[2*i],divSet[(2*i+1)]);
 		$('#entChart').append(r);
 	}
+	
+	
 }
 
 //组装向后端请求时的searchData，不带参数就是清空searchData
